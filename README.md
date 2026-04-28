@@ -1,0 +1,1 @@
+# pragma-ai-knwoledge-core
