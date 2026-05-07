@@ -1,0 +1,1185 @@
+openapi: 3.1.0
+info:
+  title: SOPP AI Hub API
+  description: |
+    API del Hub de SOPP AI. Fuente única de verdad para distribución de conocimiento
+    de IA a los pragmáticos de Pragma. Sirve assets filtrados por perfil (cuenta,
+    chapter, stack) y firmados con HMAC-SHA256 para verificación en el CLI.
+
+    ## Autenticación
+    Todos los endpoints (excepto `/health` y `/webhook`) requieren un JWT de AWS Cognito
+    en el header `Authorization: Bearer {token}`. El token se obtiene via el flujo
+    OAuth2 PKCE del CLI.
+
+    ## Firma de archivos
+    Cada archivo en las respuestas incluye un campo `signature` con HMAC-SHA256
+    del contenido, firmado con la clave privada del Hub. El CLI verifica esta firma
+    antes de escribir cualquier archivo en disco.
+
+    ## Versionado
+    El Hub usa versionado semántico para el árbol de contenido por perfil.
+    El CLI envía su `local_version` y el Hub retorna solo el diff necesario.
+  version: 1.0.0
+  contact:
+    name: Equipo de Plataforma Pragma AI
+    email: plataforma-ai@pragma.com.co
+
+servers:
+  - url: https://f680gjpaxi.execute-api.us-east-1.amazonaws.com/v1
+    description: Dev (API Gateway)
+  - url: https://hub.sopp.pragma.com.co
+    description: Producción (futuro custom domain)
+  - url: http://localhost:3000
+    description: Local
+
+tags:
+  - name: auth
+    description: Autenticación — login URL y refresh de tokens
+  - name: sync
+    description: Sincronización de assets del CLI
+  - name: config
+    description: Configuración del sistema — taxonomy e IDEs soportados
+  - name: webhook
+    description: Webhooks de GitHub para invalidación de cache
+  - name: health
+    description: Estado del servidor
+
+security:
+  - apiKey: []
+
+paths:
+
+  # ─────────────────────────────────────────────
+  # GET /auth/login
+  # ─────────────────────────────────────────────
+  /auth/login:
+    get:
+      tags: [auth]
+      summary: Obtener URL de login de Cognito
+      description: |
+        Retorna la URL completa de Cognito para iniciar el flujo OAuth2 PKCE.
+        El CLI genera el `code_verifier` y `code_challenge` localmente, y envía
+        el challenge junto con el puerto donde recibirá el callback.
+
+        La Lambda lee las credenciales de Cognito desde Secrets Manager
+        (`COGNITO_HUB_CREDENTIALS`) y construye la URL con todos los parámetros.
+
+        Este endpoint NO requiere Cognito JWT (el usuario aún no está autenticado).
+        Solo requiere API Key.
+      operationId: getLoginUrl
+      security:
+        - apiKey: []
+      parameters:
+        - name: redirect_port
+          in: query
+          required: true
+          description: Puerto local donde el CLI levantó el servidor HTTP para recibir el callback
+          schema:
+            type: integer
+            example: 54321
+        - name: code_challenge
+          in: query
+          required: true
+          description: Code challenge generado por el CLI (SHA-256 del code_verifier, base64url encoded)
+          schema:
+            type: string
+            example: "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
+        - name: code_challenge_method
+          in: query
+          required: true
+          description: Método del code challenge (siempre S256)
+          schema:
+            type: string
+            enum: [S256]
+            example: S256
+      responses:
+        "200":
+          description: URL de login construida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [login_url, client_id, scopes]
+                properties:
+                  login_url:
+                    type: string
+                    description: URL completa de Cognito para abrir en el browser del pragmático
+                    example: "https://sopp-pragma.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=abc123&response_type=code&scope=openid+email+profile&redirect_uri=http://localhost:54321/callback&code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM&code_challenge_method=S256"
+                  client_id:
+                    type: string
+                    description: Client ID de la app en Cognito (el CLI lo necesita para el token exchange)
+                    example: "abc123def456"
+                  token_endpoint:
+                    type: string
+                    description: URL del token endpoint de Cognito para intercambiar el code por tokens
+                    example: "https://sopp-pragma.auth.us-east-1.amazoncognito.com/oauth2/token"
+                  scopes:
+                    type: array
+                    items:
+                      type: string
+                    description: Scopes configurados en Cognito
+                    example: ["openid", "email", "profile"]
+        "400":
+          description: Parámetros faltantes o inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_port:
+                  value:
+                    error: INVALID_REQUEST
+                    message: El parámetro 'redirect_port' es requerido
+                missing_challenge:
+                  value:
+                    error: INVALID_REQUEST
+                    message: El parámetro 'code_challenge' es requerido
+
+  # ─────────────────────────────────────────────
+  # POST /auth/refresh
+  # ─────────────────────────────────────────────
+  /auth/refresh:
+    post:
+      tags: [auth]
+      summary: Renovar tokens con refresh token
+      description: |
+        El CLI envía su refresh token y la Lambda lo intercambia con Cognito
+        por un nuevo access token y refresh token.
+
+        Este endpoint NO requiere Cognito JWT (el access token puede estar expirado).
+        Solo requiere API Key.
+      operationId: refreshToken
+      security:
+        - apiKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token]
+              properties:
+                refresh_token:
+                  type: string
+                  description: Refresh token guardado por el CLI en auth.json
+            example:
+              refresh_token: "eyJjdHkiOiJKV1QiLCJlb..."
+      responses:
+        "200":
+          description: Tokens renovados exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [access_token, refresh_token, expires_in]
+                properties:
+                  access_token:
+                    type: string
+                    description: Nuevo JWT de acceso
+                  refresh_token:
+                    type: string
+                    description: Nuevo refresh token (Cognito puede rotarlo)
+                  expires_in:
+                    type: integer
+                    description: Segundos hasta que el access token expire
+                    example: 3600
+                  token_type:
+                    type: string
+                    example: Bearer
+        "401":
+          description: Refresh token inválido o expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: REFRESH_TOKEN_EXPIRED
+                message: El refresh token expiró. El pragmático debe re-autenticarse.
+        "400":
+          description: Body malformado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: INVALID_REQUEST
+                message: El campo 'refresh_token' es requerido
+
+  # ─────────────────────────────────────────────
+  # POST /sync
+  # ─────────────────────────────────────────────
+  /sync:
+    post:
+      tags: [sync]
+      summary: Sincronizar assets para un workspace
+      description: |
+        Endpoint principal del Hub. Recibe el contexto del workspace del pragmático
+        y retorna la lista de archivos a escribir en disco, filtrados por su perfil
+        (cuenta, chapter, stack) y formateados para su herramienta activa.
+
+        El Hub:
+        1. Valida el JWT de Cognito y extrae el perfil del pragmático
+        2. Detecta o valida el stack del workspace
+        3. Hace merge del contenido de `pragma-ai-knowledge-core` + `pragma-ai-knowledge-{cuenta}`
+        4. Filtra por scope (global → chapter → stack)
+        5. Renderiza al formato nativo de la herramienta
+        6. Firma cada archivo con HMAC-SHA256
+        7. Calcula el diff vs `local_version` enviada por el CLI
+        8. Retorna solo lo que cambió
+      operationId: syncAssets
+      security:
+        - apiKey: []
+          cognitoBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SyncRequest'
+            examples:
+              cursor_java:
+                summary: Pragmático backend Java usando Cursor
+                value:
+                  workspace: /Users/david/projects/savings-account
+                  tool: cursor
+                  stacks: [java-spring]
+                  local_version: "2.3.1"
+                  workspace_files:
+                    - pom.xml
+                    - src/main/java/co/pragma/savings/SavingsApplication.java
+              copilot_node:
+                summary: Pragmático backend Node usando Copilot
+                value:
+                  workspace: /Users/carlos/projects/api-gateway
+                  tool: github-copilot
+                  stacks: [node-nest]
+                  local_version: null
+                  workspace_files:
+                    - package.json
+                    - nest-cli.json
+                    - src/main.ts
+              first_sync:
+                summary: Primera sincronización (sin versión local)
+                value:
+                  workspace: /Users/maria/projects/mobile-app
+                  tool: kiro
+                  stacks: [flutter]
+                  local_version: null
+                  workspace_files:
+                    - pubspec.yaml
+                    - lib/main.dart
+      responses:
+        "200":
+          description: |
+            Sincronización exitosa. Si `changed: false`, no hay archivos que actualizar
+            y el CLI no necesita escribir nada.
+          headers:
+            X-Hub-Version:
+              description: Versión actual del Hub server
+              schema:
+                type: string
+                example: "1.4.2"
+            X-Request-Id:
+              description: ID único del request para trazabilidad
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncResponse'
+              examples:
+                with_changes:
+                  summary: Hay archivos nuevos o actualizados
+                  value:
+                    server_version: "2.4.0"
+                    changed: true
+                    profile:
+                      email: david@pragma.com.co
+                      cuenta: bancolombia
+                      chapter: backend
+                      stacks: [java-spring]
+                    writes:
+                      - source: chapters/backend/skills/java-spring/webflux-error-handling.md
+                        target: .cursor/rules/skills/webflux-error-handling.mdc
+                        scope: workspace
+                        content: "---\nalwaysApply: false\nglobs: ['**/*.java']\n---\n# WebFlux Error Handling..."
+                        version: "1.3.0"
+                        hash: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                        signature: "hmac-sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6"
+                    global_writes:
+                      - source: shared/steering/pragma-global.md
+                        target: ~/.cursor/rules/pragma-global.mdc
+                        scope: global
+                        required: true
+                        content: "---\nalwaysApply: true\n---\n# Pragma Global Steering..."
+                        version: "1.0.2"
+                        hash: "sha256:f4e3d2c1b0a9f4e3d2c1b0a9f4e3d2c1b0a9f4e3d2c1b0a9"
+                        signature: "hmac-sha256:b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1"
+                    deletes: []
+                    changelog:
+                      - type: updated
+                        source: chapters/backend/skills/java-spring/webflux-error-handling.md
+                        from: "1.2.0"
+                        to: "1.3.0"
+                      - type: new
+                        source: chapters/backend/skills/java-spring/spring-observability.md
+                        version: "1.0.0"
+                no_changes:
+                  summary: Sin cambios desde la última sincronización
+                  value:
+                    server_version: "2.4.0"
+                    changed: false
+                    profile:
+                      email: david@pragma.com.co
+                      cuenta: bancolombia
+                      chapter: backend
+                      stacks: [java-spring]
+                    writes: []
+                    global_writes: []
+                    deletes: []
+                    changelog: []
+
+        "400":
+          description: Request malformado o parámetros inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_workspace:
+                  summary: Workspace no enviado
+                  value:
+                    error: INVALID_REQUEST
+                    message: El campo 'workspace' es requerido
+                    details:
+                      field: workspace
+                      received: null
+                invalid_tool:
+                  summary: Herramienta no soportada
+                  value:
+                    error: INVALID_TOOL
+                    message: La herramienta 'sublime' no está soportada
+                    details:
+                      field: tool
+                      received: sublime
+                      supported: [cursor, github-copilot, kiro, amazon-q-ide, amazon-q-cli]
+                invalid_stack:
+                  summary: Stack no reconocido
+                  value:
+                    error: INVALID_STACK
+                    message: El stack 'cobol' no está registrado en el Hub
+                    details:
+                      field: stacks
+                      received: [cobol]
+                      supported: [java-spring, node-nest, node-express, dotnet, flutter, android-kotlin, react, angular]
+
+        "401":
+          description: Token de Cognito inválido, expirado o ausente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing_token:
+                  summary: Header Authorization ausente
+                  value:
+                    error: UNAUTHORIZED
+                    message: Header Authorization requerido
+                expired_token:
+                  summary: Token expirado
+                  value:
+                    error: TOKEN_EXPIRED
+                    message: El access token expiró. El CLI debe renovarlo con el refresh token.
+                invalid_token:
+                  summary: Token inválido o manipulado
+                  value:
+                    error: INVALID_TOKEN
+                    message: El token JWT no pudo ser verificado
+
+        "403":
+          description: Token válido pero el usuario no tiene acceso al recurso solicitado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                cuenta_not_found:
+                  summary: La cuenta del usuario no está registrada en el Hub
+                  value:
+                    error: CUENTA_NOT_REGISTERED
+                    message: La cuenta 'acme-corp' no está registrada en el Hub. Contacta al equipo de plataforma.
+                    details:
+                      cuenta: acme-corp
+
+        "422":
+          description: Stack enviado no coincide con los archivos del workspace (conflicto de detección)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                stack_mismatch:
+                  summary: Stack declarado no coincide con lo detectado
+                  value:
+                    error: STACK_MISMATCH
+                    message: El stack declarado 'flutter' no coincide con los archivos del workspace. Stack detectado:'android-kotlin'
+                    details:
+                      declared: flutter
+                      detected: android-kotlin
+                      hint: Verifica el stack en tu workspace con pragma-sopp init
+
+        "429":
+          description: Rate limit excedido
+          headers:
+            Retry-After:
+              description: Segundos hasta que se puede reintentar
+              schema:
+                type: integer
+                example: 60
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+                example: 100
+            X-RateLimit-Remaining:
+              schema:
+                type: integer
+                example: 0
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: RATE_LIMIT_EXCEEDED
+                message: Demasiados requests. Reintenta en 60 segundos.
+
+        "500":
+          description: Error interno del Hub
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                github_unavailable:
+                  summary: GitHub API no disponible
+                  value:
+                    error: UPSTREAM_ERROR
+                    message: No se pudo obtener contenido de GitHub. Reintenta en unos minutos.
+                    details:
+                      upstream: github
+                      status: 503
+                cache_error:
+                  summary: Error de cache interno
+                  value:
+                    error: INTERNAL_ERROR
+                    message: Error interno del Hub. El equipo fue notificado.
+                    request_id: "550e8400-e29b-41d4-a716-446655440000"
+
+        "503":
+          description: Hub en mantenimiento o temporalmente no disponible
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                example: 300
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: SERVICE_UNAVAILABLE
+                message: El Hub está en mantenimiento programado. Reintenta en 5 minutos.
+
+  # ─────────────────────────────────────────────
+  # POST /webhook/github
+  # ─────────────────────────────────────────────
+  /webhook/github:
+    post:
+      tags: [webhook]
+      summary: Recibir webhook de GitHub
+      description: |
+        Endpoint para webhooks de GitHub. Se invoca automáticamente cuando hay
+        un `push` en `pragma-ai-knowledge-core` o en cualquier `pragma-ai-knowledge-{cuenta}`.
+
+        El Hub:
+        1. Verifica la firma HMAC-SHA256 del payload con el secret del repo
+        2. Extrae la lista de archivos modificados del payload
+        3. Invalida las entradas de cache afectadas
+        4. Re-fetcha el contenido actualizado desde GitHub API
+        5. Incrementa la versión del árbol de contenido para la cuenta afectada
+
+        Este endpoint no requiere Cognito. Está protegido por API Key (x-api-key) 
+        y adicionalmente por la firma HMAC-SHA256 del payload que valida la Lambda internamente.
+      operationId: receiveGithubWebhook
+      security:
+        - apiKey: []
+      parameters:
+        - name: X-Hub-Signature-256
+          in: header
+          required: true
+          description: Firma HMAC-SHA256 del payload generada por GitHub con el webhook secret
+          schema:
+            type: string
+            example: "sha256=d57c68ca6f92289e6987010adadadea4d8cf98f8"
+        - name: X-GitHub-Event
+          in: header
+          required: true
+          description: Tipo de evento de GitHub
+          schema:
+            type: string
+            enum: [push, ping]
+            example: push
+        - name: X-GitHub-Delivery
+          in: header
+          required: true
+          description: ID único del delivery del webhook
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GithubWebhookPayload'
+      responses:
+        "200":
+          description: Webhook procesado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+                  invalidated_paths:
+                    type: integer
+                    description: Número de entradas de cache invalidadas
+                    example: 3
+        "204":
+          description: Evento ignorado (ej. ping de GitHub al configurar el webhook)
+        "400":
+          description: Payload malformado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: INVALID_PAYLOAD
+                message: No se pudo parsear el payload del webhook
+        "401":
+          description: Firma del webhook inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: INVALID_SIGNATURE
+                message: La firma X-Hub-Signature-256 no es válida para este repo
+        "404":
+          description: El repo que envió el webhook no está registrado en el Hub
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: REPO_NOT_REGISTERED
+                message: El repo 'org/sopp-ai-acme' no está registrado en el Accounts Registry
+
+  # ─────────────────────────────────────────────
+  # GET /taxonomy
+  # ─────────────────────────────────────────────
+  /taxonomy:
+    get:
+      tags: [config]
+      summary: Obtener taxonomy de chapters, plataformas y stacks
+      description: |
+        Retorna el catálogo oficial de chapters, plataformas y stacks soportados.
+        El CLI lo descarga en el `install` y lo cachea en `~/.pragma-sopp/taxonomy.json`.
+        Se refresca en cada sync si la versión del servidor es más nueva.
+        Requiere API Key + Cognito JWT.
+      operationId: getTaxonomy
+      security:
+        - apiKey: []
+          cognitoBearer: []
+      parameters:
+        - name: version
+          in: query
+          required: false
+          description: Versión local del CLI. Si coincide con la del servidor, retorna 304.
+          schema:
+            type: string
+            example: "1.0.0"
+      responses:
+        "200":
+          description: Taxonomy actualizado
+          headers:
+            X-Taxonomy-Version:
+              schema:
+                type: string
+                example: "1.2.0"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxonomyResponse'
+              example:
+                version: "1.0.0"
+                chapters:
+                  backend:
+                    platforms:
+                      java:
+                        stacks: ["java-spring", "java-webflux"]
+                        detection:
+                          java-spring:
+                            signals: ["pom.xml", "build.gradle"]
+                          java-webflux:
+                            signals: ["pom.xml"]
+                            requires_signal:
+                              file: "pom.xml"
+                              contains: "spring-boot-starter-webflux"
+        "304":
+          description: El CLI ya tiene la versión más reciente — no hay nada que descargar
+
+  # ─────────────────────────────────────────────
+  # GET /config
+  # ─────────────────────────────────────────────
+  /config:
+    get:
+      tags: [config]
+      summary: Obtener configuración de IDEs soportados
+      description: |
+        Retorna el `ides.json` con la lista de IDEs soportados, sus capacidades
+        y los path templates donde el CLI debe escribir cada tipo de asset.
+        También retorna el `signing_key` que el CLI usa para verificar la firma
+        de los archivos que recibe en cada sync.
+        El CLI lo descarga en el `install` y cachea el resultado en `~/.pragma-sopp/auth.json`.
+        Requiere API Key + Cognito JWT. El `api_key` del CLI NO viene de este endpoint —
+        está embebido en el binario en tiempo de compilación.
+      operationId: getConfig
+      security:
+        - apiKey: []
+          cognitoBearer: []
+      parameters:
+        - name: version
+          in: query
+          required: false
+          description: Versión local del CLI. Si coincide, retorna 304.
+          schema:
+            type: string
+            example: "1.0.0"
+      responses:
+        "200":
+          description: Configuración de IDEs
+          headers:
+            X-Config-Version:
+              schema:
+                type: string
+                example: "1.1.0"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdesConfigResponse'
+              example:
+                version: "1.0.0"
+                signing_key: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+                ides:
+                  - id: cursor
+                    name: Cursor
+                    capabilities: ["steering", "skill", "workflow", "guardrail", "persona", "prompt", "convencion"]
+                    global_paths:
+                      steering: "~/.cursor/rules/{id}.mdc"
+                      guardrail: "~/.cursor/rules/{id}.mdc"
+                    workspace_paths:
+                      steering: ".cursor/rules/{id}.mdc"
+                      skill: ".cursor/rules/skills/{id}.mdc"
+                      workflow: ".cursor/rules/workflows/{id}.mdc"
+                      guardrail: ".cursor/rules/{id}.mdc"
+                      persona: ".cursor/rules/personas/{id}.mdc"
+                      prompt: ".cursor/rules/prompts/{id}.mdc"
+                      convencion: ".cursor/rules/convenciones/{id}.mdc"
+                    special_behaviors:
+                      steering: "one_file_per_asset"
+        "304":
+          description: El CLI ya tiene la versión más reciente
+
+  # ─────────────────────────────────────────────
+  # GET /health
+  # ─────────────────────────────────────────────
+  /health:
+    get:
+      tags: [health]
+      summary: Estado del Hub
+      description: |
+        Endpoint de health check. Solo requiere API Key (x-api-key), sin Cognito JWT.
+        Usado por el CLI en `pragma-sopp-cli health` y por el load balancer / ALB.
+      operationId: getHealth
+      security:
+        - apiKey: []
+      responses:
+        "200":
+          description: Hub operativo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                version: "1.4.2"
+                uptime_seconds: 86423
+                cache:
+                  status: ok
+                  entries: 42
+                github:
+                  status: ok
+                  last_check: "2026-04-29T10:00:00Z"
+        "503":
+          description: Hub degradado o no disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: degraded
+                version: "1.4.2"
+                uptime_seconds: 120
+                cache:
+                  status: error
+                  error: Cannot connect to Redis
+                github:
+                  status: ok
+                  last_check: "2026-04-29T10:00:00Z"
+
+# ─────────────────────────────────────────────
+# COMPONENTS
+# ─────────────────────────────────────────────
+components:
+
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: |
+        API Key generada por la IaC (Terraform) y embebida en el binario del CLI
+        en tiempo de compilación via ldflags. El CLI la manda en el header `x-api-key`
+        en absolutamente todos los requests. API Gateway la valida antes de que
+        cualquier Lambda se invoque. Si la key es inválida, API Gateway retorna 403
+        sin invocar la Lambda.
+    cognitoBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT emitido por AWS Cognito del tenant de Pragma.
+        El CLI lo obtiene via OAuth2 PKCE y lo renueva automáticamente
+        usando el refresh token guardado en `~/.pragma-sopp/auth.json`.
+
+  schemas:
+
+    # ── REQUEST ──────────────────────────────
+    SyncRequest:
+      type: object
+      required: [workspace, tool, stacks]
+      properties:
+        workspace:
+          type: string
+          description: Path absoluto del workspace en el filesystem del pragmático
+          example: /Users/david/projects/savings-account
+        tool:
+          type: string
+          description: Herramienta activa en este workspace
+          enum: [cursor, github-copilot, kiro, amazon-q-ide, amazon-q-cli]
+          example: cursor
+        stacks:
+          type: array
+          description: |
+            Stacks activos en el workspace. Si se envía vacío, el Hub intenta
+            detectarlo desde `workspace_files`. Si no puede detectar, retorna 422.
+          items:
+            type: string
+            enum: [java-spring, node-nest, node-express, dotnet, flutter, android-kotlin, react, angular]
+          minItems: 1
+          example: [java-spring]
+        local_version:
+          type: string
+          nullable: true
+          description: |
+            Versión del árbol de contenido que el CLI tiene actualmente.
+            Si es `null` o no se envía, el Hub retorna todos los assets (primera sync).
+            Si se envía, retorna solo el diff desde esa versión.
+          example: "2.3.1"
+        workspace_files:
+          type: array
+          description: |
+            Lista de archivos del workspace para detección automática de stack.
+            Solo se usa si `stacks` viene vacío. El Hub puede prescindir de este
+            campo si `stacks` viene explícito.
+          items:
+            type: string
+          example:
+            - pom.xml
+            - src/main/java/co/pragma/savings/SavingsApplication.java
+            - docker-compose.yml
+
+    # ── RESPONSE ─────────────────────────────
+    SyncResponse:
+      type: object
+      required: [server_version, changed, profile, writes, global_writes, deletes, changelog]
+      properties:
+        server_version:
+          type: string
+          description: Versión actual del árbol de contenido en el Hub para este perfil
+          example: "2.4.0"
+        changed:
+          type: boolean
+          description: |
+            `true` si hay archivos que actualizar. Si es `false`, el CLI no escribe nada.
+          example: true
+        profile:
+          $ref: '#/components/schemas/ResolvedProfile'
+        writes:
+          type: array
+          description: Archivos de workspace a escribir o actualizar
+          items:
+            $ref: '#/components/schemas/FileWrite'
+        global_writes:
+          type: array
+          description: |
+            Archivos globales (van en el home directory del pragmático, no en el workspace).
+            Incluye steering global, guardrails globales. Marcados con `required: true`
+            si deben existir siempre y se recrean si no están.
+          items:
+            $ref: '#/components/schemas/FileWrite'
+        deletes:
+          type: array
+          description: Paths de archivos que el CLI debe eliminar (assets removidos del Hub)
+          items:
+            type: object
+            properties:
+              target:
+                type: string
+                description: Path del archivo a eliminar en el filesystem del pragmático
+                example: .cursor/rules/skills/deprecated-skill.mdc
+              scope:
+                type: string
+                enum: [workspace, global]
+                example: workspace
+        changelog:
+          type: array
+          description: Resumen legible de qué cambió. El CLI lo muestra al pragmático.
+          items:
+            $ref: '#/components/schemas/ChangelogEntry'
+
+    FileWrite:
+      type: object
+      required: [source, target, scope, content, version, hash, signature]
+      properties:
+        source:
+          type: string
+          description: Path relativo del asset en el repo de GitHub
+          example: chapters/backend/skills/java-spring/webflux-error-handling.md
+        target:
+          type: string
+          description: |
+            Path destino en el filesystem del pragmático.
+            Rutas con `~/` indican el home directory (archivos globales).
+            Rutas relativas indican el workspace actual.
+          example: .cursor/rules/skills/webflux-error-handling.mdc
+        scope:
+          type: string
+          enum: [workspace, global]
+          description: |
+            `workspace`: va en el directorio del proyecto actual.
+            `global`: va en el home directory, aplica a todos los workspaces.
+          example: workspace
+        required:
+          type: boolean
+          description: |
+            Si es `true`, el CLI verifica en cada sync que el archivo existe
+            y lo recrea si fue eliminado. Solo aplica a archivos `scope: global`.
+          default: false
+          example: false
+        content:
+          type: string
+          description: Contenido del archivo ya formateado para la herramienta activa
+          example: "---\nalwaysApply: false\nglobs: ['**/*.java']\n---\n# WebFlux Error Handling\n..."
+        version:
+          type: string
+          description: Versión semántica del asset
+          example: "1.3.0"
+        hash:
+          type: string
+          description: SHA-256 del contenido. El CLI lo guarda en manifest.json para detectar cambios futuros.
+          example: "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        signature:
+          type: string
+          description: |
+            HMAC-SHA256 del contenido firmado con la clave privada del Hub.
+            El CLI verifica esta firma antes de escribir el archivo en disco.
+            Formato: `hmac-sha256:{hex}`
+          example: "hmac-sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+
+    ResolvedProfile:
+      type: object
+      description: Perfil del pragmático resuelto por el Hub desde el JWT de Cognito
+      properties:
+        email:
+          type: string
+          format: email
+          example: david@pragma.com.co
+        cuenta:
+          type: string
+          example: bancolombia
+        chapter:
+          type: string
+          example: backend
+        stacks:
+          type: array
+          items:
+            type: string
+          example: [java-spring]
+
+    ChangelogEntry:
+      type: object
+      required: [type, source]
+      properties:
+        type:
+          type: string
+          enum: [new, updated, deleted]
+          description: Tipo de cambio
+          example: updated
+        source:
+          type: string
+          description: Path del asset en el repo
+          example: chapters/backend/skills/java-spring/webflux-error-handling.md
+        from:
+          type: string
+          nullable: true
+          description: Versión anterior (solo en `updated`)
+          example: "1.2.0"
+        to:
+          type: string
+          nullable: true
+          description: Versión nueva (en `new` y `updated`)
+          example: "1.3.0"
+        version:
+          type: string
+          nullable: true
+          description: Versión del asset (solo en `new`)
+          example: "1.0.0"
+
+    GithubWebhookPayload:
+      type: object
+      description: Payload estándar de un evento `push` de GitHub
+      properties:
+        ref:
+          type: string
+          example: refs/heads/main
+        repository:
+          type: object
+          properties:
+            full_name:
+              type: string
+              example: somospragma/pragma-ai-knowledge-core
+            clone_url:
+              type: string
+              example: https://github.com/somospragma/pragma-ai-knowledge-core.git
+        commits:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: abc123def456
+              added:
+                type: array
+                items:
+                  type: string
+                example: [chapters/backend/skills/java-spring/new-skill.md]
+              modified:
+                type: array
+                items:
+                  type: string
+                example: [chapters/backend/steering/pragma-backend.md]
+              removed:
+                type: array
+                items:
+                  type: string
+                example: []
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, error]
+          example: ok
+        version:
+          type: string
+          description: Versión del Hub server
+          example: "1.4.2"
+        uptime_seconds:
+          type: integer
+          example: 86423
+        cache:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [ok, error]
+            entries:
+              type: integer
+              description: Número de entradas en cache
+              example: 42
+            error:
+              type: string
+              nullable: true
+        github:
+          type: object
+          properties:
+            status:
+              type: string
+              enum: [ok, error]
+            last_check:
+              type: string
+              format: date-time
+
+    ErrorResponse:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          description: Código de error legible por máquina
+          enum:
+            - INVALID_REQUEST
+            - INVALID_TOOL
+            - INVALID_STACK
+            - STACK_MISMATCH
+            - UNAUTHORIZED
+            - TOKEN_EXPIRED
+            - INVALID_TOKEN
+            - CUENTA_NOT_REGISTERED
+            - RATE_LIMIT_EXCEEDED
+            - UPSTREAM_ERROR
+            - INTERNAL_ERROR
+            - SERVICE_UNAVAILABLE
+            - INVALID_PAYLOAD
+            - INVALID_SIGNATURE
+            - REPO_NOT_REGISTERED
+            - REFRESH_TOKEN_EXPIRED
+          example: INVALID_TOOL
+        message:
+          type: string
+          description: Mensaje legible por humano para mostrar en el CLI
+          example: La herramienta 'sublime' no está soportada
+        details:
+          type: object
+          nullable: true
+          description: Contexto adicional del error (campos específicos, valores recibidos, etc.)
+          additionalProperties: true
+        request_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID del request para correlación en logs (presente en errores 5xx)
+          example: "550e8400-e29b-41d4-a716-446655440000"
+    TaxonomyResponse:
+      type: object
+      properties:
+        version:
+          type: string
+          example: "1.0.0"
+        chapters:
+          type: object
+          description: Mapa de chapters con sus plataformas y stacks
+          additionalProperties:
+            type: object
+            properties:
+              platforms:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    stacks:
+                      type: array
+                      items:
+                        type: string
+                    detection:
+                      type: object
+                      additionalProperties:
+                        type: object
+                        properties:
+                          signals:
+                            type: array
+                            items:
+                              type: string
+                          any_signal:
+                            type: boolean
+                          all_signals:
+                            type: boolean
+                          requires_signal:
+                            type: object
+                            properties:
+                              file:
+                                type: string
+                              contains:
+                                type: string
+                          excludes_signal:
+                            type: object
+                            properties:
+                              file:
+                                type: string
+                              contains:
+                                type: string
+
+    IdesConfigResponse:
+      type: object
+      required: [version, signing_key, ides]
+      properties:
+        version:
+          type: string
+          example: "1.0.0"
+        signing_key:
+          type: string
+          description: |
+            HMAC-SHA256 key que el CLI usa para verificar la firma de cada archivo
+            recibido en el sync. El CLI lo guarda en ~/.pragma-sopp/auth.json y lo
+            usa en cada invocación del sync para verificar el campo "signature" de
+            cada write antes de escribir el archivo en disco.
+          example: "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+        ides:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: cursor
+              name:
+                type: string
+                example: Cursor
+              capabilities:
+                type: array
+                description: Tipos de asset que este IDE soporta. Assets de otros tipos se omiten silenciosamente.
+                items:
+                  type: string
+                  enum: [steering, skill, workflow, guardrail, prompt, persona, convencion, agent, hook, doc, adr]
+              global_paths:
+                type: object
+                description: Paths en el home directory del pragmático (~/) para archivos que aplican a todos los workspaces
+                additionalProperties:
+                  type: string
+              workspace_paths:
+                type: object
+                description: Paths relativos al workspace para archivos específicos del proyecto. {id} es reemplazado por el id del asset.
+                additionalProperties:
+                  type: string
+              special_behaviors:
+                type: object
+                description: Comportamientos especiales del renderer para este IDE
+                additionalProperties:
+                  type: string
+                  enum: [one_file_per_asset, concatenate_all]

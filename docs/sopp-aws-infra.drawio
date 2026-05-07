@@ -1,0 +1,206 @@
+<mxfile host="Electron" version="21.0.0" type="device">
+  <diagram id="sopp-aws-infra" name="SOPP AI — Infraestructura AWS">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- EXTERNAL ENTITIES                           -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <!-- CLI -->
+        <mxCell id="ext-cli" value="&lt;b&gt;pragma-sopp-cli&lt;/b&gt;&lt;br&gt;Máquina del pragmático" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=12;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="80" y="60" width="200" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- GitHub -->
+        <mxCell id="ext-github" value="&lt;b&gt;GitHub&lt;/b&gt;&lt;br&gt;Repos de knowledge + Webhook sender + GitHub API" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=12;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="620" y="60" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Cognito -->
+        <mxCell id="ext-cognito" value="&lt;b&gt;AWS Cognito&lt;/b&gt;&lt;br&gt;Pragma Identity Provider&lt;br&gt;Valida JWT en cada request" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cd;strokeColor=#c7951c;fontColor=#333333;fontSize=12;arcSize=8;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="60" width="220" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- AWS BOUNDARY                                -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="aws-boundary" value="&lt;b style=&quot;font-size:14px&quot;&gt;AWS — cuenta de Pragma&lt;/b&gt;" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=#FAFAFA;verticalLabelPosition=top;align=left;html=1;fontSize=14;fontStyle=1;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="180" width="1360" height="920" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- API GATEWAY                                 -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="apigw" value="&lt;b&gt;API Gateway — sopp-hub-api&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;10&quot;&gt;JWT Authorizer (Cognito) en todas las rutas excepto /webhook/github y /health&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;arcSize=6;fontStyle=1;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="470" y="230" width="500" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- API GW routes table -->
+        <mxCell id="apigw-routes" value="POST /sync · GET /taxonomy · GET /config · GET /cli/version → ✅ Cognito JWT → sopp-hub-sync&lt;br&gt;GET /health → ❌ Pública → sopp-hub-sync&lt;br&gt;POST /webhook/github → ❌ HMAC propio → sopp-hub-webhook" style="text;html=1;strokeColor=#6c8ebf;fillColor=#EBF5FB;align=left;verticalAlign=middle;spacingLeft=8;fontSize=10;rounded=1;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="470" y="310" width="500" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- LAMBDA SYNC                                 -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="lambda-sync" value="&lt;b&gt;Lambda sopp-hub-sync&lt;/b&gt;&lt;br&gt;Valida JWT · Une paths por perfil&lt;br&gt;Filtra · Renderiza · Firma · Responde" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;arcSize=8;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="100" y="440" width="300" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- LAMBDA WEBHOOK                              -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="lambda-webhook" value="&lt;b&gt;Lambda sopp-hub-webhook&lt;/b&gt;&lt;br&gt;Valida HMAC · Clasifica archivos&lt;br&gt;Merge core+cuenta · Escribe S3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;arcSize=8;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="440" width="300" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- S3                                          -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="s3" value="&lt;b&gt;S3 — sopp-hub-content&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;arcSize=8;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="100" y="640" width="820" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- S3 folders -->
+        <mxCell id="s3-config" value="config/&lt;br&gt;&lt;font size=&quot;10&quot;&gt;taxonomy.json · ides.json · templates/&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff0;strokeColor=#82b366;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="120" y="690" width="175" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3-index" value="index/&lt;br&gt;&lt;font size=&quot;10&quot;&gt;ids.json&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff0;strokeColor=#82b366;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="310" y="690" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3-core" value="core/&lt;br&gt;&lt;font size=&quot;10&quot;&gt;shared/ · chapters/&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff0;strokeColor=#82b366;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="475" y="690" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s3-accounts" value="accounts/&lt;br&gt;&lt;font size=&quot;10&quot;&gt;{cuenta}/ · version.json&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff0;strokeColor=#82b366;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="640" y="690" width="170" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- SECRETS MANAGER                             -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="sm" value="&lt;b&gt;AWS Secrets Manager&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;fontSize=12;arcSize=8;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="640" width="360" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sm-secret1" value="&lt;b&gt;sopp/webhook-secret&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;10&quot;&gt;Valida push de GitHub&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0e0;strokeColor=#d6923a;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="690" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sm-secret2" value="&lt;b&gt;sopp/hub-signing-key&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;10&quot;&gt;Firma archivos → CLI&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0e0;strokeColor=#d6923a;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="750" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="sm-secret3" value="&lt;b&gt;sopp/github-api-token&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;10&quot;&gt;Fetcha repos de GitHub&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0e0;strokeColor=#d6923a;fontSize=11;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="720" width="160" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- CLOUDWATCH                                  -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="cw" value="&lt;b&gt;CloudWatch Logs&lt;/b&gt;&lt;br&gt;Logs de ambas Lambdas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;arcSize=8;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="870" width="260" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- IAM ROLES                                   -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <mxCell id="iam-sync" value="IAM Role — sync&lt;br&gt;&lt;font size=&quot;10&quot;&gt;s3:GetObject, s3:ListBucket&lt;br&gt;secretsmanager:GetSecretValue (hub-signing-key)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#999999;fontSize=10;arcSize=6;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="890" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="iam-webhook" value="IAM Role — webhook&lt;br&gt;&lt;font size=&quot;10&quot;&gt;s3:GetObject, s3:PutObject, s3:ListBucket&lt;br&gt;secretsmanager:GetSecretValue (webhook-secret, github-api-token)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#999999;fontSize=10;arcSize=6;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="890" width="310" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- EDGES / ARROWS                              -->
+        <!-- ═══════════════════════════════════════════ -->
+
+        <!-- CLI → API Gateway -->
+        <mxCell id="e1" value="POST /sync&lt;br&gt;Bearer {jwt}" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;" edge="1" source="ext-cli" target="apigw" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- GitHub → API Gateway (webhook) -->
+        <mxCell id="e2" value="POST /webhook/github&lt;br&gt;X-Hub-Signature-256" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="ext-github" target="apigw" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Cognito → API Gateway -->
+        <mxCell id="e3" value="Valida JWT" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" source="ext-cognito" target="apigw" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API Gateway → Lambda Sync -->
+        <mxCell id="e4" value="Rutas autenticadas" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="apigw" target="lambda-sync" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- API Gateway → Lambda Webhook -->
+        <mxCell id="e5" value="/webhook/github" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="apigw" target="lambda-webhook" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Sync → S3 (read) -->
+        <mxCell id="e6" value="GetObject · ListBucket" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.15;entryY=0;entryDx=0;entryDy=0;" edge="1" source="lambda-sync" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Sync → Secrets Manager -->
+        <mxCell id="e7" value="GetSecretValue&lt;br&gt;hub-signing-key" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="lambda-sync" target="sm" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Webhook → S3 (read/write) -->
+        <mxCell id="e8" value="PutObject · GetObject" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.85;entryY=0;entryDx=0;entryDy=0;" edge="1" source="lambda-webhook" target="s3" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Webhook → Secrets Manager -->
+        <mxCell id="e9" value="GetSecretValue&lt;br&gt;webhook-secret · github-api-token" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="lambda-webhook" target="sm" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Webhook → GitHub (API fetch, dashed) -->
+        <mxCell id="e10" value="GET /repos/{owner}/{repo}/contents/{path}&lt;br&gt;Authorization: token" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;dashPattern=8 4;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;endArrow=open;endFill=0;" edge="1" source="lambda-webhook" target="ext-github" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Sync → CloudWatch -->
+        <mxCell id="e11" value="Logs" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="lambda-sync" target="cw" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Webhook → CloudWatch -->
+        <mxCell id="e12" value="Logs" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" source="lambda-webhook" target="cw" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Sync IAM role association (dashed) -->
+        <mxCell id="e13" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;dashPattern=4 4;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;" edge="1" source="lambda-sync" target="iam-sync" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Lambda Webhook IAM role association (dashed) -->
+        <mxCell id="e14" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;dashed=1;dashPattern=4 4;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;" edge="1" source="lambda-webhook" target="iam-webhook" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

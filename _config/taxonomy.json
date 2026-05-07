@@ -1,0 +1,116 @@
+{
+  "version": "1.0.0",
+  "chapters": {
+    "backend": {
+      "platforms": {
+        "java": {
+          "stacks": ["java-spring", "java-webflux"],
+          "detection": {
+            "java-spring": {
+              "signals": ["pom.xml", "build.gradle"],
+              "excludes_signal": {
+                "file": "AndroidManifest.xml"
+              }
+            },
+            "java-webflux": {
+              "signals": ["pom.xml"],
+              "requires_signal": {
+                "file": "pom.xml",
+                "contains": "spring-boot-starter-webflux"
+              }
+            }
+          }
+        },
+        "node": {
+          "stacks": ["node-express", "node-lambda"],
+          "detection": {
+            "node-express": {
+              "signals": ["package.json"],
+              "excludes_signal": {
+                "file": "nest-cli.json"
+              }
+            },
+            "node-lambda": {
+              "signals": ["package.json", "serverless.yml"]
+            }
+          }
+        },
+        "dotnet": {
+          "stacks": ["dotnet"],
+          "detection": {
+            "dotnet": {
+              "signals": ["*.csproj", "*.sln"]
+            }
+          }
+        }
+      }
+    },
+    "calidad": {
+      "platforms": {
+        "automation": {
+          "stacks": ["automation"],
+          "detection": {
+            "automation": {
+              "signals": ["cypress.config.ts", "playwright.config.ts", "jest.config.ts"]
+            }
+          }
+        }
+      }
+    },
+    "mobile": {
+      "platforms": {
+        "flutter": {
+          "stacks": ["flutter"],
+          "detection": {
+            "flutter": {
+              "signals": ["pubspec.yaml"]
+            }
+          }
+        },
+        "android": {
+          "stacks": ["android-native"],
+          "detection": {
+            "android-native": {
+              "signals": ["build.gradle", "AndroidManifest.xml"]
+            }
+          }
+        },
+        "apple": {
+          "stacks": ["apple-native"],
+          "detection": {
+            "apple-native": {
+              "signals": ["*.xcodeproj", "Package.swift"]
+            }
+          }
+        }
+      }
+    },
+    "frontend": {
+      "platforms": {
+        "react": {
+          "stacks": ["react"],
+          "detection": {
+            "react": {
+              "signals": ["package.json"],
+              "requires_signal": {
+                "file": "package.json",
+                "contains": "react"
+              }
+            }
+          }
+        },
+        "angular": {
+          "stacks": ["angular"],
+          "detection": {
+            "angular": {
+              "signals": ["angular.json"]
+            }
+          }
+        }
+      }
+    },
+    "arquitectura": {
+      "platforms": {}
+    }
+  }
+}

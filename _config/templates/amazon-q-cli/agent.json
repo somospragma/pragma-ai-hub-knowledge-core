@@ -1,0 +1,5 @@
+{
+  "name": "%%pragma-id%%",
+  "prompt": "%%pragma-content%%",
+  "mcpServers": []
+}

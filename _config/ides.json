@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "ides": [
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "capabilities": ["steering", "skill", "workflow", "prompt", "convencion"],
+      "global_paths": {
+        "steering": "~/.cursor/rules/{id}.mdc"
+      },
+      "workspace_paths": {
+        "steering": ".cursor/rules/{id}.mdc",
+        "skill": ".cursor/rules/skills/{id}.mdc",
+        "workflow": ".cursor/rules/workflows/{id}.mdc",
+        "prompt": ".cursor/rules/prompts/{id}.mdc",
+        "convencion": ".cursor/rules/convenciones/{id}.mdc"
+      },
+      "special_behaviors": {
+        "steering": "one_file_per_asset"
+      }
+    },
+    {
+      "id": "kiro",
+      "name": "Kiro",
+      "capabilities": ["steering", "skill", "workflow", "prompt", "agent"],
+      "global_paths": {
+        "steering": "~/.kiro/steering/{id}.md"
+      },
+      "workspace_paths": {
+        "steering": ".kiro/steering/{id}.md",
+        "skill": ".kiro/skills/{id}.md",
+        "workflow": ".kiro/steering/{id}.md",
+        "prompt": ".kiro/steering/{id}.md",
+        "agent": ".kiro/steering/{id}.md"
+      },
+      "special_behaviors": {}
+    },
+    {
+      "id": "github-copilot",
+      "name": "GitHub Copilot",
+      "capabilities": ["steering", "skill", "prompt"],
+      "global_paths": {},
+      "workspace_paths": {
+        "steering": ".github/copilot-instructions.md",
+        "skill": ".github/prompts/{id}.prompt.md",
+        "prompt": ".github/prompts/{id}.prompt.md"
+      },
+      "special_behaviors": {
+        "steering": "concatenate_all"
+      }
+    },
+    {
+      "id": "amazon-q-ide",
+      "name": "Amazon Q (IDE)",
+      "capabilities": ["steering", "skill", "prompt"],
+      "global_paths": {
+        "steering": "~/.aws/amazonq/rules/{id}.md"
+      },
+      "workspace_paths": {
+        "steering": ".amazonq/rules/{id}.md",
+        "skill": ".amazonq/rules/{id}.md",
+        "prompt": ".amazonq/rules/{id}.md"
+      },
+      "special_behaviors": {}
+    },
+    {
+      "id": "amazon-q-cli",
+      "name": "Amazon Q (CLI)",
+      "capabilities": ["steering", "skill", "agent"],
+      "global_paths": {
+        "steering": "~/.aws/amazonq/rules/{id}.md"
+      },
+      "workspace_paths": {
+        "steering": ".amazonq/rules/{id}.md",
+        "skill": ".amazonq/rules/{id}.md",
+        "agent": ".amazonq/rules/{id}.md"
+      },
+      "special_behaviors": {}
+    },
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "capabilities": ["steering", "skill", "workflow"],
+      "global_paths": {
+        "steering": "~/.claude/CLAUDE.md"
+      },
+      "workspace_paths": {
+        "steering": "CLAUDE.md",
+        "skill": "CLAUDE.md",
+        "workflow": "CLAUDE.md"
+      },
+      "special_behaviors": {
+        "steering": "concatenate_all",
+        "skill": "concatenate_all",
+        "workflow": "concatenate_all"
+      }
+    }
+  ]
+}

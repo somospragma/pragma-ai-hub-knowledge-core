@@ -1,0 +1,5 @@
+---
+inclusion: manual
+---
+
+%%pragma-content%%

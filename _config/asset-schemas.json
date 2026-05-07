@@ -1,0 +1,69 @@
+{
+  "version": "1.0.0",
+  "types": {
+    "steering": {
+      "description": "Instrucciones de comportamiento y restricciones para el AI",
+      "required_sections": ["## Rol", "## Lo que nunca debes hacer"],
+      "optional_sections": ["## Principios", "## Contexto"],
+      "frontmatter_required": ["id", "version", "scope", "type"],
+      "frontmatter_optional": ["chapter", "stack", "tags", "description"]
+    },
+    "skill": {
+      "description": "Instrucción para una tarea concreta que el AI debe ejecutar",
+      "required_sections": ["## Instrucción"],
+      "optional_sections": ["## Cuándo aplicar", "## Restricciones", "## Ejemplo"],
+      "frontmatter_required": ["id", "version", "scope", "type", "chapter"],
+      "frontmatter_optional": ["stack", "tags", "description"]
+    },
+    "workflow": {
+      "description": "Secuencia de pasos para un proceso específico",
+      "required_sections": ["## Pasos"],
+      "optional_sections": ["## Cuándo usar este workflow", "## Criterios de finalización"],
+      "frontmatter_required": ["id", "version", "scope", "type", "chapter"],
+      "frontmatter_optional": ["stack", "tags", "description"]
+    },
+    "prompt": {
+      "description": "Plantilla con variables que el pragmático puede invocar",
+      "required_sections": ["## Template"],
+      "optional_sections": ["## Variables", "## Ejemplo de uso"],
+      "frontmatter_required": ["id", "version", "scope", "type", "chapter"],
+      "frontmatter_optional": ["stack", "tags", "description"]
+    },
+    "agent": {
+      "description": "Definición de un agente especializado con rol y comportamiento",
+      "required_sections": ["## Rol", "## Cómo operar"],
+      "optional_sections": ["## Criterios de evaluación", "## Herramientas"],
+      "frontmatter_required": ["id", "version", "scope", "type", "chapter"],
+      "frontmatter_optional": ["stack", "tags", "description"]
+    },
+    "convencion": {
+      "description": "Estándares de código y naming para un stack específico",
+      "required_sections": [],
+      "optional_sections": [],
+      "frontmatter_required": ["id", "version", "scope", "type", "chapter", "stack"],
+      "frontmatter_optional": ["tags", "description"]
+    }
+  },
+  "scopes": {
+    "global": {
+      "requires_chapter": false,
+      "requires_stack": false,
+      "folder": "shared/"
+    },
+    "chapter": {
+      "requires_chapter": true,
+      "requires_stack": false,
+      "folder": "chapters/{chapter}/"
+    },
+    "stack": {
+      "requires_chapter": true,
+      "requires_stack": true,
+      "folder": "chapters/{chapter}/skills/{stack}/"
+    }
+  },
+  "valid_chapters": ["backend", "calidad", "mobile", "frontend", "arquitectura"],
+  "override_fields": {
+    "pragma_extends": "Path en core del asset que extiende",
+    "pragma_override": "full | merge"
+  }
+}

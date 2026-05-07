@@ -1,0 +1,5 @@
+---
+inclusion: auto
+---
+
+%%pragma-content%%

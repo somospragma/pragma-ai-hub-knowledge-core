@@ -1,0 +1,10 @@
+# SOPP AI Knowledge Core — Code Owners
+
+# Equipo Central Pragma AI aprueba todo
+* @pragma-ai-team
+
+# _config/ solo lo modifica el Equipo de Plataforma
+_config/ @pragma-platform-team
+
+# GitHub Actions solo los modifica el Equipo de Plataforma
+.github/ @pragma-platform-team
