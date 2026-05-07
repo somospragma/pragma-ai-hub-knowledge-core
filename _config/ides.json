@@ -2,24 +2,6 @@
   "version": "1.0.0",
   "ides": [
     {
-      "id": "cursor",
-      "name": "Cursor",
-      "capabilities": ["steering", "skill", "workflow", "prompt", "convencion"],
-      "global_paths": {
-        "steering": "~/.cursor/rules/{id}.mdc"
-      },
-      "workspace_paths": {
-        "steering": ".cursor/rules/{id}.mdc",
-        "skill": ".cursor/rules/skills/{id}.mdc",
-        "workflow": ".cursor/rules/workflows/{id}.mdc",
-        "prompt": ".cursor/rules/prompts/{id}.mdc",
-        "convencion": ".cursor/rules/convenciones/{id}.mdc"
-      },
-      "special_behaviors": {
-        "steering": "one_file_per_asset"
-      }
-    },
-    {
       "id": "kiro",
       "name": "Kiro",
       "capabilities": ["steering", "skill", "workflow", "prompt", "agent"],
