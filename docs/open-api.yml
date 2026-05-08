@@ -171,11 +171,14 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [access_token, refresh_token, expires_in]
+                required: [access_token, id_token, refresh_token, expires_in]
                 properties:
                   access_token:
                     type: string
-                    description: Nuevo JWT de acceso
+                    description: Nuevo JWT de acceso (no usar para Authorization — usar id_token)
+                  id_token:
+                    type: string
+                    description: Nuevo JWT de identidad — usar en Authorization Bearer para endpoints protegidos
                   refresh_token:
                     type: string
                     description: Nuevo refresh token (Cognito puede rotarlo)
@@ -204,6 +207,73 @@ paths:
               example:
                 error: INVALID_REQUEST
                 message: El campo 'refresh_token' es requerido
+
+  # ─────────────────────────────────────────────
+  # GET /accounts
+  # ─────────────────────────────────────────────
+  /accounts:
+    get:
+      tags: [sync]
+      summary: Listar cuentas disponibles del pragmático
+      description: |
+        Consulta NexoAPIs con el email del pragmático (extraído del JWT)
+        y retorna la lista de cuentas/proyectos a los que está asignado.
+        El CLI usa este endpoint para saber qué cuenta enviar en el sync.
+        Si solo hay una cuenta, el CLI la usa automáticamente.
+        Si hay múltiples, el CLI le pide al pragmático que seleccione.
+      operationId: getAccounts
+      security:
+        - apiKey: []
+          cognitoBearer: []
+      responses:
+        "200":
+          description: Lista de cuentas del pragmático
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [accounts]
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Nombre de la cuenta en formato kebab-case (usado en el sync)
+                          example: banco-mercantil
+                        project:
+                          type: string
+                          description: Nombre del proyecto original
+                          example: Banco Mercantil
+                        allocation:
+                          type: string
+                          description: Porcentaje de asignación
+                          example: "0.5"
+              example:
+                accounts:
+                  - name: banco-mercantil
+                    project: Banco Mercantil
+                    allocation: "0.5"
+                  - name: banco-agromercantil
+                    project: Banco Agromercantil
+                    allocation: "0.5"
+        "401":
+          description: JWT inválido o expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        "404":
+          description: Pragmático no encontrado en NexoAPIs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: PRAGMATICO_NOT_FOUND
+                message: No se encontró pragmático con ese correo en NexoAPIs
 
   # ─────────────────────────────────────────────
   # POST /sync
@@ -242,32 +312,27 @@ paths:
                 value:
                   workspace: /Users/david/projects/savings-account
                   tool: cursor
+                  chapter: backend
                   stacks: [java-spring]
+                  cuenta: nequi
                   local_version: "2.3.1"
-                  workspace_files:
-                    - pom.xml
-                    - src/main/java/co/pragma/savings/SavingsApplication.java
               copilot_node:
                 summary: Pragmático backend Node usando Copilot
                 value:
                   workspace: /Users/carlos/projects/api-gateway
                   tool: github-copilot
-                  stacks: [node-nest]
+                  chapter: backend
+                  stacks: [node-express]
+                  cuenta: null
                   local_version: null
-                  workspace_files:
-                    - package.json
-                    - nest-cli.json
-                    - src/main.ts
               first_sync:
-                summary: Primera sincronización (sin versión local)
+                summary: Primera sincronización (sin versión local, sin cuenta)
                 value:
                   workspace: /Users/maria/projects/mobile-app
                   tool: kiro
+                  chapter: mobile
                   stacks: [flutter]
                   local_version: null
-                  workspace_files:
-                    - pubspec.yaml
-                    - lib/main.dart
       responses:
         "200":
           description: |
@@ -771,16 +836,19 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: |
-        JWT emitido por AWS Cognito del tenant de Pragma.
+        JWT `id_token` emitido por AWS Cognito del tenant de Pragma.
         El CLI lo obtiene via OAuth2 PKCE y lo renueva automáticamente
         usando el refresh token guardado en `~/.pragma-sopp/auth.json`.
+        IMPORTANTE: Usar el `id_token` (no el `access_token`) porque el
+        Cognito Authorizer de API Gateway valida el claim `aud` que solo
+        está presente en el id_token.
 
   schemas:
 
     # ── REQUEST ──────────────────────────────
     SyncRequest:
       type: object
-      required: [workspace, tool, stacks]
+      required: [workspace, tool, chapter, stacks]
       properties:
         workspace:
           type: string
@@ -789,18 +857,29 @@ components:
         tool:
           type: string
           description: Herramienta activa en este workspace
-          enum: [cursor, github-copilot, kiro, amazon-q-ide, amazon-q-cli]
+          enum: [cursor, github-copilot, kiro, amazon-q-ide, amazon-q-cli, claude-code]
           example: cursor
+        chapter:
+          type: string
+          description: Chapter del pragmático (seleccionado en el init del CLI)
+          enum: [backend, calidad, mobile, frontend, arquitectura]
+          example: backend
         stacks:
           type: array
-          description: |
-            Stacks activos en el workspace. Si se envía vacío, el Hub intenta
-            detectarlo desde `workspace_files`. Si no puede detectar, retorna 422.
+          description: Stacks activos en el workspace (detectados por el CLI)
           items:
             type: string
-            enum: [java-spring, node-nest, node-express, dotnet, flutter, android-kotlin, react, angular]
+            enum: [java-spring, java-webflux, node-express, node-lambda, dotnet, flutter, android-native, apple-native, react, angular, automation]
           minItems: 1
           example: [java-spring]
+        cuenta:
+          type: string
+          nullable: true
+          description: |
+            Nombre de la cuenta del pragmático (obtenido de GET /accounts).
+            Si es `null` o no se envía, el Hub solo retorna contenido de core.
+            Si se envía, retorna core + contenido específico de la cuenta.
+          example: nequi
         local_version:
           type: string
           nullable: true
@@ -813,14 +892,12 @@ components:
           type: array
           description: |
             Lista de archivos del workspace para detección automática de stack.
-            Solo se usa si `stacks` viene vacío. El Hub puede prescindir de este
-            campo si `stacks` viene explícito.
+            Solo se usa si `stacks` viene vacío.
           items:
             type: string
           example:
             - pom.xml
             - src/main/java/co/pragma/savings/SavingsApplication.java
-            - docker-compose.yml
 
     # ── RESPONSE ─────────────────────────────
     SyncResponse:
