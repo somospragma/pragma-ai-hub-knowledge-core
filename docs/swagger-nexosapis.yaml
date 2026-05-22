@@ -1,0 +1,233 @@
+openapi: 3.0.3
+info:
+  title: NexoAPIs - API de Novedades
+  description: |
+    API REST que expone las novedades de asignación de pragmáticos a proyectos para el mes en curso.
+    
+    ## Autenticación
+    Todas las solicitudes requieren una API Key en el header `x-api-key`.
+    Contactar al equipo de Data Services para obtener una API Key.
+    
+    ## Fuente de datos
+    Los datos provienen del Data Lake de Pragma (tabla `novedades` en `delivery_analytics`)
+    cruzados con la tabla maestra de pragmáticos (`talent_stage`).
+    
+    ## Período de datos
+    Siempre retorna datos del **mes y año en curso**.
+  version: "1.0.0"
+  contact:
+    name: Data Services - Pragma
+  x-environment: production
+  x-account: "676206933306"
+  x-region: us-east-1
+
+servers:
+  - url: https://hluve0xa3a.execute-api.us-east-1.amazonaws.com/prod
+    description: Producción
+
+security:
+  - ApiKeyAuth: []
+
+paths:
+  /novedades:
+    get:
+      summary: Consultar novedades de asignación por correo
+      description: |
+        Retorna las asignaciones del pragmático identificado por su correo corporativo
+        para el mes y año en curso. Máximo 5 registros por consulta.
+      operationId: getNovedades
+      tags:
+        - Novedades
+      parameters:
+        - name: correo
+          in: query
+          required: true
+          description: Correo corporativo del pragmático
+          schema:
+            type: string
+            format: email
+            example: laura.bravo@pragma.com.co
+      responses:
+        "200":
+          description: Consulta exitosa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NovedadesResponse"
+              examples:
+                multiples_asignaciones:
+                  summary: Pragmático con múltiples proyectos
+                  value:
+                    data:
+                      - anio: "2026"
+                        mes: "5"
+                        sociedad: "4810"
+                        id_cliente: "1556445760"
+                        nombre_cliente: "PRAGMA NEXT S.A."
+                        id_proyecto: "BOM0001"
+                        nombre_proyecto: "Banco Mercantil"
+                        id_paquete_trabajo: "BOM0001.1.5"
+                        nombre_paquete_trabajo: "Agentes IA"
+                        porcentaje_asignacion: "0.5"
+                      - anio: "2026"
+                        mes: "5"
+                        sociedad: "4810"
+                        id_cliente: "1100686290"
+                        nombre_cliente: "PRAGMA, SOCIEDAD ANONIMA GUATEMALA"
+                        id_proyecto: "BAM0001"
+                        nombre_proyecto: "Banco Agromercantil"
+                        id_paquete_trabajo: "BAM0001.1.1"
+                        nombre_paquete_trabajo: "Banco Agromercantil"
+                        porcentaje_asignacion: "0.5"
+                    count: 2
+                sin_asignaciones:
+                  summary: Pragmático sin asignaciones en el mes actual
+                  value:
+                    data: []
+                    count: 0
+        "400":
+          description: Parámetro correo inválido o faltante
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Parámetro 'correo' requerido y debe ser un email válido"
+        "403":
+          description: API Key inválida o no proporcionada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenResponse"
+              example:
+                message: "Forbidden"
+        "404":
+          description: Correo no encontrado en la base de pragmáticos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "No se encontró pragmático con ese correo"
+        "429":
+          description: Límite de requests excedido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ForbiddenResponse"
+              example:
+                message: "Too Many Requests"
+        "500":
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Error interno del servidor"
+        "502":
+          description: Error al consultar los datos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Error al consultar los datos"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API Key proporcionada por el equipo de Data Services
+
+  schemas:
+    Novedad:
+      type: object
+      properties:
+        anio:
+          type: string
+          description: Año de la asignación
+          example: "2026"
+        mes:
+          type: string
+          description: Mes de la asignación (1-12)
+          example: "5"
+        sociedad:
+          type: string
+          description: Código de sociedad SAP
+          example: "4810"
+        id_cliente:
+          type: string
+          description: NIT o identificador fiscal del cliente
+          example: "890903938"
+        nombre_cliente:
+          type: string
+          description: Razón social del cliente
+          example: "BANCOLOMBIA S.A."
+        id_proyecto:
+          type: string
+          description: Código único del proyecto
+          example: "NQC001"
+        nombre_proyecto:
+          type: string
+          description: Nombre del proyecto
+          example: "Nequi Colombia"
+        id_paquete_trabajo:
+          type: string
+          description: Código del paquete de trabajo dentro del proyecto
+          example: "NQC001.1.36"
+        nombre_paquete_trabajo:
+          type: string
+          description: Nombre del paquete de trabajo
+          example: "Nequi Colombia Datamind"
+        porcentaje_asignacion:
+          type: string
+          description: Porcentaje de dedicación (1.0 = 100%, 0.5 = 50%)
+          example: "1.0"
+
+    NovedadesResponse:
+      type: object
+      required:
+        - data
+        - count
+      properties:
+        data:
+          type: array
+          description: Lista de asignaciones del pragmático para el mes en curso
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/Novedad"
+        count:
+          type: integer
+          description: Número total de asignaciones retornadas
+          example: 2
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Descripción del error
+          example: "Parámetro 'correo' requerido y debe ser un email válido"
+
+    ForbiddenResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: "Forbidden"
+
+tags:
+  - name: Novedades
+    description: Consulta de novedades de asignación de pragmáticos
+
+x-throttling:
+  rate-limit: 5 req/s
+  burst-limit: 10
+  daily-quota: 1000
