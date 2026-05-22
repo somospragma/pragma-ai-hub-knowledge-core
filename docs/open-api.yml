@@ -6,6 +6,15 @@ info:
     de IA a los pragmáticos de Pragma. Sirve assets filtrados por perfil (cuenta,
     chapter, stack) y firmados con HMAC-SHA256 para verificación en el CLI.
 
+    ## Modelo de Herencia
+    El Hub implementa un merge en 3 capas:
+    1. **Core** (pragma-ai-hub-knowledge-core): assets base para todos los pragmáticos
+    2. **Cuenta** (pragma-ai-hub-knowledge-{cuenta}): override/extensión por cliente
+    3. **Proyecto** (carpeta projects/{proyecto}/ dentro del repo de cuenta): override/extensión por proyecto
+
+    Prioridad: proyecto > cuenta > core. Si un asset existe en múltiples capas,
+    el de mayor prioridad gana (o se mergea si tiene `pragma_override: merge`).
+
     ## Autenticación
     Todos los endpoints (excepto `/health` y `/webhook`) requieren un JWT de AWS Cognito
     en el header `Authorization: Bearer {token}`. El token se obtiene via el flujo
@@ -227,37 +236,56 @@ paths:
           cognitoBearer: []
       responses:
         "200":
-          description: Lista de cuentas del pragmático
+          description: Lista de asignaciones del pragmático (cuenta + proyecto)
           content:
             application/json:
               schema:
                 type: object
-                required: [accounts]
+                required: [assignments]
                 properties:
-                  accounts:
+                  assignments:
                     type: array
                     items:
                       type: object
+                      required: [cuenta, proyecto, allocation]
                       properties:
-                        name:
+                        cuenta:
                           type: string
-                          description: Nombre de la cuenta en formato kebab-case (usado en el sync)
+                          description: Nombre normalizado de la cuenta (lowercase, guiones)
                           example: banco-mercantil
-                        project:
+                        cuenta_display:
                           type: string
-                          description: Nombre del proyecto original
+                          description: Nombre legible de la cuenta
                           example: Banco Mercantil
+                        proyecto:
+                          type: string
+                          description: Nombre normalizado del proyecto (lowercase, underscores)
+                          example: agentes_ia
+                        proyecto_display:
+                          type: string
+                          description: Nombre legible del proyecto
+                          example: Agentes IA
+                        id_paquete:
+                          type: string
+                          description: ID del paquete de trabajo en NexoAPIs
+                          example: BOM0001.1.5
                         allocation:
                           type: string
                           description: Porcentaje de asignación
                           example: "0.5"
               example:
-                accounts:
-                  - name: banco-mercantil
-                    project: Banco Mercantil
+                assignments:
+                  - cuenta: banco-mercantil
+                    cuenta_display: Banco Mercantil
+                    proyecto: agentes_ia
+                    proyecto_display: Agentes IA
+                    id_paquete: BOM0001.1.5
                     allocation: "0.5"
-                  - name: banco-agromercantil
-                    project: Banco Agromercantil
+                  - cuenta: banco-agromercantil
+                    cuenta_display: Banco Agromercantil
+                    proyecto: banco_agromercantil
+                    proyecto_display: Banco Agromercantil
+                    id_paquete: BAM0001.1.1
                     allocation: "0.5"
         "401":
           description: JWT inválido o expirado
@@ -290,7 +318,11 @@ paths:
         El Hub:
         1. Valida el JWT de Cognito y extrae el perfil del pragmático
         2. Detecta o valida el stack del workspace
-        3. Hace merge del contenido de `pragma-ai-knowledge-core` + `pragma-ai-knowledge-{cuenta}`
+        3. Hace merge del contenido en 3 capas:
+           - `pragma-ai-hub-knowledge-core` (base)
+           - `pragma-ai-hub-knowledge-{cuenta}` (override cuenta)
+           - `pragma-ai-hub-knowledge-{cuenta}/projects/{proyecto}/` (override proyecto)
+           Prioridad: proyecto > cuenta > core
         4. Filtra por scope (global → chapter → stack)
         5. Renderiza al formato nativo de la herramienta
         6. Firma cada archivo con HMAC-SHA256
@@ -314,7 +346,8 @@ paths:
                   tool: cursor
                   chapter: backend
                   stacks: [java-spring]
-                  cuenta: nequi
+                  cuenta: banco-mercantil
+                  proyecto: agentes_ia
                   local_version: "2.3.1"
               copilot_node:
                 summary: Pragmático backend Node usando Copilot
@@ -324,6 +357,7 @@ paths:
                   chapter: backend
                   stacks: [node-express]
                   cuenta: null
+                  proyecto: null
                   local_version: null
               first_sync:
                 summary: Primera sincronización (sin versión local, sin cuenta)
@@ -332,6 +366,8 @@ paths:
                   tool: kiro
                   chapter: mobile
                   stacks: [flutter]
+                  cuenta: null
+                  proyecto: null
                   local_version: null
       responses:
         "200":
@@ -879,7 +915,16 @@ components:
             Nombre de la cuenta del pragmático (obtenido de GET /accounts).
             Si es `null` o no se envía, el Hub solo retorna contenido de core.
             Si se envía, retorna core + contenido específico de la cuenta.
-          example: nequi
+          example: banco-mercantil
+        proyecto:
+          type: string
+          nullable: true
+          description: |
+            Nombre normalizado del proyecto dentro de la cuenta (obtenido de GET /accounts).
+            Si es `null`, el Hub retorna core + cuenta sin filtrar por proyecto.
+            Si se envía, retorna core + cuenta + proyecto (merge en 3 capas).
+            Formato: lowercase, espacios reemplazados por _, sin tildes.
+          example: agentes_ia
         local_version:
           type: string
           nullable: true
@@ -1007,7 +1052,11 @@ components:
           example: david@pragma.com.co
         cuenta:
           type: string
-          example: bancolombia
+          example: banco-mercantil
+        proyecto:
+          type: string
+          nullable: true
+          example: agentes_ia
         chapter:
           type: string
           example: backend
