@@ -207,6 +207,50 @@ Cómo saber que terminó correctamente
 - **AI Stewards** aprueban PRs de cuentas específicas
 - **Equipo de Plataforma** mantiene `_config/` y la infraestructura
 
+## Flujo de ramas y ambientes
+
+```
+feature/* → PR a develop → merge
+                              ↓
+                          develop (push)
+                              ↓
+                    GitHub Action webhook.yml
+                              ↓
+              ┌───────────────┼───────────────┐
+              ▼                               ▼
+    Hub TEMPORAL                      Hub DEV (oficial)
+    (se elimina después)              cuenta 700693144401
+              
+develop → PR a main → merge
+                          ↓
+                      main (push)
+                          ↓
+                GitHub Action webhook.yml
+                          ↓
+                    Hub PROD (oficial)
+                    cuenta 258975980616
+```
+
+| Rama | Ambientes que notifica | Propósito |
+|---|---|---|
+| `develop` | Temporal + DEV oficial | Validar cambios antes de producción |
+| `main` | PROD oficial | Contenido en producción para los pragmáticos |
+
+### Environments de GitHub (Settings → Environments)
+
+| Environment | Secrets | Cuándo se usa |
+|---|---|---|
+| `temporal` | URL/key/secret del ambiente temporal | Push a develop (⚠️ se elimina cuando se retire) |
+| `dev` | URL/key/secret del Hub DEV oficial | Push a develop |
+| `prod` | URL/key/secret del Hub PROD oficial | Push a main |
+
+### Eliminar el ambiente temporal
+
+Cuando el ambiente temporal se retire:
+1. Borrar el job `notify-hub-temporal` de `.github/workflows/webhook.yml`
+2. Borrar el environment `temporal` en GitHub Settings
+3. No se toca nada más
+
 ## Contacto
 
 - **Equipo**: Plataforma Pragma AI
