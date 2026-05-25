@@ -1,22 +1,11 @@
 ---
-name: flutter-caching-strategy
-description: >
-  Implements caching strategies in Flutter: HTTP response caching with dio_cache_interceptor (ETag, TTL, stale-while-revalidate, offline fallback), in-memory LRU cache, data-layer TTL cache with Drift/Isar, and image caching with cached_network_image. Use this skill when implementing API response caching, reducing redundant network calls, serving stale data while revalidating, or caching images and assets.
-commands:
-  - setup-caching
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the caching infrastructure (HTTP interceptor, TTL cache, image cache config), "audit" checks for missing cache layers, unbounded caches, or stale data not being served offline.
-    required: true
-  - name: target
-    description: Path to the network/data directory or project root (e.g. lib/core/network/ for HTTP cache, lib/ for full audit).
-    required: true
-  - name: layer
-    description: Cache layer to implement (http, data-ttl, image, in-memory, all). Defaults to all.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-caching-strategy
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements caching strategies in Flutter: HTTP response caching with dio_cache_interceptor (ETag, TTL, stale-while-reval
 ---
 
 # Caching Strategy

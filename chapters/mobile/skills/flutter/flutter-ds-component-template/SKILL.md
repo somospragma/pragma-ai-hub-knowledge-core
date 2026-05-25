@@ -1,25 +1,11 @@
 ---
-name: flutter-ds-component-template
-description: >
-  Base templates for creating Flutter Design System components by atomic level.
-  Use when generating new atom, molecule, or organism widget code.
-  Provides starter code structure with proper anatomy, tokens, and patterns.
-commands:
-  - scaffold-ds-component
-inputs:
-  - name: level
-    description: Atomic level of the component to scaffold (atom, molecule, organism). Determines the template, dependency rules, and complexity expectations.
-    required: true
-  - name: target
-    description: Path where the component will be created (e.g. lib/ui_system/atoms/badge/ or lib/ui_system/organisms/product_card/).
-    required: true
-  - name: name
-    description: Name of the component (e.g. Badge, ProductCard, SearchBar). Will be prefixed with the DS prefix automatically.
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.2"
-  domain: flutter-design-system
+id: flutter-ds-component-template
+version: 1.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Base templates for creating Flutter Design System components by atomic level.   Use when generating new atom, molecule,
 ---
 
 # Component Templates

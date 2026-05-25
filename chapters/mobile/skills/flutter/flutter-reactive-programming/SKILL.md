@@ -1,22 +1,11 @@
 ---
-name: flutter-reactive-programming
-description: > 
-  Implements reactive programming patterns in Flutter: unidirectional data flow, reactive repositories (watch streams), reactive state with BLoC and Riverpod, ValueNotifier for lightweight local state, ChangeNotifier for simple reactive models, and reactive UI composition. No rxdart. Use this skill when designing how data flows reactively through the entire app — from data source to UI — or when choosing between BLoC, Riverpod, ValueNotifier, and ChangeNotifier for a given use case.
-commands:
-  - implement-reactive
-inputs:
-  - name: pattern
-    description: Reactive pattern to implement (reactive-repository, bloc-stream, riverpod-stream, value-notifier, change-notifier, provider-composition, full-flow). "full-flow" generates the complete reactive chain from data source to UI.
-    required: true
-  - name: target
-    description: Path to the file or feature directory where the reactive pattern will be implemented (e.g. lib/features/chat/ for full-flow, or a specific repository file).
-    required: true
-  - name: state_management
-    description: State management approach to use (bloc, riverpod, value-notifier, change-notifier). Required when pattern is "full-flow" to determine the presentation layer tool.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-reactive-programming
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements reactive programming patterns in Flutter: unidirectional data flow, reactive repositories (watch streams), re
 ---
 
 # Reactive Programming

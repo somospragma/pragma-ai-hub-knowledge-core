@@ -1,22 +1,11 @@
 ---
-name: flutter-melos-management
-description: >
-  Professional management of Flutter monorepos with Melos 7.x. Use this skill for everything related to Melos: initial setup, pubspec.yaml workspace configuration, bootstrap, scripts, exec, versioning with Conventional Commits, publishing, CI/CD integration, adding packages, managing dependencies across packages, and workspace maintenance. Triggers on 'melos', 'monorepo', 'melos bootstrap', 'melos run', 'melos exec', 'melos version', 'add package to monorepo', 'shared package', 'workspace', 'resolution: workspace', or any question about managing multiple Flutter packages together. Stack: melos 7.5.1, Dart 3.8+, Flutter 3.32+.
-commands:
-  - manage-melos
-inputs:
-  - name: action
-    description: Action to perform (setup, add-package, audit, version, ci-setup). "setup" initializes a new Melos workspace, "add-package" adds a new package to an existing workspace, "audit" checks workspace health (dependency conflicts, missing resolution, outdated packages), "version" bumps versions using Conventional Commits, "ci-setup" generates CI/CD pipeline configuration for the monorepo.
-    required: true
-  - name: target
-    description: Path to the workspace root (for setup/audit/version/ci-setup) or the new package path (for add-package, e.g. packages/feature_payments).
-    required: true
-  - name: package_type
-    description: Type of package to create when action is "add-package" (feature, core, ui, app). Determines the directory structure and default dependencies.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-melos-management
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Professional management of Flutter monorepos with Melos 7.x. Use this skill for everything related to Melos: initial set
 ---
 
 # Melos 7.x — Flutter Monorepo Management

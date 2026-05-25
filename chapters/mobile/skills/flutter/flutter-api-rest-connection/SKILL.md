@@ -1,22 +1,11 @@
 ---
-name: flutter-api-rest-connection
-description: >
-  Configures and implements REST API connections in Flutter using Dio: base client setup, interceptors (auth, logging, retry, error mapping), token refresh with mutex lock, multipart file upload, request cancellation, environment-based base URLs, and clean architecture integration (DataSource → Repository). Use this skill when setting up HTTP communication with a backend, adding auth headers, handling 401 token refresh, implementing retry logic, uploading files, or mapping HTTP errors to domain Failures.
-commands:
-  - setup-api-client
-inputs:
-  - name: action
-    description: Action to perform (implement, add-interceptor, audit). "implement" generates the full Dio client setup (ApiClient, DI module, base interceptors), "add-interceptor" adds a specific interceptor to an existing client, "audit" checks for missing auth headers, no retry logic, hardcoded URLs, or error mapping gaps.
-    required: true
-  - name: target
-    description: Path to the core/network directory or project root (e.g. lib/core/network/ for implement, lib/ for audit).
-    required: true
-  - name: interceptor
-    description: Specific interceptor to add (auth, retry, error-mapping, logging, cache). Required when action is "add-interceptor".
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-api-rest-connection
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Configures and implements REST API connections in Flutter using Dio: base client setup, interceptors (auth, logging, ret
 ---
 
 # REST API Connection

@@ -1,22 +1,11 @@
 ---
-name: flutter-ds-markdown-docs
-description: >
-  Markdown documentation standard for Design System components.
-  Use when generating README files for organisms, documenting component
-  APIs, writing usage examples, or creating component catalogs.
-commands:
-  - generate-ds-docs
-inputs:
-  - name: action
-    description: Action to perform (generate, audit). "generate" creates a README.md for a DS component following the standard template, "audit" checks existing documentation for missing sections (API table, tokens, composition, anti-patterns).
-    required: true
-  - name: target
-    description: Path to the DS component directory to document (e.g. lib/ui_system/organisms/product_card/).
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-markdown-docs
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Markdown documentation standard for Design System components.   Use when generating README files for organisms, document
 ---
 
 # Markdown Documentation

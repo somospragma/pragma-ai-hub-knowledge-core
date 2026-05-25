@@ -1,25 +1,11 @@
 ---
-name: flutter-ds-figma-checklist
-description: >
-  Complete comparison checklist between Flutter implementation and Figma spec.
-  Use when auditing visual fidelity, verifying token mapping accuracy,
-  checking variant/state coverage, or validating anatomy against Figma layers.
-commands:
-  - verify-figma-fidelity
-inputs:
-  - name: action
-    description: Action to perform (verify, report). "verify" runs the full checklist against a component comparing implementation to Figma spec, "report" generates a fidelity report with pass/fail per category (colors, typography, spacing, variants, states).
-    required: true
-  - name: target
-    description: Path to the DS component implementation to verify (e.g. lib/ui_system/organisms/product_card/).
-    required: true
-  - name: figma_url
-    description: Figma URL of the reference design to compare against. Required for full verification.
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.2"
-  domain: flutter-design-system
+id: flutter-ds-figma-checklist
+version: 1.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Complete comparison checklist between Flutter implementation and Figma spec.   Use when auditing visual fidelity, verify
 ---
 
 # Figma Comparison Checklist

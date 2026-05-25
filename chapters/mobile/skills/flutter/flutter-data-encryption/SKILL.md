@@ -1,22 +1,11 @@
 ---
-name: flutter-data-encryption
-description: >
-  Implements cryptography and data encryption in Flutter: AES-256-GCM at-rest encryption, PBKDF2/Argon2 password hashing, SHA-256 checksums, and asymmetric cryptography (RSA-OAEP, ECDSA). Use this skill for any cryptographic operation. Triggers on 'encrypt data', 'hash passwor', 'AES', 'RSA', 'ECDSA', OWASP M10 (Insufficient Cryptography), or protecting data confidentiality and integrity. Always rejects weak algorithms: MD5, SHA-1, AES-ECB, DES, RC4, Random() for crypto. For storing encryption keys and tokens, see flutter-secure-storage. For certificate pinning, see flutter-certificate-pinning. Stack: pointycastle, crypto. Dart 3.8+ / Flutter 3.32+.
-commands:
-  - setup-encryption
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the encryption service, password hasher, and hash service with correct algorithms, "audit" checks existing code for weak algorithms (MD5, SHA-1, ECB, insecure Random, hardcoded keys).
-    required: true
-  - name: target
-    description: Path to the core/crypto directory or project root (e.g. lib/core/crypto/ for implement, lib/ for audit).
-    required: true
-  - name: algorithm
-    description: Specific algorithm to implement (aes-gcm, pbkdf2, sha256, hmac, rsa-oaep, ecdsa, all). Defaults to all.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-data-encryption
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements cryptography and data encryption in Flutter: AES-256-GCM at-rest encryption, PBKDF2/Argon2 password hashing,
 ---
 
 # Data Encryption in Flutter

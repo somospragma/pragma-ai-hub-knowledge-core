@@ -1,26 +1,11 @@
 ---
-name: flutter-ds-folder-structure
-description: >
-  Official folder structure for the Flutter Design System package.
-  Use when creating new files, locating existing components, setting up
-  test paths, or verifying file placement during code audit.
-  Covers lib/, test/, widgetbook/, and pipeline output directories.
-commands:
-  - check-ds-structure
-inputs:
-  - name: action
-    description: Action to perform (audit, locate, scaffold). "audit" verifies all files are in the correct directories per atomic level and naming rules, "locate" resolves the correct path for a new component given its level and name, "scaffold" creates the directory structure for a new component (lib + test + widgetbook).
-    required: true
-  - name: target
-    description: Path to the DS package root for audit, or the component name/level for locate/scaffold (e.g. lib/ui_system/ for audit, "organism/product_card" for locate/scaffold).
-    required: true
-  - name: level
-    description: Atomic level of the component (atom, molecule, organism, view). Required when action is "scaffold" or "locate".
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.3"
-  domain: flutter-design-system
+id: flutter-ds-folder-structure
+version: 1.3.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Official folder structure for the Flutter Design System package.   Use when creating new files, locating existing compon
 ---
 
 # Folder Structure

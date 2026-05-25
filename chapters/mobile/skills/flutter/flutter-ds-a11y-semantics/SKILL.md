@@ -1,23 +1,11 @@
 ---
-name: flutter-ds-a11y-semantics
-description: >
-  Accessibility and semantics rules for Design System components.
-  Use when implementing interactive widgets, adding semantic labels,
-  handling images, communicating states to screen readers, or writing
-  accessibility tests.
-commands:
-  - audit-a11y
-inputs:
-  - name: action
-    description: Action to perform (audit, fix). "audit" checks DS components for missing semantics labels, insufficient touch areas, decorative images without excludeFromSemantics, or missing state communication, "fix" applies accessibility corrections to identified issues.
-    required: true
-  - name: target
-    description: Path to the DS component file or directory to audit (e.g. lib/ui_system/atoms/button/ for specific component, lib/ui_system/ for full audit).
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-a11y-semantics
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Accessibility and semantics rules for Design System components.   Use when implementing interactive widgets, adding sema
 ---
 
 # Accessibility & Semantics

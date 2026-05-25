@@ -1,22 +1,11 @@
 ---
-name: flutter-navigation-strategy
-description: >
-  Implements declarative navigation in Flutter using go_router 17.x. Use this skill when asking about routing, navigation, redirect guards, nested navigation, tab navigation, page transitions, ShellRoute, cross-module navigation, Mediator pattern for navigation, or how to navigate between screens. Triggers on GoRouter setup, context.go, context.push, redirect, ShellRoute, StatefulShellRoute, AppNavigator, PopScope, or any navigation request. For deep link platform configuration and implementation, see the flutter-deep-link-strategy skill. Stack: go_router, go_router_builder, build_runner. Requires Flutter >=3.29 / Dart >=3.7.
-commands:
-  - setup-navigation-strategy
-inputs:
-  - name: action
-    description: Action to perform (implement, audit, add-route). "implement" generates the full router setup with auth redirect and shell, "audit" checks existing navigation for anti-patterns (Navigator 1.0 usage, hardcoded paths, missing redirects), "add-route" adds a new route to an existing router configuration.
-    required: true
-  - name: target
-    description: Path to the router file or app directory (e.g. lib/app/router/ for implement, lib/ for audit).
-    required: true
-  - name: pattern
-    description: Navigation pattern to implement (shell-tabs, shell-drawer, mediator, type-safe-routes, auth-redirect). Use when action is "implement" to specify the architecture.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.2"
+id: flutter-navigation-strategy
+version: 2.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements declarative navigation in Flutter using go_router 17.x. Use this skill when asking about routing, navigation,
 ---
 
 # Navigation Strategy — go_router 17.x

@@ -1,22 +1,11 @@
 ---
-name: flutter-ds-lint-rules
-description: >
-  Linting and code quality rules for Design System components.
-  Use when writing code, auditing code quality, configuring analysis_options,
-  or verifying compliance with Pragma coding standards.
-commands:
-  - lint-ds
-inputs:
-  - name: action
-    description: Action to perform (audit, fix, configure). "audit" checks DS code against all DS-specific lint rules (DS-001 to DS-015), "fix" applies auto-fixable corrections (const, imports), "configure" generates or updates analysis_options.yaml with DS rules.
-    required: true
-  - name: target
-    description: Path to the DS component file or directory to lint (e.g. lib/ui_system/ for full audit, lib/ui_system/atoms/button/ for specific component).
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.2"
-  domain: flutter-design-system
+id: flutter-ds-lint-rules
+version: 1.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Linting and code quality rules for Design System components.   Use when writing code, auditing code quality, configuring
 ---
 
 # Lint Rules

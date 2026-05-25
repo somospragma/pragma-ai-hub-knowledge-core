@@ -1,19 +1,11 @@
 ---
-name: flutter-dart-coding-standard
-description: >
-  Applies and enforces the Dart/Flutter coding standard for all code generation and review. Use this skill when writing, reviewing, or refactoring any Dart/Flutter code. Triggers on file creation, PR reviews, naming questions ('how do I name X?'), 'is this correct Dart?', import ordering, style reviews, linting configuration, or any Flutter code generation task. Always active when producing Dart — defines naming, file structure, import order, style rules, and analysis_options.yaml. Stack: Dart 3.8+, Flutter 3.32+, flutter_lints.
-commands:
-  - enforce-coding-standard
-inputs:
-  - name: action
-    description: Action to perform (audit, fix, configure). "audit" checks code against the full coding standard (naming, imports, types, async rules, class modifiers), "fix" applies auto-fixable corrections (dart fix, format, import ordering), "configure" generates or updates analysis_options.yaml with the standard lint rules.
-    required: true
-  - name: target
-    description: Path to the file, directory, or project root to check (e.g. lib/ for full audit, lib/features/product/ for feature-specific, . for configure).
-    required: true
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-dart-coding-standard
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Applies and enforces the Dart/Flutter coding standard for all code generation and review. Use this skill when writing, r
 ---
 
 # Flutter / Dart Coding Standard

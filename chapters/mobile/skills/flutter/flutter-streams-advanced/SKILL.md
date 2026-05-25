@@ -1,22 +1,11 @@
 ---
-name: flutter-streams-advanced
-description: >
-  Implements advanced Dart Stream patterns using only native Dart and Flutter: single vs broadcast, StreamController, custom transformers, stream composition, and real-world use cases. State management covered with BLoC (bloc_concurrency) and Riverpod (StreamProvider, AsyncNotifier). No rxdart dependency. Use this skill when implementing reactive data flows, live search, real-time updates, event buses, pagination, or combining multiple async data sources.
-commands:
-  - implement-stream
-inputs:
-  - name: pattern
-    description: Stream pattern to implement (live-search, real-time-feed, event-bus, pagination, multi-source, optimistic-update, connectivity-aware, custom-transformer).
-    required: true
-  - name: target
-    description: Path to the file or feature where the stream pattern will be implemented (e.g. lib/features/chat/data/data_sources/chat_remote_data_source.dart).
-    required: true
-  - name: state_management
-    description: State management approach to use (bloc, riverpod). Determines which integration pattern is generated.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-streams-advanced
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements advanced Dart Stream patterns using only native Dart and Flutter: single vs broadcast, StreamController, cust
 ---
 
 # Advanced Streams

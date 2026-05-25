@@ -1,25 +1,11 @@
 ---
-name: flutter-ds-asset-management
-description: >
-  Graphic asset management (SVGs, icons, images) for the Design System.
-  Use when downloading assets from Figma, optimizing SVGs, registering
-  resources in centralized classes, or referencing assets in widget code.
-commands:
-  - manage-ds-assets
-inputs:
-  - name: action
-    description: Action to perform (register, optimize, audit). "register" adds new assets to the centralized resource class and pubspec.yaml, "optimize" runs SVGO on SVG files to clean metadata, "audit" checks for hardcoded asset paths, unregistered assets, or missing pubspec declarations.
-    required: true
-  - name: target
-    description: Path to the assets directory or specific asset file (e.g. assets/icons/ for audit, assets/icons/icon_close.svg for register/optimize).
-    required: true
-  - name: asset_type
-    description: Type of asset (icon, illustration, logo). Determines the registry class and target directory.
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-asset-management
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Graphic asset management (SVGs, icons, images) for the Design System.   Use when downloading assets from Figma, optimizi
 ---
 
 # Asset Management

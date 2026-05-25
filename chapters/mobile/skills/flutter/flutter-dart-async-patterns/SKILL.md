@@ -1,22 +1,11 @@
 ---
-name: flutter-dart-async-patterns
-description: >
-  Implements correct async patterns in Flutter/Dart: Future, Stream, async/await, error handling, cancellation, parallel execution, timeouts, and Either-based results. Use this skill when working with async code, Futures, Streams, async generators, parallel calls, timeouts, retries, or asking 'how do I handle async X?'. Triggers on Future.wait, StreamController, async/await, 'run in parallel', 'cancel request', debounce, throttle, or any concurrent operation in Dart. No rxdart — use native Dart streams + bloc_concurrency only. Stack: Dart 3.8+, Flutter 3.32+, bloc_concurrency, fpdart.
-commands:
-  - implement-async
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the correct async pattern for a given scenario, "audit" checks existing async code for anti-patterns (fire-and-forget, uncancelled subscriptions, swallowed exceptions, untyped Futures).
-    required: true
-  - name: target
-    description: Path to the file or directory to implement/audit (e.g. lib/features/product/data/ for implement, lib/ for audit).
-    required: true
-  - name: pattern
-    description: Specific async pattern to implement (parallel, sequential, debounce, throttle, retry, timeout, stream-subscription). Helps generate the correct code structure.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-dart-async-patterns
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements correct async patterns in Flutter/Dart: Future, Stream, async/await, error handling, cancellation, parallel e
 ---
 
 # Async Patterns in Dart/Flutter

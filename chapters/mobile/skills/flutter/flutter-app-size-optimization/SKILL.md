@@ -1,22 +1,11 @@
 ---
-name: flutter-app-size-optimization
-description: >
-  Reduce Flutter APK/IPA size: tree shaking, deferred components, asset compression, ABI splits, --split-debug-info, obfuscation, size analysis tools, and Android 16KB page size compliance (required for Google Play as of November 2025). Use this skill when the app is too large, when Google Play warns about 16KB page size, or when optimizing download/install size for emerging markets.
-commands:
-  - optimize-app-size
-inputs:
-  - name: action
-    description: Action to perform (analyze, optimize, audit-16kb). "analyze" runs --analyze-size and reports the breakdown, "optimize" applies size reduction techniques (asset compression, deferred loading, unused deps removal), "audit-16kb" checks Android 16KB page size compliance (AGP, NDK, Flutter versions, .so alignment).
-    required: true
-  - name: target
-    description: Path to the project root or specific build output to analyze (e.g. . for full project, build/app/outputs/ for existing build).
-    required: true
-  - name: platform
-    description: Platform to optimize for (android, ios, both). Defaults to both.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-app-size-optimization
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Reduce Flutter APK/IPA size: tree shaking, deferred components, asset compression, ABI splits, --split-debug-info, obfus
 ---
 
 # App Size Optimization

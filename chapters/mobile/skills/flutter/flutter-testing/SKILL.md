@@ -1,22 +1,11 @@
 ---
-name: flutter-testing
-description: >
-  Defines how to write tests in Flutter- unit tests, widget tests, integration tests, golden tests, mutation tests, and native plugin testing. Use this skill when asking 'how do I test this?', 'how do I mock a dependency?', 'how do I write a BLoC test?', 'how do I test a widget?', 'how do I test a plugin?', or when implementing any test from scratch. For coverage thresholds, CI enforcement, and lcov reports, see flutter-test-coverage-strategy. Stack: flutter_test, bloc_test, mocktail, integration_test, fake_async.
-commands:
-  - flutter-test
-inputs:
-  - name: type
-    description: Type of test to generate (unit, widget, integration, golden, mutation, native-plugin, all). Use "all" to generate tests for every layer when target is a feature directory.
-    required: true
-  - name: target
-    description: Path to the class/file to test, or a full feature directory (e.g. lib/features/product/) to generate tests for all layers.
-    required: true
-  - name: feature
-    description: Name of the module or feature the file belongs to (e.g. product, auth, cart).
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-testing
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Defines how to write tests in Flutter- unit tests, widget tests, integration tests, golden tests, mutation tests, and na
 ---
 
 # Flutter Testing

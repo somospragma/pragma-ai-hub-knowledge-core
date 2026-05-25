@@ -1,26 +1,11 @@
 ---
-name: flutter-ds-responsive-layout
-description: >
-  Responsive layout patterns for Design System components.
-  Use when implementing organisms that adapt to different screen sizes,
-  deciding between compact and default layouts, or handling platform
-  differences (mobile vs desktop).
-commands:
-  - implement-responsive
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" adds responsive layout logic (LayoutBuilder, breakpoints, platform detection) to a component, "audit" checks existing components for hardcoded widths, missing responsive handling in organisms, or fixed sizing anti-patterns.
-    required: true
-  - name: target
-    description: Path to the DS component file or directory (e.g. lib/ui_system/organisms/product_card/ds_product_card.dart for implement, lib/ui_system/organisms/ for audit).
-    required: true
-  - name: breakpoints
-    description: Comma-separated breakpoints to support (compact, mobile, tablet, desktop, all). Defaults to mobile,tablet.
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-responsive-layout
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Responsive layout patterns for Design System components.   Use when implementing organisms that adapt to different scree
 ---
 
 # Responsive Layout

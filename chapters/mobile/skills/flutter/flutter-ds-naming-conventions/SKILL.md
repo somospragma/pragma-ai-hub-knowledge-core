@@ -1,22 +1,11 @@
 ---
-name: flutter-ds-naming-conventions
-description: >
-  Official naming conventions for the Flutter Design System.
-  Use when creating files, classes, enums, variables, branches, commits,
-  golden test outputs, or mapping Figma names to Dart identifiers.
-commands:
-  - check-ds-naming
-inputs:
-  - name: action
-    description: Action to perform (audit, resolve). "audit" checks existing DS files for naming violations (wrong prefix, incorrect casing, mismatched file/class names), "resolve" maps a Figma component name to the correct Dart class, file, and enum names.
-    required: true
-  - name: target
-    description: Path to the DS directory or file to audit (e.g. lib/ui_system/ for audit), or the Figma component name to resolve (e.g. "Card / Product" for resolve).
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.2"
-  domain: flutter-design-system
+id: flutter-ds-naming-conventions
+version: 1.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Official naming conventions for the Flutter Design System.   Use when creating files, classes, enums, variables, branche
 ---
 
 # Naming Conventions

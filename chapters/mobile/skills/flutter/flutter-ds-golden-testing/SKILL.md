@@ -1,22 +1,11 @@
 ---
-name: flutter-ds-golden-testing
-description: >
-  Golden testing (visual regression) patterns using Alchemist for Flutter DS.
-  Use when creating visual snapshot tests, verifying pixel-perfect rendering,
-  or setting up golden tests for light/dark themes and all variants/states.
-commands:
-  - golden-test-ds
-inputs:
-  - name: action
-    description: Action to perform (generate, update, audit). "generate" creates golden tests for a DS component covering all variants, states, and dark mode, "update" regenerates golden files after intentional visual changes, "audit" checks for missing golden coverage (variants, states, dark mode, sizes).
-    required: true
-  - name: target
-    description: Path to the DS component file or test directory (e.g. lib/ui_system/atoms/button/ds_button.dart for generate, test/ui_system/atoms/button/ for update/audit).
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-golden-testing
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Golden testing (visual regression) patterns using Alchemist for Flutter DS.   Use when creating visual snapshot tests, v
 ---
 
 # Golden Testing

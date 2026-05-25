@@ -1,22 +1,11 @@
 ---
-name: flutter-secure-storage
-description: >
-  Implements secure local storage in Flutter for tokens, credentials, and sensitive data. Use this skill for storing auth tokens, API keys, user credentials, PII, or any sensitive data locally. Triggers on 'store token', 'save credentials', 'persist auth', 'secure storage', SharedPreferences with sensitive data (flag as insecure), logout (must clear all storage). Enforces OWASP MASVS-STORAGE-1 (formerly M2). Stack: flutter_secure_storage 10.0.0. Dart 3.3+ / Flutter 3.32+.
-commands:
-  - secure-storage
-inputs:
-  - name: action
-    description: Action to perform (implement, audit, migrate). "implement" generates the token repository and secure storage setup, "audit" checks for insecure storage patterns (tokens in SharedPreferences, plain files, logs), "migrate" upgrades from flutter_secure_storage 9.x to 10.x.
-    required: true
-  - name: target
-    description: Path to the file or feature directory to act on (e.g. lib/core/auth/ for implement, lib/ for audit).
-    required: true
-  - name: data_type
-    description: Type of sensitive data being stored (auth-tokens, api-keys, credentials, pii, encryption-keys). Determines the storage pattern and platform options generated.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-secure-storage
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements secure local storage in Flutter for tokens, credentials, and sensitive data. Use this skill for storing auth
 ---
 
 # Secure Storage in Flutter

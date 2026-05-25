@@ -1,22 +1,11 @@
 ---
-name: flutter-deep-link-strategy
-description: >
-  Comprehensive deep link implementation using go_router 17.2.2, fpdart functional programming, clean architecture patterns, route guards, dynamic parameters, and platform-specific configuration.
-commands:
-  - setup-deep-links
-inputs:
-  - name: action
-    description: Action to perform (implement, add-link, audit). "implement" generates the full deep link architecture (domain, data, BLoC, platform config), "add-link" adds a new deep link route with validation and navigation, "audit" checks existing deep links for missing validation, unguarded routes, or platform config gaps.
-    required: true
-  - name: target
-    description: Path to the deep link feature directory or router file (e.g. lib/features/deep_link/ for implement, lib/app/router/ for add-link).
-    required: true
-  - name: link_type
-    description: Type of deep link to add (product, profile, share, content, custom). Determines the URL pattern, parameters, and validation logic. Required when action is "add-link".
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-deep-link-strategy
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Comprehensive deep link implementation using go_router 17.2.2, fpdart functional programming, clean architecture pattern
 ---
 
 # Deep Link Strategy

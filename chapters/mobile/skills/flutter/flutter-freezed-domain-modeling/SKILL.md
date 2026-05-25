@@ -1,25 +1,11 @@
 ---
-name: flutter-freezed-domain-modeling
-description: >
-  Models domain entities, value objects, sealed states, failures, and DTOs using Freezed in Flutter. Use this skill when creating or modifying domain entities, value objects, sealed states, union types, DTOs, or failure types. Triggers on 'create entity', 'model domain', 'add state', 'define failure', 'create DTO', 'how do I represent X in the domain?', the @freezed annotation, or any request to define data structures in the domain or data layers. Always apply to ensure correct Freezed patterns and proper layer separation (entities WITHOUT JSON; DTOs WITH JSON). Stack: Dart 3.8+, freezed, freezed_annotation, fpdart.
-commands:
-  - freezed-model-domain
-inputs:
-  - name: type
-    description: Type of data structure to model (entity, value-object, failure, dto, state, event, view-model). Determines the layer, Freezed pattern, and whether JSON is included.
-    required: true
-  - name: target
-    description: Path to the file or feature directory where the model will be created (e.g. lib/features/product/domain/entities/ or lib/features/product/data/models/).
-    required: true
-  - name: name
-    description: Name of the class to generate (e.g. Product, UserDto, LoginState, NetworkFailure).
-    required: true
-  - name: fields
-    description: Comma-separated list of fields with types (e.g. "id:String, name:String, price:double, imageUrl:String?"). Optional — if omitted, the skill will ask for fields interactively.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-freezed-domain-modeling
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Models domain entities, value objects, sealed states, failures, and DTOs using Freezed in Flutter. Use this skill when c
 ---
 
 # Domain Modeling with Freezed

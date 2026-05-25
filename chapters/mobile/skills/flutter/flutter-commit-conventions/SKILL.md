@@ -1,25 +1,11 @@
 ---
-name: flutter-commit-conventions
-description: >
-  Conventional Commits specification for commit messages including types (feat, fix, docs, etc), scopes, and message body/footer conventions. Use when writing commit messages, understanding commit structure, or reviewing commit history.
-commands:
-  - write-commit
-inputs:
-  - name: action
-    description: Action to perform (generate, audit). "generate" creates a properly formatted conventional commit message for a set of changes, "audit" checks recent commit history for convention violations.
-    required: true
-  - name: target
-    description: Description of the changes made (for generate) or git ref range to audit (e.g. "HEAD~5" for last 5 commits, "develop..HEAD" for branch commits).
-    required: true
-  - name: type
-    description: Commit type (feat, fix, docs, style, refactor, test, chore, ci). Required when action is "generate".
-    required: false
-  - name: scope
-    description: Commit scope — feature or module name (e.g. auth, product, di). Optional for generate.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-commit-conventions
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Conventional Commits specification for commit messages including types (feat, fix, docs, etc), scopes, and message body/
 ---
 
 # Commit Conventions

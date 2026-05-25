@@ -1,26 +1,11 @@
 ---
-name: flutter-ds-theming-tokens
-description: >
-  Design token catalog and theme access rules for Flutter Design System components.
-  Use when generating widget code, resolving Figma values to Flutter tokens,
-  writing tests that need theme setup, or auditing hardcoded values.
-  Covers colors, spacing, radius, elevation, typography, and icon sizes.
-commands:
-  - manage-tokens
-inputs:
-  - name: action
-    description: Action to perform (audit, resolve, add-token). "audit" checks widget files for hardcoded values (hex colors, magic numbers, fixed sizes), "resolve" maps Figma values to existing Flutter tokens, "add-token" adds a new token to the catalog.
-    required: true
-  - name: target
-    description: Path to the widget file, feature directory, or token catalog to act on (e.g. lib/ui_system/atoms/button/ for audit, lib/tokens/ for add-token).
-    required: true
-  - name: token_type
-    description: Type of token to add or audit (color, spacing, radius, elevation, typography, icon-size, all). Defaults to all when auditing.
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-theming-tokens
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Design token catalog and theme access rules for Flutter Design System components.   Use when generating widget code, res
 ---
 
 # Theming Tokens

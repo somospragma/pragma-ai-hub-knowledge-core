@@ -1,22 +1,11 @@
 ---
-name: flutter-background-processing
-description: >
-  Implements background tasks with WorkManager 0.5.x and push message background handling using a Strategy pattern to support multiple providers (FCM, OneSignal, custom), clean architecture, fpdart, and modern Flutter patterns.
-commands:
-  - setup-background-tasks
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the full background processing setup (WorkManager dispatcher, push background handler, platform config), "audit" checks existing background implementation for missing pragmas, incorrect isolate DI, or platform config gaps.
-    required: true
-  - name: target
-    description: Path to the core/background directory or project root (e.g. lib/core/background/ for implement, . for audit including platform files).
-    required: true
-  - name: tasks
-    description: Comma-separated list of background task types to implement (workmanager, push-background, both). Defaults to both.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-background-processing
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements background tasks with WorkManager 0.5.x and push message background handling using a Strategy pattern to supp
 ---
 
 # Background Processing

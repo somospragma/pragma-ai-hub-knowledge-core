@@ -1,26 +1,11 @@
 ---
-name: flutter-ds-widgetbook
-description: >
-  Widgetbook patterns for interactive documentation of Design System components
-  and app screens in canonical `/new-view`. Use when creating or updating
-  use cases, knobs, code preview, and build_runner generation with deterministic
-  scope selection.
-commands:
-  - setup-widgetbook
-inputs:
-  - name: action
-    description: Action to perform (implement, add-use-case, audit). "implement" generates the Widgetbook project structure and configuration, "add-use-case" creates use cases for a specific component or screen, "audit" checks existing use cases for missing states, knobs without labelBuilder, or missing code preview.
-    required: true
-  - name: target
-    description: Path to the component or screen to document (e.g. lib/ui_system/atoms/button/ for DS components, lib/features/product/presentation/pages/ for app screens).
-    required: true
-  - name: scope
-    description: Widgetbook scope (ds-components, app-screens). Determines the output location and use case structure.
-    required: true
-metadata:
-  author: pragma-ds
-  version: "2.4"
-  domain: flutter-design-system
+id: flutter-ds-widgetbook
+version: 2.4.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Widgetbook patterns for interactive documentation of Design System components   and app screens in canonical `/new-view`
 ---
 
 # Widgetbook Patterns (Deterministic Scope)

@@ -1,25 +1,11 @@
 ---
-name: flutter-changelog-management
-description: >
-   Maintain clear, organized release notes following Keep a Changelog and Semantic Versioning standards. This skill ensures your changelog communicates changes effectively to users and developers.
-commands:
-  - manage-changelog
-inputs:
-  - name: action
-    description: Action to perform (add-entry, prepare-release, audit). "add-entry" adds a new entry to the [Unreleased] section, "prepare-release" moves unreleased entries to a new version section with date, "audit" checks the changelog for formatting issues, missing categories, or inconsistent versioning.
-    required: true
-  - name: target
-    description: Path to the CHANGELOG.md file (e.g. CHANGELOG.md, packages/feature_product/CHANGELOG.md).
-    required: true
-  - name: version
-    description: Version number for prepare-release (e.g. 1.2.0). Required when action is "prepare-release".
-    required: false
-  - name: category
-    description: Change category for add-entry (added, changed, deprecated, removed, fixed, security). Required when action is "add-entry".
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-changelog-management
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Maintain clear, organized release notes following Keep a Changelog and Semantic Versioning standards. This skill ensures
 ---
 
 # Changelog Management Skill

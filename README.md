@@ -70,6 +70,75 @@ shared/                       ← Assets globales (aplican a TODOS)
 └── adrs/
 ```
 
+## Estructura de archivos de assets
+
+### Formato plano (un archivo por asset)
+
+```
+chapters/backend/skills/java-spring/api-design.md
+```
+
+Ideal para assets simples sin archivos de referencia.
+
+### Formato subcarpeta (asset con archivos de referencia)
+
+```
+chapters/mobile/skills/flutter/flutter-bloc-pattern/
+├── SKILL.md              ← Archivo principal (tiene el frontmatter canónico)
+├── references/           ← Archivos de referencia (se entregan al pragmático)
+│   ├── event-pattern.mmd
+│   └── state-diagram.mmd
+├── assets/               ← Diagramas, imágenes
+│   └── architecture.png
+└── scripts/              ← Scripts auxiliares
+    └── audit.sh
+```
+
+**Reglas:**
+- El archivo principal se llama `{TYPE}.md` en mayúsculas: `SKILL.md`, `AGENT.md`, `WORKFLOW.md`, `PROMPT.md`, `STEERING.md`
+- Las subcarpetas pueden tener **cualquier nombre** (`references/`, `assets/`, `scripts/`, `examples/`, etc.)
+- **Todos los archivos de la subcarpeta se entregan al pragmático** — no solo el `.md` principal
+- En el IDE del pragmático se escriben manteniendo la misma estructura de carpetas
+- Cada archivo se firma individualmente con HMAC-SHA256
+- Si se actualiza una referencia, solo cambia el hash/firma de ese archivo
+
+### Cómo se entrega al pragmático (ejemplo Kiro)
+
+```
+.kiro/skills/
+├── api-design.md                          ← asset plano
+└── flutter-bloc-pattern/                  ← asset subcarpeta
+    ├── SKILL.md
+    └── references/
+        ├── event-pattern.mmd
+        └── state-diagram.mmd
+```
+
+### Respuesta del sync para assets con subcarpeta
+
+```json
+{
+  "writes": [
+    {
+      "source": "core/chapters/mobile/skills/flutter/flutter-bloc-pattern/SKILL.md",
+      "target": ".kiro/skills/flutter-bloc-pattern/SKILL.md",
+      "content": "...",
+      "hash": "sha256:...",
+      "signature": "hmac-sha256:...",
+      "attached_files": [
+        {
+          "source": "core/.../references/event-pattern.mmd",
+          "target": ".kiro/skills/flutter-bloc-pattern/references/event-pattern.mmd",
+          "content": "...",
+          "hash": "sha256:...",
+          "signature": "hmac-sha256:..."
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Cómo contribuir
 
 ### 1. Crear un asset

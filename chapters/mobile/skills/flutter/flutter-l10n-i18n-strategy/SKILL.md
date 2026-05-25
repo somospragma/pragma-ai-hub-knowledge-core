@@ -1,25 +1,11 @@
 ---
-name: flutter-l10n-i18n-strategy
-description: >
-  Implements advanced localization (l10n) and internationalization (i18n) in Flutter-type-safe translations with slang, official gen-l10n with ARB files, plurals, gender, date/number/currency formatting with intl, RTL layout support, dynamic locale switching, locale persistence, and translation workflow at scale. Use this skill when adding multi-language support, handling plurals or gender, formatting dates/currencies per locale, supporting RTL languages (Arabic, Hebrew, Persian), managing translation files, or setting up a translation CI pipeline.
-commands:
-  - setup-l10n-i18n
-inputs:
-  - name: action
-    description: Action to perform (implement, add-locale, audit). "implement" generates the full l10n infrastructure (translation files, locale config, persistence), "add-locale" adds support for a new language, "audit" checks for hardcoded strings, missing translations, or incorrect formatting patterns.
-    required: true
-  - name: target
-    description: Path to the l10n directory or project root (e.g. lib/l10n/ for implement, lib/ for audit).
-    required: true
-  - name: approach
-    description: Translation approach to use (gen-l10n, slang). Defaults to gen-l10n (official Flutter toolchain).
-    required: false
-  - name: locales
-    description: Comma-separated list of locale codes to support (e.g. en,es,pt,ar). Required when action is "implement" or "add-locale".
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-l10n-i18n-strategy
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements advanced localization (l10n) and internationalization (i18n) in Flutter-type-safe translations with slang, of
 ---
 
 # Localization Strategy

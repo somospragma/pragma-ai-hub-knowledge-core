@@ -1,22 +1,11 @@
 ---
-name: flutter-test-coverage-strategy
-description: >
-  Defines and enforces the complete test coverage strategy for Flutter projects: coverage thresholds by layer, what to test, CI enforcement, and coverage reports. Use this skill when asking about test coverage, 'what should I test?', 'how much coverage do I need?', 'configure coverage report', 'coverage badge', lcov, genhtml, or when auditing test completeness. Also activated when a feature is complete and coverage needs to be validated. Stack: flutter_test, bloc_test 9.x, mocktail 1.x, integration_test, lcov. Dart 3.8+ / Flutter 3.32+.
-commands:
-  - check-coverage
-inputs:
-  - name: target
-    description: Path to the feature directory or specific file to analyze coverage for (e.g. lib/features/product/). Use "all" to audit the entire project.
-    required: true
-  - name: threshold
-    description: Minimum coverage percentage to enforce (default 80). Overrides the project-level default when provided.
-    required: false
-  - name: report
-    description: Whether to generate an HTML coverage report (true/false, default false).
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.2"
+id: flutter-test-coverage-strategy
+version: 2.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Defines and enforces the complete test coverage strategy for Flutter projects: coverage thresholds by layer, what to tes
 ---
 
 # Test Coverage Strategy

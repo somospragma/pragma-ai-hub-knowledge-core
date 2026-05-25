@@ -1,28 +1,11 @@
 ---
-name: flutter-owasp-mobile-top10
-description: >
-  Audits and remediates Flutter apps against the OWASP Mobile Top 10 (2024). Use this
-  skill when asking about mobile security, ''is this secure?'', ''security review'',
-  ''OWASP'', security audit, vulnerability verification, or when implementing
-  authentication, storage, network calls, cryptography, or authorization. Triggers on
-  storing tokens, HTTP calls, handling user data, login/logout, or any security-sensitive
-  operation. Reference: OWASP Mobile App Security project (mas.owasp.org), 2024 edition.
-  Stack- flutter_secure_storage 10.x, Dart 3.8+ / Flutter 3.32+.
-commands:
-  - owasp-audit
-inputs:
-  - name: action
-    description: Action to perform (scan, audit, remediate). "scan" runs quick grep-based detection for all M1-M10 categories, "audit" performs a deep review of a specific category, "remediate" applies fixes for identified vulnerabilities.
-    required: true
-  - name: target
-    description: Path to the project root or specific directory to scan (e.g. lib/ for full scan, lib/features/auth/ for auth-specific audit).
-    required: true
-  - name: category
-    description: Specific OWASP category to focus on (M1-M10, or "all"). M1=credentials, M2=supply-chain, M3=auth, M4=input-validation, M5=communication, M6=privacy, M7=binary, M8=misconfiguration, M9=storage, M10=cryptography.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-owasp-mobile-top10
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Audits and remediates Flutter apps against the OWASP Mobile Top 10 (2024). Use this   skill when asking about mobile sec
 ---
 
 # OWASP Mobile Top 10 — Flutter Audit

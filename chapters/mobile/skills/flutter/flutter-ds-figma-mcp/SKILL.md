@@ -1,26 +1,11 @@
 ---
-name: flutter-ds-figma-mcp
-description: >
-  Figma MCP (Model Context Protocol) integration for accessing design data
-  programmatically. Use when extracting component properties, navigating
-  Figma file trees, reading styles/tokens, analyzing full screens or pages,
-  and comparing implementation against design specs.
-commands:
-  - analyze-figma
-inputs:
-  - name: action
-    description: Action to perform (analyze-component, analyze-screen, extract-tokens, compare). "analyze-component" extracts properties and variants from a Figma component node, "analyze-screen" decomposes a full screen into organisms/molecules/atoms, "extract-tokens" maps Figma styles to DS tokens, "compare" verifies implementation matches design spec.
-    required: true
-  - name: figma_url
-    description: Figma URL containing the file key and node ID (e.g. https://www.figma.com/file/abc123/MyFile?node-id=1234-5678).
-    required: true
-  - name: target
-    description: Path to the DS component or view to compare against (required when action is "compare", e.g. lib/ui_system/organisms/product_card/).
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.2"
-  domain: flutter-design-system
+id: flutter-ds-figma-mcp
+version: 1.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Figma MCP (Model Context Protocol) integration for accessing design data   programmatically. Use when extracting compone
 ---
 
 # Figma MCP Integration

@@ -1,22 +1,11 @@
 ---
-name: flutter-push-strategy
-description: >
-  Implements push notifications with a Strategy pattern supporting multiple providers (FCM, OneSignal, custom). Covers permission handling, token management, foreground/ background/terminated states, topic subscriptions, and deep link navigation from notifications. Uses clean architecture, fpdart, and modern Flutter patterns.
-commands:
-  - setup-push-notification
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the full push notification setup with provider pattern, "audit" checks existing push implementation for missing lifecycle handlers, permission issues, or architecture violations.
-    required: true
-  - name: target
-    description: Path to the feature or core directory where push notifications will be integrated (e.g. lib/features/notifications/ or lib/core/push/).
-    required: true
-  - name: provider
-    description: Push notification provider to use (fcm, onesignal, aws-pinpoint, custom). Defaults to fcm.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-push-strategy
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements push notifications with a Strategy pattern supporting multiple providers (FCM, OneSignal, custom). Covers per
 ---
 
 # Push Notifications Strategy

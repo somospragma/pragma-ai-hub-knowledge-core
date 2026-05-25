@@ -1,25 +1,11 @@
 ---
-name: flutter-offline-first-pattern
-description: >
-  Implements offline-first architecture in Flutter: local cache as primary source of truth, background sync, connectivity detection, optimistic updates, and conflict resolution. Covers local database options (Drift, ObjectBox, Isar), sync strategies (manual queue, PowerSync managed sync), and clean architecture integration. Use this skill when building apps that must work without internet, need instant UI response, or require background data synchronization.
-commands:
-  - setup-offline-first
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the full offline-first architecture (local DB, sync queue, connectivity service, repository pattern), "audit" checks existing implementation for missing sync handlers, unqueued mutations, or connectivity gaps.
-    required: true
-  - name: target
-    description: Path to the feature or core directory where offline-first will be integrated (e.g. lib/features/product/ or lib/core/sync/).
-    required: true
-  - name: database
-    description: Local database to use (drift, objectbox, isar, powersync). Defaults to drift.
-    required: false
-  - name: conflict_strategy
-    description: Conflict resolution strategy (last-write-wins, server-wins, client-wins, field-merge, user-prompted). Defaults to last-write-wins.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-offline-first-pattern
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements offline-first architecture in Flutter: local cache as primary source of truth, background sync, connectivity
 ---
 
 # Offline-First Pattern

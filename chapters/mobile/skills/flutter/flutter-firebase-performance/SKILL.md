@@ -1,22 +1,11 @@
 ---
-name: flutter-firebase-performance
-description: >
-  Monitors Flutter app performance in real time: custom traces, HTTP monitoring, startup time, and screen rendering. Firebase Performance is the primary provider, with a Strategy + Adapter pattern to swap to Sentry, Datadog, or custom providers. Use this skill when instrumenting critical user flows, tracking API latency, measuring cold start time, or setting up performance regression alerts.
-commands:
-  - setup-performance-monitoring
-inputs:
-  - name: action
-    description: Action to perform (implement, instrument, audit). "implement" generates the full performance monitoring architecture (interface, adapter, DI), "instrument" adds traces to a specific flow or screen, "audit" checks for missing instrumentation on critical paths.
-    required: true
-  - name: target
-    description: Path to the core/performance directory or specific feature to instrument (e.g. lib/core/performance/ for implement, lib/features/checkout/ for instrument).
-    required: true
-  - name: provider
-    description: Performance monitoring provider to use (firebase, sentry, datadog, noop). Defaults to firebase.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-firebase-performance
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Monitors Flutter app performance in real time: custom traces, HTTP monitoring, startup time, and screen rendering. Fireb
 ---
 
 # Performance Monitoring

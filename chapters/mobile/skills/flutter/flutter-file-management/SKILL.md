@@ -1,22 +1,11 @@
 ---
-name: flutter-file-management
-description: >
-  Handles file operations in Flutter: pick, read/write, download with progress, upload, share, and manage app storage directories. Includes OWASP MASVS-STORAGE security requirements: internal-only storage for sensitive files, path traversal prevention, MIME validation, and no sensitive data in external/shared storage. Use this skill when implementing file picker, document download, file upload, file sharing, or any local file I/O.
-commands:
-  - manage-files
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the file management infrastructure (repository, data source, security utilities), "audit" checks existing file operations for path traversal vulnerabilities, external storage usage, or missing MIME validation.
-    required: true
-  - name: target
-    description: Path to the core/files directory or feature where file operations will be integrated (e.g. lib/core/files/ for implement, lib/ for audit).
-    required: true
-  - name: operations
-    description: Comma-separated list of file operations to implement (pick, download, upload, share, read-write, all). Defaults to all.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-file-management
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Handles file operations in Flutter: pick, read/write, download with progress, upload, share, and manage app storage dire
 ---
 
 # File Management

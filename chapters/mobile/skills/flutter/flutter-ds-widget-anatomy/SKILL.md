@@ -1,26 +1,11 @@
 ---
-name: flutter-ds-widget-anatomy
-description: >
-  Standard internal structure for a Design System widget file.
-  Use when writing or reviewing Flutter widget code to ensure correct
-  ordering of imports, constructor, properties, build methods,
-  resolvers, enums, and helper classes.
-commands:
-  - review-widget-anatomy
-inputs:
-  - name: action
-    description: Action to perform (review, scaffold). "review" checks an existing widget file against the anatomy rules (ordering, naming, limits), "scaffold" generates a new DS widget file following the correct structure.
-    required: true
-  - name: target
-    description: Path to the widget file to review or the directory where the new widget will be created (e.g. lib/ui_system/atoms/button/ds_button.dart).
-    required: true
-  - name: name
-    description: Name of the widget to scaffold (e.g. Button, Card, Badge). Required when action is "scaffold".
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.2"
-  domain: flutter-design-system
+id: flutter-ds-widget-anatomy
+version: 1.2.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Standard internal structure for a Design System widget file.   Use when writing or reviewing Flutter widget code to ensu
 ---
 
 # Widget Anatomy

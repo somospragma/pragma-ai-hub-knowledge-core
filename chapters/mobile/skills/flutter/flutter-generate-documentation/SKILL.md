@@ -1,25 +1,11 @@
 ---
-name: flutter-generate-documentation
-description: >
-  Generates and maintains project documentation using the 7-document framework: project-overview, requirements, project-structure, tech-stack, features, implementation, and user-flow. Use this skill when creating documentation for a new project, updating existing docs after major changes, onboarding new team members, or preparing delivery documentation. Triggers on 'document project', 'create docs', 'onboarding docs', 'project overview', 'tech stack doc', 'delivery documentation', or any request to produce structured project knowledge.
-commands:
-  - generate-docs
-inputs:
-  - name: action
-    description: Action to perform (generate, update, audit). "generate" creates documentation from scratch using the 7-document framework, "update" refreshes specific documents after project changes, "audit" checks existing documentation for completeness, outdated sections, or missing documents.
-    required: true
-  - name: target
-    description: Path to the docs directory or project root where documentation will be generated (e.g. docs/ for generate, . for audit).
-    required: true
-  - name: documents
-    description: Comma-separated list of documents to generate or update (project-overview, requirements, project-structure, tech-stack, features, implementation, user-flow, index, all). Defaults to all.
-    required: false
-  - name: audience
-    description: Primary audience for the documentation (developers, architects, stakeholders, all). Adjusts detail level and focus.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.0"
+id: flutter-generate-documentation
+version: 1.0.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Generates and maintains project documentation using the 7-document framework: project-overview, requirements, project-st
 ---
 
 # Project Documentation

@@ -1,22 +1,11 @@
 ---
-name: flutter-isolates
-description: >
-  Runs CPU-intensive work off the main thread using Dart isolates: compute(), Isolate.run() for one-shot tasks, Isolate.spawn() for long-lived workers, worker_manager for isolate pools with cancellation and progress, and isolate_manager for cross-platform support (VM + Web Workers + WASM). Use this skill when JSON parsing, image processing, encryption, data transformation, or any CPU-bound work causes UI jank or dropped frames.
-commands:
-  - implement-isolate
-inputs:
-  - name: pattern
-    description: Isolate pattern to implement (one-shot, long-lived, pool, cross-platform). "one-shot" uses Isolate.run for single tasks, "long-lived" uses Isolate.spawn with bidirectional comms, "pool" uses worker_manager for reusable isolates with cancellation, "cross-platform" uses isolate_manager for mobile + web + WASM.
-    required: true
-  - name: target
-    description: Path to the file or feature where the isolate work will be implemented (e.g. lib/features/product/data/data_sources/product_parser.dart).
-    required: true
-  - name: task
-    description: Description of the CPU-intensive task to offload (e.g. json-parsing, image-processing, encryption, data-transformation). Helps determine the optimal pattern and data serialization approach.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-isolates
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Runs CPU-intensive work off the main thread using Dart isolates: compute(), Isolate.run() for one-shot tasks, Isolate.sp
 ---
 
 # Dart Isolates & Workers

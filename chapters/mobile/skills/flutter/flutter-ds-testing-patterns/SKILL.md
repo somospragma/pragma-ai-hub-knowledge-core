@@ -1,25 +1,11 @@
 ---
-name: flutter-ds-testing-patterns
-description: >
-  Widget testing patterns for Flutter Design System components.
-  Use when writing widget tests, setting up test helpers, or verifying
-  component behavior across states, variants, interactions, and accessibility.
-commands:
-  - test-ds-component
-inputs:
-  - name: action
-    description: Action to perform (generate, audit). "generate" creates widget tests for a DS component covering all states, variants, and interactions, "audit" checks existing tests for missing coverage (states, variants, accessibility, null callbacks).
-    required: true
-  - name: target
-    description: Path to the DS component file or test file (e.g. lib/ui_system/atoms/button/ds_button.dart for generate, test/ui_system/atoms/button/ for audit).
-    required: true
-  - name: component_name
-    description: Name of the component to test (e.g. DsButton, DsCard). Required when action is "generate" and cannot be inferred from target path.
-    required: false
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-testing-patterns
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Widget testing patterns for Flutter Design System components.   Use when writing widget tests, setting up test helpers,
 ---
 
 # Testing Patterns

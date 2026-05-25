@@ -1,22 +1,11 @@
 ---
-name: flutter-bloc-pattern
-description: >
-  Implements the BLoC pattern correctly in Flutter with bloc 9.x and flutter_bloc 9.x. Use this skill when creating or modifying a BLoC, event, state, or any widget using BlocProvider/BlocBuilder/BlocListener. Triggers on 'create a BLoC', 'add an event', 'emit a state', BlocBuilder, BlocListener, BlocConsumer, BlocProvider, MultiBlocProvider, or any state management question using bloc. Stack- bloc, flutter_bloc, bloc_concurrency, bloc_test.
-commands:
-  - implement-bloc
-inputs:
-  - name: action
-    description: Action to perform (implement, add-event, audit). "implement" generates a complete BLoC (event + state + bloc class + page integration), "add-event" adds a new event handler to an existing BLoC, "audit" checks existing BLoCs for anti-patterns (missing transformer, DataSource injection, context access, add() inside handlers).
-    required: true
-  - name: target
-    description: Path to the BLoC file or feature directory (e.g. lib/features/auth/presentation/bloc/ for implement, lib/ for audit).
-    required: true
-  - name: feature_name
-    description: Name of the feature for the BLoC (e.g. login, product, cart). Required when action is "implement".
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-bloc-pattern
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements the BLoC pattern correctly in Flutter with bloc 9.x and flutter_bloc 9.x. Use this skill when creating or mod
 ---
 
 # BLoC Pattern in Flutter

@@ -1,22 +1,11 @@
 ---
-name: flutter-rendering
-description: >
-  Optimize Flutter rendering performance: eliminate jank, minimize widget rebuilds, use RepaintBoundary, const widgets, Impeller-aware patterns, and profiling with DevTools. Use this skill when reporting jank, slow scroll, dropped frames, excessive rebuilds, or asking about performance overlay, const constructors, RepaintBoundary, list virtualization, Impeller, or Flutter DevTools performance tab. Always profile before optimizing.
-commands:
-  - optimize-rendering
-inputs:
-  - name: action
-    description: Action to perform (diagnose, optimize, audit). "diagnose" profiles and identifies jank sources, "optimize" applies rendering fixes, "audit" checks for common anti-patterns (missing const, Opacity misuse, non-virtualized lists).
-    required: true
-  - name: target
-    description: Path to the widget, page, or feature directory to analyze (e.g. lib/features/product/presentation/pages/product_list_page.dart).
-    required: true
-  - name: issue
-    description: Specific rendering issue to focus on (jank, rebuilds, memory, slow-scroll, dropped-frames). Helps narrow the diagnosis scope.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-rendering
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Optimize Flutter rendering performance: eliminate jank, minimize widget rebuilds, use RepaintBoundary, const widgets, Im
 ---
 
 # Flutter Rendering Performance

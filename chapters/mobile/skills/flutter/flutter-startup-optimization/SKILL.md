@@ -1,22 +1,11 @@
 ---
-name: flutter-startup-optimization
-description: >
-  Optimize Flutter cold start time: measure with --trace-startup and Firebase Performance, parallelize initialization with Future.wait, defer non-critical work, use lazy singletons in GetIt, hold the native splash with deferFirstFrame/allowFirstFrame, and precache critical assets. Target < 2s cold start on mid-range devices. Use this skill when the app feels slow to launch, shows a white flash before the splash, or when startup time exceeds budget in CI.
-commands:
-  - optimize-startup
-inputs:
-  - name: action
-    description: Action to perform (measure, optimize, audit). "measure" profiles current startup time, "optimize" applies improvements, "audit" checks for common startup anti-patterns.
-    required: true
-  - name: target
-    description: Path to the main entry point or app initialization file (e.g. lib/main.dart, lib/app/di/injection.dart).
-    required: true
-  - name: device_tier
-    description: Target device tier for threshold validation (high-end, mid-range, low-end). Defaults to mid-range (< 2s target).
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-startup-optimization
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Optimize Flutter cold start time: measure with --trace-startup and Firebase Performance, parallelize initialization with
 ---
 
 # Startup Optimization

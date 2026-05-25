@@ -1,22 +1,11 @@
 ---
-name: flutter-memory-profiling
-description: >
-  Profile and fix memory leaks in Flutter using DevTools Memory tab, heap snapshots, retaining paths, allocation tracing, and the leak_tracker package for automated detection in tests. Covers correct disposal patterns for controllers, streams, BLoC, images, and isolates. Use this skill when the app crashes with OOM, slows down over time, or when investigating retained objects, growing heap, or undisposed controllers.
-commands:
-  - profile-memory
-inputs:
-  - name: action
-    description: Action to perform (diagnose, audit, fix). "diagnose" guides through DevTools heap snapshot workflow, "audit" checks code for common leak patterns (undisposed controllers, uncancelled subscriptions, stored context), "fix" applies disposal fixes to identified leaks.
-    required: true
-  - name: target
-    description: Path to the widget, BLoC, or feature directory to analyze (e.g. lib/features/gallery/presentation/pages/gallery_page.dart or lib/features/chat/).
-    required: true
-  - name: issue
-    description: Specific memory issue to focus on (leak, oom, growing-heap, undisposed-controller, image-cache). Helps narrow the diagnosis scope.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-memory-profiling
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Profile and fix memory leaks in Flutter using DevTools Memory tab, heap snapshots, retaining paths, allocation tracing,
 ---
 
 # Memory Profiling & Leak Detection

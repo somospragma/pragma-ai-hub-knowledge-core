@@ -1,22 +1,11 @@
 ---
-name: flutter-certificate-pinning
-description: >
-  Implements certificate pinning in Flutter to prevent MITM attacks: public key (SPKI) SHA-256 pinning via Dio interceptor, Android Network Security Config, iOS ATS, pin rotation strategy, and backend coordination guide. Covers OWASP MASVS-NETWORK-2 compliance (L2 requirement). Use this skill for banking, healthcare, fintech, or any app handling sensitive data that requires defense against network interception.
-commands:
-  - setup-certificate-pinning
-inputs:
-  - name: action
-    description: Action to perform (implement, rotate, audit). "implement" generates the full pinning setup (Dio interceptor, Android config, iOS config), "rotate" guides through the pin rotation workflow, "audit" checks existing pinning for single-pin vulnerability, missing backup, or incorrect strategy.
-    required: true
-  - name: target
-    description: Path to the network/security directory or project root (e.g. lib/core/network/ for implement, . for audit).
-    required: true
-  - name: domain
-    description: Server domain to pin (e.g. api.yourapp.com). Required when action is "implement" to extract the SPKI hash.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-certificate-pinning
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements certificate pinning in Flutter to prevent MITM attacks: public key (SPKI) SHA-256 pinning via Dio interceptor
 ---
 
 # Certificate Pinning

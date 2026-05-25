@@ -1,22 +1,11 @@
 ---
-name: flutter-ds-atomic-hierarchy
-description: >
-  Atomic Design classification rules and hierarchy for the Design System.
-  Use when classifying components as atoms, molecules, or organisms,
-  deciding composition strategy, or building dependency graphs (DAG).
-commands:
-  - classify-component
-inputs:
-  - name: action
-    description: Action to perform (classify, decompose, audit-dag). "classify" determines the atomic level of a component based on its dependencies, "decompose" breaks a complex component into atoms/molecules/organisms, "audit-dag" checks the dependency graph for violations (organism importing organism, molecule importing molecule).
-    required: true
-  - name: target
-    description: Path to the component file or Figma component name to classify/decompose (e.g. lib/ui_system/organisms/product_card/ for audit-dag, "ProductCard" for classify/decompose).
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-atomic-hierarchy
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Atomic Design classification rules and hierarchy for the Design System.   Use when classifying components as atoms, mole
 ---
 
 # Atomic Hierarchy

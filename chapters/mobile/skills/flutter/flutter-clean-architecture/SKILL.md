@@ -1,33 +1,11 @@
 ---
-name: flutter-clean-architecture
-description: >
-  Explains, enforces, and audits Clean Architecture in Flutter projects —
-  both for building new projects from scratch and for refactoring existing ones.
-  Use this skill when asking about project structure, layer separation,
-  'where does X go?', 'is this the right layer?', folder organization,
-  dependency direction, or architectural violations. Also activated when
-  reviewing code with violations, setting up a new project, migrating a legacy
-  codebase, or onboarding.
-  Canonical reference for layer boundaries, dependency rules, folder structure,
-  cross-feature communication (Mediator), and incremental refactoring strategy.
-  Supports single-project and monorepo with Melos.
-  Stack- Flutter >=3.32.0, Dart >=3.8.0, BLoC 9.1.1, GetIt 9.2.1,
-  Injectable 3.0.0, go_router 17.2.2, Freezed 3.2.5, fpdart 1.2.0.
-commands:
-  - audit-architecture
-inputs:
-  - name: action
-    description: Action to perform (audit, setup, refactor-plan). "audit" checks for layer violations (domain importing Flutter, presentation importing data, JSON in domain models), "setup" scaffolds the full clean architecture folder structure for a new project, "refactor-plan" generates an incremental migration plan for an existing codebase.
-    required: true
-  - name: target
-    description: Path to the project root or specific feature to audit (e.g. . for full project, lib/features/product/ for specific feature).
-    required: true
-  - name: strategy
-    description: Project strategy (single-project, monorepo). Determines folder structure and configuration. Defaults to single-project.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-clean-architecture
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Explains, enforces, and audits Clean Architecture in Flutter projects —   both for building new projects from scratch an
 ---
 
 # Clean Architecture in Flutter

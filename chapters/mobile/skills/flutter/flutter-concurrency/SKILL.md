@@ -1,22 +1,11 @@
 ---
-name: flutter-concurrency
-description: >
-  Handles concurrent operations safely in Flutter: mutex locks with synchronized, Completer for manual Future control, CancelToken for cancellable operations, debounce/throttle for UI actions, race condition prevention, semaphore patterns, and Future.wait for parallel execution. Use this skill when preventing double-submit, managing concurrent API calls, protecting shared resources, or implementing cancellable async operations. See flutter-isolates skill for CPU-bound parallelism.
-commands:
-  - implement-concurrency
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the correct concurrency pattern for a given scenario, "audit" checks existing code for race conditions, double-submit vulnerabilities, uncancelled tokens, or missing locks.
-    required: true
-  - name: target
-    description: Path to the file or directory to implement/audit (e.g. lib/features/auth/data/ for token refresh lock, lib/ for full audit).
-    required: true
-  - name: pattern
-    description: Specific concurrency pattern to implement (mutex, completer, cancel-token, debounce, throttle, semaphore, parallel-io, double-submit-guard). Helps generate the correct code structure.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-concurrency
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Handles concurrent operations safely in Flutter: mutex locks with synchronized, Completer for manual Future control, Can
 ---
 
 # Concurrency

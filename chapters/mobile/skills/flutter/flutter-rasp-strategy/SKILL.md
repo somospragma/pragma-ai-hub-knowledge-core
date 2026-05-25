@@ -1,22 +1,11 @@
 ---
-name: flutter-rasp-strategy
-description: > 
-  Implements Runtime Application Self-Protection (RASP) in Flutter using freeRASP (Talsec) as the primary provider: root/jailbreak detection, emulator detection, hook/Frida detection, tamper detection, and untrusted installation detection. Uses a Strategy + Adapter pattern so the RASP provider can be swapped without touching domain or presentation layers. Covers OWASP MASVS-RESILIENCE requirements (R category).
-commands:
-  - setup-rasp
-inputs:
-  - name: action
-    description: Action to perform (implement, audit, migrate). "implement" generates the full RASP setup with provider pattern, "audit" checks existing RASP configuration for missing threat responses or misconfigurations, "migrate" swaps the underlying RASP provider (e.g. freeRASP to commercial).
-    required: true
-  - name: target
-    description: Path to the core/security directory or feature where RASP will be integrated (e.g. lib/core/security/).
-    required: true
-  - name: provider
-    description: RASP provider to use (freerasp, custom). Defaults to freerasp.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-rasp-strategy
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements Runtime Application Self-Protection (RASP) in Flutter using freeRASP (Talsec) as the primary provider: root/j
 ---
 
 # RASP Strategy

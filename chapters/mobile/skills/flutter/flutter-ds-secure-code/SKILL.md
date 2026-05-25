@@ -1,22 +1,11 @@
 ---
-name: flutter-ds-secure-code
-description: >
-  Security rules for Design System code based on OWASP Mobile Application
-  Security and Pragma standards. Use when auditing code security, validating
-  inputs, reviewing dependencies, or checking for data exposure risks.
-commands:
-  - audit-ds-security
-inputs:
-  - name: action
-    description: Action to perform (audit, fix). "audit" checks DS component code for security violations (unauthorized imports, force unwraps, print statements, missing input validation), "fix" applies security fixes to identified issues.
-    required: true
-  - name: target
-    description: Path to the DS component file or package directory to audit (e.g. lib/ui_system/ for full audit, lib/ui_system/molecules/text_field/ for specific component).
-    required: true
-metadata:
-  author: pragma-ds
-  version: "1.1"
-  domain: flutter-design-system
+id: flutter-ds-secure-code
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Security rules for Design System code based on OWASP Mobile Application   Security and Pragma standards. Use when auditi
 ---
 
 # Secure Code

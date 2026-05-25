@@ -1,22 +1,11 @@
 ---
-name: flutter-dependency-injection-pattern
-description: >
-  Configures and wires dependency injection in Flutter using GetIt + Injectable. Use this skill when the user asks about DI, GetIt configuration, registering a service, 'how do I inject X?', 'wire my dependencies', 'add to DI', @injectable, @lazySingleton, @singleton, injection modules, or when adding any new class that must be resolved via getIt(). Also triggers when creating a new feature that requires DI registration. Stack: get_it, injectable, injectable_generator, build_runner. Dart 3.8+ / Flutter 3.32+.
-commands:
-  - setup-di
-inputs:
-  - name: action
-    description: Action to perform (implement, register, audit). "implement" generates the full DI infrastructure (injection.dart, modules, environments), "register" adds a new class to the DI container with correct annotation, "audit" checks for unregistered classes, incorrect lifetimes, or direct instantiation bypassing GetIt.
-    required: true
-  - name: target
-    description: Path to the DI directory or specific class to register (e.g. lib/core/di/ for implement, lib/features/product/data/repositories/product_repository_impl.dart for register).
-    required: true
-  - name: lifetime
-    description: Registration lifetime when action is "register" (lazy-singleton, singleton, factory, cached-factory). Determines the annotation used.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-dependency-injection-pattern
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Configures and wires dependency injection in Flutter using GetIt + Injectable. Use this skill when the user asks about D
 ---
 
 # DI in Flutter — GetIt + Injectable

@@ -1,22 +1,11 @@
 ---
-name: flutter-permissions
-description: >
-  Handles runtime permissions in Flutter with permission_handler 11.x: request at point of use, rationale dialogs, settings redirect, and platform manifest configuration. Includes store policy constraints: Google Play (April 2026 location/contacts policy, Android 17 Contact Picker requirement), App Store (usage description strings, Podfile macros), and AppGallery (standard Android permissions). Use this skill when requesting camera, location, microphone, contacts, notifications, storage, or any sensitive permission.
-commands:
-  - setup-permissions
-inputs:
-  - name: action
-    description: Action to perform (implement, audit). "implement" generates the permission service, use case, and platform configuration for the specified permissions, "audit" checks existing permission handling for policy violations, missing rationale, or incorrect manifest entries.
-    required: true
-  - name: target
-    description: Path to the core/permissions directory or feature where permissions will be integrated (e.g. lib/core/permissions/ or lib/features/camera/).
-    required: true
-  - name: permissions
-    description: Comma-separated list of permissions to handle (camera, location, microphone, contacts, notifications, storage, photos, bluetooth, all). Use "all" to generate the full permission service covering every declared permission.
-    required: true
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-permissions
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Handles runtime permissions in Flutter with permission_handler 11.x: request at point of use, rationale dialogs, setting
 ---
 
 # Runtime Permissions

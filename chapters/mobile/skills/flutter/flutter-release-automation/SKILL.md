@@ -1,25 +1,11 @@
 ---
-name: flutter-release-automation
-description: >
-  Automates Flutter release pipelines across CI/CD platforms- GitHub Actions, Azure DevOps, and Jenkins. Covers the full pipeline: quality gates (lint, test, coverage) → build (AAB/IPA) → signing (Android keystore, iOS Fastlane match) → obfuscation → distribution (Play Store, App Store, Firebase App Distribution) → version management and debug symbol upload. Use this skill when setting up or improving CI/CD for Flutter, configuring signing secrets, automating store deployments, or implementing quality gates.
-commands:
-  - setup-release-automation
-inputs:
-  - name: action
-    description: Action to perform (setup, audit, migrate). "setup" generates the full CI/CD pipeline configuration, "audit" checks an existing pipeline for missing quality gates or best practices, "migrate" converts between CI platforms (e.g. GitHub Actions to Azure DevOps).
-    required: true
-  - name: platform
-    description: CI/CD platform to target (github-actions, azure-devops, jenkins).
-    required: true
-  - name: strategy
-    description: Branching strategy to implement (gitflow, trunk-based). Determines trigger rules and environment mapping.
-    required: false
-  - name: targets
-    description: Build targets to include (android, ios, both). Defaults to both.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-release-automation
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Automates Flutter release pipelines across CI/CD platforms- GitHub Actions, Azure DevOps, and Jenkins. Covers the full p
 ---
 
 # Release Automation

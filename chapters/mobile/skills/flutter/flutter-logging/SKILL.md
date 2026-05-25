@@ -1,22 +1,11 @@
 ---
-name: flutter-logging
-description: >
-  Advanced logging skill for Flutter with Dart 3.3+, using the Strategy pattern (GoF) to swap logging handlers (Firebase Crashlytics, Sentry, DataDog, Grafana Faro) without changing client code. Includes a central Logger as the single facade, severity levels, navigation logging, performance metrics, and business events, separated by flavor (dev/staging/prod). Use this skill whenever the user mentions logging, logs, monitoring, Crashlytics, Sentry, DataDog, Grafana, production errors, analytics, API metrics, navigation traces, business events, or wants to configure observability in Flutter. Also applies when the user wants to switch logging services, add a new handler, or decouple logging from a specific provider.
-commands:
-  - setup-logging
-inputs:
-  - name: action
-    description: Action to perform (implement, add-handler, audit). "implement" generates the full logging architecture (facade, handler interface, config per flavor), "add-handler" adds a new handler for a specific provider, "audit" checks existing logging for direct provider imports, missing structured context, or bare print statements.
-    required: true
-  - name: target
-    description: Path to the core/logging directory or project root (e.g. lib/core/logging/ for implement, lib/ for audit).
-    required: true
-  - name: provider
-    description: Logging provider to implement (crashlytics, sentry, datadog, grafana, console). Required when action is "add-handler".
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-logging
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Advanced logging skill for Flutter with Dart 3.3+, using the Strategy pattern (GoF) to swap logging handlers (Firebase C
 ---
 
 # Flutter Advanced Logging

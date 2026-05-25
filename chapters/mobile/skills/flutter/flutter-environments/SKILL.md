@@ -1,22 +1,11 @@
 ---
-name: flutter-environments
-description: >
-  Advanced skill for configuring flavors, schemes, build variants, and compilation environments in Flutter for iOS and Android, using envied with obfuscate:true to protect secrets, Firebase per flavor, feature flags, signing config, and CI/CD secret injection. Use this skill whenever the user mentions flavors, environments, dev/staging/prod, build variants, schemes, xcconfig, productFlavors, envied, environment variables, .env, secrets, Firebase per environment, google-services.json, GoogleService-Info.plist, signing, keystore, certificates, or wants to separate configuration between environments. Also applies when the user wants to add a new environment, migrate from a single main.dart to multiple entry points, or protect API keys in the compiled binary. Stack: envied, Flutter 3.32+, Dart 3.8+.
-commands:
-  - setup-environments
-inputs:
-  - name: action
-    description: Action to perform (implement, add-flavor, audit). "implement" generates the full flavor architecture (entry points, envied config, Android productFlavors, iOS schemes), "add-flavor" adds a new environment to an existing setup, "audit" checks for secrets in repo, missing Firebase configs per flavor, or insecure env handling.
-    required: true
-  - name: target
-    description: Path to the project root or config directory (e.g. . for implement, lib/core/config/env/ for add-flavor).
-    required: true
-  - name: flavors
-    description: Comma-separated list of flavors to configure (e.g. dev,staging,prod). Defaults to dev,staging,prod.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "2.1"
+id: flutter-environments
+version: 2.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Advanced skill for configuring flavors, schemes, build variants, and compilation environments in Flutter for iOS and And
 ---
 
 # Flutter Flavors & Build Environments

@@ -1,25 +1,11 @@
 ---
-name: flutter-clean-feature
-description: >
-  Implements a complete Flutter feature following Clean Architecture with BLoC + GetIt/Injectable. Use this skill when the user asks to 'create a feature', 'implement screen X', 'add a module', 'build flow Y', or any request involving coordinated files across the presentation, domain, and data layers. Also triggers when implementing a use case, repository, data source, BLoC, or page as part of a new or existing feature, creating a new Melos package for a feature, or adding a feature to an existing package in a monorepo. This is the master skill for feature development. Supports single-project and monorepo with Melos. Stack: Flutter 3.32+, Dart 3.8+, BLoC, GetIt, Injectable, Freezed, fpdart, go_router.
-commands:
-  - build-feature
-inputs:
-  - name: feature_name
-    description: Name of the feature in snake_case (e.g. product_catalog, user_auth, checkout).
-    required: true
-  - name: target
-    description: Path where the feature will be created (e.g. lib/features/product/ for app folder, packages/feature_product/ for Melos package).
-    required: true
-  - name: entity_name
-    description: Primary domain entity name in PascalCase (e.g. Product, User, Order). Drives model, DTO, mapper, and BLoC naming.
-    required: true
-  - name: target_location
-    description: Where to create the feature (app-folder, melos-package). "app-folder" creates inside the app's lib/, "melos-package" creates a standalone workspace package.
-    required: false
-metadata:
-  author: Pragma Mobile Chapter
-  version: "1.1"
+id: flutter-clean-feature
+version: 1.1.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+description: Implements a complete Flutter feature following Clean Architecture with BLoC + GetIt/Injectable. Use this skill when the
 ---
 
 # Flutter Clean Feature — Implementation Guide
