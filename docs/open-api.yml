@@ -34,10 +34,10 @@ info:
     email: plataforma-ai@pragma.com.co
 
 servers:
+  - url: https://w1emkxybvj.execute-api.us-east-1.amazonaws.com/v1
+    description: Dev oficial (API Gateway - cuenta 700693144401)
   - url: https://f680gjpaxi.execute-api.us-east-1.amazonaws.com/v1
-    description: Dev (API Gateway)
-  - url: https://hub.sopp.pragma.com.co
-    description: Producción (futuro custom domain)
+    description: Dev temporal (API Gateway - cuenta 515966515611)
   - url: http://localhost:3000
     description: Local
 
@@ -425,6 +425,41 @@ paths:
                         to: "1.3.0"
                       - type: new
                         source: chapters/backend/skills/java-spring/spring-observability.md
+                        version: "1.0.0"
+                with_subcarpeta:
+                  summary: Asset con subcarpeta (references)
+                  value:
+                    server_version: "2.4.0"
+                    changed: true
+                    profile:
+                      email: david@pragma.com.co
+                      cuenta: null
+                      chapter: mobile
+                      stacks: [flutter]
+                    writes:
+                      - source: chapters/mobile/skills/flutter/flutter-bloc-pattern/SKILL.md
+                        target: .kiro/skills/flutter-bloc-pattern/SKILL.md
+                        scope: workspace
+                        content: "---\nid: flutter-bloc-pattern\nversion: 1.0.0\n---\n# BLoC Pattern..."
+                        version: "1.0.0"
+                        hash: "sha256:abc123..."
+                        signature: "hmac-sha256:def456..."
+                        attached_files:
+                          - source: core/chapters/mobile/skills/flutter/flutter-bloc-pattern/references/event-pattern.mmd
+                            target: .kiro/skills/flutter-bloc-pattern/references/event-pattern.mmd
+                            content: "graph TD\n  A[Event] --> B[BLoC]..."
+                            hash: "sha256:789abc..."
+                            signature: "hmac-sha256:012def..."
+                          - source: core/chapters/mobile/skills/flutter/flutter-bloc-pattern/references/state-diagram.mmd
+                            target: .kiro/skills/flutter-bloc-pattern/references/state-diagram.mmd
+                            content: "stateDiagram-v2\n  [*] --> Initial..."
+                            hash: "sha256:345ghi..."
+                            signature: "hmac-sha256:678jkl..."
+                    global_writes: []
+                    deletes: []
+                    changelog:
+                      - type: new
+                        source: chapters/mobile/skills/flutter/flutter-bloc-pattern/SKILL.md
                         version: "1.0.0"
                 no_changes:
                   summary: Sin cambios desde la última sincronización
@@ -893,8 +928,8 @@ components:
         tool:
           type: string
           description: Herramienta activa en este workspace
-          enum: [cursor, github-copilot, kiro, amazon-q-ide, amazon-q-cli, claude-code]
-          example: cursor
+          enum: [github-copilot, kiro, amazon-q-ide, amazon-q-cli, claude-code]
+          example: kiro
         chapter:
           type: string
           description: Chapter del pragmático (seleccionado en el init del CLI)
@@ -1041,6 +1076,44 @@ components:
             El CLI verifica esta firma antes de escribir el archivo en disco.
             Formato: `hmac-sha256:{hex}`
           example: "hmac-sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4"
+        attached_files:
+          type: array
+          nullable: true
+          description: |
+            Archivos adicionales que pertenecen a este asset (formato subcarpeta).
+            Incluye references, diagramas, scripts, etc. que se entregan junto con
+            el archivo principal. Cada archivo se firma individualmente.
+            Solo presente cuando el asset usa formato subcarpeta.
+          items:
+            $ref: '#/components/schemas/AttachedFile'
+
+    AttachedFile:
+      type: object
+      required: [source, target, content, hash, signature]
+      description: |
+        Archivo de referencia que acompaña a un asset principal (subcarpeta).
+        Se escribe en el filesystem del pragmático manteniendo la estructura
+        de carpetas relativa al asset principal.
+      properties:
+        source:
+          type: string
+          description: Path del archivo en S3
+          example: "core/chapters/mobile/skills/flutter/flutter-bloc-pattern/references/event-pattern.mmd"
+        target:
+          type: string
+          description: Path destino relativo al workspace del pragmático
+          example: ".kiro/skills/flutter-bloc-pattern/references/event-pattern.mmd"
+        content:
+          type: string
+          description: Contenido del archivo
+        hash:
+          type: string
+          description: SHA-256 del contenido
+          example: "sha256:a1b2c3d4..."
+        signature:
+          type: string
+          description: HMAC-SHA256 del contenido firmado con la clave del Hub
+          example: "hmac-sha256:e5f6a1b2..."
 
     ResolvedProfile:
       type: object
