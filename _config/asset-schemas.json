@@ -42,6 +42,13 @@
       "optional_sections": [],
       "frontmatter_required": ["id", "version", "scope", "type", "chapter", "stack"],
       "frontmatter_optional": ["project", "tags", "description"]
+    },
+    "hook": {
+      "description": "Hook de automatización para Kiro — se activa en eventos del IDE",
+      "required_sections": [],
+      "optional_sections": ["## Cuándo se activa", "## Qué hace"],
+      "frontmatter_required": ["id", "version", "scope", "type"],
+      "frontmatter_optional": ["chapter", "stack", "project", "tags", "description"]
     }
   },
   "scopes": {

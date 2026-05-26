@@ -1,5 +1,1 @@
----
-mode: ask
----
-
 %%pragma-content%%

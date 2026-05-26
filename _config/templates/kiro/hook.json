@@ -1,0 +1,12 @@
+{
+  "name": "%%pragma-id%%",
+  "version": "1.0.0",
+  "description": "%%pragma-description%%",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "%%pragma-content%%"
+  }
+}
