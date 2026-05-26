@@ -370,25 +370,19 @@ paths:
                   proyecto: null
                   local_version: null
       responses:
-        "200":
+        "202":
           description: |
-            Sincronización exitosa. Si `changed: false`, no hay archivos que actualizar
-            y el CLI no necesita escribir nada.
-          headers:
-            X-Hub-Version:
-              description: Versión actual del Hub server
-              schema:
-                type: string
-                example: "1.4.2"
-            X-Request-Id:
-              description: ID único del request para trazabilidad
-              schema:
-                type: string
-                format: uuid
+            Sync aceptado. El procesamiento se ejecuta en segundo plano.
+            El CLI debe hacer polling a `GET /sync/tasks/{task_id}` hasta que
+            el status sea `done` o `failed`.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SyncResponse'
+                $ref: '#/components/schemas/SyncTaskAccepted'
+              example:
+                task_id: "550e8400-e29b-41d4-a716-446655440000"
+                status: "processing"
+                status_url: "/sync/tasks/550e8400-e29b-41d4-a716-446655440000"
               examples:
                 with_changes:
                   summary: Hay archivos nuevos o actualizados
@@ -625,6 +619,91 @@ paths:
               example:
                 error: SERVICE_UNAVAILABLE
                 message: El Hub está en mantenimiento programado. Reintenta en 5 minutos.
+
+  # ─────────────────────────────────────────────
+  # GET /sync/tasks/{taskId}
+  # ─────────────────────────────────────────────
+  /sync/tasks/{taskId}:
+    get:
+      tags: [sync]
+      summary: Consultar estado de un task de sync
+      description: |
+        Endpoint de polling para consultar el resultado de un sync asíncrono.
+        El CLI llama a este endpoint cada 2-3 segundos después de recibir el 202
+        de `POST /sync` hasta que el status sea `done` o `failed`.
+
+        El resultado se almacena en S3 como `tasks/{taskId}.json` y se elimina
+        automáticamente después de 24 horas (lifecycle policy).
+      operationId: getSyncTaskStatus
+      security:
+        - apiKey: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          description: ID del task retornado por POST /sync
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Estado del task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SyncTaskResult'
+              examples:
+                processing:
+                  summary: Task aún en proceso
+                  value:
+                    status: "processing"
+                    created_at: "2026-05-26T15:00:00.000Z"
+                done:
+                  summary: Task completado exitosamente
+                  value:
+                    status: "done"
+                    result:
+                      server_version: "1.0.0"
+                      changed: true
+                      profile:
+                        email: david@pragma.com.co
+                        cuenta: null
+                        chapter: mobile
+                        stacks: [flutter]
+                      writes:
+                        - source: core/chapters/mobile/skills/flutter/flutter-bloc-pattern/SKILL.md
+                          target: .kiro/skills/flutter-bloc-pattern/SKILL.md
+                          scope: workspace
+                          content: "..."
+                          version: "1.0.0"
+                          hash: "sha256:abc..."
+                          signature: "hmac-sha256:def..."
+                          attached_files:
+                            - source: core/chapters/mobile/skills/flutter/flutter-bloc-pattern/references/event.mmd
+                              target: .kiro/skills/flutter-bloc-pattern/references/event.mmd
+                              content: "..."
+                              hash: "sha256:..."
+                              signature: "hmac-sha256:..."
+                      global_writes: []
+                      deletes: []
+                      changelog:
+                        - type: new
+                          source: core/chapters/mobile/skills/flutter/flutter-bloc-pattern/SKILL.md
+                          version: "1.0.0"
+                failed:
+                  summary: Task falló
+                  value:
+                    status: "failed"
+                    error: "ids.json not available in S3"
+        "404":
+          description: Task no encontrado (expiró o ID inválido)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: NOT_FOUND
+                message: Task not found
 
   # ─────────────────────────────────────────────
   # POST /webhook/github
@@ -1114,6 +1193,50 @@ components:
           type: string
           description: HMAC-SHA256 del contenido firmado con la clave del Hub
           example: "hmac-sha256:e5f6a1b2..."
+
+    SyncTaskAccepted:
+      type: object
+      required: [task_id, status, status_url]
+      description: Respuesta inmediata de POST /sync — el procesamiento continúa en segundo plano
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          description: ID único del task para consultar el resultado
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        status:
+          type: string
+          enum: [processing]
+          description: Siempre "processing" en la respuesta inicial
+          example: "processing"
+        status_url:
+          type: string
+          description: URL relativa para hacer polling del resultado
+          example: "/sync/tasks/550e8400-e29b-41d4-a716-446655440000"
+
+    SyncTaskResult:
+      type: object
+      required: [status]
+      description: |
+        Resultado de un task de sync. Tres estados posibles:
+        - `processing`: aún en ejecución
+        - `done`: completado, incluye `result` con la respuesta completa del sync
+        - `failed`: falló, incluye `error` con el mensaje
+      properties:
+        status:
+          type: string
+          enum: [processing, done, failed]
+          description: Estado actual del task
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp de creación del task
+        result:
+          $ref: '#/components/schemas/SyncResponse'
+          description: Resultado completo del sync (solo cuando status=done)
+        error:
+          type: string
+          description: Mensaje de error (solo cuando status=failed)
 
     ResolvedProfile:
       type: object
