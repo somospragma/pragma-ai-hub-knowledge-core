@@ -113,7 +113,6 @@ s3://sopp-hub-content/
     taxonomy.json                       ← servido en GET /taxonomy
     ides.json                           ← servido en GET /config
     templates/
-      cursor/
       kiro/
       github-copilot/
       amazon-q-ide/

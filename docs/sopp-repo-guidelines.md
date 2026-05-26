@@ -40,7 +40,6 @@
 │   ├── taxonomy.json         ← chapters, plataformas, stacks y señales de detección
 │   ├── ides.json             ← IDEs soportados, capacidades y path templates
 │   └── templates/            ← plantillas de renderizado por IDE y tipo de asset
-│       ├── cursor/
 │       ├── kiro/
 │       ├── github-copilot/
 │       ├── amazon-q-ide/
