@@ -1,0 +1,147 @@
+{
+  "skill_name": "flutter-feature-development",
+  "description": "Evaluations to verify that flutter-feature-development correctly guides Flutter feature structure, layer implementation, DI setup, barrel exports, and works for both monorepo and single-app project layouts.",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "feature-structure-single-app",
+      "prompt": "I'm building a standalone Flutter app (not a monorepo) and I want to add a 'notifications' feature using Clean Architecture. Where should the feature code live and what's the folder structure I should create inside it?",
+      "expected_output": "Suggests placing the feature at `lib/src/features/notifications/` (single-app layout) with subdirectories: domain/{entities,repositories,usecases}, data/{datasources,models,mappers,repositories}, presentation/{blocs,pages,widgets,routes}, di/. Provides the full directory tree.",
+      "assertions": [
+        {
+          "name": "correct-path-for-single-app",
+          "criteria": "Response uses a path appropriate for a single-app Flutter project (e.g. lib/src/features/notifications/ or lib/features/notifications/) — NOT a top-level features/ directory assuming a monorepo"
+        },
+        {
+          "name": "three-layers-present",
+          "criteria": "Suggested structure contains all three Clean Architecture layers: domain/, data/, presentation/"
+        },
+        {
+          "name": "di-directory-included",
+          "criteria": "DI directory (di/ or injection/) is present in the suggested structure"
+        },
+        {
+          "name": "test-directory-mentioned",
+          "criteria": "A test directory mirroring the lib structure is mentioned or shown"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "domain-layer-implementation",
+      "prompt": "I'm creating a 'wishlist' feature for my Flutter app. The domain layer needs: an entity (WishlistItem with id, productId, productName, addedAt DateTime), a repository interface that can add, remove, and fetch all items, and a usecase to get all wishlist items. Write the Dart code for all three.",
+      "expected_output": "Three Dart files: (1) WishlistItemEntity extending Equatable (or BaseEntity) with final fields and props override; (2) WishlistRepository abstract class with Future<Result<...>> methods for add/remove/getAll; (3) GetWishlistItemsUseCase with call() returning Future<Result<List<WishlistItemEntity>, Exception>>. No Flutter imports in any file.",
+      "assertions": [
+        {
+          "name": "entity-is-immutable",
+          "criteria": "WishlistItemEntity has final fields, const constructor, and overrides props (Equatable) or equivalent"
+        },
+        {
+          "name": "repository-is-abstract",
+          "criteria": "WishlistRepository is an abstract class (interface), not a concrete implementation"
+        },
+        {
+          "name": "repository-methods-all-present",
+          "criteria": "Repository interface has methods for add, remove, and getAll (or fetchAll) — all three operations"
+        },
+        {
+          "name": "usecase-returns-result",
+          "criteria": "GetWishlistItemsUseCase.call() returns Future<Result<List<WishlistItemEntity>, Exception>> or Either equivalent"
+        },
+        {
+          "name": "no-flutter-imports-in-domain",
+          "criteria": "None of the three files import 'package:flutter/...' or contain UI-related code"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "eval_name": "cubit-state-classes",
+      "prompt": "I need to create the BLoC/Cubit state classes for a 'payment' feature. The feature can be: idle (initial), loading a payment, payment completed (with a PaymentReceipt entity), or payment failed (with an error message). Show me how to structure the states and the Cubit.",
+      "expected_output": "Sealed class or abstract class PaymentState extending Equatable, with subclasses: PaymentInitial, PaymentLoading, PaymentSuccess(PaymentReceipt receipt), PaymentError(String message). Cubit extends Cubit<PaymentState>, uses processPayment() with result.fold() to emit states.",
+      "assertions": [
+        {
+          "name": "four-states-defined",
+          "criteria": "All four states are defined: Initial, Loading, Success (with receipt), Error (with message)"
+        },
+        {
+          "name": "states-extend-equatable",
+          "criteria": "States use Equatable (with props) or sealed class for value comparison"
+        },
+        {
+          "name": "cubit-uses-fold-not-try-catch",
+          "criteria": "The Cubit method uses result.fold() or equivalent — not a try-catch block to handle errors"
+        },
+        {
+          "name": "loading-emitted-before-call",
+          "criteria": "The Cubit emits the Loading state before calling the UseCase"
+        },
+        {
+          "name": "usecase-injected-in-cubit",
+          "criteria": "The relevant UseCase is injected via the Cubit constructor, not instantiated inside"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "eval_name": "dependency-injection-module",
+      "prompt": "My Flutter app uses get_it + injectable for dependency injection. I have a 'reviews' feature with: ReviewRemoteDataSource, ReviewLocalDataSource, ReviewMapper, ReviewRepositoryImpl (implementing ReviewRepository), and GetReviewsUseCase. Write the DI module for this feature.",
+      "expected_output": "A @module abstract class (e.g., ReviewsModule or FeatureRegisterModule) with @lazySingleton providers for each component. DataSources registered separately (possibly @Named), Mapper registered, Repository registered with datasources and mapper injected, UseCase registered. Injectable annotations used correctly.",
+      "assertions": [
+        {
+          "name": "module-annotation-present",
+          "criteria": "Class is annotated with @module (injectable) or equivalent DI framework annotation"
+        },
+        {
+          "name": "all-five-components-registered",
+          "criteria": "All five components are registered: RemoteDataSource, LocalDataSource, Mapper, Repository, UseCase"
+        },
+        {
+          "name": "repository-bound-to-interface",
+          "criteria": "ReviewRepositoryImpl is registered as the implementation of ReviewRepository (abstract interface), not just the concrete class"
+        },
+        {
+          "name": "named-or-typed-datasources",
+          "criteria": "Remote and Local DataSources are differentiated — either via @Named annotations or separate typed providers"
+        },
+        {
+          "name": "no-manual-instantiation-in-ui",
+          "criteria": "Response does NOT suggest calling GetIt.instance.get() or manual instantiation inside a Widget or Page"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "eval_name": "barrel-exports-public-api",
+      "prompt": "I finished building my 'invoices' Flutter feature. What files should I export in the public barrel file (lib/invoices.dart) and why? The feature has entities, repositories (interface + impl), usecases, models, datasources, mappers, cubits, states, pages, widgets, and a DI module.",
+      "expected_output": "Public API exports: Domain entities, repository interfaces (abstract), usecases, Cubit + States, Pages (for routing/navigation), DI module/injector. Should NOT export: models (data layer internal), datasource implementations, mapper implementations, repository implementations. Explains why: consumers only need domain contracts and presentation entry points.",
+      "assertions": [
+        {
+          "name": "domain-entities-exported",
+          "criteria": "Domain entities are listed as exports in the public barrel file"
+        },
+        {
+          "name": "presentation-pages-exported",
+          "criteria": "Pages (and optionally Cubit/States) are exported for navigation/integration"
+        },
+        {
+          "name": "di-module-exported",
+          "criteria": "The DI module or injector is exported (so host apps can register the feature)"
+        },
+        {
+          "name": "data-layer-internals-not-exported",
+          "criteria": "Models, DataSources, Mappers, and RepositoryImpl are NOT listed as public exports"
+        },
+        {
+          "name": "reasoning-provided",
+          "criteria": "Response explains WHY certain things are exported (public contract) vs not (implementation detail)"
+        }
+      ],
+      "files": []
+    }
+  ]
+}

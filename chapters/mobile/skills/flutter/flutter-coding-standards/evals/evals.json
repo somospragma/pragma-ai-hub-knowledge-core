@@ -1,0 +1,442 @@
+{
+  "skill_name": "flutter-coding-standards",
+  "evals": [
+    {
+      "id": "eval-001-file-naming",
+      "title": "File Naming Standard Violation",
+      "category": "Naming Conventions",
+      "difficulty": "easy",
+      "prompt": "Review this Dart file path and identify naming standard violations. The file is located at: lib/src/domain/entities/UserEntity.dart - Does it follow snake_case conventions?",
+      "expected_output": "The file violates Dart naming standards. Files must use snake_case (e.g., user_entity.dart), not PascalCase. Expected: lib/src/domain/entities/user_entity.dart",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-001-a",
+          "text": "The assistant identifies that 'UserEntity.dart' violates snake_case naming convention",
+          "type": "boolean",
+          "weight": 0.5
+        },
+        {
+          "id": "assert-001-b",
+          "text": "The assistant provides the correct file name 'user_entity.dart'",
+          "type": "boolean",
+          "weight": 0.5
+        }
+      ]
+    },
+    {
+      "id": "eval-002-class-naming",
+      "title": "Class Naming Conventions in Clean Architecture",
+      "category": "Naming Conventions",
+      "difficulty": "medium",
+      "prompt": "Review these class definitions for naming correctness according to Clean Architecture. Which ones violate conventions?\\n\\nclass user_repository { }\\nclass GetUserUseCase { }\\nclass user_model extends BaseModel { }\\nclass UserRepositoryImpl { }",
+      "expected_output": "Violations: 'user_repository' should be 'UserRepository' (PascalCase). 'user_model' should be 'UserModel' (PascalCase). Correct naming: UserRepository (interface), GetUserUseCase, UserModel, UserRepositoryImpl.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-002-a",
+          "text": "Identifies all three naming violations: 'user_repository', 'user_model', and incorrect usage patterns",
+          "type": "boolean",
+          "weight": 0.4
+        },
+        {
+          "id": "assert-002-b",
+          "text": "Provides correct naming for all three classes: UserRepository, UserModel, UserRepositoryImpl",
+          "type": "boolean",
+          "weight": 0.3
+        },
+        {
+          "id": "assert-002-c",
+          "text": "Explains PascalCase rule for all class types",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "id": "eval-003-const-final-late",
+      "title": "const vs final vs late Decision (Edge Case)",
+      "category": "Variable Declaration",
+      "difficulty": "hard",
+      "prompt": "Analyze these variable declarations. Which ones are incorrectly using const/final/late?\\n\\nconst String defaultName = 'Guest';\\nlate final user = fetchUser();\\nfinal DateTime now = DateTime.now();\\nconst var config = loadConfig();",
+      "expected_output": "Line 2 is problematic: 'late final user = ...' tries to assign in late declaration (should be 'final user = await fetchUser()' or 'late final user;' + separate initialization). Line 4: 'const var config = ...' won't work because 'var' is dynamic and config is runtime-computed; use 'final' instead.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-003-a",
+          "text": "Identifies that 'late final user = fetchUser()' is problematic (late cannot be initialized immediately)",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-003-b",
+          "text": "Identifies that 'const var config = loadConfig()' is wrong (config is runtime, not compile-time)",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-003-c",
+          "text": "Provides correct alternatives: 'final user = await fetchUser()' and 'final config = loadConfig()'",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "id": "eval-004-import-organization",
+      "title": "Import Organization Correctness",
+      "category": "Import Standards",
+      "difficulty": "easy",
+      "prompt": "Reorder these imports according to the coding standards. Identify which organization is correct:\\nA) import 'package:flutter/material.dart'; import 'dart:async'; import '../entities/user.dart'; import 'package:equatable/equatable.dart';\\nB) import 'dart:async'; import 'package:flutter/material.dart'; import 'package:equatable/equatable.dart'; import '../entities/user.dart';",
+      "expected_output": "Option B is correct. Import order: (1) dart imports, (2) flutter imports, (3) packages, (4) relative imports. Option A violates this by placing flutter before dart and relative after packages.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-004-a",
+          "text": "Correctly identifies Option B as the correct import organization",
+          "type": "boolean",
+          "weight": 0.5
+        },
+        {
+          "id": "assert-004-b",
+          "text": "Explains the ordering rule: dart → flutter → packages → relative",
+          "type": "boolean",
+          "weight": 0.5
+        }
+      ]
+    },
+    {
+      "id": "eval-005-logging-violations",
+      "title": "Logging Standards: print vs log",
+      "category": "Logging Standards",
+      "difficulty": "easy",
+      "prompt": "Identify logging violations in this Dart code:\\nvoid loadUsers() {\\n  print('Loading users...');\\n  try {\\n    debugPrint('Fetching from API');\\n    final data = fetchData();\\n    print('Success: $data');\\n  } catch (e) {\\n    print('Error: $e');\\n  }\\n}",
+      "expected_output": "All print() and debugPrint() calls violate standards. They should use the log interface: log.debug(), log.info(), log.error(). Replace: 'print(...)' → 'log.info(...)', 'debugPrint(...)' → 'log.debug(...)'. Never use print() in production code.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-005-a",
+          "text": "Identifies all three instances of print()/debugPrint() violations (3 occurrences minimum)",
+          "type": "quantitative",
+          "target": 3,
+          "operator": ">=",
+          "weight": 0.4
+        },
+        {
+          "id": "assert-005-b",
+          "text": "Recommends using log.info(), log.debug(), log.error() replacements",
+          "type": "boolean",
+          "weight": 0.3
+        },
+        {
+          "id": "assert-005-c",
+          "text": "States that print() should never be used in production code",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "id": "eval-006-missing-documentation",
+      "title": "Documentation for Public API Methods",
+      "category": "Code Documentation",
+      "difficulty": "medium",
+      "prompt": "This is a public API method. Does it have sufficient documentation?\\npublic Future<UserEntity> getUserById(String userId) async {\\n  return _repository.getUser(userId);\\n}\\n\\nWhat documentation is missing?",
+      "expected_output": "Missing public documentation (/// comment). Should have: '/// Retrieves a user by their unique identifier.\\n/// Returns [UserEntity] on success.\\n/// Throws [UserNotFoundException] if user not found.\\n/// Throws [NetworkException] on network errors.'",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-006-a",
+          "text": "Identifies missing /// documentation comment for public method",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-006-b",
+          "text": "Recommends documentation covering: method purpose, return type, exceptions thrown",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-006-c",
+          "text": "Provides a complete example documentation template with ///",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "id": "eval-007-trailing-commas",
+      "title": "Trailing Commas in Multi-line Calls",
+      "category": "Formatting Rules",
+      "difficulty": "easy",
+      "prompt": "Check trailing comma usage in this multi-line function call. Is it correct?\\nfinal result = await useCase.call(\\n  userId: 'user-123',\\n  includeDetails: true\\n);",
+      "expected_output": "Missing trailing comma after 'includeDetails: true'. Should be:\\nfinal result = await useCase.call(\\n  userId: 'user-123',\\n  includeDetails: true,\\n);\\nTrailing commas enable auto-format and improve readability in version control diffs.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-007-a",
+          "text": "Identifies the missing trailing comma after 'includeDetails: true'",
+          "type": "boolean",
+          "weight": 0.5
+        },
+        {
+          "id": "assert-007-b",
+          "text": "Explains that trailing commas enable auto-format and improve diffs",
+          "type": "boolean",
+          "weight": 0.5
+        }
+      ]
+    },
+    {
+      "id": "eval-008-null-safety-violations",
+      "title": "Null Safety Violations",
+      "category": "Null Safety",
+      "difficulty": "hard",
+      "prompt": "Identify null safety violations in this code:\\nclass UserController {\\n  User user = null;\\n  String getName() {\\n    return user.name!;  // Always unsafe\\n  }\\n  void display() {\\n    if (user != null) {\\n      print(user.toJson());\\n    }\\n  }\\n}",
+      "expected_output": "Violations: (1) 'User user = null;' should be 'User? user;' (nullable type). (2) 'user.name!' is unsafe unwrap without null check. (3) Line 8 checks 'user != null' but doesn't narrow type for safe access. Fix: Make user nullable, check before use, or use 'user?.name ?? defaultValue'.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-008-a",
+          "text": "Identifies that 'User user = null;' should use explicit nullable type 'User?'",
+          "type": "boolean",
+          "weight": 0.3
+        },
+        {
+          "id": "assert-008-b",
+          "text": "Flags 'user.name!' as unsafe unwrap without null narrowing",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-008-c",
+          "text": "Identifies that null check does not narrow the type for safe access in the current code",
+          "type": "boolean",
+          "weight": 0.35
+        }
+      ]
+    },
+    {
+      "id": "eval-009-generic-exceptions",
+      "title": "Custom Exceptions vs Generic Exception",
+      "category": "Exception Handling",
+      "difficulty": "medium",
+      "prompt": "Review this exception handling. What's wrong with exception usage?\\ntry {\\n  final data = await api.fetch();\\n} catch (e) {\\n  throw Exception('Failed to fetch data');\\n}",
+      "expected_output": "Using generic 'Exception' violates standards. Should create custom exceptions: 'class FetchDataException extends AppException { FetchDataException(String msg) : super(msg); }' then throw 'FetchDataException('Failed to fetch data')'.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-009-a",
+          "text": "Identifies that throwing generic 'Exception' violates standards",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-009-b",
+          "text": "Recommends creating a custom exception class (e.g., FetchDataException)",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-009-c",
+          "text": "Provides implementation example of custom AppException hierarchy",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "id": "eval-010-equatable-entities",
+      "title": "Equatable Implementation for Entity Comparison",
+      "category": "Entity Design",
+      "difficulty": "medium",
+      "prompt": "This UserEntity is compared for equality. Does it correctly implement Equatable?\\nclass UserEntity {\\n  final String id;\\n  final String name;\\n  const UserEntity({required this.id, required this.name});\\n}\\nfinal u1 = UserEntity(id: '1', name: 'John');\\nfinal u2 = UserEntity(id: '1', name: 'John');\\nprint(u1 == u2);  // Should be true",
+      "expected_output": "UserEntity must extend Equatable and override 'props'. Currently, u1 == u2 will be false (different object references). Fix: 'class UserEntity extends Equatable { ... @override List<Object> get props => [id, name]; }' to enable proper equality comparison.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-010-a",
+          "text": "Identifies that UserEntity does not extend Equatable (comparison will fail)",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-010-b",
+          "text": "Recommends extending Equatable and overriding 'props'",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-010-c",
+          "text": "Provides complete code fix showing 'extends Equatable' and '@override List<Object> get props'",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "id": "eval-011-boolean-naming",
+      "title": "Boolean Variable Naming Conventions",
+      "category": "Naming Conventions",
+      "difficulty": "easy",
+      "prompt": "Review these boolean variable declarations. Which ones violate Dart naming conventions?\\nbool loading = false;\\nbool errorState = true;\\nbool isAuthenticated = false;\\nbool userCanDelete = true;\\nbool active = false;\\nbool hasNotifications = true;",
+      "expected_output": "Violations: 'loading' should be 'isLoading', 'errorState' should be 'hasError' or 'isError', 'active' should be 'isActive'. The 'userCanDelete' naming is acceptable but 'canDelete' is cleaner. Correct: isAuthenticated, hasNotifications follow the is/has/can prefix rule.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-011-a",
+          "text": "Identifies 'loading' as a violation — should use 'isLoading' prefix",
+          "type": "boolean",
+          "weight": 0.3
+        },
+        {
+          "id": "assert-011-b",
+          "text": "Identifies 'active' as a violation — should be 'isActive'",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-011-c",
+          "text": "Identifies 'errorState' as a violation — should be 'isError' or 'hasError'",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-011-d",
+          "text": "Correctly confirms 'isAuthenticated' and 'hasNotifications' as valid",
+          "type": "boolean",
+          "weight": 0.2
+        }
+      ]
+    },
+    {
+      "id": "eval-012-private-member-naming",
+      "title": "Private Member Naming with Underscore Prefix",
+      "category": "Naming Conventions",
+      "difficulty": "easy",
+      "prompt": "Are these private member declarations correct in Dart?\\nclass PaymentService {\\n  late final RemoteDataSource remoteSource;\\n  final LocalDataSource localSource;\\n  late UserRepository _repo;\\n  \n  void _processPayment() { }\\n  String formatAmount(double amount) => amount.toStringAsFixed(2);\\n}",
+      "expected_output": "Violations: 'remoteSource' and 'localSource' are intended to be private but lack the underscore prefix — should be '_remoteSource' and '_localSource'. '_repo' is named correctly but should be 'late final' for DI-injected fields. 'formatAmount' is public (no underscore) — if it should be private, rename to '_formatAmount'.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-012-a",
+          "text": "Identifies 'remoteSource' as missing the underscore prefix for private visibility",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-012-b",
+          "text": "Identifies 'localSource' as missing the underscore prefix for private visibility",
+          "type": "boolean",
+          "weight": 0.35
+        },
+        {
+          "id": "assert-012-c",
+          "text": "Mentions that 'late final' should be used for injected fields set exactly once",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    },
+    {
+      "id": "eval-013-string-interpolation",
+      "title": "String Interpolation vs Concatenation",
+      "category": "Formatting Rules",
+      "difficulty": "easy",
+      "prompt": "Review these string operations and identify which ones violate Dart standards:\\nfinal greeting = 'Hello, ' + user.name + '!';\\nfinal url = baseUrl + '/users/' + userId + '/profile';\\nfinal message = 'User $userId logged in';\\nfinal detail = 'Balance: ${account.balance.toStringAsFixed(2)} USD';",
+      "expected_output": "Lines 1 and 2 violate the 'prefer_interpolation_to_compose_strings' rule — use string interpolation instead. Correct: 'Hello, ${user.name}!' and '$baseUrl/users/$userId/profile'. Lines 3 and 4 are correct: simple variable uses '$var', expression uses '${expression}'.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-013-a",
+          "text": "Identifies the first string concatenation (greeting) as a violation",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-013-b",
+          "text": "Identifies the second string concatenation (url) as a violation",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-013-c",
+          "text": "Provides correct interpolation alternatives for both violations",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-013-d",
+          "text": "Confirms lines 3 and 4 are correct (simple $var and ${expression} patterns)",
+          "type": "boolean",
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "id": "eval-014-enum-and-typedef-naming",
+      "title": "Enum and Typedef Naming Conventions",
+      "category": "Naming Conventions",
+      "difficulty": "medium",
+      "prompt": "Identify naming violations in these Dart type definitions:\\nenum payment_status { PENDING, COMPLETED, FAILED }\\ntypedef onUserLoaded = void Function(UserEntity user);\\nmixin cache_strategy { }\\nenum ApiStatus { loading, success, error }\\ntypedef JsonMap = Map<String, dynamic>;",
+      "expected_output": "Violations: 'payment_status' should be 'PaymentStatus' (PascalCase enum). Enum values should be camelCase: 'pending', 'completed', 'failed' (not SCREAMING_SNAKE_CASE). 'onUserLoaded' typedef should be 'OnUserLoaded' (PascalCase). 'cache_strategy' mixin should be 'CacheStrategy' (PascalCase). Correct: 'ApiStatus' and enum values 'loading/success/error', 'JsonMap' typedef.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-014-a",
+          "text": "Identifies 'payment_status' as a violation — should be 'PaymentStatus' (PascalCase)",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-014-b",
+          "text": "Identifies SCREAMING_SNAKE_CASE enum values (PENDING, COMPLETED, FAILED) as violations — should be camelCase",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-014-c",
+          "text": "Identifies 'onUserLoaded' typedef as a violation — should be 'OnUserLoaded' (PascalCase)",
+          "type": "boolean",
+          "weight": 0.25
+        },
+        {
+          "id": "assert-014-d",
+          "text": "Identifies 'cache_strategy' mixin as a violation — should be 'CacheStrategy' (PascalCase)",
+          "type": "boolean",
+          "weight": 0.25
+        }
+      ]
+    },
+    {
+      "id": "eval-015-linting-package-choice",
+      "title": "Choosing the Right Linting Package",
+      "category": "Linting Configuration",
+      "difficulty": "easy",
+      "prompt": "I'm starting a new open-source Flutter package that I plan to publish on pub.dev. It's a small utilities library with a few helper functions. Which linting package should I use in analysis_options.yaml and why?",
+      "expected_output": "For an open-source pub.dev package, 'lint' or 'flutter_lints' is typically appropriate — they have medium strictness suitable for libraries consumed by others with different coding styles. 'very_good_analysis' can be too strict for open-source libraries (contributors may struggle). Provides a sample analysis_options.yaml snippet.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "assert-015-a",
+          "text": "Recommends 'lint' or 'flutter_lints' for an open-source package (NOT very_good_analysis as the primary recommendation)",
+          "type": "boolean",
+          "weight": 0.4
+        },
+        {
+          "id": "assert-015-b",
+          "text": "Explains the reasoning: open-source packages should be contributor-friendly with moderate strictness",
+          "type": "boolean",
+          "weight": 0.3
+        },
+        {
+          "id": "assert-015-c",
+          "text": "Provides a sample analysis_options.yaml with the recommended include directive",
+          "type": "boolean",
+          "weight": 0.3
+        }
+      ]
+    }
+  ]
+}
