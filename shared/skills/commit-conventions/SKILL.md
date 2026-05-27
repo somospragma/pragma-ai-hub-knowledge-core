@@ -1,11 +1,13 @@
 ---
-id: flutter-commit-conventions
-version: 1.1.0
-scope: stack
-type: skill
-chapter: mobile
-stack: [flutter]
-description: Conventional Commits specification for commit messages including types (feat, fix, docs, etc), scopes, and message body/
+name: commit-conventions
+description: Conventional Commits specification for commit messages including types (feat, fix, docs, etc), scopes, and message body/footer conventions. Use when writing commit messages, understanding commit structure, or reviewing commit history.
+license: Complete terms in LICENSE.txt
+metadata:
+  id: commit-conventions
+  version: 1.0.0
+  scope: global
+  type: skill
+  category: productivity
 ---
 
 # Commit Conventions
