@@ -3,10 +3,13 @@ name: flutter-feature-development
 description: Complete workflow for developing new Flutter features using Clean Architecture. ALWAYS use this skill when creating new features, implementing user stories, structuring domain/data/presentation layers, configuring dependency injection for features, or organizing feature packages. Activate for ANY Flutter project layout — monorepo with top-level `features/` directory, single-app with `lib/src/features/`, or standalone Dart packages. ALWAYS trigger when users ask "where do I put this code?", "how do I structure a new screen?", "how does DI work in a feature?", "where does this business logic go?", or describe wanting to add a new user story, module, or feature. Use this skill even when the user doesn't explicitly say "Clean Architecture", "feature package", or "BLoC" — you should recognize feature-creation intent from context.
 license: Complete terms in LICENSE.txt
 metadata:
-  author: Pragma Mobile Chapter
+  id: flutter-feature-development
   version: 1.0.0
+  scope: stack
+  type: skill
+  chapter: mobile
+  stack: [flutter]
   category: productivity
-  languages: [en]
 ---
 
 # Feature Development

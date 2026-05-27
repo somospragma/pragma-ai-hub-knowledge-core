@@ -18,10 +18,13 @@ description: >
   shared packages, or when the user attaches Dart files and requests a review.
 license: Complete terms in LICENSE.txt
 metadata:
-  author: Pragma Mobile Chapter
+  id: flutter-rules
   version: 1.0.0
+  scope: stack
+  type: skill
+  chapter: mobile
+  stack: [flutter]
   category: productivity
-  languages: [en]
 ---
 
 # Flutter Rules
