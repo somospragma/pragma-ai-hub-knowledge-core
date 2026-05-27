@@ -1,0 +1,75 @@
+---
+id: calidad-mandatory-inputs-protocol
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: Define los inputs obligatorios y opcionales que el usuario debe entregar antes de generar cualquier prueba automatizada.
+tags: [inputs, protocol, spec, firma, user-story]
+---
+
+# Mandatory Inputs Protocol — Contrato de Entrada Antes de Generar
+
+## Cuándo aplicar
+
+Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-route-test-generation]]`). Su objetivo es asegurar que todos los insumos necesarios están presentes y bien formados antes de invocar `[[calidad-spec-validation]]` o cualquier workflow de generación.
+
+## Inputs comunes y su semántica
+
+| Input          | Obligatoriedad                                  | Qué es                                                                                            | Cómo se usa                                                                                                  |
+|----------------|-------------------------------------------------|---------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `intent`       | Obligatorio                                     | Texto en lenguaje natural que describe qué quiere el usuario                                      | Insumo de `[[calidad-intent-detection]]` para elegir framework                                               |
+| `project_name` | Obligatorio                                     | Nombre del proyecto en **kebab-case**                                                             | Nombre de carpetas, artefactos Maven/npm, identificadores en reportes                                        |
+| `output_path`  | Obligatorio                                     | Ruta **absoluta** del directorio donde se escriben los archivos                                   | Destino del streaming de archivos (`[[calidad-streaming-files-protocol]]`)                                   |
+| `spec`         | Obligatorio (Karate/K6)                         | **Contenido COMPLETO** del OpenAPI/Swagger/WSDL (no la ruta del archivo)                          | Input de `[[calidad-spec-validation]]`; fuente única para endpoints, schemas y auth                          |
+| `base_url`     | A veces obligatorio                             | Base URL del servicio                                                                             | Necesario si el spec **no** lo declara (algunos Swagger 2.0 sin `host`, WSDL sin `<soap:address>` accesible) |
+| `user_story`   | Opcional (recomendado · obligatorio en Mercantil-Karate-brownfield) | Historia de usuario (formato Gherkin libre o As-a/I-want/So-that) con criterios de aceptación   | Naming de escenarios, prioridad de endpoints, criterios negativos                                            |
+| `firma`        | Opcional (altamente recomendado)                | Documento técnico del servicio: reglas de negocio, ejemplos de datos reales, terminología, SLAs   | Enriquecimiento de payloads, escenarios `@negative`, vocabulario en nombres de escenarios                    |
+| `extra_params` | Opcional                                        | JSON con parámetros framework-specific                                                            | Ej.: `{"include_login_case": true}` para Appium, `{"thresholds": {"http_req_duration": "p(95)<500"}}` para K6 |
+
+## Reglas de uso
+
+1. **Lee la `firma` ANTES de analizar el spec.** La firma te da el dominio, las reglas de negocio y los valores reales para construir payloads creíbles. Sin ese contexto, las pruebas terminan siendo "happy-path inventado".
+2. **Si `user_story` está presente, los escenarios deben nombrarse con su lenguaje de negocio.** Ejemplo: si la historia habla de "cliente Pyme", el escenario es `"Cliente Pyme consulta su saldo disponible"`, no `"GET /accounts/{id} returns 200"`.
+3. **Si la `firma` define reglas no presentes en el spec** (ej.: "un cliente no puede tener más de 3 direcciones activas") → **genera escenarios `@negative` aunque el spec no las indique**. La firma es fuente de verdad de negocio incluso cuando el contrato técnico no la refleja.
+4. **NUNCA inventes** reglas, headers, valores enum, mensajes de error o flujos que no estén ni en el spec ni en la firma. Si falta información crítica, **pregunta**; no rellenes.
+5. **Validación de `project_name`**: debe matchear `^[a-z][a-z0-9-]*[a-z0-9]$`. Si trae espacios, mayúsculas o snake_case, rechaza y solicita corrección.
+6. **Validación de `output_path`**: debe ser absoluta. Si es relativa, rechaza. Antes de escribir, verifica que el directorio padre existe.
+7. **Validación de `spec`**: si el usuario pasa una ruta de archivo en lugar de contenido, rechaza con: *"se requiere el contenido completo del spec, no la ruta del archivo."*
+
+## Flujo de recolección
+
+```
+1. Pedir al usuario los obligatorios faltantes, uno por uno o en bloque (preferir bloque para no fragmentar).
+2. Si un input está incompleto → indicar exactamente QUÉ falta, no devolver "está incompleto".
+3. Confirmar opcionales relevantes según framework detectado (firma, user_story, extra_params).
+4. Para clientes específicos (ej. Mercantil), aplicar reglas adicionales del steering del cliente correspondiente.
+5. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
+```
+
+## Reglas específicas de cliente (resumen)
+
+- **Mercantil + Karate brownfield**: `user_story` es **obligatoria** (no opcional). Aplica además las convenciones de naming, headers y body loading definidas en el steering del cliente Mercantil. Ver el skill del cliente correspondiente (asset separado).
+
+## Overrides por cliente / proyecto
+
+Algunos clientes y proyectos hacen que inputs que en el catálogo común son **opcionales** se vuelvan **obligatorios**. Esos overrides se documentan en el skill del framework correspondiente y se referencian acá para visibilidad:
+
+| Cliente / proyecto | Skill / asset                      | Inputs que pasan a obligatorios                                                                                                                                       |
+|--------------------|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Mercantil**      | `[[karate-brownfield]]`            | `user_story` y `firma` son **obligatorios** (no opcionales). Convenciones detalladas en el reference `mercantil-conventions.md` dentro del skill `karate-brownfield`. |
+
+### Pattern para nuevos overrides
+
+Cuando un cliente o proyecto necesite endurecer inputs:
+
+1. Documentar la regla en el SKILL del framework correspondiente (por ejemplo `karate-brownfield/SKILL.md` o un reference cliente-específico).
+2. Apuntar el override en la tabla de arriba con: nombre del cliente, skill o asset que lo define, lista de inputs que se vuelven obligatorios.
+3. Si el override aplica también a la validación de spec o al flujo de generación, mencionarlo en el skill de framework, no acá: este documento sólo concentra el pointer.
+
+## Restricciones
+
+- **NUNCA proceder** sin los inputs obligatorios resueltos.
+- **NUNCA mezclar** convenciones de cliente con proyectos genéricos.
+- **NUNCA asumir** valores por defecto para `base_url`, headers de auth o entornos: si falta, se pregunta.
+- Encadena con `[[calidad-spec-validation]]` (paso siguiente) y con `[[calidad-intent-detection]]` (paso previo).

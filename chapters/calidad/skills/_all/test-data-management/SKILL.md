@@ -1,0 +1,58 @@
+---
+id: calidad-test-data-management
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Estrategia de gestión de datos de prueba: builders, factories, anonimización, seeding, cleanup, datos sintéticos."
+tags: [test-data, builders, factory, anonymization, gdpr, ley-1581, faker, synthetic-data]
+---
+
+# Test Data Management — Datos de Prueba Reproducibles y Conformes
+
+## Cuándo aplicar
+
+Aplica este skill **cada vez que se diseñe una suite que requiera datos consistentes, reproducibles y conformes a normativa** — es decir, prácticamente toda suite no trivial.
+
+Es especialmente crítico en clientes regulados de LATAM:
+
+- **Ley 1581 de 2012 (Colombia)** — protección de datos personales.
+- **LGPD (Brasil)** — Lei Geral de Proteção de Dados.
+- **Ley 25.326 (Argentina)** — Protección de Datos Personales.
+- **LFPDPPP (México)** — Ley Federal de Protección de Datos.
+- **Ley 19.628 (Chile)** — Protección de la Vida Privada.
+
+Estos marcos prohíben usar datos productivos en ambientes de prueba sin anonimización. Este skill define la estrategia para evitar esa exposición y al mismo tiempo garantizar **reproducibilidad** (mismo seed → mismo dataset → mismos resultados).
+
+Activa este skill en paralelo con `[[karate-greenfield]]`, `[[karate-brownfield]]`, `[[playwright-greenfield]]`, `[[k6-greenfield]]` o `[[appium-screenplay-android]]`. Coordina con `[[calidad-mandatory-inputs-protocol]]` para obtener catálogo de datasets disponibles del cliente.
+
+## Instrucción
+
+1. **Definir alcance** — ¿el dato es para unit, integration, e2e o performance? La estrategia cambia drásticamente. Matriz en `references/test-data-strategies.md`.
+2. **Elegir estrategia** — `synthetic` (generado on-the-fly, default) vs `anonymized prod-like` (snapshot prod pasado por pipeline de anonimización, sólo cuando volumen/realismo lo exija). Anonimización detallada en `references/anonymization-pii.md`.
+3. **Diseñar el patrón de construcción** — Object Mother, Test Data Builder o Factory según contexto. Snippets canónicos por lenguaje en `references/builder-factory-objectmother-patterns.md`.
+4. **Integrar Faker con seeds deterministas** — Locales LATAM (`es_CO`, `es_MX`, `pt_BR`, `es_CL`, `es_AR`). Seed fijo en CI. Reglas y anti-patrones en `references/synthetic-data-faker.md`.
+5. **Seeding y cleanup transaccional** — Por framework: Karate `Setup.feature`, k6 `setup()/teardown()`, Playwright `globalSetup/globalTeardown`, Spring `@Transactional` rollback. Patrones en `references/seeding-cleanup-transactional.md`.
+6. **Anonimizar por columna** — Reglas por tipo de dato: cédulas, RUT, teléfono, email, dirección, tarjeta (Luhn-valid pero fake), IBAN. Ver `references/anonymization-pii.md`.
+7. **Catalogar datasets versionados** — Naming, almacenamiento (git LFS, DVC, S3 con tags), regeneración cuando cambia el esquema. Estrategia en `references/datasets-versioning.md`. Para perf, consideraciones específicas en `references/data-for-perf-testing.md`.
+
+## Restricciones
+
+- **NUNCA** usar datos productivos sin anonimización en ningún ambiente que no sea producción. Es una violación legal en toda LATAM y un riesgo reputacional grave.
+- **NUNCA** commitear datasets que contengan PII real, ni siquiera "para que sea más fácil reproducir un bug". Si un dataset llegó a la rama, debe purgarse del historial (`git filter-repo`) y se debe notificar al cliente.
+- **SIEMPRE** documentar la política de retención de los datasets sintéticos/anonimizados: por defecto se rotan cada release.
+- **SIEMPRE** usar seed fijo en CI (`FAKER_SEED=12345`) para garantizar reproducibilidad. Local puede usar seed aleatorio sólo si se loguea el seed usado para poder reproducir.
+- **NUNCA** mezclar cleanup transaccional con cleanup por API admin en la misma suite sin documentarlo: confunde la traza.
+- Encadena con `[[calidad-test-evidence-and-traceability]]` para que el `seed`, el ID del dataset y la versión queden registrados en cada reporte.
+- Sigue `[[calidad-mandatory-inputs-protocol]]` para confirmar al inicio: ¿hay catálogo de datasets del cliente? ¿qué framework de anonimización usa? ¿qué políticas de retención aplican?
+- Si el cliente requiere snapshot prod-like, exige el dataset anonimizado por el equipo de datos del cliente; **no** anonimices tú dumps productivos.
+
+## Cross-links
+
+- `references/test-data-strategies.md`
+- `references/builder-factory-objectmother-patterns.md`
+- `references/anonymization-pii.md`
+- `references/synthetic-data-faker.md`
+- `references/seeding-cleanup-transactional.md`
+- `references/datasets-versioning.md`
+- `references/data-for-perf-testing.md`

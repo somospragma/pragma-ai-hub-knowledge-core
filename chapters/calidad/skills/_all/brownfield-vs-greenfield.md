@@ -1,0 +1,123 @@
+---
+id: calidad-brownfield-vs-greenfield
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: Distingue proyectos brownfield (existentes) de greenfield (nuevos) y define qué se genera y qué no en cada modo, por framework.
+tags: [brownfield, greenfield, karate, playwright, k6, conventions]
+---
+
+# Brownfield vs Greenfield — Reglas de Generación por Modo
+
+## Cuándo aplicar
+
+Aplica este skill después de `[[calidad-intent-detection]]` y antes de invocar el workflow específico de generación (paso 4 de `[[calidad-route-test-generation]]`).
+
+## Criterios de clasificación
+
+Es **brownfield** si **cualquiera** de las siguientes condiciones es verdadera:
+
+- El usuario provee archivos del proyecto existente (features, tests, page objects, configuraciones).
+- El `output_path` ya contiene código de pruebas (existe `pom.xml`, `karate-config.js`, `package.json` con `@playwright/test`, `playwright.config.ts`, carpetas `features/`, `tests/`, `pages/`, etc.).
+- El usuario describe explícitamente "queremos agregar tests al proyecto X", "actualizar selectores", "extender la suite existente".
+
+Es **greenfield** si **todas** las siguientes son verdaderas:
+
+- No hay archivos previos en el `output_path` (o existe pero está vacío).
+- El usuario no menciona un proyecto preexistente.
+- No hay convenciones del cliente que respetar más allá de las del Chapter.
+
+**Regla de oro:** si tienes duda, **inspecciona el `output_path` antes de decidir**. Si después de inspeccionar sigues con duda, pregunta al usuario.
+
+## Reglas duras por framework
+
+### Karate
+
+| Modo        | Qué SE genera                                                    | Qué NO se genera                                                     |
+|-------------|------------------------------------------------------------------|----------------------------------------------------------------------|
+| greenfield  | Proyecto completo: `.feature`, bodies JSON, `pom.xml`, `karate-config.js`, `TestRunner.java`, `logback-test.xml`, `README.md` | —                                                                    |
+| brownfield  | Solo `.feature` nuevos/actualizados y bodies JSON                | `pom.xml`, `karate-config.js`, `TestRunner.java`, `logback-test.xml`, ningún archivo de build o configuración |
+
+En **brownfield Karate** debes detectar y respetar **exactamente** las convenciones del proyecto:
+
+| Convención                  | Cómo se detecta                                                                                | Ejemplo                                              |
+|-----------------------------|------------------------------------------------------------------------------------------------|------------------------------------------------------|
+| `features_dir`              | Carpeta que contiene archivos `.feature` existentes                                            | `src/test/java/features/`                            |
+| `bodies_dir`                | Carpeta hermana que contiene JSON de request bodies                                            | `src/test/java/bodies/`                              |
+| `package_name`              | Paquete Java declarado en `TestRunner.java`                                                    | `com.client.qa.api`                                  |
+| `base_url_var`              | Nombre de la variable de base URL en `karate-config.js`                                        | `baseUrlApi`, `apiBaseUrl`                           |
+| `header_style`              | Inline en feature vs. `karate-config.js` vs. helper feature                                    | inline / config / helper                             |
+| `body_loading_style`        | `read('classpath:...')` vs. `read('bodies/...')` vs. inline                                    | classpath / relative                                 |
+| `scenario_naming_pattern`   | Convención observada en los `Scenario:` existentes                                             | `"[POSITIVE] should ..."`, `"CP-001 Crear usuario"`  |
+
+### Playwright
+
+| Modo        | Qué SE genera                                                          | Qué NO se genera                                                     |
+|-------------|------------------------------------------------------------------------|----------------------------------------------------------------------|
+| greenfield  | Proyecto completo: tests, Page Objects, `playwright.config.ts`, `tsconfig.json`, `package.json`, fixtures, README | —                                                                    |
+| brownfield  | Solo Page Objects y tests (nuevos o actualizados)                      | `package.json`, `playwright.config.ts`, `tsconfig.json`, fixtures base, scripts npm |
+
+En **brownfield Playwright** detecta y respeta:
+
+| Convención              | Cómo se detecta                                                       | Ejemplo                                  |
+|-------------------------|-----------------------------------------------------------------------|------------------------------------------|
+| `test_file_pattern`     | Naming de los `*.spec.ts` o `*.test.ts` existentes                    | `feature.spec.ts`, `*.e2e.ts`            |
+| `page_object_style`     | Clase con métodos vs. función factory vs. POM con fixtures            | class / factory / fixture-based          |
+| `selector_strategy`     | `getByRole`, `getByTestId`, CSS, XPath                                | getByTestId preferido                    |
+| `import_style`          | Alias `@/pages/...` vs. rutas relativas                               | `@/pages/LoginPage`                      |
+| `auth_pattern`          | `storageState`, `globalSetup`, login por test                         | storageState con `setup.ts`              |
+
+### K6
+
+| Modo        | Qué SE genera                                                                                  | Qué NO se genera                                                                                  |
+|-------------|------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| greenfield  | Proyecto completo: 5 scripts (`smoke`, `load`, `stress`, `spike`, `soak`), `config.js`, `utils.js`, `package.json`, `README.md`, `run-all.sh`, `.gitignore` | —                                                                                                 |
+| brownfield  | Solo `tests/*-test.js` nuevos y patches incrementales a `config.js` / `utils.js`               | `package.json`, `README.md`, `run-all.sh`, `.gitignore`, ni regeneración completa de `config.js`/`utils.js` |
+
+**Detección brownfield:** el `project_root` (= `output_path`) contiene mínimo `tests/config.js` + `tests/utils.js` + ≥1 `tests/*-test.js`. Si falta alguno, tratar como greenfield.
+
+**Acción greenfield:** invocar `[[k6-greenfield]]` y el workflow `[[generate-k6-suite]]`.
+
+**Acción brownfield:** invocar `[[k6-brownfield]]` y el workflow `[[extend-k6-brownfield]]`. NO regenerar infraestructura. Reusar `config.js` y `utils.js` (entregar patches incrementales, no archivos completos).
+
+En **brownfield K6** detecta y respeta:
+
+| Convención                       | Cómo se detecta                                                                              | Ejemplo                                  |
+|----------------------------------|----------------------------------------------------------------------------------------------|------------------------------------------|
+| `tests_dir`                      | Carpeta que contiene los `*-test.js` existentes                                              | `tests/` (default) o `perf/`, `k6/`       |
+| `script_naming`                  | Estilo del filename del primer script                                                        | `smoke-test.js` (kebab) / `smoke_test.js` (snake) |
+| `groups_naming`                  | Idioma y prefijos en `group()` / `check()`                                                   | Español (`'crear usuario'`) vs Inglés    |
+| `auth_mode`                      | `authToken` en `config.js` + `Authorization` en `getDefaultHeaders()`                        | `spec` (default) o `external` (override) |
+| `existing_thresholds`            | Valores de `options.thresholds` mapeados a Conservative/Moderate/Relaxed                     | Moderate                                 |
+| `existing_payload_builders`      | Funciones `buildXxxBody()` ya presentes en `utils.js`                                        | `buildCreateUserBody`                    |
+| `existing_id_correlation_pattern`| Cómo se extrae el id del response del POST y se reusa en GET/PUT/DELETE                      | `const id = res.json('id');` + guard     |
+| `handle_summary_path`            | Destino dentro de `handleSummary()`: `results/` (default) vs `reports/`                       | `results/${timestamp}-summary.json`      |
+
+Detalle del algoritmo en `[[k6-convention-detection]]`. Patrones de extensión en `[[k6-extension-patterns]]`.
+
+### Appium
+
+Pragma's Chapter Calidad soporta **tanto greenfield como brownfield** en Appium, y **tanto Android como iOS**. La separación es:
+
+| Modo        | Plataforma soportada              | Asset destino                                                                                  |
+|-------------|-----------------------------------|------------------------------------------------------------------------------------------------|
+| greenfield  | Android (vía scaffolder V2)       | `[[appium-screenplay-android]]`                                                                |
+| greenfield  | iOS (vía scaffold manual)         | Guidance manual en `references/android-only-scope-rationale.md` del skill greenfield           |
+| brownfield  | Android **e** iOS                 | `[[appium-brownfield]]`                                                                        |
+
+**Detección brownfield Appium:** `project_root` contiene `build.gradle` o `pom.xml`, **más** `src/test/resources/features/` (o equivalente), **más** ≥1 archivo `.feature`. Si además existen UserInterfaces bajo `src/main/java/.../userinterfaces/`, refuerza brownfield.
+
+**Acción brownfield:** invocar `[[appium-brownfield]]`. Preservar infraestructura (`build.gradle`/`pom.xml`, `gradlew`, `serenity.conf`, runner Cucumber). Respetar convenciones detectadas (`base_package`, `gherkin_language`, tags, naming). Soporta Android y iOS — la plataforma se detecta leyendo `automationName` en las capabilities (`UiAutomator2` → android, `XCUITest` → ios).
+
+**Acción greenfield Android:** invocar `[[appium-screenplay-android]]` (scaffolder V2 produce proyecto completo Gradle + Screenplay + Serenity + Cucumber). Solo Android — es una limitación del auto-generador, no del chapter.
+
+**Acción greenfield iOS:** el scaffolder V2 NO genera proyectos iOS. Apuntar al usuario al workaround manual descrito en `references/android-only-scope-rationale.md` del skill `[[appium-screenplay-android]]`. V3 del scaffolder incluirá iOS.
+
+## Restricciones
+
+- En brownfield **jamás regenerar infraestructura existente**: no sobrescribir `pom.xml`, `playwright.config.ts`, `package.json`, runners ni configs.
+- En brownfield **jamás cambiar convenciones detectadas**: si el proyecto usa `getByTestId`, el código nuevo usa `getByTestId`; si los scenarios se nombran `CP-001 ...`, los nuevos también.
+- Si las convenciones del brownfield están en **conflicto interno** (p. ej. dos estilos de Page Object), **pregunta al usuario** cuál adoptar; no decidas tú.
+- En greenfield aplica los estándares del Chapter; no inventes variantes.
+- Encadena con `[[calidad-streaming-files-protocol]]` para el orden de emisión de archivos.
