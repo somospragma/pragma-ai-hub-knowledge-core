@@ -1,0 +1,302 @@
+{
+  "skill_name": "spec-driven-development",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "user_profile_edit_requirements_en",
+      "prompt": "I want to add a user profile editing feature to my app. Users should be able to update their name, email, profile picture, and bio. What should we spec out first?",
+      "expected_output": "The skill should guide the user through Phase 1 (Requirements), creating a .specs/user_profile_edit/ folder with requirements.md. It should capture functional requirements like being able to update fields, validation rules, and non-functional requirements like response time. Should pause for user approval before moving to design.",
+      "assertions": [
+        {
+          "name": "created-specs-folder",
+          "type": "boolean",
+          "description": "Created .specs/user_profile_edit/ folder with requirements.md"
+        },
+        {
+          "name": "stopped-for-approval",
+          "type": "boolean",
+          "description": "Did not create design.md or tasks.md, stopped for human review"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "stripe_subscription_complex_en",
+      "prompt": "We need to integrate with a third-party payment provider (Stripe) for our subscription system. We already have a user accounts system in place, and we need to handle recurring billing. I'm not entirely sure how to structure this or what data we'll need.",
+      "expected_output": "The skill should: (1) Ask clarifying questions about existing architecture, (2) Guide through Requirements phase capturing functional requirements (subscription tiers, billing cycle, cancellation), non-functional (PCI compliance, idempotency), constraints (Stripe API), and dependencies on existing user system. (3) Show requirements for approval.",
+      "assertions": [
+        {
+          "name": "asked-clarifying-questions",
+          "type": "boolean",
+          "description": "Asked about existing architecture before creating specs"
+        },
+        {
+          "name": "captured-nfr",
+          "type": "boolean",
+          "description": "Captured non-functional requirements like PCI compliance and idempotency"
+        },
+        {
+          "name": "stopped-for-approval",
+          "type": "boolean",
+          "description": "Stopped for human approval after requirements, did not proceed to design"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "eval_name": "vague_performance_ambiguity_en",
+      "prompt": "We want to improve how the app performs, but I'm not sure exactly what's slow. Could you help me figure out what to spec and build?",
+      "expected_output": "The skill should recognize this is vague and ask probing diagnostic questions before jumping to Phase 1. Once clarified (e.g., 'Dashboard loading takes 5 seconds'), it should then guide into Requirements phase.",
+      "assertions": [
+        {
+          "name": "triggered-diagnostic-gate",
+          "type": "boolean",
+          "description": "Did NOT start Phase 1 immediately — asked diagnostic questions first"
+        },
+        {
+          "name": "converted-vague-to-clear",
+          "type": "boolean",
+          "description": "Helped user convert vague request into a clear, measurable problem statement"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "eval_name": "create_pagos_stripe_requirements_es",
+      "prompt": "Necesito definir los requerimientos para la nueva integración de pagos con Stripe.",
+      "expected_output": "El skill debe guiar al usuario por la Fase 1 (Requerimientos), crear la carpeta .specs/ con el nombre apropiado, llenar requirements.md y detenerse para aprobación humana antes de continuar.",
+      "assertions": [
+        {
+          "name": "created-folder-and-file",
+          "type": "boolean",
+          "description": "Creó la carpeta y el archivo requirements.md correctamente nombrados"
+        },
+        {
+          "name": "stopped-for-approval",
+          "type": "boolean",
+          "description": "No creó design.md ni tasks.md, se detuvo para revisión humana"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "eval_name": "continue_to_design_after_approval_es",
+      "prompt": "Ya aprobé los requerimientos de la feature 'login_jwt'. Ayúdame con la siguiente fase.",
+      "expected_output": "El skill debe reconocer que los requerimientos ya están aprobados, avanzar a la Fase 2 (Diseño), crear design.md usando el template, y detenerse antes de tasks.md para nueva aprobación.",
+      "assertions": [
+        {
+          "name": "created-design-md",
+          "type": "boolean",
+          "description": "Creó design.md usando el template de assets"
+        },
+        {
+          "name": "read-approved-requirements",
+          "type": "boolean",
+          "description": "Leyó requirements.md existente antes de empezar el diseño"
+        },
+        {
+          "name": "stopped-before-tasks",
+          "type": "boolean",
+          "description": "Se detuvo para pedir aprobación antes de crear tasks.md"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "eval_name": "complex-feature-triggers-multiagent-mode",
+      "prompt": "We need to build a real-time event streaming pipeline that integrates our existing user service, a new Kafka topic, and a downstream analytics platform. It also needs to handle replay, deduplication, and backpressure. Help me spec this out.",
+      "expected_output": "The skill should: (1) classify this as HIGH complexity (new module + 3+ components + architectural decisions), (2) announce '🔀 Running in multi-agent mode', (3) reference the Proposer and Critic agents, (4) NOT jump straight to creating requirements.md without announcing the mode first.",
+      "assertions": [
+        {
+          "id": "A6.1",
+          "name": "classifies-as-high-complexity",
+          "description": "Skill identifies this as a high-complexity feature before Phase 1",
+          "check": "output mentions 'multi-agent mode', 'complex', or signals that Proposer/Critic will be used"
+        },
+        {
+          "id": "A6.2",
+          "name": "announces-multiagent-mode",
+          "description": "Skill explicitly announces 🔀 MULTI-AGENT MODE before proceeding",
+          "check": "output contains '🔀' or 'multi-agent mode' announcement before creating any spec file"
+        },
+        {
+          "id": "A6.3",
+          "name": "references-proposer-critic",
+          "description": "Skill references the Proposer and Critic agents by role or file name",
+          "check": "output mentions 'Proposer', 'Critic', 'sdd-proposer', or 'sdd-critic' as part of the workflow"
+        },
+        {
+          "id": "A6.4",
+          "name": "does-not-skip-mode-announcement",
+          "description": "Skill does not silently begin drafting requirements without mode announcement",
+          "check": "mode announcement appears BEFORE any requirements content or spec file creation"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "eval_name": "critic-feedback-reflected-in-output",
+      "prompt": "Quiero agregar un módulo de facturación recurrente que se integre con nuestra base de datos de usuarios existente, el proveedor de pagos Stripe, y un sistema de notificaciones para cobros fallidos. Necesita manejar reintentos, webhooks de Stripe, y cumplimiento PCI.",
+      "expected_output": "In multi-agent mode: (1) Proposer drafts requirements, (2) Critic audits and finds at least one gap (e.g. PCI compliance scope, retry backoff strategy, idempotency on webhook replay), (3) the final output presented to the user reflects Critic corrections — it is NOT identical to what the Proposer would produce alone. Evidence: the final requirements include PCI compliance as an explicit RNF and webhook idempotency as an explicit constraint.",
+      "assertions": [
+        {
+          "id": "A7.1",
+          "name": "multiagent-mode-announced-in-spanish",
+          "description": "Skill announces multi-agent mode and responds in Spanish",
+          "check": "output contains '🔀' mode announcement and is written in Spanish"
+        },
+        {
+          "id": "A7.2",
+          "name": "pci-compliance-captured-as-rnf",
+          "description": "PCI compliance appears as a named non-functional requirement",
+          "check": "output includes PCI or PCI-DSS as an RNF, not just mentioned in passing"
+        },
+        {
+          "id": "A7.3",
+          "name": "webhook-idempotency-captured",
+          "description": "Webhook replay idempotency is captured as a constraint or explicit requirement",
+          "check": "output includes idempotency, webhook replay, or duplicate event handling as a named RF or constraint"
+        },
+        {
+          "id": "A7.4",
+          "name": "retry-strategy-addressed",
+          "description": "Retry logic and backoff strategy are captured (likely surfaced by Critic)",
+          "check": "output includes retry, backoff, or reintentos as a named requirement or constraint"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 8,
+      "eval_name": "tasks-approved-triggers-execution-handoff",
+      "prompt": "All three spec phases (requirements, design, tasks) for feature 'notification_service' are approved in .specs/notification_service/context.json. The tasks.md has four standard task phases: Foundation (no deps), Core (depends on Foundation), Integration (depends on Core), and Polish (depends on Integration). Please proceed to the next step.",
+      "expected_output": "After verifying all phases are approved, the skill should: (1) announce Phase 4 (Execution) is starting, (2) parse the tasks.md dependency DAG and identify 4 units (foundation, core, integration, polish), (3) build a 4-wave sequential plan (each unit depends on the prior), (4) present the wave plan to the user for confirmation, (5) emit an Execution Orchestrator Handoff Block. It must NOT begin implementing code or skip the wave plan confirmation step.",
+      "assertions": [
+        {
+          "id": "A8.1",
+          "name": "announces-phase4",
+          "description": "Skill announces Phase 4 (Execution) as the next step after tasks approval",
+          "check": "output contains 'Phase 4' or 'Execution' as a named phase transition"
+        },
+        {
+          "id": "A8.2",
+          "name": "identifies-four-units",
+          "description": "Skill correctly identifies foundation, core, integration, and polish as execution units",
+          "check": "output lists all four unit names derived from the four task phases"
+        },
+        {
+          "id": "A8.3",
+          "name": "builds-sequential-waves",
+          "description": "Skill builds 4 sequential waves matching the linear dependency chain",
+          "check": "output shows Wave 1=foundation, Wave 2=core, Wave 3=integration, Wave 4=polish"
+        },
+        {
+          "id": "A8.4",
+          "name": "confirms-before-launching",
+          "description": "Skill presents the wave plan and waits for user confirmation before emitting unit handoffs",
+          "check": "output asks user to confirm (✅) the wave plan and does not emit Unit Executor Handoff Blocks before receiving confirmation"
+        },
+        {
+          "id": "A8.5",
+          "name": "emits-orchestrator-handoff-block",
+          "description": "Skill emits the Execution Orchestrator Handoff Block after phase 3 approval",
+          "check": "output contains the structured handoff block with spec folder, approved phase files, and orchestrator instructions"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 9,
+      "eval_name": "parallel-units-in-same-wave",
+      "prompt": "Feature 'ecommerce_checkout' has tasks approved. The tasks.md shows: auth_service (no deps), product_service (no deps), cart_service (depends on auth_service AND product_service), and checkout_service (depends on cart_service). Launch the execution phase.",
+      "expected_output": "The skill should: (1) identify 4 units: auth_service, product_service, cart_service, checkout_service. (2) Build 3 waves: Wave 1 = [auth_service, product_service] (parallel, no deps), Wave 2 = [cart_service] (depends on both Wave 1 units), Wave 3 = [checkout_service] (depends on cart_service). (3) Mark Wave 1 as parallel=true with 2 units running simultaneously. (4) Emit Unit Executor Handoff Blocks for BOTH auth_service and product_service simultaneously for Wave 1.",
+      "assertions": [
+        {
+          "id": "A9.1",
+          "name": "detects-parallel-wave1",
+          "description": "Skill groups auth_service and product_service into Wave 1 as parallel units",
+          "check": "output shows Wave 1 containing both auth_service and product_service marked as parallel"
+        },
+        {
+          "id": "A9.2",
+          "name": "correct-wave2-dependency",
+          "description": "cart_service is placed in Wave 2 because it depends on both Wave 1 units",
+          "check": "output shows cart_service in Wave 2 with depends_on: [auth_service, product_service]"
+        },
+        {
+          "id": "A9.3",
+          "name": "correct-wave3",
+          "description": "checkout_service is placed in Wave 3",
+          "check": "output shows checkout_service in Wave 3 with depends_on: [cart_service]"
+        },
+        {
+          "id": "A9.4",
+          "name": "emits-two-unit-handoffs-for-wave1",
+          "description": "Skill emits separate Unit Executor Handoff Blocks for both Wave 1 units simultaneously",
+          "check": "output contains two distinct Unit Executor Handoff Blocks — one for auth_service and one for product_service — both labeled Wave 1"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 10,
+      "eval_name": "sequential-one-question-at-a-time",
+      "prompt": "I want to add a notification system to my app. Users should receive push, email, and in-app alerts.",
+      "expected_output": "The skill must ask clarifying questions one at a time (not all at once). The first message must contain exactly ONE question. Only after the user answers should the next question appear. The agent must NOT present a numbered list of 3+ questions in a single message.",
+      "assertions": [
+        {
+          "id": "A10.1",
+          "name": "single-question-first-message",
+          "description": "The first clarifying message contains exactly ONE question, not a list of multiple questions",
+          "check": "first agent message contains only one question mark (?) and does not present a numbered list of 2+ questions"
+        },
+        {
+          "id": "A10.2",
+          "name": "uses-ask-tool-or-table",
+          "description": "Uses vscode/askQuestions tool or renders a Markdown table for MCQ — does not dump raw prose questions",
+          "check": "output uses the interactive ask tool OR formats options as a Markdown table with Option/Description columns"
+        },
+        {
+          "id": "A10.3",
+          "name": "includes-recommendation",
+          "description": "For any multiple-choice question, states a recommended option with reasoning before the table",
+          "check": "output contains 'Recommended: Option' followed by a letter and reasoning before or after the options table"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 11,
+      "eval_name": "yes-accepts-recommendation",
+      "prompt": "Simulate a Phase 1 clarification where the user replies 'yes' to your recommended option. Show the agent correctly adopts the recommendation without re-asking.",
+      "expected_output": "When the user says 'yes' or 'recommended', the agent must record the previously stated recommendation as the chosen answer and advance to the next question — NOT re-ask or request confirmation again.",
+      "assertions": [
+        {
+          "id": "A11.1",
+          "name": "adopts-recommendation-on-yes",
+          "description": "Agent explicitly acknowledges adoption of the recommendation using structured markers exclusive to the skill",
+          "check": "output contains 'Adopting the recommendation' or '✅ Recorded' after the 'yes' reply — generic acceptance phrases like 'Great, we'll go with...' do NOT satisfy this assertion"
+        },
+        {
+          "id": "A11.2",
+          "name": "advances-without-reconfirm",
+          "description": "Agent does not ask 'Are you sure?' or repeat the question after receiving 'yes'",
+          "check": "output does not contain a re-confirmation request or repetition of the original question after the 'yes' reply"
+        },
+        {
+          "id": "A11.3",
+          "name": "max-five-questions-respected",
+          "description": "Agent stops asking after 5 questions in the same gate, even if items remain in queue",
+          "check": "agent does not ask a 6th question within the same approval gate session; question counter is visible in output (e.g. 'Question 2 of ~4')"
+        }
+      ],
+      "files": []
+    }
+  ]
+}
