@@ -56,6 +56,17 @@ La recolección sigue `[[calidad-mandatory-inputs-protocol]]`.
 10. **Emitir infraestructura** — `playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md` según `[config-strict-ts](../../../skills/automation/playwright/playwright-greenfield/references/playwright-config-strict-ts.md)` y `[project-structure](../../../skills/automation/playwright/playwright-greenfield/references/project-structure.md)`. Incluir `BASE_URL`, `BACKEND_URL` y projects filtrados por tag (`@live`, `@mocked`, `@hybrid`). Si la UI tiene login real, además `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` según `[auth-storage-state](../../../skills/automation/playwright/playwright-greenfield/references/auth-storage-state.md)`.
 11. **Entregar y trazar** — Usa `[[calidad-streaming-files-protocol]]` para la entrega ordenada. Vincula la evidencia con `[[calidad-test-evidence-and-traceability]]`. Documenta los modos en `[execution-modes-live-mocked-hybrid](../../../skills/automation/playwright/playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)` y referencia `[[playwright-run-and-modes]]`.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.**
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin navegadores instalados, sin red al frontend, sin `BASE_URL` accesible), degradar a `scaffold-only` y reportar `partial`.
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` el proyecto correspondiente según `mock_mode` (`npx playwright test --project=live-chromium`, o `mocked-*`/`hybrid-*` cuando aplique). Capturar `playwright-report/`, `test-results/` y traces como evidencia.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky y diagnosticar causa raíz (selector stale, race con red, auth state expirado, bug del SUT, snapshot visual desactualizado).
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback, LLM-driven selector repair, visual AI healing) cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca convertir aserciones de negocio en `toBeVisible()` triviales, ni inflar `timeout` para esconder race conditions reales, ni reemplazar `expect` por `try/catch` silenciosos.
+5. Reportar estado final: `success` (todos los tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con test, paso fallido, locator, trace, screenshot e hipótesis).
+6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
+
 ## Criterios de finalización (DoD)
 
 - [ ] ≥1 `tests/{resource}.spec.ts` por página detectada, con tag `@live` por defecto.
@@ -71,3 +82,8 @@ La recolección sigue `[[calidad-mandatory-inputs-protocol]]`.
 - [ ] Si la UI tiene login real: `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` + `storageState: '.auth/user.json'`. La existencia de `security` en un OpenAPI **no** justifica por sí sola este bloque.
 - [ ] Prioridades de páginas provienen de `priority_assignments` o consulta directa al usuario; ninguna inferida por keyword.
 - [ ] `.gitignore` excluye `node_modules/`, `test-results/`, `playwright-report/`, `.auth/`, `**/.env`.
+- [ ] Tests ejecutados al menos una vez. Estado: `success` / `partial` / `failed` reportado.
+- [ ] Si hubo fallos: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada.
+- [ ] Si hubo correcciones aplicadas (selector repair, healing visual, fixture ajustada): audit log persistido con anti-cheating guardrails verificados.
+- [ ] Si el modo es `dry-run` o `scaffold-only`: scaffold + comandos `npx playwright test ...` + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+- [ ] Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@a11y` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra). Aserciones WCAG y reglas axe quedan intocables.

@@ -92,6 +92,17 @@ k6 run -e BASE_URL=$BASE_URL -e AUTH_TOKEN=$AUTH_TOKEN tests/<nuevo-script>-test
 
 Detalle de comandos en `[[k6-run-and-suite]]`.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** En K6 brownfield, esta fase usa **únicamente smoke individual del/los script(s) nuevo(s) o modificado(s)**: `load/stress/spike/soak` quedan fuera del loop. Además, la auto-corrección aplica **EXCLUSIVAMENTE** a los scripts/patches generados por este workflow; NUNCA a los scripts preexistentes del cliente, aunque fallen (ver `[[calidad-brownfield-vs-greenfield]]` sección "Auto-corrección en brownfield").
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin `k6`, sin red al `BASE_URL`, sin `AUTH_TOKEN` cuando aplique), degradar a `scaffold-only` y reportar `partial`.
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` sólo el smoke individual del nuevo script (`k6 run -e BASE_URL=$BASE_URL tests/<nuevo-script>-test.js`). Si el cambio fue patch a `utils.js`/`config.js`, correr el smoke del primer script afectado. Capturar `results/${timestamp}-summary.json`.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky. Causas típicas: payload mal correlacionado con el nuevo endpoint, header faltante, `AUTH_TOKEN` mal seteado, threshold heredado irreal para el nuevo flujo. Fallos de scripts preexistentes del cliente por daño colateral del patch: detenerse y reportar, NO auto-corregir el legado.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar `checks`, `http_req_failed` ni `http_req_duration`; las correcciones deben respetar las convenciones detectadas (`script_naming`, `groups_naming`, `auth_mode`, `existing_thresholds`, `handle_summary_path`).
+5. Reportar estado final: `success` | `partial` | `failed` con script, métricas, threshold violado e hipótesis cuando se escala.
+6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Recordar que la calibración formal de thresholds para el nuevo flujo se hace via `[[calibrate-k6-thresholds]]`.
+
 ## Criterios de finalización
 
 1. Ningún archivo de infraestructura modificado (`package.json`, `README.md`, `run-all.sh`, `.gitignore`) salvo lo explícitamente solicitado por el usuario.
@@ -102,3 +113,8 @@ Detalle de comandos en `[[k6-run-and-suite]]`.
 6. `handleSummary()` preservado: ruta de salida, formato de timestamp y origen de `textSummary` (jslib remota o vendor local) idénticos a los del proyecto.
 7. Si hubo migración a `auth_mode = external`, el usuario fue notificado de actualizar `README.md` y CI con `AUTH_TOKEN` como variable obligatoria.
 8. Mensaje final al usuario enumera: (a) archivos nuevos, (b) patches a archivos existentes con path y resumen del cambio, (c) comando de ejecución, (d) cualquier acción manual pendiente.
+9. Smoke del/los script(s) nuevo(s) ejecutado al menos una vez. Estado: `success` / `partial` / `failed` reportado.
+10. Si hubo fallos: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada. Fallos de scripts preexistentes del cliente reportados al humano, NO auto-corregidos.
+11. Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados. Auto-corrección sólo tocó scripts/patches generados por este workflow.
+12. Si el modo es `dry-run` o `scaffold-only`: scaffold + comando de ejecución + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+13. Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).

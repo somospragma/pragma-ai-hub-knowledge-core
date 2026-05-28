@@ -39,6 +39,10 @@ Y cuatro ejes cross-cutting que aplican a los cuatro frameworks:
 | `test-evidence-and-traceability.md`    | Configuración de reportes, traces, summaries y trazabilidad requisito → test → resultado.                    |
 | `cicd-integration/SKILL.md`            | Integración de las cuatro suites en pipelines Azure DevOps / GitHub Actions / GitLab CI.                     |
 | `security-testing/SKILL.md`            | Estrategia de seguridad: OWASP Top 10 API, fuzzing, SAST/DAST/SCA, autenticación.                            |
+| `test-execution-orchestration/SKILL.md`| Ejecutar las suites generadas: invocar comandos, capturar output, parsear resultados, gestionar modos `full` / `dry-run` / `scaffold-only` / `execute-only`. |
+| `failure-triage-and-classification/SKILL.md` | Clasifica fallos como deterministic vs flaky y diagnostica causa raíz antes de proponer corrección.    |
+| `test-self-correction-loop/SKILL.md`   | Loop iterativo de auto-corrección con anti-cheating guardrails (max 3 iteraciones por default).             |
+| `test-self-healing/SKILL.md`           | Self-healing en runtime: multi-locator fallback, LLM-driven selector repair, visual AI healing.              |
 
 ### Skills per-framework
 
@@ -93,6 +97,9 @@ Incluye references para capas Screenplay, locators diferidos, smoke vs proposed 
 | K6 calibración     | `workflows/automation/k6/calibrate-k6-thresholds.workflow.md`                          |
 | Appium greenfield  | `workflows/automation/appium/generate-appium-screenplay-android.workflow.md`           |
 | Appium locators    | `workflows/automation/appium/complete-deferred-locators.workflow.md`                   |
+| K6 brownfield      | `workflows/automation/k6/extend-k6-brownfield.workflow.md`                             |
+| Appium brownfield  | `workflows/automation/appium/extend-appium-brownfield.workflow.md`                     |
+| Self-correction loop (cross-framework) | invocado como fase final por todos los workflows anteriores (ver `[[calidad-test-self-correction-loop]]`). |
 
 ### Prompts (`prompts/automation/`)
 
@@ -123,6 +130,8 @@ Ese workflow se encarga de:
 
 No saltar pasos: el router protege contra la generación con inputs incompletos o framework equivocado.
 
+**El contrato de entrega del Chapter incluye ejecución + verificación + auto-corrección.** Generar tests sin ejecutarlos es entrega incompleta. Cada workflow del chapter termina con una fase obligatoria que invoca `[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]` y `[[calidad-test-self-healing]]` cuando aplica. Ver principio 9 en `[[calidad-chapter-perspective]]`.
+
 ## Convenciones internas
 
 - **Frontmatter completo** sólo en assets accionables: `SKILL.md`, archivos `*.workflow.md`, archivos `*.prompt.md` y archivos de steering.
@@ -144,7 +153,6 @@ Items conocidos pendientes en el chapter:
 - **Appium iOS** — el auto-generador V3 con soporte iOS está pendiente; V2 cubre sólo Android.
 - **Profundizar el catálogo de marcos regulatorios del alcance del Chapter** (LATAM + Estados Unidos): hoy se cubren PCI-DSS, OWASP API, ISO 27001, SOC 2, HIPAA, SOX, CCPA/CPRA, FedRAMP, Ley 1581, LGPD, LFPDPPP, Ley 19.628/21.719, Ley 25.326, Ley 29.733 y equivalentes locales LATAM. Marcos fuera de este alcance (UE, APAC, África) se escalan caso a caso, no se incorporan al chapter por defecto.
 - **AsyncAPI testing** — el ecosistema Karate cubre REST y SOAP; queda pendiente un skill formal para eventos (Kafka, SNS/SQS, AMQP/RabbitMQ, Google Pub/Sub) basado en AsyncAPI 3.0.
-- **Workflows brownfield K6 y Appium** — declarados en el router como placeholders (`extend-k6-brownfield`, `extend-appium-brownfield`); en construcción por agentes paralelos del chapter.
 - **Skill formal de contract testing** consumer-driven con Pact, complementario a `match` patterns de Karate.
 
 ## Maintainers

@@ -56,6 +56,17 @@ Aplica `[[karate-negative-coverage-formula]]`. En Mercantil, suma los headers de
 
 Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-test-evidence-and-traceability]]`.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** Brownfield: la auto-corrección aplica **EXCLUSIVAMENTE** a los `.feature` y bodies recién generados por este workflow; NUNCA a los preexistentes del cliente, aunque fallen (ver `[[calidad-brownfield-vs-greenfield]]` sección "Auto-corrección en brownfield").
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP — Mercantil suele ameritar `dry-run`) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin `mvn`, sin acceso al ambiente del cliente), degradar a `scaffold-only` y reportar `partial`.
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` filtrado por el tag de la nueva historia (`mvn test -Dkarate.options="--tags @user-story:HUT-XXX"`), de modo que la corrida toque sólo los features nuevos.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz. Si un test preexistente del cliente falla por daño colateral (p. ej. cambio compartido en `karate-config.js`), detenerse y reportar — NO auto-corregir.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar headers Mercantil, aserciones de negocio o status codes para forzar verde.
+5. Reportar estado final: `success` (todos los nuevos tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con feature, scenario, assertion, response y hipótesis).
+6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
+
 ## Criterios de finalización
 
 1. Convenciones detectadas respetadas al 100%.
@@ -69,3 +80,8 @@ Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-
 4. Fórmula de cobertura aplicada y declarada.
 5. Sin lógica condicional en aserciones; `Examples` sin celdas vacías.
 6. Comando `mvn test` filtrado por tag de la nueva historia provisto en la entrega.
+7. Tests nuevos ejecutados al menos una vez. Estado: `success` / `partial` / `failed` reportado.
+8. Si hubo fallos: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada. Fallos de tests preexistentes del cliente reportados al humano, NO auto-corregidos.
+9. Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados. Auto-corrección sólo tocó los features/bodies generados por este workflow.
+10. Si el modo es `dry-run` o `scaffold-only`: scaffold + comando de ejecución + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+11. Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra). En Mercantil, los headers `Transaction-Id` / `Sid` / `Auth-Id` / `X-Channel` quedan intocables.

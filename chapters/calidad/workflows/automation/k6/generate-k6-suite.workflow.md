@@ -65,6 +65,17 @@ Aplica `[[calidad-streaming-files-protocol]]` y `[[k6-greenfield]]`:
 
 Recorre el checklist de 10 items (`## Criterios de finalización`). Si algún ítem falla, regenera el archivo correspondiente antes de cerrar. Registra trazabilidad con `[[calidad-test-evidence-and-traceability]]`.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** En K6, esta fase usa **únicamente `smoke-test.js`** como verificación rápida del scaffold: 1-2 VUs por un minuto. Los scripts `load`, `stress`, `spike`, `soak` NO se ejecutan dentro del loop de auto-corrección porque generan carga real y requieren ventana de mantenimiento + gobernanza (`[[k6-thresholds-three-tiers]]`).
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin `k6`, sin red al `BASE_URL`, ambiente productivo sin autorización), degradar a `scaffold-only` y reportar `partial`.
+2. **Ejecutar** sólo `smoke-test.js` vía `[[calidad-test-execution-orchestration]]` (`k6 run -e BASE_URL=$BASE_URL tests/smoke-test.js`, agregando `AUTH_TOKEN` si `auth_mode = external`). Capturar `results/${timestamp}-summary.json` como evidencia.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky (típico K6: 401 por token expirado, payload mal correlacionado, threshold inicial irreal, endpoint inexistente). El thresholds-tier inicial puede ser irreal en el ambiente real — eso NO es bug del SUT; queda para `[[calibrate-k6-thresholds]]`.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique (p. ej. ajuste de payload por schema-drift). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar `checks` para esconder respuestas 4xx/5xx reales, nunca eliminar `http_req_failed` ni `http_req_duration` de `options.thresholds` para forzar verde, nunca reducir `iterations` para esconder degradación.
+5. Reportar estado final: `success` (smoke pasa) | `partial` (entregado scaffold, no se pudo ejecutar smoke o load/stress quedan fuera de scope del loop) | `failed` (escalado a humano con script, métricas medidas, threshold violado e hipótesis).
+6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`. Recordar al usuario que la calibración formal de thresholds y la ejecución de `load/stress/spike/soak` se hace con `[[calibrate-k6-thresholds]]` bajo ventana coordinada.
+
 ## Criterios de finalización (DoD — 10 items)
 
 1. Todos los imports usados (sin dead imports).
@@ -77,3 +88,8 @@ Recorre el checklist de 10 items (`## Criterios de finalización`). Si algún í
 8. Headers se construyen vía `getDefaultHeaders()` de `utils.js` (no inline).
 9. Payloads se construyen vía `buildXxxBody()` de `utils.js` (no inline).
 10. `handleSummary()` presente en cada script exportando JSON a `results/`.
+11. `smoke-test.js` ejecutado al menos una vez. Estado: `success` / `partial` / `failed` reportado. `load/stress/spike/soak` quedan fuera del loop y se ejecutan via `[[calibrate-k6-thresholds]]`.
+12. Si hubo fallos en el smoke: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada.
+13. Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados (no se relajaron `checks`, ni `http_req_failed`, ni `http_req_duration`).
+14. Si el modo es `dry-run` o `scaffold-only`: scaffold + comando `k6 run ...` + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+15. Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).

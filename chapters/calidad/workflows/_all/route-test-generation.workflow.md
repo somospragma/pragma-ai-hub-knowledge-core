@@ -96,6 +96,17 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 - Asegura que cada test tenga al menos un tag `@user-story:<ID>` o `@requirement:<ID>`.
 - Documenta en el `README.md` la ruta del reporte y el comando para abrirlo.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir (invocación universal)
+
+**Esta fase es parte del contrato de entrega del router**: independientemente del workflow específico al que se haya delegado en el paso 5, el router exige que el ciclo de ejecución + triage + auto-corrección se haya cerrado. Cada workflow específico ya integra esta fase con adaptaciones por framework; el router la audita y confirma su cumplimiento antes de finalizar.
+
+1. **Resolver modo de operación universal** con el usuario si el workflow delegado no lo hizo (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin entornos, sin credenciales), degradar a `scaffold-only` y reportar `partial`.
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` con el comando idiomático del framework delegado.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros del chapter**.
+5. Reportar estado final agregado: `success` (todos los tests pasan determinísticamente en el framework delegado) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con contexto completo del framework correspondiente).
+6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. El router NO finaliza con éxito si esta fase quedó sin cerrar.
+
 ## Criterios de finalización
 
 Este workflow se considera completo **solo cuando**:
@@ -108,3 +119,8 @@ Este workflow se considera completo **solo cuando**:
 - [ ] La ruta del reporte de evidencia está documentada y el reporter está activo.
 - [ ] El checklist de calidad propio del framework destino (ver el workflow específico) está aprobado.
 - [ ] El usuario tiene un mensaje final que enumera (a) archivos generados, (b) comando de ejecución, (c) ruta del reporte, (d) tags de trazabilidad usados.
+- [ ] Tests ejecutados al menos una vez por el workflow delegado. Estado agregado: `success` / `partial` / `failed` reportado por el router.
+- [ ] Si hubo fallos: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada.
+- [ ] Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados.
+- [ ] Si el modo es `dry-run` o `scaffold-only`: scaffold + comandos de ejecución + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+- [ ] Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra del chapter).

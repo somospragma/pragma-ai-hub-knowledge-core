@@ -54,6 +54,17 @@ Uno por schema utilizado en respuestas. Respeta `#type` vs `##type`.
 ### 8. Asegurar resource files y validar DoD
 Detecta referencias a `classpath:resources/files/*` y crea archivos por defecto. Recorre el checklist de finalización antes de entregar. Entrega con `[[calidad-streaming-files-protocol]]` y registra trazabilidad por `[[calidad-test-evidence-and-traceability]]`.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.**
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin `mvn`, sin red al SUT), degradar a `scaffold-only` y reportar `partial`.
+2. **Ejecutar** `mvn test` (o el filtro por tag de la nueva historia) vía `[[calidad-test-execution-orchestration]]`. Capturar `target/karate-reports/karate-summary.json` como evidencia primaria y parsear a esquema común.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz (bug del SUT, contrato mal asumido, payload inválido, environment, timing, infra).
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique (p. ej. schema-drift tolerable en `match`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar aserciones de negocio, status code o headers de seguridad para forzar verde.
+5. Reportar estado final: `success` (todos los tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con contexto completo: feature, scenario, assertion, response real, hipótesis).
+6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
+
 ## Criterios de finalización (DoD — 14 items)
 
 1. Todos los archivos no-Java en `src/test/java/` (cero en `src/test/resources/`).
@@ -70,3 +81,8 @@ Detecta referencias a `classpath:resources/files/*` y crea archivos por defecto.
 12. Todos los paths relativos en `Given path` (sin protocolo/host).
 13. Field names en bodies coinciden exactamente con el spec.
 14. Sin lógica condicional (`if`) en aserciones; `Examples` sin celdas vacías. Comando `mvn test` provisto en la entrega.
+15. Tests ejecutados al menos una vez. Estado: `success` / `partial` / `failed` reportado.
+16. Si hubo fallos: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada.
+17. Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados.
+18. Si el modo es `dry-run` o `scaffold-only`: scaffold + comando `mvn test` + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+19. Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).

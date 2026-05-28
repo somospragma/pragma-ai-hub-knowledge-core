@@ -66,6 +66,17 @@ Exit 0 sin cambios manuales; cero colisiones; cero errores `compileJava`/`compil
 ### 10. Reportar status
 Entregar archivos con `[[calidad-streaming-files-protocol]]` solo si `generation_status = success`. Registrar trazabilidad por `[[calidad-test-evidence-and-traceability]]` y mapear casos según `[[calidad-route-test-generation]]`.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** Esta fase **extiende el health-check estático del paso 7** (14 stages + pipeline Gradle) con verificación de **runtime** real: instalar APK, levantar Appium server, correr los 2 escenarios `@android @smoke` y aplicar el loop de triage + auto-corrección. El health-check estático garantiza que el scaffold compila; este loop garantiza que arranca contra el binario real.
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `scaffold-only` porque el paso 8 ya bloquea entrega si `generation_status != success`; el agente típicamente NO tiene emulador Android disponible. Subir a `full` sólo si el usuario confirma device/emulador + Appium server + APK válido. Clientes regulados (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) defaultean a `dry-run`. Si `scaffold-only`, reportar `partial` (el scaffold es válido, falta runtime).
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` cuando aplique: `./gradlew clean test aggregate -p <project_path> -Dcucumber.filter.tags=@smoke`. Capturar `target/site/serenity/` como evidencia primaria.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky. Causas típicas: Appium server no responde, capabilities mal configuradas, APK no instalado, `app_package`/`app_activity` incorrectos (recordar TODO con `aapt dump badging`), locators diferidos aún en `TODO`.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique (multi-locator fallback, accesibilidad como alternativa a `id`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca eliminar el assert visual de `AppIsResponsive`, nunca reemplazar `TapOn` real por flags en memoria, nunca completar locators reales falsos (eso requiere Appium Inspector, ver `[[complete-deferred-locators]]`).
+5. Reportar estado final: `success` (scaffold + smoke runtime pasa) | `partial` (scaffold válido, no se ejecutó runtime por falta de device/Appium server) | `failed` (escalado a humano con stage, logcat, screenshot Serenity, hipótesis).
+6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Recordar al usuario que los locators reales se completan con `[[complete-deferred-locators]]`.
+
 ## Criterios de finalización
 
 1. `generation_status = success` (no `partial`, no `failed`).
@@ -76,3 +87,8 @@ Entregar archivos con `[[calidad-streaming-files-protocol]]` solo si `generation
 6. Los 2 escenarios `@android @smoke` ejecutables pasan en BUILD SUCCESSFUL sin selectores reales.
 7. Reporte Serenity generado en `target/site/serenity/index.html`.
 8. Si se aplicaron defaults `app_package=com.example.app` / `app_activity=.MainActivity`, el README lo declara como TODO con el comando `aapt dump badging`.
+9. Health-check de runtime ejecutado al menos una vez (cuando hay device/Appium server). Estado: `success` / `partial` / `failed` reportado. `partial` es aceptable si el scaffold pasó health-check estático pero no hay device disponible.
+10. Si hubo fallos en runtime: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada.
+11. Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados. Locators diferidos NUNCA se completaron con valores inventados (eso es `[[complete-deferred-locators]]`).
+12. Si el modo es `dry-run` o `scaffold-only`: scaffold + comando `./gradlew test` + checklist runtime pendiente entregados; ninguna corrección aplicada sin aprobación humana.
+13. Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@accessibility` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).

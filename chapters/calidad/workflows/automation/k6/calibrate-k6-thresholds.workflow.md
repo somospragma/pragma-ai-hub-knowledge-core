@@ -64,9 +64,28 @@ En el `README.md` del proyecto, registra:
 - Valores P95/P99/error rate medidos.
 - Próxima fecha de recalibración (ej. cada release mayor).
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** Este workflow **es naturalmente un loop de ejecución + triage + auto-corrección de thresholds**: medir, comparar, ajustar, re-verificar. Aquí formalizamos esa naturaleza alineándola con la capacidad cross-cutting del chapter. Auto-corrección aplica EXCLUSIVAMENTE a los valores numéricos de `options.thresholds`; NUNCA a `checks`, lógica del script, ni a scripts que no sean propiedad de este proyecto.
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default para calibración: `execute-only` (los scripts ya existen; sólo se actualizan thresholds y se re-corre el smoke). Para clientes regulados (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) defaultear a `dry-run` (entregar diff de thresholds propuesto sin aplicar). `scaffold-only` no aplica acá. Si el agente carece de capacidad para correr `k6`, degradar a `dry-run` y reportar `partial`.
+2. **Ejecutar** el smoke re-corrido (paso 4) vía `[[calidad-test-execution-orchestration]]`. Capturar el nuevo `results/${timestamp}-summary.json`.
+3. Si el smoke falla con los nuevos thresholds: aplicar `[[calidad-failure-triage-and-classification]]`. Distinguir entre:
+   - **Tier demasiado estricto vs. baseline real** → ajuste legítimo de tier hacia uno más permisivo, dentro de los tres tiers canónicos. NO inventar tiers ad-hoc.
+   - **Servicio degradado** → NO relajar el threshold; reportar al humano que el SUT degradó y mantener el tier alineado al SLA.
+   - **Flakiness por ambiente o saturación de red** → reportar y proponer ventana o instancia dedicada; no maquillar con thresholds.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]`. `[[calidad-test-self-healing]]` típicamente NO aplica acá (no hay selectores). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros de calibración**: jamás cruzar el SLA declarado por el negocio en `user_story` / `firma`; jamás eliminar métricas de `options.thresholds`; jamás convertir `http_req_failed` en un porcentaje absurdo (>0.1) para forzar verde.
+5. Reportar estado final: `success` (smoke pasa con tier elegido y SLA respetado) | `partial` (no se pudo ejecutar smoke; se entregaron thresholds propuestos en diff) | `failed` (servicio degradado o flakiness no atribuible a thresholds — escalado a humano con métricas, SLA y razonamiento).
+6. Archivar evidencia + audit log de cambios de threshold según `[[calidad-test-evidence-and-traceability]]`. Conservar el JSON del baseline previo y del baseline post-calibración para auditoría.
+
 ## Criterios de finalización
 
 - Los 5 scripts tienen `options.thresholds` actualizados al tier elegido.
 - El smoke re-corrido pasa los nuevos thresholds.
 - El tier y su justificación están documentados en `README.md`.
 - Se conserva el JSON del baseline usado para auditoría (`results/${timestamp}-summary.json`).
+- [ ] Smoke re-corrido ejecutado al menos una vez con los thresholds nuevos. Estado: `success` / `partial` / `failed` reportado.
+- [ ] Si hubo fallos: clasificación (servicio degradado vs tier irreal vs flakiness ambiental) y causa raíz documentada. SLA de negocio NUNCA cruzado.
+- [ ] Si hubo correcciones aplicadas (ajuste de tier): audit log persistido con anti-cheating guardrails verificados (sólo se tocaron valores numéricos de `options.thresholds`, dentro de los tres tiers canónicos).
+- [ ] Si el modo es `dry-run`: diff de thresholds propuesto entregado; ningún cambio aplicado sin aprobación humana.
+- [ ] Métricas `http_req_duration`, `http_req_failed` y `checks` no fueron eliminadas de `options.thresholds` bajo ningún concepto (regla anti-cheating maestra de calibración).

@@ -72,6 +72,17 @@ Variantes y overrides en `[[appium-run-and-tags]]`.
 
 Entrega los archivos con `[[calidad-streaming-files-protocol]]` y registra trazabilidad por `[[calidad-test-evidence-and-traceability]]`.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** Brownfield: la auto-corrección aplica **EXCLUSIVAMENTE** a los `.feature`, `UserInterface`, `Task`/`Question`/`Interaction`, step definitions y locators recién generados/modificados por este workflow; NUNCA a los archivos preexistentes del cliente, aunque fallen (ver `[[calidad-brownfield-vs-greenfield]]` sección "Auto-corrección en brownfield").
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `scaffold-only` por defecto, porque típicamente el agente no tiene device/emulador (Android) ni real device farm (iOS) disponibles. Subir a `full` sólo si el usuario confirma device/emulador o cloud provider + Appium server + binario válido. Clientes regulados (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) defaultean a `dry-run`.
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` filtrado por el tag de la nueva historia: Gradle (`./gradlew clean test aggregate -p {project_root} -Dcucumber.filter.tags="@user-story:<ID>"`) o Maven (`mvn clean verify -f {project_root}/pom.xml -Dcucumber.filter.tags="@user-story:<ID>"`). Capturar `target/site/serenity/`.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky. Causas típicas iOS/Android: locator stale, capability mal alineada con `platform_detected`, drift del DOM entre versiones del binario, step definition mal reutilizada. Fallos de tests preexistentes del cliente por daño colateral del cambio: detenerse y reportar, NO auto-corregir el legado.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback respetando la API idiomática de `platform_detected`: Android `id`/`xpath`/`accessibilityId`; iOS `iOSClassChain`/`iOSNsPredicateString`/`accessibilityId`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca cambiar el `package` de un `*.java`, nunca debilitar `Question`s de aserción de negocio, nunca eliminar tags `scenario_tag_conventions` para esquivar filtros del cliente.
+5. Reportar estado final: `success` | `partial` (entregado scaffold, no se ejecutó por falta de device) | `failed` (escalado a humano con scenario, stage, logcat/idb log, screenshot Serenity, hipótesis).
+6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Si la corrección involucró locators, recordar al usuario el patrón documentado en `[[complete-deferred-locators]]` para los casos donde se requiere Appium Inspector con el binario real.
+
 ## Criterios de finalización
 
 - [ ] Objeto de convenciones extraído y documentado en el reporte de salida.
@@ -83,3 +94,8 @@ Entrega los archivos con `[[calidad-streaming-files-protocol]]` y registra traza
 - [ ] Cada `*.java` nuevo: `package` coincide con path físico bajo `base_package`.
 - [ ] Comando de ejecución filtrado por el tag de la nueva historia provisto en la entrega.
 - [ ] No se introdujeron dependencias nuevas sin aprobación explícita.
+- [ ] Tests nuevos/modificados ejecutados al menos una vez (cuando hay device/Appium server). Estado: `success` / `partial` / `failed` reportado. `partial` aceptable si no hay device disponible.
+- [ ] Si hubo fallos: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada. Fallos de tests preexistentes del cliente reportados al humano, NO auto-corregidos.
+- [ ] Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados. Auto-corrección sólo tocó archivos generados/modificados por este workflow, respetó `platform_detected` y `scenario_tag_conventions`.
+- [ ] Si el modo es `dry-run` o `scaffold-only`: scaffold + comando de ejecución + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+- [ ] Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@accessibility` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).

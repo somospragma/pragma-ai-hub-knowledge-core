@@ -121,3 +121,9 @@ Pragma's Chapter Calidad soporta **tanto greenfield como brownfield** en Appium,
 - Si las convenciones del brownfield están en **conflicto interno** (p. ej. dos estilos de Page Object), **pregunta al usuario** cuál adoptar; no decidas tú.
 - En greenfield aplica los estándares del Chapter; no inventes variantes.
 - Encadena con `[[calidad-streaming-files-protocol]]` para el orden de emisión de archivos.
+
+## Auto-corrección en brownfield
+
+En brownfield, la auto-corrección aplica EXCLUSIVAMENTE a tests recién generados/modificados por el agente. NUNCA aplicar correcciones automáticas a tests preexistentes del cliente, aunque fallen. Si tests preexistentes fallan: reportar al humano, NO modificar (puede esconder bugs, romper convenciones del cliente, o violar el contrato implícito de no-modificación).
+
+Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`) y a sus invocaciones desde cualquier workflow brownfield del chapter (`[[extend-karate-brownfield]]`, `[[update-playwright-brownfield]]`, `[[extend-k6-brownfield]]`, `[[extend-appium-brownfield]]`). El alcance de la auto-corrección se delimita por el conjunto de archivos producidos o modificados en la corrida actual; cualquier fallo fuera de ese conjunto se reporta y escala, no se repara.

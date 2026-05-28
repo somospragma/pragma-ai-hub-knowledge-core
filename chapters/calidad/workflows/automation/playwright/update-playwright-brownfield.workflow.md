@@ -34,6 +34,17 @@ Recolección según `[[calidad-mandatory-inputs-protocol]]`.
 5. **Validar coherencia** — Recorre cada archivo nuevo/modificado y verifica que respeta cada campo del objeto de convenciones (selector strategy, import style, file pattern, page object style).
 6. **Entregar SIN regenerar infraestructura** — Usa `[[calidad-streaming-files-protocol]]` para entregar exclusivamente los archivos cambiados o nuevos. No emitir `playwright.config.ts`, `tsconfig.json`, `package.json` ni `fixtures/base.fixture.ts` salvo que el usuario lo pida explícitamente.
 
+### Fase final obligatoria — Ejecutar, triar y auto-corregir
+
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** Brownfield: la auto-corrección aplica **EXCLUSIVAMENTE** a los Page Objects y `*.spec.ts` recién generados/modificados por este workflow; NUNCA a los tests preexistentes del cliente, aunque fallen (ver `[[calidad-brownfield-vs-greenfield]]` sección "Auto-corrección en brownfield").
+
+1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin navegadores, sin red al frontend), degradar a `scaffold-only` y reportar `partial`.
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` filtrado a los specs nuevos/modificados (`npx playwright test tests/<spec>.spec.ts` o por tag de la nueva historia). Capturar `playwright-report/`, traces y screenshots como evidencia.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky y diagnosticar causa raíz. Si un spec preexistente del cliente falla por daño colateral (p. ej. cambio compartido en un Page Object reusado), detenerse y reportar — NO auto-corregir el legado.
+4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback, LLM-driven selector repair) cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar aserciones de negocio ni inflar timeouts para esconder race conditions. Las correcciones deben preservar las convenciones detectadas (selector strategy, import style, file pattern, page object style).
+5. Reportar estado final: `success` | `partial` | `failed` con contexto completo si se escala a humano.
+6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`.
+
 ## Criterios de finalización
 
 - [ ] Objeto de convenciones extraído y documentado en el reporte de salida.
@@ -42,3 +53,8 @@ Recolección según `[[calidad-mandatory-inputs-protocol]]`.
 - [ ] En cambios de selector: métodos, imports, types, comments y signatures de los Page Objects originales permanecen idénticos.
 - [ ] No se introdujeron dependencias nuevas sin aprobación explícita.
 - [ ] No se introdujo `auth.setup.ts` si no existía y el flujo no lo requiere.
+- [ ] Tests nuevos/modificados ejecutados al menos una vez. Estado: `success` / `partial` / `failed` reportado.
+- [ ] Si hubo fallos: clasificación de cada uno (deterministic vs flaky) y causa raíz documentada. Fallos de tests preexistentes del cliente reportados al humano, NO auto-corregidos.
+- [ ] Si hubo correcciones aplicadas: audit log persistido con anti-cheating guardrails verificados. Auto-corrección sólo tocó archivos generados/modificados por este workflow y respetó las convenciones detectadas.
+- [ ] Si el modo es `dry-run` o `scaffold-only`: scaffold + comandos de ejecución + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
+- [ ] Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@a11y` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).
