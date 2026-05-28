@@ -1,0 +1,196 @@
+{
+  "skill_name": "branching-model-gitflow",
+  "description": "Evaluations to verify that branching-model-gitflow produces correct, generic GitFlow branching guidance across different project types and tech stacks.",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "feature-branch-nodejs-github-issues",
+      "prompt": "I'm working on a Node.js REST API project. We track issues using GitHub Issues. I was assigned issue #87 which is a new authentication module — it has 3 sub-tasks (issues #88, #89, #90). How should I name my branches and what's the git workflow I should follow from start to finish?",
+      "expected_output": "Clear branch naming using gh-87 (or #87) format, task branches like feature/gh-87_task-88, the full workflow from creating branches off develop to merging into develop via PR, with CI gates mentioned. No Flutter/Melos-specific commands.",
+      "assertions": [
+        {
+          "name": "uses-generic-issue-id-format",
+          "criteria": "Branch names use a format based on GitHub issue numbers (e.g., feature/gh-87 or feature/#87 or feature/87) — NOT 'hu-' prefixes"
+        },
+        {
+          "name": "task-branches-created",
+          "criteria": "Sub-task branches are shown, e.g., feature/gh-87_task-88 or similar pattern with the parent issue id"
+        },
+        {
+          "name": "no-flutter-melos-commands",
+          "criteria": "Response does NOT mention 'flutter test', 'melos analyze', 'dart analyze', 'pubspec.yaml', or any Flutter/Dart-specific commands"
+        },
+        {
+          "name": "develop-as-base",
+          "criteria": "Feature branch is created from 'develop' branch, not from 'main'"
+        },
+        {
+          "name": "full-workflow-covered",
+          "criteria": "Response covers all key steps: branch creation, commits, PR to feature branch, PR to develop, and cleanup"
+        },
+        {
+          "name": "conventional-commits-hint",
+          "criteria": "Response mentions or shows a conventional commit message (e.g., feat(scope): description)"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "hotfix-python-jira-production-bug",
+      "prompt": "We have a critical bug in production right now — our Python Django app is throwing 500 errors on the /checkout endpoint because of a payment gateway timeout not being handled. The bug is tracked as SHOP-451 in Jira. Our version in production is 2.3.0. Walk me through the hotfix process.",
+      "expected_output": "Hotfix branch named hotfix-2.3.1 from main, fix commit with fix(checkout): description, version bump to 2.3.1, urgent PR to main, tag v2.3.1, cherry-pick to develop. No Flutter-specific steps. Uses SHOP-451 reference in commit message.",
+      "assertions": [
+        {
+          "name": "hotfix-branch-from-main",
+          "criteria": "Hotfix branch is created from 'main', not from 'develop' or 'release'"
+        },
+        {
+          "name": "correct-version-bump",
+          "criteria": "New version is 2.3.1 (patch bump from 2.3.0)"
+        },
+        {
+          "name": "hotfix-branch-name-correct",
+          "criteria": "Branch name is 'hotfix-2.3.1' (not 'feature/' or other prefix)"
+        },
+        {
+          "name": "tag-created",
+          "criteria": "Response includes creating a git tag (v2.3.1 or 2.3.1)"
+        },
+        {
+          "name": "cherry-pick-to-develop",
+          "criteria": "Response includes cherry-picking the fix to the develop branch to prevent regression"
+        },
+        {
+          "name": "no-flutter-specific-steps",
+          "criteria": "No mention of pubspec.yaml, flutter test, melos, or any Dart/Flutter tooling"
+        },
+        {
+          "name": "version-file-generic",
+          "criteria": "Version bump references a Python-appropriate file (e.g., pyproject.toml, setup.py, or VERSION file) — not pubspec.yaml"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "eval_name": "release-workflow-node-semver",
+      "prompt": "My team is ready to release version 1.4.0 of our Node.js microservice. We're using GitFlow with main, release, and develop branches. The code is all merged into our 'release' branch and passed QA. What are the exact steps to make the release?",
+      "expected_output": "Create release-1.4.0 from release, bump package.json version, run npm test + npm run lint, PR to main, tag v1.4.0, push, back-merge to develop, clean up. CI mentioned.",
+      "assertions": [
+        {
+          "name": "release-branch-name-correct",
+          "criteria": "Release branch is named 'release-1.4.0' (not any other format)"
+        },
+        {
+          "name": "version-manifest-generic",
+          "criteria": "Version bump file is mentioned generically (e.g., package.json, semver file) — can include package.json specifically. Must NOT only reference pubspec.yaml."
+        },
+        {
+          "name": "tag-v1-4-0",
+          "criteria": "Git tag v1.4.0 is created during the release"
+        },
+        {
+          "name": "back-merge-to-develop",
+          "criteria": "After merging to main, the release branch (or main) is also merged back to develop"
+        },
+        {
+          "name": "test-commands-generic",
+          "criteria": "Test/lint commands are generic (npm test, npm run lint, or '{your-test-command}') — NOT 'flutter test' or 'melos analyze'"
+        },
+        {
+          "name": "pr-to-main-mentioned",
+          "criteria": "A PR from release-1.4.0 to main is mentioned (not a direct merge without review)"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "eval_name": "branch-naming-linear-no-tracker",
+      "prompt": "Quick question: our startup doesn't use an issue tracker — we just work from a shared Notion doc. I need to create a branch for a new 'dark mode' feature for our React web app. What should I call it? And should I even set up GitFlow for a 2-person team?",
+      "expected_output": "Branch name like feature/dark-mode (descriptive slug, no issue ID), and honest recommendation that GitHub Flow (feature → main directly) is better for a 2-person team without QA stages.",
+      "assertions": [
+        {
+          "name": "descriptive-slug-without-issue-id",
+          "criteria": "Suggests a branch name like 'feature/dark-mode' or 'feature/dark-mode-ui' without requiring an issue ID prefix"
+        },
+        {
+          "name": "github-flow-recommended",
+          "criteria": "Response recommends GitHub Flow (simplified) or mentions it as a better option for a small team, since full GitFlow may be overkill"
+        },
+        {
+          "name": "lowercase-kebab-case",
+          "criteria": "Branch name suggestion is in lowercase kebab-case (e.g., dark-mode, not DarkMode or dark_mode)"
+        },
+        {
+          "name": "feature-prefix-kept",
+          "criteria": "Branch name still uses the 'feature/' prefix even without an issue ID"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "eval_name": "pr-template-go-backend",
+      "prompt": "I'm opening a PR for a Go backend service. The branch is feature/AUTH-203_oauth2-integration merging into develop. Fill out the PR template for me — it adds OAuth2 login support via Google and GitHub providers. Tests are written, all CI checks pass.",
+      "expected_output": "Filled PR template with correct title format [feature/AUTH-203_oauth2-integration → develop], Feature checked as type, Closes AUTH-203, checklist items checked, How to Test section describing OAuth2 test steps. No Flutter/Dart-specific checklist items.",
+      "assertions": [
+        {
+          "name": "pr-title-format-correct",
+          "criteria": "PR title includes the format '[feature/AUTH-203_oauth2-integration → develop]' or equivalent"
+        },
+        {
+          "name": "type-feature-checked",
+          "criteria": "The 'Feature' checkbox is marked as checked in the Type of Change section"
+        },
+        {
+          "name": "related-issue-auth-203",
+          "criteria": "AUTH-203 is referenced in the Related Issue section"
+        },
+        {
+          "name": "checklist-items-project-agnostic",
+          "criteria": "Checklist does NOT contain 'dart analyze', 'dart format', 'flutter test', or other language-specific items — items are generic or Go-appropriate"
+        },
+        {
+          "name": "how-to-test-filled",
+          "criteria": "The 'How to Test' section contains specific steps related to OAuth2 testing, not just placeholder text"
+        },
+        {
+          "name": "description-includes-context",
+          "criteria": "The Description section describes what the PR adds (OAuth2 login with Google and GitHub providers)"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "eval_name": "bugfix-qa-environment-java",
+      "prompt": "Our QA team found a form validation bug in our Java Spring Boot app — the email field accepts invalid formats. It's tracked as CORE-512 in Jira. The bug is only in QA (not in develop yet, it came from a missed edge case during the last merge to release). How do I fix it?",
+      "expected_output": "Create bugfix/CORE-512_fix-email-validation from release branch (not develop, since bug is in QA/release), fix commit, PR to release, merge and clean up. Optionally back-merge to develop.",
+      "assertions": [
+        {
+          "name": "branch-from-release-not-develop",
+          "criteria": "Bugfix branch is created from 'release' branch (since the bug was found in QA/release, not in develop)"
+        },
+        {
+          "name": "bugfix-branch-name-correct",
+          "criteria": "Branch name uses 'bugfix/' prefix and includes CORE-512, e.g., bugfix/CORE-512_fix-email-validation"
+        },
+        {
+          "name": "fix-commit-message",
+          "criteria": "Commit message uses 'fix(scope): description' conventional format"
+        },
+        {
+          "name": "no-framework-specific-commands",
+          "criteria": "No Flutter, Dart, Python, Node.js or other framework-specific commands — or if a test command is shown, it's labeled as {your-test-command} or Java/Maven equivalent"
+        },
+        {
+          "name": "back-merge-to-develop-mentioned",
+          "criteria": "Response mentions or recommends merging or cherry-picking the fix back to develop to avoid the same bug reappearing"
+        }
+      ],
+      "files": []
+    }
+  ]
+}
