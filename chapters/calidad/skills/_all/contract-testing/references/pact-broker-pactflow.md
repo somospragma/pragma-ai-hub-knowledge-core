@@ -17,7 +17,7 @@ El broker es el corazón de la operación Pact: almacena pacts, registra resulta
 **Recomendación Pragma:**
 - Clientes pequeños / proyectos iniciales: **Pactflow Starter** (free tier).
 - Clientes enterprise con muchos pacticipants: **Pactflow Enterprise**.
-- Clientes bancarios con datos sensibles que no pueden salir on-premise: **Self-hosted en Kubernetes**.
+- Clientes con datos sensibles bajo políticas de no-egress (salud, gobierno, defensa, financiero on-prem, telecom regulada): **Self-hosted en Kubernetes**.
 
 ## Self-hosted con Docker
 

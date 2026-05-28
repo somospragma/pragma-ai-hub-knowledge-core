@@ -72,4 +72,4 @@ export default function () {
 - **Concurrency conflicts**: múltiples VUs operando sobre el mismo ID generan colisiones y falsos negativos.
 - **Environment portability**: un ID válido en QA no existe en staging ni en prod; el script se rompe al cambiar de ambiente.
 - **False baselines**: hits sobre datos cacheados generan latencias artificialmente bajas y enmascaran problemas reales.
-- **Audit failure**: en sectores regulados (banca), operar siempre sobre el mismo ID es trazabilidad inaceptable.
+- **Audit failure**: en sistemas con auditoría trazable (compliance, sectores regulados — financiero, salud, gobierno, IoT life-safety), operar siempre sobre el mismo ID es trazabilidad inaceptable.

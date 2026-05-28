@@ -24,7 +24,7 @@ Notas sobre la versión:
 
 ## Alternativa offline / CI air-gapped
 
-En bancos LATAM y entornos regulados es común que los runners de CI **no tengan egress** a internet (sin acceso a `https://jslib.k6.io`). El import remoto rompe la corrida: `k6 run` aborta intentando resolver el módulo.
+En entornos enterprise con egress restringido (ambientes air-gapped, redes corporativas con firewall estricto, sectores regulados, defensa, gobierno) es común que los runners de CI **no tengan egress** a internet (sin acceso a `https://jslib.k6.io`). El import remoto rompe la corrida: `k6 run` aborta intentando resolver el módulo.
 
 Solución: vendorizar el archivo dentro del proyecto y consumirlo localmente.
 
@@ -40,7 +40,7 @@ Solución: vendorizar el archivo dentro del proyecto y consumirlo localmente.
    ```
 4. Documentar en el `README.md` que `tests/vendor/k6-summary.js` es código de terceros (link al original) y la versión congelada.
 
-Justificación: las pipelines de bancos LATAM y entornos regulados a menudo se ejecutan en redes internas sin egress a `https://jslib.k6.io`; el vendor local elimina la dependencia de red y evita corridas no reproducibles cuando cambia la versión upstream.
+Justificación: las pipelines en entornos enterprise con egress restringido (ambientes air-gapped, redes corporativas con firewall estricto, sectores regulados, defensa, gobierno) a menudo se ejecutan en redes internas sin egress a `https://jslib.k6.io`; el vendor local elimina la dependencia de red y evita corridas no reproducibles cuando cambia la versión upstream.
 
 Cuándo aplicar esta alternativa: cuando el `firma` del cliente incluye "CI sin egress", "air-gapped", "self-hosted runner con allowlist", o cuando una corrida previa falló con error de DNS/resolución contra `jslib.k6.io`.
 

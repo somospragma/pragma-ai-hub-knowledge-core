@@ -59,7 +59,7 @@ El **provider** publica la especificación (OpenAPI 3.x). Los consumers se gener
 
 ## Recomendación por contexto Pragma
 
-- **Cliente bancario con microservicios internos cross-team** (consumer team A, provider team B): **CDC con Pact**.
+- **Cliente enterprise con microservicios internos cross-team** (consumer team A, provider team B — financiero, salud, gobierno, SaaS multi-tenant, telco, gaming, etc.): **CDC con Pact**.
 - **Cliente que expone API publica para partners** (consumers desconocidos): **Schema-First con OpenAPI diff**.
 - **Monolito con un solo equipo**: probablemente **NINGUNO** — Karate `match schema` es suficiente.
 - **Cliente con Kafka + microservicios** (eventos asincronos): **Schema Registry Confluent** para los topics + **Pact Messaging** o **AsyncAPI** para los contratos de payload.

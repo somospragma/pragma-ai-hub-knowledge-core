@@ -59,7 +59,7 @@ El `real_minimum` es el techo teórico de cobertura negativa. En la práctica, n
 
 | Nivel      | Criterio                                                                                       | Factor |
 |------------|------------------------------------------------------------------------------------------------|--------|
-| `CRITICAL` | Transacciones financieras, datos sensibles (PII, salud), flujos regulados (SOX, PCI, HIPAA)    | 1.0    |
+| `CRITICAL` | Transacciones financieras, datos sensibles (PII, PHI, PCI), flujos regulados (SOX, PCI-DSS, HIPAA, GDPR, SOC 2), identidad ciudadana, voto electrónico, life-safety en IoT, checkout en peak | 1.0    |
 | `HIGH`     | Operaciones core no transaccionales, integraciones externas, escrituras de estado de negocio    | 0.7    |
 | `MEDIUM`   | Queries no críticas, lecturas con filtros, configuraciones de usuario                          | 0.4    |
 | `LOW`      | Health checks, metadata, catálogos estáticos, endpoints administrativos internos               | 0.2    |

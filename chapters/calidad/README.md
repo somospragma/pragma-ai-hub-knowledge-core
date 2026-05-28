@@ -2,7 +2,7 @@
 
 ## Overview
 
-El Chapter Calidad de Pragma agrupa el conocimiento accionable para QA automation en clientes regulados de LATAM, con énfasis en **banca, fintech y retail**. Los assets de este chapter están diseñados para alimentar agentes que generan, extienden y operan suites de pruebas reales en producción.
+El Chapter Calidad de Pragma agrupa el conocimiento accionable para **QA automation para cualquier sistema bajo prueba — APIs, web, mobile, performance — sin presunción de sector o región**. Capacidades específicas (compliance, anonimización, mobile clouds) se activan según el contexto del cliente, no por defecto. Los assets de este chapter están diseñados para alimentar agentes que generan, extienden y operan suites de pruebas reales en producción.
 
 Cubre cuatro frameworks de automatización:
 
@@ -24,7 +24,7 @@ Y cuatro ejes cross-cutting que aplican a los cuatro frameworks:
 
 | Path                                                | Propósito                                                                |
 |-----------------------------------------------------|--------------------------------------------------------------------------|
-| `steering/_all/chapter-calidad-perspective.md`      | Perspectiva rectora del Chapter para clientes regulados de LATAM.        |
+| `steering/_all/chapter-calidad-perspective.md`      | Perspectiva rectora del Chapter para cualquier sistema bajo prueba con disciplina de QA automation. |
 
 ### Skills cross-cutting (`skills/_all/`)
 
@@ -142,7 +142,7 @@ No saltar pasos: el router protege contra la generación con inputs incompletos 
 Items conocidos pendientes en el chapter:
 
 - **Appium iOS** — el auto-generador V3 con soporte iOS está pendiente; V2 cubre sólo Android.
-- **Más jurisdicciones de compliance** — actualmente el chapter cubre SOX, PCI, GDPR y SFC (Colombia); falta extender a CNBV (México), SBS (Perú), BCU (Uruguay) y CMF (Chile).
+- **Más jurisdicciones de compliance** — profundizar el catálogo de marcos regulatorios globales (hoy: PCI-DSS, GDPR, HIPAA, SOX, SOC 2, ISO 27001, FedRAMP, NIS2, LGPD, Ley 1581, CCPA/CPRA, PIPEDA, PIPL, equivalentes LATAM/APAC). Cada cliente activa solo el subconjunto aplicable.
 - **AsyncAPI testing** — el ecosistema Karate cubre REST y SOAP; queda pendiente un skill formal para eventos (Kafka, RabbitMQ, MQTT) basado en AsyncAPI 3.0.
 - **Workflows brownfield K6 y Appium** — declarados en el router como placeholders (`extend-k6-brownfield`, `extend-appium-brownfield`); en construcción por agentes paralelos del chapter.
 - **Skill formal de contract testing** consumer-driven con Pact, complementario a `match` patterns de Karate.

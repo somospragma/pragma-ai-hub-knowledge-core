@@ -11,9 +11,21 @@ Ejecutar Appium en devices reales requiere infraestructura cara y de mantenimien
 | AWS Device Farm    | Sí           | Sí         | 5-50               | Medio          | Pago por minuto, integración AWS nativa            |
 | Firebase Test Lab  | Sí (Android) | Sí         | Pool dinámico      | Bajo           | Solo Android, integrado a Firebase, barato         |
 
+## Cómo elegir devices
+
+La matrix de devices se define por **research del mercado objetivo del cliente**, no por suposiciones regionales. Pasos:
+
+1. Pedir al cliente analytics reales de devices (Google Analytics, Firebase, App Store Connect, Google Play Console).
+2. Cubrir el 80% del tráfico real (top devices + top OS versions).
+3. Añadir 2-3 edge cases (low-end, oldest supported OS, foldable/tablet si aplica).
+4. Para cobertura accesibilidad: incluir screen readers (TalkBack Android, VoiceOver iOS).
+5. Revisar la matrix cada 6 meses (el mercado cambia rápido).
+
+No asumir geografías; usar data.
+
 ## Cuándo elegir cada uno
 
-- **BrowserStack App Automate**: cliente con catálogo amplio de dispositivos (LATAM = muchos Android low-end), suites cross-platform iOS+Android, equipos sin expertise AWS.
+- **BrowserStack App Automate**: cliente con catálogo amplio de dispositivos (incluyendo mercados con alta penetración de Android mid/low-end como India, África, sudeste asiático, Latinoamérica), suites cross-platform iOS+Android, equipos sin expertise AWS.
 - **Sauce Labs Real Device Cloud**: cliente enterprise con SLAs estrictos, necesidad de analítica detallada de performance mobile.
 - **AWS Device Farm**: cliente ya en AWS, pricing por uso (suites infrecuentes), integración con CodePipeline.
 - **Firebase Test Lab**: solo Android, presupuesto ajustado, integración con Crashlytics, validación pre-release de Play Store.
@@ -108,14 +120,14 @@ Para Appium server-driven en Firebase: NO soportado directamente — usar Browse
 
 Patrón típico Pragma:
 - **PR**: 1-2 emuladores locales (Android Studio AVD, sin coste).
-- **Nightly**: 5-10 devices reales en BrowserStack (matrix de top devices LATAM).
-- **Release**: 20-30 devices, cross-OS, incluyendo low-end Android (Pragma LATAM = importantes).
+- **Nightly**: 5-10 devices reales en BrowserStack (matrix definida por research de devices reales del mercado objetivo del cliente).
+- **Release**: 20-30 devices, cross-OS, incluyendo low-end Android cuando el mercado objetivo lo amerita (configurable por segmento).
 
 ```yaml
-# matrix LATAM top devices
+# matrix de devices top por mercado objetivo — ajustar al cliente
 matrix:
   device:
-    - {name: 'Samsung Galaxy A14', os: '13'}    # Top Android LATAM
+    - {name: 'Samsung Galaxy A14', os: '13'}    # Ejemplo mid-range Android (sustituir según research)
     - {name: 'Xiaomi Redmi Note 12', os: '13'}  # Top mid-range
     - {name: 'Motorola Moto G84', os: '14'}     # Top Motorola
     - {name: 'iPhone 14', os: '17'}             # Top iPhone region

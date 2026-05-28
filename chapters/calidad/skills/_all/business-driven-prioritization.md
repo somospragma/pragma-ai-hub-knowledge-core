@@ -27,7 +27,7 @@ Es transversal a los cuatro frameworks del Chapter Calidad y a cualquier workflo
 **La prioridad la fija el negocio, no el nombre del recurso.**
 
 - La asigna el **Product Owner**, el **QA Lead** o un **risk assessment formal** hecho con stakeholders del negocio.
-- **NUNCA** se infiere por keywords del path, URL o nombre de archivo. `/login` no es CRITICAL por defecto: en una app interna de catálogo puede ser MEDIUM; en una banca digital puede ser CRITICAL.
+- **NUNCA** se infiere por keywords del path, URL o nombre de archivo. `/login` no es CRITICAL por defecto: en una app interna de catálogo puede ser MEDIUM; en un portal de telemedicina, banca digital, identidad ciudadana o gaming en vivo puede ser CRITICAL.
 - **NUNCA** se inventa: si nadie asignó la prioridad y no hay señal en la documentación, se pregunta.
 
 ## Cómo obtener prioridades
@@ -53,7 +53,7 @@ Orden recomendado de fuentes, de más confiable a menos:
 
 | Nivel      | Impacto financiero          | Impacto regulatorio                   | Alcance de usuarios     | Frecuencia de uso        | Ejemplos típicos                                        |
 |------------|-----------------------------|---------------------------------------|-------------------------|--------------------------|---------------------------------------------------------|
-| `CRITICAL` | Pérdida directa de dinero o reputación de marca | Falla causa incumplimiento (SOX, PCI, HIPAA, GDPR, SFC) | Todos los usuarios externos | Diaria, en hora pico    | Transferencias, pagos, autenticación de banca, KYC      |
+| `CRITICAL` | Pérdida directa de dinero o reputación de marca | Falla causa incumplimiento (SOX, PCI, HIPAA, GDPR, SFC) | Todos los usuarios externos | Diaria, en hora pico    | Transacciones financieras, autenticación de identidad, prescripción médica, expediente clínico, voto electrónico, matchmaking en gaming live, checkout e-commerce en peak, sensores life-safety en IoT industrial |
 | `HIGH`     | Pérdida indirecta (costo operacional, retrabajo) | Falla auditable pero no sancionable inmediato            | Mayoría de usuarios       | Diaria fuera de pico     | Consulta de saldo, alta de productos, integraciones B2B |
 | `MEDIUM`   | Sin pérdida monetaria directa  | Sin impacto regulatorio                | Subset de usuarios       | Semanal / bajo demanda   | Configuración de preferencias, búsquedas filtradas       |
 | `LOW`      | Costo nulo / cosmético         | Ninguno                                | Internos o automatizados | Esporádica               | Health checks, metadata, catálogos estáticos, admin tooling |

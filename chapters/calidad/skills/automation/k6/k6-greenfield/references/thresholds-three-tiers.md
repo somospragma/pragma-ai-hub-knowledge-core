@@ -7,7 +7,7 @@ K6 expone `options.thresholds` para definir criterios de pass/fail por métrica.
 
 | Tier | Contexto típico | P95 | P99 | Error rate | Checks pass |
 |---|---|---|---|---|---|
-| Conservative | Banca core, pagos, sistemas críticos regulados | <500 ms | <1000 ms | <0.001 | >0.99 |
+| Conservative | Sistemas mission-critical con SLA estricto: transacciones financieras, salud (EHR, prescripción), identidad/autenticación, life-safety IoT, gaming live, checkout en peak | <500 ms | <1000 ms | <0.001 | >0.99 |
 | **Moderate (DEFAULT)** | APIs de negocio normales | <1000 ms | <2000 ms | <0.01 | >0.95 |
 | Relaxed | Servicios internos, no críticos | <2000 ms | <5000 ms | <0.05 | >0.90 |
 
@@ -21,7 +21,7 @@ K6 expone `options.thresholds` para definir criterios de pass/fail por métrica.
 ## Snippet por tier
 
 ```javascript
-// Conservative — banca core, pagos
+// Conservative — sistemas mission-critical (financiero, salud, identidad, life-safety)
 thresholds: {
   http_req_duration: ['p(95)<500',  'p(99)<1000'],
   http_req_failed:   ['rate<0.001'],

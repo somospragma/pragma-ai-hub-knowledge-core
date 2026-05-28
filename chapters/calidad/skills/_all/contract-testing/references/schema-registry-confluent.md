@@ -20,7 +20,7 @@ Para arquitecturas Kafka, **Confluent Schema Registry** centraliza los schemas (
 | `FULL_TRANSITIVE`          | Igual + todas las versiones                                          | Máxima seguridad, mínima flexibilidad.                    |
 | `NONE`                     | Cualquier cambio                                                     | NUNCA en produccion. Solo experimentación.                |
 
-**Recomendación Pragma:** `BACKWARD` por defecto. `FULL` para topics críticos en banca donde no se puede coordinar deploy de N consumers.
+**Recomendación Pragma:** `BACKWARD` por defecto. `FULL` para topics mission-critical donde no se puede coordinar deploy de N consumers (procesamiento financiero, telemetría safety-critical, plataformas multi-tenant con SLAs contractuales).
 
 ## Configurar compatibility mode
 

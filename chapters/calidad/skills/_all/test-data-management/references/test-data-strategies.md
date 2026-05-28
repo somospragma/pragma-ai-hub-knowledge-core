@@ -63,7 +63,7 @@ La estrategia óptima depende del nivel de prueba. Mezclar estrategias (ej. usar
 
 ## Anti-patrones
 
-- **Reusar datos productivos**: ilegal en LATAM sin anonimización (Ley 1581, LGPD, etc.).
+- **Reusar datos productivos**: ilegal en prácticamente toda jurisdicción con marco de protección de datos personales (GDPR/UK-GDPR, HIPAA, CCPA/CPRA, LGPD, Ley 1581, LFPDPPP, PIPL, APPI, etc.) sin anonimización previa.
 - **Hardcodear IDs entre tests**: acopla orden de ejecución y rompe paralelismo.
 - **Generar datos distintos en cada corrida sin loguear el seed**: bugs irreproducibles.
 - **Cleanup parcial**: deja residuos que contaminan corridas siguientes.

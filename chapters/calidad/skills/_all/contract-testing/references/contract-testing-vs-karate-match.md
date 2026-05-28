@@ -123,7 +123,7 @@ jobs:
 - Microservicios con **N consumers** por provider — necesitas saber a quién rompes.
 - Equipos distribuidos donde provider y consumer son **cross-team** o **cross-company**.
 - Sistemas con **deploys independientes** (provider y consumer deployan en pipelines distintos).
-- Compliance / banca / salud donde el contrato debe ser **versionado y auditable**.
+- Sistemas con compliance estricto (financiero, salud, gobierno, certificaciones SOC 2/ISO 27001) donde el contrato debe ser **versionado y auditable**.
 
 ## Recomendación final
 

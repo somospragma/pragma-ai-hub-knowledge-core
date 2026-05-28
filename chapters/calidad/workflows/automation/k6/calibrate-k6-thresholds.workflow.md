@@ -59,7 +59,7 @@ Ejecuta `npm run smoke` (ver `[[k6-run-and-suite]]`). Si los nuevos thresholds p
 
 En el `README.md` del proyecto, registra:
 
-- Tier elegido y justificación (banca core, API normal, servicio interno).
+- Tier elegido y justificación (mission-critical, business-as-usual, internal — con la razón objetiva del contexto, no del sector).
 - Fecha y ambiente del baseline usado.
 - Valores P95/P99/error rate medidos.
 - Próxima fecha de recalibración (ej. cada release mayor).

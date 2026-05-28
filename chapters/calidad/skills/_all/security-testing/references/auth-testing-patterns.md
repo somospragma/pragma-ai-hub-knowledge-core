@@ -1,6 +1,6 @@
 # Auth Testing Patterns — JWT, OAuth2/OIDC, mTLS, Session
 
-Patrones de prueba para los esquemas de autenticación más comunes en APIs y apps LATAM. Todos los escenarios deben tagearse `@security @auth` para activarse en pipelines de seguridad sin afectar el smoke funcional.
+Patrones de prueba para los esquemas de autenticación más comunes en APIs y apps enterprise (cualquier jurisdicción). Todos los escenarios deben tagearse `@security @auth` para activarse en pipelines de seguridad sin afectar el smoke funcional.
 
 ## JWT
 

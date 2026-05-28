@@ -154,7 +154,7 @@ class UserEventsProviderTest {
 **Recomendación Pragma:**
 - **AsyncAPI** como source of truth de la topología event-driven + documentación.
 - **Pact Messaging** para los consumers críticos que necesitan gate per-consumer.
-- Combinar ambos en clientes con muchos eventos críticos (banca transaccional).
+- Combinar ambos en sistemas event-driven críticos (procesamiento de transacciones, telemetría IoT life-safety, plataformas streaming, sistemas de pago, healthcare HL7/FHIR eventos).
 
 ## Schema Registry como alternativa (Kafka específico)
 

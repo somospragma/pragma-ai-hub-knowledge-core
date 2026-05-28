@@ -55,7 +55,7 @@ Si el spec SÍ declara security:
 
 ## Modo external-auth (override)
 
-El comportamiento default ("spec drives auth") cubre microservicios cuya OpenAPI declara explícitamente `securitySchemes`. En entornos reales —especialmente banca y retail LATAM— esa premisa falla a menudo: el spec sólo describe el contrato funcional del microservicio aguas arriba del gateway y no incluye los mecanismos de autenticación que sí se aplican en producción y en los ambientes de performance.
+El comportamiento default ("spec drives auth") cubre microservicios cuya OpenAPI declara explícitamente `securitySchemes`. En entornos reales —típicamente arquitecturas con API gateway, IdP externo (Cognito/Keycloak/Okta/Auth0), mTLS o request signing— esa premisa falla a menudo: el spec sólo describe el contrato funcional del microservicio aguas arriba del gateway y no incluye los mecanismos de autenticación que sí se aplican en producción y en los ambientes de performance.
 
 ### Trigger
 

@@ -17,7 +17,7 @@ tags: [k6, prompt, script, smoke, load, stress, spike, soak]
 - `{{endpoints}}`: lista de endpoints (path, method, operationId, request body schema).
 - `{{crud_flows}}`: lista de flujos CRUD detectados (`full` / `partial`), con base path normalizado y métodos disponibles.
 - `{{user_story}}`: historia de usuario (puede declarar SLA).
-- `{{firma}}`: perfil del cliente (puede declarar tier — banca core, normal, interno).
+- `{{firma}}`: perfil del sistema (puede declarar tier — mission-critical, business-as-usual, internal).
 
 ## Prompt
 

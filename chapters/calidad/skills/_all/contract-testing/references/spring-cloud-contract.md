@@ -16,7 +16,7 @@ A diferencia de Pact (consumer-driven), Spring Cloud Contract pone el contrato *
 | Curva                              | Media (DSL Groovy)          | Alta                        |
 | Mejor caso                         | Provider Spring + consumers conocidos | Cross-org / cross-team |
 
-**Recomendación Pragma:** SCC si el cliente es **Spring-heavy** (común en banca latam) y el provider es la fuente autoritativa. Pact si los consumers son los dueños del contrato.
+**Recomendación Pragma:** SCC si el cliente es **Spring-heavy** y el provider es la fuente autoritativa del contrato. Pact si los consumers son los dueños del contrato.
 
 ## Setup en el provider (Maven + Spring Boot)
 

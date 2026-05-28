@@ -20,7 +20,7 @@ Cuando el routing del chapter (`[[calidad-route-test-generation]]`) detecta inte
 Gobernados por `[[calidad-mandatory-inputs-protocol]]`:
 
 - **Obligatorios**: `spec` (OpenAPI 3.x o Swagger 2.0), `project_name`, `output_path`, `base_url`.
-- **Opcionales / recomendados**: `user_story` (para derivar SLA y elegir tier), `firma` (perfil del cliente — banca core → Conservative), `auth_mode` (`spec` default | `external` override — ver paso 3 y `[[k6-enums-headers-security-extraction]]`).
+- **Opcionales / recomendados**: `user_story` (para derivar SLA y elegir tier), `firma` (perfil del sistema — mission-critical → Conservative; business-as-usual → Moderate; internal → Relaxed), `auth_mode` (`spec` default | `external` override — ver paso 3 y `[[k6-enums-headers-security-extraction]]`).
 
 ## Pasos
 

@@ -107,5 +107,5 @@ Aplica la misma convención de tags **en todos los frameworks** (Karate `@`, Cuc
 - **NUNCA** entregar tests sin tags de trazabilidad: como mínimo `@user-story` o `@requirement`.
 - **NUNCA** desactivar reportes para "ahorrar tiempo de CI": son la única evidencia auditable.
 - **NUNCA** reportar "todo verde" si solo corrió `@smoke`. Documenta qué suite se ejecutó.
-- En clientes regulados (banca), los reportes y summaries deben **archivarse** (S3, artifactory, o equivalente) según política de retención del cliente.
+- En clientes con políticas de retención (compliance, auditoría externa, certificaciones ISO/SOC), los reportes y summaries deben **archivarse** (S3, artifactory, o equivalente) según política de retención del cliente.
 - Encadena con `[[calidad-route-test-generation]]` como paso final.

@@ -17,7 +17,7 @@ ReportPortal (RP) es una plataforma de analisis de ejecucion con ML-based failur
 
 **Recomendacion Pragma:**
 - **Allure** por defecto en proyectos cortos (<6 meses) o ad-hoc.
-- **ReportPortal** en proyectos largos (>6 meses), suites muy grandes (>1000 tests), o clientes que requieren integracion Jira automatizada (banca, salud).
+- **ReportPortal** en proyectos largos (>6 meses), suites muy grandes (>1000 tests), o clientes que requieren integración Jira/ALM automatizada para auditoría (financiero, salud, gobierno, certificaciones SOC/ISO).
 
 ## Integraciones oficiales por framework
 
