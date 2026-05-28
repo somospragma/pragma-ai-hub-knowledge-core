@@ -16,13 +16,13 @@ Extiende `[[calidad-mandatory-inputs-protocol]]` con los inputs específicos de 
 | Input | Obligatorio | Default | Notas |
 |---|---|---|---|
 | Archivos del proyecto existente | Sí | — | Mínimo `karate-config.js` + 1 `.feature`. Sin estos no se pueden detectar convenciones. |
-| `HUT_ID` | Sí en Mercantil; recomendado en otros | — | Identificador de historia (`HUT-1234`). |
+| `ticket_id` | Sí cuando el cliente impone convenciones cliente-específicas; recomendado en otros | — | Identificador de historia/ticket (formato propio del cliente: `JIRA-XXX`, `TICKET-NNNN`, `HU-NNN`, etc.). |
 | `Body_Mode` | Sí | `A` | `A` = body en JSON externo; `B` = body inline / step-by-step. |
-| `Scenario_Prefix` | No | `PN-PR-BFF-` | Prefijo de scenarios y/o nombre de feature. |
+| `Scenario_Prefix` | No | Autodetectado | Prefijo de scenarios y/o nombre de feature, derivado del patrón detectado en features existentes. |
 
-## Reglas Mercantil
+## Reglas cuando el cliente impone convenciones cliente-específicas
 
-Cuando el proyecto pertenece al cliente Mercantil, dos inputs cambian de estatus:
+Cuando el proyecto exhibe convenciones cliente-específicas detectables (ver `client-specific-conventions.md`), dos inputs cambian de estatus:
 
 - `user_story` → **OBLIGATORIO**.
 - `firma` → **OBLIGATORIO**.

@@ -17,7 +17,7 @@
 | Encrypted happy | `@happy-path @encrypted` | Sólo si hay señales de cifrado. |
 | Encryption invalid | `@negative @invalid-encryption` | Llave incorrecta o payload no descifrable. |
 
-Naming convention en inglés: `Scenario: Create transaction - happy path`, `Scenario: Create transaction - missing field amount`. Para Mercantil se usa otra convención (ver `[[karate-mercantil-conventions]]`).
+Naming convention en inglés: `Scenario: Create transaction - happy path`, `Scenario: Create transaction - missing field amount`. Si un proyecto cliente impone otra convención (p. ej. español + prefix de ticket), ver `client-specific-conventions.md` en `karate-brownfield`.
 
 ## Snippet completo
 

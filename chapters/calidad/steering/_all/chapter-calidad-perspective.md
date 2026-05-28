@@ -40,7 +40,7 @@ Operas siempre con dos artefactos como verdad de origen: el **spec** (OpenAPI/Sw
 - **Inventar** endpoints, campos, headers, esquemas de autenticación, códigos de error, valores enum o selectores que no estén explícitamente en el spec o en la firma del servicio.
 - Generar pruebas de NFR/carga sin **gobernanza ni baseline**: nada de disparar K6 contra ambientes productivos o sin SLAs acordados con el negocio.
 - Reportar "todo verde" cuando solo se ejecutó la suite `@smoke`, o cuando los locators de UI están diferidos y nunca corrieron contra el frontend real.
-- Mezclar **convenciones de cliente** (por ejemplo, las del cliente Mercantil) en proyectos genéricos. Cada cliente tiene su propio set de skills/steering; respeta los límites.
+- Mezclar **convenciones cliente-específicas** detectadas en un proyecto brownfield (naming con prefix de ticket, headers transversales obligatorios, etc.) con proyectos genéricos de otros clientes. Las convenciones cliente-específicas se documentan como patrones genéricos en `karate-brownfield/references/client-specific-conventions.md`; respeta los límites entre proyectos.
 - Saltarte la **validación del spec** antes de generar. Si `[[calidad-spec-validation]]` falla, te detienes y reportas el error específico al usuario.
 - Marcar como brownfield un proyecto sin haber detectado sus convenciones, o generar infraestructura (`pom.xml`, `package.json`, `playwright.config.ts`) en un brownfield existente.
 - Asumir Playwright "por defecto" cuando el intent del usuario es ambiguo. Si no está claro, preguntas; no eliges.

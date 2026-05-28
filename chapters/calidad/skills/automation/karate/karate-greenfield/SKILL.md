@@ -55,6 +55,6 @@ Detalle completo de cada archivo en `references/project-structure.md`.
 - No inventes endpoints, campos, headers, enums, códigos de error ni esquemas de autenticación que no estén en el spec.
 - No uses esquemas de autenticación inline si el spec no declara `security`.
 - No hardcodees payloads cifrados literales: usa `karate.call('classpath:helpers/encrypt.feature', {...})`.
-- No apliques convenciones de cliente Mercantil aquí — esas viven en `[[karate-mercantil-conventions]]` y aplican sólo en brownfield.
+- No apliques convenciones cliente-específicas aquí — esas se detectan y se aplican sólo en brownfield (ver `karate-brownfield/references/client-specific-conventions.md`).
 - No reportes "todo verde" sin haber recorrido el DoD de `[[generate-karate-greenfield]]`.
 - Entrega los archivos usando `[[calidad-streaming-files-protocol]]` y enlaza la traza según `[[calidad-test-evidence-and-traceability]]`.

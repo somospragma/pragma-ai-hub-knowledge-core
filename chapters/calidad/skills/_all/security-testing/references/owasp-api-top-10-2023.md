@@ -111,7 +111,7 @@ Lista de referencia para mapear cobertura de seguridad en cualquier API entregad
     And match responseHeaders['Strict-Transport-Security'][0] == '#string'
     And match responseHeaders['X-Content-Type-Options'][0] == 'nosniff'
   ```
-- **Herramienta**: ZAP (passive scan), `testssl.sh`, Nikto, `[[karate-mercantil-security-headers]]`.
+- **Herramienta**: ZAP (passive scan), `testssl.sh`, Nikto. Para clientes que imponen headers transversales obligatorios (ver `client-specific-conventions.md` en `karate-brownfield`), validar también su presencia y formato.
 
 ## API9:2023 — Improper Inventory Management
 

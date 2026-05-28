@@ -36,7 +36,7 @@ Activa este skill en paralelo con la generación funcional (`[[karate-greenfield
 - **NUNCA** commitear tokens, claves privadas, certificados o credenciales reales en el repositorio. Usa los mecanismos descritos en `references/secrets-management.md` (SOPS, Vault, AWS Secrets Manager, GitHub OIDC).
 - **NUNCA** entregar una suite de seguridad sin gating real en pipeline (DAST + SCA mínimo). Reportes sin gates no detienen regresiones.
 - Encadena con `[[calidad-test-evidence-and-traceability]]` para que los reportes ZAP/Snyk/Schemathesis queden archivados con el resto de la evidencia.
-- Para clientes con cifrado de payloads (ej. Mercantil), respeta `[[karate-encrypted-payloads]]` y `[[karate-mercantil-security-headers]]` además de este skill.
+- Para clientes con cifrado de payloads, respeta `[[karate-encrypted-payloads]]` y las convenciones de headers transversales del cliente detectadas en `[[karate-brownfield]]` (reference `client-specific-conventions.md`) además de este skill.
 - Sigue `[[calidad-mandatory-inputs-protocol]]` para obtener autorizaciones y `[[calidad-intent-detection]]` para decidir si la conversación es de tipo "security review" o suite funcional con cobertura de seguridad.
 
 ## Cross-links

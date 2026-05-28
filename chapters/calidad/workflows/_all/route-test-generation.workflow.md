@@ -25,7 +25,7 @@ NO uses este workflow para:
 Inputs obligatorios y opcionales gobernados por `[[calidad-mandatory-inputs-protocol]]`:
 
 - **Obligatorios**: `intent`, `project_name`, `output_path`, `spec` (excepto algunos casos puntuales de Playwright greenfield sin contrato).
-- **Condicionales**: `base_url` (si no está en spec), `user_story` (obligatorio en Mercantil + Karate brownfield).
+- **Condicionales**: `base_url` (si no está en spec), `user_story` (obligatorio en Karate brownfield cuando el cliente impone convenciones cliente-específicas).
 - **Opcionales**: `firma`, `extra_params`.
 
 ## Pasos

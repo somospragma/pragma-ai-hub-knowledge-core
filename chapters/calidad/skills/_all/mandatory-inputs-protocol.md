@@ -23,7 +23,7 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 | `output_path`  | Obligatorio                                     | Ruta **absoluta** del directorio donde se escriben los archivos                                   | Destino del streaming de archivos (`[[calidad-streaming-files-protocol]]`)                                   |
 | `spec`         | Obligatorio (Karate/K6)                         | **Contenido COMPLETO** del OpenAPI/Swagger/WSDL (no la ruta del archivo)                          | Input de `[[calidad-spec-validation]]`; fuente única para endpoints, schemas y auth                          |
 | `base_url`     | A veces obligatorio                             | Base URL del servicio                                                                             | Necesario si el spec **no** lo declara (algunos Swagger 2.0 sin `host`, WSDL sin `<soap:address>` accesible) |
-| `user_story`   | Opcional (recomendado · obligatorio en Mercantil-Karate-brownfield) | Historia de usuario (formato Gherkin libre o As-a/I-want/So-that) con criterios de aceptación   | Naming de escenarios, prioridad de endpoints, criterios negativos                                            |
+| `user_story`   | Opcional (recomendado · obligatorio en Karate brownfield cuando el cliente impone convenciones cliente-específicas) | Historia de usuario (formato Gherkin libre o As-a/I-want/So-that) con criterios de aceptación   | Naming de escenarios, prioridad de endpoints, criterios negativos                                            |
 | `firma`        | Opcional (altamente recomendado)                | Documento técnico del servicio: reglas de negocio, ejemplos de datos reales, terminología, SLAs   | Enriquecimiento de payloads, escenarios `@negative`, vocabulario en nombres de escenarios                    |
 | `extra_params` | Opcional                                        | JSON con parámetros framework-specific                                                            | Ej.: `{"include_login_case": true}` para Appium, `{"thresholds": {"http_req_duration": "p(95)<500"}}` para K6 |
 
@@ -43,33 +43,29 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 1. Pedir al usuario los obligatorios faltantes, uno por uno o en bloque (preferir bloque para no fragmentar).
 2. Si un input está incompleto → indicar exactamente QUÉ falta, no devolver "está incompleto".
 3. Confirmar opcionales relevantes según framework detectado (firma, user_story, extra_params).
-4. Para clientes específicos (ej. Mercantil), aplicar reglas adicionales del steering del cliente correspondiente.
+4. Para proyectos con convenciones cliente-específicas detectadas (ver `[[karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
 5. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
 ```
 
-## Reglas específicas de cliente (resumen)
+## Overrides por convenciones cliente-específicas
 
-- **Mercantil + Karate brownfield**: `user_story` es **obligatoria** (no opcional). Aplica además las convenciones de naming, headers y body loading definidas en el steering del cliente Mercantil. Ver el skill del cliente correspondiente (asset separado).
+Algunos clientes/proyectos imponen overrides sobre los inputs opcionales. Patrón típico: clientes con convenciones brownfield estrictas (ver `[[karate-brownfield]]` y su reference `client-specific-conventions.md`) elevan `user_story` y `firma` a obligatorios.
 
-## Overrides por cliente / proyecto
-
-Algunos clientes y proyectos hacen que inputs que en el catálogo común son **opcionales** se vuelvan **obligatorios**. Esos overrides se documentan en el skill del framework correspondiente y se referencian acá para visibilidad:
-
-| Cliente / proyecto | Skill / asset                      | Inputs que pasan a obligatorios                                                                                                                                       |
-|--------------------|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Mercantil**      | `[[karate-brownfield]]`            | `user_story` y `firma` son **obligatorios** (no opcionales). Convenciones detalladas en el reference `mercantil-conventions.md` dentro del skill `karate-brownfield`. |
+| Escenario                                                            | Skill / asset                      | Inputs que pasan a obligatorios                                                                                                                                       |
+|----------------------------------------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Karate brownfield con convenciones cliente-específicas detectadas    | `[[karate-brownfield]]`            | `user_story` y `firma` son **obligatorios** (no opcionales). Convenciones genéricas detalladas en el reference `client-specific-conventions.md` dentro del skill `karate-brownfield`. |
 
 ### Pattern para nuevos overrides
 
 Cuando un cliente o proyecto necesite endurecer inputs:
 
-1. Documentar la regla en el SKILL del framework correspondiente (por ejemplo `karate-brownfield/SKILL.md` o un reference cliente-específico).
-2. Apuntar el override en la tabla de arriba con: nombre del cliente, skill o asset que lo define, lista de inputs que se vuelven obligatorios.
+1. Documentar la regla en el SKILL del framework correspondiente (por ejemplo `karate-brownfield/SKILL.md` o un reference de convenciones cliente-específicas).
+2. Apuntar el override en la tabla de arriba con: escenario, skill o asset que lo define, lista de inputs que se vuelven obligatorios.
 3. Si el override aplica también a la validación de spec o al flujo de generación, mencionarlo en el skill de framework, no acá: este documento sólo concentra el pointer.
 
 ## Restricciones
 
 - **NUNCA proceder** sin los inputs obligatorios resueltos.
-- **NUNCA mezclar** convenciones de cliente con proyectos genéricos.
+- **NUNCA mezclar** convenciones cliente-específicas detectadas en un proyecto con proyectos genéricos de otros clientes.
 - **NUNCA asumir** valores por defecto para `base_url`, headers de auth o entornos: si falta, se pregunta.
 - Encadena con `[[calidad-spec-validation]]` (paso siguiente) y con `[[calidad-intent-detection]]` (paso previo).

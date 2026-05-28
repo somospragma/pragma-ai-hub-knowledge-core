@@ -16,7 +16,7 @@ tags: [karate, gherkin, feature, prompt, generation]
 - `{{endpoint_info}}` — objeto JSON de un endpoint (proveniente de `[[karate-analyze-openapi-prompt]]`).
 - `{{user_story}}` — identificador de historia de usuario.
 - `{{firma}}` — documento técnico complementario.
-- `{{client_conventions}}` — opcional; convenciones detectadas del proyecto brownfield o reglas de cliente (Mercantil).
+- `{{client_conventions}}` — opcional; convenciones detectadas del proyecto brownfield o convenciones cliente-específicas (ver `karate-brownfield/references/client-specific-conventions.md`).
 
 ## Plantilla
 
@@ -55,7 +55,7 @@ Reglas obligatorias:
    - Si hay cifrado: @happy-path @encrypted + @negative @invalid-encryption + @negative @plaintext-body-on-encrypted-contract.
 
 4. ESTILO:
-   - Si {{client_conventions}} incluye reglas Mercantil: headers one-by-one, body step-by-step, assertions field-by-field, naming "PN-PR-BFF-{jira} solicitud exitosa/fallida - ...". 
+   - Si {{client_conventions}} incluye convenciones cliente-especificas (headers one-by-one, body step-by-step, assertions field-by-field, naming con prefix de ticket "{ticket-prefix}-{ticket-id} solicitud exitosa/fallida - ..."), respetarlas al 100%.
    - Si no, estilo Karate idiomatico en ingles.
 
 5. PROHIBIDO:

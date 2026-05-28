@@ -54,7 +54,7 @@ Y cuatro ejes cross-cutting que aplican a los cuatro frameworks:
 | `karate-brownfield/SKILL.md`     | Extiende un proyecto Karate existente respetando convenciones, sin regenerar infraestructura.   |
 | `karate-run-and-tags.md`         | Comandos Maven, ejecución por tag o environment, semántica de tags estándar.                    |
 
-Incluye references específicas como `negative-coverage-formula.md` (con `risk_factor` modulado por negocio), `contract-testing-match-patterns.md`, `encrypted-payloads.md` y reglas de cliente Mercantil aisladas.
+Incluye references específicas como `negative-coverage-formula.md` (con `risk_factor` modulado por negocio), `contract-testing-match-patterns.md`, `encrypted-payloads.md` y `client-specific-conventions.md` (patrones genéricos para proyectos brownfield donde el cliente impone convenciones propias).
 
 #### Playwright (`skills/automation/playwright/`)
 
@@ -142,9 +142,8 @@ No saltar pasos: el router protege contra la generación con inputs incompletos 
 - **Links entre assets**:
   - `[[asset-id]]` sólo para assets que tienen `id:` en su frontmatter.
   - References se enlazan por **path relativo** desde el documento que los cita, no por id.
-- **Reglas específicas de cliente** se aíslan en su skill correspondiente. El caso vigente:
-  - Cliente **Mercantil** tiene sus reglas en `skills/automation/karate/karate-brownfield/references/mercantil-*.md` (convenciones de naming, headers de seguridad).
-  - El override de inputs obligatorios para Mercantil se documenta en `skills/_all/mandatory-inputs-protocol.md` con pointer al skill.
+- **Convenciones cliente-específicas detectadas en brownfield** se documentan como patrones genéricos en `skills/automation/karate/karate-brownfield/references/client-specific-conventions.md`. El brownfield detecta y respeta esas convenciones (naming con prefix de ticket, headers transversales obligatorios, estilo step-by-step, etc.) sin nombrar clientes concretos.
+  - El override de inputs obligatorios (cuando el cliente impone convenciones estrictas, `user_story` y `firma` pasan a obligatorios) se documenta en `skills/_all/mandatory-inputs-protocol.md` con pointer al skill.
 
 ## Roadmap
 
@@ -225,33 +224,33 @@ Existen **tres modos de invocación**. Elegir uno u otro depende del nivel de co
 
 ---
 
-#### 2. Karate Brownfield — Cliente Mercantil agrega endpoint
+#### 2. Karate Brownfield — Cliente regulado agrega endpoint con convenciones propias
 
-**Setup**: proyecto Karate existente en `pagos-mercantil-tests/` con `karate-config.js`, features previos y convenciones consolidadas. Nuevo endpoint `POST /transferencia` agregado al spec. HUT_ID = `PN-PR-BFF-4521`. Body_Mode = A (JSON externo). Cliente Mercantil → modo `dry-run` automático por regulación.
+**Setup**: proyecto Karate existente en `pagos-cliente-tests/` con `karate-config.js`, features previos y convenciones consolidadas del cliente. Nuevo endpoint `POST /transferencia` agregado al spec. ticket_prefix = `TICKET-4521`. Body_Mode = A (JSON externo). Cliente regulado → modo `dry-run` automático.
 
 ```
-> QA: Agrega el endpoint POST /transferencia al proyecto pagos-mercantil-tests. HUT_ID PN-PR-BFF-4521, body en JSON externo.
+> QA: Agrega el endpoint POST /transferencia al proyecto pagos-cliente-tests. Ticket TICKET-4521, body en JSON externo.
 
-> Kiro: Detecto intent "karate brownfield" en cliente Mercantil. Activo el override de [[calidad-mandatory-inputs-protocol]] para Mercantil (HUT_ID, Body_Mode son obligatorios, ya los proporcionaste).
+> Kiro: Detecto intent "karate brownfield" en proyecto con convenciones cliente-específicas estrictas. Activo el override de [[calidad-mandatory-inputs-protocol]] (user_story y firma son obligatorios cuando el cliente impone convenciones; ticket_prefix y Body_Mode ya los proporcionaste).
 >
 > Aplico [[calidad-brownfield-vs-greenfield]] para detectar convenciones del proyecto existente:
 >   - headers strategy: `one-by-one` (detectado en features previos)
 >   - body strategy: `external-json` (detectado en `resources/files/`)
->   - naming prefix: `PN-PR-BFF-` (detectado en `@HUT_ID` tags)
->   - Mercantil security headers detectados intactos: `Transaction-Id`, `Sid`, `Auth-Id`, `X-Channel` (NO se modifican, según `references/mercantil-security-headers.md`)
+>   - naming prefix: `TICKET-` (detectado en tags y nombres de scenario)
+>   - headers transversales obligatorios detectados intactos: `Transaction-Id`, `Sid`, `Auth-Id`, `X-Channel` (NO se modifican, ver `references/client-specific-conventions.md`)
 >
-> Delego a `extend-karate-brownfield`. Como el cliente es Mercantil (regulado), [[calidad-test-execution-orchestration]] fuerza `mode: dry-run`. Genero:
+> Delego a `extend-karate-brownfield`. Como el cliente es regulado, [[calidad-test-execution-orchestration]] fuerza `mode: dry-run`. Genero:
 >   1. `src/test/java/transferencia/transferencia.feature` (nuevo)
 >   2. `src/test/resources/files/transferencia-valid.json` (nuevo)
 >   3. NO toco `karate-config.js`, NO toco features previos.
 >
-> Ejecuto: `mvn test -Dkarate.options="--tags @PN-PR-BFF-4521"`. Resultado: 4/5 pass, 1 fail por spec drift (el spec declara `metadata.channel` como required pero la API real lo trata como opcional).
+> Ejecuto: `mvn test -Dkarate.options="--tags @TICKET-4521"`. Resultado: 4/5 pass, 1 fail por spec drift (el spec declara `metadata.channel` como required pero la API real lo trata como opcional).
 >
 > Triage [[calidad-failure-triage-and-classification]]: deterministic, causa = spec drift. [[calidad-test-self-correction-loop]] propone el diff (cambiar `#string` por `##string` en el campo opcional) pero NO aplica porque estamos en dry-run.
 
 > QA: Entendido. ¿Qué pasa con el cambio?
 
-> Kiro: Genero el reporte de cambios propuestos en `.evidence/dry-run-PN-PR-BFF-4521.json` con el diff completo, justificación y trazabilidad al HUT_ID. Creo ticket Jira de aprobación para el QA Lead de Mercantil. El cambio NO se aplica hasta que haya firma humana.
+> Kiro: Genero el reporte de cambios propuestos en `.evidence/dry-run-TICKET-4521.json` con el diff completo, justificación y trazabilidad al ticket. Creo ticket Jira de aprobación para el QA Lead del cliente. El cambio NO se aplica hasta que haya firma humana.
 >
 > Estado final: partial (dry-run). Modo efectivo: dry-run.
 ```
@@ -259,10 +258,10 @@ Existen **tres modos de invocación**. Elegir uno u otro depende del nivel de co
 **Artefactos resultantes**:
 - `src/test/java/transferencia/transferencia.feature`
 - `src/test/resources/files/transferencia-valid.json`
-- `.evidence/dry-run-PN-PR-BFF-4521.json`
+- `.evidence/dry-run-TICKET-4521.json`
 - Ticket Jira de aprobación (creado vía MCP)
 
-**Cierre**: `partial`. Diff propuesto archivado bajo audit log Mercantil. Espera aprobación humana.
+**Cierre**: `partial`. Diff propuesto archivado bajo audit log del cliente. Espera aprobación humana.
 
 ---
 

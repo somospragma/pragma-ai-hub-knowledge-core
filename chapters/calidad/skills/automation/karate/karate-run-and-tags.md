@@ -61,4 +61,4 @@ mvn test -f {project_path}/pom.xml -Dkarate.options="--tags @smoke" -Dkarate.env
 | `@invalid-encryption` | Payload cifrado con llave/formato inválido. |
 | `@user-story:HUT-XXX` | Trazabilidad a la historia de usuario. Reemplaza `HUT-XXX` por el id real. |
 
-Convención: tags en kebab-case (excepto Mercantil que usa camelCase `@happyPath`; respetarlo en proyectos Mercantil — ver `[[karate-mercantil-conventions]]`).
+Convención: tags en kebab-case. Si un proyecto cliente impone otro estilo (p. ej. camelCase `@happyPath`), respetarlo — ver `client-specific-conventions.md` en `karate-brownfield`.

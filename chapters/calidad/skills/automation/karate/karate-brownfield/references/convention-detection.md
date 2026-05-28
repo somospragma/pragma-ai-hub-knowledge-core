@@ -8,7 +8,7 @@
 | `features_dir` | Path del primer `.feature` que se encuentre bajo `src/test/java/`. |
 | `bodies_dir` | Path resuelto del primer `read('classpath:...json')` en un `.feature`. |
 | `package_name` | Package del `TestRunner.java` (ej: `com.testing`, `com.cliente.qa`). |
-| `base_url_var` | Variable de URL usada en los `Background` (ej: `baseUrl`, `mercantilUrl`, `apiUrl`). NO asumir `baseUrl`. |
+| `base_url_var` | Variable de URL usada en los `Background` (ej: `baseUrl`, `apiUrl`, o nombre específico del cliente). NO asumir `baseUrl`. |
 | `background_pattern` | Líneas comunes en el `Background` (url, headers, defs, callonce). |
 | `header_style` | `one-by-one` (`And header X-Name = 'value'`) o `configure-headers` (`* configure headers = {...}`). |
 | `body_loading_style` | `external-json` (`read('classpath:...json')`) o `inline` (`* def body = { ... }` / `* set body.field = value`). |
@@ -29,4 +29,4 @@
 
 ## Regla de prioridad
 
-Si el proyecto pertenece a un cliente con doc específica (ej: `[[karate-mercantil-conventions]]`), las reglas del cliente sobrescriben las convenciones autodetectadas en caso de conflicto. Esto evita "regresar" estilo cuando un proyecto fue construido contra una versión vieja del estándar Mercantil.
+Si el proyecto impone convenciones cliente-específicas (ver `client-specific-conventions.md`), esas reglas sobrescriben las convenciones autodetectadas en caso de conflicto. Esto evita "regresar" estilo cuando un proyecto fue construido contra una versión vieja del estándar del cliente.
