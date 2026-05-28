@@ -20,6 +20,190 @@ Y cuatro ejes cross-cutting que aplican a los cuatro frameworks:
 
 ## Mapa de assets
 
+### Estructura de carpetas y archivos
+
+```
+chapters/calidad/
+├── README.md
+│
+├── steering/
+│   └── _all/
+│       └── chapter-calidad-perspective.md
+│
+├── skills/
+│   ├── _all/
+│   │   ├── brownfield-vs-greenfield.md
+│   │   ├── business-driven-prioritization.md
+│   │   ├── intent-detection.md
+│   │   ├── mandatory-inputs-protocol.md
+│   │   ├── spec-validation.md
+│   │   ├── streaming-files-protocol.md
+│   │   ├── test-evidence-and-traceability.md
+│   │   │
+│   │   ├── cicd-integration/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{allure-aggregation, azure-devops-pipeline-templates,
+│   │   │                   github-actions-workflows, gitlab-ci-jobs, mobile-cloud-providers,
+│   │   │                   quality-gates, rp-integration, secrets-in-pipelines,
+│   │   │                   sharding-and-parallelization}.md
+│   │   │
+│   │   ├── context-determined-defaults/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{data-class-public-internal-confidential-restricted,
+│   │   │                   operational-criticality-tiers, regulatory-exposure-mapping,
+│   │   │                   traffic-class-and-peak-analysis, user-impact-and-blast-radius}.md
+│   │   │
+│   │   ├── contract-testing/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{asyncapi-event-contracts, cdc-vs-schema-first,
+│   │   │                   contract-testing-vs-karate-match, openapi-diff-breaking-changes,
+│   │   │                   pact-broker-pactflow, pact-consumer-tests,
+│   │   │                   pact-provider-verification, schema-registry-confluent,
+│   │   │                   spring-cloud-contract}.md
+│   │   │
+│   │   ├── failure-triage-and-classification/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{bug-vs-test-design-decision-tree, failure-pattern-catalog,
+│   │   │                   quarantine-pattern, re-run-protocol-for-determinism,
+│   │   │                   stability-score-metric}.md
+│   │   │
+│   │   ├── security-testing/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{api-fuzzing-schemathesis-restler, auth-testing-patterns,
+│   │   │                   compliance-regulatory-mapping, dast-with-owasp-zap,
+│   │   │                   owasp-api-top-10-2023, sast-sca-dast-pipeline,
+│   │   │                   secrets-management}.md
+│   │   │
+│   │   ├── sut-types-and-adaptations/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{data-pipeline-batch-streaming, event-driven-messaging,
+│   │   │                   graphql-api, grpc-service, legacy-soap-ejb,
+│   │   │                   ml-inference-service, rest-microservice,
+│   │   │                   serverless-functions}.md
+│   │   │
+│   │   ├── test-data-management/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{anonymization-pii, builder-factory-objectmother-patterns,
+│   │   │                   data-for-perf-testing, datasets-versioning,
+│   │   │                   seeding-cleanup-transactional, synthetic-data-faker,
+│   │   │                   test-data-strategies}.md
+│   │   │
+│   │   ├── test-execution-orchestration/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{evidence-archival, execute-and-capture-by-framework,
+│   │   │                   executor-as-skill-vs-as-pipeline, output-parsers,
+│   │   │                   result-schema-common}.md
+│   │   │
+│   │   ├── test-self-correction-loop/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{anti-cheating-guardrails, correction-audit-log,
+│   │   │                   correction-loop-state-machine, diff-aware-repair-rules,
+│   │   │                   iteration-limits-and-escalation, regulated-client-overrides}.md
+│   │   │
+│   │   └── test-self-healing/
+│   │       ├── SKILL.md
+│   │       └── references/{commercial-vs-oss-healing-tools, healing-aware-page-object,
+│   │                       healing-strategies-by-framework, llm-driven-selector-repair,
+│   │                       multi-locator-fallback-pattern, over-healing-guardrails,
+│   │                       visual-ai-healing}.md
+│   │
+│   └── automation/
+│       ├── appium/
+│       │   ├── appium-run-and-tags.md
+│       │   ├── appium-screenplay-android/
+│       │   │   ├── SKILL.md
+│       │   │   └── references/{android-only-scope-rationale, deferred-locators-strategy,
+│       │   │                   gherkin-syntax-rules, gradle-version-matrix,
+│       │   │                   health-check-pipeline, mandatory-inputs-validation,
+│       │   │                   mobile-accessibility, mobile-visual-regression,
+│       │   │                   no-aggregate-collision, project-structure,
+│       │   │                   screenplay-layers, smoke-vs-proposed-scenarios}.md
+│       │   └── appium-brownfield/
+│       │       ├── SKILL.md
+│       │       └── references/{convention-detection, selector-update-strategy}.md
+│       │
+│       ├── k6/
+│       │   ├── k6-run-and-suite.md
+│       │   ├── k6-greenfield/
+│       │   │   ├── SKILL.md
+│       │   │   └── references/{config-and-utils-modules, crud-dynamic-id-correlation,
+│       │   │                   enums-headers-security-extraction, five-script-types,
+│       │   │                   handle-summary-evidence, project-structure,
+│       │   │                   thresholds-three-tiers}.md
+│       │   └── k6-brownfield/
+│       │       ├── SKILL.md
+│       │       └── references/{convention-detection, extension-patterns}.md
+│       │
+│       ├── karate/
+│       │   ├── karate-run-and-tags.md
+│       │   ├── karate-greenfield/
+│       │   │   ├── SKILL.md
+│       │   │   └── references/{contract-testing-match-patterns, encrypted-payloads,
+│       │   │                   feature-design-dsl, file-location-constraint,
+│       │   │                   negative-coverage-formula, project-structure}.md
+│       │   └── karate-brownfield/
+│       │       ├── SKILL.md
+│       │       └── references/{client-specific-conventions, convention-detection,
+│       │                       mandatory-inputs-brownfield}.md
+│       │
+│       └── playwright/
+│           ├── playwright-run-and-modes.md
+│           ├── playwright-greenfield/
+│           │   ├── SKILL.md
+│           │   └── references/{accessibility-axe-wcag, auth-storage-state,
+│           │                   execution-modes-live-mocked-hybrid, fixtures-composition,
+│           │                   mocks-page-route, page-object-model,
+│           │                   playwright-config-strict-ts, project-structure,
+│           │                   selector-priority, ui-source-priority,
+│           │                   visual-regression}.md
+│           ├── playwright-brownfield/
+│           │   ├── SKILL.md
+│           │   └── references/{convention-detection, selector-update-strategy}.md
+│           └── playwright-from-live-app/
+│               └── SKILL.md
+│
+├── workflows/
+│   ├── _all/
+│   │   ├── route-test-generation.workflow.md
+│   │   └── test-self-correction-loop.workflow.md
+│   └── automation/
+│       ├── appium/
+│       │   ├── complete-deferred-locators.workflow.md
+│       │   ├── extend-appium-brownfield.workflow.md
+│       │   └── generate-appium-screenplay-android.workflow.md
+│       ├── k6/
+│       │   ├── calibrate-k6-thresholds.workflow.md
+│       │   ├── extend-k6-brownfield.workflow.md
+│       │   └── generate-k6-suite.workflow.md
+│       ├── karate/
+│       │   ├── extend-karate-brownfield.workflow.md
+│       │   └── generate-karate-greenfield.workflow.md
+│       └── playwright/
+│           ├── generate-playwright-greenfield.workflow.md
+│           └── update-playwright-brownfield.workflow.md
+│
+└── prompts/
+    └── automation/
+        ├── appium/
+        │   ├── generate-cucumber-feature-android.prompt.md
+        │   ├── generate-screenplay-task.prompt.md
+        │   └── validate-appium-inputs.prompt.md
+        ├── k6/
+        │   ├── extract-config-from-openapi.prompt.md
+        │   ├── generate-k6-script.prompt.md
+        │   └── generate-utils-and-payloads.prompt.md
+        ├── karate/
+        │   ├── analyze-openapi-for-karate.prompt.md
+        │   ├── generate-karate-feature.prompt.md
+        │   └── generate-karate-match-schema.prompt.md
+        └── playwright/
+            ├── detect-pages-from-ui-source.prompt.md
+            ├── extract-pages-from-live-app.prompt.md
+            ├── generate-accessibility-suite.prompt.md
+            ├── generate-mock-handlers.prompt.md
+            └── generate-page-object.prompt.md
+```
+
 ### Steering
 
 | Path                                                | Propósito                                                                |
