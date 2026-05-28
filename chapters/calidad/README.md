@@ -294,9 +294,71 @@ Incluye references para capas Screenplay, locators diferidos, smoke vs proposed 
 | K6         | `extract-config-from-openapi`, `generate-k6-script`, `generate-utils-and-payloads`                                         |
 | Appium     | `validate-appium-inputs`, `generate-cucumber-feature-android`, `generate-screenplay-task`                                  |
 
+## Instalación y sync — cómo llegan los assets a tu IDE
+
+Los assets del chapter no se copian a mano: los distribuye la CLI **`pragma-ai`** desde el Hub de SOPP hacia el IDE que uses. El flujo estándar es:
+
+```bash
+# 1. Una vez por máquina: autenticación con OAuth2 (token en llavero del sistema)
+pragma-ai login
+
+# 2. En la raíz del proyecto QA, inicializar el entorno
+cd mi-proyecto-tests
+pragma-ai init --ide kiro --chapter calidad --stack automation
+
+# 3. Verificar instalación
+pragma-ai status
+
+# 4. Mantener al día (correr periódicamente)
+pragma-ai update --dry-run    # ver qué cambiaría
+pragma-ai update              # aplicar
+```
+
+`init` crea `pragma.yaml` en la raíz del proyecto, descarga los assets del chapter Calidad (stack `automation`) en el path nativo del IDE elegido, agrega `.pragma/` al `.gitignore` e instala los hooks del IDE para telemetría. Detalle completo de la CLI en el manual de `pragma-ai`.
+
+**Multi-IDE** en el mismo proyecto: repetir `--ide`:
+
+```bash
+pragma-ai init --ide kiro --ide claude-code --chapter calidad --stack automation
+```
+
+**Diagnóstico** cuando algo no funciona:
+
+```bash
+pragma-ai doctor          # checa Hub, token, hooks, observabilidad
+pragma-ai rollback        # restaura bundle anterior si un update rompió algo
+```
+
+## Cobertura por IDE
+
+Cada IDE soporta un subset de los tipos de asset. Esta es la matriz para el chapter Calidad:
+
+| Asset del Chapter | Cantidad | Kiro | Claude Code | GitHub Copilot | Amazon Q (IDE) | Amazon Q (CLI) |
+|---|---|---|---|---|---|---|
+| `steering`     | 1   | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `skill`        | 30  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `workflow`     | 12  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `prompt`       | 14  | ✓ | — | ✓ | ✓ | — |
+
+Implicaciones operativas:
+
+- **Claude Code y Amazon Q (CLI)**: reciben steering + skills + workflows del chapter pero **no los prompts**. Quienes usan estos IDEs invocan la lógica del prompt desde el skill o workflow correspondiente (el prompt es un template, su lógica vive replicada en el skill que lo referencia).
+- **GitHub Copilot y Amazon Q (IDE)**: cobertura completa salvo `agent` (no presente en este chapter).
+- **Kiro**: cobertura completa de los 4 tipos del chapter; es el IDE de referencia para los ejemplos de uso más abajo.
+
+Paths de destino por IDE (típicos, después de `pragma-ai init`):
+
+| IDE | Path workspace |
+|---|---|
+| Kiro            | `.kiro/skills/<id>/SKILL.md`, `.kiro/steering/<id>.md` |
+| Claude Code     | `.claude/rules/<id>.md`, `CLAUDE.md` (steering concatenado) |
+| GitHub Copilot  | `.github/skills/<id>/SKILL.md`, `.github/prompts/<id>.prompt.md`, `.github/copilot-instructions.md` (steering concatenado) |
+| Amazon Q (IDE)  | `.amazonq/rules/<id>.md` |
+| Amazon Q (CLI)  | `.amazonq/rules/<id>.md` |
+
 ## Cómo empezar
 
-Un developer o un agente que necesite generar pruebas en este chapter debe entrar por el **workflow router**:
+Una vez los assets están instalados en tu IDE vía `pragma-ai init`, el punto de entrada para generar pruebas es el **workflow router**:
 
 ```
 workflows/_all/route-test-generation.workflow.md
@@ -347,6 +409,13 @@ Chapter Calidad — Pragma. Para cambios, propuestas de nuevos assets o reportes
 ## Ejemplos de uso desde Kiro
 
 Esta sección muestra escenarios reales de un QA usando el Chapter Calidad desde **Kiro** (el chat integrado en el IDE, similar a Cursor / Cline / Amazon Q Developer). En todos los ejemplos el QA escribe en lenguaje natural y Kiro decide qué skill, workflow o prompt invocar.
+
+> **Prerrequisito común a todos los ejemplos**: los assets ya están en `.kiro/` porque el QA corrió previamente:
+> ```bash
+> pragma-ai login   # una vez por máquina
+> pragma-ai init --ide kiro --chapter calidad --stack automation
+> ```
+> Sin este paso, Kiro no tiene visibilidad de `[[calidad-route-test-generation]]`, `@karate-greenfield`, ni el resto de assets. Si los ejemplos se ejecutan desde otro IDE, ajustar el `--ide` (`claude-code`, `cursor`, `github-copilot`, `amazon-q-ide`, `amazon-q-cli`) y considerar la **Cobertura por IDE** arriba — los `prompt`-type no llegan a Claude Code ni Amazon Q (CLI).
 
 El objetivo es ilustrar el **contrato completo** del chapter: no basta con generar archivos, hay que **ejecutarlos, triar fallos y aplicar auto-corrección** cuando aplica. Cada ejemplo declara explícitamente el modo de operación efectivo (`full` / `dry-run` / `scaffold-only` / `execute-only`).
 
