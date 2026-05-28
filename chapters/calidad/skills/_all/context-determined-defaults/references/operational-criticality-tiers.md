@@ -4,17 +4,16 @@ Cuatro niveles de criticidad operacional. Universal cross-sector. Es el input qu
 
 ## life-safety
 
-- **Definición**: la falla del sistema puede causar **daño físico** a personas (lesión, enfermedad agravada, muerte) o **daño ambiental** grave.
-- **Ejemplos cross-sector**:
-  - Dispositivos médicos clase II/III (monitor cardíaco, bomba de insulina, ventilador).
-  - Sistema de control industrial (SCADA) en planta química, eléctrica, nuclear.
-  - Sensores de paro de emergencia en línea de producción.
-  - Sistemas de control automotriz (ABS, airbags, ADAS).
-  - Aviónica.
-  - Telemetría de salud crítica en wearables certificados (FDA / CE-MDR).
-  - Sistemas de emergencia (911, alertas sísmicas, alertas tsunami).
-  - Robótica colaborativa con humanos en el loop.
-- **Implicación testing**: Conservative SIEMPRE. risk_factor 1.0. Cobertura negativa exhaustiva. HIL obligatorio si hay hardware. Evidencia compatible con FDA / ISO 26262 / IEC 62304 según aplique.
+- **Definición**: la falla del sistema puede causar **daño físico** a personas (lesión, enfermedad agravada, muerte).
+- **Ejemplos cross-sector (web/mobile)**:
+  - Apps de telemedicina sincrónica con riesgo a vida del paciente (consulta remota en emergencia, triage virtual).
+  - App móvil de prescripción médica de control / dispensación remota.
+  - App móvil o web de monitoreo remoto de paciente crónico con alertas a equipo médico.
+  - Portal web de emergencia ciudadana (911, alertas sísmicas, alertas tsunami) accedido desde navegador o app.
+  - Apps móviles y web que califican como **SaMD (Software as Medical Device)**.
+- **Implicación testing**: Conservative SIEMPRE. risk_factor 1.0. Cobertura negativa exhaustiva. Evidencia compatible con el marco regulatorio aplicable:
+  - **Estados Unidos**: SaMD bajo FDA 21 CFR Part 820 (Software as Medical Device).
+  - **LATAM**: ANVISA RDC 657/2022 (Brasil software médico), INVIMA (Colombia), COFEPRIS (México) cuando regulan SaMD.
 
 ## mission
 

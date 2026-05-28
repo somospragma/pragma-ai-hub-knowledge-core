@@ -7,7 +7,7 @@
 - `Content-Type: application/jose` o `application/jwt`.
 - Campo `encryptedPayload` (o equivalente) en el body del request/response.
 - La firma del servicio menciona cifrado, JWE/JWS, llave pública, KMS.
-- Sistemas con cifrado a nivel aplicación (común en salud — HIPAA exige cifrado de PHI; financiero — PCI exige cifrado de PAN; gobierno — clasificación de datos; mensajería end-to-end): **preguntar siempre** si los endpoints usan este patrón.
+- Sistemas con cifrado a nivel aplicación (común en salud — HIPAA exige cifrado de PHI; financiero — PCI exige cifrado de PAN; gobierno — clasificación de datos): **preguntar siempre** si los endpoints usan este patrón.
 
 Si detectas al menos una señal, añade los escenarios de esta sección.
 

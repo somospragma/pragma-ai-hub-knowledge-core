@@ -20,7 +20,7 @@ Clasificación universal de datos. Aplica cross-sector. Define cuán fuerte debe
   - Tickets de soporte interno (sin PII de cliente).
   - Procesos operativos documentados.
   - Métricas de uso agregadas.
-  - Telemetría no-sensible de dispositivos IoT (uptime, versión de firmware).
+  - Telemetría no-sensible de aplicaciones (uptime, versión desplegada de un dashboard administrativo SPA o de una app móvil de banca).
   - Backlog de un equipo de producto.
 - **Cómo identificar**: requiere autenticación para acceder, pero su pérdida no implica notificación regulatoria ni daño a individuos.
 
@@ -45,10 +45,10 @@ Clasificación universal de datos. Aplica cross-sector. Define cuán fuerte debe
   - Datos biométricos (huellas, iris, facial).
   - Credenciales (passwords, tokens privados, llaves criptográficas, certificados).
   - Datos de menores de edad bajo cualquier contexto.
-  - Telemetría de seguridad (sensores life-safety industrial, dispositivos médicos clase II/III).
+  - Datos clínicos de telemedicina (consulta remota en emergencia, app de monitoreo de paciente remoto, app de prescripción médica de control).
   - Datos de inteligencia o defensa.
   - Identidad ciudadana en sistemas nacionales.
-- **Cómo identificar**: aplica regulación específica (HIPAA, PCI-DSS, GDPR especial-categoría, biométricos, menores) o la divulgación causa daño físico/legal/reputacional grave e irreversible. En OpenAPI: campos como `pan`, `cvv`, `diagnosis`, `prescription`, `biometric`, `nationalId` en sistemas oficiales, `password`, `privateKey`.
+- **Cómo identificar**: aplica regulación específica (HIPAA PHI en Estados Unidos, PCI-DSS, LGPD dados sensíveis en Brasil, Ley 1581 datos sensibles en Colombia, biométricos, menores) o la divulgación causa daño físico/legal/reputacional grave e irreversible. En OpenAPI: campos como `pan`, `cvv`, `diagnosis`, `prescription`, `biometric`, `nationalId` en sistemas oficiales, `password`, `privateKey`.
 
 ## Identificación a partir de la firma del SUT
 

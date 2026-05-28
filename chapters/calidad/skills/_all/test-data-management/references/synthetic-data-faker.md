@@ -1,15 +1,15 @@
 # Datos Sintéticos con Faker — JS/TS, Java, Python
 
-Faker es la herramienta default del chapter para generar datos sintéticos. Existe en múltiples lenguajes con APIs equivalentes y soporta locales globales — elegir el locale por **jurisdicción del cliente**, no por suposición regional.
+Faker es la herramienta default del chapter para generar datos sintéticos. Existe en múltiples lenguajes con APIs equivalentes y soporta locales globales — para el alcance del Chapter (LATAM + Estados Unidos), elegir el locale por **jurisdicción del cliente**.
 
 ## Implementaciones
 
-| Lenguaje     | Paquete                                | Locales relevantes (selección)                                                  |
-|--------------|----------------------------------------|---------------------------------------------------------------------------------|
-| JavaScript   | `@faker-js/faker`                      | `en_US`, `en_GB`, `de_DE`, `fr_FR`, `es_ES`, `it_IT`, `pt_BR`, `es_MX`, `ja_JP`, `zh_CN`, `ko_KR` |
-| Python       | `Faker` (joke2k/faker)                 | `en_US`, `en_GB`, `de_DE`, `fr_FR`, `es_ES`, `it_IT`, `pt_BR`, `es_MX`, `ja_JP`, `zh_CN`, `ko_KR`, `ar_SA`, `hi_IN`, `ru_RU` |
-| Java         | `net.datafaker:datafaker`              | `en-US`, `en-GB`, `de`, `fr`, `es`, `it`, `pt-BR`, `ja`, `zh-CN`, `ko`, `ru`    |
-| Ruby         | `faker` gem                            | `en`, `en-GB`, `de`, `fr`, `es`, `it`, `pt-BR`, `ja`, `zh-CN`                   |
+| Lenguaje     | Paquete                                | Locales del alcance (selección)                                                  |
+|--------------|----------------------------------------|----------------------------------------------------------------------------------|
+| JavaScript   | `@faker-js/faker`                      | `en_US`, `es_CO`, `es_MX`, `es_AR`, `es_CL`, `es_PE`, `es_VE`, `pt_BR`, `es`     |
+| Python       | `Faker` (joke2k/faker)                 | `en_US`, `es_CO`, `es_MX`, `es_AR`, `es_CL`, `es_PE`, `es_VE`, `pt_BR`, `es`     |
+| Java         | `net.datafaker:datafaker`              | `en-US`, `es-CO`, `es-MX`, `es-AR`, `es-CL`, `es-PE`, `pt-BR`, `es`              |
+| Ruby         | `faker` gem                            | `en`, `es-CO`, `es-MX`, `es-CL`, `es-PE`, `pt-BR`                                |
 
 ## Regla cero: seeds deterministas
 
@@ -31,46 +31,39 @@ console.log(`[test-data] seed=${seed}`);
 
 Esto permite reproducir cualquier corrida pasando el seed exacto.
 
-## Locales por jurisdicción
+## Locales por jurisdicción (alcance Chapter)
 
-Selección del locale guiada por el cliente y su mercado objetivo. La siguiente tabla cubre los locales más usados; cualquiera de los tres lenguajes principales acepta selección equivalente.
+Selección del locale guiada por el cliente y su mercado objetivo dentro del alcance del Chapter (LATAM + Estados Unidos). La siguiente tabla cubre los locales usados; cualquiera de los tres lenguajes principales acepta selección equivalente.
 
-| Mercado / región        | Locale JS                              | Locale Python   | Notas                                          |
-|-------------------------|----------------------------------------|-----------------|------------------------------------------------|
-| Estados Unidos          | `en_US`                                | `en_US`         | Default global cuando el cliente no especifica |
-| Reino Unido             | `en_GB`                                | `en_GB`         | Direcciones y teléfonos UK                     |
-| Alemania                | `de_DE`                                | `de_DE`         | Umlauts y formato dirección DE                 |
-| Francia                 | `fr_FR`                                | `fr_FR`         | Acentos; código postal 5 dígitos               |
-| España                  | `es_ES`                                | `es_ES`         | DNI/NIE no incluido por defecto (custom)       |
-| Italia                  | `it_IT`                                | `it_IT`         | Codice Fiscale via paquete externo             |
-| Brasil                  | `pt_BR`                                | `pt_BR`         | CPF/CNPJ via paquete externo                   |
-| México                  | `es_MX`                                | `es_MX`         | CURP/RFC custom provider                       |
-| Colombia                | `es_CO`                                | `es_CO`         | NUIP custom provider                           |
-| Japón                   | `ja_JP`                                | `ja_JP`         | Kanji + romaji; nombres reales del locale      |
-| China                   | `zh_CN`                                | `zh_CN`         | Caracteres simplificados                       |
-| Corea del Sur           | `ko_KR`                                | `ko_KR`         | Hangul                                         |
-| Arabia Saudí / árabe    | (no nativo)                            | `ar_SA`         | RTL; verificar UI                              |
-| India                   | (limitado)                             | `hi_IN` / `en_IN` | Aadhaar/PAN via paquetes externos            |
-| Rusia                   | (limitado)                             | `ru_RU`         | Cirílico                                       |
+| Mercado / país          | Locale JS    | Locale Python   | Notas                                          |
+|-------------------------|--------------|-----------------|------------------------------------------------|
+| Estados Unidos          | `en_US`      | `en_US`         | Default cuando el cliente opera principalmente en US |
+| Colombia                | `es_CO`      | `es_CO`         | NUIP custom provider                           |
+| México                  | `es_MX`      | `es_MX`         | CURP/RFC custom provider                       |
+| Argentina               | `es_AR`      | `es_AR`         | DNI custom provider                            |
+| Chile                   | `es_CL`      | `es_CL`         | RUT custom provider                            |
+| Perú                    | `es_PE`      | `es_PE`         | DNI custom provider                            |
+| Venezuela               | `es_VE`      | `es_VE`         | Cédula custom provider                         |
+| Brasil                  | `pt_BR`      | `pt_BR`         | CPF/CNPJ via paquete externo                   |
+| Centroamérica + Caribe + Uruguay + Bolivia + Ecuador + Paraguay | `es` genérico | `es` genérico | Sin locale dedicado; aplicar custom provider del documento local |
 
 ```javascript
 // JavaScript — múltiples locales por jurisdicción
 const { faker: fakerUS } = require('@faker-js/faker/locale/en_US');
-const { faker: fakerGB } = require('@faker-js/faker/locale/en_GB');
-const { faker: fakerDE } = require('@faker-js/faker/locale/de_DE');
-const { faker: fakerJP } = require('@faker-js/faker/locale/ja_JP');
-const { faker: fakerBR } = require('@faker-js/faker/locale/pt_BR');
+const { faker: fakerCO } = require('@faker-js/faker/locale/es_CO');
 const { faker: fakerMX } = require('@faker-js/faker/locale/es_MX');
+const { faker: fakerBR } = require('@faker-js/faker/locale/pt_BR');
+const { faker: fakerCL } = require('@faker-js/faker/locale/es_CL');
 ```
 
 ```python
 # Python
 from faker import Faker
 fake_us = Faker('en_US')
-fake_gb = Faker('en_GB')
-fake_de = Faker('de_DE')
-fake_jp = Faker('ja_JP')
+fake_co = Faker('es_CO')
+fake_mx = Faker('es_MX')
 fake_br = Faker('pt_BR')
+fake_cl = Faker('es_CL')
 Faker.seed(12345)
 ```
 
@@ -81,8 +74,7 @@ import java.util.Locale;
 import java.util.Random;
 
 Faker fakerUS = new Faker(new Locale("en", "US"), new Random(12345));
-Faker fakerDE = new Faker(new Locale("de", "DE"), new Random(12345));
-Faker fakerJP = new Faker(new Locale("ja"),       new Random(12345));
+Faker fakerCO = new Faker(new Locale("es", "CO"), new Random(12345));
 Faker fakerBR = new Faker(new Locale("pt", "BR"), new Random(12345));
 ```
 
@@ -99,23 +91,26 @@ Nunca usar `faker.internet.email()` sin `provider`: por defecto genera dominios 
 
 ### Teléfono internacional formateado
 
-Cada locale formatea el teléfono según las convenciones del país. Si necesitas E.164 explícito o un país específico, pasa el patrón.
+Cada locale formatea el teléfono según las convenciones del país. Si necesitas E.164 explícito o un país específico del alcance, pasa el patrón.
 
 ```javascript
 // E.164 genérico
 const e164 = faker.phone.number('+###########');
 
 // Ejemplos por país (patrón explícito)
-const us = faker.phone.number('+1 ### ### ####');   // Estados Unidos
-const uk = faker.phone.number('+44 #### ######');   // Reino Unido
-const de = faker.phone.number('+49 ### #######');   // Alemania
-const jp = faker.phone.number('+81 ## #### ####');  // Japón
-const co = faker.phone.number('+57 3## ### ####');  // Colombia
-const mx = faker.phone.number('+52 ### ### ####');  // México
-const br = faker.phone.number('+55 ## #####-####'); // Brasil
+const us = faker.phone.number('+1 ### ### ####');     // Estados Unidos
+const co = faker.phone.number('+57 3## ### ####');    // Colombia
+const mx = faker.phone.number('+52 ### ### ####');    // México
+const br = faker.phone.number('+55 ## #####-####');   // Brasil
+const ar = faker.phone.number('+54 ## #### ####');    // Argentina
+const cl = faker.phone.number('+56 # #### ####');     // Chile
+const pe = faker.phone.number('+51 ### ### ###');     // Perú
+const cr = faker.phone.number('+506 #### ####');      // Costa Rica
+const pa = faker.phone.number('+507 #### ####');      // Panamá
+const dor= faker.phone.number('+1 809 ### ####');     // República Dominicana (+1-809/849/829)
 ```
 
-Para garantizar rangos reservados de testing del país, combinar con prefijos definidos por el regulador local (ej. UK Ofcom reserva `+44 113 496 0xxx`).
+Para garantizar rangos reservados de testing del país, combinar con prefijos definidos por el regulador local cuando exista.
 
 ### Tarjeta de crédito test-safe
 
@@ -126,11 +121,14 @@ const card = faker.finance.creditCardNumber('visa'); // ej 4xxx...
 const testCard = '4111111111111111'; // BIN reservado Visa para testing
 ```
 
-### Identificadores nacionales out-of-the-box
+### Identificadores nacionales del alcance — out-of-the-box
 
-`@faker-js/faker` y librerías equivalentes ofrecen generadores genéricos (nombre, email, dirección, IBAN, SSN US, etc.) por locale, pero **muchos identificadores nacionales no están incluidos** y requieren paquetes dedicados o custom providers — esto aplica globalmente, no solo a LATAM:
+`@faker-js/faker` y librerías equivalentes ofrecen generadores genéricos (nombre, email, dirección, IBAN, SSN US) por locale, pero **muchos identificadores nacionales LATAM no están incluidos** y requieren paquetes dedicados o custom providers:
 
 ```javascript
+// Estados Unidos: SSN, Driver's License (Faker soporta SSN out-of-the-box)
+const ssn = faker.helpers.replaceSymbols('9##-##-####'); // ITIN-like
+
 // Brasil: CPF/CNPJ
 const { generate: cpfGen } = require('@brazilian-utils/brazilian-utils/dist-node/cpf');
 const cpf = cpfGen();
@@ -139,14 +137,13 @@ const cpf = cpfGen();
 const rut = require('rut.js');
 const rutSintetico = rut.generate(); // "12.345.678-5"
 
-// India: PAN / Aadhaar (paquetes comunitarios, ej. 'aadhaar-validator')
-// Italia: Codice Fiscale (ej. 'codice-fiscale-utils')
-// España: DNI/NIE (custom provider — letra MOD-23 calculada)
-// Reino Unido: NHS number (custom provider — check MOD-11)
-// Japón: My Number (custom provider — check digit dedicado)
+// Colombia: NUIP (custom provider — 10 dígitos, prefijo `99` sintético)
+// México: CURP / RFC (custom provider — 18 / 13 chars con check digit)
+// Argentina / Perú: DNI (custom provider — 8 dígitos)
+// Centroamérica + Caribe: cédula nacional por país (custom provider)
 ```
 
-La recomendación es mantener una librería interna `pragma-test-id-providers` con custom providers por país, alimentada a medida que los clientes lo requieren.
+La recomendación es mantener una librería interna `pragma-test-id-providers` con custom providers por país del alcance, alimentada a medida que los clientes lo requieren.
 
 ## Patrón de uso con builders
 
@@ -175,7 +172,7 @@ Los tests no llaman a Faker directamente: piden `aUser({ role: 'ADMIN' })`.
 - **Generar números de tarjeta sin BIN reservado** → riesgo de coincidir con tarjeta real.
 - **Compartir un Faker singleton mutable entre tests paralelos** → race conditions en el seed.
 - **Hardcodear datos que podrían ser sintéticos** → cambia el esquema y todo rompe.
-- **Asumir el locale del cliente por geografía del equipo de QA** → confirmar con el cliente; un cliente con sede en una región puede operar en mercados distintos.
+- **Asumir el locale del cliente por geografía del equipo de QA** → confirmar con el cliente; un cliente con sede en una región puede operar en varios países del alcance.
 
 ## Snippet completo: setup reproducible para Karate
 
@@ -214,5 +211,5 @@ Background:
 - Seed fijo en CI siempre. Reportar el seed en cada ejecución para reproducibilidad.
 - Dominios reservados (`example.com`, `example.org`) — nunca `gmail.com`.
 - BIN reservados para tarjetas — nunca generar BINs reales.
-- Locale elegido por jurisdicción del cliente, no por suposición regional.
+- Locale elegido por jurisdicción del cliente dentro del alcance del Chapter (LATAM + Estados Unidos). Para clientes fuera del alcance, escalar.
 - Encadena con `[[calidad-test-evidence-and-traceability]]` registrando seed y locale en el reporte.

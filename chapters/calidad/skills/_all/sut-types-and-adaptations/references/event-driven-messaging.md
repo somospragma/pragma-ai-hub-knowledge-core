@@ -3,7 +3,7 @@
 ## Patrones canónicos
 
 - **Consumer-driven contract testing**: Pact Messaging permite que el consumer defina los mensajes que espera, y el producer valida que los emita correctamente. Sin esto, los cambios en el producer rompen consumers sin aviso.
-- **AsyncAPI**: equivalente a OpenAPI para eventos. Documenta channels, mensajes, schemas, bindings (Kafka, SNS, MQTT, AMQP). Generadores de tests: `asyncapi-validator`, `microcks`.
+- **AsyncAPI**: equivalente a OpenAPI para eventos. Documenta channels, mensajes, schemas, bindings (Kafka, SNS/SQS, AMQP/RabbitMQ, Google Pub/Sub, Azure Service Bus). Generadores de tests: `asyncapi-validator`, `microcks`.
 - **Schema Registry**: Confluent Schema Registry, AWS Glue Schema Registry, Apicurio. Validar **compatibility mode** (`BACKWARD`, `FORWARD`, `FULL`, `NONE`) — un schema FORWARD-compatible nuevo no debe romper consumers viejos.
 - **Idempotent consumers**: el mismo mensaje puede llegar más de una vez (at-least-once). El consumer debe deduplicar por `messageId` o por una key de negocio.
 - **Exactly-once vs at-least-once**: Kafka soporta exactly-once con transacciones (`enable.idempotence=true`, `transactional.id`). SQS estándar es at-least-once; SQS FIFO con `MessageDeduplicationId` es exactly-once dentro de 5 min.

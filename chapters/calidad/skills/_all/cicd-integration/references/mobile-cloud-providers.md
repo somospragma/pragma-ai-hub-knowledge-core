@@ -25,7 +25,7 @@ No asumir geografías; usar data.
 
 ## Cuándo elegir cada uno
 
-- **BrowserStack App Automate**: cliente con catálogo amplio de dispositivos (incluyendo mercados con alta penetración de Android mid/low-end como India, África, sudeste asiático, Latinoamérica), suites cross-platform iOS+Android, equipos sin expertise AWS.
+- **BrowserStack App Automate**: cliente con catálogo amplio de dispositivos; mercados LATAM y Estados Unidos típicamente requieren cobertura de top Android (mid/low-end común en LATAM, top-tier en US) + top iOS (iPhone últimas 2-3 generaciones); suites cross-platform iOS+Android; equipos sin expertise AWS.
 - **Sauce Labs Real Device Cloud**: cliente enterprise con SLAs estrictos, necesidad de analítica detallada de performance mobile.
 - **AWS Device Farm**: cliente ya en AWS, pricing por uso (suites infrecuentes), integración con CodePipeline.
 - **Firebase Test Lab**: solo Android, presupuesto ajustado, integración con Crashlytics, validación pre-release de Play Store.

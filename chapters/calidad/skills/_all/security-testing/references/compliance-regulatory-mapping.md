@@ -1,45 +1,50 @@
-# Compliance Regulatory Mapping — OWASP API Top 10 ↔ Marcos Regulatorios Globales
+# Compliance Regulatory Mapping — OWASP API Top 10 ↔ Marcos Aplicables
 
-Mapeo entre los riesgos OWASP API Security Top 10 2023 y los marcos regulatorios más comunes. La tabla principal cubre marcos globales/multinacionales. Los anexos cubren regulaciones por región. Activar solo el subset aplicable según la jurisdicción del cliente y la naturaleza del sistema bajo prueba.
+Mapeo entre los riesgos OWASP API Security Top 10 2023 y los marcos regulatorios que aplican al alcance del Chapter (LATAM + Estados Unidos). Los estándares internacionales (PCI-DSS, ISO 27001, SOC 2) son de aplicación universal independientemente de la región. Las leyes nacionales se mencionan cuando son relevantes para el cliente.
 
-## Marcos globales / multinacionales
+## Estándares internacionales de aplicación universal
 
-- **PCI-DSS 4.0** — Pagos con tarjeta. Aplica a cualquier sistema que almacena/procesa/transmite datos de tarjeta, en cualquier jurisdicción.
-- **GDPR (UE) / UK-GDPR (Reino Unido)** — Protección de datos personales. Aplica si hay datos de usuarios en UE/UK independientemente de la ubicación del sistema.
-- **HIPAA (Estados Unidos)** — Datos de salud (PHI). Aplica a covered entities y business associates en EE.UU.
-- **SOX (Sarbanes-Oxley, EE.UU.)** — Controles internos para empresas públicas que cotizan en bolsas US.
-- **SOC 2** — Certificación voluntaria de controles de seguridad/disponibilidad/integridad. Común en SaaS B2B.
-- **ISO 27001 / ISO 27017 / ISO 27018** — Sistemas de gestión de seguridad de información (global).
-- **FedRAMP (EE.UU.)** — Cloud para gobierno federal de EE.UU.
-- **NIS2 (UE)** — Resiliencia operacional de servicios esenciales (entró vigor 2024).
-- **DORA (UE, 2025)** — Resiliencia operacional para sector financiero europeo.
-- **CCPA / CPRA (California)** — Privacidad para residentes de California.
-- **LGPD (Brasil)** — Lei Geral de Proteção de Dados.
-- **PIPEDA (Canadá)** — Personal Information Protection.
-- **PIPL (China)** — Personal Information Protection Law.
-- **APPI (Japón)** — Act on the Protection of Personal Information.
-- **POPIA (Sudáfrica)** — Protection of Personal Information Act.
+- **PCI-DSS 4.0** — Pagos con tarjeta. Aplica a cualquier sistema que almacena/procesa/transmite datos de tarjeta.
+- **OWASP API Security Top 10 (2023)** — Referencia técnica de la industria.
+- **ISO 27001 / 27017 / 27018** — Sistema de gestión de seguridad de información. Frecuente en clientes con certificación.
+- **SOC 2** — Certificación voluntaria de controles de seguridad / disponibilidad / integridad. Común en SaaS B2B.
 
-## Tabla maestra: OWASP API 2023 ↔ marcos globales
+## Marcos Estados Unidos
 
-| OWASP API 2023               | PCI-DSS 4.0 | HIPAA            | GDPR    | SOX  | SOC 2 | ISO 27001 | FedRAMP |
-|------------------------------|-------------|------------------|---------|------|-------|-----------|---------|
-| API1 BOLA                    | 7.x         | §164.308(a)(4)   | Art.32  | ICFR | CC6.1 | A.9.1     | AC-3    |
-| API2 Broken Authentication   | 8.x         | §164.312(d)      | Art.32  | ICFR | CC6.1 | A.9.4     | IA-2    |
-| API3 BOPLA                   | 4.x, 8.x    | §164.514         | Art.5   | ICFR | CC6.7 | A.13.2    | SC-28   |
-| API4 Unrestricted Consumption| 12.x        | §164.312(b)      | Art.32  | -    | A1.2  | A.13.1    | SC-5    |
-| API5 BFLA                    | 7.x         | §164.308(a)(4)   | Art.32  | ICFR | CC6.3 | A.9.4.1   | AC-6    |
-| API6 Sensitive Business Flow | 12.x        | -                | Art.32  | -    | CC7.4 | A.16.1    | SI-4    |
-| API7 SSRF                    | 6.x         | -                | Art.32  | -    | CC6.6 | A.13.1.3  | SC-7    |
-| API8 Misconfiguration        | 2.x, 6.x    | §164.308(a)(8)   | Art.32  | -    | CC6.6 | A.12.6    | CM-6    |
-| API9 Improper Inventory      | 11.x        | -                | Art.30  | -    | CC2.2 | A.8.1     | CM-8    |
-| API10 Unsafe Consumption     | 6.x         | -                | Art.32  | -    | CC6.6 | A.14.2.5  | SA-8    |
+- **HIPAA** — Datos de salud (PHI). Aplica a covered entities y business associates.
+- **SOX (Sarbanes-Oxley)** — Controles internos para empresas públicas listadas en bolsas US.
+- **GLBA** — Sector financiero.
+- **CCPA / CPRA** — Privacidad para residentes de California; en la práctica funciona como mínimo común para apps con usuarios en US.
+- **FedRAMP** — Cloud para gobierno federal US.
 
-(Las celdas con "-" indican que el marco no tiene un control directamente equivalente.)
+## Marcos LATAM
 
-## Controles transversales (aplican a casi todos los marcos)
+- **Colombia** — Ley 1581/2012 + Decreto 1377; Circular Externa 007/008 SFC para entidades financieras vigiladas y fintech.
+- **Brasil** — LGPD (Lei 13.709); Resolução BCB 4.893/2021 para instituciones financieras.
+- **México** — LFPDPPP; Disposiciones CNBV (ITC) para instituciones de crédito.
+- **Chile** — Ley 19.628; Norma SBIF/CMF para bancos; Ley 21.719 (2024) introduce sanciones reforzadas.
+- **Argentina** — Ley 25.326 de Protección de Datos Personales.
+- **Perú** — Ley 29.733; Resolución SBS 504-2021 para entidades supervisadas.
+- **Centroamérica** — Aplicar el marco análogo nacional (Costa Rica Ley 8968, Panamá Ley 81/2019, República Dominicana Ley 172-13, equivalentes locales) + estándares internacionales como mínimo común cuando no exista regulación específica.
 
-Independiente de la jurisdicción, estos controles aparecen en prácticamente todos los marcos y se demuestran con tests automatizables:
+## Tabla maestra: OWASP API 2023 ↔ marcos
+
+| OWASP API 2023               | PCI-DSS 4.0 | HIPAA           | SOC 2 | ISO 27001 | Marco LATAM típico (ej. CE 007 CO) |
+|------------------------------|-------------|-----------------|-------|-----------|------------------------------------|
+| API1 BOLA                    | 7.x         | §164.308(a)(4)  | CC6.1 | A.9.1     | Control de acceso a datos          |
+| API2 Broken Authentication   | 8.x         | §164.312(d)     | CC6.1 | A.9.4     | Autenticación fuerte               |
+| API3 BOPLA                   | 4.x, 8.x    | §164.514        | CC6.7 | A.13.2    | Minimización de datos              |
+| API4 Unrestricted Consumption| 12.x        | §164.312(b)     | A1.2  | A.13.1    | Gestión de capacidad y abuso       |
+| API5 BFLA                    | 7.x         | §164.308(a)(4)  | CC6.3 | A.9.4.1   | Segregación de funciones           |
+| API6 Sensitive Business Flow | 12.x        | -               | CC7.4 | A.16.1    | Antifraude / detección de abuso    |
+| API7 SSRF                    | 6.x         | -               | CC6.6 | A.13.1.3  | Segmentación de red                |
+| API8 Misconfiguration        | 2.x, 6.x    | §164.308(a)(8)  | CC6.6 | A.12.6    | Hardening y gestión de vulnerab.   |
+| API9 Improper Inventory      | 11.x        | -               | CC2.2 | A.8.1     | Inventario de activos              |
+| API10 Unsafe Consumption     | 6.x         | -               | CC6.6 | A.14.2.5  | Seguridad en integraciones         |
+
+## Controles transversales
+
+Independiente del marco específico, los siguientes controles aparecen en casi todos los marcos del alcance y son automatizables:
 
 1. **Autenticación fuerte y MFA** — login sin segundo factor retorna `401`; tests Karate `@security @auth @mfa` y flujos Playwright validando TOTP/OTP. Ver `auth-testing-patterns.md`.
 2. **Principio de mínimo privilegio (BOLA/BFLA)** — usuario A no accede a recursos de usuario B; usuarios sin rol no invocan endpoints administrativos. Matriz roles × endpoints × status esperado.
@@ -50,52 +55,22 @@ Independiente de la jurisdicción, estos controles aparecen en prácticamente to
 7. **Gestión de incidentes** — runbooks, comunicación a autoridades regulatorias en plazos definidos.
 8. **Retención, minimización y eliminación de datos** — políticas por dataset, evidencia de borrado al final del ciclo.
 9. **Separación de ambientes** — dev/QA/staging/prod aislados; secretos y datos no se cruzan.
-
-## Anexos regionales
-
-### Anexo A — LATAM
-
-- **Colombia** — Ley 1581/2012 + Decreto 1377; Circular Externa 007/008 SFC (financiero).
-- **Brasil** — LGPD (Lei 13.709); Resolução BCB 4.893/2021 (financiero).
-- **México** — LFPDPPP; Disposiciones CNBV cap. X (ITC, financiero).
-- **Chile** — Ley 19.628; Norma SBIF/CMF cap. 20-9 y RAN 1-13 (financiero); Ley 21.719 (2024).
-- **Perú** — Ley 29.733; Resolución SBS 504-2021 (financiero).
-- **Argentina** — Ley 25.326.
-- **Costa Rica** — Ley 8968.
-- **Uruguay** — Ley 18.331.
-- **Ecuador** — LOPDP (2021).
-
-### Anexo B — EU/EEA/UK
-
-- GDPR / UK-GDPR; ePrivacy; NIS2; DORA (financiero); AI Act (sistemas IA, 2025-2026).
-
-### Anexo C — Estados Unidos
-
-- HIPAA (salud); SOX (financiero público); GLBA (financiero); FERPA (educación); COPPA (menores); CCPA/CPRA (California); SHIELD Act (NY); BIPA (Illinois biométricos); FedRAMP (gobierno).
-
-### Anexo D — APAC
-
-- PIPL (China); APPI (Japón); PDPA (Singapur); PDPA (Malasia); Personal Data Protection Act (Tailandia); IT Act (India) + DPDP Act 2023.
-
-### Anexo E — África / Medio Oriente
-
-- POPIA (Sudáfrica); NDPR (Nigeria); UAE PDPL; Saudi PDPL.
+10. **Gestión de secretos** — vault, OIDC, rotación; nunca credenciales en repo.
 
 ## Cómo activar este mapeo
 
-Para clientes regulados, cada release debe acompañarse de un paquete que incluya:
+Para clientes regulados, cada release debe acompañarse de un paquete con:
 
-1. Identificación del marco aplicable (lista de Anexos relevantes).
+1. Marcos aplicables identificados (internacional + jurisdicción del cliente).
 2. Inventario de endpoints/flujos afectados.
 3. Resultados de tests por riesgo OWASP API.
 4. Evidencia DAST/SAST/SCA con timestamps.
-5. Matriz de mapeo control regulatorio → test → resultado.
+5. Matriz control → test → resultado.
 
-Archivado bajo política de retención del cliente (típicamente 1-5 años según marco). Encadena con `[[calidad-test-evidence-and-traceability]]`.
+Mantener este archivo enfocado en el alcance del Chapter (LATAM + Estados Unidos). Si llega un cliente fuera de ese alcance, escalar para definir el subset aplicable; no extender este mapeo por defecto.
 
 ## Restricciones
 
 - Este mapeo es **orientativo**; cada cliente tiene su propia matriz formal de controles. Confirma con el equipo de Compliance/Riesgo del cliente antes de declarar cobertura.
-- Las jurisdicciones evolucionan: revisar trimestralmente.
 - No supone reemplazo de auditoría externa formal (PCI QSA, ISO 27001, SOC 2 Type II).
-- Mantener este archivo neutro: agregar marcos nuevos por jurisdicción sin elevar ninguno como default.
+- Encadena con `[[calidad-test-evidence-and-traceability]]` para evidencia archivada bajo la política de retención del cliente.

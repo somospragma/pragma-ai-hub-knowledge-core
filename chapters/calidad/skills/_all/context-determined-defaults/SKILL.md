@@ -12,7 +12,7 @@ tags: [defaults, context, tiers, priority, neutral, governance]
 
 ## Principio
 
-La criticidad de un sistema **no la determina el sector del cliente** (banca, salud, gobierno, retail, gaming, telco, edu, manufactura, etc.). Razonamientos del tipo "este cliente es un banco → tier Conservative", "este es de gaming → tier Relaxed", "es gobierno → todo CRITICAL", son **antipatrones**. Sectores enteros tienen sistemas de baja criticidad (un blog de marketing de un banco), y sectores históricamente "ligeros" tienen sistemas de altísima criticidad (matchmaking en gaming con SLA contractual a partners, telemetría de wearable médico FDA-cleared).
+La criticidad de un sistema **no la determina el sector del cliente** (banca, salud, gobierno, retail, gaming, telco, edu, etc.). Razonamientos del tipo "este cliente es un banco → tier Conservative", "este es de gaming → tier Relaxed", "es gobierno → todo CRITICAL", son **antipatrones**. Sectores enteros tienen sistemas de baja criticidad (un blog de marketing de un banco), y sectores históricamente "ligeros" tienen sistemas de altísima criticidad (matchmaking en gaming con SLA contractual a partners, portal de telemedicina con prescripción remota).
 
 La criticidad real se determina por una combinación de **variables objetivas**: clase de datos, clase de tráfico, impacto al usuario, exposición regulatoria, criticidad operacional y ventana de tolerancia a downtime. Estas variables son universales y aplican igual cross-sector.
 
@@ -23,7 +23,7 @@ Este skill define cómo derivar los defaults técnicos (tier de k6, `risk_factor
 - **Clase de datos (data class)**: `PUBLIC` | `INTERNAL` | `CONFIDENTIAL` | `RESTRICTED`. Mapea con tipos como PII, PHI, PCI, IP corporativa, datos públicos. Detalle en `references/data-class-public-internal-confidential-restricted.md`.
 - **Clase de tráfico (traffic class)**: peak QPS observado, distribución diaria/semanal/mensual, picos estacionales (Black Friday, fin de mes, días de pago, inicio de período escolar, eventos en vivo). Método de cálculo en `references/traffic-class-and-peak-analysis.md`.
 - **Impacto al usuario (user impact)**: B2C masivo (>1M usuarios), B2B contractual (SLA escrito), interno (<1k usuarios). Detalle en `references/user-impact-and-blast-radius.md`.
-- **Exposición regulatoria (regulatory exposure)**: explícita (texto del marco regulatorio aplica directamente — PCI-DSS, HIPAA, GDPR art. 32, etc.), implícita (contrato B2B referencia compliance en cláusula), ninguna. Detalle en `references/regulatory-exposure-mapping.md`.
+- **Exposición regulatoria (regulatory exposure)**: explícita (texto del marco regulatorio aplica directamente — PCI-DSS, HIPAA, SOC 2, ISO 27001 según aplique, etc.), implícita (contrato B2B referencia compliance en cláusula), ninguna. Detalle en `references/regulatory-exposure-mapping.md`.
 - **Criticidad operacional (operational criticality)**: `life-safety` (la falla puede causar daño físico), `mission` (la falla detiene el negocio o un proceso central), `business` (la falla degrada el negocio sin detenerlo), `internal` (la falla afecta solo operaciones internas). Detalle en `references/operational-criticality-tiers.md`.
 - **Ventana de downtime tolerable**: `zero` (24/7, sin ventana), `bajo` (minutos/mes), `medio` (horas/semana), `alto` (horas/día).
 
@@ -51,11 +51,12 @@ Se rotan los sectores deliberadamente para mostrar que el mismo contexto produce
 - **Gaming — matchmaking en partida live con apuestas o ranking**: INTERNAL (PII mínimo) + mission (UX colapsa sin él) + bajo downtime → Moderate + HIGH (puede ser Conservative si hay SLA contractual con partners y revenue significativo durante el evento).
 - **E-commerce — checkout durante peak (Black Friday, Cyber Monday)**: CONFIDENTIAL (PCI) + mission + bajo downtime → Conservative + CRITICAL durante la ventana.
 - **SaaS B2B multi-tenant — API core de la plataforma**: CONFIDENTIAL (datos del cliente) + business + medio downtime → Moderate + HIGH.
-- **IoT industrial — sensor de seguridad en planta (presión, gas, paro de emergencia)**: RESTRICTED (telemetría crítica de seguridad) + life-safety + zero downtime → Conservative + CRITICAL.
+- **Fintech — app de checkout en peak**: CONFIDENTIAL (PCI) + business + bajo downtime → Moderate (Conservative durante peak).
+- **Logística — API de rastreo en tiempo real consumido por la app del cliente**: INTERNAL + business + medio downtime → Moderate.
 - **Educación — LMS durante exámenes en vivo**: INTERNAL + mission durante la ventana de examen + alto downtime fuera de ella → variable por ventana: Conservative durante examen, Relaxed fuera.
 - **Media streaming — live event (final deportiva, concierto)**: INTERNAL + mission durante el evento + alto downtime fuera → Moderate con auto-scaling validado por tests; Conservative si hay contrato exclusivo con partners.
 
-Los mismos criterios se aplican a clientes de **fintech, telco, manufactura, agro, retail físico, logística, energy & utilities, real estate, hospitality, transporte, defensa, biotech, edtech, govtech, legaltech** y cualquier otro sector. La pregunta nunca es "qué sector es el cliente"; siempre es "qué contexto tiene este sistema".
+Los mismos criterios se aplican a clientes de **fintech, telco, retail, logística, energy & utilities, real estate, hospitality, transporte, biotech, edtech, govtech, legaltech** y cualquier otro sector. La pregunta nunca es "qué sector es el cliente"; siempre es "qué contexto tiene este sistema".
 
 ## Restricciones
 

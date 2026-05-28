@@ -1,6 +1,6 @@
-# Anonimización de PII — Técnicas, Reglas por Dato, Cumplimiento Multi-Jurisdiccional
+# Anonimización de PII — Técnicas, Reglas por Dato, Cumplimiento (LATAM + Estados Unidos)
 
-Cuando no es viable usar datos sintéticos puros y se requiere un snapshot prod-like, los datos deben anonimizarse **antes** de salir del perímetro productivo. Este documento describe técnicas, reglas por tipo de dato y herramientas, aplicables a cualquier jurisdicción. Las particularidades regionales (identificadores nacionales, marcos legales) se cubren en anexos.
+Cuando no es viable usar datos sintéticos puros y se requiere un snapshot prod-like, los datos deben anonimizarse **antes** de salir del perímetro productivo. Este documento describe técnicas, reglas por tipo de dato y herramientas, aplicables al alcance del Chapter (LATAM + Estados Unidos). Los identificadores universales aparecen en la sección principal; los identificadores nacionales del alcance se cubren en anexos.
 
 ## Principios universales
 
@@ -17,9 +17,9 @@ Cuando no es viable usar datos sintéticos puros y se requiere un snapshot prod-
 | **Supresión**                    | Eliminar campo                                                         | PII no necesaria para el test            |
 | **Síntesis**                     | Reemplazar por valor generado plausible (Faker)                        | Default del chapter                      |
 
-## Reglas por tipo de dato — formato global
+## Reglas por tipo de dato — identificadores universales
 
-Identificadores y campos que aparecen en virtualmente cualquier sistema, independientemente de la región del cliente.
+Identificadores y campos que aparecen en virtualmente cualquier sistema del alcance, independientemente del país del cliente.
 
 ### Identificación e identidad
 
@@ -31,10 +31,7 @@ Identificadores y campos que aparecen en virtualmente cualquier sistema, indepen
 | IP address (v4/v6)         | Generar en rangos reservados (`192.0.2.0/24`, `198.51.100.0/24`, `2001:db8::/32`)       |
 | MAC address                | Generar en rango locally-administered (`02:xx:xx:xx:xx:xx`)                             |
 | Passport number            | Generar formato plausible por país; nunca números reales                                |
-| IBAN (UE/UK/varios)        | Generar con MOD-97 correcto + país de testing (`XX99...`) o BIN fake                    |
-| SSN (EE.UU.)               | Usar rango reservado `900-xx-xxxx` ITIN-like; nunca SSN real                            |
-| SIN (Canadá)               | 9 dígitos con Luhn válido; prefijo `8` reservado por ServiceCanada para testing         |
-| NHS Number (UK)            | 10 dígitos con check digit MOD-11; rango de testing definido por NHS Digital            |
+| IBAN                       | Generar con MOD-97 correcto + país de testing (`XX99...`) o BIN fake. Puede aparecer en bancos LATAM que operan con clientes globales |
 
 ### Contacto
 
@@ -44,7 +41,7 @@ Identificadores y campos que aparecen en virtualmente cualquier sistema, indepen
 | Teléfono  | Prefijo del país real, número en rango reservado del país (ver Faker por locale)   |
 | Dirección | Faker con locale + sufijo `(TEST)`                                                 |
 
-### Financiero (global)
+### Financiero (universal)
 
 | Dato                 | Regla                                                                                       |
 |----------------------|---------------------------------------------------------------------------------------------|
@@ -62,74 +59,67 @@ Identificadores y campos que aparecen en virtualmente cualquier sistema, indepen
 | Diagnóstico         | Códigos CIE-10 / ICD-10 plausibles pero aleatorios                                 |
 | Tipo de sangre      | Distribución uniforme                                                              |
 
-## Reglas por tipo de dato — anexos regionales
+## Reglas por tipo de dato — anexos del alcance
 
-Cada anexo cubre identificadores nacionales propios de la jurisdicción. Activar solo el subset que aplica al cliente.
+Cada anexo cubre identificadores nacionales del alcance del Chapter. Activar solo el subset que aplica al cliente.
 
 ### Anexo LATAM
 
-| Dato                       | Regla                                                                                   |
-|----------------------------|-----------------------------------------------------------------------------------------|
-| Cédula Colombia (NUIP)     | Generar 10 dígitos numéricos sin validación oficial; prefijo `99` para marcar sintético |
-| CURP México                | 18 chars; generar con `faker-js` locale `es_MX` con custom provider                    |
-| RFC México                 | 13 chars (persona física) / 12 (moral); generar plausible, marcar prefijo `XAXX`        |
-| RUT Chile                  | Generar 8 dígitos + DV calculado (módulo 11)                                            |
-| CPF Brasil                 | 11 dígitos + DV calculado (módulo 11); usar `faker-br` `cpf()`                          |
-| CNPJ Brasil                | 14 dígitos + DV calculado; `faker-br` `cnpj()`                                          |
-| DNI Argentina              | 7-8 dígitos numéricos                                                                   |
-| DNI Perú                   | 8 dígitos numéricos                                                                     |
+| Dato                                      | Regla                                                                                   |
+|-------------------------------------------|-----------------------------------------------------------------------------------------|
+| Cédula Colombia (NUIP)                    | Generar 10 dígitos numéricos sin validación oficial; prefijo `99` para marcar sintético |
+| CURP México                               | 18 chars; generar con `faker-js` locale `es_MX` con custom provider                    |
+| RFC México                                | 13 chars (persona física) / 12 (moral); generar plausible, marcar prefijo `XAXX`        |
+| RUT Chile                                 | Generar 8 dígitos + DV calculado (módulo 11)                                            |
+| CPF Brasil                                | 11 dígitos + DV calculado (módulo 11); usar `faker-br` `cpf()`                          |
+| CNPJ Brasil                               | 14 dígitos + DV calculado; `faker-br` `cnpj()`                                          |
+| DNI Argentina                             | 7-8 dígitos numéricos                                                                   |
+| DNI Perú                                  | 8 dígitos numéricos                                                                     |
+| Cédula nacional (formato por país)        | Para Centroamérica + Caribe (Costa Rica, Panamá, República Dominicana, Honduras, Guatemala, El Salvador, Nicaragua) usar el formato local del documento; generar dígitos sintéticos sin reusar productivos |
 
-### Anexo Europa
+### Anexo Estados Unidos
 
-| Dato                                | Regla                                                                |
-|-------------------------------------|----------------------------------------------------------------------|
-| DNI/NIE/NIF España                  | 8 dígitos + letra calculada por módulo 23; prefijo `X/Y/Z` para NIE  |
-| Codice Fiscale Italia               | 16 chars alfanuméricos; generar con librería dedicada o custom prov. |
-| NHS Number Reino Unido              | 10 dígitos con check digit MOD-11                                    |
-| Personalausweis (DE)                | 10 chars con check digit; usar rango reservado                       |
-| AVS / Sozialversicherungsnummer (CH)| 13 dígitos formato `756.xxxx.xxxx.xx` con EAN-13 check               |
-| Numéro de sécurité sociale (FR)     | 15 dígitos con clé MOD-97                                            |
-
-### Anexo Estados Unidos / Canadá
-
-| Dato                  | Regla                                                                          |
-|-----------------------|--------------------------------------------------------------------------------|
-| SSN (EE.UU.)          | Rango reservado `000-xx-xxxx` / `9xx-xx-xxxx`; nunca SSN real                  |
-| EIN (EE.UU.)          | 9 dígitos formato `xx-xxxxxxx`; usar rango de testing                          |
-| ITIN (EE.UU.)         | 9 dígitos empezando por `9`, cuarto dígito 7 u 8                               |
-| Driver's License      | Formato por estado (variable 8-13 chars); generar plausible                    |
-| SIN Canadá            | 9 dígitos Luhn-valid; prefijo `8` reservado para testing                       |
-
-### Anexo APAC
-
-| Dato                                | Regla                                                                |
-|-------------------------------------|----------------------------------------------------------------------|
-| Aadhaar India                       | 12 dígitos con Verhoeff check; usar rango sintético, nunca real      |
-| PAN India                           | 10 chars alfanuméricos formato `AAAAA9999A`                          |
-| MyKad Malasia                       | 12 dígitos formato `YYMMDD-PB-####`                                  |
-| NRIC Singapur                       | 9 chars con check letter (algoritmo público)                         |
-| Resident Registration Number Corea  | 13 dígitos formato `YYMMDD-Gxxxxxx`                                  |
-| My Number Japón                     | 12 dígitos con check digit                                           |
+| Dato                          | Regla                                                                          |
+|-------------------------------|--------------------------------------------------------------------------------|
+| SSN (EE.UU.)                  | Rango reservado `000-xx-xxxx` / `9xx-xx-xxxx`; nunca SSN real                  |
+| EIN (EE.UU.)                  | 9 dígitos formato `xx-xxxxxxx`; usar rango de testing                          |
+| ITIN (EE.UU.)                 | 9 dígitos empezando por `9`, cuarto dígito 7 u 8                               |
+| Driver's License (state-issued)| Formato por estado (variable 8-13 chars); generar plausible                   |
+| Medicare Beneficiary ID (MBI) | 11 chars alfanuméricos formato definido por CMS; aplicar cuando el sistema toca salud bajo HIPAA |
 
 ## Cumplimiento por marco
 
-Ningún dato productivo cruza el perímetro de producción sin pasar por un pipeline de anonimización auditable, sin importar la jurisdicción. Cada marco añade reglas específicas:
+Ningún dato productivo cruza el perímetro de producción sin pasar por un pipeline de anonimización auditable. Cada marco del alcance añade reglas específicas:
 
-| Jurisdicción / Marco           | Implicaciones para QA                                                          |
+### Internacional (aplicación universal)
+
+| Marco            | Implicaciones para QA                                                          |
+|------------------|--------------------------------------------------------------------------------|
+| PCI-DSS 4.0      | Tarjetas: nunca PAN real fuera de zona PCI; tokenización obligatoria.          |
+| ISO 27001 / 27018| Política documentada de tratamiento de datos en QA; control de acceso al dataset. |
+| SOC 2            | Evidencia auditable de anonimización por release.                              |
+
+### Estados Unidos
+
+| Marco                  | Implicaciones para QA                                                          |
+|------------------------|--------------------------------------------------------------------------------|
+| HIPAA                  | Safe Harbor (eliminar 18 identifiers) o Expert Determination para PHI.         |
+| CCPA / CPRA            | Right to delete; documentar uso en QA y permitir purga bajo solicitud.         |
+| SOX                    | Trazabilidad de los datasets usados en QA de sistemas financieros públicos.    |
+| GLBA                   | Salvaguardas técnicas para datos financieros de consumidores.                  |
+| FedRAMP                | Anonimización + segregación de ambientes obligatoria; auditoría continua.      |
+
+### LATAM
+
+| Marco                          | Implicaciones para QA                                                          |
 |--------------------------------|--------------------------------------------------------------------------------|
-| GDPR / UK-GDPR (UE, UK)        | Anonimización irreversible o pseudonimización con base legal. DPO obligatorio. |
-| HIPAA (EE.UU.)                 | Safe Harbor (eliminar 18 identifiers) o Expert Determination para PHI.         |
-| CCPA / CPRA (California)       | Right to delete; documentar uso en QA y permitir purga bajo solicitud.         |
-| LGPD (Brasil)                  | Anonimización irreversible o consentimiento explícito. DPO obligatorio.        |
-| Ley 1581 (Colombia)            | Datos en QA deben anonimizarse o ser sintéticos. Registrar tratamiento.        |
-| LFPDPPP (México)               | Aviso de privacidad obligatorio; principio de finalidad limita uso en QA.      |
-| Ley 25.326 (Argentina)         | Datos sensibles requieren consentimiento expreso por escrito.                  |
-| Ley 19.628 / 21.719 (Chile)    | Ley 21.719 introduce sanciones tipo GDPR; alinear a partir de 2026.            |
-| Ley 29.733 (Perú)              | Registro de bancos de datos personales obligatorio.                            |
-| PIPL (China)                   | Localización de datos; transferencia internacional con CAC approval.           |
-| APPI (Japón)                   | Notificación obligatoria de uso secundario.                                    |
-| PDPA (Singapur / Malasia / TH) | Consent mandatorio; restricciones de transferencia internacional.              |
-| POPIA (Sudáfrica)              | Information Officer obligatorio; data subject rights similares a GDPR.         |
+| Ley 1581 / Decreto 1377 (CO)   | Datos en QA deben anonimizarse o ser sintéticos. Registrar tratamiento.        |
+| LGPD (BR)                      | Anonimización irreversible o consentimiento explícito. DPO obligatorio.        |
+| LFPDPPP (MX)                   | Aviso de privacidad obligatorio; principio de finalidad limita uso en QA.      |
+| Ley 19.628 / Ley 21.719 (CL)   | Ley 21.719 introduce sanciones reforzadas; alinear a partir de 2026.           |
+| Ley 25.326 (AR)                | Datos sensibles requieren consentimiento expreso por escrito.                  |
+| Ley 29.733 (PE)                | Registro de bancos de datos personales obligatorio.                            |
+| Otras jurisdicciones LATAM (Centroamérica, Caribe) | Aplicar marco nacional + estándares internacionales como mínimo común. |
 
 **Regla común**: ningún dato productivo cruza el perímetro de producción sin pasar por un pipeline de anonimización auditable.
 
@@ -138,7 +128,7 @@ Ningún dato productivo cruza el perímetro de producción sin pasar por un pipe
 | Herramienta            | Propósito                                                          |
 |------------------------|--------------------------------------------------------------------|
 | **ARX**                | Anonimización k-anon / l-diversity, GUI + CLI. OSS (Java).         |
-| **Faker (js/py/java)** | Generación sintética con locales globales (ver Faker — locales globales). |
+| **Faker (js/py/java)** | Generación sintética con locales del alcance (ver Faker — locales). |
 | **Snowfakery**         | DSL declarativo para generar datasets relacionales coherentes.     |
 | **Synthea**            | Generación sintética para salud (estándar HL7/FHIR).               |
 | **Microsoft Presidio** | Detección y enmascarado automático de PII en texto libre.          |
@@ -147,7 +137,7 @@ Ningún dato productivo cruza el perímetro de producción sin pasar por un pipe
 ## Pipeline de anonimización recomendado
 
 ```
-[DB prod (snapshot)] 
+[DB prod (snapshot)]
     → [Detección de PII con Presidio / reglas]
     → [Anonimización por columna (Faker / FPE / tokenización)]
     → [Validación de integridad referencial]
@@ -158,15 +148,15 @@ Ningún dato productivo cruza el perímetro de producción sin pasar por un pipe
 
 Cada paso debe ser auditable: la salida lleva un manifest con la regla aplicada por columna y el hash del dataset.
 
-## Faker — locales globales
+## Faker — locales del alcance
 
-Elegir el locale por **jurisdicción del cliente**, no por defaults regionales. Mantener un mapping `cliente → locale(s)` versionado.
+Elegir el locale por **jurisdicción del cliente** dentro del alcance del Chapter (LATAM + Estados Unidos). Mantener un mapping `cliente → locale(s)` versionado.
 
 ```javascript
 // JavaScript — seleccionar el locale por cliente
 const { faker } = require('@faker-js/faker/locale/en_US');
-// otras opciones disponibles: en_GB, de_DE, fr_FR, it_IT, es_ES,
-// pt_BR, es_MX, es_CO, ja_JP, zh_CN, ko_KR, ar_SA, hi_IN, ru_RU
+// otras opciones del alcance: es_CO, es_MX, es_AR, es_CL, es_PE, pt_BR,
+// y es genérico para Centroamérica + Caribe + Uruguay + Bolivia + Ecuador + Paraguay donde no hay locale dedicado
 faker.seed(12345);
 
 const usuario = {
@@ -182,8 +172,8 @@ const usuario = {
 # Python — múltiples locales en paralelo
 from faker import Faker
 fake_us = Faker('en_US')
-fake_de = Faker('de_DE')
-fake_jp = Faker('ja_JP')
+fake_co = Faker('es_CO')
+fake_mx = Faker('es_MX')
 fake_br = Faker('pt_BR')
 Faker.seed(12345)
 ```
@@ -195,10 +185,11 @@ import java.util.Locale;
 import java.util.Random;
 
 Faker fakerUS = new Faker(new Locale("en", "US"), new Random(12345));
-Faker fakerDE = new Faker(new Locale("de", "DE"), new Random(12345));
+Faker fakerCO = new Faker(new Locale("es", "CO"), new Random(12345));
+Faker fakerBR = new Faker(new Locale("pt", "BR"), new Random(12345));
 ```
 
-Para identificadores nacionales que `faker` no incluye out-of-the-box (CPF/CNPJ Brasil, RUT Chile, Aadhaar India, NHS UK), usar paquetes dedicados o custom providers — ver `synthetic-data-faker.md`.
+Para identificadores nacionales que `faker` no incluye out-of-the-box (CPF/CNPJ Brasil, RUT Chile, NUIP/CURP/RFC), usar paquetes dedicados o custom providers — ver `synthetic-data-faker.md`.
 
 ## Restricciones
 
@@ -206,4 +197,5 @@ Para identificadores nacionales que `faker` no incluye out-of-the-box (CPF/CNPJ 
 - La pseudonimización **no es** anonimización (es reversible); para cumplimiento, exige anonimización irreversible.
 - Nunca confíes en "anonimización" hecha solo con masking de UI: el backend sigue con el dato real.
 - Documenta en cada release qué dataset se usó y su hash.
+- Para clientes fuera del alcance del Chapter (LATAM + Estados Unidos), escalar para definir reglas adicionales; no extender este documento por defecto.
 - Encadena con `[[calidad-test-evidence-and-traceability]]`.

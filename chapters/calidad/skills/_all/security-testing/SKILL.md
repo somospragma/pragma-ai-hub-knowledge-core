@@ -12,15 +12,15 @@ tags: [security, owasp, zap, fuzzing, dast, sast, sca, authentication]
 
 ## Cuándo aplicar
 
-Aplica este skill **cada vez que se entregue una suite de pruebas para una API o aplicación que toque datos sensibles** (PII, financieros, salud) o que sea un sistema con requisitos de compliance, datos sensibles o exposición regulatoria (sin presunción de sector específico — aplica a salud, financiero, gobierno, retail, gaming, IoT, SaaS, etc.).
+Aplica cada vez que se entregue una suite de pruebas para una aplicación web, mobile o sus integraciones backend con requisitos de compliance, datos sensibles o exposición regulatoria — sin presunción de sector específico (salud, financiero, gobierno, retail, gaming, SaaS, etc.).
 
-En clientes con requisitos de compliance (PCI-DSS 4.0, HIPAA, GDPR/UK-GDPR, CCPA/CPRA, SOX, SOC 2, ISO 27001, FedRAMP, NIS2, Ley 1581 Colombia, LGPD Brasil, CNBV México, SBIF/CMF Chile, y equivalentes por jurisdicción) la cobertura mínima de seguridad alineada con OWASP API Security Top 10 2023 es **obligatoria**: ninguna suite funcional/regresión se entrega sin ella.
+En clientes del scope del Chapter (LATAM + Estados Unidos) con requisitos de compliance (PCI-DSS 4.0, OWASP API Top 10 2023, ISO 27001, SOC 2; HIPAA / SOX / CCPA/CPRA / FedRAMP en Estados Unidos; Ley 1581 Colombia, LGPD Brasil, LFPDPPP México, Ley 19.628/21.719 Chile, Ley 25.326 Argentina, Ley 29.733 Perú, y equivalentes locales LATAM) la cobertura mínima de seguridad alineada con OWASP API Security Top 10 2023 es **obligatoria**: ninguna suite funcional/regresión se entrega sin ella.
 
 Activa este skill en paralelo con la generación funcional (`[[karate-greenfield]]`, `[[karate-brownfield]]`, `[[playwright-greenfield]]`, `[[k6-greenfield]]`) y aplica la perspectiva de chapter `[[calidad-chapter-perspective]]` para decidir el alcance.
 
 ## Instrucción
 
-1. **Clasificar el riesgo del sistema bajo prueba** — ¿maneja PII?, ¿datos financieros o transaccionales?, ¿está bajo un marco regulatorio (PCI-DSS, HIPAA, GDPR/UK-GDPR, CCPA/CPRA, SOX, SOC 2, ISO 27001, FedRAMP, NIS2, Ley 1581, LGPD, y equivalentes por jurisdicción)?. Documenta la respuesta como artefacto inicial. Si la respuesta es sí en cualquier eje, el alcance de seguridad es **obligatorio** (no opcional).
+1. **Clasificar el riesgo del sistema bajo prueba** — ¿maneja PII?, ¿datos financieros o transaccionales?, ¿está bajo un marco regulatorio del alcance (PCI-DSS, OWASP API Top 10, ISO 27001, SOC 2; HIPAA / SOX / CCPA/CPRA / FedRAMP en Estados Unidos; Ley 1581 Colombia, LGPD Brasil, LFPDPPP México, Ley 19.628/21.719 Chile, Ley 25.326 Argentina, Ley 29.733 Perú, y equivalentes locales LATAM)?. Documenta la respuesta como artefacto inicial. Si la respuesta es sí en cualquier eje, el alcance de seguridad es **obligatorio** (no opcional).
 2. **Mapear contra OWASP API Security Top 10 2023** — Recorre los 10 riesgos y marca cuáles aplican según los endpoints y datos detectados. Detalle en `references/owasp-api-top-10-2023.md`.
 3. **Seleccionar herramientas** — ZAP/Burp (DAST), Schemathesis/RESTler (fuzzing API), Snyk/Trivy/Dependency-Check (SCA), SonarQube/Semgrep/CodeQL (SAST). Criterio en `references/sast-sca-dast-pipeline.md`.
 4. **Cubrir autenticación** — Diseña escenarios `@security` para JWT, OAuth2/OIDC, mTLS y sesión según aplique. Patrones canónicos en `references/auth-testing-patterns.md`.

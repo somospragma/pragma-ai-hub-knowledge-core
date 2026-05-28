@@ -142,8 +142,8 @@ No saltar pasos: el router protege contra la generación con inputs incompletos 
 Items conocidos pendientes en el chapter:
 
 - **Appium iOS** — el auto-generador V3 con soporte iOS está pendiente; V2 cubre sólo Android.
-- **Más jurisdicciones de compliance** — profundizar el catálogo de marcos regulatorios globales (hoy: PCI-DSS, GDPR, HIPAA, SOX, SOC 2, ISO 27001, FedRAMP, NIS2, LGPD, Ley 1581, CCPA/CPRA, PIPEDA, PIPL, equivalentes LATAM/APAC). Cada cliente activa solo el subconjunto aplicable.
-- **AsyncAPI testing** — el ecosistema Karate cubre REST y SOAP; queda pendiente un skill formal para eventos (Kafka, RabbitMQ, MQTT) basado en AsyncAPI 3.0.
+- **Profundizar el catálogo de marcos regulatorios del alcance del Chapter** (LATAM + Estados Unidos): hoy se cubren PCI-DSS, OWASP API, ISO 27001, SOC 2, HIPAA, SOX, CCPA/CPRA, FedRAMP, Ley 1581, LGPD, LFPDPPP, Ley 19.628/21.719, Ley 25.326, Ley 29.733 y equivalentes locales LATAM. Marcos fuera de este alcance (UE, APAC, África) se escalan caso a caso, no se incorporan al chapter por defecto.
+- **AsyncAPI testing** — el ecosistema Karate cubre REST y SOAP; queda pendiente un skill formal para eventos (Kafka, SNS/SQS, AMQP/RabbitMQ, Google Pub/Sub) basado en AsyncAPI 3.0.
 - **Workflows brownfield K6 y Appium** — declarados en el router como placeholders (`extend-k6-brownfield`, `extend-appium-brownfield`); en construcción por agentes paralelos del chapter.
 - **Skill formal de contract testing** consumer-driven con Pact, complementario a `match` patterns de Karate.
 

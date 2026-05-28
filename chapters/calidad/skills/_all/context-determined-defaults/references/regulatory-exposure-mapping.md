@@ -8,22 +8,16 @@ Define cómo determinar si un sistema está sujeto a un marco regulatorio y con 
 
 El marco regulatorio aplica directamente al sistema porque procesa datos o realiza operaciones reguladas:
 
-- **PCI-DSS 4.0**: cualquier sistema que reciba, procese, almacene o transmita datos de tarjeta (PAN, CVV, expiración).
+- **PCI-DSS 4.0**: cualquier sistema que reciba, procese, almacene o transmita datos de tarjeta (PAN, CVV, expiración). Aplicación universal.
+- **ISO 27001 / 27017 / 27018**: framework internacional de SGSI. Aplicación universal.
+- **SOC 2**: framework de auditoría para SaaS B2B (controles de seguridad, disponibilidad, confidencialidad, integridad, privacidad). Aplicación universal.
 - **HIPAA / HITECH (US)**: PHI (Protected Health Information).
-- **GDPR (EU) / UK-GDPR**: datos personales de residentes de la UE / UK. Artículo 32 exige seguridad técnica y organizacional apropiada.
-- **CCPA / CPRA (California)**: datos personales de residentes de California.
-- **LGPD (Brasil)**, **Ley 1581 (Colombia)**, **Ley 25.326 (Argentina)**, **LFPDPPP (México)**, **Ley 19.628 (Chile)**: equivalentes locales de GDPR.
 - **SOX (US)**: controles financieros para empresas públicas listadas en US.
-- **SOC 2**: framework de auditoría para SaaS B2B (controles de seguridad, disponibilidad, confidencialidad, integridad, privacidad).
-- **ISO 27001**: framework internacional de SGSI.
-- **FedRAMP**: sistemas que sirven al gobierno federal US.
-- **NIS2 (EU)**: ciberseguridad de infraestructura crítica y servicios esenciales.
-- **PSD2 (EU)**: open banking y autenticación reforzada (SCA).
-- **DORA (EU)**: resiliencia operativa digital sector financiero EU.
-- **HKMA (Hong Kong)**, **MAS (Singapore)**, **APRA (Australia)**, **SBIF/CMF (Chile)**, **CNBV (México)**, **Superintendencia Financiera (Colombia)**: regulación financiera por jurisdicción.
-- **FDA 21 CFR Part 11**: registros electrónicos en dispositivos médicos y farma.
-- **IEC 62304**: ciclo de vida software dispositivos médicos.
-- **ISO 26262 / IEC 61508**: safety-critical sistemas automotrices / industriales.
+- **GLBA (US)**: sector financiero.
+- **CCPA / CPRA (California)**: datos personales de residentes de California.
+- **FedRAMP (US)**: sistemas que sirven al gobierno federal US.
+- **LGPD (Brasil)**, **Ley 1581 (Colombia)**, **Ley 25.326 (Argentina)**, **LFPDPPP (México)**, **Ley 19.628 / Ley 21.719 (Chile)**, **Ley 29.733 (Perú)**: protección de datos personales LATAM.
+- **SBIF/CMF (Chile)**, **CNBV (México)**, **Superintendencia Financiera (Colombia)**, **BCB (Brasil)**, **SBS (Perú)**: regulación financiera LATAM por jurisdicción.
 
 ### Implícita
 
@@ -55,8 +49,8 @@ Cuando hay certificación externa, los tests deben generar evidencia compatible 
 
 | Exposición | Tier típico (interactúa con otras variables) |
 |---|---|
-| Explícita estricta (PCI-DSS, HIPAA, FDA) | Conservative + risk_factor 1.0 |
-| Explícita moderada (GDPR, SOC 2) sin datos especial-categoría | Moderate o Conservative |
+| Explícita estricta (PCI-DSS, HIPAA) | Conservative + risk_factor 1.0 |
+| Explícita moderada (SOC 2, ISO 27001, ley nacional LATAM/US sin especial-categoría) | Moderate o Conservative |
 | Implícita con SLA contractual | Moderate o Conservative según penalización |
 | Ninguna pero PII presente | Moderate |
 | Ninguna y sin PII | Relaxed permitido |
@@ -64,7 +58,6 @@ Cuando hay certificación externa, los tests deben generar evidencia compatible 
 ## Antipatrones
 
 - Asumir "no aplica regulación" sin revisar contratos B2B firmados.
-- Tratar GDPR como solo EU — aplica a cualquier sistema que procese datos de residentes EU, sin importar dónde esté el servidor.
-- Olvidar regulaciones sectoriales locales (CNBV, SBS, Superfinanciera, etc.) porque "ya cumplimos PCI".
+- Olvidar regulaciones sectoriales locales LATAM (CNBV, SBS, Superfinanciera, CMF, BCB, etc.) porque "ya cumplimos PCI".
 - Reducir el tier cuando el cliente "promete que no van datos reales a QA" — los datos reales siempre terminan llegando.
 - Generar evidencia que no es auditable (sin timestamp, sin commit hash, sin pipeline run ID).
