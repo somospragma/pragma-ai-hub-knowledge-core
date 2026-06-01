@@ -1,5 +1,13 @@
 # Folder Structure — Single Project and Monorepo
 
+## Table of Contents
+
+1. [Strategy 1 — Single Project](#strategy-1--single-project)
+2. [Strategy 2 — Monorepo with Melos](#strategy-2--monorepo-with-melos)
+3. [Melos — Base Configuration](#melos--base-configuration-7x)
+4. [Folder Naming Table](#folder-naming-table)
+5. [Strategy Selection Guide](#strategy-selection-guide)
+
 Two supported strategies. Choose **one** based on team size and number of apps.
 
 ---
@@ -157,7 +165,7 @@ project/
 
 ## Melos — Base Configuration (7.x)
 
-In Melos 7.x, there is no `melos.yaml`. All configuration lives in the root `pubspec.yaml`.
+In Melos 7.x, all configuration lives in the root `pubspec.yaml`.
 
 ```yaml
 # pubspec.yaml (workspace root)
@@ -167,7 +175,6 @@ publish_to: none
 environment:
   sdk: ">=3.8.0 <4.0.0"
 
-# List all packages explicitly — globs not yet supported
 workspace:
   - apps/app_name
   - packages/core

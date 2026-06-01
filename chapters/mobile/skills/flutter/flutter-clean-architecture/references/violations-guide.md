@@ -1,5 +1,18 @@
 # Violations Guide — Before/After Fixes
 
+## Table of Contents
+
+1. [V1: Domain Model with JSON (CRITICAL)](#v1-domain-model-with-json-critical)
+2. [V2: BLoC Calling DataSource Directly (HIGH)](#v2-bloc-calling-datasource-directly-high)
+3. [V3: Domain Importing Flutter (CRITICAL)](#v3-domain-importing-flutter-critical)
+4. [V4: Presentation Importing DataModel (HIGH)](#v4-presentation-importing-datamodel-high)
+5. [V5: Throwing Instead of Returning Result (MEDIUM)](#v5-throwing-instead-of-returning-result-medium)
+6. [V6: Multiple Use Cases in One File (LOW)](#v6-multiple-use-cases-in-one-file-low)
+7. [V7: Infrastructure in Presentation (HIGH)](#v7-infrastructure-in-presentation-high)
+8. [V8: Repository Interface Returning DataModel (HIGH)](#v8-repository-interface-returning-datamodel-high)
+9. [V9: UseCase with Multiple Responsibilities (MEDIUM)](#v9-usecase-with-multiple-responsibilities-medium)
+10. [V10: abstract class Instead of abstract interface class (LOW)](#v10-abstract-class-instead-of-abstract-interface-class-low)
+
 Complete examples of architectural violations with corrections.
 Each violation includes severity, detection command, and the fix.
 
@@ -154,7 +167,6 @@ class ProductEvent with _$ProductEvent {
 @freezed
 class ProductEvent with _$ProductEvent {
   const factory ProductEvent.updated(Product product) = _Updated; // domain model ✅
-  // or with primitives:
   const factory ProductEvent.load({required String id}) = _Load;
 }
 ```
@@ -166,16 +178,16 @@ grep -rn "import.*data_models\|import.*_model\.dart" lib/*/presentation/
 
 ---
 
-## V5: Throwing Instead of Returning Either (MEDIUM)
+## V5: Throwing Instead of Returning Result (MEDIUM)
 
 **Why it's wrong:** Throwing exceptions bypasses the explicit error handling that
-`Either<Failure, T>` enforces. Callers can forget to handle errors.
+`Result<T, E>` enforces. Callers can forget to handle errors.
 
 ```dart
 // ❌ VIOLATION — repository throws exception
 class ProductRepositoryImpl implements ProductRepository {
   @override
-  Future<Product> getProduct(String id) async { // ← NO EITHER
+  Future<Product> getProduct(String id) async { // ← NO Result
     try {
       final model = await _remote.getProduct(id);
       return ProductMapper.fromDataModel(model);
@@ -185,22 +197,22 @@ class ProductRepositoryImpl implements ProductRepository {
   }
 }
 
-// ✅ FIX — return Either, never throw from domain/data
+// ✅ FIX — return Result, never throw from domain/data
 class ProductRepositoryImpl implements ProductRepository {
   @override
-  Future<Either<Failure, Product>> getProduct({required String id}) async {
+  Future<Result<Product, Exception>> getProduct({required String id}) async {
     try {
       final cached = await _local.getCachedProduct(id);
-      if (cached != null) return Right(ProductMapper.fromDataModel(cached));
+      if (cached != null) return Success(ProductMapper.fromDataModel(cached));
       final model = await _remote.getProduct(id);
       await _local.cacheProduct(model);
-      return Right(ProductMapper.fromDataModel(model));
+      return Success(ProductMapper.fromDataModel(model));
     } on DioException catch (e) {
-      return Left(_mapDioError(e));
+      return Failure(_mapDioError(e));
     } on CacheException catch (e) {
-      return Left(Failure.cache(message: e.message));
+      return Failure(CacheFailure(message: e.message));
     } catch (e) {
-      return Left(Failure.unexpected(error: e));
+      return Failure(UnexpectedFailure(error: e));
     }
   }
 }
@@ -265,7 +277,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     );
   }
 }
-// Domain: SettingsRepository.getSettings() → Future<Either<Failure, Settings>>
+// Domain: SettingsRepository.getSettings() → Future<Result<Settings, Exception>>
 // Data: SettingsLocalDataSourceImpl reads from SharedPreferences
 ```
 
@@ -282,9 +294,9 @@ abstract interface class ProductRepository {
   Future<ProductModel> getProduct(String id); // ← DATA MODEL IN DOMAIN INTERFACE
 }
 
-// ✅ FIX — repository returns DomainModel wrapped in Either
+// ✅ FIX — repository returns DomainModel wrapped in Result
 abstract interface class ProductRepository {
-  Future<Either<Failure, Product>> getProduct({required String id});
+  Future<Result<Product, Exception>> getProduct({required String id});
 }
 ```
 
@@ -304,9 +316,9 @@ make it hard to test and violate the Single Responsibility Principle.
 // ❌ VIOLATION — use case doing too much
 @injectable
 class ProductUseCase {
-  Future<Either<Failure, Product>> getProduct(String id) async { ... }
-  Future<Either<Failure, List<Product>>> getProducts() async { ... } // ← SECOND RESPONSIBILITY
-  Future<Either<Failure, Unit>> updateProduct(Product p) async { ... } // ← THIRD
+  Future<Result<Product, Exception>> getProduct(String id) async { ... }
+  Future<Result<List<Product>, Exception>> getProducts() async { ... } // ← SECOND
+  Future<Result<Unit, Exception>> updateProduct(Product p) async { ... } // ← THIRD
 }
 
 // ✅ FIX — one use case per operation
@@ -331,12 +343,12 @@ Using `abstract class` allows adding implementation, which blurs the boundary.
 ```dart
 // ❌ VIOLATION — using abstract class for a contract
 abstract class ProductRepository {
-  Future<Either<Failure, Product>> getProduct({required String id});
+  Future<Result<Product, Exception>> getProduct({required String id});
 }
 
 // ✅ FIX — use abstract interface class for pure contracts
 abstract interface class ProductRepository {
-  Future<Either<Failure, Product>> getProduct({required String id});
+  Future<Result<Product, Exception>> getProduct({required String id});
 }
 ```
 

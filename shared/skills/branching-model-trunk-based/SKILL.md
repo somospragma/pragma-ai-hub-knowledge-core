@@ -1,6 +1,10 @@
 ---
+id: branching-model-trunk-based
+version: 1.0.0
+scope: global
+type: skill
 name: branching-model-trunk-based
-description: |
+description: >
   Trunk-Based Development (TBD) branch strategy, naming conventions, commit rules,
   release strategies, and hotfix procedures for ANY project type, tech stack, or Git
   hosting platform (GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, etc.).
@@ -15,10 +19,6 @@ description: |
   Trigger even if the user doesn't say "Trunk-Based Development" explicitly.
 license: Complete terms in LICENSE.txt
 metadata:
-  id: branching-model-trunk-based
-  version: 1.0.0
-  scope: global
-  type: skill
   category: productivity
 ---
 

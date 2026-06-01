@@ -1,12 +1,13 @@
 ---
+id: branching-model-gitflow
+version: 1.0.0
+scope: global
+type: skill
 name: branching-model-gitflow
-description: Git branch strategy, naming conventions, PR/MR workflows, and branch protection rules for ANY project type or tech stack. Use this skill ALWAYS when the user asks about creating or naming branches, merging strategies, release workflows, hotfix procedures, PR/MR templates, branch protection rules, choosing GitFlow vs GitHub Flow, rebasing vs merging, handling production bugs, versioning releases, or establishing Git conventions — in ANY technology (web, mobile, backend, data, infrastructure, monorepos). Also activate when users describe a Git problem in non-technical terms "I need to fix a bug on prod", "we need to release tomorrow", "how do I start a new feature", "someone merged to main by mistake". Trigger even if the user doesn't explicitly say "GitFlow" or "branch strategy."
+description: >
+  Git branch strategy, naming conventions, PR/MR workflows, and branch protection rules for ANY project type or tech stack. Use this skill ALWAYS when the user asks about creating or naming branches, merging strategies, release workflows, hotfix procedures, PR/MR templates, branch protection rules, choosing GitFlow vs GitHub Flow, rebasing vs merging, handling production bugs, versioning releases, or establishing Git conventions — in ANY technology (web, mobile, backend, data, infrastructure, monorepos). Also activate when users describe a Git problem in non-technical terms "I need to fix a bug on prod", "we need to release tomorrow", "how do I start a new feature", "someone merged to main by mistake". Trigger even if the user doesn't explicitly say "GitFlow" or "branch strategy."
 license: Complete terms in LICENSE.txt
 metadata:
-  id: branching-model-gitflow
-  version: 1.0.0
-  scope: global
-  type: skill
   category: productivity
 ---
 

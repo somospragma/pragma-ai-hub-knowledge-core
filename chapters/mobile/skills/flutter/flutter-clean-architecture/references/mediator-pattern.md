@@ -1,5 +1,21 @@
 # Mediator Pattern — Cross-Feature Communication
 
+## Table of Contents
+
+1. [Why Features Must Not Import Each Other](#why-features-must-not-import-each-other)
+2. [MediatorEvent — Base Type](#1-mediatorevent--base-type)
+3. [AppMediator — Interface](#2-appmediator--interface)
+4. [AppMediatorImpl — Implementation](#3-appmediatorimpl--implementation)
+5. [Event Catalog — Define Events in Core](#4-event-catalog--define-events-in-core)
+6. [BLoC Integration — Publisher](#5-bloc-integration--publisher)
+7. [BLoC Integration — Subscriber](#6-bloc-integration--subscriber)
+8. [DI Registration](#7-di-registration)
+9. [Rules](#8-rules)
+10. [When to Use Mediator vs Direct UseCase Call](#9-when-to-use-mediator-vs-direct-usecase-call)
+11. [Event Catalog Template](#10-event-catalog-template)
+
+---
+
 ## Why Features Must Not Import Each Other
 
 In Clean Architecture, each feature is a vertical slice with its own
@@ -36,7 +52,6 @@ Neither feature knows the other exists.
 // lib/core/mediator/mediator_event.dart
 
 /// Base class for all cross-feature events.
-/// Sealed so the compiler enforces exhaustive handling.
 abstract interface class MediatorEvent {
   const MediatorEvent();
 }
@@ -97,8 +112,9 @@ This keeps the contract neutral and prevents either feature from owning it.
 
 ```dart
 // lib/core/mediator/events/auth_events.dart
-import '../mediator_event.dart';
 
+/// Published by: AuthBloc (auth feature)
+/// Subscribed by: CartBloc (cart feature), ProfileBloc (profile feature)
 class UserLoggedInEvent extends MediatorEvent {
   const UserLoggedInEvent({required this.userId, required this.email});
   final String userId;
@@ -116,8 +132,6 @@ class SessionExpiredEvent extends MediatorEvent {
 
 ```dart
 // lib/core/mediator/events/cart_events.dart
-import '../mediator_event.dart';
-
 class CartUpdatedEvent extends MediatorEvent {
   const CartUpdatedEvent({required this.itemCount, required this.total});
   final int itemCount;
@@ -126,17 +140,6 @@ class CartUpdatedEvent extends MediatorEvent {
 
 class CartClearedEvent extends MediatorEvent {
   const CartClearedEvent();
-}
-```
-
-```dart
-// lib/core/mediator/events/order_events.dart
-import '../mediator_event.dart';
-
-class OrderPlacedEvent extends MediatorEvent {
-  const OrderPlacedEvent({required this.orderId, required this.total});
-  final String orderId;
-  final double total;
 }
 ```
 
@@ -149,7 +152,7 @@ class OrderPlacedEvent extends MediatorEvent {
 @injectable
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignInUseCase _signIn;
-  final AppMediator _mediator; // ✅ injected via DI
+  final AppMediator _mediator;
 
   AuthBloc(this._signIn, this._mediator) : super(const AuthState.initial()) {
     on<SignInEvent>(_onSignIn);
@@ -222,11 +225,6 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     );
   }
 
-  Future<void> _onClear(ClearCartEvent event, Emitter<CartState> emit) async {
-    await _clearCart();
-    emit(const CartState.empty());
-  }
-
   @override
   Future<void> close() async {
     await _authSub?.cancel(); // ✅ always cancel in close()
@@ -239,20 +237,9 @@ class CartBloc extends Bloc<CartEvent, CartState> {
 
 ## 7. DI Registration
 
-```dart
-// lib/core/di/modules/mediator_module.dart
-import 'package:injectable/injectable.dart';
-
-@module
-abstract class MediatorModule {
-  // AppMediatorImpl is registered via @LazySingleton(as: AppMediator)
-  // No additional registration needed here — Injectable handles it.
-}
-```
-
-The `AppMediatorImpl` singleton is shared across all BLoCs that inject `AppMediator`.
-Because it is a `@LazySingleton`, it is created once and reused — all publishers
-and subscribers share the same stream.
+The `AppMediatorImpl` is registered via `@LazySingleton(as: AppMediator)` directly
+on the class — Injectable handles the rest. All BLoCs that inject `AppMediator`
+share the same singleton instance and therefore the same stream.
 
 ---
 
@@ -290,21 +277,7 @@ core/mediator/events/
 ├── auth_events.dart        UserLoggedInEvent, UserLoggedOutEvent, SessionExpiredEvent
 ├── cart_events.dart        CartUpdatedEvent, CartClearedEvent
 ├── order_events.dart       OrderPlacedEvent, OrderCancelledEvent
-├── notification_events.dart NotificationReceivedEvent, NotificationTappedEvent
 └── onboarding_events.dart  OnboardingCompletedEvent
 ```
 
-Each event file should have a comment explaining the publisher and expected subscribers:
-
-```dart
-// lib/core/mediator/events/auth_events.dart
-
-/// Published by: AuthBloc (auth feature)
-/// Subscribed by: CartBloc (cart feature), ProfileBloc (profile feature),
-///                AnalyticsBloc (analytics feature)
-class UserLoggedInEvent extends MediatorEvent {
-  const UserLoggedInEvent({required this.userId, required this.email});
-  final String userId;
-  final String email;
-}
-```
+Each event file should include a comment with the publisher and expected subscribers (see §4 above).

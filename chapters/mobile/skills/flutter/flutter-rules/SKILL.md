@@ -1,29 +1,24 @@
 ---
+id: flutter-rules
+version: 1.0.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
 name: flutter-rules
 description: >
-  Evaluates Flutter projects against Pragma's best practices and rules across 5 domains:
-  Maintainability, Traceability, Performance, Security, and Documentation.
-  Generates an actionable Markdown report in reports/flutter_rules_report.md with a
-  visual table (✔️/❌/⚠️/N/A), specific recommendations, and an executive summary.
-
-  Use it ALWAYS when the user mentions: evaluate Flutter project, audit Flutter best practices,
-  review Flutter rules, analyze Dart code quality, verify clean Flutter architecture,
-  review BLoC state management, audit widget performance, review Flutter error handling,
-  verify basic mobile security, review Flutter code against standards, analyze Pragma Flutter
-  quality, or when they ask "does my app follow best practices?", "review my Flutter project",
-  "how good is my Flutter code?", "audit my Dart/Flutter app", "run the Flutter rules",
-  "evaluate my code against Pragma", "validate my Flutter project", "flutter rules report".
-  Also activate for projects with pubspec.yaml, Flutter monorepos with Melos or Nx,
-  analysis of multiple apps in apps/, features/, packages/, shared/, cross-impact between
-  shared packages, or when the user attaches Dart files and requests a review.
+  Evaluates Flutter projects against Pragma's best practices across 5 domains: Maintainability,
+  Traceability, Performance, Security, and Documentation. Generates an actionable Markdown report
+  with visual status table (✔️/❌/⚠️/N/A), specific recommendations, and executive summary.
+  Triggers: evaluate/audit Flutter project, review Flutter rules, analyze Dart code quality,
+  verify clean Flutter architecture, review BLoC state management, audit widget performance,
+  review Flutter error handling, verify mobile security, review Flutter code standards.
+  Also: "does my app follow best practices?", "review my Flutter project", "how good is my Flutter code?",
+  "audit my Dart/Flutter app", "run the Flutter rules", "evaluate code against Pragma", "validate Flutter project".
+  Activate for pubspec.yaml, Flutter monorepos with Melos/Nx, multiple apps in apps/features/packages/shared/,
+  cross-impact analysis between shared packages, or when user attaches Dart files requesting review.
 license: Complete terms in LICENSE.txt
 metadata:
-  id: flutter-rules
-  version: 1.0.0
-  scope: stack
-  type: skill
-  chapter: mobile
-  stack: [flutter]
   category: productivity
 ---
 
