@@ -6,9 +6,10 @@
 |---|---|---|---|---|---|
 | `steering` | ✅ | ✅ (concatena) | ✅ | ✅ | ✅ (concatena) |
 | `skill` | ✅ | ✅ | ✅ | ✅ | ✅ (concatena) |
-| `workflow` | ✅ | ❌ | ❌ | ❌ | ✅ (concatena) |
+| `workflow` | ✅ | ✅ | ✅ | ✅ | ✅ (concatena) |
 | `prompt` | ✅ | ✅ | ✅ | ❌ | ❌ |
-| `agent` | ✅ | ❌ | ❌ | ✅ | ❌ |
+| `agent` | ✅ | ✅ | ❌ | ✅ | ❌ |
+| `hook` | ✅ | ❌ | ❌ | ❌ | ❌ |
 | `guardrail` | ❌ | ❌ | ❌ | ❌ | ❌ |
 | `convencion` | ❌ | ❌ | ❌ | ❌ | ❌ |
 
@@ -282,6 +283,16 @@ El template usa `%%pragma-content%%` como placeholder:
 %%pragma-content%%
 ```
 
+Para templates con frontmatter (Kiro skills, steering):
+```markdown
+---
+name: %%pragma-id%%
+description: %%pragma-description%%
+---
+
+%%pragma-content%%
+```
+
 Para templates JSON:
 ```json
 {
@@ -289,6 +300,14 @@ Para templates JSON:
   "content": "%%pragma-content%%"
 }
 ```
+
+### Placeholders disponibles
+
+| Placeholder | Valor |
+|---|---|
+| `%%pragma-content%%` | Contenido del asset sin frontmatter |
+| `%%pragma-id%%` | El `id` del asset (del frontmatter canónico) |
+| `%%pragma-description%%` | El `description` del asset (del frontmatter canónico) |
 
 ### 3. Agregar al `_config/asset-schemas.json`
 
@@ -326,17 +345,30 @@ El webhook procesa el cambio en `_config/` y lo sube a S3. Las lambdas lo leen e
 
 ## Notas sobre IDEs específicos
 
+### Kiro
+- Skills siguen el estándar [Agent Skills](https://agentskills.io/) — carpeta con `SKILL.md` dentro: `.kiro/skills/{id}/SKILL.md`
+- El frontmatter de skills usa `name` + `description` (Agent Skills standard), el Hub transforma automáticamente
+- Steering, workflows, prompts y agents van en `.kiro/steering/{id}.md`
+- Steering usa modo `auto` con `name` + `description` para activación automática por contexto
+- Hooks van en `.kiro/hooks/{id}.kiro.hook` (formato JSON)
+- Soporta scope global (`~/.kiro/steering/`, `~/.kiro/skills/`) y workspace
+- Powers y MCP son configuraciones externas, no assets del Hub
+
 ### GitHub Copilot
 - `steering` se concatena en un solo archivo `.github/copilot-instructions.md`
-- `skill` y `prompt` van como `.prompt.md` individuales en `.github/prompts/`
+- `skill` va en `.github/skills/{id}/SKILL.md` (Agent Skills standard)
+- `prompt` va en `.github/prompts/{id}.prompt.md`
+- `agent` va en `.github/agents/{id}.md`
+- `workflow` va en `.github/instructions/{id}.instructions.md`
 
 ### Claude Code
-- Todo se concatena en un solo `CLAUDE.md` (steering + skills + workflows)
+- `steering` se concatena en un solo `CLAUDE.md`
+- `skill` y `workflow` van en `.claude/rules/{id}.md` (se concatenan al contexto)
 
-### Kiro
-- Cada asset es un archivo `.md` separado
-- Skills van en `.kiro/skills/`
-- El resto en `.kiro/steering/`
+### Amazon Q IDE
+- Todo va como `.md` en `.amazonq/rules/{id}.md`
+- Soporta scope global (`~/.amazonq/rules/`) y workspace
 
-### Amazon Q
-- Todo va como `.md` en `.amazonq/rules/`
+### Amazon Q CLI
+- Rules en `.amazonq/rules/{id}.md`
+- Agents en `.amazonq/cli-agents/{id}.json` (formato JSON)
