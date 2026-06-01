@@ -4,7 +4,13 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Feature builder agent. Use when the task is to create a complete feature   following Clean Architecture (domain → data →
+description: >
+  Feature builder agent. Use when the task is to create a complete feature
+  following Clean Architecture (domain → data → presentation), add a feature
+  to an existing module, or scaffold a new Melos package for a feature.
+  Generates all layers: domain model, repository contract, use case, DTO,
+  mapper, data source, repository impl, BLoC (event + state + bloc), UIModel,
+  and page — wired with DI and registered in the router.
 ---
 
 # Feature Builder Agent Instructions

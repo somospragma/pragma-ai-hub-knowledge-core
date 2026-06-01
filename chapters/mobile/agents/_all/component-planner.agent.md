@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Planificador de componentes. Usar cuando ya existe análisis de Figma y toca    convertirlo en especificación canónica, i
+description: >
+   Planificador de componentes. Usar cuando ya existe análisis de Figma y toca
+   convertirlo en especificación canónica, inventariar reutilización en el repo
+   y construir el DAG con orden de creación bottom-up.
 ---
 
 # Instrucciones del Component Planner

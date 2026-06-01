@@ -4,7 +4,13 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Test coverage engineer agent. Use when the task is to analyze, plan, and   generate tests for an existing feature. Recei
+description: >
+  Test coverage engineer agent. Use when the task is to analyze, plan, and
+  generate tests for an existing feature. Receives a feature path, inventories
+  all source files, identifies missing test coverage, generates unit/widget/
+  integration tests to meet coverage targets, and produces a testing report
+  in docs/testing/. ALWAYS generates test files AND creates the testing
+  report as mandatory final outputs.
 ---
 
 # Test Coverage Engineer Agent Instructions

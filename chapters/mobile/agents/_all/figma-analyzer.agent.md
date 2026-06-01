@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Especialista en extraer y analizar información de diseño desde Figma. Usar   cuando la tarea principal sea interpretar u
+description: >
+  Especialista en extraer y analizar información de diseño desde Figma. Usar
+  cuando la tarea principal sea interpretar un componente o pantalla en Figma,
+  mapear tokens, identificar variantes/estados y producir una especificación.
 ---
 
 # Instrucciones del Figma Analyzer

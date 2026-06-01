@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Ingeniero especializado en golden tests. Usar cuando la tarea sea validar   regresión visual, pixel-perfect rendering y
+description: >
+  Ingeniero especializado en golden tests. Usar cuando la tarea sea validar
+  regresión visual, pixel-perfect rendering y cobertura visual por estados,
+  variantes, tamaños o temas.
 ---
 
 # Instrucciones del Golden Test Engineer

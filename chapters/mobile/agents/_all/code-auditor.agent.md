@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Auditor de calidad de código. Usar cuando hay que revisar código generado,   validar SOLID, tokens, seguridad, linting y
+description: >
+  Auditor de calidad de código. Usar cuando hay que revisar código generado,
+  validar SOLID, tokens, seguridad, linting y fidelidad, y decidir si se aprueba
+  o se devuelve a corrección.
 ---
 
 # Instrucciones del Code Auditor

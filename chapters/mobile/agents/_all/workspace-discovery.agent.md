@@ -4,7 +4,11 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Especialista en descubrir topología de workspace Flutter y preparar   configuración inicial determinista (`project.confi
+description: >
+  Especialista en descubrir topología de workspace Flutter y preparar
+  configuración inicial determinista (`project.config.yaml`,
+  `ARCHITECTURE-CONTRACT.yaml` y `DEPENDENCIES-CONTRACT.yaml`) antes de
+  ejecutar `/new-view` o `/new-component`.
 ---
 
 # Instrucciones del Workspace Discovery Agent
