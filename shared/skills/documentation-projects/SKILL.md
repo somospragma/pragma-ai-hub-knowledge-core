@@ -1,12 +1,13 @@
 ---
+id: documentation-projects
+version: 1.0.0
+scope: global
+type: skill
 name: documentation-projects
-description: Create, structure, audit, and complete project documentation using a proven 7-document framework. Orchestrates specialized sub-agents to avoid context window overflow. SIEMPRE activa cuando el usuario quiera documentar un proyecto — en español o inglés. Spanish triggers: "necesito documentar mi proyecto", "arma la documentación técnica", "tengo documentación incompleta", "ayúdame con los docs". English triggers: "help me write the docs", "document this project", "write technical specs", "audit our docs", "create a README". Works for new projects and incomplete existing docs. Always respond in the same language the user used.
+description: >
+  Create, structure, audit, and complete project documentation using a proven 7-document framework. Orchestrates specialized sub-agents to avoid context window overflow. SIEMPRE activa cuando el usuario quiera documentar un proyecto — en español o inglés. Spanish triggers: "necesito documentar mi proyecto", "arma la documentación técnica", "tengo documentación incompleta", "ayúdame con los docs". English triggers: "help me write the docs", "document this project", "write technical specs", "audit our docs", "create a README". Works for new projects and incomplete existing docs. Always respond in the same language the user used.
 license: Complete terms in LICENSE.txt
 metadata:
-  id: documentation-projects
-  version: 1.0.0
-  scope: global
-  type: skill
   category: productivity
 ---
 

@@ -1,6 +1,10 @@
 ---
+id: spec-driven-development
+version: 2.0.0
+scope: global
+type: skill
 name: spec-driven-development
-description: |
+description: >
   Spec-Driven Development workflow: intercept every change request BEFORE any code is
   written — features, fixes, improvements, hotfixes, refactors, or modifications.
   Trigger on any signal of change: "feat", "fix", "hotfix", "mejora", "modificación",
@@ -14,10 +18,6 @@ description: |
   spec-driven-development goes first. Exception: user says "skip planning" or "just implement".
 license: Complete terms in LICENSE.txt
 metadata:
-  id: spec-driven-development
-  version: 2.0.0
-  scope: global
-  type: skill
   category: productivity
 ---
 
