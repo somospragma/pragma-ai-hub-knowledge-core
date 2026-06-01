@@ -1,14 +1,15 @@
 ---
+id: flutter-coding-standards
+version: 1.0.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
 name: flutter-coding-standards
-description: Dart and Flutter coding standards, naming conventions, formatting rules, linting configuration, and import organization. Use this skill ALWAYS when developers ask about code naming (files, classes, methods, variables, constants, booleans, enums, mixins, extensions), code formatting (line length, indentation, trailing commas, string interpolation), linting rules and violations, import organization and dependencies, comments and code documentation, or edge cases in Dart/Flutter code. Provides strict standards based on the `very_good_analysis` package (also compatible with `flutter_lints` and `lint`) and Clean Architecture layer patterns. Always include ✅ CORRECT and ❌ INCORRECT examples. Apply to ANY Dart or Flutter project — mobile, web, desktop, CLI, or packages.
+description: >
+  Dart and Flutter coding standards, naming conventions, formatting rules, linting configuration, and import organization. Use this skill ALWAYS when developers ask about code naming (files, classes, methods, variables, constants, booleans, enums, mixins, extensions), code formatting (line length, indentation, trailing commas, string interpolation), linting rules and violations, import organization and dependencies, comments and code documentation, or edge cases in Dart/Flutter code. Provides strict standards based on the `very_good_analysis` package (also compatible with `flutter_lints` and `lint`) and Clean Architecture layer patterns. Always include ✅ CORRECT and ❌ INCORRECT examples. Apply to ANY Dart or Flutter project — mobile, web, desktop, CLI, or packages.
 license: Complete terms in LICENSE.txt
 metadata:
-  id: flutter-coding-standards
-  version: 1.0.0
-  scope: stack
-  type: skill
-  chapter: mobile
-  stack: [flutter]
   category: productivity
 ---
 

@@ -1,15 +1,15 @@
 ---
+id: flutter-mason-clean-feature
+version: 2.0.0
+scope: stack
+type: skill
+chapter: mobile
+stack: [flutter]
+tags: [archetype, flutter, mobile, mason, clean architecture, feature, feature generation]
 name: flutter-mason-clean-feature
 description: Complete workflow for creating Flutter features using the flutter_clean_feature Mason brick. Use when creating a new feature in a Flutter project with Clean Architecture, setting up feature-specific dependency injection, integrating features into host apps, configuring routing and navigation, or understanding feature scope and boundaries. Works with any Flutter project structure—from monorepos with multiple apps to single-app projects. Covers Mason brick configuration, layer implementation, DI setup, app integration, testing structure, and best practices.
 license: Complete terms in LICENSE.txt
 metadata:
-  id: flutter-mason-clean-feature
-  version: 2.0.0
-  scope: stack
-  chapter: mobile
-  stack: [flutter]
-  tags: [archetype, flutter, mobile, mason, clean architecture, feature, feature generation]
-  type: skill
   category: productivity
 ---
 
