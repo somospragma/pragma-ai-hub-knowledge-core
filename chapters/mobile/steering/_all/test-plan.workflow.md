@@ -4,7 +4,12 @@ version: 1.0.0
 scope: chapter
 type: steering
 chapter: mobile
-description: Workflow for analyzing, planning, and generating complete test coverage   for an existing feature. Inventories all sourc
+description: >
+  Workflow for analyzing, planning, and generating complete test coverage
+  for an existing feature. Inventories all source files, identifies missing
+  tests, generates unit/widget tests per layer, validates coverage targets,
+  and produces a testing report. Use when a feature exists but lacks tests
+  or has incomplete coverage.
 ---
 
 # Workflow: Test Plan (Full Coverage for Existing Feature)

@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Security rules for Design System code based on OWASP Mobile Application   Security and Pragma standards. Use when auditi
+description: >
+  Security rules for Design System code based on OWASP Mobile Application
+  Security and Pragma standards. Use when auditing code security, validating
+  inputs, reviewing dependencies, or checking for data exposure risks.
 ---
 
 # Secure Code

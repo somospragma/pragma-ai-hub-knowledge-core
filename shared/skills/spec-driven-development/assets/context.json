@@ -1,0 +1,38 @@
+{
+  "_comment": "This file is written and updated by the spec-driven-development skill after each approval gate. Subagents read this file to resume the workflow without losing context.",
+  "feature_name": "{feature_name}",
+  "spec_folder": ".specs/{feature_name}",
+  "current_phase": "requirements",
+  "phases": {
+    "requirements": {
+      "status": "in_progress",
+      "file": ".specs/{feature_name}/requirements.md",
+      "approved_at": null
+    },
+    "design": {
+      "status": "not_started",
+      "file": ".specs/{feature_name}/design.md",
+      "approved_at": null
+    },
+    "tasks": {
+      "status": "not_started",
+      "file": ".specs/{feature_name}/tasks.md",
+      "approved_at": null
+    }
+  },
+  "project_context": {
+    "root_path": null,
+    "build_system": null,
+    "main_language": null,
+    "notes": null
+  },
+  "execution": {
+    "status": "not_started",
+    "waves": [],
+    "units": [],
+    "completed_units": [],
+    "approved_at": null
+  },
+  "created_at": "{ISO8601_TIMESTAMP}",
+  "updated_at": "{ISO8601_TIMESTAMP}"
+}

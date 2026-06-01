@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Implements secure local storage in Flutter for tokens, credentials, and sensitive data. Use this skill for storing auth
+description: >
+  Implements secure local storage in Flutter for tokens, credentials, and sensitive data. Use this skill for storing auth tokens, API keys, user credentials, PII, or any sensitive data locally. Triggers on 'store token', 'save credentials', 'persist auth', 'secure storage', SharedPreferences with sensitive data (flag as insecure), logout (must clear all storage). Enforces OWASP MASVS-STORAGE-1 (formerly M2). Stack: flutter_secure_storage 10.0.0. Dart 3.3+ / Flutter 3.32+.
 ---
 
 # Secure Storage in Flutter

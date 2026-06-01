@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Arquitecto de componentes. Usar cuando hay que definir interfaces, firmas,   estructura de archivos, contratos entre com
+description: >
+  Arquitecto de componentes. Usar cuando hay que definir interfaces, firmas,
+  estructura de archivos, contratos entre componentes o fragmentación técnica
+  antes de que el widget-developer implemente el código.
 ---
 
 # Instrucciones del Component Architect

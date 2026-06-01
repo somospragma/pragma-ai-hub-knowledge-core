@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Choose and implement the right local database for Flutter: Drift (relational, reactive SQLite), ObjectBox (NoSQL, highes
+description: >
+  Choose and implement the right local database for Flutter: Drift (relational, reactive SQLite), ObjectBox (NoSQL, highest performance), Isar community forks (NoSQL, document store), sqflite (raw SQLite), and flutter_secure_storage (encrypted sensitive data). Hive is in maintenance mode — do NOT use for new projects. Use this skill when choosing a local persistence strategy, implementing DAOs, schema migrations, or reactive queries.
 ---
 
 # Database Strategy

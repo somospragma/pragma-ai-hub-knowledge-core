@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Widget testing patterns for Flutter Design System components.   Use when writing widget tests, setting up test helpers,
+description: >
+  Widget testing patterns for Flutter Design System components.
+  Use when writing widget tests, setting up test helpers, or verifying
+  component behavior across states, variants, interactions, and accessibility.
 ---
 
 # Testing Patterns

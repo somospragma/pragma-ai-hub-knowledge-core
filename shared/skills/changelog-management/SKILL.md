@@ -1,11 +1,13 @@
 ---
-id: flutter-changelog-management
-version: 1.1.0
-scope: stack
-type: skill
-chapter: mobile
-stack: [flutter]
-description: Maintain clear, organized release notes following Keep a Changelog and Semantic Versioning standards. This skill ensures
+name: changelog-management
+description: Maintain clear, organized release notes following Keep a Changelog and Semantic Versioning standards. This skill ensures your changelog communicates changes effectively to users and developers.
+license: Complete terms in LICENSE.txt
+metadata:
+  id: changelog-management
+  version: 1.0.0
+  scope: global
+  type: skill
+  category: productivity
 ---
 
 # Changelog Management Skill

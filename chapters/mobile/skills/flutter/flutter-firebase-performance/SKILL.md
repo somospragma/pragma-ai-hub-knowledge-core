@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Monitors Flutter app performance in real time: custom traces, HTTP monitoring, startup time, and screen rendering. Fireb
+description: >
+  Monitors Flutter app performance in real time: custom traces, HTTP monitoring, startup time, and screen rendering. Firebase Performance is the primary provider, with a Strategy + Adapter pattern to swap to Sentry, Datadog, or custom providers. Use this skill when instrumenting critical user flows, tracking API latency, measuring cold start time, or setting up performance regression alerts.
 ---
 
 # Performance Monitoring

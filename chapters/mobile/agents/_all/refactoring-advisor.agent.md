@@ -4,7 +4,15 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Refactoring advisor agent. Use when the task is to improve, restructure,   or evolve an existing feature that already fo
+description: >
+  Refactoring advisor agent. Use when the task is to improve, restructure,
+  or evolve an existing feature that already follows Clean Architecture.
+  Analyzes code smells, architectural violations, and complexity — then
+  proposes and executes incremental refactoring steps that keep the app
+  compiling at every stage. Also handles full legacy migrations when the
+  feature is NOT in the target architecture. ALWAYS generates missing tests
+  AND creates a refactoring documentation file in docs/refactoring/ as
+  mandatory final outputs.
 ---
 
 # Refactoring Advisor Agent Instructions

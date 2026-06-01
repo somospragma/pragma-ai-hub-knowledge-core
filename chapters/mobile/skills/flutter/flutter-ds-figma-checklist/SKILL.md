@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Complete comparison checklist between Flutter implementation and Figma spec.   Use when auditing visual fidelity, verify
+description: >
+  Complete comparison checklist between Flutter implementation and Figma spec.
+  Use when auditing visual fidelity, verifying token mapping accuracy,
+  checking variant/state coverage, or validating anatomy against Figma layers.
 ---
 
 # Figma Comparison Checklist

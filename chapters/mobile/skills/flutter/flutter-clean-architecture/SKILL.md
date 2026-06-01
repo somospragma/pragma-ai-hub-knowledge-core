@@ -1,19 +1,7 @@
 ---
 name: flutter-clean-architecture
 description: >
-  Clean Architecture patterns for Flutter/Dart — 3-layer dependency flow
-  (Domain, Data, Presentation), Result pattern, BLoC/Cubit state management,
-  and cross-feature communication via Mediator. USE when implementing features,
-  designing architecture, understanding layer responsibilities, working with
-  entities/repositories/usecases, or reviewing code for violations.
-  Also activate when the user asks: how to structure a Flutter feature,
-  where to put business logic, how to avoid HTTP calls in widgets, whether to
-  use try-catch or Result type, how repositories should work, where state
-  management belongs, how layers should depend on each other, how to migrate
-  an existing app to Clean Architecture, or how features should communicate
-  without importing each other. Trigger even if the user doesn't say
-  "Clean Architecture" explicitly — in any Flutter or Dart project
-  (single-app, monorepo, package).
+  Clean Architecture patterns for Flutter/Dart — 3-layer dependency flow (Domain, Data, Presentation), Result pattern, BLoC/Cubit state management, cross-feature communication via Mediator. USE when implementing features, designing architecture, understanding layer responsibilities, working with entities/repositories/usecases, or reviewing code violations. Activate for: structuring Flutter features, business logic placement, avoiding HTTP calls in widgets, Result vs try-catch patterns, repository design, state management scope, layer dependencies, migrating to Clean Architecture, cross-feature communication. Trigger even if user doesn't say "Clean Architecture" explicitly—applies to any Flutter/Dart project: single-app, monorepo, or packages. Stack: Flutter >=3.32.0, Dart >=3.8.0, BLoC 9.1.1, GetIt 9.2.1, Injectable 3.0.0, go_router 17.2.2, Freezed 3.2.5, fpdart 1.2.0.
 license: Complete terms in LICENSE.txt
 metadata:
   id: flutter-clean-architecture

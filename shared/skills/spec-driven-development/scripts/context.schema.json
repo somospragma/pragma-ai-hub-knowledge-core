@@ -1,0 +1,175 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "spec-driven-development/context.schema.json",
+  "title": "SDD Spec Context",
+  "description": "Machine-readable phase state for a spec-driven-development feature spec. Written and updated by the skill after every approval gate.",
+  "type": "object",
+  "required": ["feature_name", "spec_folder", "current_phase", "phases", "created_at", "updated_at"],
+  "additionalProperties": false,
+  "properties": {
+    "feature_name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "description": "snake_case identifier for the feature (e.g. user_authentication, payment_workflow)"
+    },
+    "spec_folder": {
+      "type": "string",
+      "pattern": "^\\.specs/[a-z][a-z0-9_/]*$",
+      "description": "Relative path to the spec folder from the project root"
+    },
+    "current_phase": {
+      "type": "string",
+      "enum": ["requirements", "design", "tasks", "execution", "complete"],
+      "description": "The phase currently in progress or the last completed phase"
+    },
+    "phases": {
+      "type": "object",
+      "required": ["requirements", "design", "tasks"],
+      "additionalProperties": false,
+      "properties": {
+        "requirements": { "$ref": "#/definitions/phase_entry" },
+        "design":       { "$ref": "#/definitions/phase_entry" },
+        "tasks":        { "$ref": "#/definitions/phase_entry" }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["not_started", "in_progress", "complete"],
+          "description": "Overall execution lifecycle status"
+        },
+        "waves": {
+          "type": "array",
+          "description": "Ordered list of execution waves; units within each wave run in parallel",
+          "items": { "$ref": "#/definitions/wave_entry" }
+        },
+        "units": {
+          "type": "array",
+          "description": "All execution units derived from the tasks.md dependency DAG",
+          "items": { "$ref": "#/definitions/unit_entry" }
+        },
+        "completed_units": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Names of units that have finished all ai-dlc stages"
+        },
+        "approved_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when all execution waves completed; null until done"
+        }
+      }
+    },
+    "project_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "root_path":    { "type": ["string", "null"] },
+        "build_system": { "type": ["string", "null"] },
+        "main_language":{ "type": ["string", "null"] },
+        "notes":        { "type": ["string", "null"] }
+      }
+    },
+    "_comment": {
+      "type": "string",
+      "description": "Optional human-readable note about this context file"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the spec was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the last update (updated after every approval gate)"
+    }
+  },
+  "definitions": {
+    "phase_entry": {
+      "type": "object",
+      "required": ["status", "file"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["not_started", "in_progress", "approved"],
+          "description": "Lifecycle status of this phase"
+        },
+        "file": {
+          "type": "string",
+          "description": "Relative path to the phase document from the project root"
+        },
+        "approved_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the phase was approved; null if not yet approved"
+        }
+      }
+    },
+    "wave_entry": {
+      "type": "object",
+      "required": ["wave", "units", "parallel"],
+      "additionalProperties": false,
+      "properties": {
+        "wave": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Wave number (1-based)"
+        },
+        "units": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Unit names in this wave"
+        },
+        "parallel": {
+          "type": "boolean",
+          "description": "True if units in this wave can run simultaneously"
+        }
+      }
+    },
+    "unit_entry": {
+      "type": "object",
+      "required": ["name", "wave", "status", "ai_dlc_stages", "tasks", "depends_on"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "snake_case unit name (e.g. foundation, core, auth_service)"
+        },
+        "wave": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Wave this unit belongs to"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "complete", "blocked"],
+          "description": "Execution status of this unit"
+        },
+        "ai_dlc_stages": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["functional_design", "nfr_requirements", "nfr_design", "infrastructure_design", "code_generation"]
+          },
+          "description": "Ordered list of ai-dlc Construction stages this unit will execute"
+        },
+        "tasks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Task IDs or titles from tasks.md assigned to this unit"
+        },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Names of upstream units that must complete before this unit starts"
+        }
+      }
+    }
+  }
+}

@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Implements certificate pinning in Flutter to prevent MITM attacks: public key (SPKI) SHA-256 pinning via Dio interceptor
+description: >
+  Implements certificate pinning in Flutter to prevent MITM attacks: public key (SPKI) SHA-256 pinning via Dio interceptor, Android Network Security Config, iOS ATS, pin rotation strategy, and backend coordination guide. Covers OWASP MASVS-NETWORK-2 compliance (L2 requirement). Use this skill for banking, healthcare, fintech, or any app handling sensitive data that requires defense against network interception.
 ---
 
 # Certificate Pinning

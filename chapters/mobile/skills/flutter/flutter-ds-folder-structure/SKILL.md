@@ -5,7 +5,11 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Official folder structure for the Flutter Design System package.   Use when creating new files, locating existing compon
+description: >
+  Official folder structure for the Flutter Design System package.
+  Use when creating new files, locating existing components, setting up
+  test paths, or verifying file placement during code audit.
+  Covers lib/, test/, widgetbook/, and pipeline output directories.
 ---
 
 # Folder Structure

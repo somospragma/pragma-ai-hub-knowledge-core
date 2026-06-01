@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Ingeniero de testing especializado en widget tests y unit tests. Usar cuando   la tarea sea validar comportamiento funci
+description: >
+  Ingeniero de testing especializado en widget tests y unit tests. Usar cuando
+  la tarea sea validar comportamiento funcional, estados, callbacks y lógica
+  del componente con pruebas automáticas.
 ---
 
 # Instrucciones del Test Engineer

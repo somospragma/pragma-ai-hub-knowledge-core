@@ -4,7 +4,11 @@ version: 1.2.0
 scope: chapter
 type: steering
 chapter: mobile
-description: Workflow de arranque para descubrir topología/rutas del workspace y preparar   `project.config.yaml` + `ARCHITECTURE-CON
+description: >
+  Workflow de arranque para descubrir topología/rutas del workspace y preparar
+  `project.config.yaml` + `ARCHITECTURE-CONTRACT.yaml` +
+  `DEPENDENCIES-CONTRACT.yaml` antes de ejecutar `/new-view` o
+  `/new-component`.
 ---
 
 # Workflow: Bootstrap de Workspace

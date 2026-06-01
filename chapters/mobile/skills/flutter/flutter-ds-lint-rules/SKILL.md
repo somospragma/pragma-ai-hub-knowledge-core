@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Linting and code quality rules for Design System components.   Use when writing code, auditing code quality, configuring
+description: >
+  Linting and code quality rules for Design System components.
+  Use when writing code, auditing code quality, configuring analysis_options,
+  or verifying compliance with Pragma coding standards.
 ---
 
 # Lint Rules

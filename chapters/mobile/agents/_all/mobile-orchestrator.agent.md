@@ -4,7 +4,12 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Global routing orchestrator for the Flutter mobile ecosystem. Use as the   default entry point when the user's intent sp
+description: >
+  Global routing orchestrator for the Flutter mobile ecosystem. Use as the
+  default entry point when the user's intent spans multiple domains or is
+  ambiguous. Classifies the request and delegates to the appropriate
+  domain-specific orchestrator or agent. Does NOT execute code, generate
+  files, or manage pipelines — only routes.
 ---
 
 # Mobile Orchestrator — Global Routing Agent

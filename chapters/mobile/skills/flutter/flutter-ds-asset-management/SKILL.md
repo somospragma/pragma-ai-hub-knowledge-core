@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Graphic asset management (SVGs, icons, images) for the Design System.   Use when downloading assets from Figma, optimizi
+description: >
+  Graphic asset management (SVGs, icons, images) for the Design System.
+  Use when downloading assets from Figma, optimizing SVGs, registering
+  resources in centralized classes, or referencing assets in widget code.
 ---
 
 # Asset Management

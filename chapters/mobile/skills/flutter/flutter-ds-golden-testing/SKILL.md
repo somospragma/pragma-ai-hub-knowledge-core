@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Golden testing (visual regression) patterns using Alchemist for Flutter DS.   Use when creating visual snapshot tests, v
+description: >
+  Golden testing (visual regression) patterns using Alchemist for Flutter DS.
+  Use when creating visual snapshot tests, verifying pixel-perfect rendering,
+  or setting up golden tests for light/dark themes and all variants/states.
 ---
 
 # Golden Testing

@@ -5,7 +5,11 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Responsive layout patterns for Design System components.   Use when implementing organisms that adapt to different scree
+description: >
+  Responsive layout patterns for Design System components.
+  Use when implementing organisms that adapt to different screen sizes,
+  deciding between compact and default layouts, or handling platform
+  differences (mobile vs desktop).
 ---
 
 # Responsive Layout

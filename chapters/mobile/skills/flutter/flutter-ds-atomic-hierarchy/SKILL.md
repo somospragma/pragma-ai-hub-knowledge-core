@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Atomic Design classification rules and hierarchy for the Design System.   Use when classifying components as atoms, mole
+description: >
+  Atomic Design classification rules and hierarchy for the Design System.
+  Use when classifying components as atoms, molecules, or organisms,
+  deciding composition strategy, or building dependency graphs (DAG).
 ---
 
 # Atomic Hierarchy

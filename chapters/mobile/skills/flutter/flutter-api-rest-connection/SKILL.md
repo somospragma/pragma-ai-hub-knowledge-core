@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Configures and implements REST API connections in Flutter using Dio: base client setup, interceptors (auth, logging, ret
+description: >
+  Configures and implements REST API connections in Flutter using Dio: base client setup, interceptors (auth, logging, retry, error mapping), token refresh with mutex lock, multipart file upload, request cancellation, environment-based base URLs, and clean architecture integration (DataSource → Repository). Use this skill when setting up HTTP communication with a backend, adding auth headers, handling 401 token refresh, implementing retry logic, uploading files, or mapping HTTP errors to domain Failures.
 ---
 
 # REST API Connection

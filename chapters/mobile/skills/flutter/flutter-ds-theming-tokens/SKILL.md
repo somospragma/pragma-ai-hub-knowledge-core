@@ -5,7 +5,11 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Design token catalog and theme access rules for Flutter Design System components.   Use when generating widget code, res
+description: >
+  Design token catalog and theme access rules for Flutter Design System components.
+  Use when generating widget code, resolving Figma values to Flutter tokens,
+  writing tests that need theme setup, or auditing hardcoded values.
+  Covers colors, spacing, radius, elevation, typography, and icon sizes.
 ---
 
 # Theming Tokens

@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Generates and maintains project documentation using the 7-document framework: project-overview, requirements, project-st
+description: >
+  Generates and maintains project documentation using the 7-document framework: project-overview, requirements, project-structure, tech-stack, features, implementation, and user-flow. Use this skill when creating documentation for a new project, updating existing docs after major changes, onboarding new team members, or preparing delivery documentation. Triggers on 'document project', 'create docs', 'onboarding docs', 'project overview', 'tech stack doc', 'delivery documentation', or any request to produce structured project knowledge.
 ---
 
 # Project Documentation

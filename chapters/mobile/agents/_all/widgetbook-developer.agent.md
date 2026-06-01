@@ -4,7 +4,9 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Desarrollador de Widgetbook. Usar cuando la tarea sea documentar y exponer   componentes en Widgetbook con stories, knob
+description: >
+  Desarrollador de Widgetbook. Usar cuando la tarea sea documentar y exponer
+  componentes en Widgetbook con stories, knobs y casos explorables por diseño.
 ---
 
 # Instrucciones del Widgetbook Developer

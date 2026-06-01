@@ -4,7 +4,12 @@ version: 1.0.0
 scope: chapter
 type: steering
 chapter: mobile
-description: Workflow for refactoring an existing feature that already follows Clean   Architecture (or close to it). Analyzes code s
+description: >
+  Workflow for refactoring an existing feature that already follows Clean
+  Architecture (or close to it). Analyzes code smells, architectural
+  violations, and complexity — then executes incremental improvements that
+  keep the app compiling at every stage. Not for DS components (use
+  /refactor-component) or legacy rewrites from scratch.
 ---
 
 # Workflow: Refactor Feature (Evolutionary Improvement)
