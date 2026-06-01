@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Advanced logging skill for Flutter with Dart 3.3+, using the Strategy pattern (GoF) to swap logging handlers (Firebase C
+description: >
+  Advanced logging skill for Flutter with Dart 3.3+, using the Strategy pattern (GoF) to swap logging handlers (Firebase Crashlytics, Sentry, DataDog, Grafana Faro) without changing client code. Includes a central Logger as the single facade, severity levels, navigation logging, performance metrics, and business events, separated by flavor (dev/staging/prod). Use this skill whenever the user mentions logging, logs, monitoring, Crashlytics, Sentry, DataDog, Grafana, production errors, analytics, API metrics, navigation traces, business events, or wants to configure observability in Flutter. Also applies when the user wants to switch logging services, add a new handler, or decouple logging from a specific provider.
 ---
 
 # Flutter Advanced Logging

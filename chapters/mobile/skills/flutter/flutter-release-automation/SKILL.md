@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Automates Flutter release pipelines across CI/CD platforms- GitHub Actions, Azure DevOps, and Jenkins. Covers the full p
+description: >
+  Automates Flutter release pipelines across CI/CD platforms- GitHub Actions, Azure DevOps, and Jenkins. Covers the full pipeline: quality gates (lint, test, coverage) → build (AAB/IPA) → signing (Android keystore, iOS Fastlane match) → obfuscation → distribution (Play Store, App Store, Firebase App Distribution) → version management and debug symbol upload. Use this skill when setting up or improving CI/CD for Flutter, configuring signing secrets, automating store deployments, or implementing quality gates.
 ---
 
 # Release Automation

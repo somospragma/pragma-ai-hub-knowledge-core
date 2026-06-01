@@ -5,7 +5,19 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Explains, enforces, and audits Clean Architecture in Flutter projects —   both for building new projects from scratch an
+description: >
+  Explains, enforces, and audits Clean Architecture in Flutter projects —
+  both for building new projects from scratch and for refactoring existing ones.
+  Use this skill when asking about project structure, layer separation,
+  'where does X go?', 'is this the right layer?', folder organization,
+  dependency direction, or architectural violations. Also activated when
+  reviewing code with violations, setting up a new project, migrating a legacy
+  codebase, or onboarding.
+  Canonical reference for layer boundaries, dependency rules, folder structure,
+  cross-feature communication (Mediator), and incremental refactoring strategy.
+  Supports single-project and monorepo with Melos.
+  Stack- Flutter >=3.32.0, Dart >=3.8.0, BLoC 9.1.1, GetIt 9.2.1,
+  Injectable 3.0.0, go_router 17.2.2, Freezed 3.2.5, fpdart 1.2.0.
 ---
 
 # Clean Architecture in Flutter

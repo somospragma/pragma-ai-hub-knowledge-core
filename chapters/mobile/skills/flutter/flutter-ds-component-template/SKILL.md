@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Base templates for creating Flutter Design System components by atomic level.   Use when generating new atom, molecule,
+description: >
+  Base templates for creating Flutter Design System components by atomic level.
+  Use when generating new atom, molecule, or organism widget code.
+  Provides starter code structure with proper anatomy, tokens, and patterns.
 ---
 
 # Component Templates

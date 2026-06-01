@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Implements caching strategies in Flutter: HTTP response caching with dio_cache_interceptor (ETag, TTL, stale-while-reval
+description: >
+  Implements caching strategies in Flutter: HTTP response caching with dio_cache_interceptor (ETag, TTL, stale-while-revalidate, offline fallback), in-memory LRU cache, data-layer TTL cache with Drift/Isar, and image caching with cached_network_image. Use this skill when implementing API response caching, reducing redundant network calls, serving stale data while revalidating, or caching images and assets.
 ---
 
 # Caching Strategy

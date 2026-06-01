@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Professional management of Flutter monorepos with Melos 7.x. Use this skill for everything related to Melos: initial set
+description: >
+  Professional management of Flutter monorepos with Melos 7.x. Use this skill for everything related to Melos: initial setup, pubspec.yaml workspace configuration, bootstrap, scripts, exec, versioning with Conventional Commits, publishing, CI/CD integration, adding packages, managing dependencies across packages, and workspace maintenance. Triggers on 'melos', 'monorepo', 'melos bootstrap', 'melos run', 'melos exec', 'melos version', 'add package to monorepo', 'shared package', 'workspace', 'resolution: workspace', or any question about managing multiple Flutter packages together. Stack: melos 7.5.1, Dart 3.8+, Flutter 3.32+.
 ---
 
 # Melos 7.x — Flutter Monorepo Management

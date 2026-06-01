@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Optimize Flutter cold start time: measure with --trace-startup and Firebase Performance, parallelize initialization with
+description: >
+  Optimize Flutter cold start time: measure with --trace-startup and Firebase Performance, parallelize initialization with Future.wait, defer non-critical work, use lazy singletons in GetIt, hold the native splash with deferFirstFrame/allowFirstFrame, and precache critical assets. Target < 2s cold start on mid-range devices. Use this skill when the app feels slow to launch, shows a white flash before the splash, or when startup time exceeds budget in CI.
 ---
 
 # Startup Optimization

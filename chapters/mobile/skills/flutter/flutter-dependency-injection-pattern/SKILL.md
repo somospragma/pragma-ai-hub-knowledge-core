@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Configures and wires dependency injection in Flutter using GetIt + Injectable. Use this skill when the user asks about D
+description: >
+  Configures and wires dependency injection in Flutter using GetIt + Injectable. Use this skill when the user asks about DI, GetIt configuration, registering a service, 'how do I inject X?', 'wire my dependencies', 'add to DI', @injectable, @lazySingleton, @singleton, injection modules, or when adding any new class that must be resolved via getIt(). Also triggers when creating a new feature that requires DI registration. Stack: get_it, injectable, injectable_generator, build_runner. Dart 3.8+ / Flutter 3.32+.
 ---
 
 # DI in Flutter — GetIt + Injectable

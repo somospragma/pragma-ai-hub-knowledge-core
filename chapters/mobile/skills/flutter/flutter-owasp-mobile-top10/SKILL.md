@@ -5,7 +5,14 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Audits and remediates Flutter apps against the OWASP Mobile Top 10 (2024). Use this   skill when asking about mobile sec
+description: >
+  Audits and remediates Flutter apps against the OWASP Mobile Top 10 (2024). Use this
+  skill when asking about mobile security, ''is this secure?'', ''security review'',
+  ''OWASP'', security audit, vulnerability verification, or when implementing
+  authentication, storage, network calls, cryptography, or authorization. Triggers on
+  storing tokens, HTTP calls, handling user data, login/logout, or any security-sensitive
+  operation. Reference: OWASP Mobile App Security project (mas.owasp.org), 2024 edition.
+  Stack- flutter_secure_storage 10.x, Dart 3.8+ / Flutter 3.32+.
 ---
 
 # OWASP Mobile Top 10 — Flutter Audit
