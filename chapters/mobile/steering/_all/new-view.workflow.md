@@ -4,7 +4,10 @@ version: 1.3.0
 scope: chapter
 type: steering
 chapter: mobile
-description: Workflow determinista para crear una vista o pantalla Flutter desde Figma,   con componentes DS y capa de presentación d
+description: >
+  Workflow determinista para crear una vista o pantalla Flutter desde Figma,
+  con componentes DS y capa de presentación de app. No usar para crear un
+  componente DS aislado.
 ---
 
 # Workflow: Nueva Vista/Pantalla desde Figma

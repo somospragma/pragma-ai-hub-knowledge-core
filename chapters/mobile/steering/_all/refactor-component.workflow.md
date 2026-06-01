@@ -4,7 +4,9 @@ version: 1.2.0
 scope: chapter
 type: steering
 chapter: mobile
-description: Workflow determinista para refactorizar un componente DS existente. Usar   cuando el usuario pide cambios sobre implemen
+description: >
+  Workflow determinista para refactorizar un componente DS existente. Usar
+  cuando el usuario pide cambios sobre implementación ya materializada.
 ---
 
 # Workflow: Refactorizar Componente

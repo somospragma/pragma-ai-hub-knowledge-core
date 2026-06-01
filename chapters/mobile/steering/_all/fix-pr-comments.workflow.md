@@ -4,7 +4,9 @@ version: 1.2.0
 scope: chapter
 type: steering
 chapter: mobile
-description: Workflow determinista para corregir comentarios de Pull Request de forma   trazable. Usar cuando ya existe feedback conc
+description: >
+  Workflow determinista para corregir comentarios de Pull Request de forma
+  trazable. Usar cuando ya existe feedback concreto.
 ---
 
 # Workflow: Corregir Comentarios de PR
