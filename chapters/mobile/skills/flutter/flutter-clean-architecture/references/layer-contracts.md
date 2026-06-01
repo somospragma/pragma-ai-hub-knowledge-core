@@ -1,30 +1,46 @@
 # Layer Contracts — Base Classes and Shared Abstractions
 
+## Table of Contents
+
+1. [UseCase — Base Contract](#1-usecase--base-contract)
+2. [Failure — Sealed Error Type](#2-failure--sealed-error-type)
+3. [Repository — Domain Contract](#3-repository--domain-contract)
+4. [DataSource — Data Layer Contracts](#4-datasource--data-layer-contracts)
+5. [CacheStore — Local Storage Abstraction](#5-cachestore--local-storage-abstraction)
+6. [Mapper — Cross-Layer Conversion](#6-mapper--cross-layer-conversion)
+7. [UIMapper — Domain → Presentation Conversion](#7-uimapper--domain--presentation-conversion)
+8. [ApiClient — HTTP Abstraction](#8-apiclient--http-abstraction)
+9. [BLoC — Presentation Contract](#9-bloc--presentation-contract)
+10. [Contract Summary Table](#10-contract-summary-table)
+11. [Dependency Direction — Full Diagram](#11-dependency-direction--full-diagram)
+
 Canonical reference for the interfaces and generic classes that define layer boundaries.
 All abstractions live in `core/` (single project) or `packages/core/` (monorepo).
+
+---
 
 ## 1. UseCase — Base Contract
 
 Every use case implements one of these interfaces. The domain **never** returns
-raw types — always `Either<Failure, T>` to force explicit error handling.
+raw types — always `Result<T, E>` to force explicit error handling.
 
 ```dart
 // lib/core/usecase/usecase.dart
-import 'package:fpdart/fpdart.dart';
+import 'package:commons/commons.dart';
 
 /// Use case with parameters.
 abstract interface class UseCase<T, P> {
-  Future<Either<Failure, T>> call(P params);
+  Future<Result<T, Exception>> call(P params);
 }
 
 /// Use case without parameters.
 abstract interface class UseCaseNoParams<T> {
-  Future<Either<Failure, T>> call();
+  Future<Result<T, Exception>> call();
 }
 
 /// Use case that returns a Stream instead of a Future.
 abstract interface class StreamUseCase<T, P> {
-  Stream<Either<Failure, T>> call(P params);
+  Stream<Result<T, Exception>> call(P params);
 }
 ```
 
@@ -48,7 +64,7 @@ class GetProductUseCase implements UseCase<Product, GetProductParams> {
   final ProductRepository _repository;
 
   @override
-  Future<Either<Failure, Product>> call(GetProductParams params) =>
+  Future<Result<Product, Exception>> call(GetProductParams params) =>
       _repository.getProduct(id: params.id, locale: params.locale);
 }
 ```
@@ -57,49 +73,7 @@ class GetProductUseCase implements UseCase<Product, GetProductParams> {
 
 ---
 
-## 2. Repository — Domain Contract
-
-The interface lives in `domain/repositories/`. The implementation lives in `data/repositories/`.
-The domain **never** knows the implementation.
-
-```dart
-// lib/{feature}/domain/repositories/product_repository.dart
-import 'package:fpdart/fpdart.dart';
-
-abstract interface class ProductRepository {
-  /// Fetches a product by ID.
-  /// Returns [Failure] if network or parsing fails.
-  Future<Either<Failure, Product>> getProduct({required String id});
-
-  /// Fetches a paginated list of products.
-  Future<Either<Failure, List<Product>>> getProducts({
-    required int page,
-    required int limit,
-  });
-
-  /// Observes real-time changes to a product.
-  Stream<Either<Failure, Product>> watchProduct({required String id});
-}
-```
-
-### Rules
-
-- Only domain types in the signature: `Product` (DomainModel), `Failure`, primitives.
-- **Forbidden**: `Response`, `DataModel`, `Map<String, dynamic>`, HTTP types.
-- Write methods return `Either<Failure, Unit>` (not `void`).
-
-```dart
-abstract interface class CartRepository {
-  Future<Either<Failure, Unit>> addToCart({required CartItem item});
-  Future<Either<Failure, Unit>> removeFromCart({required String itemId});
-  Future<Either<Failure, Cart>> getCart();
-  Future<Either<Failure, Unit>> clearCart();
-}
-```
-
----
-
-## 3. Failure — Sealed Error Type
+## 2. Failure — Sealed Error Type
 
 A single `Failure` type shared across the entire app. Features can extend it
 if they need specific errors.
@@ -141,53 +115,82 @@ sealed class Failure with _$Failure {
 ### Exception → Failure Mapping in RepositoryImpl
 
 ```dart
-// lib/{feature}/data/repositories/product_repository_impl.dart
 @LazySingleton(as: ProductRepository)
 class ProductRepositoryImpl implements ProductRepository {
-  const ProductRepositoryImpl(this._remoteDataSource, this._localDataSource);
-  final ProductRemoteDataSource _remoteDataSource;
-  final ProductLocalDataSource _localDataSource;
+  const ProductRepositoryImpl(this._remote, this._local);
+  final ProductRemoteDataSource _remote;
+  final ProductLocalDataSource _local;
 
   @override
-  Future<Either<Failure, Product>> getProduct({required String id}) async {
+  Future<Result<Product, Exception>> getProduct({required String id}) async {
     try {
-      // 1. Try local cache
-      final cached = await _localDataSource.getCachedProduct(id);
-      if (cached != null) {
-        return Right(ProductMapper.fromDataModel(cached));
-      }
+      final cached = await _local.getCachedProduct(id);
+      if (cached != null) return Success(ProductMapper.fromDataModel(cached));
 
-      // 2. Call remote
-      final model = await _remoteDataSource.getProduct(id);
-
-      // 3. Save to cache
-      await _localDataSource.cacheProduct(model);
-
-      // 4. Map to domain
-      return Right(ProductMapper.fromDataModel(model));
+      final model = await _remote.getProduct(id);
+      await _local.cacheProduct(model);
+      return Success(ProductMapper.fromDataModel(model));
     } on DioException catch (e) {
-      return Left(_mapDioError(e));
+      return Failure(_mapDioError(e));
     } on CacheException catch (e) {
-      return Left(Failure.cache(message: e.message));
+      return Failure(CacheFailure(message: e.message));
     } on Exception catch (e) {
-      return Left(Failure.unexpected(error: e));
+      return Failure(UnexpectedFailure(error: e));
     }
   }
 
-  Failure _mapDioError(DioException e) => switch (e.type) {
+  Exception _mapDioError(DioException e) => switch (e.type) {
         DioExceptionType.connectionTimeout ||
         DioExceptionType.receiveTimeout ||
         DioExceptionType.connectionError =>
-          Failure.network(message: e.message),
+          NetworkFailure(message: e.message),
         _ => switch (e.response?.statusCode) {
-            401 => Failure.unauthorized(message: e.message),
-            404 => Failure.notFound(message: e.message),
-            _ => Failure.server(
-                message: e.message,
-                statusCode: e.response?.statusCode,
-              ),
+            401 => UnauthorizedFailure(message: e.message),
+            404 => NotFoundFailure(message: e.message),
+            _ => ServerFailure(message: e.message, statusCode: e.response?.statusCode),
           },
       };
+}
+```
+
+---
+
+## 3. Repository — Domain Contract
+
+The interface lives in `domain/repositories/`. The implementation lives in `data/repositories/`.
+The domain **never** knows the implementation.
+
+```dart
+// lib/{feature}/domain/repositories/product_repository.dart
+import 'package:commons/commons.dart';
+
+abstract interface class ProductRepository {
+  /// Fetches a product by ID.
+  Future<Result<Product, Exception>> getProduct({required String id});
+
+  /// Fetches a paginated list of products.
+  Future<Result<List<Product>, Exception>> getProducts({
+    required int page,
+    required int limit,
+  });
+
+  /// Observes real-time changes to a product.
+  Stream<Result<Product, Exception>> watchProduct({required String id});
+}
+```
+
+### Rules
+
+- Only domain types in the signature: `Product` (DomainModel), `Exception`, primitives.
+- **Forbidden**: `Response`, `DataModel`, `Map<String, dynamic>`, HTTP types.
+- Write methods return `Result<Unit, Exception>` (not `void`).
+
+```dart
+abstract interface class CartRepository {
+  Future<Result<Unit, Exception>> addToCart({required CartItem item});
+  Future<Result<Unit, Exception>> removeFromCart({required String itemId});
+  Future<Result<Cart, Exception>> getCart();
+  Future<Result<Unit, Exception>> clearCart();
 }
 ```
 
@@ -224,19 +227,12 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<List<ProductModel>> getProducts({
-    required int page,
-    required int limit,
-  }) async {
+  Future<List<ProductModel>> getProducts({required int page, required int limit}) async {
     final response = await _client.get(
       '/products',
       queryParameters: {'page': page, 'limit': limit},
     );
-    final list = response.data as List<dynamic>;
-    return list
-        .cast<Map<String, dynamic>>()
-        .map(ProductModel.fromJson)
-        .toList();
+    return (response.data as List).cast<Map<String, dynamic>>().map(ProductModel.fromJson).toList();
   }
 }
 ```
@@ -247,29 +243,6 @@ abstract interface class ProductLocalDataSource {
   Future<ProductModel?> getCachedProduct(String id);
   Future<void> cacheProduct(ProductModel model);
   Future<void> clearProductCache();
-}
-
-@LazySingleton(as: ProductLocalDataSource)
-class ProductLocalDataSourceImpl implements ProductLocalDataSource {
-  const ProductLocalDataSourceImpl(this._cacheStore);
-  final CacheStore _cacheStore;
-
-  static const _prefix = 'product_';
-
-  @override
-  Future<ProductModel?> getCachedProduct(String id) async {
-    final json = await _cacheStore.get('$_prefix$id');
-    if (json == null) return null;
-    return ProductModel.fromJson(json);
-  }
-
-  @override
-  Future<void> cacheProduct(ProductModel model) =>
-      _cacheStore.put('$_prefix${model.id}', model.toJson());
-
-  @override
-  Future<void> clearProductCache() =>
-      _cacheStore.removeByPrefix(_prefix);
 }
 ```
 
@@ -330,7 +303,7 @@ abstract final class ProductMapper {
 
 - Live in `data/` because they know both `DataModel` and `DomainModel`.
 - **Forbidden** in Domain — the domain does not know DataModels exist.
-- Simple transformation logic: rename fields, convert units, derive booleans.
+- Simple transformation logic only: rename fields, convert units, derive booleans.
 - If the transformation requires complex business logic, move it to the UseCase.
 
 ---
@@ -371,10 +344,10 @@ abstract final class ProductUIMapper {
 
 ### UIMapper Rules
 
-- Live in `presentation/` — know DomainModel (allowed) and Flutter types (Color, etc.).
+- Live in `presentation/` — knows DomainModel (allowed) and Flutter types (Color, etc.).
 - **Forbidden** in Domain.
 - String formatting, color calculation, localized labels — all here.
-- The BLoC calls the UIMapper before emitting the state.
+- The BLoC calls the UIMapper **before** emitting the state.
 
 ---
 
@@ -383,32 +356,12 @@ abstract final class ProductUIMapper {
 ```dart
 // lib/core/network/api_client.dart
 abstract interface class ApiClient {
-  Future<Response<T>> get<T>(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  });
-
-  Future<Response<T>> post<T>(
-    String path, {
-    Object? data,
-    Options? options,
-  });
-
-  Future<Response<T>> put<T>(
-    String path, {
-    Object? data,
-    Options? options,
-  });
-
-  Future<Response<T>> delete<T>(
-    String path, {
-    Options? options,
-  });
+  Future<Response<T>> get<T>(String path, {Map<String, dynamic>? queryParameters, Options? options});
+  Future<Response<T>> post<T>(String path, {Object? data, Options? options});
+  Future<Response<T>> put<T>(String path, {Object? data, Options? options});
+  Future<Response<T>> delete<T>(String path, {Options? options});
 }
 ```
-
-The implementation uses Dio and is registered in the network module:
 
 ```dart
 // lib/core/di/modules/network_module.dart
@@ -436,15 +389,6 @@ abstract class NetworkModule {
 
 ```dart
 // lib/{feature}/presentation/bloc/product_bloc.dart
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:injectable/injectable.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:fpdart/fpdart.dart';
-
-part 'product_bloc.freezed.dart';
-part 'product_event.dart';
-part 'product_state.dart';
-
 @injectable
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc(this._getProduct) : super(const ProductState.initial()) {
@@ -453,40 +397,29 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   final GetProductUseCase _getProduct;
 
-  Future<void> _onLoad(
-    LoadProductEvent event,
-    Emitter<ProductState> emit,
-  ) async {
+  Future<void> _onLoad(LoadProductEvent event, Emitter<ProductState> emit) async {
     emit(const ProductState.loading());
-
     final result = await _getProduct(GetProductParams(id: event.id));
-
     result.fold(
       (failure) => emit(ProductState.error(failure: failure)),
-      (product) => emit(ProductState.success(
-        product: ProductUIMapper.toUIModel(product),
-      )),
+      (product) => emit(ProductState.success(product: ProductUIMapper.toUIModel(product))),
     );
   }
 }
 
 // product_event.dart
-part of 'product_bloc.dart';
-
 @freezed
 class ProductEvent with _$ProductEvent {
   const factory ProductEvent.load({required String id}) = LoadProductEvent;
 }
 
 // product_state.dart
-part of 'product_bloc.dart';
-
 @freezed
 class ProductState with _$ProductState {
   const factory ProductState.initial() = ProductInitial;
   const factory ProductState.loading() = ProductLoading;
   const factory ProductState.success({required ProductUIModel product}) = ProductSuccess;
-  const factory ProductState.error({required Failure failure}) = ProductError;
+  const factory ProductState.error({required Exception failure}) = ProductError;
 }
 ```
 
@@ -532,14 +465,11 @@ class ProductState with _$ProductState {
 │       ┌─────────────┼─────────┼──────────────┐              │
 │       │     DOMAIN  │         │              │              │
 │       │             │         │              │              │
-│       │  UseCase ◄──┘         └──► Repository (interface)   │
-│       │     │                        ▲       │              │
-│       │     ▼                        │       │              │
-│       │  DomainModel            Failure      │              │
-│       │                                      │              │
-│       └──────────────────────────────────────┘              │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+│       │  UseCase ◄──┘         └──► Repository (interface)  │
+│       │     │                        ▲                      │
+│       │     ▼                        │                      │
+│       │  DomainModel            Failure                     │
+│       └─────────────────────────────────────────────────────┘
 ```
 
 **Arrows = dependency direction.** Domain depends on nothing.
