@@ -181,7 +181,7 @@ description: Qué hace en una línea  # Recomendado
 | backend | `java-spring`, `java-webflux`, `node-express`, `node-lambda`, `dotnet` |
 | frontend | `react`, `angular` |
 | mobile | `flutter`, `android-native`, `apple-native` |
-| calidad | `automation` |
+| calidad | `karate`, `playwright`, `k6`, `appium` |
 | arquitectura | (sin stacks específicos) |
 
 ## Templates de assets
