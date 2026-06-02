@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Markdown documentation standard for Design System components.   Use when generating README files for organisms, document
+description: >
+  Markdown documentation standard for Design System components.
+  Use when generating README files for organisms, documenting component
+  APIs, writing usage examples, or creating component catalogs.
 ---
 
 # Markdown Documentation

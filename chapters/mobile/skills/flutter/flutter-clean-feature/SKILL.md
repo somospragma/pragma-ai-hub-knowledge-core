@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Implements a complete Flutter feature following Clean Architecture with BLoC + GetIt/Injectable. Use this skill when the
+description: >
+  Implements a complete Flutter feature following Clean Architecture with BLoC + GetIt/Injectable. Use this skill when the user asks to 'create a feature', 'implement screen X', 'add a module', 'build flow Y', or any request involving coordinated files across the presentation, domain, and data layers. Also triggers when implementing a use case, repository, data source, BLoC, or page as part of a new or existing feature, creating a new Melos package for a feature, or adding a feature to an existing package in a monorepo. This is the master skill for feature development. Supports single-project and monorepo with Melos. Stack: Flutter 3.32+, Dart 3.8+, BLoC, GetIt, Injectable, Freezed, fpdart, go_router.
 ---
 
 # Flutter Clean Feature — Implementation Guide

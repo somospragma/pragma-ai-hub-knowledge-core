@@ -5,7 +5,11 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Widgetbook patterns for interactive documentation of Design System components   and app screens in canonical `/new-view`
+description: >
+  Widgetbook patterns for interactive documentation of Design System components
+  and app screens in canonical `/new-view`. Use when creating or updating
+  use cases, knobs, code preview, and build_runner generation with deterministic
+  scope selection.
 ---
 
 # Widgetbook Patterns (Deterministic Scope)

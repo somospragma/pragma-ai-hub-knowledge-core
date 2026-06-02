@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Implements background tasks with WorkManager 0.5.x and push message background handling using a Strategy pattern to supp
+description: >
+  Implements background tasks with WorkManager 0.5.x and push message background handling using a Strategy pattern to support multiple providers (FCM, OneSignal, custom), clean architecture, fpdart, and modern Flutter patterns.
 ---
 
 # Background Processing

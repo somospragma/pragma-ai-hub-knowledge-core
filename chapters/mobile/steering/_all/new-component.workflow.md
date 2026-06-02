@@ -4,7 +4,10 @@ version: 1.2.0
 scope: chapter
 type: steering
 chapter: mobile
-description: Workflow determinista para crear un nuevo componente del Design System desde   Figma. Usar cuando el usuario pide un com
+description: >
+  Workflow determinista para crear un nuevo componente del Design System desde
+  Figma. Usar cuando el usuario pide un componente nuevo con URL de Figma y HU.
+  No usar para crear pantalla completa o refactor sin diseño nuevo.
 ---
 
 # Workflow: Nuevo Componente desde Figma

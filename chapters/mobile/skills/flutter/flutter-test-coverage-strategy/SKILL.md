@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Defines and enforces the complete test coverage strategy for Flutter projects: coverage thresholds by layer, what to tes
+description: >
+  Defines and enforces the complete test coverage strategy for Flutter projects: coverage thresholds by layer, what to test, CI enforcement, and coverage reports. Use this skill when asking about test coverage, 'what should I test?', 'how much coverage do I need?', 'configure coverage report', 'coverage badge', lcov, genhtml, or when auditing test completeness. Also activated when a feature is complete and coverage needs to be validated. Stack: flutter_test, bloc_test 9.x, mocktail 1.x, integration_test, lcov. Dart 3.8+ / Flutter 3.32+.
 ---
 
 # Test Coverage Strategy

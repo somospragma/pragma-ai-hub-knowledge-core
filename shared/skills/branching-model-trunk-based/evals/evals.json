@@ -1,0 +1,134 @@
+{
+  "skill_name": "branching-model-trunk-based",
+  "description": "Evaluations to verify that branching-model-trunk-based produces correct, actionable Trunk-Based Development guidance across different team sizes, project types, and scenarios.",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "small-team-setup-tbd-from-scratch",
+      "prompt": "We're a team of 5 developers building a React + Node.js SaaS product. We've been using long feature branches and we're constantly suffering from merge conflicts. Someone suggested we try Trunk-Based Development. We use GitHub Issues for tracking. How do we set up and follow TBD from scratch? What are the rules we must follow?",
+      "expected_output": "Explanation of TBD core principles, short-lived feature branches (≤2 days), direct-to-main or SLFB workflow for 5 devs, branch naming conventions, CI requirements, commit frequency guidance, and anti-patterns to avoid. Should NOT mention GitFlow's develop branch as part of the workflow.",
+      "assertions": [
+        {
+          "name": "two-day-max-branch-lifetime",
+          "criteria": "Response mentions that short-lived feature branches must not exceed 2 days (or 48 hours) in lifetime"
+        },
+        {
+          "name": "main-always-releasable",
+          "criteria": "Response states that main/trunk must always be in a releasable state, never broken"
+        },
+        {
+          "name": "ci-requirement-mentioned",
+          "criteria": "Response explicitly mentions that CI is mandatory or required for TBD to work"
+        },
+        {
+          "name": "branch-naming-examples",
+          "criteria": "Response includes concrete branch naming examples (e.g., feat/gh-42-feature-name or similar kebab-case patterns)"
+        },
+        {
+          "name": "no-long-lived-develop-branch",
+          "criteria": "Response does NOT recommend creating a long-lived 'develop' branch — this is a GitFlow pattern incompatible with TBD"
+        },
+        {
+          "name": "commit-frequency-guidance",
+          "criteria": "Response mentions committing to trunk at least daily (or more frequently) as a key practice"
+        },
+        {
+          "name": "anti-patterns-or-rules",
+          "criteria": "Response includes at least one warning, anti-pattern, or hard rule to avoid in TBD"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "hotfix-production-tbd-release-branch",
+      "prompt": "Our team follows Trunk-Based Development with monthly releases. We use release branches. Right now, version 3.1.0 is in production and we have a critical bug: our Python Django payment service is throwing a 500 error on the /api/pay endpoint when the amount exceeds $1000 due to an integer overflow. It's tracked as PAY-789 in Jira. Our current main is 3 weeks ahead of release/3.1.0. Walk me through the hotfix process step by step.",
+      "expected_output": "Fix on main first (write failing test + fix), CI on main, cherry-pick to release/3.1.0, CI on release branch, tag v3.1.1, deploy from tag. Clear emphasis on fix-on-main-first rule and NO merging release branch back to main.",
+      "assertions": [
+        {
+          "name": "fix-on-main-first",
+          "criteria": "Response explicitly states to fix the bug on main FIRST before touching the release branch"
+        },
+        {
+          "name": "cherry-pick-not-merge",
+          "criteria": "Response uses cherry-pick to move the fix from main to release/3.1.0, NOT a merge"
+        },
+        {
+          "name": "version-bump-to-patch",
+          "criteria": "New version is 3.1.1 (patch bump from 3.1.0)"
+        },
+        {
+          "name": "ci-on-release-branch",
+          "criteria": "Response mentions running CI on the release branch after cherry-picking"
+        },
+        {
+          "name": "no-reverse-merge",
+          "criteria": "Response does NOT suggest merging release/3.1.0 back into main"
+        },
+        {
+          "name": "jira-ticket-in-commit",
+          "criteria": "Commit message example includes the ticket reference PAY-789"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "eval_name": "large-feature-split-across-multiple-branches",
+      "prompt": "My team uses GitLab and we follow Trunk-Based Development. We need to implement a complete checkout redesign that will take at least 3 weeks. We cannot use feature flags — our architecture doesn't support them. We must keep main always green and we cannot block other developers. How do we handle this large feature in TBD without feature flags?",
+      "expected_output": "Guidance on breaking down large features into multiple independently-releasable short-lived branches, each completing within 2 days. Should mention vertical slicing, incremental delivery, and keeping main always releasable. Should NOT require feature flags as a prerequisite. Should acknowledge GitLab MR (merge request) terminology while staying git-platform agnostic in the git commands.",
+      "assertions": [
+        {
+          "name": "split-into-small-branches",
+          "criteria": "Response explicitly recommends breaking the large feature into multiple short-lived branches (each ≤2 days), not a single long-lived branch"
+        },
+        {
+          "name": "incremental-independent-commits",
+          "criteria": "Response explains that each branch/MR should be independently releasable or at least not break main when merged"
+        },
+        {
+          "name": "no-feature-flag-required",
+          "criteria": "Response does NOT require feature flags as the mandatory solution — it provides a git-branching-only answer"
+        },
+        {
+          "name": "mr-pr-agnostic-language",
+          "criteria": "Response uses platform-agnostic language for merge/pull requests (e.g., 'MR/PR', 'merge request', or 'pull request') and does not assume exclusively GitHub or GitLab"
+        },
+        {
+          "name": "main-always-green",
+          "criteria": "Response reinforces that main must remain green/releasable after each small branch merges"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "eval_name": "tbd-vs-gitflow-team-decision",
+      "prompt": "Our engineering team is debating whether to use Trunk-Based Development or GitFlow for our new mobile app project. We deploy every 2 weeks to the App Store, we have 8 developers, and we have automated CI with ~70% test coverage. The CTO is leaning towards GitFlow because 'it's more structured'. What would you recommend and why?",
+      "expected_output": "Nuanced comparison of TBD vs GitFlow for their specific context (bi-weekly releases, 8 devs, CI in place). Should lean toward TBD but acknowledge GitFlow's tradeoffs. Must include: the incompatibility between GitFlow's develop branch and TBD, the fact that GitFlow's author acknowledged its limitations for CD, and specific factors for their context (team size, CI maturity, release cadence).",
+      "assertions": [
+        {
+          "name": "tbd-recommendation-with-justification",
+          "criteria": "Response recommends TBD (or gives a clear reasoning for/against based on their context) rather than just listing pros/cons without a conclusion"
+        },
+        {
+          "name": "gitflow-develop-as-antipattern",
+          "criteria": "Response mentions that GitFlow's long-lived 'develop' branch is incompatible with TBD principles"
+        },
+        {
+          "name": "bi-weekly-release-addressed",
+          "criteria": "Response specifically addresses their 2-week release cycle and whether TBD supports it (it does, with release branches)"
+        },
+        {
+          "name": "8-devs-size-considered",
+          "criteria": "Response factors in team size of 8 developers in its reasoning"
+        },
+        {
+          "name": "ci-maturity-factored",
+          "criteria": "Response considers their existing CI and ~70% test coverage as relevant context for choosing TBD"
+        }
+      ],
+      "files": []
+    }
+  ]
+}

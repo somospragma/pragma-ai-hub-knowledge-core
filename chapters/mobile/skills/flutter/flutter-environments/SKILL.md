@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Advanced skill for configuring flavors, schemes, build variants, and compilation environments in Flutter for iOS and And
+description: >
+  Advanced skill for configuring flavors, schemes, build variants, and compilation environments in Flutter for iOS and Android, using envied with obfuscate:true to protect secrets, Firebase per flavor, feature flags, signing config, and CI/CD secret injection. Use this skill whenever the user mentions flavors, environments, dev/staging/prod, build variants, schemes, xcconfig, productFlavors, envied, environment variables, .env, secrets, Firebase per environment, google-services.json, GoogleService-Info.plist, signing, keystore, certificates, or wants to separate configuration between environments. Also applies when the user wants to add a new environment, migrate from a single main.dart to multiple entry points, or protect API keys in the compiled binary. Stack: envied, Flutter 3.32+, Dart 3.8+.
 ---
 
 # Flutter Flavors & Build Environments

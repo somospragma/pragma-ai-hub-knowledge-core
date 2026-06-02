@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Applies and enforces the Dart/Flutter coding standard for all code generation and review. Use this skill when writing, r
+description: >
+  Applies and enforces the Dart/Flutter coding standard for all code generation and review. Use this skill when writing, reviewing, or refactoring any Dart/Flutter code. Triggers on file creation, PR reviews, naming questions ('how do I name X?'), 'is this correct Dart?', import ordering, style reviews, linting configuration, or any Flutter code generation task. Always active when producing Dart — defines naming, file structure, import order, style rules, and analysis_options.yaml. Stack: Dart 3.8+, Flutter 3.32+, flutter_lints.
 ---
 
 # Flutter / Dart Coding Standard

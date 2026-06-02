@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Reduce Flutter APK/IPA size: tree shaking, deferred components, asset compression, ABI splits, --split-debug-info, obfus
+description: >
+  Reduce Flutter APK/IPA size: tree shaking, deferred components, asset compression, ABI splits, --split-debug-info, obfuscation, size analysis tools, and Android 16KB page size compliance (required for Google Play as of November 2025). Use this skill when the app is too large, when Google Play warns about 16KB page size, or when optimizing download/install size for emerging markets.
 ---
 
 # App Size Optimization

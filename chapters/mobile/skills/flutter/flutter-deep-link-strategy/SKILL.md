@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Comprehensive deep link implementation using go_router 17.2.2, fpdart functional programming, clean architecture pattern
+description: >
+  Comprehensive deep link implementation using go_router 17.2.2, fpdart functional programming, clean architecture patterns, route guards, dynamic parameters, and platform-specific configuration.
 ---
 
 # Deep Link Strategy

@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Runs CPU-intensive work off the main thread using Dart isolates: compute(), Isolate.run() for one-shot tasks, Isolate.sp
+description: >
+  Runs CPU-intensive work off the main thread using Dart isolates: compute(), Isolate.run() for one-shot tasks, Isolate.spawn() for long-lived workers, worker_manager for isolate pools with cancellation and progress, and isolate_manager for cross-platform support (VM + Web Workers + WASM). Use this skill when JSON parsing, image processing, encryption, data transformation, or any CPU-bound work causes UI jank or dropped frames.
 ---
 
 # Dart Isolates & Workers

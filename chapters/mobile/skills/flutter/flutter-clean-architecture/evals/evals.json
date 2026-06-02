@@ -1,0 +1,185 @@
+{
+  "skill_name": "flutter-clean-architecture",
+  "description": "Evaluations to verify that flutter-clean-architecture correctly guides layering decisions, dependency direction, Result pattern usage, and layer responsibilities in any Flutter/Dart project.",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "flutter-import-in-domain-violation",
+      "prompt": "I'm writing a UseCase in the domain layer of my Flutter app. Here's my code:\n\n```dart\nimport 'package:flutter/material.dart';\nimport 'package:equatable/equatable.dart';\nimport '../repositories/product_repository.dart';\n\nclass GetProductUseCase {\n  final ProductRepository repository;\n  GetProductUseCase(this.repository);\n\n  Future<ProductEntity> call(String id) async {\n    try {\n      return await repository.getProduct(id);\n    } catch (e) {\n      showDialog(context: context, builder: (_) => AlertDialog(title: Text(e.toString())));\n      throw e;\n    }\n  }\n}\n```\n\nWhat's wrong with this code from a Clean Architecture perspective?",
+      "expected_output": "Identifies at least two violations: (1) Flutter import in domain layer (no Flutter deps allowed in domain), (2) try-catch with UI logic (showDialog) in domain layer — domain should not know about UI, should return Result type instead. The UseCase should return Result<ProductEntity, Exception> and never throw or call UI.",
+      "assertions": [
+        {
+          "name": "flutter-import-violation-identified",
+          "criteria": "Response identifies that 'import package:flutter/material.dart' is a violation — domain layer must not depend on Flutter"
+        },
+        {
+          "name": "ui-in-domain-violation-identified",
+          "criteria": "Response identifies that calling showDialog/UI code from domain layer violates Clean Architecture (domain has no knowledge of presentation)"
+        },
+        {
+          "name": "result-pattern-recommended",
+          "criteria": "Response recommends returning Result<T, E> or Either<Failure, T> instead of try-catch + throw"
+        },
+        {
+          "name": "correct-return-type-shown",
+          "criteria": "Response shows or describes a corrected UseCase signature returning Future<Result<ProductEntity, Exception>> or similar"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "eval_name": "result-pattern-fold-vs-try-catch",
+      "prompt": "I have this Cubit code in my Flutter app. It uses try-catch to handle errors from the UseCase. My team says I should use the Result pattern. Can you show me how to refactor it?\n\n```dart\nclass OrderCubit extends Cubit<OrderState> {\n  OrderCubit(this.placeOrderUseCase) : super(const OrderInitial());\n  final PlaceOrderUseCase placeOrderUseCase;\n\n  Future<void> placeOrder(OrderRequest request) async {\n    emit(const OrderLoading());\n    try {\n      final order = await placeOrderUseCase.call(request);\n      emit(OrderSuccess(order: order));\n    } catch (e) {\n      emit(OrderError(message: e.toString()));\n    }\n  }\n}\n```",
+      "expected_output": "Refactored Cubit using result.fold() or result.when(), with UseCase returning Result<Order, Exception>. The Cubit no longer uses try-catch. The fold has a success branch emitting OrderSuccess and a failure branch emitting OrderError.",
+      "assertions": [
+        {
+          "name": "try-catch-removed",
+          "criteria": "The refactored Cubit code does NOT contain a try-catch block"
+        },
+        {
+          "name": "fold-or-when-used",
+          "criteria": "The refactored code uses .fold(), .when(), or pattern matching on the Result type"
+        },
+        {
+          "name": "both-branches-handled",
+          "criteria": "Both success and failure branches are handled: success emits OrderSuccess, failure emits OrderError"
+        },
+        {
+          "name": "usecase-return-type-mentioned",
+          "criteria": "Response mentions or shows that PlaceOrderUseCase must return Result<Order, Exception> or Either<Failure, Order>"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "eval_name": "dependency-direction-violation",
+      "prompt": "A junior developer wrote this code in the Data layer's repository implementation. Is there anything architecturally wrong?\n\n```dart\n// lib/src/data/repositories/cart_repository_impl.dart\nimport '../datasources/cart_remote_datasource.dart';\nimport '../../domain/entities/cart_entity.dart';\nimport '../../presentation/blocs/cart_cubit.dart'; // notify cubit directly\n\nclass CartRepositoryImpl implements CartRepository {\n  final CartRemoteDataSource remoteDataSource;\n  CartRepositoryImpl(this.remoteDataSource);\n\n  @override\n  Future<Result<CartEntity, Exception>> getCart(String userId) async {\n    final data = await remoteDataSource.fetchCart(userId);\n    final entity = CartMapper().toEntity(data);\n    CartCubit.instance.emit(CartLoaded(cart: entity)); // direct cubit call\n    return Result.success(entity);\n  }\n}\n```",
+      "expected_output": "The data layer imports and directly calls the presentation layer (CartCubit) — this is a critical violation. Dependencies must flow inward: Presentation → Domain ← Data. Data layer must never import or reference the Presentation layer. The repository should simply return the Result; the Cubit subscribes to the UseCase, not the other way.",
+      "assertions": [
+        {
+          "name": "data-to-presentation-violation-identified",
+          "criteria": "Response clearly identifies the import of CartCubit (presentation) from the Data layer as a dependency direction violation"
+        },
+        {
+          "name": "dependency-rule-explained",
+          "criteria": "Response explains the correct direction: Presentation depends on Domain, Data depends on Domain, Domain depends on nobody"
+        },
+        {
+          "name": "fix-described",
+          "criteria": "Response describes the fix: remove the CubitCubit import and direct call; repository returns the Result and the Cubit observes it through the UseCase"
+        },
+        {
+          "name": "no-singleton-cubit-endorsed",
+          "criteria": "Response does NOT suggest keeping CartCubit.instance pattern as acceptable"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "eval_name": "entity-vs-model-distinction",
+      "prompt": "I have a Flutter e-commerce app. I defined a single class used both for JSON deserialization from the API and as the object I pass through the domain layer:\n\n```dart\nclass Product {\n  final String id;\n  final String name;\n  final double price;\n  final Map<String, dynamic> rawAttributes;\n\n  Product({required this.id, required this.name, required this.price, required this.rawAttributes});\n\n  factory Product.fromJson(Map<String, dynamic> json) => Product(\n    id: json['id'],\n    name: json['name'],\n    price: json['price'].toDouble(),\n    rawAttributes: json,\n  );\n}\n```\n\nWhat Clean Architecture improvements should I make?",
+      "expected_output": "Separates into ProductModel (Data layer, handles fromJson/toJson, can have rawAttributes) and ProductEntity (Domain layer, pure business fields, Equatable, no JSON methods, no rawAttributes). A Mapper converts Model → Entity. Explains why: entities should not depend on serialization formats, making domain testable without JSON.",
+      "assertions": [
+        {
+          "name": "separation-recommended",
+          "criteria": "Response recommends splitting into a Model (data layer) and an Entity (domain layer)"
+        },
+        {
+          "name": "entity-no-json-methods",
+          "criteria": "The recommended Entity does NOT contain fromJson/toJson/rawAttributes — those belong in the Model"
+        },
+        {
+          "name": "mapper-mentioned",
+          "criteria": "Response mentions a Mapper class (or mapping function) to convert Model → Entity"
+        },
+        {
+          "name": "equatable-in-entity",
+          "criteria": "Response shows or mentions Equatable (or props list) on the Entity for value equality"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "eval_name": "layer-responsibilities-quiz",
+      "prompt": "For each of these tasks, tell me which Clean Architecture layer it belongs to and why:\n1. Validating that a user's email format is correct before saving\n2. Calling the REST API endpoint POST /users\n3. Showing a SnackBar when registration succeeds\n4. Defining what fields a User has in the system\n5. Deciding whether to load data from cache or network",
+      "expected_output": "1. Domain (business rule validation in UseCase or Entity). 2. Data (RemoteDataSource calls the API). 3. Presentation (UI reaction in Page/Widget listening to Cubit state). 4. Domain (Entity defines the business object). 5. Data (Repository implementation decides cache vs network strategy).",
+      "assertions": [
+        {
+          "name": "email-validation-domain",
+          "criteria": "Email validation is correctly placed in Domain layer (UseCase or Entity)"
+        },
+        {
+          "name": "api-call-data",
+          "criteria": "REST API call is correctly placed in Data layer (DataSource or Repository)"
+        },
+        {
+          "name": "snackbar-presentation",
+          "criteria": "Showing a SnackBar is correctly placed in Presentation layer"
+        },
+        {
+          "name": "entity-fields-domain",
+          "criteria": "Defining User fields is correctly placed in Domain layer (Entity)"
+        },
+        {
+          "name": "cache-vs-network-data",
+          "criteria": "Cache vs network decision is correctly placed in Data layer (Repository implementation)"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 6,
+      "eval_name": "mediator-cross-feature-violation",
+      "prompt": "A developer wrote this code in the cart feature:\n\n```dart\n// lib/cart/presentation/bloc/cart_bloc.dart\nimport '../../auth/domain/usecases/get_current_user_usecase.dart';\n\n@injectable\nclass CartBloc extends Bloc<CartEvent, CartState> {\n  CartBloc(this._loadCart, this._getCurrentUser) : super(const CartState.initial()) {\n    on<LoadCartEvent>(_onLoad);\n  }\n  final LoadCartUseCase _loadCart;\n  final GetCurrentUserUseCase _getCurrentUser; // from auth feature\n\n  Future<void> _onLoad(LoadCartEvent event, Emitter<CartState> emit) async {\n    final userResult = await _getCurrentUser();\n    userResult.fold(\n      (failure) => emit(CartState.error(failure: failure)),\n      (user) async {\n        final result = await _loadCart(LoadCartParams(userId: user.id));\n        result.fold(\n          (failure) => emit(CartState.error(failure: failure)),\n          (cart) => emit(CartState.success(cart: cart)),\n        );\n      },\n    );\n  }\n}\n```\n\nIs there anything architecturally wrong with this code?",
+      "expected_output": "Identifies that CartBloc directly imports GetCurrentUserUseCase from the auth feature — this is a horizontal coupling violation. Features must never import each other directly. The solution is to use AppMediator: when auth feature logs in, it sends UserLoggedInEvent via AppMediator.send(); CartBloc subscribes via AppMediator.on<UserLoggedInEvent>() and reacts without knowing about the auth feature.",
+      "assertions": [
+        {
+          "name": "direct-feature-import-violation-identified",
+          "criteria": "Response identifies that importing GetCurrentUserUseCase from the auth feature inside CartBloc is a cross-feature coupling violation"
+        },
+        {
+          "name": "mediator-solution-proposed",
+          "criteria": "Response proposes using AppMediator (or Mediator pattern) as the solution for cross-feature communication"
+        },
+        {
+          "name": "send-and-on-methods-described",
+          "criteria": "Response describes or shows AppMediator.send() for publishing events and AppMediator.on<T>() for subscribing"
+        },
+        {
+          "name": "direct-import-not-endorsed",
+          "criteria": "Response does NOT suggest keeping the direct import as acceptable or as an alternative"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 7,
+      "eval_name": "incremental-refactoring-order",
+      "prompt": "I have an existing Flutter app with these issues:\n1. BLoC classes use try-catch blocks to handle errors\n2. Domain models (User, Product) have fromJson/toJson methods\n3. Some BLoC classes call HTTP endpoints directly via Dio\n4. There are no repository interfaces — data access is directly in the BLoC\n\nI want to migrate this to Clean Architecture. Where do I start? The app has 8 features and I can't rewrite everything at once.",
+      "expected_output": "Recommends an incremental, per-feature migration following the 10-step order: start with Failure type and UseCase base interfaces, then extract domain models (remove fromJson), create repository interfaces, move HTTP calls behind DataSources, create RepositoryImpl mapping exceptions to Failure, replace direct calls in BLoC with UseCase calls. Explicitly advises against a full rewrite.",
+      "assertions": [
+        {
+          "name": "no-full-rewrite-recommended",
+          "criteria": "Response explicitly advises against rewriting everything at once and recommends incremental migration"
+        },
+        {
+          "name": "failure-type-or-usecase-base-first",
+          "criteria": "Response recommends introducing Failure type or UseCase base interfaces as one of the first steps"
+        },
+        {
+          "name": "incremental-per-feature-mentioned",
+          "criteria": "Response mentions migrating one feature at a time without breaking other features"
+        },
+        {
+          "name": "order-compatible-with-10-steps",
+          "criteria": "The suggested migration order is compatible with the canonical 10-step incremental refactoring order (domain models before repositories, repositories before replacing BLoC direct calls)"
+        }
+      ],
+      "files": []
+    }
+  ]
+}

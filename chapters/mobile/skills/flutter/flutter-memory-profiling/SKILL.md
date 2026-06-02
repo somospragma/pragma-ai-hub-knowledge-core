@@ -5,7 +5,8 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Profile and fix memory leaks in Flutter using DevTools Memory tab, heap snapshots, retaining paths, allocation tracing,
+description: >
+  Profile and fix memory leaks in Flutter using DevTools Memory tab, heap snapshots, retaining paths, allocation tracing, and the leak_tracker package for automated detection in tests. Covers correct disposal patterns for controllers, streams, BLoC, images, and isolates. Use this skill when the app crashes with OOM, slows down over time, or when investigating retained objects, growing heap, or undisposed controllers.
 ---
 
 # Memory Profiling & Leak Detection

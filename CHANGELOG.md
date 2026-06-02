@@ -1,0 +1,27 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+#### Shared Skills (Global)
+- **changelog-management**: Maintain clear, organized release notes following Keep a Changelog and Semantic Versioning standards
+- **commit-conventions**: Conventional Commits specification for commit messages including types, scopes, and message body/footer conventions
+- **documentation-projects**: Create and structure project documentation using a proven 7-document framework
+- **spec-driven-development**: Spec-Driven Development workflow for intercepting change requests before code implementation
+- **branching-model-gitflow**: GitFlow branch strategy with feature, release, and hotfix branches
+- **branching-model-trunk-based**: Trunk-Based Development strategy for continuous integration and deployment
+
+#### Mobile Stack (Flutter)
+- Flutter-specific skills and capabilities for mobile development
+- Flutter stack metadata organization with skill categorization
+- Mobile workflow definitions and steering guidelines
+
+---
+
+[unreleased]: https://github.com/somospragma/pragma-ai-hub-knowledge-core/compare/v1.0.0...HEAD

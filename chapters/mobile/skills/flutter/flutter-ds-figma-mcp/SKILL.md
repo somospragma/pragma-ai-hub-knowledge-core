@@ -5,7 +5,11 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Figma MCP (Model Context Protocol) integration for accessing design data   programmatically. Use when extracting compone
+description: >
+  Figma MCP (Model Context Protocol) integration for accessing design data
+  programmatically. Use when extracting component properties, navigating
+  Figma file trees, reading styles/tokens, analyzing full screens or pages,
+  and comparing implementation against design specs.
 ---
 
 # Figma MCP Integration

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sdd-scripts"
+version = "0.1.0"
+description = "Validation scripts for the spec-driven-development skill."
+requires-python = ">=3.9"
+dependencies = [
+    "jsonschema>=4.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = []
+
+[tool.hatch.envs.default]
+dependencies = [
+    "jsonschema>=4.0",
+]
+
+[tool.hatch.envs.default.scripts]
+validate = "python validate_context.py {args}"
+validate-all = "python validate_context.py"

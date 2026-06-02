@@ -5,7 +5,10 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Official naming conventions for the Flutter Design System.   Use when creating files, classes, enums, variables, branche
+description: >
+  Official naming conventions for the Flutter Design System.
+  Use when creating files, classes, enums, variables, branches, commits,
+  golden test outputs, or mapping Figma names to Dart identifiers.
 ---
 
 # Naming Conventions

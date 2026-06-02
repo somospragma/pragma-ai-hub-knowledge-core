@@ -5,7 +5,11 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Accessibility and semantics rules for Design System components.   Use when implementing interactive widgets, adding sema
+description: >
+  Accessibility and semantics rules for Design System components.
+  Use when implementing interactive widgets, adding semantic labels,
+  handling images, communicating states to screen readers, or writing
+  accessibility tests.
 ---
 
 # Accessibility & Semantics

@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Orquestador principal del pipeline Figma → Flutter DS. Usar cuando el usuario   pida una tarea completa de punta a punta
+description: >
+  Orquestador principal del pipeline Figma → Flutter DS. Usar cuando el usuario
+  pida una tarea completa de punta a punta como bootstrap de workspace, crear
+  un componente, crear una vista, refactorizar un componente o corregir
 ---
 
 # Instrucciones del Orquestador

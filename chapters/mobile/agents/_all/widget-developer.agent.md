@@ -4,7 +4,10 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Desarrollador especializado en implementar widgets Flutter puros. Usar cuando   el plan técnico ya está definido y toca
+description: >
+  Desarrollador especializado en implementar widgets Flutter puros. Usar cuando
+  el plan técnico ya está definido y toca generar código de componentes DS o
+  vistas Flutter respetando tokens, estructura y Atomic Design.
 ---
 
 # Instrucciones del Widget Developer

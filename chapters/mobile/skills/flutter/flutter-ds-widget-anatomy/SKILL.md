@@ -5,7 +5,11 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
-description: Standard internal structure for a Design System widget file.   Use when writing or reviewing Flutter widget code to ensu
+description: >
+  Standard internal structure for a Design System widget file.
+  Use when writing or reviewing Flutter widget code to ensure correct
+  ordering of imports, constructor, properties, build methods,
+  resolvers, enums, and helper classes.
 ---
 
 # Widget Anatomy

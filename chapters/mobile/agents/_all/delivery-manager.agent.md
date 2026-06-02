@@ -4,7 +4,9 @@ version: 1.0.0
 scope: chapter
 type: agent
 chapter: mobile
-description: Gestor de entrega. Usar cuando implementación y testing terminaron y toca   preparar documentación, branch/PR y reporte
+description: >
+  Gestor de entrega. Usar cuando implementación y testing terminaron y toca
+  preparar documentación, branch/PR y reporte final de forma determinista.
 ---
 
 # Instrucciones del Delivery Manager
