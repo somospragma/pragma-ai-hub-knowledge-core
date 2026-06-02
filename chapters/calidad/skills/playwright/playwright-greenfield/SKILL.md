@@ -5,7 +5,7 @@ scope: stack
 type: skill
 chapter: calidad
 stack: [playwright]
-description: Genera un proyecto Playwright E2E web completo a partir de fuentes UI reales (URL viva, Figma, user stories con flujos UI, Storybook). No acepta OpenAPI ni specs backend como entrada.
+description: Genera un proyecto Playwright E2E web completo a partir de fuentes UI reales (URL viva, Figma, user stories con flujos UI, Storybook).
 tags: [playwright, greenfield, e2e, typescript, page-object-model, ui-first, live-app]
 ---
 
@@ -25,20 +25,18 @@ Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]`,
 2. **Figma, wireframes o mockups UI** — descripciones visuales con jerarquía de componentes, rutas tentativas y form fields.
 3. **User stories con flujos UI explícitos** — historias que enumeran páginas, transiciones y acciones (no historias que solo describen reglas de negocio).
 4. **Storybook o sistema de diseño existente** — componentes catalogados con sus rutas demo.
-> Bug histórico: anteriormente este skill aceptaba OpenAPI como fuente de páginas (y también como fuente de mocks). **OpenAPI quedó completamente fuera del scope de Playwright** — ni para inferir páginas ni para generar mocks. Para pruebas de contrato backend usar `[[karate-greenfield]]`; para performance sobre OpenAPI usar `[[k6-greenfield]]`; aquí se valida exclusivamente la capa de presentación con fuentes UI reales.
-
 ## Instrucción
 
 1. **Validar UI source** — Verifica que el insumo describa UI real:
    - Si es URL: que sea accesible y autenticable (si aplica).
    - Si es Figma: link público o screenshots con jerarquía de páginas.
    - Si es user story: que liste páginas y flujos UI explícitos (no solo reglas backend).
-   - Si solo hay OpenAPI/Swagger o cualquier spec backend: **detente** y pide al usuario una fuente UI real. OpenAPI no es entrada válida para Playwright bajo ninguna circunstancia.
+   - Si no hay descripción de UI, **detente** y pide una fuente válida según `[ui-source-priority](references/ui-source-priority.md)`.
 2. **Detectar páginas** — Invoca `[[playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content`, `user_story` y `priority_assignments`. Extrae `route` (frontend), `page_type`, `form_fields`, `navigation` y `selectors_hint` directamente desde la fuente UI.
 3. **Detectar flujos** — Clasifica los flujos de usuario observados en la UI: navegación entre páginas, formularios multi-paso, autenticación, listados con paginación. Cada flujo se traducirá en uno o más `.spec.ts`.
 4. **Decidir modo de ejecución** — Pregunta al usuario: `@live` (default, contra backend real), `@mocked` (opt-in, mocks via `page.route()`) o `@hybrid` (live + mock de endpoints específicos). Ver `[execution-modes-live-mocked-hybrid](references/execution-modes-live-mocked-hybrid.md)`.
 5. **Planificar tests** — Para cada página: 5 a 8 escenarios funcionales con tag `@live` por defecto. Para páginas `CRITICAL` y `HIGH` (según `priority_assignments` provistas por el usuario/PO), añade visual regression (`[ver visual](references/visual-regression.md)`) y accesibilidad WCAG 2.1 AA (`[ver a11y](references/accessibility-axe-wcag.md)`).
-6. **Emitir archivos en orden de prioridad** — Primero `tests/*.spec.ts`, luego Page Objects, después fixtures, y por último infraestructura (`playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md`). Los mocks (`mocks/api-handlers.ts`) se emiten SOLO si el usuario declaró una lista explícita `mock_endpoints` (observada en la app viva, capturada con Codegen/MCP browser, o provista manualmente por el QA / equipo backend vía Postman collection). Nunca se generan a partir de un OpenAPI. Usa `[[calidad-streaming-files-protocol]]` para la entrega.
+6. **Emitir archivos en orden de prioridad** — Primero `tests/*.spec.ts`, luego Page Objects, después fixtures, y por último infraestructura (`playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md`). Los mocks (`mocks/api-handlers.ts`) se emiten SOLO si el usuario declaró `mock_mode != off` con su lista `mock_endpoints` (ver `[mocks-page-route](references/mocks-page-route.md)` para fuentes válidas y orden de preferencia). Usa `[[calidad-streaming-files-protocol]]` para la entrega.
 7. **Validar** — Recorre `[[generate-playwright-greenfield]]` (criterios de finalización) y enlaza la traza según `[[calidad-test-evidence-and-traceability]]`.
 
 ## Modo de ejecución

@@ -5,7 +5,7 @@ scope: stack
 type: workflow
 chapter: calidad
 stack: [playwright]
-description: Workflow orquestador para generar un proyecto Playwright greenfield desde una fuente UI real (URL viva, Figma, user story, Storybook). OpenAPI no es entrada válida.
+description: Workflow orquestador para generar un proyecto Playwright greenfield desde una fuente UI real (URL viva, Figma, user story, Storybook).
 tags: [playwright, greenfield, workflow, ui-first, live-app, figma]
 ---
 
@@ -20,14 +20,15 @@ Cuando `[[calidad-intent-detection]]` clasifica la petición como **automation E
 | Input               | Obligatorio | Descripción                                                                                                       |
 |---------------------|-------------|-------------------------------------------------------------------------------------------------------------------|
 | `ui_source`         | sí          | Insumo principal que describe la UI (URL, Figma, texto de user story, URL Storybook, o combinación).               |
-| `ui_source_type`    | sí          | `live-url | figma | user-story | storybook | hybrid`. NO se acepta ningún tipo derivado de spec backend.            |
+| `ui_source_type`    | sí          | `live-url | figma | user-story | storybook | hybrid`.                                                              |
 | `project_name`      | sí          | Nombre kebab-case del proyecto (raíz de la estructura).                                                            |
 | `output_path`       | sí          | Ruta donde se materializará el proyecto.                                                                           |
 | `base_url`          | no          | URL del frontend bajo prueba. Si falta, usar `process.env.BASE_URL`.                                               |
 | `backend_url`       | no          | URL del backend que el frontend consume. Si falta, usar `process.env.BACKEND_URL`.                                 |
 | `priority_assignments` | no       | Mapa `pageName -> CRITICAL | HIGH | MEDIUM | LOW` provisto por usuario/PO. Si falta, preguntar.                  |
 | `mock_mode`         | no          | `off | full | partial`. Default `off`. Solo declarar si el usuario quiere mocks.                                  |
-| `mock_endpoints`    | no          | Lista declarativa de paths a mockear cuando `mock_mode != off`. Se construye desde captura en live app (Codegen / MCP browser / HAR), Postman collection del equipo backend o lista manual del QA. **Nunca** se deriva de un OpenAPI. |
+| `mock_endpoints`    | no          | Lista declarativa de paths a mockear cuando `mock_mode != off`. Fuentes válidas en orden de preferencia: captura live app → Postman → OpenAPI/Swagger del backend → lista manual (ver `[mocks-page-route](../../../skills/playwright/playwright-greenfield/references/mocks-page-route.md)`). |
+| `spec`              | no          | OpenAPI/Swagger del backend. Solo se usa, si se provee, como insumo del prompt de mocks cuando `mock_mode != off`. |
 | `user_story`        | no          | Contexto funcional adicional.                                                                                      |
 | `firma`             | no          | Identidad del autor para README/reporte.                                                                           |
 
@@ -40,7 +41,7 @@ La recolección sigue `[[calidad-mandatory-inputs-protocol]]`.
    - `figma`: link público o screenshots con jerarquía de páginas.
    - `user-story`: historia con flujos UI explícitos (no solo reglas backend).
    - `storybook`: URL del Storybook publicada.
-   - Si el usuario solo provee `spec` OpenAPI/Swagger/WSDL o una colección Postman sin `ui_source`, **detente**: ningún tipo de spec backend es entrada válida para Playwright. Solicita una fuente UI según `[ui-source-priority](../../../skills/playwright/playwright-greenfield/references/ui-source-priority.md)`, o deriva al usuario a `[[karate-greenfield]]` (pruebas funcionales del contrato) o `[[k6-greenfield]]` (performance).
+   - Si no hay `ui_source` (aunque venga un `spec` o una colección Postman), **detente**: el insumo principal debe describir UI. Solicita una fuente UI según `[ui-source-priority](../../../skills/playwright/playwright-greenfield/references/ui-source-priority.md)`. Si la intención del usuario es validar el contrato backend o medir performance, deriva a `[[karate-greenfield]]` o `[[k6-greenfield]]`.
 2. **Detectar páginas** — Invoca `[[playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content = ui_source`, `user_story` y `priority_assignments`. Output: lista de páginas con `route` (frontend), `form_fields`, `navigation`, `selectors_hint`, `page_type` y `priority`.
 3. **Resolver prioridades faltantes** — Para cada página con `priority: UNKNOWN`, pregunta al usuario/PO antes de continuar. Nunca infieras prioridad desde el nombre.
 4. **Detectar flujos de usuario** — Clasifica navegación, formularios, auth, listados/paginación a partir de la UI detectada. Cada flujo mapeará a uno o más `.spec.ts`.
@@ -50,7 +51,7 @@ La recolección sigue `[[calidad-mandatory-inputs-protocol]]`.
    - `partial` → genera mocks dirigidos para `mock_endpoints` y suite `@hybrid`.
 6. **Planificar tests** — Para cada página: 5-8 escenarios funcionales con tag `@live` por defecto. Marcar visual + a11y en páginas `CRITICAL` y `HIGH`. Aplicar `[[calidad-route-test-generation]]` para mapear flujo UI → test.
 7. **Generar Page Objects** — Por cada página, invoca `[[playwright-generate-page-object-prompt]]` siguiendo `[POM](../../../skills/playwright/playwright-greenfield/references/page-object-model.md)` + `[selector-priority](../../../skills/playwright/playwright-greenfield/references/selector-priority.md)`. `navigate()` usa la `route` frontend detectada (anti-patrón rutas inventadas).
-8. **Generar mocks (opt-in)** — SOLO si `mock_mode != off`, invoca `[[playwright-generate-mock-handlers-prompt]]` con `endpoints = mock_endpoints` (lista declarativa obtenida por captura en live app, Postman collection del equipo backend o lista manual del QA) y `mock_mode`. Sigue `[mocks-page-route](../../../skills/playwright/playwright-greenfield/references/mocks-page-route.md)`. Si `mock_mode = off`, **no se crea** la carpeta `mocks/` ni el fixture `mockApi`. Bajo ninguna circunstancia se derivan `endpoints` desde un OpenAPI.
+8. **Generar mocks (opt-in)** — SOLO si `mock_mode != off`, invoca `[[playwright-generate-mock-handlers-prompt]]` con `endpoints = mock_endpoints` (o derivados del `spec` si se aportó) y `mock_mode`. Sigue `[mocks-page-route](../../../skills/playwright/playwright-greenfield/references/mocks-page-route.md)`. Si `mock_mode = off`, **no se crea** la carpeta `mocks/` ni el fixture `mockApi`.
 9. **Generar tests** — Emite primero los `tests/*.spec.ts` con tag `@live` por defecto (`[[playwright-greenfield]]` paso 6). Tests que ejerciten error states con mocks llevan `@mocked` o `@hybrid` y declaran `mockApi` en la firma. Para suites de accesibilidad invoca `[[playwright-generate-a11y-prompt]]`; para visual aplica `[visual-regression](../../../skills/playwright/playwright-greenfield/references/visual-regression.md)`.
 10. **Emitir infraestructura** — `playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md` según `[config-strict-ts](../../../skills/playwright/playwright-greenfield/references/playwright-config-strict-ts.md)` y `[project-structure](../../../skills/playwright/playwright-greenfield/references/project-structure.md)`. Incluir `BASE_URL`, `BACKEND_URL` y projects filtrados por tag (`@live`, `@mocked`, `@hybrid`). Si la UI tiene login real, además `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` según `[auth-storage-state](../../../skills/playwright/playwright-greenfield/references/auth-storage-state.md)`.
 11. **Entregar y trazar** — Usa `[[calidad-streaming-files-protocol]]` para la entrega ordenada. Vincula la evidencia con `[[calidad-test-evidence-and-traceability]]`. Documenta los modos en `[execution-modes-live-mocked-hybrid](../../../skills/playwright/playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)` y referencia `[[playwright-run-and-modes]]`.

@@ -16,7 +16,6 @@ tags: [playwright, live-app, codegen, mcp, ui-first, exploration]
 Cuando el usuario quiere generar un proyecto Playwright y:
 
 - La aplicación está accesible vía URL (dev/staging/prod).
-- No hay spec OpenAPI relevante o no debe usarse para inferir UI.
 - No hay Figma actualizado ni Storybook publicado.
 - Se desea capturar selectores reales del DOM, no inferidos.
 

@@ -38,6 +38,17 @@ npx playwright test --grep @mocked    # ejecución sin backend (dev offline)
 npx playwright test --grep "@live|@hybrid"
 ```
 
+## Fuentes válidas para `mock_endpoints` (orden de preferencia)
+
+Cuando el QA activa mocks, hay que enumerar qué endpoints interceptar. Las fuentes válidas, de mayor a menor fidelidad respecto a lo que el frontend realmente llama:
+
+1. **Captura del live app** (Playwright Codegen / MCP browser / HAR export del navegador) — refleja exactamente lo que el frontend invoca; cero drift.
+2. **Postman collection** del equipo backend — curada por humanos, suele estar actualizada en proyectos con CI/CD maduro.
+3. **OpenAPI / Swagger** del backend — útil como starting reference cuando no hay live app y no existe Postman; verificar contra una corrida `@live` antes de promover los mocks a regresión, porque el spec puede divergir de la implementación.
+4. **Lista manual** del QA — fallback cuando ninguna de las anteriores está disponible.
+
+El criterio es la fidelidad respecto al runtime: cualquier fuente sirve, pero las primeras dejan menos margen para que el mock no coincida con la realidad del backend.
+
 ## Reglas de agrupamiento (cuando los mocks SÍ aplican)
 
 - Un único `setupMocks(page)` exportado desde `mocks/api-handlers.ts`.
