@@ -107,101 +107,98 @@ chapters/calidad/
 │   │                       multi-locator-fallback-pattern, over-healing-guardrails,
 │   │                       visual-ai-healing}.md
 │   │
-│   └── automation/
-│       ├── appium/
-│       │   ├── appium-run-and-tags.md
-│       │   ├── appium-screenplay-android/
-│       │   │   ├── SKILL.md
-│       │   │   └── references/{android-only-scope-rationale, deferred-locators-strategy,
-│       │   │                   gherkin-syntax-rules, gradle-version-matrix,
-│       │   │                   health-check-pipeline, mandatory-inputs-validation,
-│       │   │                   mobile-accessibility, mobile-visual-regression,
-│       │   │                   no-aggregate-collision, project-structure,
-│       │   │                   screenplay-layers, smoke-vs-proposed-scenarios}.md
-│       │   └── appium-brownfield/
-│       │       ├── SKILL.md
-│       │       └── references/{convention-detection, selector-update-strategy}.md
-│       │
-│       ├── k6/
-│       │   ├── k6-run-and-suite.md
-│       │   ├── k6-greenfield/
-│       │   │   ├── SKILL.md
-│       │   │   └── references/{config-and-utils-modules, crud-dynamic-id-correlation,
-│       │   │                   enums-headers-security-extraction, five-script-types,
-│       │   │                   handle-summary-evidence, project-structure,
-│       │   │                   thresholds-three-tiers}.md
-│       │   └── k6-brownfield/
-│       │       ├── SKILL.md
-│       │       └── references/{convention-detection, extension-patterns}.md
-│       │
-│       ├── karate/
-│       │   ├── karate-run-and-tags.md
-│       │   ├── karate-greenfield/
-│       │   │   ├── SKILL.md
-│       │   │   └── references/{contract-testing-match-patterns, encrypted-payloads,
-│       │   │                   feature-design-dsl, file-location-constraint,
-│       │   │                   negative-coverage-formula, project-structure}.md
-│       │   └── karate-brownfield/
-│       │       ├── SKILL.md
-│       │       └── references/{client-specific-conventions, convention-detection,
-│       │                       mandatory-inputs-brownfield}.md
-│       │
-│       └── playwright/
-│           ├── playwright-run-and-modes.md
-│           ├── playwright-greenfield/
-│           │   ├── SKILL.md
-│           │   └── references/{accessibility-axe-wcag, auth-storage-state,
-│           │                   execution-modes-live-mocked-hybrid, fixtures-composition,
-│           │                   mocks-page-route, page-object-model,
-│           │                   playwright-config-strict-ts, project-structure,
-│           │                   selector-priority, ui-source-priority,
-│           │                   visual-regression}.md
-│           ├── playwright-brownfield/
-│           │   ├── SKILL.md
-│           │   └── references/{convention-detection, selector-update-strategy}.md
-│           └── playwright-from-live-app/
-│               └── SKILL.md
+│   ├── appium/
+│   │   ├── appium-run-and-tags.md
+│   │   ├── appium-screenplay-android/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{android-only-scope-rationale, deferred-locators-strategy,
+│   │   │                   gherkin-syntax-rules, gradle-version-matrix,
+│   │   │                   health-check-pipeline, mandatory-inputs-validation,
+│   │   │                   mobile-accessibility, mobile-visual-regression,
+│   │   │                   no-aggregate-collision, project-structure,
+│   │   │                   screenplay-layers, smoke-vs-proposed-scenarios}.md
+│   │   └── appium-brownfield/
+│   │       ├── SKILL.md
+│   │       └── references/{convention-detection, selector-update-strategy}.md
+│   │
+│   ├── k6/
+│   │   ├── k6-run-and-suite.md
+│   │   ├── k6-greenfield/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{config-and-utils-modules, crud-dynamic-id-correlation,
+│   │   │                   enums-headers-security-extraction, five-script-types,
+│   │   │                   handle-summary-evidence, project-structure,
+│   │   │                   thresholds-three-tiers}.md
+│   │   └── k6-brownfield/
+│   │       ├── SKILL.md
+│   │       └── references/{convention-detection, extension-patterns}.md
+│   │
+│   ├── karate/
+│   │   ├── karate-run-and-tags.md
+│   │   ├── karate-greenfield/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{contract-testing-match-patterns, encrypted-payloads,
+│   │   │                   feature-design-dsl, file-location-constraint,
+│   │   │                   negative-coverage-formula, project-structure}.md
+│   │   └── karate-brownfield/
+│   │       ├── SKILL.md
+│   │       └── references/{client-specific-conventions, convention-detection,
+│   │                       mandatory-inputs-brownfield}.md
+│   │
+│   └── playwright/
+│       ├── playwright-run-and-modes.md
+│       ├── playwright-greenfield/
+│       │   ├── SKILL.md
+│       │   └── references/{accessibility-axe-wcag, auth-storage-state,
+│       │                   execution-modes-live-mocked-hybrid, fixtures-composition,
+│       │                   mocks-page-route, page-object-model,
+│       │                   playwright-config-strict-ts, project-structure,
+│       │                   selector-priority, ui-source-priority,
+│       │                   visual-regression}.md
+│       ├── playwright-brownfield/
+│       │   ├── SKILL.md
+│       │   └── references/{convention-detection, selector-update-strategy}.md
+│       └── playwright-from-live-app/
+│           └── SKILL.md
 │
 ├── workflows/
 │   ├── _all/
 │   │   ├── route-test-generation.workflow.md
 │   │   └── test-self-correction-loop.workflow.md
-│   └── automation/
-│       ├── appium/
-│       │   ├── complete-deferred-locators.workflow.md
-│       │   ├── extend-appium-brownfield.workflow.md
-│       │   └── generate-appium-screenplay-android.workflow.md
-│       ├── k6/
-│       │   ├── calibrate-k6-thresholds.workflow.md
-│       │   ├── extend-k6-brownfield.workflow.md
-│       │   └── generate-k6-suite.workflow.md
-│       ├── karate/
-│       │   ├── extend-karate-brownfield.workflow.md
-│       │   └── generate-karate-greenfield.workflow.md
-│       └── playwright/
-│           ├── generate-playwright-greenfield.workflow.md
-│           └── update-playwright-brownfield.workflow.md
+│   ├── appium/
+│   │   ├── complete-deferred-locators.workflow.md
+│   │   ├── extend-appium-brownfield.workflow.md
+│   │   └── generate-appium-screenplay-android.workflow.md
+│   ├── k6/
+│   │   ├── calibrate-k6-thresholds.workflow.md
+│   │   ├── extend-k6-brownfield.workflow.md
+│   │   └── generate-k6-suite.workflow.md
+│   ├── karate/
+│   │   ├── extend-karate-brownfield.workflow.md
+│   │   └── generate-karate-greenfield.workflow.md
+│   └── playwright/
+│       ├── generate-playwright-greenfield.workflow.md
+│       └── update-playwright-brownfield.workflow.md
 │
 └── prompts/
-    └── automation/
-        ├── appium/
-        │   ├── generate-cucumber-feature-android.prompt.md
-        │   ├── generate-screenplay-task.prompt.md
-        │   └── validate-appium-inputs.prompt.md
-        ├── k6/
-        │   ├── extract-config-from-openapi.prompt.md
-        │   ├── generate-k6-script.prompt.md
-        │   └── generate-utils-and-payloads.prompt.md
-        ├── karate/
-        │   ├── analyze-openapi-for-karate.prompt.md
-        │   ├── generate-karate-feature.prompt.md
-        │   └── generate-karate-match-schema.prompt.md
-        └── playwright/
-            ├── detect-pages-from-ui-source.prompt.md
-            ├── extract-pages-from-live-app.prompt.md
-            ├── generate-accessibility-suite.prompt.md
-            ├── generate-mock-handlers.prompt.md
-            └── generate-page-object.prompt.md
+    ├── appium/
+    │   ├── generate-cucumber-feature-android.prompt.md
+    │   ├── generate-screenplay-task.prompt.md
+    │   └── validate-appium-inputs.prompt.md
+    ├── k6/
+    │   ├── extract-config-from-openapi.prompt.md
+    │   ├── generate-k6-script.prompt.md
+    │   └── generate-utils-and-payloads.prompt.md
+    ├── karate/
+    │   ├── analyze-openapi-for-karate.prompt.md
+    │   ├── generate-karate-feature.prompt.md
+    │   └── generate-karate-match-schema.prompt.md
+    └── playwright/
+        ├── detect-pages-from-ui-source.prompt.md
+        ├── extract-pages-from-live-app.prompt.md
+        ├── generate-accessibility-suite.prompt.md
+        ├── generate-mock-handlers.prompt.md
+        └── generate-page-object.prompt.md
 ```
 
 ### Steering
@@ -230,7 +227,7 @@ chapters/calidad/
 
 ### Skills per-framework
 
-#### Karate (`skills/automation/karate/`)
+#### Karate (`skills/karate/`)
 
 | Asset                            | Capacidad                                                                                       |
 |----------------------------------|-------------------------------------------------------------------------------------------------|
@@ -240,7 +237,7 @@ chapters/calidad/
 
 Incluye references específicas como `negative-coverage-formula.md` (con `risk_factor` modulado por negocio), `contract-testing-match-patterns.md`, `encrypted-payloads.md` y `client-specific-conventions.md` (patrones genéricos para proyectos brownfield donde el cliente impone convenciones propias).
 
-#### Playwright (`skills/automation/playwright/`)
+#### Playwright (`skills/playwright/`)
 
 | Asset                              | Capacidad                                                                                              |
 |------------------------------------|--------------------------------------------------------------------------------------------------------|
@@ -250,7 +247,7 @@ Incluye references específicas como `negative-coverage-formula.md` (con `risk_f
 
 Incluye references para Page Object Model, fixtures, selectores, auth storage state, mocks `page.route`, visual regression y accesibilidad axe/WCAG.
 
-#### K6 (`skills/automation/k6/`)
+#### K6 (`skills/k6/`)
 
 | Asset                         | Capacidad                                                                                      |
 |-------------------------------|------------------------------------------------------------------------------------------------|
@@ -259,7 +256,7 @@ Incluye references para Page Object Model, fixtures, selectores, auth storage st
 
 Incluye references para los cinco tipos de scripts (load, stress, spike, soak, smoke), thresholds en tres niveles, correlación dinámica de IDs y módulos de config/utils.
 
-#### Appium (`skills/automation/appium/`)
+#### Appium (`skills/appium/`)
 
 | Asset                                          | Capacidad                                                                                  |
 |------------------------------------------------|--------------------------------------------------------------------------------------------|
@@ -273,19 +270,19 @@ Incluye references para capas Screenplay, locators diferidos, smoke vs proposed 
 | Tipo               | Asset                                                                                  |
 |--------------------|----------------------------------------------------------------------------------------|
 | Router rector      | `workflows/_all/route-test-generation.workflow.md`                                     |
-| Karate greenfield  | `workflows/automation/karate/generate-karate-greenfield.workflow.md`                   |
-| Karate brownfield  | `workflows/automation/karate/extend-karate-brownfield.workflow.md`                     |
-| Playwright greenfield | `workflows/automation/playwright/generate-playwright-greenfield.workflow.md`        |
-| Playwright brownfield | `workflows/automation/playwright/update-playwright-brownfield.workflow.md`          |
-| K6 greenfield      | `workflows/automation/k6/generate-k6-suite.workflow.md`                                |
-| K6 calibración     | `workflows/automation/k6/calibrate-k6-thresholds.workflow.md`                          |
-| Appium greenfield  | `workflows/automation/appium/generate-appium-screenplay-android.workflow.md`           |
-| Appium locators    | `workflows/automation/appium/complete-deferred-locators.workflow.md`                   |
-| K6 brownfield      | `workflows/automation/k6/extend-k6-brownfield.workflow.md`                             |
-| Appium brownfield  | `workflows/automation/appium/extend-appium-brownfield.workflow.md`                     |
+| Karate greenfield  | `workflows/karate/generate-karate-greenfield.workflow.md`                   |
+| Karate brownfield  | `workflows/karate/extend-karate-brownfield.workflow.md`                     |
+| Playwright greenfield | `workflows/playwright/generate-playwright-greenfield.workflow.md`        |
+| Playwright brownfield | `workflows/playwright/update-playwright-brownfield.workflow.md`          |
+| K6 greenfield      | `workflows/k6/generate-k6-suite.workflow.md`                                |
+| K6 calibración     | `workflows/k6/calibrate-k6-thresholds.workflow.md`                          |
+| Appium greenfield  | `workflows/appium/generate-appium-screenplay-android.workflow.md`           |
+| Appium locators    | `workflows/appium/complete-deferred-locators.workflow.md`                   |
+| K6 brownfield      | `workflows/k6/extend-k6-brownfield.workflow.md`                             |
+| Appium brownfield  | `workflows/appium/extend-appium-brownfield.workflow.md`                     |
 | Self-correction loop (cross-framework) | invocado como fase final por todos los workflows anteriores (ver `[[calidad-test-self-correction-loop]]`). |
 
-### Prompts (`prompts/automation/`)
+### Prompts (`prompts/`)
 
 | Framework  | Prompts disponibles                                                                                                        |
 |------------|----------------------------------------------------------------------------------------------------------------------------|
@@ -302,9 +299,13 @@ Los assets del chapter no se copian a mano: los distribuye la CLI **`pragma-ai`*
 # 1. Una vez por máquina: autenticación con OAuth2 (token en llavero del sistema)
 pragma-ai login
 
-# 2. En la raíz del proyecto QA, inicializar el entorno
+# 2. En la raíz del proyecto QA, inicializar el entorno (elegir el stack del proyecto)
 cd mi-proyecto-tests
-pragma-ai init --ide kiro --chapter calidad --stack automation
+pragma-ai init --ide kiro --chapter calidad --stack karate     # API testing
+# o:
+pragma-ai init --ide kiro --chapter calidad --stack playwright # E2E web
+pragma-ai init --ide kiro --chapter calidad --stack k6         # performance
+pragma-ai init --ide kiro --chapter calidad --stack appium     # mobile Android
 
 # 3. Verificar instalación
 pragma-ai status
@@ -314,12 +315,14 @@ pragma-ai update --dry-run    # ver qué cambiaría
 pragma-ai update              # aplicar
 ```
 
-`init` crea `pragma.yaml` en la raíz del proyecto, descarga los assets del chapter Calidad (stack `automation`) en el path nativo del IDE elegido, agrega `.pragma/` al `.gitignore` e instala los hooks del IDE para telemetría. Detalle completo de la CLI en el manual de `pragma-ai`.
+`init` crea `pragma.yaml` en la raíz del proyecto, descarga los assets del chapter Calidad para el stack indicado (más todos los skills cross-cutting de `_all/`) en el path nativo del IDE, agrega `.pragma/` al `.gitignore` e instala los hooks para telemetría. Detalle completo de la CLI en el manual de `pragma-ai`.
+
+**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium`. Cada uno corresponde a un framework de automatización; un proyecto típico usa un solo stack. Si la suite combina varios frameworks (ej. APIs + UI + perf en el mismo repo), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos del stack se suman sin conflicto.
 
 **Multi-IDE** en el mismo proyecto: repetir `--ide`:
 
 ```bash
-pragma-ai init --ide kiro --ide claude-code --chapter calidad --stack automation
+pragma-ai init --ide kiro --ide claude-code --chapter calidad --stack karate
 ```
 
 **Diagnóstico** cuando algo no funciona:
@@ -388,7 +391,7 @@ No saltar pasos: el router protege contra la generación con inputs incompletos 
 - **Links entre assets**:
   - `[[asset-id]]` sólo para assets que tienen `id:` en su frontmatter.
   - References se enlazan por **path relativo** desde el documento que los cita, no por id.
-- **Convenciones cliente-específicas detectadas en brownfield** se documentan como patrones genéricos en `skills/automation/karate/karate-brownfield/references/client-specific-conventions.md`. El brownfield detecta y respeta esas convenciones (naming con prefix de ticket, headers transversales obligatorios, estilo step-by-step, etc.) sin nombrar clientes concretos.
+- **Convenciones cliente-específicas detectadas en brownfield** se documentan como patrones genéricos en `skills/karate/karate-brownfield/references/client-specific-conventions.md`. El brownfield detecta y respeta esas convenciones (naming con prefix de ticket, headers transversales obligatorios, estilo step-by-step, etc.) sin nombrar clientes concretos.
   - El override de inputs obligatorios (cuando el cliente impone convenciones estrictas, `user_story` y `firma` pasan a obligatorios) se documenta en `skills/_all/mandatory-inputs-protocol.md` con pointer al skill.
 
 ## Roadmap
@@ -413,9 +416,9 @@ Esta sección muestra escenarios reales de un QA usando el Chapter Calidad desde
 > **Prerrequisito común a todos los ejemplos**: los assets ya están en `.kiro/` porque el QA corrió previamente:
 > ```bash
 > pragma-ai login   # una vez por máquina
-> pragma-ai init --ide kiro --chapter calidad --stack automation
+> pragma-ai init --ide kiro --chapter calidad --stack <karate|playwright|k6|appium>
 > ```
-> Sin este paso, Kiro no tiene visibilidad de `[[calidad-route-test-generation]]`, `@karate-greenfield`, ni el resto de assets. Si los ejemplos se ejecutan desde otro IDE, ajustar el `--ide` (`claude-code`, `cursor`, `github-copilot`, `amazon-q-ide`, `amazon-q-cli`) y considerar la **Cobertura por IDE** arriba — los `prompt`-type no llegan a Claude Code ni Amazon Q (CLI).
+> El stack se elige según el framework del proyecto. Sin este paso, Kiro no tiene visibilidad de `[[calidad-route-test-generation]]`, `@karate-greenfield`, ni el resto de assets. Si los ejemplos se ejecutan desde otro IDE, ajustar el `--ide` (`claude-code`, `cursor`, `github-copilot`, `amazon-q-ide`, `amazon-q-cli`) y considerar la **Cobertura por IDE** arriba — los `prompt`-type no llegan a Claude Code ni Amazon Q (CLI).
 
 El objetivo es ilustrar el **contrato completo** del chapter: no basta con generar archivos, hay que **ejecutarlos, triar fallos y aplicar auto-corrección** cuando aplica. Cada ejemplo declara explícitamente el modo de operación efectivo (`full` / `dry-run` / `scaffold-only` / `execute-only`).
 

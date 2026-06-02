@@ -70,7 +70,7 @@ Criterio de tie-break: si un item cumple criterios de dos niveles, se asigna el 
 
 ## Encadenamiento
 
-- En Karate, el `risk_factor` definido en `chapters/calidad/skills/automation/karate/karate-greenfield/references/negative-coverage-formula.md` consume directamente esta clasificación para modular la cantidad de escenarios negativos por endpoint.
+- En Karate, el `risk_factor` definido en `chapters/calidad/skills/karate/karate-greenfield/references/negative-coverage-formula.md` consume directamente esta clasificación para modular la cantidad de escenarios negativos por endpoint.
 - En Playwright y Appium, el orden de scaffold (`[[calidad-streaming-files-protocol]]`) prioriza páginas/pantallas CRITICAL primero.
 - En K6, los thresholds más estrictos se aplican a endpoints CRITICAL/HIGH.
 
