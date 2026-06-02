@@ -48,10 +48,27 @@
     "calidad": {
       "platforms": {
         "automation": {
-          "stacks": ["automation"],
+          "stacks": ["karate", "playwright", "k6", "appium"],
           "detection": {
-            "automation": {
-              "signals": ["cypress.config.ts", "playwright.config.ts", "jest.config.ts"]
+            "karate": {
+              "signals": ["karate-config.js"]
+            },
+            "playwright": {
+              "signals": ["playwright.config.ts", "playwright.config.js"]
+            },
+            "k6": {
+              "signals": ["package.json"],
+              "requires_signal": {
+                "file": "package.json",
+                "contains": "k6 run"
+              }
+            },
+            "appium": {
+              "signals": ["build.gradle"],
+              "requires_signal": {
+                "file": "build.gradle",
+                "contains": "appium-java-client"
+              }
             }
           }
         }
