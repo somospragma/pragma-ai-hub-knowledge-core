@@ -22,8 +22,8 @@ Si el workflow `[[generate-playwright-greenfield]]` no recibió esos campos en s
 
 ## Variables
 
-- `{{endpoints}}` — Lista de endpoints `{ path, method, status, requestSchema?, responseSchema? }` que el usuario quiere mockear (subset de un OpenAPI, o lista manual).
-- `{{response_schemas}}` — Mapa de schemas para construir bodies sintéticos válidos.
+- `{{endpoints}}` — Lista declarativa de endpoints `{ path, method, status, sample_response? }` que el usuario quiere mockear. Fuentes válidas, en orden de preferencia: **(a)** captura del live app vía Playwright Codegen / MCP browser / HAR export del navegador (refleja lo que el frontend realmente llama); **(b)** Postman collection entregada por el equipo backend; **(c)** lista manual del QA. **No se acepta OpenAPI/Swagger** como fuente: el contrato declarado en spec puede divergir de lo que el frontend invoca en runtime y mezclar fuentes induce mocks irreales.
+- `{{sample_payloads}}` — Mapa opcional de payloads de muestra capturados desde el live app o construidos manualmente. NO se autogenera desde un schema OpenAPI.
 - `{{mock_mode}}` — `full | partial`. Cuando es `partial`, los paths no listados deben caer a `route.continue()` (no romper integración real).
 
 ## Instrucción para el LLM
@@ -33,11 +33,11 @@ Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente `[ver moc
 - Exporta `async function setupMocks(page: Page): Promise<void>`.
 - Declara `let nextId = 1000;` al inicio.
 - Agrupa los endpoints por path: una sola llamada a `page.route()` por path, con `switch` sobre `route.request().method()` adentro.
-- Convierte `{id}` (estilo OpenAPI) a `*` en el patrón Playwright: `/api/v1/users/{id}` → `**/api/v1/users/*`.
+- Convierte cualquier placeholder de ID en el path (`{id}`, `:id`, `[id]` según el router del frontend o la convención de la fuente capturada) a `*` en el patrón Playwright: `/api/v1/users/{id}` → `**/api/v1/users/*`.
 - Para POST: genera body de respuesta con `const id = nextId++;` y mergea el `postDataJSON()` cuando aplique.
 - Para DELETE: responde `{ status: 204 }` sin body.
 - Cualquier method no manejado en el path: `await route.continue();`.
-- Bodies sintéticos derivados de `{{response_schemas}}`. NO inventes campos fuera de los schemas.
+- Bodies sintéticos derivados de `{{sample_payloads}}` (capturados de la app viva o provistos manualmente). NO inventes campos no observados; si falta información, deja un `// TODO: capturar payload real desde la app viva` y avísalo en el reporte de salida.
 - Si `{{mock_mode}}` es `partial`, cualquier path no presente en `{{endpoints}}` debe quedar implícito (no registrar handler), de modo que las llamadas no listadas alcancen el backend real.
 
 ## Recordatorio sobre el riesgo de mockear

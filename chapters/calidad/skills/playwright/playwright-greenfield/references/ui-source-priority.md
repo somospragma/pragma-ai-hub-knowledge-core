@@ -1,15 +1,20 @@
 
 # Fuentes válidas de información para Playwright
 
-Playwright valida la capa de presentación. Por eso el insumo principal debe describir UI real, no contrato backend. Esta referencia documenta las 5 fuentes aceptadas, cuándo usar cada una y qué profundidad de extracción esperar.
+Playwright valida la capa de presentación. Por eso el insumo debe describir UI real, no contrato backend. Esta referencia documenta las 4 fuentes aceptadas, cuándo usar cada una y qué profundidad de extracción esperar.
 
-## Las 5 fuentes (en orden de preferencia)
+## Las 4 fuentes (en orden de preferencia)
 
 1. **URL de aplicación viva** — la app está accesible (dev/staging/prod) y autenticable.
 2. **Figma / wireframes / mockups UI** — diseños con jerarquía de páginas y componentes.
 3. **User stories con flujos UI explícitos** — historias que enumeran páginas, acciones y transiciones.
 4. **Storybook / sistema de diseño existente** — componentes catalogados con sus rutas demo.
-5. **OpenAPI / Swagger** — SOLO como insumo opcional para generar mocks aislados (`@mocked`). **NUNCA** como fuente de páginas.
+
+## Lo que NO es una fuente válida
+
+- **OpenAPI / Swagger / WSDL** — describe contrato backend, no UI. Para pruebas funcionales contra el contrato usar `[[karate-greenfield]]`; para performance usar `[[k6-greenfield]]`.
+- **Postman collections, listados de endpoints, capturas HAR** — son insumos válidos exclusivamente para una lista declarativa `mock_endpoints` cuando el QA opta por modo `@mocked` o `@hybrid`. No reemplazan la fuente UI; solo determinan qué llamadas se interceptan en `page.route()`.
+- **Diagramas de arquitectura backend, modelos de datos, esquemas de BD** — irrelevantes para Playwright.
 
 ## Árbol de decisión
 
@@ -23,7 +28,7 @@ Playwright valida la capa de presentación. Por eso el insumo principal debe des
                 └── No → ¿Hay Storybook publicado?
                         ├── Sí → Storybook. Cobertura limitada a componentes catalogados.
                         └── No → DETENTE. Solicita al usuario una fuente UI real.
-                                  OpenAPI solo no alcanza para generar Playwright.
+                                  OpenAPI / Swagger no es alternativa válida.
 ```
 
 ## Profundidad de extracción esperada por fuente
@@ -34,7 +39,6 @@ Playwright valida la capa de presentación. Por eso el insumo principal debe des
 | Figma             | Anotadas       | Inferidos         | Sí (visual) | Sí         | Medio               |
 | User story        | Texto          | Inferidos         | Parcial     | Texto      | Medio-alto          |
 | Storybook         | Por componente | Sí (story DOM)    | Parcial     | Limitada   | Medio               |
-| OpenAPI (mocks)   | NO aplica      | NO aplica         | NO aplica   | NO aplica  | N/A — no es UI      |
 
 ## Herramientas recomendadas por fuente
 
@@ -42,7 +46,6 @@ Playwright valida la capa de presentación. Por eso el insumo principal debe des
 - **Figma** → plugin oficial de Figma para exportar specs; OCR sobre screenshots si solo hay imagen.
 - **User story** → leer en voz alta el flujo y mapearlo a páginas; pedir al PO los flujos faltantes.
 - **Storybook** → `npm run storybook` y crawlear `iframe.html?id=...` con Playwright.
-- **OpenAPI** → opcional para `[[playwright-generate-mock-handlers-prompt]]`; nunca para inferir páginas.
 
 ## Comparativa rápida — accuracy vs effort
 
@@ -52,8 +55,7 @@ Playwright valida la capa de presentación. Por eso el insumo principal debe des
 | Storybook         | Alta (acotada)         | Bajo-medio           | Hay design system maduro y la app está poco accesible |
 | Figma             | Media (inferidos)      | Medio                | App no existe aún (pre-dev) pero hay diseño aprobado  |
 | User story        | Baja (texto)           | Alto                 | Solo si no hay nada mejor; pedir validación luego     |
-| OpenAPI           | N/A                    | N/A                  | Nunca como fuente UI                                  |
 
 ## Regla operacional
 
-Si llegas a este skill y el único insumo es OpenAPI/Swagger, **detente** y aplica `[[calidad-mandatory-inputs-protocol]]` para solicitar una fuente UI válida. No procedas a inferir páginas desde paths backend; ese fue precisamente el bug histórico que esta refactorización corrige.
+Si llegas a este skill y el único insumo es OpenAPI/Swagger/WSDL/Postman, **detente** y aplica `[[calidad-mandatory-inputs-protocol]]` para solicitar una fuente UI válida. No procedas a inferir páginas desde paths backend; ese fue precisamente el bug histórico que esta refactorización corrige. Para validar el contrato backend, deriva al usuario a `[[karate-greenfield]]`; para performance, a `[[k6-greenfield]]`.

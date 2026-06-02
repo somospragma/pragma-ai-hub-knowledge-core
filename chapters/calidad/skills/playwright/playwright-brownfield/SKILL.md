@@ -38,7 +38,7 @@ Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]` 
 ## Restricciones
 
 - **NO regenerar** `package.json`, `playwright.config.ts`, `tsconfig.json`, `fixtures/base.fixture.ts`, ni cualquier archivo de infraestructura existente.
-- **NO inferir páginas desde OpenAPI/Swagger**: las páginas y selectores se derivan exclusivamente de la UI real (live URL, Figma, screenshots, Storybook). El spec backend solo alimenta mocks opt-in.
+- **NO inferir páginas desde OpenAPI/Swagger/WSDL**: las páginas y selectores se derivan exclusivamente de la UI real (live URL, Figma, screenshots, Storybook). Ningún spec backend es entrada válida para Playwright — ni para páginas ni para mocks. Para mocks opt-in, los endpoints se capturan del live app, Postman collection o lista manual del QA.
 - **NO asumir** equivalencia entre endpoints backend y rutas frontend; un endpoint puede no tener pantalla y una pantalla puede consumir varios endpoints.
 - **Respetar Page Objects existentes** y su `selector_strategy` detectada: si el proyecto usa `getByRole`, los nuevos POM siguen `getByRole`; si usa `data-testid`, idem.
 - **Preservar TODO el código no-selector**: métodos, imports, types, comments, signatures, decoradores, orden de propiedades.

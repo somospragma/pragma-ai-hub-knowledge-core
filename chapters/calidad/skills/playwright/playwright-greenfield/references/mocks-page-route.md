@@ -42,7 +42,7 @@ npx playwright test --grep "@live|@hybrid"
 
 - Un único `setupMocks(page)` exportado desde `mocks/api-handlers.ts`.
 - Una llamada a `page.route()` por path, no por método. Dentro del handler, se hace `switch` sobre `route.request().method()` para responder GET/POST/PUT/DELETE.
-- Convertir `{id}` (estilo OpenAPI, si vino de un spec) a `*` en el patrón Playwright: `/api/v1/users/{id}` → `**/api/v1/users/*`.
+- Convertir cualquier placeholder de id en el path (`{id}`, `:id`, `[id]` según la convención de la fuente desde la que se capturaron los endpoints) a `*` en el patrón Playwright: `/api/v1/users/{id}` → `**/api/v1/users/*`.
 - ID dinámico para POST con `let nextId = 1000; const id = nextId++;`.
 - DELETE responde `204` sin body.
 - Cualquier method no manejado cae a `route.continue()` para no romper otras llamadas.
@@ -105,8 +105,8 @@ export async function setupMocks(page: Page): Promise<void> {
 ## Cuándo NO mockear
 
 - Smoke pipeline: siempre `@live`, sin excepciones.
-- Validar contratos reales backend-frontend.
-- Detectar drift entre el OpenAPI publicado y la implementación real.
+- Validar contratos reales backend-frontend (para esto se usa `[[karate-greenfield]]`, no Playwright).
+- Pruebas de regresión que el negocio cuenta como evidencia de integración funcionando.
 
 ## Cuándo SÍ mockear
 
