@@ -2,6 +2,8 @@
 
 ## RemoteDataSource — Standard CRUD
 
+**IMPORTANT**: The Data Source layer is a low-level implementation detail. Destructive operations (e.g., `deleteProduct`) and sensitive file/network access (e.g., `uploadImage`) must be preceded by appropriate validation, authorization checks, and user confirmation in the Application (Use Case) or Presentation (BLoC/UI) layers.
+
 ```dart
 // lib/{feature}/data/data_sources/remote/product_data_source.dart
 import 'package:dio/dio.dart';

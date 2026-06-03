@@ -148,26 +148,28 @@ abstract class NetworkModule {
         sendTimeout: const Duration(seconds: 30),
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
         },
       ),
     );
 
-    dio.interceptors.addAll([
-      authInterceptor,    // 1st: adds auth header, handles 401
-      retryInterceptor,   // 2nd: retries on network failure
-      errorInterceptor,   // 3rd: maps DioException → AppException
-      // Logging last — sees the final request/response
-      if (!kReleaseMode)
+    // IMPORTANT: Ensure sensitive data (e.g., Auth tokens, PII) is redacted in logs.
+    // Use a custom Interceptor or configure PrettyDioLogger to avoid leaking secrets.
+    dio.interceptors.add(AuthInterceptor());
+    dio.interceptors.add(RetryInterceptor());
+    dio.interceptors.add(ErrorInterceptor());
+
+    if (kDebugMode) {
+      dio.interceptors.add(
         PrettyDioLogger(
           requestHeader: true,
           requestBody: true,
           responseBody: true,
           responseHeader: false,
           error: true,
-          compact: true,
+          debugPrint: debugPrint,
         ),
-    ]);
+      );
+    }
 
     return dio;
   }
