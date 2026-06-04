@@ -49,12 +49,25 @@ Estructura Maven completa:
 
 Detalle completo de cada archivo en `references/project-structure.md`.
 
+**Fuente autoritativa de archivos a copiar** — las plantillas inmutables viven en `references/templates/`:
+
+- `pom.xml.tpl` — pom.xml completo con `1.0.0-SNAPSHOT`, `karate-junit5` 1.4.1, surefire 3.2.2 con `<include>**/TestRunner.java</include>`, y `<testResources>` excluyendo `**/*.java`.
+- `karate-config.js.tpl` — config con retorno explícito del objeto, sin `karate.configure()`.
+- `TestRunner.java.tpl` — runner con `.relativeTo(getClass())`, sin paths hardcodeados.
+- `feature.tpl` — feature con comentario `# cobertura:` obligatorio en primera línea (ver `references/cobertura-comment-enforcement.md`) y bloques por cada escenario mínimo (`@happy-path`, `@contract`, `@data-driven`, y un negativo separado por cada required field / header).
+- `body.json.tpl` — body JSON externo (Body Mode A).
+
+Copiar textualmente. Solo rellenar `{{slots}}` declarados.
+
 ## Restricciones
 
+- Las plantillas en `references/templates/` son **inmutables**: copiar textualmente, solo rellenar `{{slots}}` declarados. No parafrasear, no omitir secciones, no reordenar bloques.
+- Cada `.feature` generada DEBE incluir el comentario `# cobertura: <N>` en la cabecera, donde `<N>` es el `effective_minimum` calculado con `[[karate-negative-coverage-formula]]`. Detalle en `references/cobertura-comment-enforcement.md`. Este número es consumido por `[[calidad-delivery-gate-contract]]`.
 - **TODOS** los `.feature`, `.json`, `.js`, `.xml` van dentro de `src/test/java/`. NUNCA en `src/test/resources/`. Causa raíz y diagnóstico en `[[karate-feature-file-location-constraint]]`.
 - No inventes endpoints, campos, headers, enums, códigos de error ni esquemas de autenticación que no estén en el spec.
 - No uses esquemas de autenticación inline si el spec no declara `security`.
 - No hardcodees payloads cifrados literales: usa `karate.call('classpath:helpers/encrypt.feature', {...})`.
 - No apliques convenciones cliente-específicas aquí — esas se detectan y se aplican sólo en brownfield (ver `karate-brownfield/references/client-specific-conventions.md`).
 - No reportes "todo verde" sin haber recorrido el DoD de `[[generate-karate-greenfield]]`.
+- Antes de generar, recorre `[[calidad-pre-generation-protocol]]`. Al cerrar, recorre `[[calidad-post-generation-protocol]]` y valida `[[calidad-delivery-gate-contract]]`.
 - Entrega los archivos usando `[[calidad-streaming-files-protocol]]` y enlaza la traza según `[[calidad-test-evidence-and-traceability]]`.

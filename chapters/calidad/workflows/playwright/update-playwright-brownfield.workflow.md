@@ -15,6 +15,23 @@ tags: [playwright, brownfield, workflow, conventions, selector-update]
 
 Cuando `[[calidad-intent-detection]]` clasifica la petición como **automation E2E web** y `[[calidad-brownfield-vs-greenfield]]` determina **brownfield Playwright** (el usuario provee archivos del proyecto existente).
 
+### Pre-flight (OBLIGATORIO)
+
+Antes de cualquier acción, ejecutar `[ver preflight](../../../skills/playwright/playwright-greenfield/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+
+Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
+
+### Regla brownfield específica — Auto-corrección
+
+La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS que este workflow genera. Los archivos preexistentes del cliente (tests, Page Objects, fixtures, configs) son INTOCABLES bajo ningún concepto, aunque fallen. Si tests preexistentes fallan en la ejecución:
+
+1. Reportar el fallo al usuario con triage (deterministic vs flaky).
+2. NUNCA modificar el test preexistente.
+3. NUNCA modificar fixtures, data o configs preexistentes para hacer pasar tests.
+4. Escalar a humano con el contexto completo del fallo.
+
+Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
 ## Inputs
 
 | Input                | Obligatorio | Descripción                                                                     |
@@ -44,6 +61,8 @@ Recolección según `[[calidad-mandatory-inputs-protocol]]`.
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback, LLM-driven selector repair) cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar aserciones de negocio ni inflar timeouts para esconder race conditions. Las correcciones deben preservar las convenciones detectadas (selector strategy, import style, file pattern, page object style).
 5. Reportar estado final: `success` | `partial` | `failed` con contexto completo si se escala a humano.
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`.
+7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths, grep de imports cruzados entre fixtures/data/tests nuevos, `npx tsc --noEmit` si modo=full) antes de cerrar.
+8. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/modificados, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log + traces si modo=full, audit log si hubo correcciones), blockers (fallos en specs preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 

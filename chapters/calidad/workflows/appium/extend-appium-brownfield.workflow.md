@@ -15,6 +15,23 @@ tags: [appium, brownfield, workflow, mobile, screenplay, conventions]
 
 Cuando `[[calidad-intent-detection]]` identifica una solicitud de automatización mobile Appium y `[[calidad-brownfield-vs-greenfield]]` la clasifica como **brownfield**: el usuario provee archivos de un proyecto Appium existente (Android o iOS) y solicita extenderlo. Para greenfield Android usar `[[generate-appium-screenplay-android]]`; para greenfield iOS, scaffold manual descrito en `references/android-only-scope-rationale.md` del skill `[[appium-screenplay-android]]`.
 
+### Pre-flight (OBLIGATORIO)
+
+Antes de cualquier acción, ejecutar `[ver preflight](../../../skills/appium/appium-screenplay-android/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+
+Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
+
+### Regla brownfield específica — Auto-corrección
+
+La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS que este workflow genera. Los archivos preexistentes del cliente (tests, Page Objects, fixtures, configs) son INTOCABLES bajo ningún concepto, aunque fallen. Si tests preexistentes fallan en la ejecución:
+
+1. Reportar el fallo al usuario con triage (deterministic vs flaky).
+2. NUNCA modificar el test preexistente.
+3. NUNCA modificar fixtures, data o configs preexistentes para hacer pasar tests.
+4. Escalar a humano con el contexto completo del fallo.
+
+Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
 ## Inputs
 
 | Input                 | Obligatorio | Notas                                                                                                |
@@ -82,6 +99,8 @@ Entrega los archivos con `[[calidad-streaming-files-protocol]]` y registra traza
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback respetando la API idiomática de `platform_detected`: Android `id`/`xpath`/`accessibilityId`; iOS `iOSClassChain`/`iOSNsPredicateString`/`accessibilityId`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca cambiar el `package` de un `*.java`, nunca debilitar `Question`s de aserción de negocio, nunca eliminar tags `scenario_tag_conventions` para esquivar filtros del cliente.
 5. Reportar estado final: `success` | `partial` (entregado scaffold, no se ejecutó por falta de device) | `failed` (escalado a humano con scenario, stage, logcat/idb log, screenshot Serenity, hipótesis).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Si la corrección involucró locators, recordar al usuario el patrón documentado en `[[complete-deferred-locators]]` para los casos donde se requiere Appium Inspector con el binario real.
+7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find `scripts/preflight.sh` ejecutable, `test -x gradlew` wrapper ejecutable, `./gradlew compileJava` si modo=full) antes de cerrar.
+8. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/modificados, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, `target/site/serenity/` si modo=full, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos; ausencia de device/emulador reportada como blocker con status `partial`).
 
 ## Criterios de finalización
 

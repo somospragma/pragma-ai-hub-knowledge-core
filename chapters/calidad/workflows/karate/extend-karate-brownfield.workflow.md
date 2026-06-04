@@ -15,6 +15,23 @@ tags: [karate, brownfield, workflow]
 
 Cuando `[[calidad-intent-detection]]` y `[[calidad-brownfield-vs-greenfield]]` identifican un escenario brownfield para Karate: el usuario provee al menos `karate-config.js` + un `.feature` del proyecto existente y solicita agregar pruebas para nuevos endpoints.
 
+### Pre-flight (OBLIGATORIO)
+
+Antes de cualquier acción, ejecutar `[ver preflight](../../../skills/karate/karate-greenfield/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+
+Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
+
+### Regla brownfield específica — Auto-corrección
+
+La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS que este workflow genera. Los archivos preexistentes del cliente (tests, Page Objects, fixtures, configs) son INTOCABLES bajo ningún concepto, aunque fallen. Si tests preexistentes fallan en la ejecución:
+
+1. Reportar el fallo al usuario con triage (deterministic vs flaky).
+2. NUNCA modificar el test preexistente.
+3. NUNCA modificar fixtures, data o configs preexistentes para hacer pasar tests.
+4. Escalar a humano con el contexto completo del fallo.
+
+Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
 ## Inputs
 
 | Input | Obligatorio | Notas |
@@ -66,6 +83,8 @@ Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar headers transversales del cliente, aserciones de negocio o status codes para forzar verde.
 5. Reportar estado final: `success` (todos los nuevos tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con feature, scenario, assertion, response y hipótesis).
 6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
+7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths, grep imports cruzados, compile/lint dry-run sobre archivos nuevos) antes de cerrar.
+8. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log si modo=full, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 

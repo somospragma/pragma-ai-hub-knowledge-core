@@ -24,36 +24,45 @@ Gobernados por `[[calidad-mandatory-inputs-protocol]]`:
 
 ## Pasos
 
-### Paso 1 — Validar spec
+### Paso 1 (OBLIGATORIO) — Pre-flight check del stack
+
+Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../../skills/k6/k6-greenfield/references/preflight.md):
+- Si pasa: continuar al paso 2.
+- Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
+- Persistir el resultado en `.evidence/preflight-result.json`.
+
+Este paso es enforcement obligatorio según `[[calidad-pre-generation-protocol]]`.
+
+### Paso 2 — Validar spec
 
 Aplica `[[calidad-spec-validation]]`: >200 chars, JSON/YAML parseable, contiene `openapi` o `swagger`, `info`, `paths`. Si falla, detente y reporta.
 
-### Paso 2 — Extraer endpoints
+### Paso 3 — Extraer endpoints
 
 Lista cada `path` con `method`, `operationId`, parámetros y referencias de schema. Emite el checklist legible antes de generar código.
 
-### Paso 3 — Extraer config data y decidir auth_mode
+### Paso 4 — Extraer config data y decidir auth_mode
 
 Aplica `[[k6-enums-headers-security-extraction]]`: enums, headers requeridos y security schemes. Decide si `authToken` y `Authorization` aplican según el **modo de autenticación**:
 
 - Rama A — `auth_mode = spec` (default, sin input explícito): incluye `authToken`/`Authorization` SOLO si el spec declara `security` (`components.securitySchemes` / `securityDefinitions`). Si no hay security, **no** los emitas.
 - Rama B — `auth_mode = external` (input explícito o env `EXTERNAL_AUTH=true`): incluye `authToken: __ENV.AUTH_TOKEN || ''` en `config.js` y `Authorization: Bearer ${config.authToken}` en `getDefaultHeaders()` **siempre**, aunque el spec no declare security. Marca `AUTH_TOKEN` como env var obligatoria para el README.
 
-Anota la rama elegida; los pasos 6 y 7 dependen de ella.
+Anota la rama elegida; los pasos 7 y 8 dependen de ella.
 
-### Paso 4 — Detectar CRUD flows
+### Paso 5 — Detectar CRUD flows
 
 Aplica `[[k6-crud-dynamic-id-correlation]]`: normaliza paths, agrupa, clasifica `full` o `partial`.
 
-### Paso 5 — Elegir tier de thresholds
+### Paso 6 — Elegir tier de thresholds
 
 Aplica `[[k6-thresholds-three-tiers]]`: deriva desde `user_story.SLA` → `firma.SLA` → Moderate default.
 
-### Paso 6 — Generar utils template
+### Paso 7 — Generar utils template
 
 Construye el contenido de `utils.js` (`uuidv4`, `getDefaultHeaders`, `buildXxxBody`) según `[[k6-config-and-utils-modules]]`. Aún no se escribe a disco; sirve de plantilla para los tests.
 
-### Paso 7 — Emitir archivos (orden estricto)
+### Paso 8 — Emitir archivos (orden estricto)
 
 Aplica `[[calidad-streaming-files-protocol]]` y `[[k6-greenfield]]`:
 
@@ -61,7 +70,7 @@ Aplica `[[calidad-streaming-files-protocol]]` y `[[k6-greenfield]]`:
 2. Luego `utils.js` (vía `[[k6-generate-utils-prompt]]`) y `config.js` (vía `[[k6-extract-config-prompt]]`).
 3. Por último: `package.json`, `run-all.sh`, `.gitignore`, `README.md` (ver `[[k6-project-structure]]`).
 
-### Paso 8 — Validar DoD
+### Paso 9 — Validar DoD
 
 Recorre el checklist de 10 items (`## Criterios de finalización`). Si algún ítem falla, regenera el archivo correspondiente antes de cerrar. Registra trazabilidad con `[[calidad-test-evidence-and-traceability]]`.
 

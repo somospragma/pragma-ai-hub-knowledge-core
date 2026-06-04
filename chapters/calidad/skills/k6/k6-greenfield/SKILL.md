@@ -32,9 +32,9 @@ Además de los gobernados por `[[calidad-mandatory-inputs-protocol]]` (spec, pro
 3. **Extraer config data** — Aplica `[[k6-enums-headers-security-extraction]]`: enums (top-level y por propiedad), headers requeridos por endpoint, security schemes (`components.securitySchemes` o `securityDefinitions`) y path params.
 4. **Detectar CRUD flows** — Normaliza el path (recorta `/{param}` final), agrupa por base path, clasifica como `full` (POST+GET+DELETE) o `partial` (≥2 métodos). Detalle en `[[k6-crud-dynamic-id-correlation]]`.
 5. **Generar utils template** — Construye `utils.js` con `uuidv4()`, `getDefaultHeaders()` y `buildXxxBody()` por endpoint con request body. Para `Authorization` aplica la rama según `auth_mode`: en `spec` (default) sólo si el spec define `security`; en `external` siempre. Plantilla en `[[k6-config-and-utils-modules]]`.
-6. **Emitir tests primero** — Sigue `[[calidad-streaming-files-protocol]]`: persiste `smoke-test.js`, `load-test.js`, `stress-test.js`, `spike-test.js` y `soak-test.js` antes que cualquier otro artefacto. Aplica stages y thresholds del tier elegido (`[[k6-five-script-types]]`, `[[k6-thresholds-three-tiers]]`).
-7. **Generar config/utils/infra** — Luego `utils.js`, `config.js`, y por último `package.json`, `README.md`, `run-all.sh`, `.gitignore`. Estructura completa en `[[k6-project-structure]]`. Incluye `handleSummary()` (ver `[[k6-handle-summary-evidence]]`) en cada script.
-8. **Validar checklist** — Antes de cerrar, recorre el DoD de 10 items del workflow `[[generate-k6-suite]]` y enlaza traza según `[[calidad-test-evidence-and-traceability]]`.
+6. **Emitir tests primero** — Sigue `[[calidad-streaming-files-protocol]]`: persiste `smoke-test.js`, `load-test.js`, `stress-test.js`, `spike-test.js` y `soak-test.js` antes que cualquier otro artefacto. **Los 5 scripts (smoke/load/stress/spike/soak) son OBLIGATORIOS. No entregar solo smoke aunque por economía pareciera suficiente** — ver `references/coverage-formula.md`. Aplica stages y thresholds del tier elegido (`[[k6-five-script-types]]`, `[[k6-thresholds-three-tiers]]`). La fuente autoritativa del contenido textual de cada script está en `references/templates/` (`smoke-test.js.tpl`, `load-test.js.tpl`, `stress-test.js.tpl`, `spike-test.js.tpl`, `soak-test.js.tpl`).
+7. **Generar config/utils/infra** — Luego `utils.js`, `config.js`, y por último `package.json`, `README.md`, `run-all.sh`, `.gitignore`. Estructura completa en `[[k6-project-structure]]`. Plantillas inmutables en `references/templates/` (`config.js.tpl`, `utils.js.tpl`, `package.json.tpl`, `run-all.sh.tpl`). Incluye `handleSummary()` (ver `[[k6-handle-summary-evidence]]`) en cada script.
+8. **Validar checklist** — Antes de cerrar, recorre el DoD de 10 items del workflow `[[generate-k6-suite]]` y enlaza traza según `[[calidad-test-evidence-and-traceability]]`. Aplica `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]` y `[[calidad-delivery-gate-contract]]` para declarar/verificar coverage y tier.
 
 ## Salidas
 
@@ -58,6 +58,9 @@ Estructura completa del proyecto (detalle en `[[k6-project-structure]]`):
 
 ## Restricciones
 
+- **Los 5 scripts son OBLIGATORIOS** (smoke, load, stress, spike, soak). Coverage formula en `references/coverage-formula.md`. No es válido entregar solo smoke "porque el resto sigue el mismo patrón".
+- **Sleep variable obligatorio** en flows multi-endpoint. `sleep(1)` constante prohibido salvo en smoke 1-endpoint puramente protocolar. Usar `sleep(randomIntBetween(1, 5))`. Detalle en `references/realistic-sleep-policy.md`.
+- **Tier de thresholds declarado** en `.evidence/tier-declared.md` antes de generar. Aflojar thresholds para hacer pasar smoke es violación grave (anti-cheating). Default Moderate. Detalle en `references/threshold-tier-justification.md`.
 - **IDs hardcodeados PROHIBIDOS en flujos CRUD.** Todo flujo CRUD debe capturar el ID del response del POST y reusarlo en GET/PUT/DELETE con guard clause. Detalle y patrón obligatorio en `[[k6-crud-dynamic-id-correlation]]`.
 - **Header `Authorization` y `authToken`** dependen de `auth_mode`. Default `spec`: incluir SOLO si el spec declara `security` (`components.securitySchemes` o `securityDefinitions`). Override `external` (input `auth_mode: external` o env `EXTERNAL_AUTH=true`): incluir SIEMPRE. Detalle en `[[k6-enums-headers-security-extraction]]`.
 - No inventes endpoints, campos, enums, headers ni códigos de error que no estén en el spec.

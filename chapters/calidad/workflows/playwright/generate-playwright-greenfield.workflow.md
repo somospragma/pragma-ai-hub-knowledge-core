@@ -36,25 +36,36 @@ La recolección sigue `[[calidad-mandatory-inputs-protocol]]`.
 
 ## Pasos
 
-1. **Validar UI source** — Verifica que `ui_source` describa UI real según `ui_source_type`:
+### Paso 1 (OBLIGATORIO) — Pre-flight check del stack
+
+Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../../skills/playwright/playwright-greenfield/references/preflight.md):
+- Si pasa: continuar al paso 2.
+- Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
+- Persistir el resultado en `.evidence/preflight-result.json`.
+
+Este paso es enforcement obligatorio según `[[calidad-pre-generation-protocol]]`.
+
+### Pasos restantes
+
+2. **Validar UI source** — Verifica que `ui_source` describa UI real según `ui_source_type`:
    - `live-url`: URL accesible y autenticable si aplica.
    - `figma`: link público o screenshots con jerarquía de páginas.
    - `user-story`: historia con flujos UI explícitos (no solo reglas backend).
    - `storybook`: URL del Storybook publicada.
    - Si no hay `ui_source` (aunque venga un `spec` o una colección Postman), **detente**: el insumo principal debe describir UI. Solicita una fuente UI según `[ui-source-priority](../../../skills/playwright/playwright-greenfield/references/ui-source-priority.md)`. Si la intención del usuario es validar el contrato backend o medir performance, deriva a `[[karate-greenfield]]` o `[[k6-greenfield]]`.
-2. **Detectar páginas** — Invoca `[[playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content = ui_source`, `user_story` y `priority_assignments`. Output: lista de páginas con `route` (frontend), `form_fields`, `navigation`, `selectors_hint`, `page_type` y `priority`.
-3. **Resolver prioridades faltantes** — Para cada página con `priority: UNKNOWN`, pregunta al usuario/PO antes de continuar. Nunca infieras prioridad desde el nombre.
-4. **Detectar flujos de usuario** — Clasifica navegación, formularios, auth, listados/paginación a partir de la UI detectada. Cada flujo mapeará a uno o más `.spec.ts`.
-5. **Decidir `mock_mode`** — Pregunta explícita al usuario si no lo declaró:
+3. **Detectar páginas** — Invoca `[[playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content = ui_source`, `user_story` y `priority_assignments`. Output: lista de páginas con `route` (frontend), `form_fields`, `navigation`, `selectors_hint`, `page_type` y `priority`.
+4. **Resolver prioridades faltantes** — Para cada página con `priority: UNKNOWN`, pregunta al usuario/PO antes de continuar. Nunca infieras prioridad desde el nombre.
+5. **Detectar flujos de usuario** — Clasifica navegación, formularios, auth, listados/paginación a partir de la UI detectada. Cada flujo mapeará a uno o más `.spec.ts`.
+6. **Decidir `mock_mode`** — Pregunta explícita al usuario si no lo declaró:
    - `off` (default) → suite 100% `@live`; no se genera carpeta `mocks/`.
    - `full` → genera mocks y suite `@mocked` además de `@live`.
    - `partial` → genera mocks dirigidos para `mock_endpoints` y suite `@hybrid`.
-6. **Planificar tests** — Para cada página: 5-8 escenarios funcionales con tag `@live` por defecto. Marcar visual + a11y en páginas `CRITICAL` y `HIGH`. Aplicar `[[calidad-route-test-generation]]` para mapear flujo UI → test.
-7. **Generar Page Objects** — Por cada página, invoca `[[playwright-generate-page-object-prompt]]` siguiendo `[POM](../../../skills/playwright/playwright-greenfield/references/page-object-model.md)` + `[selector-priority](../../../skills/playwright/playwright-greenfield/references/selector-priority.md)`. `navigate()` usa la `route` frontend detectada (anti-patrón rutas inventadas).
-8. **Generar mocks (opt-in)** — SOLO si `mock_mode != off`, invoca `[[playwright-generate-mock-handlers-prompt]]` con `endpoints = mock_endpoints` (o derivados del `spec` si se aportó) y `mock_mode`. Sigue `[mocks-page-route](../../../skills/playwright/playwright-greenfield/references/mocks-page-route.md)`. Si `mock_mode = off`, **no se crea** la carpeta `mocks/` ni el fixture `mockApi`.
-9. **Generar tests** — Emite primero los `tests/*.spec.ts` con tag `@live` por defecto (`[[playwright-greenfield]]` paso 6). Tests que ejerciten error states con mocks llevan `@mocked` o `@hybrid` y declaran `mockApi` en la firma. Para suites de accesibilidad invoca `[[playwright-generate-a11y-prompt]]`; para visual aplica `[visual-regression](../../../skills/playwright/playwright-greenfield/references/visual-regression.md)`.
-10. **Emitir infraestructura** — `playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md` según `[config-strict-ts](../../../skills/playwright/playwright-greenfield/references/playwright-config-strict-ts.md)` y `[project-structure](../../../skills/playwright/playwright-greenfield/references/project-structure.md)`. Incluir `BASE_URL`, `BACKEND_URL` y projects filtrados por tag (`@live`, `@mocked`, `@hybrid`). Si la UI tiene login real, además `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` según `[auth-storage-state](../../../skills/playwright/playwright-greenfield/references/auth-storage-state.md)`.
-11. **Entregar y trazar** — Usa `[[calidad-streaming-files-protocol]]` para la entrega ordenada. Vincula la evidencia con `[[calidad-test-evidence-and-traceability]]`. Documenta los modos en `[execution-modes-live-mocked-hybrid](../../../skills/playwright/playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)` y referencia `[[playwright-run-and-modes]]`.
+7. **Planificar tests** — Para cada página: 5-8 escenarios funcionales con tag `@live` por defecto. Marcar visual + a11y en páginas `CRITICAL` y `HIGH`. Aplicar `[[calidad-route-test-generation]]` para mapear flujo UI → test.
+8. **Generar Page Objects** — Por cada página, invoca `[[playwright-generate-page-object-prompt]]` siguiendo `[POM](../../../skills/playwright/playwright-greenfield/references/page-object-model.md)` + `[selector-priority](../../../skills/playwright/playwright-greenfield/references/selector-priority.md)`. `navigate()` usa la `route` frontend detectada (anti-patrón rutas inventadas).
+9. **Generar mocks (opt-in)** — SOLO si `mock_mode != off`, invoca `[[playwright-generate-mock-handlers-prompt]]` con `endpoints = mock_endpoints` (o derivados del `spec` si se aportó) y `mock_mode`. Sigue `[mocks-page-route](../../../skills/playwright/playwright-greenfield/references/mocks-page-route.md)`. Si `mock_mode = off`, **no se crea** la carpeta `mocks/` ni el fixture `mockApi`.
+10. **Generar tests** — Emite primero los `tests/*.spec.ts` con tag `@live` por defecto (`[[playwright-greenfield]]` paso 6). Tests que ejerciten error states con mocks llevan `@mocked` o `@hybrid` y declaran `mockApi` en la firma. Para suites de accesibilidad invoca `[[playwright-generate-a11y-prompt]]`; para visual aplica `[visual-regression](../../../skills/playwright/playwright-greenfield/references/visual-regression.md)`.
+11. **Emitir infraestructura** — `playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md` según `[config-strict-ts](../../../skills/playwright/playwright-greenfield/references/playwright-config-strict-ts.md)` y `[project-structure](../../../skills/playwright/playwright-greenfield/references/project-structure.md)`. Incluir `BASE_URL`, `BACKEND_URL` y projects filtrados por tag (`@live`, `@mocked`, `@hybrid`). Si la UI tiene login real, además `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` según `[auth-storage-state](../../../skills/playwright/playwright-greenfield/references/auth-storage-state.md)`.
+12. **Entregar y trazar** — Usa `[[calidad-streaming-files-protocol]]` para la entrega ordenada. Vincula la evidencia con `[[calidad-test-evidence-and-traceability]]`. Documenta los modos en `[execution-modes-live-mocked-hybrid](../../../skills/playwright/playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)` y referencia `[[playwright-run-and-modes]]`.
 
 ### Fase final obligatoria — Ejecutar, triar y auto-corregir
 

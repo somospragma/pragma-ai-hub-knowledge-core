@@ -1,11 +1,21 @@
 ---
 id: calidad-test-self-correction-loop
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: "Loop de auto-corrección de tests: ejecutar → triage → decidir si es test design issue → proponer fix → re-ejecutar → validar. Incluye guardrails anti-cheating estrictos para NO modificar tests que esconden bugs reales del SUT."
-tags: [self-correction, loop, auto-fix, anti-cheating, guardrails, diff-aware]
+tags: [self-correction, loop, auto-fix, anti-cheating, guardrails, diff-aware, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "max 3 iteraciones respetadas; tras la tercera sin éxito, escalado a humano con reporte"
+    failure_message: "Bloqueado: el loop superó 3 iteraciones sin escalar. Más iteraciones esconden bugs reales del SUT."
+  - check: "no se modificó assertion de contrato, security ni compliance (anti-cheating estricto)"
+    failure_message: "Bloqueado: se detectó modificación de assertion de contrato/security/compliance — violación de anti-cheating."
+  - check: "audit log persistido en .evidence/audit-log-<fecha>.md con diff por iteración y guardrail verificado"
+    failure_message: "Bloqueado: no hay audit log de las correcciones; sin trazabilidad la auto-corrección es inválida."
+  - check: "input de triage presente y clasificación distinta a bug del SUT antes de activar el loop"
+    failure_message: "Bloqueado: el loop se activó sin triage previo o sobre fallos clasificados como bug del SUT."
 ---
 
 # Test Self-Correction Loop — Auto-corrección Controlada con Guardrails Anti-Cheating

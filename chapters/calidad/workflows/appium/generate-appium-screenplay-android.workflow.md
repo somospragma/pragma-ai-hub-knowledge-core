@@ -36,34 +36,64 @@ Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`.
 
 ## Pasos
 
-### 1. Validar inputs
+### 1. Pre-flight check del stack (OBLIGATORIO)
+
+Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../../skills/appium/appium-screenplay-android/references/preflight.md):
+- Si pasa: continuar al paso 2.
+- Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
+- Persistir el resultado en `.evidence/preflight-result.json`.
+
+Este paso es enforcement obligatorio según `[[calidad-pre-generation-protocol]]`.
+
+### 2. Validar inputs
 Aplica las 5 reglas de `[[appium-mandatory-inputs-validation]]`. Si falla, abortar con el mensaje exacto.
 
-### 2. Rechazar si no es Android
+### 3. Rechazar si no es Android
 Si `platform_name` (cuando viene) en minúsculas no es `"android"`, responder `"En Appium V2 solo se soporta Android."` (`[[appium-android-only-scope-rationale]]`).
 
-### 3. Extraer flows y normalizar defaults
+### 4. Decidir estrategia de locators (auto-discovery vs deferred)
+
+Si el pre-flight (paso 1) detectó:
+- APK válido (aapt dump badging legible)
+- adb funcional con ≥1 device/emulator
+- appium binary disponible
+
+→ **PREGUNTAR al usuario explícitamente**:
+
+> "Detecto APK + emulador/device + Appium server disponibles. Puedo:
+> 
+> (a) **Auto-descubrir selectores reales** recorriendo la app (~3-5 min, recomendado). Aplica `[[appium-apk-auto-discovery]]`. Los Page Objects se generan con selectores reales del DOM (resource-id, content-desc, etc.) y score de confianza por cada uno.
+> 
+> (b) **Continuar con locators diferidos** (`// TODO: update real locator`). Aplica `[[appium-deferred-locators-strategy]]`. Tú completas los selectores manualmente después usando Appium Inspector.
+> 
+> ¿Cuál prefieres?"
+
+- Si elige (a) → invocar `[[appium-apk-auto-discovery]]` antes de generar Page Objects (paso 7). Persistir resultados en `.evidence/locators-discovered.json`.
+- Si elige (b) o no respondió → comportamiento actual (deferred).
+- Si pre-flight no detectó capacidades → omitir la pregunta, ir directo a deferred.
+
+### 5. Extraer flows y normalizar defaults
 Mapear `user_story` y `test_cases` a items para escenarios `@proposed` (≤80 chars, newlines → espacios). Normalizar defaults Android. Si falta `app_package`/`app_activity`, dejar TODO en README con `aapt dump badging`.
 
-### 4. Generar Gradle scaffold
+### 6. Generar Gradle scaffold
 `build.gradle`, `settings.gradle`, `gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md` con las versiones inmutables de `[[appium-gradle-version-matrix]]`. NO redefinir `aggregate`/`reports`/`clean` (`[[appium-no-aggregate-collision]]`).
 
-### 5. Generar capa Screenplay
-`LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` bajo `co.com.pragma.*` siguiendo `[[appium-screenplay-layers]]`. Aplicar deferred locators (`[[appium-deferred-locators-strategy]]`).
+### 7. Generar capa Screenplay
+`LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` bajo `co.com.pragma.*` siguiendo `[[appium-screenplay-layers]]`. Si el paso 4 eligió auto-discovery: inyectar selectores reales desde `.evidence/locators-discovered.json` (`[[appium-apk-auto-discovery]]`). Si eligió deferred o no había capacidades: aplicar deferred locators (`[[appium-deferred-locators-strategy]]`).
 
-### 6. Generar features
+### 8. Generar features
 2 escenarios `@android @smoke` siempre + `@android @proposed` por cada item de `user_story`/`test_cases`. Cumplir `[[appium-gherkin-syntax-rules]]`. Detalle en `[[appium-smoke-vs-proposed-scenarios]]`.
 
-### 7. Ejecutar health-check
+### 9. Ejecutar health-check
 14 stages estáticas + pipeline Gradle (`clean → compileJava → testClasses` mínimo). Calcular `generation_status` según `[[appium-health-check-pipeline]]`.
 
-### 8. Validar 5 acceptance criteria
+### 10. Validar 5 acceptance criteria
 Exit 0 sin cambios manuales; cero colisiones; cero errores `compileJava`/`compileTestJava`; todos los `*.feature` parsean; `gradlew` ejecutable de primera.
 
-### 9. Construir run command
+### 11. Construir run command
 `./gradlew clean test aggregate -p <project_path>` + variantes de `[[appium-run-and-tags]]`.
 
-### 10. Reportar status
+### 12. Reportar status
 Entregar archivos con `[[calidad-streaming-files-protocol]]` solo si `generation_status = success`. Registrar trazabilidad por `[[calidad-test-evidence-and-traceability]]` y mapear casos según `[[calidad-route-test-generation]]`.
 
 ### Fase final obligatoria — Ejecutar, triar y auto-corregir

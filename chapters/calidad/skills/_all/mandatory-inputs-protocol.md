@@ -1,11 +1,21 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: Define los inputs obligatorios y opcionales que el usuario debe entregar antes de generar cualquier prueba automatizada.
-tags: [inputs, protocol, spec, firma, user-story]
+tags: [inputs, protocol, spec, firma, user-story, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "los 4 inputs base (intent, project_name, output_path, spec/ui_source/apk_path) + modo de operación confirmados explícitamente por el usuario"
+    failure_message: "Bloqueado: faltan inputs obligatorios o el modo de operación no fue confirmado. No se puede generar sin contrato de entrada completo."
+  - check: "project_name matchea ^[a-z][a-z0-9-]*[a-z0-9]$ y output_path es ruta absoluta verificada"
+    failure_message: "Bloqueado: project_name u output_path no cumplen las reglas formales del protocolo."
+  - check: "spec entregado como contenido completo, no como ruta de archivo"
+    failure_message: "Bloqueado: se requiere el contenido completo del spec, no la ruta del archivo."
+  - check: "risk_map confirmado por usuario o default HIGH reportado explícitamente para revisión"
+    failure_message: "Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario."
 ---
 
 # Mandatory Inputs Protocol — Contrato de Entrada Antes de Generar

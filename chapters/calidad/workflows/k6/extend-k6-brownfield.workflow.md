@@ -15,6 +15,23 @@ tags: [k6, brownfield, workflow, performance, conventions]
 
 Cuando `[[calidad-route-test-generation]]` (paso 5) y `[[calidad-brownfield-vs-greenfield]]` identifican un escenario brownfield K6: el `project_root` contiene mínimo `tests/config.js` + `tests/utils.js` + ≥1 `tests/*-test.js`. El skill subyacente es `[[k6-brownfield]]`.
 
+### Pre-flight (OBLIGATORIO)
+
+Antes de cualquier acción, ejecutar `[ver preflight](../../../skills/k6/k6-greenfield/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+
+Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
+
+### Regla brownfield específica — Auto-corrección
+
+La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS que este workflow genera. Los archivos preexistentes del cliente (tests, Page Objects, fixtures, configs) son INTOCABLES bajo ningún concepto, aunque fallen. Si tests preexistentes fallan en la ejecución:
+
+1. Reportar el fallo al usuario con triage (deterministic vs flaky).
+2. NUNCA modificar el test preexistente.
+3. NUNCA modificar fixtures, data o configs preexistentes para hacer pasar tests.
+4. Escalar a humano con el contexto completo del fallo.
+
+Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
 Transfiere control aquí cuando el usuario pide:
 
 - Agregar endpoints / scripts a la suite K6 existente.
@@ -102,6 +119,8 @@ Detalle de comandos en `[[k6-run-and-suite]]`.
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar `checks`, `http_req_failed` ni `http_req_duration`; las correcciones deben respetar las convenciones detectadas (`script_naming`, `groups_naming`, `auth_mode`, `existing_thresholds`, `handle_summary_path`).
 5. Reportar estado final: `success` | `partial` | `failed` con script, métricas, threshold violado e hipótesis cuando se escala.
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Recordar que la calibración formal de thresholds para el nuevo flujo se hace via `[[calibrate-k6-thresholds]]`.
+7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths `tests/*.js`, grep `handleSummary` en scripts nuevos, `k6 inspect tests/<nuevo-script>-test.js` validación de sintaxis) antes de cerrar.
+8. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/patches, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, `results/${timestamp}-summary.json` si modo=full, audit log si hubo correcciones), blockers (fallos en scripts preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 
