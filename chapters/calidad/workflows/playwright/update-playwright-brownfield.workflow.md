@@ -17,7 +17,7 @@ Cuando `[[calidad-intent-detection]]` clasifica la petición como **automation E
 
 ### Pre-flight (OBLIGATORIO)
 
-Antes de cualquier acción, ejecutar `[ver preflight](../../../skills/playwright/playwright-greenfield/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+Antes de cualquier acción, ejecutar `[ver preflight](../../skills/playwright/playwright-greenfield/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
 
 Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
 
@@ -31,6 +31,18 @@ La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS 
 4. Escalar a humano con el contexto completo del fallo.
 
 Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
+Refuerzos adicionales:
+- **Step isolation** (ver `[step-isolation-pattern](../../skills/_all/step-isolation-pattern.md)`) aplica a los specs y Page Objects NUEVOS. Los specs preexistentes mantienen su estructura aunque no cumplan el patrón; no se les aplica refactor.
+- **Validación contractual no superficial** según `[contractual-checks-from-ui](../../skills/playwright/playwright-greenfield/references/contractual-checks-from-ui.md)` aplica solo a specs nuevos. NO re-escribir aserciones de specs preexistentes.
+
+### Paso previo — Análisis condicional con STRATEGY.md
+
+Si el alcance del brownfield es **grande** (≥3 historias/páginas/flujos nuevos, o cambios cross-cutting que afectan multiple Page Objects preexistentes): generar `STRATEGY.md` según el template `[STRATEGY.md.tpl](../../skills/playwright/playwright-greenfield/references/templates/STRATEGY.md.tpl)` y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+
+Si el alcance es **pequeño** (1-2 cambios puntuales, p. ej. un selector-update o un único spec nuevo): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
+
+Respetar convenciones del proyecto cliente: el STRATEGY del brownfield documenta lo NUEVO, no rediseña lo existente.
 
 ## Inputs
 
@@ -62,7 +74,11 @@ Recolección según `[[calidad-mandatory-inputs-protocol]]`.
 5. Reportar estado final: `success` | `partial` | `failed` con contexto completo si se escala a humano.
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`.
 7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths, grep de imports cruzados entre fixtures/data/tests nuevos, `npx tsc --noEmit` si modo=full) antes de cerrar.
-8. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/modificados, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log + traces si modo=full, audit log si hubo correcciones), blockers (fallos en specs preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
+8. **Smoke gate universal (tests nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [smoke-gate-policy](../../skills/_all/smoke-gate-policy.md). En brownfield Playwright, el gate ejecuta **únicamente los specs nuevos/modificados** filtrados por tag o path: `npx playwright test --grep "@smoke @new" --project=chromium-live --max-failures=1` o filtrado por path del spec recién generado. Los specs preexistentes NO se ejecutan en el gate para no inflar tiempo ni contaminar resultados. Si fallan tests preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado.
+9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/browser launch failure), emitir `.evidence/execution-status.json` según [environment-blocker-evidence](../../skills/_all/environment-blocker-evidence.md). El estado pasa a `partial` con razón.
+10. **Metadata por corrida**: emitir `results/playwright/{date}/{ISO}-metadata.json` según el schema universal [execution-metadata-schema](../../skills/_all/execution-metadata-schema.md). En brownfield, el campo `workload_or_scope` debe distinguir "N specs nuevos sobre M preexistentes".
+11. **Reporte ejecutivo**: invocar `[[generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `playwright-report-template.md`. El reporte debe segregar explícitamente "specs/Page Objects nuevos (en scope de esta sesión)" de "specs preexistentes (referencia, no ejecutados en el gate)".
+12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/modificados, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log + traces si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en specs preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 

@@ -30,6 +30,8 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
    - `scaffold-only`: omitir ejecución; documentar razón.
    - `execute-only`: solo ejecuta sin generar.
 
+   **Nota K6 — modo `full`**: el smoke gate 1:1 es obligatorio (ver [smoke-1-1-gate](../../skills/k6/k6-greenfield/references/smoke-1-1-gate.md)). Solo después del smoke OK se ejecutan los otros escenarios (Carga / Estrés y opt-in Spike / Soak). Si el smoke 1:1 falla, status `partial` con `blocker: "smoke_1_1_failed"`, sin intentar correr Carga ni Estrés.
+
 3. **Aplicar re-run N=3 sobre fallos** (modo full):
    - Por cada test fallido, re-ejecutar 2 veces más.
    - Clasificar: 3/3 fail mismo error → `deterministic`; alterna → `flaky`; 3/3 errores distintos → `flaky_high_variance`.
@@ -46,6 +48,7 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
    - `execution-log-<fecha>.json`: resultado por test (modo full)
    - `audit-log-<fecha>.md`: correcciones aplicadas con guardrails verificados
    - `coverage-declared-vs-delivered.json`: comparación
+   - Si la ejecución termina con bloqueo de ambiente (WAF, rate limit, DNS, IdP caído, device unavailable, browser missing, JDK wrong): emitir `.evidence/execution-status.json` según [ver schema](../../skills/_all/environment-blocker-evidence.md). El status final del delivery_gate pasa a `partial` con `blocker: "environment_blocked_<type>"`; la auto-corrección NO intenta resolver bloqueos de ambiente.
 
 6. **Emitir delivery_gate yaml** según `[[calidad-delivery-gate-contract]]` antes del mensaje final.
 

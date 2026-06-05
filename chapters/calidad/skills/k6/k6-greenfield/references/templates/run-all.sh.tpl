@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# {{project_name}} — orquestador de los 5 scripts K6.
+# {{project_name}} — orquestador de la suite K6 modular.
 #
 # Tras generar el proyecto: chmod +x run-all.sh
 # Ejecucion: ./run-all.sh   (o npm run all)
 #
-# set -e detiene en el primer fallo: smoke debe pasar antes que load, etc.
-# Si necesitas correr todos los scripts ignorando fallos, comenta la siguiente linea.
+# set -e detiene en el primer fallo: linea-base debe pasar antes que carga, etc.
+# Si necesitas correr todos los escenarios ignorando fallos, comenta la siguiente linea.
 set -euo pipefail
 
 BASE_URL="${BASE_URL:-{{baseUrl}}}"
@@ -16,19 +16,14 @@ export AUTH_TOKEN
 
 mkdir -p results
 
-echo "==> smoke-test.js"
-k6 run tests/smoke-test.js
+for scenario in linea-base carga estres; do
+  echo "==> Running $scenario"
+  mkdir -p "results/$scenario"
+  k6 run \
+    -e BASE_URL="$BASE_URL" \
+    -e AUTH_TOKEN="$AUTH_TOKEN" \
+    -e SCENARIO_NAME="$scenario" \
+    "tests/$scenario/main.js"
+done
 
-echo "==> load-test.js"
-k6 run tests/load-test.js
-
-echo "==> stress-test.js"
-k6 run tests/stress-test.js
-
-echo "==> spike-test.js"
-k6 run tests/spike-test.js
-
-echo "==> soak-test.js"
-k6 run tests/soak-test.js
-
-echo "==> {{project_name}}: all scripts completed"
+echo "==> {{project_name}}: all scenarios completed"

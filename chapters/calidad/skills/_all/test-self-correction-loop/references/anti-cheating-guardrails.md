@@ -237,3 +237,5 @@ Anti-patterns adicionales prohibidos en brownfield:
 - Eliminar tests preexistentes que fallan.
 
 Si un test preexistente del cliente está fallando y bloquea la entrega: reportar como `blocker` en el `[[calidad-delivery-gate-contract]]` con estado `partial`, NUNCA tocar el test.
+
+- **Smoke gate en brownfield ejecuta SOLO tests nuevos**. Si tests preexistentes fallan al correr la suite completa después del entregable, eso NO bloquea la entrega del scope nuevo — se reporta como issue separado al usuario sin tocar el código preexistente, sin auto-corrección y sin re-clasificación. El alcance del gate se delimita por el `generation-manifest.json` de la sesión (filtro por tag `@new`, por path de archivo emitido, o equivalente del framework).

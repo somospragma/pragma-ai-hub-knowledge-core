@@ -1,3 +1,7 @@
+// DEPRECATED: monolithic single-file template. Use modular structure instead: scenarios/ + workloads/ + tests/{escenario}/main.js + shared/.
+// See references/modular-architecture.md and references/options-scenarios-executors.md.
+// Keep this file only for brownfield projects that already use the monolithic pattern.
+
 // {{project_name}} — stress-test.js
 // Proposito: encontrar el punto de quiebre del sistema.
 // VUs agresivos 0 -> 50 -> 100 -> 200 -> 300 -> 50 -> 0, duration ~25m. Tier por default: Moderate.

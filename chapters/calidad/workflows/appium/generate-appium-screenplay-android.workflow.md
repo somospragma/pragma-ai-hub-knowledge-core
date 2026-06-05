@@ -38,20 +38,28 @@ Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`.
 
 ### 1. Pre-flight check del stack (OBLIGATORIO)
 
-Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../../skills/appium/appium-screenplay-android/references/preflight.md):
+Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../skills/appium/appium-screenplay-android/references/preflight.md):
 - Si pasa: continuar al paso 2.
 - Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
 - Persistir el resultado en `.evidence/preflight-result.json`.
 
 Este paso es enforcement obligatorio según `[[calidad-pre-generation-protocol]]`.
 
-### 2. Validar inputs
+### 2. Análisis previo (STRATEGY.md)
+
+Antes de generar cualquier código, generar `STRATEGY.md` en el `output_path` según `references/templates/STRATEGY.md.tpl` y `[[calidad-pre-design-strategy-document]]`. Presentar al usuario y esperar:
+- "aprobado" → continuar al siguiente paso.
+- "modificar X" → iterar el documento; volver a presentar.
+
+NUNCA generar código sin STRATEGY.md aprobado explícitamente.
+
+### 3. Validar inputs
 Aplica las 5 reglas de `[[appium-mandatory-inputs-validation]]`. Si falla, abortar con el mensaje exacto.
 
-### 3. Rechazar si no es Android
+### 4. Rechazar si no es Android
 Si `platform_name` (cuando viene) en minúsculas no es `"android"`, responder `"En Appium V2 solo se soporta Android."` (`[[appium-android-only-scope-rationale]]`).
 
-### 4. Decidir estrategia de locators (auto-discovery vs deferred)
+### 5. Decidir estrategia de locators (auto-discovery vs deferred)
 
 Si el pre-flight (paso 1) detectó:
 - APK válido (aapt dump badging legible)
@@ -68,37 +76,39 @@ Si el pre-flight (paso 1) detectó:
 > 
 > ¿Cuál prefieres?"
 
-- Si elige (a) → invocar `[[appium-apk-auto-discovery]]` antes de generar Page Objects (paso 7). Persistir resultados en `.evidence/locators-discovered.json`.
+- Si elige (a) → invocar `[[appium-apk-auto-discovery]]` antes de generar Page Objects (paso 8). Persistir resultados en `.evidence/locators-discovered.json`.
 - Si elige (b) o no respondió → comportamiento actual (deferred).
 - Si pre-flight no detectó capacidades → omitir la pregunta, ir directo a deferred.
 
-### 5. Extraer flows y normalizar defaults
+### 6. Extraer flows y normalizar defaults
 Mapear `user_story` y `test_cases` a items para escenarios `@proposed` (≤80 chars, newlines → espacios). Normalizar defaults Android. Si falta `app_package`/`app_activity`, dejar TODO en README con `aapt dump badging`.
 
-### 6. Generar Gradle scaffold
+### 7. Generar Gradle scaffold
 `build.gradle`, `settings.gradle`, `gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md` con las versiones inmutables de `[[appium-gradle-version-matrix]]`. NO redefinir `aggregate`/`reports`/`clean` (`[[appium-no-aggregate-collision]]`).
 
-### 7. Generar capa Screenplay
-`LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` bajo `co.com.pragma.*` siguiendo `[[appium-screenplay-layers]]`. Si el paso 4 eligió auto-discovery: inyectar selectores reales desde `.evidence/locators-discovered.json` (`[[appium-apk-auto-discovery]]`). Si eligió deferred o no había capacidades: aplicar deferred locators (`[[appium-deferred-locators-strategy]]`).
+### 8. Generar capa Screenplay
+`LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` bajo `co.com.pragma.*` siguiendo `[[appium-screenplay-layers]]`. Si el paso 5 eligió auto-discovery: inyectar selectores reales desde `.evidence/locators-discovered.json` (`[[appium-apk-auto-discovery]]`). Si eligió deferred o no había capacidades: aplicar deferred locators (`[[appium-deferred-locators-strategy]]`).
 
-### 8. Generar features
+### 9. Generar features
 2 escenarios `@android @smoke` siempre + `@android @proposed` por cada item de `user_story`/`test_cases`. Cumplir `[[appium-gherkin-syntax-rules]]`. Detalle en `[[appium-smoke-vs-proposed-scenarios]]`.
 
-### 9. Ejecutar health-check
+### 10. Ejecutar health-check
 14 stages estáticas + pipeline Gradle (`clean → compileJava → testClasses` mínimo). Calcular `generation_status` según `[[appium-health-check-pipeline]]`.
 
-### 10. Validar 5 acceptance criteria
+### 11. Validar 5 acceptance criteria
 Exit 0 sin cambios manuales; cero colisiones; cero errores `compileJava`/`compileTestJava`; todos los `*.feature` parsean; `gradlew` ejecutable de primera.
 
-### 11. Construir run command
+### 12. Construir run command
 `./gradlew clean test aggregate -p <project_path>` + variantes de `[[appium-run-and-tags]]`.
 
-### 12. Reportar status
+### 13. Reportar status
 Entregar archivos con `[[calidad-streaming-files-protocol]]` solo si `generation_status = success`. Registrar trazabilidad por `[[calidad-test-evidence-and-traceability]]` y mapear casos según `[[calidad-route-test-generation]]`.
 
 ### Fase final obligatoria — Ejecutar, triar y auto-corregir
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.** Esta fase **extiende el health-check estático del paso 7** (14 stages + pipeline Gradle) con verificación de **runtime** real: instalar APK, levantar Appium server, correr los 2 escenarios `@android @smoke` y aplicar el loop de triage + auto-corrección. El health-check estático garantiza que el scaffold compila; este loop garantiza que arranca contra el binario real.
+
+0. **Smoke gate 1:1 (obligatorio en modo full)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con 1 escenario `@android @smoke`. Aplicar [smoke-gate-policy](../../skills/_all/smoke-gate-policy.md) y [smoke-gate-gradle](../../skills/appium/appium-screenplay-android/references/smoke-gate-gradle.md). Comando: `./gradlew test -Dcucumber.filter.tags=@smoke`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_appium"` y escalar al usuario; NO continuar a ejecución de `@proposed` ni a auto-corrección.
 
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `scaffold-only` porque el paso 8 ya bloquea entrega si `generation_status != success`; el agente típicamente NO tiene emulador Android disponible. Subir a `full` sólo si el usuario confirma device/emulador + Appium server + APK válido. Clientes regulados (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) defaultean a `dry-run`. Si `scaffold-only`, reportar `partial` (el scaffold es válido, falta runtime).
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` cuando aplique: `./gradlew clean test aggregate -p <project_path> -Dcucumber.filter.tags=@smoke`. Capturar `target/site/serenity/` como evidencia primaria.
@@ -106,6 +116,10 @@ Entregar archivos con `[[calidad-streaming-files-protocol]]` solo si `generation
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique (multi-locator fallback, accesibilidad como alternativa a `id`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca eliminar el assert visual de `AppIsResponsive`, nunca reemplazar `TapOn` real por flags en memoria, nunca completar locators reales falsos (eso requiere Appium Inspector, ver `[[complete-deferred-locators]]`).
 5. Reportar estado final: `success` (scaffold + smoke runtime pasa) | `partial` (scaffold válido, no se ejecutó runtime por falta de device/Appium server) | `failed` (escalado a humano con stage, logcat, screenshot Serenity, hipótesis).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Recordar al usuario que los locators reales se completan con `[[complete-deferred-locators]]`.
+
+### Paso final — Reporte ejecutivo
+
+Invocar `[[generate-executive-report]]` con `results_path`, `strategy_md_path` y `output_format` (preguntar al usuario o usar default `html`). El reporte se persiste en `.evidence/report-{ISO}.{ext}` y se referencia en el `delivery_gate.evidence_persisted.executive_report`. Si modo es `scaffold-only` o `dry-run` → omitir este paso y registrar `null`.
 
 ## Criterios de finalización
 

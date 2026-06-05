@@ -1,3 +1,7 @@
+// DEPRECATED: monolithic single-file template. Use modular structure instead: scenarios/ + workloads/ + tests/{escenario}/main.js + shared/.
+// See references/modular-architecture.md and references/options-scenarios-executors.md.
+// Keep this file only for brownfield projects that already use the monolithic pattern.
+
 // {{project_name}} — spike-test.js
 // Proposito: picos subitos de demanda + recuperacion.
 // VUs 10 -> 200 -> 10, duration ~7m. Tier por default: Moderate.

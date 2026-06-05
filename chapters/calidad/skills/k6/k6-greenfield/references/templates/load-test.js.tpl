@@ -1,3 +1,7 @@
+// DEPRECATED: monolithic single-file template. Use modular structure instead: scenarios/ + workloads/ + tests/{escenario}/main.js + shared/.
+// See references/modular-architecture.md and references/options-scenarios-executors.md.
+// Keep this file only for brownfield projects that already use the monolithic pattern.
+
 // {{project_name}} — load-test.js
 // Proposito: carga normal y pico esperado, validar SLAs declarados.
 // VUs ramping 0 -> 10 -> 30 -> 50 -> 0, duration ~20m. Tier por default: Moderate.

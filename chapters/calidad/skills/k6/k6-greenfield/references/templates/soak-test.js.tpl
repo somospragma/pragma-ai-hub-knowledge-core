@@ -1,3 +1,7 @@
+// DEPRECATED: monolithic single-file template. Use modular structure instead: scenarios/ + workloads/ + tests/{escenario}/main.js + shared/.
+// See references/modular-architecture.md and references/options-scenarios-executors.md.
+// Keep this file only for brownfield projects that already use the monolithic pattern.
+
 // {{project_name}} — soak-test.js
 // Proposito: estabilidad a largo plazo (memory leaks, drift, connection pools).
 // VUs constante 50, duration 2h por default (rango 2-8h). Tier por default: Moderate.

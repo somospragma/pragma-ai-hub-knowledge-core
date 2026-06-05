@@ -65,6 +65,9 @@ delivery_gate:
     rerun_N3_applied: true | false | not_applicable
     deterministic_failures: 0
     flaky_failures: 0
+    smoke_1_1:                          # SOLO K6 — gate obligatorio en modo full
+      executed: true | false | skipped
+      exit_code: 0                      # int (0 = ok); null si executed=false|skipped
   corrections_applied:
     count: 0
     audit_log: ".evidence/audit-log-20260604.md"
@@ -75,6 +78,7 @@ delivery_gate:
     execution_log: ".evidence/execution-log-20260604.json" | null
     audit_log: ".evidence/audit-log-20260604.md" | null
     coverage_audit: ".evidence/coverage-declared-vs-delivered.json"
+    executive_report: ".evidence/report-{ISO}.html" | null   # null si modo scaffold-only/dry-run
   status: success | partial | failed
   blockers: []                          # lista de razones si status != success
   next_steps: []                        # acciones recomendadas al usuario
@@ -103,4 +107,4 @@ verification:
 
 ## Cross-links
 
-`[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-test-evidence-and-traceability]]`.
+`[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-executive-report-generator]]`, `[[generate-executive-report]]`.

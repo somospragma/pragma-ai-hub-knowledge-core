@@ -111,6 +111,7 @@ Estructura de proyecto TypeScript completa (detalle en `[ver estructura](referen
 - **Page Objects**: una clase por página, constructor `(private page: Page)`, propiedades `readonly` para Locators, métodos `async`, sufijo `Page` en el nombre. Ver `[POM](references/page-object-model.md)`.
 - **Fixtures**: componer Page Objects con `test.extend<Pages>()`. `mockApi` se declara como fixture **opt-in** (NO `auto`), de modo que cada test elige si quiere mocks. Ver `[fixtures](references/fixtures-composition.md)`.
 - **TypeScript strict**: `tsconfig.json` con `strict: true` y path aliases (`@pages/*`, `@fixtures/*`, `@mocks/*`, `@utils/*`). Ver `[config TS](references/playwright-config-strict-ts.md)`.
+- **Step isolation obligatorio** cuando el flow tiene setup/auth/main/cleanup: separar `test.beforeEach`/`test.afterEach` y tagear el cuerpo del test con `@main-step`. La cobertura sólo cuenta `@main-step`. Auth via `auth.setup.ts` + `storageState` NO cuenta como step. Detalle en `references/step-isolation-playwright.md`.
 - **No inventes** páginas, rutas frontend, campos ni selectores que no estén presentes en la fuente UI provista.
 - No relajar matchers, no bajar `effective_minimum`, no convertir tests fallidos en `test.skip`/`test.fixme` para hacer pasar el gate.
 - Antes de generar, recorre `[[calidad-pre-generation-protocol]]`. Al cerrar, recorre `[[calidad-post-generation-protocol]]` y valida `[[calidad-delivery-gate-contract]]`.

@@ -68,6 +68,7 @@ Copiar textualmente. Solo rellenar `{{slots}}` declarados.
 - No uses esquemas de autenticación inline si el spec no declara `security`.
 - No hardcodees payloads cifrados literales: usa `karate.call('classpath:helpers/encrypt.feature', {...})`.
 - No apliques convenciones cliente-específicas aquí — esas se detectan y se aplican sólo en brownfield (ver `karate-brownfield/references/client-specific-conventions.md`).
+- **Step isolation obligatorio** cuando el flow tiene setup/auth/main/cleanup: separar en `Background:` + escenarios `@auth`/`@main`/`@cleanup` con tags por step. La cobertura sólo cuenta `@main`. Detalle en `references/step-isolation-karate.md`.
 - No reportes "todo verde" sin haber recorrido el DoD de `[[generate-karate-greenfield]]`.
 - Antes de generar, recorre `[[calidad-pre-generation-protocol]]`. Al cerrar, recorre `[[calidad-post-generation-protocol]]` y valida `[[calidad-delivery-gate-contract]]`.
 - Entrega los archivos usando `[[calidad-streaming-files-protocol]]` y enlaza la traza según `[[calidad-test-evidence-and-traceability]]`.

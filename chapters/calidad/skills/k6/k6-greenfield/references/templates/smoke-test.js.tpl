@@ -1,3 +1,7 @@
+// DEPRECATED: monolithic single-file template. Use modular structure instead: scenarios/ + workloads/ + tests/{escenario}/main.js + shared/.
+// See references/modular-architecture.md and references/options-scenarios-executors.md.
+// Keep this file only for brownfield projects that already use the monolithic pattern.
+
 // {{project_name}} — smoke-test.js
 // Proposito: validacion basica del flujo + baseline minimo.
 // VUs=3, duration~5m. Tier por default: Moderate (ver threshold-tier-justification.md).

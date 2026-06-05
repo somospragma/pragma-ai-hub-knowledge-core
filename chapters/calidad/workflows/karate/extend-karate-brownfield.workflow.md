@@ -17,7 +17,7 @@ Cuando `[[calidad-intent-detection]]` y `[[calidad-brownfield-vs-greenfield]]` i
 
 ### Pre-flight (OBLIGATORIO)
 
-Antes de cualquier acción, ejecutar `[ver preflight](../../../skills/karate/karate-greenfield/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+Antes de cualquier acción, ejecutar `[ver preflight](../../skills/karate/karate-greenfield/references/preflight.md)` del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
 
 Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
 
@@ -31,6 +31,18 @@ La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS 
 4. Escalar a humano con el contexto completo del fallo.
 
 Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
+Refuerzos adicionales:
+- **Step isolation** (ver `[step-isolation-pattern](../../skills/_all/step-isolation-pattern.md)`) aplica a los features y scenarios NUEVOS. Los features preexistentes mantienen su estructura aunque no cumplan el patrón; no se les aplica refactor.
+- **Validación contractual no superficial** (ver `references/contractual-checks-from-user-story.md` del skill K6 como referencia de granularidad equivalente para escenarios Karate basados en historia/spec) aplica solo a scenarios nuevos. NO re-escribir matchers ni checks preexistentes.
+
+### Paso previo — Análisis condicional con STRATEGY.md
+
+Si el alcance del brownfield es **grande** (≥3 endpoints/HUs/escenarios nuevos, o cambios cross-cutting que afectan multiple features preexistentes): generar `STRATEGY.md` según el template `[STRATEGY.md.tpl](../../skills/karate/karate-greenfield/references/templates/STRATEGY.md.tpl)` y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+
+Si el alcance es **pequeño** (1-2 cambios puntuales): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
+
+Respetar convenciones del proyecto cliente: el STRATEGY del brownfield documenta lo NUEVO, no rediseña lo existente.
 
 ## Inputs
 
@@ -84,7 +96,11 @@ Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-
 5. Reportar estado final: `success` (todos los nuevos tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con feature, scenario, assertion, response y hipótesis).
 6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
 7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths, grep imports cruzados, compile/lint dry-run sobre archivos nuevos) antes de cerrar.
-8. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log si modo=full, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
+8. **Smoke gate universal (tests nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [smoke-gate-policy](../../skills/_all/smoke-gate-policy.md). En brownfield Karate, el gate ejecuta **únicamente los features nuevos** filtrados por tag: `mvn test -Dkarate.options="--tags @smoke and @new"` o equivalente filtrado por path del feature recién generado. Los features preexistentes NO se ejecutan en el gate para no inflar tiempo ni contaminar resultados. Si fallan tests preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado.
+9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/SSL), emitir `.evidence/execution-status.json` según [environment-blocker-evidence](../../skills/_all/environment-blocker-evidence.md). El estado pasa a `partial` con razón.
+10. **Metadata por corrida**: emitir `results/karate/{date}/{ISO}-metadata.json` según el schema universal [execution-metadata-schema](../../skills/_all/execution-metadata-schema.md). En brownfield, el campo `workload_or_scope` debe distinguir "N features/scenarios nuevos sobre M preexistentes".
+11. **Reporte ejecutivo**: invocar `[[generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `karate-report-template.md`. El reporte debe segregar explícitamente "features/scenarios nuevos (en scope de esta sesión)" de "features preexistentes (referencia, no ejecutados en el gate)".
+12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 
