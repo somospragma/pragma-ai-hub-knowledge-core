@@ -59,7 +59,7 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 
 ### K6-specific inputs
 
-Para proyectos K6, además de los inputs base de la tabla anterior, el agente DEBE completar el checklist K6-específico (perfil de carga por escenario, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente). Ver [k6-discovery-checklist](../../skills/k6/k6-greenfield/references/k6-discovery-checklist.md).
+Para proyectos K6, además de los inputs base de la tabla anterior, el agente DEBE completar el checklist K6-específico (perfil de carga por escenario, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente). Ver [[k6-greenfield]] (consultar `references/k6-discovery-checklist.md`).
 
 Sin este checklist, K6 no puede generar `options.stages` ni `options.thresholds` defendibles y debe degradar a `scaffold-only`.
 

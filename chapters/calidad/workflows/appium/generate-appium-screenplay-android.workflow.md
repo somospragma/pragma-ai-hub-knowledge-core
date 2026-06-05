@@ -38,7 +38,7 @@ Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`.
 
 ### 1. Pre-flight check del stack (OBLIGATORIO)
 
-Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../skills/appium/appium-screenplay-android/references/preflight.md):
+Antes de cualquier otra acción, ejecutar el pre-flight según [[appium-screenplay-android]] (consultar `references/preflight.md` en su subfolder):
 - Si pasa: continuar al paso 2.
 - Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
 - Persistir el resultado en `.evidence/preflight-result.json`.
@@ -108,7 +108,7 @@ Entregar archivos con `[[calidad-streaming-files-protocol]]` solo si `generation
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.** Esta fase **extiende el health-check estático del paso 7** (14 stages + pipeline Gradle) con verificación de **runtime** real: instalar APK, levantar Appium server, correr los 2 escenarios `@android @smoke` y aplicar el loop de triage + auto-corrección. El health-check estático garantiza que el scaffold compila; este loop garantiza que arranca contra el binario real.
 
-0. **Smoke gate 1:1 (obligatorio en modo full)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con 1 escenario `@android @smoke`. Aplicar [smoke-gate-policy](../../skills/_all/smoke-gate-policy.md) y [smoke-gate-gradle](../../skills/appium/appium-screenplay-android/references/smoke-gate-gradle.md). Comando: `./gradlew test -Dcucumber.filter.tags=@smoke`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_appium"` y escalar al usuario; NO continuar a ejecución de `@proposed` ni a auto-corrección.
+0. **Smoke gate 1:1 (obligatorio en modo full)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con 1 escenario `@android @smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[appium-screenplay-android]] (consultar `references/smoke-gate-gradle.md`). Comando: `./gradlew test -Dcucumber.filter.tags=@smoke`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_appium"` y escalar al usuario; NO continuar a ejecución de `@proposed` ni a auto-corrección.
 
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `scaffold-only` porque el paso 8 ya bloquea entrega si `generation_status != success`; el agente típicamente NO tiene emulador Android disponible. Subir a `full` sólo si el usuario confirma device/emulador + Appium server + APK válido. Clientes regulados (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) defaultean a `dry-run`. Si `scaffold-only`, reportar `partial` (el scaffold es válido, falta runtime).
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` cuando aplique: `./gradlew clean test aggregate -p <project_path> -Dcucumber.filter.tags=@smoke`. Capturar `target/site/serenity/` como evidencia primaria.

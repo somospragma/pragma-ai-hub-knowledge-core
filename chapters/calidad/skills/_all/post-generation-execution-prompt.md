@@ -1,3 +1,14 @@
+---
+id: calidad-post-generation-execution-prompt
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Prompt universal post-scaffold para confirmar modo de ejecución (full/dry-run/scaffold-only/execute-only) antes de invocar el smoke gate. Aplica a los 4 stacks en los 5 IDEs."
+tags: [post-generation, prompt, universal, mandatory]
+enforcement: mandatory
+---
+
 # Post-Generation Execution Prompt — Confirmación universal antes de smoke gate
 
 ## Propósito

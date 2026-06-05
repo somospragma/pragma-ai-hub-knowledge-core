@@ -32,7 +32,7 @@ Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`.
 
 ### 1. Pre-flight check del stack (OBLIGATORIO)
 
-Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../skills/karate/karate-greenfield/references/preflight.md):
+Antes de cualquier otra acción, ejecutar el pre-flight según [[karate-greenfield]] (consultar `references/preflight.md` en su subfolder):
 - Si pasa: continuar al paso 2.
 - Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
 - Persistir el resultado en `.evidence/preflight-result.json`.
@@ -75,7 +75,7 @@ Detecta referencias a `classpath:resources/files/*` y crea archivos por defecto.
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.**
 
-0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [smoke-gate-policy](../../skills/_all/smoke-gate-policy.md) y [smoke-gate-karate](../../skills/karate/karate-greenfield/references/smoke-gate-mvn.md). Comando: `mvn test -Dkarate.options="--tags @smoke"`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_karate"` y escalar al usuario; NO continuar a ejecución completa de la suite.
+0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[karate-greenfield]] (consultar `references/smoke-gate-mvn.md`). Comando: `mvn test -Dkarate.options="--tags @smoke"`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_karate"` y escalar al usuario; NO continuar a ejecución completa de la suite.
 
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin `mvn`, sin red al SUT), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** `mvn test` (o el filtro por tag de la nueva historia) vía `[[calidad-test-execution-orchestration]]`. Capturar `target/karate-reports/karate-summary.json` como evidencia primaria y parsear a esquema común.

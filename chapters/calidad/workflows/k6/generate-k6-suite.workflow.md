@@ -26,7 +26,7 @@ Gobernados por `[[calidad-mandatory-inputs-protocol]]`:
 
 ### Paso 1 (OBLIGATORIO) — Pre-flight check del stack
 
-Antes de cualquier otra acción, ejecutar el pre-flight según [ver preflight](../../skills/k6/k6-greenfield/references/preflight.md):
+Antes de cualquier otra acción, ejecutar el pre-flight según [[k6-greenfield]] (consultar `references/preflight.md` en su subfolder):
 - Si pasa: continuar al paso 2.
 - Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
 - Persistir el resultado en `.evidence/preflight-result.json`.
@@ -74,7 +74,7 @@ Construye el contenido de `utils.js` (`uuidv4`, `getDefaultHeaders`, `buildXxxBo
 
 Aplica `[[calidad-streaming-files-protocol]]` y `[[k6-greenfield]]`:
 
-1. Tests primero, en este orden: primero los 3 obligatorios `smoke-test.js`, `load-test.js`, `stress-test.js`, luego los opt-in activados (`spike-test.js`, `soak-test.js`) si `user_story` / `firma` / `risk_map` los amerita. Ver [vocabulary-and-scenario-mapping](../../skills/k6/k6-greenfield/references/vocabulary-and-scenario-mapping.md). Cada script incluye stages, thresholds, `default function`, `check()` con validación de campos, `sleep(1)`, `handleSummary()` (`[[k6-handle-summary-evidence]]`). Genera cada test invocando `[[k6-generate-script-prompt]]`.
+1. Tests primero, en este orden: primero los 3 obligatorios `smoke-test.js`, `load-test.js`, `stress-test.js`, luego los opt-in activados (`spike-test.js`, `soak-test.js`) si `user_story` / `firma` / `risk_map` los amerita. Ver [[k6-greenfield]] (consultar `references/vocabulary-and-scenario-mapping.md`). Cada script incluye stages, thresholds, `default function`, `check()` con validación de campos, `sleep(1)`, `handleSummary()` (`[[k6-handle-summary-evidence]]`). Genera cada test invocando `[[k6-generate-script-prompt]]`.
 2. Luego `utils.js` (vía `[[k6-generate-utils-prompt]]`) y `config.js` (vía `[[k6-extract-config-prompt]]`).
 3. Por último: `package.json`, `run-all.sh`, `.gitignore`, `README.md` (ver `[[k6-project-structure]]`).
 
@@ -90,7 +90,7 @@ Recorre el checklist de 10 items (`## Criterios de finalización`). Si algún í
 2. **Ejecutar** sólo `smoke-test.js` vía `[[calidad-test-execution-orchestration]]` (`k6 run -e BASE_URL=$BASE_URL tests/smoke-test.js`, agregando `AUTH_TOKEN` si `auth_mode = external`). Capturar `results/${timestamp}-summary.json` como evidencia.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky (típico K6: 401 por token expirado, payload mal correlacionado, threshold inicial irreal, endpoint inexistente). El thresholds-tier inicial puede ser irreal en el ambiente real — eso NO es bug del SUT; queda para `[[calibrate-k6-thresholds]]`.
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique (p. ej. ajuste de payload por schema-drift). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar `checks` para esconder respuestas 4xx/5xx reales, nunca eliminar `http_req_failed` ni `http_req_duration` de `options.thresholds` para forzar verde, nunca reducir `iterations` para esconder degradación.
-5. **Smoke 1:1 gate obligatorio**: ejecutar `k6 run tests/linea-base/main.js --vus 1 --iterations 1` (o `tests/smoke/main.js` según vocabulario elegido). Ver [smoke-1-1-gate](../../skills/k6/k6-greenfield/references/smoke-1-1-gate.md). Exit != 0 → `status: partial`, `blocker: "smoke_1_1_failed"`. Exit 0 → continuar al prompt del paso 6.
+5. **Smoke 1:1 gate obligatorio**: ejecutar `k6 run tests/linea-base/main.js --vus 1 --iterations 1` (o `tests/smoke/main.js` según vocabulario elegido). Ver [[k6-greenfield]] (consultar `references/smoke-1-1-gate.md`). Exit != 0 → `status: partial`, `blocker: "smoke_1_1_failed"`. Exit 0 → continuar al prompt del paso 6.
 6. **Prompt explícito al usuario post-generación** (solo si smoke 1:1 OK):
 
    > "Smoke 1:1 validado [OK]. ¿Cómo procedemos con la suite completa?

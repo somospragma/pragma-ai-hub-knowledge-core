@@ -1,3 +1,14 @@
+---
+id: calidad-environment-blocker-evidence
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Schema universal .evidence/execution-status.json para reportar bloqueos de ambiente (WAF, red, auth, rate-limit, DNS, device, browser, JDK) sin auto-corregir."
+tags: [evidence, environment, blockers, universal, mandatory]
+enforcement: mandatory
+---
+
 # Environment Blocker Evidence — Schema universal `.evidence/execution-status.json`
 
 Cuando una corrida termina sin poder validar el contrato porque el ambiente del cliente falla (no porque el código bajo prueba esté roto), el agente DEBE emitir `.evidence/execution-status.json` con el motivo categorizado y NO debe intentar "arreglar" el blocker con auto-corrección. El bloqueo es de infra/ambiente y se escala.

@@ -1,3 +1,13 @@
+---
+id: calidad-test-organization-by-scenario
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Regla universal: organizar tests por carpetas (una por HU/escenario) cuando hay ≥3 HUs. <3 HUs mantener flat. Equilibra trazabilidad vs overhead de navegación."
+tags: [organization, structure, universal]
+---
+
 # Test Organization by Scenario — Cuándo carpetas, cuándo flat
 
 ## Principio

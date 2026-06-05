@@ -1,3 +1,14 @@
+---
+id: calidad-smoke-gate-policy
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Política universal de smoke gate 1:1 obligatorio antes de declarar success. Comando por stack, criterios de aceptación, comportamiento ante fallo."
+tags: [smoke-gate, universal, mandatory, post-generation]
+enforcement: mandatory
+---
+
 # Smoke Gate Policy — Universal cross-stack
 
 ## Principio

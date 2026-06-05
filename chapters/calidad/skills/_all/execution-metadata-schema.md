@@ -1,3 +1,14 @@
+---
+id: calidad-execution-metadata-schema
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Schema universal {ISO}-metadata.json (13 keys) emitido por cada corrida en los 4 frameworks para que dashboards y delivery-gate procesen evidencia cross-stack."
+tags: [evidence, metadata, schema, universal, mandatory]
+enforcement: mandatory
+---
+
 # Execution Metadata Schema — `{ISO}-metadata.json` universal
 
 Cada corrida (cualquier framework) DEBE emitir un `{ISO}-metadata.json` junto al summary del stack, con un schema idéntico cross-stack. Esto permite que dashboards, comparadores y el delivery-gate procesen evidencia de cualquier framework con el mismo parser.

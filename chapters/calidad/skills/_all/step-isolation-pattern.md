@@ -1,3 +1,13 @@
+---
+id: calidad-step-isolation-pattern
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Aislamiento de métricas y criterios por step (setup/auth/main/cleanup) usando tags. Anti-pattern: mezclar criterio de auth con criterio del flow objetivo."
+tags: [pattern, step-isolation, metrics, universal]
+---
+
 # Step Isolation Pattern — Aislamiento de métricas y criterios por step
 
 ## Principio

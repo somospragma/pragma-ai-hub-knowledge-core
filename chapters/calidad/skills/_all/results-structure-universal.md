@@ -1,3 +1,14 @@
+---
+id: calidad-results-structure-universal
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "Convención universal results/{categoría}/{fecha}/ para organización de evidencia en los 4 frameworks. Garantiza diffabilidad, agrupación por HU y compatibilidad con CI."
+tags: [evidence, results, structure, universal, mandatory]
+enforcement: mandatory
+---
+
 # Results Structure — Convención universal `results/{categoría}/{fecha}/`
 
 Convención obligatoria para la organización de evidencia de ejecución en los 4 frameworks. Garantiza diffabilidad entre corridas, agrupación por feature/scenario/HU y compatibilidad con artefactos de CI.

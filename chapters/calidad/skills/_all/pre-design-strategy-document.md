@@ -1,3 +1,14 @@
+---
+id: calidad-pre-design-strategy-document
+version: 1.0.0
+scope: chapter
+type: skill
+chapter: calidad
+description: "STRATEGY.md design-doc obligatorio aprobado por el usuario ANTES de generar código de tests. Aplica a los 4 stacks en greenfield; delta-strategy en brownfield."
+tags: [pre-design, strategy, mandatory, universal, gate]
+enforcement: mandatory
+---
+
 # Pre-design — STRATEGY.md universal antes de generar código
 
 Principio universal del chapter calidad: **NUNCA se genera código de tests sin un `STRATEGY.md` aprobado explícitamente por el usuario**. El `STRATEGY.md` es el design doc que precede a templates, scaffolds y prompts. El agente lo redacta a partir de los inputs mandatorios y del análisis del SUT, lo presenta al usuario, e itera hasta que el usuario emite la palabra "aprobado" (o equivalente).
