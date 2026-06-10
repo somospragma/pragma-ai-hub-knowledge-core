@@ -219,3 +219,23 @@ Antes de transicionar `DIAGNOSING → FIXING`, el agente ejecuta este pipeline d
 ```
 
 Las heurísticas son **conservadoras por diseño**: en caso de duda, bloquear y escalar. Un falso positivo significa pedir revisión humana; un falso negativo significa esconder un bug y romper el contrato del chapter.
+
+---
+
+## Guardrail brownfield maestro
+
+En modo brownfield, **la auto-corrección NUNCA toca archivos preexistentes del cliente**. Solo opera sobre archivos NUEVOS emitidos en la sesión actual.
+
+Verificación pre-modificación:
+- Antes de aplicar cualquier corrección a un archivo, verificar que ese archivo fue emitido en `generation-manifest.json` de la sesión actual.
+- Si el archivo no está en el manifest (es preexistente) → BLOQUEAR la corrección y escalar a humano.
+
+Anti-patterns adicionales prohibidos en brownfield:
+- Modificar `package.json`, `pom.xml`, `build.gradle` existentes para resolver fallos. Si una dependencia falta, reportar al usuario.
+- Cambiar fixtures preexistentes para "alinearlos" con los nuevos.
+- Reformatear / "modernizar" código preexistente.
+- Eliminar tests preexistentes que fallan.
+
+Si un test preexistente del cliente está fallando y bloquea la entrega: reportar como `blocker` en el `[[calidad-delivery-gate-contract]]` con estado `partial`, NUNCA tocar el test.
+
+- **Smoke gate en brownfield ejecuta SOLO tests nuevos**. Si tests preexistentes fallan al correr la suite completa después del entregable, eso NO bloquea la entrega del scope nuevo — se reporta como issue separado al usuario sin tocar el código preexistente, sin auto-corrección y sin re-clasificación. El alcance del gate se delimita por el `generation-manifest.json` de la sesión (filtro por tag `@new`, por path de archivo emitido, o equivalente del framework).

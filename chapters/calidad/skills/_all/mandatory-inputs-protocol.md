@@ -1,11 +1,21 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: Define los inputs obligatorios y opcionales que el usuario debe entregar antes de generar cualquier prueba automatizada.
-tags: [inputs, protocol, spec, firma, user-story]
+tags: [inputs, protocol, spec, firma, user-story, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "los 4 inputs base (intent, project_name, output_path, spec/ui_source/apk_path) + modo de operación confirmados explícitamente por el usuario"
+    failure_message: "Bloqueado: faltan inputs obligatorios o el modo de operación no fue confirmado. No se puede generar sin contrato de entrada completo."
+  - check: "project_name matchea ^[a-z][a-z0-9-]*[a-z0-9]$ y output_path es ruta absoluta verificada"
+    failure_message: "Bloqueado: project_name u output_path no cumplen las reglas formales del protocolo."
+  - check: "spec entregado como contenido completo, no como ruta de archivo"
+    failure_message: "Bloqueado: se requiere el contenido completo del spec, no la ruta del archivo."
+  - check: "risk_map confirmado por usuario o default HIGH reportado explícitamente para revisión"
+    failure_message: "Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario."
 ---
 
 # Mandatory Inputs Protocol — Contrato de Entrada Antes de Generar
@@ -46,6 +56,12 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 4. Para proyectos con convenciones cliente-específicas detectadas (ver `[[karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
 5. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
 ```
+
+### K6-specific inputs
+
+Para proyectos K6, además de los inputs base de la tabla anterior, el agente DEBE completar el checklist K6-específico (perfil de carga por escenario, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente). Ver [[k6-greenfield]] (consultar `references/k6-discovery-checklist.md`).
+
+Sin este checklist, K6 no puede generar `options.stages` ni `options.thresholds` defendibles y debe degradar a `scaffold-only`.
 
 ## Overrides por convenciones cliente-específicas
 

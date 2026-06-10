@@ -1,11 +1,21 @@
 ---
 id: calidad-business-driven-prioritization
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: Asignación de prioridad de pruebas (CRITICAL/HIGH/MEDIUM/LOW) basada en valor de negocio y riesgo, no en heurísticas de nombre.
-tags: [prioritization, risk, business-value, governance]
+tags: [prioritization, risk, business-value, governance, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "risk_map declarado por usuario (o derivado de user_story/firma) antes de generar el primer archivo"
+    failure_message: "Bloqueado: no se puede priorizar ni generar sin risk_map confirmado por una fuente válida."
+  - check: "fuente de la asignación documentada (PO, user_story, firma, default-pendiente-revisión)"
+    failure_message: "Bloqueado: prioridades sin fuente documentada equivalen a prioridades inventadas."
+  - check: "default HIGH reportado explícitamente cuando se usó, nunca silencioso"
+    failure_message: "Bloqueado: se aplicó default silencioso sin advertir al usuario para revisión explícita."
+  - check: "no se infirió prioridad por keywords del path/URL/nombre de archivo"
+    failure_message: "Bloqueado: se detectó inferencia por keyword (/login → CRITICAL, etc.). Esa heurística está prohibida."
 ---
 
 # Business-Driven Prioritization — Prioridad por valor de negocio

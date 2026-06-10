@@ -1,11 +1,19 @@
 ---
 id: calidad-test-execution-orchestration
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: "Ejecutar las pruebas generadas como capacidad del chapter: invocar comandos, capturar output, parsear resultados a un esquema común, gestionar modos de operación (full / scaffold-only / execute-only / dry-run)."
-tags: [execution, orchestration, runtime, result-parsing, modes, evidence]
+tags: [execution, orchestration, runtime, result-parsing, modes, evidence, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "ejecutado al menos smoke en modo full con exit_code capturado, stdout persistido y artefactos archivados"
+    failure_message: "Bloqueado: en modo full no se ejecutó nada o no se capturó evidencia de la corrida. La entrega no puede declarar success."
+  - check: "modo confirmado explícitamente al inicio (no asumir full) y degradación a scaffold-only documentada cuando aplica"
+    failure_message: "Bloqueado: el modo de operación no fue confirmado o la degradación automática no quedó documentada."
+  - check: "resultados parseados a esquema común consumible por triage (calidad-failure-triage-and-classification)"
+    failure_message: "Bloqueado: el output de ejecución no fue parseado al esquema común; triage no puede operar sobre datos crudos."
 ---
 
 # Test Execution Orchestration — Ejecución y Parseo de Resultados como Capacidad del Chapter

@@ -15,6 +15,36 @@ tags: [appium, brownfield, workflow, mobile, screenplay, conventions]
 
 Cuando `[[calidad-intent-detection]]` identifica una solicitud de automatización mobile Appium y `[[calidad-brownfield-vs-greenfield]]` la clasifica como **brownfield**: el usuario provee archivos de un proyecto Appium existente (Android o iOS) y solicita extenderlo. Para greenfield Android usar `[[generate-appium-screenplay-android]]`; para greenfield iOS, scaffold manual descrito en `references/android-only-scope-rationale.md` del skill `[[appium-screenplay-android]]`.
 
+### Pre-flight (OBLIGATORIO)
+
+Antes de cualquier acción, ejecutar [[appium-screenplay-android]] (consultar `references/preflight.md` en su subfolder) del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+
+Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
+
+### Regla brownfield específica — Auto-corrección
+
+La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS que este workflow genera. Los archivos preexistentes del cliente (tests, Page Objects, fixtures, configs) son INTOCABLES bajo ningún concepto, aunque fallen. Si tests preexistentes fallan en la ejecución:
+
+1. Reportar el fallo al usuario con triage (deterministic vs flaky).
+2. NUNCA modificar el test preexistente.
+3. NUNCA modificar fixtures, data o configs preexistentes para hacer pasar tests.
+4. Escalar a humano con el contexto completo del fallo.
+
+Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
+Refuerzos adicionales:
+- **Step isolation** (ver `[[calidad-step-isolation-pattern]]`) aplica a las Tasks/Questions/Interactions y `.feature` NUEVOS. Los archivos preexistentes mantienen su estructura aunque no cumplan el patrón; no se les aplica refactor.
+- **Validación contractual no superficial** según [[appium-screenplay-android]] (consultar `references/contractual-questions.md`) aplica solo a Questions/scenarios nuevos. NO re-escribir aserciones de Questions preexistentes.
+- **Auto-discovery APK**: si el proyecto preexistente ya tiene Page Objects (UserInterfaces) con selectores reales, NO re-correr auto-discovery sobre el APK ni reemplazar selectores existentes. Auto-discovery aplica únicamente a los UserInterfaces NUEVOS generados en esta sesión.
+
+### Paso previo — Análisis condicional con STRATEGY.md
+
+Si el alcance del brownfield es **grande** (≥3 escenarios/HUs/pages nuevos, o `selector-update` masivo cross-cutting): generar `STRATEGY.md` según el template [[appium-screenplay-android]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+
+Si el alcance es **pequeño** (1-2 cambios puntuales, p. ej. un selector-update aislado o un único `new-page`): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
+
+Respetar convenciones del proyecto cliente: el STRATEGY del brownfield documenta lo NUEVO, no rediseña lo existente. Respetar `platform_detected` (Android/iOS) y la API idiomática de selectores correspondiente.
+
 ## Inputs
 
 | Input                 | Obligatorio | Notas                                                                                                |
@@ -82,6 +112,12 @@ Entrega los archivos con `[[calidad-streaming-files-protocol]]` y registra traza
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback respetando la API idiomática de `platform_detected`: Android `id`/`xpath`/`accessibilityId`; iOS `iOSClassChain`/`iOSNsPredicateString`/`accessibilityId`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca cambiar el `package` de un `*.java`, nunca debilitar `Question`s de aserción de negocio, nunca eliminar tags `scenario_tag_conventions` para esquivar filtros del cliente.
 5. Reportar estado final: `success` | `partial` (entregado scaffold, no se ejecutó por falta de device) | `failed` (escalado a humano con scenario, stage, logcat/idb log, screenshot Serenity, hipótesis).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Si la corrección involucró locators, recordar al usuario el patrón documentado en `[[complete-deferred-locators]]` para los casos donde se requiere Appium Inspector con el binario real.
+7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find `scripts/preflight.sh` ejecutable, `test -x gradlew` wrapper ejecutable, `./gradlew compileJava` si modo=full) antes de cerrar.
+8. **Smoke gate universal (scenarios nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [[calidad-smoke-gate-policy]]. En brownfield Appium, el gate ejecuta **únicamente los scenarios nuevos** filtrados por tag combinado: `./gradlew test -Dcucumber.filter.tags="@smoke and @new"` (Gradle) o `mvn test -Dcucumber.filter.tags="@smoke and @new"` (Maven), o equivalente filtrado por path del feature recién generado. Los scenarios preexistentes NO se ejecutan en el gate para no inflar tiempo ni contaminar resultados. Si fallan tests preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado. Si no hay device/emulador disponible, el gate degrada a `partial` con razón documentada.
+9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (no device, Appium server no disponible, APK inválido, capabilities no negociables, network al backend), emitir `.evidence/execution-status.json` según [[calidad-environment-blocker-evidence]]. El estado pasa a `partial` con razón.
+10. **Metadata por corrida**: emitir `results/appium/{date}/{ISO}-metadata.json` según el schema universal [[calidad-execution-metadata-schema]]. En brownfield, el campo `workload_or_scope` debe distinguir "N scenarios/pages nuevos sobre M preexistentes" e incluir `platform_detected` y device/emulator usado.
+11. **Reporte ejecutivo**: invocar `[[generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `appium-report-template.md`. El reporte debe segregar explícitamente "scenarios/pages/UserInterfaces nuevos (en scope de esta sesión)" de "scenarios preexistentes (referencia, no ejecutados en el gate)".
+12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/modificados, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, `target/site/serenity/` si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos; ausencia de device/emulador reportada como blocker con status `partial`).
 
 ## Criterios de finalización
 

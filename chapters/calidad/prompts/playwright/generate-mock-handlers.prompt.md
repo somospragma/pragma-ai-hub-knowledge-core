@@ -22,13 +22,13 @@ Si el workflow `[[generate-playwright-greenfield]]` no recibió esos campos en s
 
 ## Variables
 
-- `{{endpoints}}` — Lista declarativa de endpoints `{ path, method, status, sample_response? }` que el usuario quiere mockear. Fuentes válidas en orden de preferencia (ver `[mocks-page-route](../../skills/playwright/playwright-greenfield/references/mocks-page-route.md)`): captura del live app (Codegen/MCP/HAR) → Postman collection → OpenAPI/Swagger del backend → lista manual.
+- `{{endpoints}}` — Lista declarativa de endpoints `{ path, method, status, sample_response? }` que el usuario quiere mockear. Fuentes válidas en orden de preferencia (ver [[playwright-greenfield]] (consultar `references/mocks-page-route.md`)): captura del live app (Codegen/MCP/HAR) → Postman collection → OpenAPI/Swagger del backend → lista manual.
 - `{{sample_payloads}}` — Mapa opcional de payloads de muestra. Preferir capturas reales del live app; payloads inferidos desde un schema (OpenAPI o Postman example) son aceptables como punto de partida pero deben revisarse contra runtime.
 - `{{mock_mode}}` — `full | partial`. Cuando es `partial`, los paths no listados deben caer a `route.continue()` (no romper integración real).
 
 ## Instrucción para el LLM
 
-Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente `[ver mocks](../../skills/playwright/playwright-greenfield/references/mocks-page-route.md)`:
+Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente [[playwright-greenfield]] (consultar `references/mocks-page-route.md`):
 
 - Exporta `async function setupMocks(page: Page): Promise<void>`.
 - Declara `let nextId = 1000;` al inicio.
@@ -42,7 +42,7 @@ Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente `[ver moc
 
 ## Recordatorio sobre el riesgo de mockear
 
-Los tests `@mocked` validan que el frontend habla con el contrato del mock, no con el backend real. Pueden pasar verde aunque la API esté caída. La estrategia recomendada es: smoke suite siempre `@live`; mocks solo para aislamiento UI puntual, contract regression del mock o desarrollo offline. Ver `[execution-modes-live-mocked-hybrid](../../skills/playwright/playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)`.
+Los tests `@mocked` validan que el frontend habla con el contrato del mock, no con el backend real. Pueden pasar verde aunque la API esté caída. La estrategia recomendada es: smoke suite siempre `@live`; mocks solo para aislamiento UI puntual, contract regression del mock o desarrollo offline. Ver [[playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md`).
 
 ## Snippet de salida esperado
 

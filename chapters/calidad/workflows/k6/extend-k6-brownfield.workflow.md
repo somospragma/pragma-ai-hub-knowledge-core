@@ -15,6 +15,35 @@ tags: [k6, brownfield, workflow, performance, conventions]
 
 Cuando `[[calidad-route-test-generation]]` (paso 5) y `[[calidad-brownfield-vs-greenfield]]` identifican un escenario brownfield K6: el `project_root` contiene mínimo `tests/config.js` + `tests/utils.js` + ≥1 `tests/*-test.js`. El skill subyacente es `[[k6-brownfield]]`.
 
+### Pre-flight (OBLIGATORIO)
+
+Antes de cualquier acción, ejecutar [[k6-greenfield]] (consultar `references/preflight.md` en su subfolder) del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+
+Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
+
+### Regla brownfield específica — Auto-corrección
+
+La auto-corrección y self-healing aplican EXCLUSIVAMENTE a los archivos NUEVOS que este workflow genera. Los archivos preexistentes del cliente (tests, Page Objects, fixtures, configs) son INTOCABLES bajo ningún concepto, aunque fallen. Si tests preexistentes fallan en la ejecución:
+
+1. Reportar el fallo al usuario con triage (deterministic vs flaky).
+2. NUNCA modificar el test preexistente.
+3. NUNCA modificar fixtures, data o configs preexistentes para hacer pasar tests.
+4. Escalar a humano con el contexto completo del fallo.
+
+Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-self-correction-loop]]` y sus `references/anti-cheating-guardrails.md`.
+
+Refuerzos adicionales:
+- **Step isolation** (ver `[[calidad-step-isolation-pattern]]`) aplica a los `group()` / `check()` de los scripts NUEVOS. Los scripts preexistentes mantienen su estructura aunque no cumplan el patrón; no se les aplica refactor.
+- **Validación contractual no superficial** según [[k6-greenfield]] (consultar `references/contractual-checks-from-user-story.md`) aplica solo a scripts/escenarios nuevos. NO re-escribir checks preexistentes.
+
+### Paso previo — Análisis condicional con STRATEGY.md
+
+Si el alcance del brownfield es **grande** (≥3 endpoints/escenarios nuevos, o cambios cross-cutting que afectan multiple scripts preexistentes, o migración de `auth_mode`): generar `STRATEGY.md` según el template [[k6-greenfield]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+
+Si el alcance es **pequeño** (1-2 cambios puntuales, p. ej. añadir un endpoint o recalibrar un threshold): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
+
+Respetar convenciones del proyecto cliente: el STRATEGY del brownfield documenta lo NUEVO, no rediseña lo existente. Respetar nomenclatura existente (smoke/load/stress/spike/soak vs línea-base/carga/estrés/pico/resistencia): si el proyecto cliente usa una, NO renombrar a la otra.
+
 Transfiere control aquí cuando el usuario pide:
 
 - Agregar endpoints / scripts a la suite K6 existente.
@@ -102,6 +131,12 @@ Detalle de comandos en `[[k6-run-and-suite]]`.
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar `checks`, `http_req_failed` ni `http_req_duration`; las correcciones deben respetar las convenciones detectadas (`script_naming`, `groups_naming`, `auth_mode`, `existing_thresholds`, `handle_summary_path`).
 5. Reportar estado final: `success` | `partial` | `failed` con script, métricas, threshold violado e hipótesis cuando se escala.
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Recordar que la calibración formal de thresholds para el nuevo flujo se hace via `[[calibrate-k6-thresholds]]`.
+7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths `tests/*.js`, grep `handleSummary` en scripts nuevos, `k6 inspect tests/<nuevo-script>-test.js` validación de sintaxis) antes de cerrar.
+8. **Smoke gate universal (scripts nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [[calidad-smoke-gate-policy]]. En brownfield K6, el gate ejecuta **únicamente smoke individual de los scripts/escenarios nuevos** con la mínima carga: `k6 run tests/<nuevo-script>-test.js --vus 1 --iterations 1` (o `-e BASE_URL=...` y `AUTH_TOKEN` cuando aplique). Bajo NINGÚN concepto re-ejecutar `load/stress/spike/soak` preexistentes en el gate (esos tienen otro propósito y duración). Si la nomenclatura del proyecto cliente usa línea-base en vez de smoke, aplicar el equivalente local manteniendo carga mínima. Si fallan scripts preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado.
+9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/throughput cap), emitir `.evidence/execution-status.json` según [[calidad-environment-blocker-evidence]]. El estado pasa a `partial` con razón.
+10. **Metadata por corrida**: emitir `results/k6/{date}/{ISO}-metadata.json` según el schema universal [[calidad-execution-metadata-schema]]. En brownfield, el campo `workload_or_scope` debe distinguir "N scripts/escenarios nuevos sobre M preexistentes" e incluir VUs/iterations efectivos.
+11. **Reporte ejecutivo**: invocar `[[generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `k6-report-template.md`. El reporte debe segregar explícitamente "scripts nuevos (en scope de esta sesión)" de "scripts preexistentes (referencia, no ejecutados en el gate)" e incluir comparación corrida nueva vs baseline preexistente si los `results/*-summary.json` previos están disponibles.
+12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/patches, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, `results/${timestamp}-summary.json` si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en scripts preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 

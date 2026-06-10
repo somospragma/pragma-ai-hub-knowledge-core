@@ -1,11 +1,19 @@
 ---
 id: calidad-streaming-files-protocol
-version: 2.0.0
+version: 2.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: Define el orden de scaffold de un proyecto de pruebas por valor entregado (tests primero, utilitarios después, infraestructura al final).
-tags: [scaffold, prioritization, value-delivery, generation]
+tags: [scaffold, prioritization, value-delivery, generation, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "emit [ok] <ruta> por cada archivo persistido (una línea de log por archivo, no reporte global)"
+    failure_message: "Bloqueado: la trazabilidad por archivo emitido falta. Sin log por archivo no hay manifiesto auditable."
+  - check: "orden estricto respetado: tests → utilitarios/abstracciones → infraestructura"
+    failure_message: "Bloqueado: el orden de scaffold se violó (infraestructura emitida antes que tests). Eso esconde valor detrás de boilerplate."
+  - check: "directorio padre verificado antes de escribir; scaffold idempotente (no duplicar ni sobrescribir trabajo manual)"
+    failure_message: "Bloqueado: archivo escrito sin verificar directorio padre o scaffold no idempotente."
 ---
 
 # Orden de scaffold por valor entregado

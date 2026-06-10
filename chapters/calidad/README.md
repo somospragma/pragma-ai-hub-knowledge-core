@@ -34,11 +34,20 @@ chapters/calidad/
 │   ├── _all/
 │   │   ├── brownfield-vs-greenfield.md
 │   │   ├── business-driven-prioritization.md
+│   │   ├── delivery-gate-contract.md
+│   │   ├── environment-blocker-evidence.md
+│   │   ├── execution-metadata-schema.md
 │   │   ├── intent-detection.md
 │   │   ├── mandatory-inputs-protocol.md
+│   │   ├── post-generation-execution-prompt.md
+│   │   ├── pre-design-strategy-document.md
+│   │   ├── results-structure-universal.md
+│   │   ├── smoke-gate-policy.md
 │   │   ├── spec-validation.md
+│   │   ├── step-isolation-pattern.md
 │   │   ├── streaming-files-protocol.md
 │   │   ├── test-evidence-and-traceability.md
+│   │   ├── test-organization-by-scenario.md
 │   │   │
 │   │   ├── cicd-integration/
 │   │   │   ├── SKILL.md
@@ -115,8 +124,14 @@ chapters/calidad/
 │   │   │                   gherkin-syntax-rules, gradle-version-matrix,
 │   │   │                   health-check-pipeline, mandatory-inputs-validation,
 │   │   │                   mobile-accessibility, mobile-visual-regression,
-│   │   │                   no-aggregate-collision, project-structure,
-│   │   │                   screenplay-layers, smoke-vs-proposed-scenarios}.md
+│   │   │                   no-aggregate-collision, preflight, project-structure,
+│   │   │                   screenplay-layers, smoke-gate-gradle,
+│   │   │                   smoke-vs-proposed-scenarios}.md
+│   │   ├── appium-apk-auto-discovery/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{adb-and-emulator-bootstrap, appium-inspector-rest-api,
+│   │   │                   crawler-strategy, locator-confidence-scoring,
+│   │   │                   safety-and-cleanup, selector-extraction-rules}.md
 │   │   └── appium-brownfield/
 │   │       ├── SKILL.md
 │   │       └── references/{convention-detection, selector-update-strategy}.md
@@ -125,10 +140,17 @@ chapters/calidad/
 │   │   ├── k6-run-and-suite.md
 │   │   ├── k6-greenfield/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{config-and-utils-modules, crud-dynamic-id-correlation,
-│   │   │                   enums-headers-security-extraction, five-script-types,
-│   │   │                   handle-summary-evidence, project-structure,
-│   │   │                   thresholds-three-tiers}.md
+│   │   │   └── references/{auth-strategy-setup-vs-per-vu, availability-metric-from-rnf,
+│   │   │                   config-and-utils-modules, contractual-checks-from-user-story,
+│   │   │                   coverage-formula, crud-dynamic-id-correlation,
+│   │   │                   enums-headers-security-extraction, execution-status-and-blockers,
+│   │   │                   five-script-types, handle-summary-evidence,
+│   │   │                   k6-discovery-checklist, modular-architecture,
+│   │   │                   options-scenarios-executors, preflight, project-structure,
+│   │   │                   realistic-sleep-policy, results-structure-and-metadata,
+│   │   │                   smoke-1-1-gate, tag-policy-and-metrics-isolation,
+│   │   │                   templates/, threshold-tier-justification,
+│   │   │                   thresholds-three-tiers, vocabulary-and-scenario-mapping}.md
 │   │   └── k6-brownfield/
 │   │       ├── SKILL.md
 │   │       └── references/{convention-detection, extension-patterns}.md
@@ -137,9 +159,11 @@ chapters/calidad/
 │   │   ├── karate-run-and-tags.md
 │   │   ├── karate-greenfield/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{contract-testing-match-patterns, encrypted-payloads,
-│   │   │                   feature-design-dsl, file-location-constraint,
-│   │   │                   negative-coverage-formula, project-structure}.md
+│   │   │   └── references/{cobertura-comment-enforcement, contract-testing-match-patterns,
+│   │   │                   encrypted-payloads, feature-design-dsl,
+│   │   │                   file-location-constraint, metadata-emitter-karate,
+│   │   │                   negative-coverage-formula, preflight, project-structure,
+│   │   │                   smoke-gate-mvn, step-isolation-karate, templates/}.md
 │   │   └── karate-brownfield/
 │   │       ├── SKILL.md
 │   │       └── references/{client-specific-conventions, convention-detection,
@@ -149,12 +173,16 @@ chapters/calidad/
 │       ├── playwright-run-and-modes.md
 │       ├── playwright-greenfield/
 │       │   ├── SKILL.md
-│       │   └── references/{accessibility-axe-wcag, auth-storage-state,
+│       │   └── references/{accessibility-axe-wcag, auth-detection-rules,
+│       │                   auth-storage-state, coherence-checks,
+│       │                   contractual-checks-from-ui, coverage-formula,
 │       │                   execution-modes-live-mocked-hybrid, fixtures-composition,
-│       │                   mocks-page-route, page-object-model,
-│       │                   playwright-config-strict-ts, project-structure,
-│       │                   selector-priority, ui-source-priority,
-│       │                   visual-regression}.md
+│       │                   metadata-emitter-playwright, mocks-page-route,
+│       │                   page-object-model, playwright-config-strict-ts,
+│       │                   playwright-native-tags-v142, preflight, project-structure,
+│       │                   selector-priority, smoke-gate-playwright,
+│       │                   step-isolation-playwright, templates/, ui-source-priority,
+│       │                   visual-regression, waits-policy}.md
 │       ├── playwright-brownfield/
 │       │   ├── SKILL.md
 │       │   └── references/{convention-detection, selector-update-strategy}.md
@@ -163,6 +191,7 @@ chapters/calidad/
 │
 ├── workflows/
 │   ├── _all/
+│   │   ├── generate-executive-report.workflow.md
 │   │   ├── route-test-generation.workflow.md
 │   │   └── test-self-correction-loop.workflow.md
 │   ├── appium/
@@ -209,21 +238,61 @@ chapters/calidad/
 
 ### Skills cross-cutting (`skills/_all/`)
 
+#### Pre-generación (contratos de entrada y diseño)
+
 | Asset                                  | Descripción                                                                                                  |
 |----------------------------------------|--------------------------------------------------------------------------------------------------------------|
 | `mandatory-inputs-protocol.md`         | Inputs obligatorios y opcionales antes de generar pruebas (intent, project_name, spec, firma, user_story).   |
 | `intent-detection.md`                  | Decide qué framework aplicar a partir del intent del usuario.                                                |
 | `spec-validation.md`                   | Valida OpenAPI 3.x, Swagger 2.0 y WSDL antes de generar; extrae endpoints, base URL, security schemes, enums. |
 | `brownfield-vs-greenfield.md`          | Distingue proyectos existentes vs nuevos y define qué se genera y qué no en cada modo.                       |
-| `streaming-files-protocol.md`          | Orden de scaffold por valor entregado: tests → utilities → infraestructura.                                  |
 | `business-driven-prioritization.md`    | Asignación de prioridad CRITICAL/HIGH/MEDIUM/LOW por valor de negocio, nunca por keywords del path.          |
+| `pre-design-strategy-document.md`      | `STRATEGY.md` como design-doc obligatorio aprobado por humano antes de generar código (los 4 stacks en greenfield). |
+
+#### Generación (cómo se emite el scaffold)
+
+| Asset                                  | Descripción                                                                                                  |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `streaming-files-protocol.md`          | Orden de scaffold por valor entregado: tests → utilities → infraestructura.                                  |
+| `test-organization-by-scenario.md`     | Regla universal: organizar por carpetas (una por HU) cuando hay ≥3 HUs; flat para proyectos chicos.          |
+| `step-isolation-pattern.md`            | Aislamiento de métricas y criterios por step (setup/auth/main/cleanup) usando tags.                           |
+
+#### Post-generación (gates obligatorios antes de declarar success)
+
+| Asset                                  | Descripción                                                                                                  |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `post-generation-execution-prompt.md`  | Prompt universal post-scaffold para resolver modo (`full` / `dry-run` / `scaffold-only` / `execute-only`) antes del smoke gate. |
+| `smoke-gate-policy.md`                 | Smoke gate 1:1 obligatorio antes de declarar success; comando por stack y comportamiento ante fallo.         |
+| `delivery-gate-contract.md`            | Bloque YAML universal de cierre con `status`, `blockers[]`, `evidence_persisted{}` y `audit_log`.            |
+
+#### Evidencia y trazabilidad
+
+| Asset                                  | Descripción                                                                                                  |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
 | `test-evidence-and-traceability.md`    | Configuración de reportes, traces, summaries y trazabilidad requisito → test → resultado.                    |
+| `results-structure-universal.md`       | Convención universal `results/{categoría}/{fecha}/` para los 4 frameworks (diffabilidad y compatibilidad CI). |
+| `execution-metadata-schema.md`         | Schema universal `{ISO}-metadata.json` (13 keys) emitido por cada corrida en los 4 frameworks.               |
+| `environment-blocker-evidence.md`      | Schema `.evidence/execution-status.json` para reportar bloqueos (WAF, network, auth, rate-limit, device, etc.) sin auto-corregir. |
+
+#### Operación (ejecución, triage, auto-corrección)
+
+| Asset                                  | Descripción                                                                                                  |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `test-execution-orchestration/SKILL.md`| Ejecutar las suites generadas: invocar comandos, capturar output, parsear resultados, gestionar modos.       |
+| `failure-triage-and-classification/SKILL.md` | Clasifica fallos como deterministic vs flaky y diagnostica causa raíz antes de proponer corrección.    |
+| `test-self-correction-loop/SKILL.md`   | Loop iterativo de auto-corrección con anti-cheating guardrails (max 3 iteraciones por default).              |
+| `test-self-healing/SKILL.md`           | Self-healing en runtime: multi-locator fallback, LLM-driven selector repair, visual AI healing.              |
+
+#### Transversales (seguridad, contratos, datos, CI)
+
+| Asset                                  | Descripción                                                                                                  |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
 | `cicd-integration/SKILL.md`            | Integración de las cuatro suites en pipelines Azure DevOps / GitHub Actions / GitLab CI.                     |
 | `security-testing/SKILL.md`            | Estrategia de seguridad: OWASP Top 10 API, fuzzing, SAST/DAST/SCA, autenticación.                            |
-| `test-execution-orchestration/SKILL.md`| Ejecutar las suites generadas: invocar comandos, capturar output, parsear resultados, gestionar modos `full` / `dry-run` / `scaffold-only` / `execute-only`. |
-| `failure-triage-and-classification/SKILL.md` | Clasifica fallos como deterministic vs flaky y diagnostica causa raíz antes de proponer corrección.    |
-| `test-self-correction-loop/SKILL.md`   | Loop iterativo de auto-corrección con anti-cheating guardrails (max 3 iteraciones por default).             |
-| `test-self-healing/SKILL.md`           | Self-healing en runtime: multi-locator fallback, LLM-driven selector repair, visual AI healing.              |
+| `contract-testing/SKILL.md`            | CDC con Pact, OpenAPI diff, AsyncAPI, Spring Cloud Contract, Schema Registry.                                |
+| `context-determined-defaults/SKILL.md` | Defaults inferidos del contexto del cliente (data class, criticality tiers, regulatory exposure, peak).      |
+| `sut-types-and-adaptations/SKILL.md`   | Adaptaciones por tipo de SUT (REST, GraphQL, gRPC, eventos, ML inference, serverless, SOAP/EJB, batch).      |
+| `test-data-management/SKILL.md`        | Builder/Factory/ObjectMother, datasets versionados, anonimización PII, data para perf, sintética.            |
 
 ### Skills per-framework
 
@@ -252,35 +321,39 @@ Incluye references para Page Object Model, fixtures, selectores, auth storage st
 | Asset                         | Capacidad                                                                                      |
 |-------------------------------|------------------------------------------------------------------------------------------------|
 | `k6-greenfield/SKILL.md`      | Genera proyecto K6 completo de performance testing desde un spec OpenAPI/Swagger.              |
+| `k6-brownfield/SKILL.md`      | Extiende un proyecto K6 existente sin tocar scripts preexistentes.                              |
 | `k6-run-and-suite.md`         | Instalación y ejecución de scripts K6 individuales y la suite completa con `run-all.sh`.        |
 
-Incluye references para los cinco tipos de scripts (load, stress, spike, soak, smoke), thresholds en tres niveles, correlación dinámica de IDs y módulos de config/utils.
+Arquitectura modular: `scenarios/ + workloads/ + tests/{escenario}/main.js + shared/`. Cinco tipos de script (smoke, load, stress, spike, soak) con `options.scenarios` y executors (`ramping-vus`, `constant-vus`, `ramping-arrival-rate`). Includes references para thresholds en tres tiers con justificación, smoke 1:1 gate, contractual checks desde user story, auth strategy (setup-vs-per-vu), métricas de disponibilidad desde RNF, tag policy + step isolation, sleep policy realista, correlación dinámica de IDs en CRUD, extracción de enums/headers/security, vocabulary mapping (línea-base/carga/estrés vs smoke/load/stress), discovery checklist, preflight, templates y schema de results/metadata.
 
 #### Appium (`skills/appium/`)
 
 | Asset                                          | Capacidad                                                                                  |
 |------------------------------------------------|--------------------------------------------------------------------------------------------|
 | `appium-screenplay-android/SKILL.md`           | Genera proyecto Appium V2 Android con Screenplay + Serenity + Cucumber listo para correr.  |
+| `appium-apk-auto-discovery/SKILL.md`           | Recorrido automatizado del APK (crawler + Appium Inspector REST API) que extrae locators reales con score de confianza; alternativa a locators diferidos. |
+| `appium-brownfield/SKILL.md`                   | Extiende un proyecto Appium Android/iOS existente respetando convenciones; plataforma detectada del proyecto. |
 | `appium-run-and-tags.md`                       | Comandos Gradle, filtros por tags y override de env.                                       |
 
-Incluye references para capas Screenplay, locators diferidos, smoke vs proposed scenarios, matriz de versiones Gradle y health-check pipeline.
+Incluye references para capas Screenplay, locators diferidos vs auto-discovery (score de confianza por selector), smoke vs proposed scenarios, smoke gate Gradle, matriz de versiones Gradle inmutable, health-check pipeline, accesibilidad móvil, visual regression móvil y reglas anti-colisión de tasks Gradle.
 
 ### Workflows
 
-| Tipo               | Asset                                                                                  |
-|--------------------|----------------------------------------------------------------------------------------|
-| Router rector      | `workflows/_all/route-test-generation.workflow.md`                                     |
-| Karate greenfield  | `workflows/karate/generate-karate-greenfield.workflow.md`                   |
-| Karate brownfield  | `workflows/karate/extend-karate-brownfield.workflow.md`                     |
-| Playwright greenfield | `workflows/playwright/generate-playwright-greenfield.workflow.md`        |
-| Playwright brownfield | `workflows/playwright/update-playwright-brownfield.workflow.md`          |
-| K6 greenfield      | `workflows/k6/generate-k6-suite.workflow.md`                                |
-| K6 calibración     | `workflows/k6/calibrate-k6-thresholds.workflow.md`                          |
-| Appium greenfield  | `workflows/appium/generate-appium-screenplay-android.workflow.md`           |
-| Appium locators    | `workflows/appium/complete-deferred-locators.workflow.md`                   |
-| K6 brownfield      | `workflows/k6/extend-k6-brownfield.workflow.md`                             |
-| Appium brownfield  | `workflows/appium/extend-appium-brownfield.workflow.md`                     |
-| Self-correction loop (cross-framework) | invocado como fase final por todos los workflows anteriores (ver `[[calidad-test-self-correction-loop]]`). |
+| Tipo                                   | Asset                                                                                  |
+|----------------------------------------|----------------------------------------------------------------------------------------|
+| Router rector                          | `workflows/_all/route-test-generation.workflow.md`                                     |
+| Executive report (cross-framework)     | `workflows/_all/generate-executive-report.workflow.md` — consolidado HTML/PPTX/DOC post-corrida. |
+| Self-correction loop (cross-framework) | `workflows/_all/test-self-correction-loop.workflow.md` — invocado como fase final por todos los workflows de stack. |
+| Karate greenfield                      | `workflows/karate/generate-karate-greenfield.workflow.md`                              |
+| Karate brownfield                      | `workflows/karate/extend-karate-brownfield.workflow.md`                                |
+| Playwright greenfield                  | `workflows/playwright/generate-playwright-greenfield.workflow.md`                      |
+| Playwright brownfield                  | `workflows/playwright/update-playwright-brownfield.workflow.md`                        |
+| K6 greenfield                          | `workflows/k6/generate-k6-suite.workflow.md`                                           |
+| K6 brownfield                          | `workflows/k6/extend-k6-brownfield.workflow.md`                                        |
+| K6 calibración                         | `workflows/k6/calibrate-k6-thresholds.workflow.md`                                     |
+| Appium greenfield                      | `workflows/appium/generate-appium-screenplay-android.workflow.md`                      |
+| Appium brownfield                      | `workflows/appium/extend-appium-brownfield.workflow.md`                                |
+| Appium locators                        | `workflows/appium/complete-deferred-locators.workflow.md`                              |
 
 ### Prompts (`prompts/`)
 
@@ -338,9 +411,9 @@ Cada IDE soporta un subset de los tipos de asset. Esta es la matriz para el chap
 
 | Asset del Chapter | Cantidad | Kiro | Claude Code | GitHub Copilot | Amazon Q (IDE) | Amazon Q (CLI) |
 |---|---|---|---|---|---|---|
-| `steering`     | 1   | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `skill`        | 30  | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `workflow`     | 12  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `steering`     | 3   | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `skill`        | 41  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `workflow`     | 13  | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `prompt`       | 14  | ✓ | — | ✓ | ✓ | — |
 
 Implicaciones operativas:
@@ -369,17 +442,23 @@ workflows/_all/route-test-generation.workflow.md
 
 Ese workflow se encarga de:
 
-1. Recolectar inputs obligatorios (`mandatory-inputs-protocol`).
-2. Identificar framework (`intent-detection`).
-3. Validar el spec si aplica (`spec-validation`).
-4. Decidir greenfield vs brownfield (`brownfield-vs-greenfield`).
-5. Delegar al workflow específico del framework + modo correspondiente.
-6. Emitir archivos con disciplina de scaffold por valor (`streaming-files-protocol`).
-7. Configurar evidencia y trazabilidad (`test-evidence-and-traceability`).
+1. Recolectar inputs obligatorios (`[[calidad-mandatory-inputs-protocol]]`).
+2. Identificar framework (`[[calidad-intent-detection]]`).
+3. Validar el spec si aplica (`[[calidad-spec-validation]]`).
+4. Decidir greenfield vs brownfield (`[[calidad-brownfield-vs-greenfield]]`).
+5. **Pre-diseño**: redactar `STRATEGY.md` y esperar aprobación humana (`[[calidad-pre-design-strategy-document]]`). En greenfield es obligatorio; en brownfield grande se simplifica a un delta-strategy.
+6. Delegar al workflow específico del framework + modo correspondiente.
+7. Emitir archivos con disciplina de scaffold por valor (`[[calidad-streaming-files-protocol]]`).
+8. Configurar evidencia y trazabilidad (`[[calidad-test-evidence-and-traceability]]` + `[[calidad-results-structure-universal]]` + `[[calidad-execution-metadata-schema]]`).
+9. **Resolver modo de operación** con el usuario (`[[calidad-post-generation-execution-prompt]]`): `full` / `dry-run` / `scaffold-only` / `execute-only`.
+10. **Smoke gate 1:1 obligatorio** (`[[calidad-smoke-gate-policy]]`) antes de declarar success. Si falla → status `partial`, no continúa a suite completa.
+11. **Ejecución + triage + auto-corrección** del ciclo: `[[calidad-test-execution-orchestration]]` → `[[calidad-failure-triage-and-classification]]` → `[[calidad-test-self-correction-loop]]` (con `[[calidad-test-self-healing]]` cuando aplica). Bloqueos de ambiente se reportan vía `[[calidad-environment-blocker-evidence]]` (no se intenta auto-corregir el ambiente).
+12. **Executive report** consolidado HTML/PPTX/DOC (`[[generate-executive-report]]`) cuando el modo es `full` o `execute-only`.
+13. **Delivery gate contract** YAML (`[[calidad-delivery-gate-contract]]`) emitido como bloque final con `status`, `blockers[]`, `evidence_persisted{}` y `audit_log`. Sin ese bloque, la entrega se considera incompleta.
 
-No saltar pasos: el router protege contra la generación con inputs incompletos o framework equivocado.
+No saltar pasos: el router protege contra la generación con inputs incompletos, sin diseño aprobado o sin ejecución verificada.
 
-**El contrato de entrega del Chapter incluye ejecución + verificación + auto-corrección.** Generar tests sin ejecutarlos es entrega incompleta. Cada workflow del chapter termina con una fase obligatoria que invoca `[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]` y `[[calidad-test-self-healing]]` cuando aplica. Ver principio 9 en `[[calidad-chapter-perspective]]`.
+**El contrato de entrega del Chapter incluye ejecución + verificación + auto-corrección.** Generar tests sin ejecutarlos es entrega incompleta. Anti-cheating maestro del chapter: tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@accessibility` NO se modifican por auto-corrección bajo ningún concepto. En brownfield, la auto-corrección NUNCA toca tests preexistentes.
 
 ## Convenciones internas
 
@@ -389,8 +468,8 @@ No saltar pasos: el router protege contra la generación con inputs incompletos 
 - **Prose en español**; **código en inglés** (identificadores, comentarios técnicos, paths, comandos).
 - **Sin emojis** en ningún asset.
 - **Links entre assets**:
-  - `[[asset-id]]` sólo para assets que tienen `id:` en su frontmatter.
-  - References se enlazan por **path relativo** desde el documento que los cita, no por id.
+  - `[[asset-id]]` para cualquier asset con `id:` en su frontmatter — es la forma portable porque sobrevive al sync de IDEs (Kiro, Cline, Claude Code, etc.) que aplanan workflows/prompts/steering a una sola carpeta.
+  - References (archivos sin frontmatter dentro de `references/`) se enlazan por **path relativo** sólo cuando el documento que las cita vive en el **mismo skill folder** (ej. el `SKILL.md` apunta a sus propias references). Para references de **otro skill**, citar el skill por `[[skill-id]]` y mencionar el archivo en prosa (`consultar references/Y.md en su subfolder`); el path relativo cross-skill se rompe al sync.
 - **Convenciones cliente-específicas detectadas en brownfield** se documentan como patrones genéricos en `skills/karate/karate-brownfield/references/client-specific-conventions.md`. El brownfield detecta y respeta esas convenciones (naming con prefix de ticket, headers transversales obligatorios, estilo step-by-step, etc.) sin nombrar clientes concretos.
   - El override de inputs obligatorios (cuando el cliente impone convenciones estrictas, `user_story` y `firma` pasan a obligatorios) se documenta en `skills/_all/mandatory-inputs-protocol.md` con pointer al skill.
 
@@ -398,10 +477,9 @@ No saltar pasos: el router protege contra la generación con inputs incompletos 
 
 Items conocidos pendientes en el chapter:
 
-- **Appium iOS** — el auto-generador V3 con soporte iOS está pendiente; V2 cubre sólo Android.
+- **Appium iOS greenfield (V3)** — el scaffolder greenfield V2 solo genera proyectos Android (limitación de tooling). El brownfield Appium SÍ soporta Android e iOS (la plataforma se detecta del proyecto). El generador V3 con soporte iOS greenfield queda pendiente.
+- **AsyncAPI testing formal** — hoy `[[calidad-contract-testing]]` documenta AsyncAPI/Schema Registry/Pact Messaging como referencia. Queda pendiente un skill greenfield específico para eventos (Kafka, SNS/SQS, AMQP/RabbitMQ, Google Pub/Sub) basado en AsyncAPI 3.0, con scaffold de tests de contract de payload + integración con el broker.
 - **Profundizar el catálogo de marcos regulatorios del alcance del Chapter** (LATAM + Estados Unidos): hoy se cubren PCI-DSS, OWASP API, ISO 27001, SOC 2, HIPAA, SOX, CCPA/CPRA, FedRAMP, Ley 1581, LGPD, LFPDPPP, Ley 19.628/21.719, Ley 25.326, Ley 29.733 y equivalentes locales LATAM. Marcos fuera de este alcance (UE, APAC, África) se escalan caso a caso, no se incorporan al chapter por defecto.
-- **AsyncAPI testing** — el ecosistema Karate cubre REST y SOAP; queda pendiente un skill formal para eventos (Kafka, SNS/SQS, AMQP/RabbitMQ, Google Pub/Sub) basado en AsyncAPI 3.0.
-- **Skill formal de contract testing** consumer-driven con Pact, complementario a `match` patterns de Karate.
 
 ## Maintainers
 
