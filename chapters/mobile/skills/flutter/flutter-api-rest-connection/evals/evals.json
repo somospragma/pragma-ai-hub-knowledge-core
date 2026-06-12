@@ -1,0 +1,26 @@
+{
+  "skill_name": "flutter-api-rest-connection",
+  "evals": [
+    {
+      "id": 1,
+      "name": "auth-interceptor-token-refresh",
+      "prompt": "I'm implementing a Flutter feature that needs to call a REST API. Users have JWT tokens that refresh every hour. When a 401 response comes back, I need to refresh the token and retry the original request. However, I'm worried about race conditions if multiple requests get a 401 at the same time. How do I implement the AuthInterceptor with proper token refresh synchronization? Also, where in the Clean Architecture should this go?",
+      "expected_output": "Complete AuthInterceptor implementation using mutex Lock pattern, guidance on proper placement in Data layer, how to register with GetIt/Injectable, and best practices to prevent concurrent refresh race conditions.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "retry-logic-transient-failures",
+      "prompt": "My Flutter app makes HTTP requests but sometimes fails due to network timeouts or temporary connection issues. I want to automatically retry failed requests up to 3 times with exponential backoff, but NOT retry on 4xx/5xx server errors. How do I set up RetryInterceptor in my Dio client? Should I combine it with other interceptors? What's the proper order of interceptors?",
+      "expected_output": "RetryInterceptor implementation with exponential backoff, clarification on which errors to retry (connection timeouts, not server errors), interceptor execution order diagram, and how to register it in the Dio client alongside other interceptors.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "secure-logging-pii-protection",
+      "prompt": "I need to add logging to my Flutter API client for debugging and observability. However, I'm concerned about accidentally logging sensitive data like auth tokens, passwords, or user emails in production. I've heard PrettyDioLogger can leak data to logcat. What's the safe way to implement logging that doesn't expose PII while still capturing useful request/response info? Can I selectively redact sensitive fields?",
+      "expected_output": "Safe logging patterns using LoggingInterceptor, techniques to redact sensitive fields (tokens, passwords, email), examples of what to log vs what to redact, how to disable logging in release builds, and a comparison with PrettyDioLogger's risks.",
+      "files": []
+    }
+  ]
+}

@@ -1,11 +1,19 @@
 ---
 id: calidad-test-self-healing
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: "Estrategias de self-healing aplicadas en runtime a los tests generados por el chapter: multi-locator fallback, LLM-driven selector repair, visual AI healing, schema-drift tolerance. Incluye guardrails contra over-healing que esconde bugs reales."
-tags: [self-healing, auto-healing, multi-locator, llm-repair, visual-ai, schema-drift, resilience]
+tags: [self-healing, auto-healing, multi-locator, llm-repair, visual-ai, schema-drift, resilience, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "self-healing aplica solo a selectores/locators/schema-drift no críticos; nunca a assertions de negocio"
+    failure_message: "Bloqueado: over-healing detectado; se intentó sanar una assertion de contrato/negocio en lugar de un locator."
+  - check: "cada healing en runtime queda registrado con before/after y razón en evidencia"
+    failure_message: "Bloqueado: el healing se aplicó sin dejar registro auditable en .evidence/."
+  - check: "estrategia de healing diseñada antes de entregar (multi-locator, fallback, schema-drift) y no improvisada en runtime"
+    failure_message: "Bloqueado: el suite se entregó sin estrategia de healing — viola la disciplina del chapter para suites en CI/CD recurrente."
 ---
 
 # Test Self-Healing — Estrategias de Resiliencia en Runtime con Guardrails Anti-Cheating

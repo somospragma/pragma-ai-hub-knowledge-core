@@ -270,3 +270,41 @@ class ProductRepositoryImpl implements ProductRepository {
   );
 }
 ```
+
+---
+
+## SafeLoggingInterceptor — Secure Logging Without PII
+
+⚠️ **CRITICAL SECURITY:** Never use `PrettyDioLogger` in production. It logs entire request/response bodies, exposing auth tokens, passwords, user emails, and other sensitive data to logcat and crash reporters.
+
+**Use `SafeLoggingInterceptor` instead:** Logs metadata only (method, status, duration) and redacts all sensitive headers and JSON fields.
+
+**Complete implementation:** See `references/logging_interceptor.md`
+
+**Features:**
+- ✅ Redacts Authorization headers, API keys, cookies
+- ✅ Redacts sensitive JSON fields (password, email, ssn, credit_card, etc.)
+- ✅ Logs only metadata: method, path, status, duration
+- ✅ Never logs request/response body content
+- ✅ Safely integrates with Sentry/Crashlytics
+- ✅ Works in debug and release (errors only in release)
+- ✅ GDPR/PCI-DSS compliant
+
+**Quick Registration:**
+```dart
+@module
+abstract class HttpModule {
+  @injectable
+  SafeLoggingInterceptor provideSafeLoggingInterceptor() =>
+      SafeLoggingInterceptor();
+}
+
+// In Dio setup:
+..interceptors.addAll([
+  authInterceptor,
+  retryInterceptor,
+  safeLoggingInterceptor, // ← Between retry and error
+  errorInterceptor,
+]);
+```
+```

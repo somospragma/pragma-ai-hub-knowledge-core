@@ -1,11 +1,19 @@
 ---
 id: calidad-failure-triage-and-classification
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 description: "Clasificar fallos de tests como deterministas vs intermitentes; identificar causa raíz (bug del SUT, test mal diseñado, data state, ambiente, timing, locator stale, infrastructura) antes de proponer cualquier corrección."
-tags: [triage, classification, flakiness, root-cause, deterministic, quarantine]
+tags: [triage, classification, flakiness, root-cause, deterministic, quarantine, enforcement, mandatory]
+enforcement: mandatory
+verification:
+  - check: "re-run N=3 aplicado sobre cada fallo y clasificación deterministic|flaky|flaky_high_variance asignada por test"
+    failure_message: "Bloqueado: no se aplicó re-run N=3 ni se clasificó cada fallo. No se puede pasar a corrección sin triage."
+  - check: "causa raíz declarada (bug SUT, test design, data state, ambiente, timing, locator stale, infra) antes de proponer fix"
+    failure_message: "Bloqueado: triage no produjo causa raíz; auto-corrección sin causa raíz esconde bugs del SUT."
+  - check: "fallos clasificados como bug del SUT NO pasan a self-correction; se escalan a humano con reporte"
+    failure_message: "Bloqueado: se intentó auto-corregir un bug real del SUT — violación de anti-cheating."
 ---
 
 # Failure Triage and Classification — Clasificación de Fallos y Análisis de Causa Raíz antes de Corregir

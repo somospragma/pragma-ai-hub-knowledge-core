@@ -106,6 +106,8 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros del chapter**.
 5. Reportar estado final agregado: `success` (todos los tests pasan determinísticamente en el framework delegado) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con contexto completo del framework correspondiente).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. El router NO finaliza con éxito si esta fase quedó sin cerrar.
+7. **Invocar `[[generate-executive-report]]`** para producir el reporte consolidado post-corrida en formato HTML/PPTX/DOC. Si modo es `scaffold-only` o `dry-run` → omitir y registrar `null` en el `delivery_gate.evidence_persisted.executive_report`.
+8. **Emitir `[[calidad-delivery-gate-contract]]`** con el bloque YAML completo antes del mensaje final. Sin este bloque, la entrega se considera incompleta.
 
 ## Criterios de finalización
 

@@ -127,3 +127,13 @@ Pragma's Chapter Calidad soporta **tanto greenfield como brownfield** en Appium,
 En brownfield, la auto-corrección aplica EXCLUSIVAMENTE a tests recién generados/modificados por el agente. NUNCA aplicar correcciones automáticas a tests preexistentes del cliente, aunque fallen. Si tests preexistentes fallan: reportar al humano, NO modificar (puede esconder bugs, romper convenciones del cliente, o violar el contrato implícito de no-modificación).
 
 Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`) y a sus invocaciones desde cualquier workflow brownfield del chapter (`[[extend-karate-brownfield]]`, `[[update-playwright-brownfield]]`, `[[extend-k6-brownfield]]`, `[[extend-appium-brownfield]]`). El alcance de la auto-corrección se delimita por el conjunto de archivos producidos o modificados en la corrida actual; cualquier fallo fuera de ese conjunto se reporta y escala, no se repara.
+
+## Paridad de garantías universales brownfield ↔ greenfield
+
+Tras este chapter, todos los workflows brownfield reciben las mismas garantías universales que greenfield: smoke gate (universal), evidencia de bloqueo de ambiente, metadata por corrida, reporte ejecutivo, step isolation, validación contractual no superficial y STRATEGY.md condicional cuando el alcance es grande. La diferencia es de **scope de aplicación**: en brownfield estas mejoras se aplican **solo a archivos NUEVOS emitidos en la sesión**, nunca a tests preexistentes. Concretamente:
+
+- **Smoke gate**: en brownfield ejecuta únicamente tests nuevos (filtrado por tag `@new`, por path de archivo emitido, o equivalente del framework). Los preexistentes no se ejecutan en el gate.
+- **Step isolation y validación contractual**: aplican solo a archivos nuevos. Los preexistentes mantienen su estructura aunque no cumplan los patrones.
+- **Auto-corrección**: solo sobre archivos emitidos en la sesión; preexistentes son intocables.
+- **Reporte ejecutivo**: debe segregar explícitamente "nuevos (en scope de esta sesión)" de "preexistentes (referencia)".
+- **STRATEGY.md**: documenta lo NUEVO, no rediseña lo existente.
