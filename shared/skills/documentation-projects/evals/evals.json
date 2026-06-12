@@ -1,131 +1,121 @@
 {
   "skill_name": "documentation-projects",
+  "_tool_scope": "This file is an evaluation definition — it is not executed as agent instructions. Assertions of type 'llm_judge' are grading metadata, not tool grants. The skill itself uses read/write file access and orchestrates sub-agents; it does not grant blanket tool access.",
   "evals": [
     {
       "id": 1,
-      "eval_name": "new-project-from-scratch",
-      "prompt": "Necesito documentar un nuevo proyecto que estoy construyendo. Es un microservicio en Java con Spring Boot que maneja pagos. Usa PostgreSQL, tiene una API REST y se despliega en AWS. Aún no tenemos ningún documento. ¿Puedes crear la documentación completa del proyecto?",
-      "expected_output": "El orchestrator debe: 1) detectar dominio backend, 2) delegar al Auditor (todos los docs = CREAR), 3) delegar al Interviewer para cada doc uno a la vez, 4) delegar al Generator para cada doc en aislamiento, 5) delegar al Validator para el reporte final. La respuesta debe estar en español.",
+      "prompt": "Necesito documentar mi proyecto de backend en Node.js, no tengo ningún doc todavía",
+      "expected_output": "The orchestrator should: (1) detect missing domain/audience context and ask clarifying questions, OR if sufficient context exists, proceed to delegate to doc-auditor with docs_path='none — new project'. It should present a status matrix showing all 7 documents with action=CREAR and propose the documentation plan.",
+      "files": ["SKILL.md"],
       "assertions": [
         {
-          "id": "A1.1",
-          "name": "activa-orchestrator-en-espanol",
-          "description": "El skill responde en español dado que el prompt está en español",
-          "check": "output está en español — no mezcla inglés en las respuestas al usuario"
+          "id": "a1",
+          "text": "The response invokes or delegates to the doc-auditor agent with a properly formatted AUDITOR INPUT block",
+          "type": "llm_judge"
         },
         {
-          "id": "A1.2",
-          "name": "delega-al-auditor-primero",
-          "description": "El orchestrator menciona o invoca el Auditor como primer paso antes de generar contenido",
-          "check": "output menciona auditor, análisis de documentación existente, o presenta la matriz de estado"
+          "id": "a2",
+          "text": "The response presents or describes a status matrix with all 7 required documents (index.md, project-overview.md, requirements.md, project-structure.md, tech-stack.md, features.md, implementation.md, user-flow.md)",
+          "type": "llm_judge"
         },
         {
-          "id": "A1.3",
-          "name": "no-genera-todos-docs-de-una-vez",
-          "description": "El orchestrator no genera los 7 documentos en una sola respuesta monolítica — delega por partes",
-          "check": "output NO contiene los 7 documentos completos en una sola respuesta; en su lugar muestra flujo por pasos"
-        },
-        {
-          "id": "A1.4",
-          "name": "identifica-dominio-backend-java",
-          "description": "El skill identifica correctamente backend/Java y lo refleja en el flujo",
-          "check": "output menciona dominio backend, Java, Spring Boot o microservicio"
-        },
-        {
-          "id": "A1.5",
-          "name": "presenta-matriz-de-estado",
-          "description": "El Auditor produce y el orchestrator presenta la matriz de estado con los 8 documentos",
-          "check": "output muestra tabla o lista con los 8 documentos y su acción (CREAR/COMPLETAR/LISTO)"
+          "id": "a3",
+          "text": "The response does NOT attempt to generate any document content — it only audits and proposes a plan",
+          "type": "llm_judge"
         }
-      ],
-      "files": []
+      ]
     },
     {
       "id": 2,
-      "eval_name": "existing-partial-docs-completion",
-      "prompt": "Tengo una carpeta docs/ con algunos documentos de mi app Flutter de gestión de tareas. Algunos están a medias con TBDs. El index.md existe pero está vacío. requirements.md tiene solo los headers sin contenido. features.md y user-flow.md están completos. Los demás no existen. ¿Puedes ayudarme a completar la documentación?",
-      "expected_output": "El orchestrator debe: 1) delegar al Auditor que clasifica index.md y requirements.md como COMPLETAR, features.md y user-flow.md como LISTO (no se tocan), y los restantes como CREAR. 2) El Interviewer es invocado solo para docs CREAR/COMPLETAR — uno a la vez. 3) El Generator respeta el contenido existente de features.md y user-flow.md.",
+      "prompt": "Help me write the technical docs for my React dashboard project, I already have a README",
+      "expected_output": "The orchestrator should detect an existing doc (README), ask for or infer the docs/ path, then delegate to doc-auditor. The auditor should classify README as an existing file and flag it for possible mapping to project-overview.md or index.md. The response should present a status matrix distinguishing existing vs missing documents and offer to audit + complete.",
+      "files": ["SKILL.md"],
       "assertions": [
         {
-          "id": "A2.1",
-          "name": "audita-estado-existente",
-          "description": "El Auditor clasifica correctamente los documentos según estado",
-          "check": "output clasifica features.md y user-flow.md como LISTO, index.md y requirements.md como COMPLETAR"
+          "id": "a1",
+          "text": "The response acknowledges the existing README and incorporates it into the audit plan rather than ignoring it",
+          "type": "llm_judge"
         },
         {
-          "id": "A2.2",
-          "name": "no-altera-docs-completos",
-          "description": "El orchestrator indica explícitamente que features.md y user-flow.md no se modificarán",
-          "check": "output indica que features.md y user-flow.md están completos y no se reescriben"
+          "id": "a2",
+          "text": "The response delegates to doc-auditor (not directly to doc-generator) and shows a delegation input block",
+          "type": "llm_judge"
         },
         {
-          "id": "A2.3",
-          "name": "interviewer-por-doc-separado",
-          "description": "El Interviewer es invocado de forma separada por cada documento faltante — no en batch",
-          "check": "output muestra preguntas específicas para documentos individuales, no un mega-cuestionario de todos a la vez"
-        },
-        {
-          "id": "A2.4",
-          "name": "identifica-dominio-mobile-flutter",
-          "description": "El Auditor detecta Flutter/mobile y adapta el flujo",
-          "check": "output menciona Flutter, mobile, iOS/Android, widget, BLoC, o Riverpod"
+          "id": "a3",
+          "text": "The response uses English throughout, matching the input language",
+          "type": "contains"
         }
-      ],
-      "files": []
+      ]
     },
     {
       "id": 3,
-      "eval_name": "audit-and-generalize-specific-docs",
-      "prompt": "Tenemos documentación pero contiene datos reales que queremos generalizar para publicar como template. Por ejemplo, tech-stack.md menciona 'api-key: sk-prod-abc123xyz', implementation.md tiene '/Users/juan/projects/myapp' como setup path, y requirements.md incluye 'github.com/mi-empresa/repo-privado'. ¿Puedes auditar y generalizar los documentos?",
-      "expected_output": "El Auditor debe clasificar esos documentos como GENERALIZAR. El Generator debe reemplazar los datos sensibles con placeholders apropiados. El Validator debe confirmar que el output final no contiene datos sensibles.",
+      "prompt": "Audit my docs/ folder at src/docs and tell me what's missing",
+      "expected_output": "The orchestrator should invoke doc-auditor ONLY with docs_path='src/docs'. It should NOT proceed to the Interviewer or Generator. The response is a status matrix showing which of the 7 documents exist, their content state, and required actions.",
+      "files": ["SKILL.md"],
       "assertions": [
         {
-          "id": "A3.1",
-          "name": "auditor-clasifica-como-generalizar",
-          "description": "El Auditor detecta los datos sensibles y clasifica los docs afectados como GENERALIZAR",
-          "check": "output menciona GENERALIZAR o 'datos sensibles' para tech-stack.md, implementation.md, requirements.md"
+          "id": "a1",
+          "text": "The response invokes doc-auditor with docs_path set to 'src/docs'",
+          "type": "llm_judge"
         },
         {
-          "id": "A3.2",
-          "name": "generator-usa-placeholders",
-          "description": "El Generator reemplaza correctamente los datos sensibles con placeholders",
-          "check": "output propone [API_KEY], /path/to/project/, o [REPOSITORY_URL] en lugar de los datos reales"
+          "id": "a2",
+          "text": "The response does NOT invoke doc-interviewer or doc-generator — the workflow stops after the audit",
+          "type": "llm_judge"
         },
         {
-          "id": "A3.3",
-          "name": "validator-confirma-limpieza",
-          "description": "El Validator produce un reporte que confirma que los datos sensibles fueron eliminados",
-          "check": "output incluye validación de seguridad o checklist confirmando que no hay credenciales ni rutas absolutas"
+          "id": "a3",
+          "text": "The response presents a status matrix table listing each of the 7 required documents with their status",
+          "type": "llm_judge"
         }
-      ],
-      "files": []
+      ]
     },
     {
       "id": 4,
-      "eval_name": "english-trigger-single-doc",
-      "prompt": "I need to write the technical requirements document for our new GraphQL API service built with Node.js and Apollo Server. We're using MongoDB and deploying on GCP. Can you help me create just the requirements.md?",
-      "expected_output": "The skill triggers for a single-document request in English. The orchestrator runs the Auditor (all CREAR since no existing docs mentioned), then invokes the Interviewer only for requirements.md, then the Generator produces requirements.md in English. Responds entirely in English.",
+      "prompt": "Write only the requirements.md for my Flutter mobile app",
+      "expected_output": "The orchestrator should skip the full audit phase (or run a minimal one) and directly invoke doc-interviewer for requirements.md only, then hand off to doc-generator. The interviewer should ask Flutter-domain-specific questions about functional requirements, technical requirements, quality requirements, and environments.",
+      "files": ["SKILL.md"],
       "assertions": [
         {
-          "id": "A4.1",
-          "name": "responds-in-english",
-          "description": "Skill detects English input and responds entirely in English",
-          "check": "output is in English — no Spanish in responses to the user"
+          "id": "a1",
+          "text": "The response invokes doc-interviewer with doc_name='requirements.md' and domain='mobile' or detected_stack containing 'Flutter'",
+          "type": "llm_judge"
         },
         {
-          "id": "A4.2",
-          "name": "scoped-to-single-document",
-          "description": "Orchestrator focuses on requirements.md only, does not generate all 7 documents",
-          "check": "output scopes to requirements.md; does not generate project-overview.md, features.md, etc. without being asked"
+          "id": "a2",
+          "text": "The response does NOT generate all 7 documents — it scopes the workflow to requirements.md only",
+          "type": "llm_judge"
         },
         {
-          "id": "A4.3",
-          "name": "detects-backend-nodejs-graphql",
-          "description": "Auditor identifies Node.js / GraphQL / MongoDB stack correctly",
-          "check": "output mentions Node.js, GraphQL, Apollo, or MongoDB in the domain detection"
+          "id": "a3",
+          "text": "The interviewer questions are adapted to Flutter/mobile context (e.g., mentions pubspec, widgets, platforms, or app stores)",
+          "type": "llm_judge"
         }
-      ],
-      "files": []
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "¿Cuáles son las mejores prácticas para documentar APIs REST?",
+      "expected_output": "The orchestrator should recognize this as a general knowledge question, NOT a project documentation request. It should answer briefly with REST API documentation best practices (OpenAPI/Swagger, versioning, endpoint descriptions, error codes, examples) without triggering the 4-agent orchestration workflow.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "The response does NOT invoke doc-auditor, doc-interviewer, doc-generator, or doc-validator",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "The response answers in Spanish, matching the input language",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "The response mentions at least one concrete REST API documentation tool or standard (e.g., OpenAPI, Swagger, AsyncAPI, or similar)",
+          "type": "contains"
+        }
+      ]
     }
   ]
 }

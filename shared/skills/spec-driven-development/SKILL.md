@@ -1,6 +1,6 @@
 ---
 id: spec-driven-development
-version: 2.0.0
+version: 2.1.0
 scope: global
 type: skill
 name: spec-driven-development
@@ -488,7 +488,7 @@ Stop asking further questions when **any** of the following is true:
 2. The user signals completion: *"done"*, *"good"*, *"no more"*, *"continue"*.
 3. You have asked **5 questions** in this gate.
 
-If no valid questions exist at the start of a gate, proceed immediately without asking.
+If no valid questions exist at the start of a gate, present a brief summary of what will happen next and ask the user to confirm before proceeding (e.g., "No clarifying questions needed — ready to move to Phase X. Shall I continue?").
 
 ---
 
@@ -601,7 +601,7 @@ where the workflow left off.
 | Skipping Requirements | You design for the wrong thing | Insist on the gate. "Let's lock in requirements first." |
 | Over-detailed Requirements | Takes forever to write | Focus on *what*, not *how*. Requirements ≠ implementation. |
 | Overly Complex Design | Tasks become huge and unclear | Ask: "Can we simplify this?" Break design into smaller pieces. |
-| No Approval Gates | Misalignment with user | Always stop and ask for feedback before moving to the next phase. |
+| Bypassing Approval Gates | Misalignment with user | Always stop and present output to the user. Wait for explicit confirmation before moving to the next phase. |
 | Mixing Technologies into Spec | Spec becomes prescriptive | Keep spec technology-agnostic. Delegate tech choices to implementation phase. |
 
 ---

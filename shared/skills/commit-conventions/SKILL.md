@@ -1,12 +1,14 @@
 ---
 id: commit-conventions
-version: 1.0.0
+version: 1.2.0
 scope: global
 type: skill
 name: commit-conventions
 description: >
   Conventional Commits specification for commit messages including types (feat, fix, docs, etc), scopes, and message body/footer conventions. Use when writing commit messages, understanding commit structure, or reviewing commit history.
 license: Complete terms in LICENSE.txt
+permissions:
+  - file_read  # may read CHANGELOG.md or existing commit history when referenced by the user
 metadata:
   category: productivity
 ---
@@ -266,18 +268,23 @@ git commit -m "feat(auth): implement complete authentication system with UI and 
 
 ### Fix Mistakes Properly
 
+> **Note:** The commands below are for **you to run in your terminal** — the agent does not execute them.
+> `--amend` and `rebase -i` **rewrite commit history** and should only be used on commits that have **not yet been pushed** to a shared remote. Using them on pushed commits will cause history divergence for other collaborators.
+
 ```bash
 # Fix in previous commit (not yet pushed)
 git commit --amend -m "feat(auth): corrected implementation"
 
-# Fix in earlier commit (create new commit)
+# Fix in earlier commit (create new commit — safe for pushed commits)
 git commit -m "fix(auth): resolve issue from login feature"
 
-# Interactive rebase for local-only commits (not yet pushed)
+# Interactive rebase for local-only commits (not yet pushed — rewrites history)
 git rebase -i HEAD~3
 ```
 
 ## Viewing Commit History
+
+> **Note:** The commands below are examples for **you to run in your terminal**.
 
 ```bash
 # View conventional commits clearly
@@ -305,6 +312,8 @@ commitlint --from origin/develop --to HEAD
 ```
 
 ## Maintaining Changelog
+
+> **Note:** The git commands in this section are for **you to run in your terminal** — they show a recommended workflow for keeping commits and changelog in sync. The agent does not run `git add` or `git commit` on your behalf.
 
 **Before committing significant changes**, update the CHANGELOG.md file following Keep a Changelog format or skills changelog guidelines.
 

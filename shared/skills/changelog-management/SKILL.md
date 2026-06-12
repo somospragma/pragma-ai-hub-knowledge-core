@@ -1,12 +1,23 @@
 ---
 id: changelog-management
-version: 1.0.0
+version: 1.3.0
 scope: global
 type: skill
 name: changelog-management
 description: >
-   Maintain clear, organized release notes following Keep a Changelog and Semantic Versioning standards. This skill ensures your changelog communicates changes effectively to users and developers.
-license: Complete terms in LICENSE.txt
+  Manage CHANGELOG.md following the Keep a Changelog and Semantic Versioning (semver) standards.
+  Use this skill to create or update CHANGELOG.md entries, classify changes under the standard
+  Keep a Changelog categories (Added, Changed, Deprecated, Removed, Fixed, Security), determine
+  the correct version bump type (MAJOR, MINOR, PATCH) specifically when writing changelog entries
+  or preparing a release of a project, prepare a release by moving entries from [Unreleased] to a
+  numbered version section, or review the format and structure of an existing CHANGELOG.md file.
+  Trigger phrases: release notes, notas de versión, entradas de changelog, preparar release,
+  bump de versión, categorizar cambios en CHANGELOG, validar CHANGELOG, generar release notes
+  desde CHANGELOG. Do NOT trigger for general API versioning strategy, URL versioning, or
+  architectural decisions unrelated to maintaining a CHANGELOG file.
+permissions:
+  - file_read   # reads CHANGELOG.md to validate format and extract entries
+  - file_write  # edits CHANGELOG.md when the user requests updates to entries
 metadata:
   category: productivity
 ---
@@ -111,20 +122,25 @@ Not all categories need to appear in every release.
 
 ### When Developing
 
-1. **Add entry to `[Unreleased]`**
+> These are instructions for **you, the developer**, to follow in your own repository. The agent guides you through these steps on request — it reads and suggests edits to your files, but does not write to disk, persist state, or schedule any recurring actions autonomously.
+
+1. **Add a new entry to the `[Unreleased]` section of your `CHANGELOG.md`**
+
+   Open your `CHANGELOG.md` and add a bullet under the appropriate category inside `[Unreleased]`:
+
    ```markdown
    ## [Unreleased]
    ### Added
    - New comprehensive user profile page
    ```
 
-2. **Use appropriate category** based on change type
+2. **Use the appropriate category** based on the type of change (see the 6 categories above)
 
-3. **Write from user perspective**
-   - "Users can now export data" ✅
-   - "Implemented export feature" ❌
+3. **Write from the user's perspective** — describe what changed for them, not what you did internally
+   - "Users can now export data as CSV" ✅
+   - "Refactored export module" ❌
 
-4. **Keep entries brief** - Save details for pull request descriptions
+4. **Keep entries brief** — save implementation details for pull request descriptions, not the changelog
 
 ### Before Release
 
@@ -151,12 +167,22 @@ Not all categories need to appear in every release.
    ```
 
 5. **Create git tag**
+
+   > ⚠️ **WARNING — DESTRUCTIVE OPERATION**: The commands below permanently modify the remote repository. A pushed tag cannot be easily removed once other systems or CI pipelines have picked it up. **Do not run these automatically — copy and execute them manually in your terminal after verifying the version number.**
+
+   Run these commands in your terminal:
    ```bash
+   # Verify the version number before running
    git tag -a v1.2.0 -m "Release v1.2.0"
+
+   # DESTRUCTIVE: The following push is permanent and cannot be undone on the remote.
+   # Double-check the tag name matches the intended release version.
    git push origin v1.2.0
    ```
 
 ## Semantic Versioning Guide
+
+> **Scope note**: This guide applies specifically to choosing the version number for a CHANGELOG entry or release. For general API versioning strategies (URL versioning, header versioning, etc.) consult your architecture team — that is outside the scope of this skill.
 
 | Change Type | Version | Example |
 |------------|---------|---------|
@@ -230,6 +256,7 @@ PATCH: Fixed login bug, improved performance → v1.0.0 → v1.0.1
 
 ### Validate Changelog Format
 
+Run these commands in your terminal:
 ```bash
 # Simple check for structure
 grep -E "^## \[" CHANGELOG.md
@@ -240,6 +267,7 @@ grep -A 5 "## \[Unreleased\]" CHANGELOG.md | grep -E "### (Added|Changed|Depreca
 
 ### Generate Release Notes
 
+Run these commands in your terminal:
 ```bash
 # Extract unreleased section for release notes
 sed -n '/## \[Unreleased\]/,/## \[/p' CHANGELOG.md | head -n -1
@@ -247,22 +275,24 @@ sed -n '/## \[Unreleased\]/,/## \[/p' CHANGELOG.md | head -n -1
 
 ### Link Version References
 
-```bash
-# Add comparison links at bottom of CHANGELOG.md
-echo "[unreleased]: https://github.com/org/repo/compare/v1.2.0...HEAD" >> CHANGELOG.md
-echo "[1.2.0]: https://github.com/org/repo/releases/tag/v1.2.0" >> CHANGELOG.md
+Add the following version comparison links manually at the bottom of `CHANGELOG.md`:
+
+```markdown
+[unreleased]: https://github.com/org/repo/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/org/repo/releases/tag/v1.2.0
 ```
+
+> Replace `v1.2.0` with the version you just released and adjust the URL to point to the previous version accordingly.
 
 ## See Also
 
 - [Keep a Changelog Official](https://keepachangelog.com/) - Full specification
 - [Semantic Versioning](https://semver.org/) - Version numbering system
 
-## Next Steps
+## Additional References
 
-1. ✅ Read this skill to understand changelog structure
-2. Read [keepachangelog-rules.md](references/keepachangelog-rules.md) for detailed rules
-3. Review [changelog-examples.md](references/changelog-examples.md) for content patterns
-4. Review [writing-guidelines.md](references/writing-guidelines.md) for best practices in writing entries
-5. Follow [categories-guide.md](assets/categories-guide.md) when writing entries
-6. Use [changelog-template.md](assets/changelog-template.md) as reference
+- [keepachangelog-rules.md](references/keepachangelog-rules.md) — Detailed Keep a Changelog rules
+- [changelog-examples.md](references/changelog-examples.md) — Content patterns and real-world examples
+- [writing-guidelines.md](references/writing-guidelines.md) — Best practices for writing changelog entries
+- [categories-guide.md](assets/categories-guide.md) — Guide for choosing the right category
+- [changelog-template.md](assets/changelog-template.md) — Starter template for new changelogs

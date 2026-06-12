@@ -12,7 +12,7 @@
 
 **Why**: What problem does this solve? For whom?
 
-Keep this concise—it's the north star.
+Be concise — this is the north star.
 
 ## Functional Requirements (RF)
 

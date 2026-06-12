@@ -5,7 +5,7 @@ scope: global
 type: skill
 name: branching-model-gitflow
 description: >
-  Git branch strategy, naming conventions, PR/MR workflows, and branch protection rules for ANY project type or tech stack. Use this skill ALWAYS when the user asks about creating or naming branches, merging strategies, release workflows, hotfix procedures, PR/MR templates, branch protection rules, choosing GitFlow vs GitHub Flow, rebasing vs merging, handling production bugs, versioning releases, or establishing Git conventions — in ANY technology (web, mobile, backend, data, infrastructure, monorepos). Also activate when users describe a Git problem in non-technical terms "I need to fix a bug on prod", "we need to release tomorrow", "how do I start a new feature", "someone merged to main by mistake". Trigger even if the user doesn't explicitly say "GitFlow" or "branch strategy."
+  Git branch strategy, naming conventions, PR/MR workflows, and branch protection rules for ANY project type or tech stack. Use this skill when the user asks about creating or naming branches, merging strategies, release workflows, hotfix procedures, PR/MR templates, branch protection rules, choosing GitFlow vs GitHub Flow, rebasing vs merging, handling production bugs, versioning releases, or establishing Git conventions — in ANY technology (web, mobile, backend, data, infrastructure, monorepos). Also activate when users to describe a Git problem in non-technical terms "I need to fix a bug on prod", "we need to release tomorrow", "how do I start a new feature", "someone merged to main by mistake".
 license: Complete terms in LICENSE.txt
 metadata:
   category: productivity
@@ -88,6 +88,8 @@ git push origin feature/{issue-id}_{task-id}
 # CI: lint + tests
 
 # 6. After approval, merge task into feature and clean up
+# DESTRUCTIVE: The following delete commands remove branches permanently.
+# Verify you are on the correct branch and that the work has been merged.
 git checkout feature/{issue-id}
 git pull origin feature/{issue-id}
 git merge feature/{issue-id}_{task-id}
@@ -102,6 +104,7 @@ git push origin --delete feature/{issue-id}_{task-id}
 git checkout develop
 git merge --no-ff feature/{issue-id}
 git push origin develop
+# DESTRUCTIVE: Deletes the feature branch locally and on remote.
 git branch -d feature/{issue-id}
 git push origin --delete feature/{issue-id}
 ```
@@ -141,6 +144,7 @@ git merge --no-ff release-{version}
 git push origin develop
 
 # 8. Clean up
+# DESTRUCTIVE: Deletes the release branch locally and on remote.
 git branch -d release-{version}
 git push origin --delete release-{version}
 ```
@@ -171,6 +175,7 @@ git cherry-pick <fix-commit-hash>
 git push origin develop
 
 # 6. Clean up
+# DESTRUCTIVE: Deletes the hotfix branch locally and on remote.
 git branch -d hotfix-{version}
 git push origin --delete hotfix-{version}
 ```
@@ -193,6 +198,7 @@ git push origin bugfix/{issue-id}_{short-desc}
 git checkout develop     # (or release)
 git merge bugfix/{issue-id}_{short-desc}
 git push origin develop
+# DESTRUCTIVE: Deletes the bugfix branch locally and on remote.
 git branch -d bugfix/{issue-id}_{short-desc}
 git push origin --delete bugfix/{issue-id}_{short-desc}
 ```
@@ -246,7 +252,7 @@ git reset --soft HEAD~1
 # View full branch graph
 git log --all --graph --decorate --oneline
 
-# Delete local + remote branch
+# DESTRUCTIVE: Delete local + remote branch (ensure work is merged first)
 git branch -d feature/{issue-id}
 git push origin --delete feature/{issue-id}
 
@@ -256,7 +262,8 @@ git cherry-pick <commit-hash>
 # Squash commits before PR (interactive rebase)
 git rebase -i HEAD~3
 
-# Safe force-push (personal branches only — never shared branches)
+# DESTRUCTIVE: Force-push rewrites remote history. Use ONLY on personal branches.
+# Never use on shared branches (develop, main, release).
 git push --force-with-lease origin feature/{issue-id}
 ```
 

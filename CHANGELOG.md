@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **branching-model-gitflow**: Updated with enhanced evaluation tests and improved branch strategy references (v1.2.0)
+- **changelog-management**: Added comprehensive evals and clarified developer workflow guidance (v1.4.0)
+- **commit-conventions**: Added permissions declaration and clarified git command warnings for history rewriting (v1.2.0)
+- **documentation-projects**: Added permissions, security notes, and updated evals (v1.3.0)
+- **spec-driven-development**: Updated version to 2.1.0 with improved gate confirmation prompts (v2.1.0)
+
 ### Added
 
 #### Shared Skills (Global)
@@ -16,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **spec-driven-development**: Spec-Driven Development workflow for intercepting change requests before code implementation
 - **branching-model-gitflow**: GitFlow branch strategy with feature, release, and hotfix branches
 - **branching-model-trunk-based**: Trunk-Based Development strategy for continuous integration and deployment
+
+#### Security & Evaluations
+- Added SkillSpector security reports for all modified skills
+- Added comprehensive evals.json files for changelog-management, commit-conventions, documentation-projects, and spec-driven-development skills
+- Added evaluation markdown files for all major skills
 
 #### Mobile Stack (Flutter)
 - Flutter-specific skills and capabilities for mobile development

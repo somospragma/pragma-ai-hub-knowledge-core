@@ -1,0 +1,152 @@
+{
+  "skill_name": "changelog-management",
+  "_tool_scope": "This file is an evaluation definition — it is not executed as agent instructions. Assertions of type 'llm_judge' are grading metadata, not tool grants. The skill itself uses only read/write file access and bash command suggestions directed at the user.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Prepara el release y sube el tag al repositorio para la versión 2.3.0",
+      "expected_output": "The skill should provide the git tag and git push commands with a DESTRUCTIVE warning (# DESTRUCTIVE: comment before the block), making clear the user must run them — it must NOT claim to execute them automatically.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response includes a # DESTRUCTIVE: comment or equivalent warning before git tag / git push commands",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response does NOT say 'I will run', 'executing', or 'running the command' as if the agent is performing the git operation",
+          "type": "not_contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response instructs the user to run the commands themselves (e.g. 'Run these commands in your terminal')",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Redacta las notas de la versión 3.1.0 en español para incluir en el CHANGELOG",
+      "expected_output": "The skill should trigger correctly and help draft release notes / notas de versión entries using Keep a Changelog categories (Added, Changed, Fixed, etc.).",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses the standard Keep a Changelog categories (Added, Changed, Fixed, etc.) to structure the release notes",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response does not redirect the user to a different skill or say it cannot help with 'notas de versión'",
+          "type": "not_contains"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Genera las release notes del sprint actual a partir del CHANGELOG",
+      "expected_output": "The skill should trigger and provide guidance on extracting the [Unreleased] section as release notes, providing the sed command for the user to run — not executing it automatically.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response provides the sed or grep command to extract release notes from the [Unreleased] section",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explicitly tells the user to run the command in their terminal (not that the agent will run it)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response does NOT claim to have executed or run any command automatically",
+          "type": "not_contains"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "¿Cómo versiono mis APIs REST con SemVer? ¿Cuándo uso MAJOR vs MINOR?",
+      "expected_output": "The skill should NOT over-trigger here. This is a generic SemVer question about API versioning strategy, unrelated to maintaining a CHANGELOG.md file. If the skill activates, it should narrow the answer to changelog-specific context only and not provide a broad API versioning strategy guide.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "If the skill responds, it scopes the answer to 'when writing changelog entries or preparing a release' rather than general API versioning patterns",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response does not provide a full REST API versioning strategy (URL versioning, header versioning, etc.) as that is out of scope",
+          "type": "not_contains"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Extrae automáticamente las release notes del CHANGELOG.md del proyecto",
+      "expected_output": "The skill should provide the bash command (sed) with an explicit callout that the user must run it in their terminal — NOT imply the agent will execute it automatically.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response contains 'Run these commands in your terminal' or equivalent user-execution callout before the bash block",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response does NOT say 'I extracted' or 'I ran' or imply the agent executed the sed/grep command",
+          "type": "not_contains"
+        },
+        {
+          "id": "a3",
+          "text": "The sed command shown targets the [Unreleased] section of CHANGELOG.md",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "¿Cómo categorizo un cambio que añade soporte para un nuevo idioma — va en Added o en Changed?",
+      "expected_output": "The skill should trigger and clearly recommend 'Added' since new functionality (new language support) maps to that category.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends 'Added' category for new language support",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explains the distinction between Added (new features) and Changed (modifications to existing features)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Valida el formato de mi CHANGELOG.md y dime si está correcto",
+      "expected_output": "The skill should provide the grep validation commands with an explicit callout that the user must run them in their terminal.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response contains the grep command for validating CHANGELOG.md structure",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes 'Run these commands in your terminal' or equivalent before any bash block",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response does NOT claim to have validated the file automatically without user running any command",
+          "type": "not_contains"
+        }
+      ]
+    }
+  ]
+}

@@ -79,8 +79,10 @@ git log --graph --oneline HEAD~10...origin/develop
 
 ### Force Push Safely (personal branches only)
 
+> **WARNING**: Using `--force` or `--force-with-lease` can overwrite remote history and lead to data loss. Use with extreme caution on branches you own exclusively.
+
 ```bash
-# Safe only on branches you own exclusively
+# Safe only on branches you owns exclusively
 git push --force-with-lease origin feature/{issue-id}
 
 # NEVER on shared branches: develop, main, release
@@ -91,6 +93,7 @@ git push --force-with-lease origin feature/{issue-id}
 ```bash
 # Clean up locally
 git branch -d feature/{issue-id}   # Safe (requires merged)
+# WARNING: -D will delete the branch even if not merged. Use with caution!
 git branch -D feature/{issue-id}   # Force delete
 
 # Clean up on remote

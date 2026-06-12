@@ -1,14 +1,20 @@
 [build-system]
-requires = ["hatchling"]
+# hatchling is pinned to a known-safe version. Update deliberately after reviewing release notes.
+requires = ["hatchling==1.30.0"]
 build-backend = "hatchling.build"
 
 [project]
 name = "sdd-scripts"
 version = "0.1.0"
 description = "Validation scripts for the spec-driven-development skill."
+# NOTE: 'requires-python' is a PEP 517/518 build metadata field — NOT a PyPI dependency.
+# Advisory MAL-2025-41747 targets a PyPI package named 'requires-python', which is unrelated
+# to this standard TOML key. This is a confirmed false positive (scanner: SC4, confidence 80%).
+# No remediation needed for this field. See: https://osv.dev/vulnerability/MAL-2025-41747
 requires-python = ">=3.9"
 dependencies = [
-    "jsonschema>=4.0",
+    # jsonschema pinned to a known-safe version. Update deliberately after reviewing changelogs.
+    "jsonschema==4.25.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -16,7 +22,7 @@ packages = []
 
 [tool.hatch.envs.default]
 dependencies = [
-    "jsonschema>=4.0",
+    "jsonschema==4.25.0",
 ]
 
 [tool.hatch.envs.default.scripts]
