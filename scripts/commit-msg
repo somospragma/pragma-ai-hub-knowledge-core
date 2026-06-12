@@ -1,0 +1,40 @@
+#!/bin/sh
+# commit-msg hook: validates Conventional Commits format
+# Usage: .git/hooks/commit-msg <path-to-commit-msg-file>
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+COMMIT_MSG_FILE=$1
+COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+
+# Ignore merge and revert lines
+if echo "$COMMIT_MSG" | grep -qE "^Merge |^Revert "; then
+  exit 0
+fi
+
+PATTERN="^(feat|fix|docs|style|refactor|test|chore|ci|build|perf)(\([a-zA-Z0-9_/-]+\))?: .{1,72}$"
+
+if ! echo "$COMMIT_MSG" | grep -qE "$PATTERN"; then
+  echo ""
+  echo -e "${RED}❌ Invalid commit message.${NC}"
+  echo ""
+  echo -e "   Expected format: ${CYAN}<type>(<scope>): <description>${NC}"
+  echo -e "   Valid types: ${CYAN}feat, fix, docs, style, refactor, test, chore, ci, build, perf${NC}"
+  echo ""
+  echo -e "   Valid examples:"
+  echo -e "     ${CYAN}feat(auth): add biometric login${NC}"
+  echo -e "     ${CYAN}fix: correct null pointer in http client${NC}"
+  echo -e "     ${CYAN}docs: update README${NC}"
+  echo ""
+  echo -e "   Your message: ${YELLOW}$COMMIT_MSG${NC}"
+  echo ""
+  exit 1
+fi
+
+exit 0

@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+#### Flutter Skills
+- Flutter-specific skills and highly optimized capabilities for mobile development with [skill-crator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) and [SkillSpector](https://github.com/NVIDIA/SkillSpector)
+- **flutter-api-rest-connection**: Refactored to include updated evaluations, improved Dio setup documentation, and new logging interceptor references.
+
 ### Added
+
+#### General
+- Add script `scan_skills.sh` for excute [SkillSpector](https://github.com/NVIDIA/SkillSpector) e.g. `./scripts/scan_skills.sh --help`
+- Add script `commit-msg` and `makefile` to add control to the repository
 
 #### Shared Skills (Global)
 - **changelog-management**: Maintain clear, organized release notes following Keep a Changelog and Semantic Versioning standards
