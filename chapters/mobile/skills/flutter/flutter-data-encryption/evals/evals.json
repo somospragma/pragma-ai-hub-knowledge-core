@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-data-encryption",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to encrypt user health records at rest in a Flutter app before storing them locally. The data is sensitive (HIPAA context). What algorithm should I use, how do I implement it correctly with pointycastle, and how do I manage the key?",
+      "expected_output": "Recommends AES-256-GCM (12-byte unique nonce per encryption, 128-bit auth tag). Shows AesGcmEncryptionService with encrypt/decrypt, base64(nonce):base64(ciphertext+tag) format, Random.secure() for nonce generation. EncryptionKeyProvider with FlutterSecureStorage. Explicitly rejects AES-ECB, DES, encrypt package. Notes InvalidCipherTextException for tamper detection.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I want to let users set a passcode for the app. I need to store it securely and verify it when they enter it. What's the correct way to hash the passcode in Flutter, and what algorithm should I use? I've seen some code using SHA-256 directly which I'm told is wrong.",
+      "expected_output": "Rejects plain SHA-256 for passwords (designed for speed, not password hashing). Recommends PBKDF2-SHA256 with ≥310k iterations (or Argon2id). Shows PasswordHasher with hash() returning 'base64(salt):base64(hash)' and verify() with constant-time comparison (_constantTimeEquals) to prevent timing attacks. Explains why iterations and salt are necessary. Notes Argon2id as even better alternative.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I'm doing a security review of a Flutter codebase and I want to check for common cryptography mistakes. What forbidden patterns should I search for, and why is each one dangerous?",
+      "expected_output": "Lists all forbidden patterns from the skill: MD5 (broken, collision attacks), SHA-1 (deprecated), AES-ECB (leaks data patterns via ECB penguin), Random() for crypto (not cryptographically secure, use Random.secure()), hardcoded keys (never in source, use FlutterSecureStorage), nonce reuse in GCM (catastrophic — allows key recovery), encrypt package (hides critical GCM params), RSA-PKCS1v1.5 (padding oracle attacks). Each with concrete reason and secure alternative.",
+      "files": []
+    }
+  ]
+}

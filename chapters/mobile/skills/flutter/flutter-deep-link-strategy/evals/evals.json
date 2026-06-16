@@ -1,0 +1,74 @@
+{
+  "skill_name": "flutter-deep-link-strategy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a Flutter e-commerce app with a bottom navigation bar (3 tabs: Home, Cart, Profile). I need deep links like `/product/:id` to open inside the Home tab and `/profile/:userId` to open the Profile tab. How do I set this up with go_router?",
+      "expected_output": "Recommends StatefulShellRoute.indexedStack for bottom navigation with persistent tabs. Shows branch configuration with deep links nested inside the correct branch. Explains route placement strategy.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends StatefulShellRoute.indexedStack for bottom navigation with deep links activating the correct tab",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows StatefulShellBranch with routes nested inside the correct branch",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains that deep links placed in the correct branch will activate that tab",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My Flutter app receives share links like `/share/:token` but I need to validate the token before navigating. If it's expired or invalid, redirect to home. How do I implement this route guard with go_router?",
+      "expected_output": "Shows redirect callback in GoRoute for authentication/validation. Demonstrates Either<DeepLinkFailure, T> error handling. Includes unauthorized failure type and redirect logic.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses go_router redirect callback or GoRoute redirect for the route guard",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes error handling for invalid or unauthorized deep links",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions DeepLinkFailure or unauthorized failure type",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "How do I configure Android App Links and iOS Universal Links for my Flutter app so that `https://myapp.com/product/123` opens the app instead of a browser?",
+      "expected_output": "Shows Android intent-filter with autoVerify=true, associated domains entitlement for iOS, and confirms go_router 17.x handles deep links declaratively.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response covers Android App Links configuration including intent-filter with android:autoVerify",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response covers iOS Universal Links with associated domains or entitlements",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions go_router 17 or the go_router version used in the skill",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

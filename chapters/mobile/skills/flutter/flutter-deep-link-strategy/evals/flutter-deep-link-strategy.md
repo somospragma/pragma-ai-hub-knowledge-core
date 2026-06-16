@@ -1,14 +1,14 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-deep-link-strategy`  
-**Scanned:** 2026-06-03 17:42:21 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-deep-link-strategy`  
+**Scanned:** 2026-06-15 20:26:19 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 10/100 |
+| Score | 0/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
@@ -19,18 +19,9 @@
 | `SKILL.md` | markdown | 159 | No |
 | `references/implementation_guide.md` | markdown | 1209 | No |
 
-## Issues (1)
+## Issues (0)
 
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/implementation_guide.md:886`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 

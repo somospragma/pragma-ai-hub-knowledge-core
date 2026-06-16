@@ -1,74 +1,32 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-database-strategy`  
-**Scanned:** 2026-06-03 17:42:17 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-database-strategy`  
+**Scanned:** 2026-06-16 13:26:05 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 100/100 |
-| Severity | CRITICAL |
-| Recommendation | DO NOT INSTALL |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
 ## Components (7)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 182 | No |
-| `evals/flutter-database-strategy.md` | markdown | 43 | No |
-| `references/drift.md` | markdown | 264 | No |
+| `evals/evals.json` | json | 79 | No |
+| `references/drift.md` | markdown | 269 | No |
 | `references/isar.md` | markdown | 180 | No |
 | `references/objectbox.md` | markdown | 193 | No |
-| `references/repository_pattern.md` | markdown | 233 | No |
-| `references/secure_storage.md` | markdown | 160 | No |
+| `references/repository_pattern.md` | markdown | 258 | No |
+| `references/secure_storage.md` | markdown | 165 | No |
 
-## Issues (4)
+## Issues (0)
 
-### 🔴 HIGH: PE3
-
-**Location:** `SKILL.md:26`  
-**Confidence:** 70%  
-
-**Message:** Credential Access
-
-**Remediation:** Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.
-
----
-
-### 🔴 HIGH: PE3
-
-**Location:** `SKILL.md:48`  
-**Confidence:** 70%  
-
-**Message:** Credential Access
-
-**Remediation:** Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.
-
----
-
-### 🔴 HIGH: PE3
-
-**Location:** `references/secure_storage.md:6`  
-**Confidence:** 70%  
-
-**Message:** Credential Access
-
-**Remediation:** Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.
-
----
-
-### 🔴 HIGH: PE3
-
-**Location:** `references/secure_storage.md:30`  
-**Confidence:** 70%  
-
-**Message:** Credential Access
-
-**Remediation:** Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.
-
----
+No security issues detected.
 
 ## Metadata
 

@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-dependency-injection-pattern`  
-**Scanned:** 2026-06-03 17:42:22 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-dependency-injection-pattern`  
+**Scanned:** 2026-06-16 14:45:04 UTC  
 
 ## Risk Assessment
 
@@ -18,7 +18,7 @@
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 300 | No |
 | `assets/di_module_template.dart` | other | 102 | No |
-| `evals/flutter-dependency-injection-pattern.md` | markdown | 31 | No |
+| `evals/evals.json` | json | 79 | No |
 | `references/module_patterns.md` | markdown | 163 | No |
 
 ## Issues (0)

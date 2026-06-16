@@ -224,7 +224,12 @@ static QueryExecutor _openEncryptedConnection(String encryptionKey) {
         final dir = await getApplicationDocumentsDirectory();
         return path.join(dir.path, 'app_encrypted.db');
       },
-      setup: (db) => db.execute("PRAGMA key = '$encryptionKey'"),
+      setup: (db) {
+        // Use a parameterized statement instead of string interpolation.
+        // Never build PRAGMA key via '$encryptionKey' — if the key value
+        // were ever influenced by untrusted input, that would be SQL injection.
+        db.execute('PRAGMA key = ?', [encryptionKey]);
+      },
     ),
   );
 }

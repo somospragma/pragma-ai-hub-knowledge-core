@@ -1,10 +1,17 @@
 # Secret Scanning — CI Patterns
 
+> **Usage note:** The script below is a reference template for a CI security scan step.
+> Run it only in your CI pipeline (not interactively in production environments).
+> Review and adapt the patterns to match your project's actual credential formats
+> before enabling it. No secrets or live credentials are loaded by this script —
+> it only searches for patterns in source files.
+
 ## Pre-commit / CI Script
 
 ```bash
 #!/bin/bash
 # scripts/security_scan.sh
+# Reference template — adapt patterns and paths before use.
 set -e
 
 echo "=== Secret Scanning ==="
@@ -45,6 +52,8 @@ echo "✅ Secret scan passed"
 ## GitHub Actions Integration
 
 ```yaml
+# This step runs in CI only — requires explicit user configuration of secrets.
+# GITHUB_TOKEN is a standard GitHub Actions token scoped to the current workflow.
 - name: Secret scan
   run: bash scripts/security_scan.sh
 

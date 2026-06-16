@@ -129,7 +129,12 @@ class AppDatabase extends _$AppDatabase {
       driftDatabase(
         name: 'app_database_encrypted',
         native: DriftNativeOptions(
-          setup: (db) => db.execute("PRAGMA key = '$key'"),
+          setup: (db) {
+            // Pass the key as a bound parameter to avoid SQL injection via
+            // string interpolation. PRAGMA key supports parameterized binding
+            // through the sqlite3 C API, which drift's NativeDatabase exposes.
+            db.execute('PRAGMA key = ?', [key]);
+          },
         ),
       );
 }

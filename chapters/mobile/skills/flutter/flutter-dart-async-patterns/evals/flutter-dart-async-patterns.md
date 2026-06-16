@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-dart-async-patterns`  
-**Scanned:** 2026-06-03 17:42:11 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-dart-async-patterns`  
+**Scanned:** 2026-06-15 19:45:54 UTC  
 
 ## Risk Assessment
 
@@ -17,7 +17,7 @@
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 140 | No |
-| `evals/flutter-dart-async-patterns.md` | markdown | 30 | No |
+| `evals/evals.json` | json | 23 | No |
 | `references/patterns.md` | markdown | 282 | No |
 
 ## Issues (0)

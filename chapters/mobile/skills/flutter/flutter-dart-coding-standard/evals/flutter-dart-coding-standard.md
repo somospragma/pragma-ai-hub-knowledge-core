@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-dart-coding-standard`  
-**Scanned:** 2026-06-03 17:42:13 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-dart-coding-standard`  
+**Scanned:** 2026-06-16 14:30:25 UTC  
 
 ## Risk Assessment
 
@@ -18,10 +18,10 @@
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 283 | No |
 | `assets/analysis_options.yaml` | yaml | 120 | No |
-| `evals/flutter-dart-coding-standard.md` | markdown | 33 | No |
+| `evals/evals.json` | json | 23 | No |
 | `references/analysis_options.md` | markdown | 90 | No |
 | `references/dart3_patterns.md` | markdown | 221 | No |
-| `scripts/lint_fix.sh` | shell | 55 | Yes |
+| `scripts/lint_fix.sh` | shell | 109 | Yes |
 
 ## Issues (0)
 

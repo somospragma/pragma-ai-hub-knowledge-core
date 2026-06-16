@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-database-strategy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to store a product catalog with categories and inventory levels. We'll need to run joins between products and categories, and the UI should auto-update when stock changes. Which local database should I use and how do I set it up with the repository pattern?",
+      "expected_output": "Recommends Drift for relational data with reactive streams. Shows abstract interface class repository, DAO with reactive watch() stream, proper dependencies, and architecture integration.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends Drift for relational data with join requirements",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes abstract interface class for the repository contract",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes a reactive Stream (watch method) in the DAO",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response shows drift and drift_flutter dependencies in pubspec",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "We're building a Flutter app with a social feed that needs to persist thousands of posts locally with very high write throughput — users can like/comment offline and sync later. Hive was used in the old version. What should we migrate to?",
+      "expected_output": "Recommends ObjectBox for high write throughput. Warns that Hive is in maintenance mode. Shows entity definition, Box DAO, reactive stream, and repository pattern.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response warns that Hive is in maintenance mode and should not be used for new projects",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends ObjectBox for high write throughput requirements",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes objectbox and objectbox_flutter_libs in dependencies",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need to store JWT tokens and an encryption key for my Flutter app's local database. Where should I store these sensitive values and how do I integrate them with my Drift database?",
+      "expected_output": "Recommends flutter_secure_storage for JWT tokens and encryption keys. Shows secure_storage service, encryption key generation, and integration with Drift via SQLCipher.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends flutter_secure_storage for sensitive data like tokens and keys — not the database itself",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response does NOT suggest storing sensitive data inside the regular database",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions version ^10.0.0 or flutter_secure_storage package",
+          "type": "contains"
+        }
+      ]
+    }
+  ]
+}

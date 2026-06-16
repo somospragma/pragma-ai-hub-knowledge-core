@@ -1,60 +1,29 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-data-encryption`  
-**Scanned:** 2026-06-03 17:42:16 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-data-encryption`  
+**Scanned:** 2026-06-15 19:48:41 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 45/100 |
-| Severity | MEDIUM |
-| Recommendation | CAUTION |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
 ## Components (4)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 285 | No |
-| `evals/flutter-data-encryption.md` | markdown | 51 | No |
+| `evals/evals.json` | json | 23 | No |
 | `references/rsa_patterns.md` | markdown | 172 | No |
-| `references/secret_scanning.md` | markdown | 76 | No |
+| `references/secret_scanning.md` | markdown | 85 | No |
 
-## Issues (3)
+## Issues (0)
 
-### 🔴 HIGH: PE3
-
-**Location:** `references/secret_scanning.md:72`  
-**Confidence:** 70%  
-
-**Message:** Credential Access
-
-**Remediation:** Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/secret_scanning.md:14`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/secret_scanning.md:70`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 

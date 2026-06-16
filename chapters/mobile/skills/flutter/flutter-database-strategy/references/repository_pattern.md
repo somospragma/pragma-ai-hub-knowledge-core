@@ -22,6 +22,31 @@ abstract interface class ProductRepository {
 }
 ```
 
+## DAO — Search Method
+
+Search logic belongs in the DAO, not in the repository. This keeps the repository
+agnostic of database-specific APIs (Drift query builders, raw SQL, etc.) and makes
+the logic independently testable.
+
+```dart
+// lib/features/product/data/datasources/product_dao.dart
+@DriftAccessor(tables: [Products])
+@injectable
+class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
+  ProductDao(super.db);
+
+  // ... other methods ...
+
+  /// Search products by name using Drift's type-safe query builder.
+  /// The '%' wildcards are added here, not in the repository.
+  Future<List<Product>> search(String query) =>
+      (select(products)
+            ..where((t) => t.name.like('%$query%'))
+            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+          .get();
+}
+```
+
 ## Repository Implementation (Drift example)
 
 ```dart
@@ -96,9 +121,9 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Either<Failure, List<Product>>> searchProducts(String query) async {
     try {
-      final rows = await (_dao.db.select(_dao.db.products)
-            ..where((t) => t.name.like('%$query%')))
-          .get();
+      // Delegate search logic to the DAO — the repository stays agnostic
+      // of database-specific types and query builders.
+      final rows = await _dao.search(query);
       return Right(rows.map(_mapper.fromRow).toList());
     } catch (e) {
       return Left(Failure.local(message: '$e'));
