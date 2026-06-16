@@ -1,14 +1,17 @@
 ---
 id: flutter-ds-atomic-hierarchy
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-atomic-hierarchy
 description: >
   Atomic Design classification rules and hierarchy for the Design System.
   Use when classifying components as atoms, molecules, or organisms,
   deciding composition strategy, or building dependency graphs (DAG).
+  Always activate when creating a new DS component to ensure correct level
+  classification and that organisms never import other organisms.
 ---
 
 # Atomic Hierarchy
@@ -79,7 +82,7 @@ Contains other DS widgets?
 - An **atom** does NOT import other DS widgets
 - A **molecule** ONLY imports atoms
 - An **organism** imports molecules AND/OR atoms
-- **FORBIDDEN** to import organisms inside other organisms
+- ❌ **FORBIDDEN**: importing organisms inside other organisms — this creates tight coupling and breaks the hierarchy. If two sections share structure, extract a molecule.
 
 ### Reuse Strategy
 - `reuse`: existing compatible component → import directly

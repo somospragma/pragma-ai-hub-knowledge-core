@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-folder-structure`  
-**Scanned:** 2026-06-03 17:42:36 UTC  
+**Skill:** flutter-ds-folder-structure  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-folder-structure`  
+**Scanned:** 2026-06-16 15:06:42 UTC  
 
 ## Risk Assessment
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 133 | No |
-| `evals/flutter-ds-folder-structure.md` | markdown | 39 | No |
+| `SKILL.md` | markdown | 144 | No |
+| `evals/evals.json` | json | 74 | No |
 | `references/TREE.md` | markdown | 135 | No |
 
 ## Issues (0)

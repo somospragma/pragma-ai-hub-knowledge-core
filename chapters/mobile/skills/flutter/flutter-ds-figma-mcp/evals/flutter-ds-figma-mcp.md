@@ -1,14 +1,14 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-figma-mcp`  
-**Scanned:** 2026-06-03 17:42:34 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-figma-mcp`  
+**Scanned:** 2026-06-16 15:04:30 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 10/100 |
+| Score | 0/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
@@ -16,21 +16,12 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 283 | No |
-| `evals/flutter-ds-figma-mcp.md` | markdown | 29 | No |
+| `SKILL.md` | markdown | 305 | No |
+| `evals/evals.json` | json | 79 | No |
 
-## Issues (1)
+## Issues (0)
 
-### 🟡 MEDIUM: OH3
-
-**Location:** `SKILL.md:205`  
-**Confidence:** 60%  
-
-**Message:** Unbounded Output
-
-**Remediation:** Set explicit limits on output length, generation count, and rate. Use max_tokens and truncation to prevent unbounded output.
-
----
+No security issues detected.
 
 ## Metadata
 

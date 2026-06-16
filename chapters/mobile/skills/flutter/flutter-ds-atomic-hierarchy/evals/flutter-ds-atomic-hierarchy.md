@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-atomic-hierarchy`  
-**Scanned:** 2026-06-03 17:42:29 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-atomic-hierarchy`  
+**Scanned:** 2026-06-16 14:57:32 UTC  
 
 ## Risk Assessment
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 103 | No |
-| `evals/flutter-ds-atomic-hierarchy.md` | markdown | 29 | No |
+| `SKILL.md` | markdown | 105 | No |
+| `evals/evals.json` | json | 79 | No |
 
 ## Issues (0)
 

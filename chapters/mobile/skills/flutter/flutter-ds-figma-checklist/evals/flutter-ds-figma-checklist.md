@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-figma-checklist`  
-**Scanned:** 2026-06-03 17:42:32 UTC  
+**Skill:** flutter-ds-figma-checklist  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-figma-checklist`  
+**Scanned:** 2026-06-16 15:00:44 UTC  
 
 ## Risk Assessment
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 98 | No |
-| `evals/flutter-ds-figma-checklist.md` | markdown | 30 | No |
+| `SKILL.md` | markdown | 122 | No |
+| `evals/evals.json` | json | 56 | No |
 | `references/EXTENDED-CHECKLIST.md` | markdown | 43 | No |
 
 ## Issues (0)

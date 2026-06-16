@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-component-template`  
-**Scanned:** 2026-06-03 17:42:30 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-component-template`  
+**Scanned:** 2026-06-16 14:59:46 UTC  
 
 ## Risk Assessment
 
@@ -16,11 +16,11 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 67 | No |
+| `SKILL.md` | markdown | 109 | No |
 | `assets/atom_template.dart.txt` | text | 93 | No |
 | `assets/molecule_template.dart.txt` | text | 77 | No |
 | `assets/organism_template.dart.txt` | text | 95 | No |
-| `evals/flutter-ds-component-template.md` | markdown | 32 | No |
+| `evals/evals.json` | json | 56 | No |
 
 ## Issues (0)
 

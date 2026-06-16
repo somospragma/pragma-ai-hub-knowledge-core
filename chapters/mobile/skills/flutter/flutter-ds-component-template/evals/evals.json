@@ -1,0 +1,56 @@
+{
+  "skill_name": "flutter-ds-component-template",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to create a new DS button atom for our Flutter Design System. It has variants (primary, secondary, ghost), sizes (sm, md, lg), and states (default, loading, disabled). Give me the complete starting template.",
+      "expected_output": "Provides complete atom template with const constructor, super.key, final properties, state/variant/size enums, build() delegating to _build* per state, and _resolve* methods for token lookup. Uses DS_PREFIX.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses the atom template structure with const constructor and required parameters first",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes enums for State, Variant, and Size",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes _build* private methods for state-based building and _resolve* methods for token resolution",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response includes DS_PREFIX in the widget class name",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need a molecule template for a ProductPriceMolecule that composes our DS Text atom (for the price label), DS Badge atom (for the discount badge), and DS Text atom (for the original crossed-out price). Show me the molecule template structure.",
+      "expected_output": "Provides molecule template that imports and uses DS atoms, delegates visual properties to child atoms, uses data parameters (String price, String discount), adds layout with spacing tokens, propagates states to atoms.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response imports and uses existing DS atoms — does not recreate text or badge functionality",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses data parameters (String price, bool showDiscount, etc.) not Widget parameters",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response uses spacing tokens between children — not hardcoded pixel values",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-ds-atomic-hierarchy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to build a product card for our Design System. It has a product image, title text, price, a favorite icon button, and an 'Add to cart' button. How should I classify and decompose this into the atomic hierarchy?",
+      "expected_output": "Classifies overall card as Organism. Decomposes into molecules (CardHeader, CardActions) and atoms (Image, Text, Badge, Button, IconButton). Shows strict bottom-up composition rules and dependency direction.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response classifies the overall product card as an Organism",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response identifies atoms (e.g., Image, Text, Button, IconButton) as the indivisible base elements",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains the strict bottom-up creation order: atoms first, then molecules, then organisms",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response mentions that organisms must NOT import other organisms",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to create a search bar widget that combines our DS text input atom and a search icon button atom into a single functional search component. What atomic level is this and what are the key rules?",
+      "expected_output": "Classifies as Molecule (composes 2+ atoms). States molecule must import and use atoms, delegate visual properties to them, propagate states, and use data parameters (not widget parameters).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response correctly classifies the search bar as a Molecule",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response states the molecule must import and USE the existing atoms — not recreate their functionality",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions that molecule parameters should be data (String, bool) not widget instances",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What's the difference between Atom, Molecule, and Organism in our Flutter DS? I'm trying to figure out if a custom checkbox with its own label text qualifies as an atom or molecule.",
+      "expected_output": "Explains the three levels and decision criteria. For checkbox+label: if the label is a DS Text atom, it's a Molecule. If the label is an intrinsic part with no DS atom dependency, it could be an Atom. Shows decision tree.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response explains Atom as having no DS widget dependencies, Molecule as composing atoms, and Organism as composing molecules + atoms",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses the decision tree or criteria to help classify the checkbox+label case",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains that an atom maps to one visual concept and is indivisible in the DS context",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

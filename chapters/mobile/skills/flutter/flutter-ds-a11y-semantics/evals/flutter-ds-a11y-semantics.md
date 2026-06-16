@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-a11y-semantics`  
-**Scanned:** 2026-06-03 17:42:25 UTC  
+**Skill:** flutter-ds-a11y-semantics  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-a11y-semantics`  
+**Scanned:** 2026-06-16 14:54:49 UTC  
 
 ## Risk Assessment
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 105 | No |
-| `evals/flutter-ds-a11y-semantics.md` | markdown | 29 | No |
+| `SKILL.md` | markdown | 121 | No |
+| `evals/evals.json` | json | 74 | No |
 
 ## Issues (0)
 

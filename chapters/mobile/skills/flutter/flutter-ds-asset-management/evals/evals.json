@@ -1,0 +1,56 @@
+{
+  "skill_name": "flutter-ds-asset-management",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just exported a close icon from Figma as SVG for our DS package. How do I optimize it, register it in the resource class, declare it in pubspec, and use it correctly in a widget?",
+      "expected_output": "Shows svgo optimization command, snake_case naming, abstract class with static const path, pubspec flutter.assets declaration, and SvgPicture.asset using the centralized constant with token sizes.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response shows svgo optimization command for the SVG",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows registering the asset path as a static const in a centralized resource class",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response uses SvgPicture.asset with the centralized constant — not a hardcoded string path",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response declares the asset in pubspec.yaml under flutter.assets",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A junior dev on my team wrote `SvgPicture.asset('assets/icons/icon_close.svg', width: 24, height: 24)` directly in a widget. What's wrong with this and how should it be written?",
+      "expected_output": "Explains hardcoded path violates centralized registry pattern and hardcoded size violates token usage. Shows correct version with resource class constant and size token.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies hardcoded path as a violation of the centralized registry pattern",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response identifies hardcoded width/height as a violation of token usage",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response shows the correct version using a resource class constant",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

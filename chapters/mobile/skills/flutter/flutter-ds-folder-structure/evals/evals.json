@@ -1,0 +1,74 @@
+{
+  "skill_name": "flutter-ds-folder-structure",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to add a new DsPrimaryButton atom to our Flutter Design System package. Where exactly do I create the implementation file, the test file, and the Widgetbook story?",
+      "expected_output": "Shows lib/src/atoms/buttons/ds_primary_button.dart, test/atoms/buttons/ds_primary_button_test.dart, and widgetbook path from structure.widgetbook_components_path. Reminds to export from public barrel file.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response places the atom implementation in lib/src/atoms/buttons/ or similar atoms subfolder",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mirrors the lib/src structure in the test/ folder for the test file",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions exporting the new component from the public barrel file",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm creating a new ProductDetailView screen for the app (not the DS package). This screen is large and needs a private hero section widget and a content list widget. Where do I place all these files?",
+      "expected_output": "Views go in lib/src/presentation/views/product_detail/ subfolder. Private section widgets go in the same subfolder with underscore prefix. Not exported from DS barrel. Test goes in test/presentation/views/product_detail/.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response places the view in lib/src/presentation/views/ and creates a subfolder for the view",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response places private section widgets in the same view subfolder with underscore prefix",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response clarifies that views do NOT get the DS prefix and are NOT exported from the DS barrel",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "A colleague is adding code to lib/atoms/buttons/ but our DS package is configured with lib/src/atoms/buttons/. What should I tell them?",
+      "expected_output": "Explains the implementation source must be in lib/src. If a legacy layout exists (lib/atoms), register an alert and keep new code in lib/src path. The public barrel file exports from lib/src.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies lib/src as the correct location for all DS implementation code",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions registering an alert if a legacy layout structure is detected",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains the public barrel file should export only from lib/src",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}
