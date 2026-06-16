@@ -325,7 +325,7 @@ void main() {
 
       final handler = MockErrorInterceptorHandler();
       final error = DioException(
-        requestOptions: RequestOptions(path: 'https://api.yourapp.com/test'),
+        requestOptions: RequestOptions(path: 'https://api.example.com/test'),
         type: DioExceptionType.badCertificate,
       );
 

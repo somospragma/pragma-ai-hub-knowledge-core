@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-bloc-pattern`  
-**Scanned:** 2026-06-03 17:41:52 UTC  
+**Skill:** flutter-bloc-pattern  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-bloc-pattern`  
+**Scanned:** 2026-06-15 19:06:30 UTC  
 
 ## Risk Assessment
 
@@ -12,11 +12,12 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (7)
+## Components (8)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 392 | No |
+| `SKILL.md` | markdown | 393 | No |
+| `evals/evals.json` | json | 23 | No |
 | `references/ClassDiagram.mmd` | other | 235 | No |
 | `references/CleanArchitecture.mmd` | other | 72 | No |
 | `references/PlaceholdersSequenceDiagram.mmd` | other | 64 | No |

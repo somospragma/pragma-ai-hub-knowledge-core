@@ -1,0 +1,17 @@
+{
+  "skill_name": "flutter-app-lifecycle-management",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My Flutter app makes network requests on a timer every 30 seconds. When the user backgrounds the app, the requests keep firing and draining battery. I need to pause them when the app goes to background and resume when it comes back to foreground. Show me how to use AppLifecycleObserver correctly in a clean architecture context.",
+      "expected_output": "WidgetsBindingObserver mixin, didChangeAppLifecycleState override handling AppLifecycleState.paused/resumed/inactive/detached, integration with a service or BLoC to pause/resume timers, disposal pattern, explanation of each lifecycle state and when it fires on iOS vs Android.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I want to release expensive resources (database connections, camera feed, audio session) when my Flutter app is backgrounded to avoid memory pressure, and reclaim them when it returns to the foreground. What's the recommended pattern and how do I ensure resources are always released even if the app is killed?",
+      "expected_output": "AppLifecycleObserver pattern for managed release/reclaim, distinction between paused (backgrounded, may return) vs detached (likely killed), FlutterPlugin.onDetachedFromEngine for plugin-level cleanup, best-effort cleanup in detached state explanation, practical example with a resource-heavy service.",
+      "files": []
+    }
+  ]
+}

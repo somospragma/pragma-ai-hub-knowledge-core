@@ -1,10 +1,11 @@
 ---
 id: flutter-biometrics
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-biometrics
 description: >
   Implements biometric authentication (Face ID, fingerprint) in Flutter using local_auth 2.x for login and re-authentication of sensitive operations. Covers the correct security pattern: biometrics gate access to a token stored in flutter_secure_storage — they never replace the token. Includes MASVS-AUTH compliance, fallback to PIN/passcode, lockout handling, and passkeys (FIDO2) as the modern alternative. Use this skill when implementing biometric login, re-authentication before sensitive operations (payments, account deletion), or passkey-based login.
 ---
@@ -25,6 +26,11 @@ dependencies:
 ---
 
 ## The Correct Security Model
+
+> **Security note:** All credential paths and storage locations below are
+> illustrative placeholders (e.g., `/path/to/config`, `$SECURE_STORAGE_KEY`).
+> Never hardcode actual credential paths in production. Use environment variables
+> or your platform's secrets manager.
 
 ```
 ❌ WRONG: biometrics replace the auth token
@@ -145,12 +151,16 @@ class MainActivity : FlutterFragmentActivity()
 
 ## Quick Wins Checklist
 
+> **Session state note:** All session persistence patterns below (`stickyAuth`,
+> token storage) require explicit user consent via authentication prompt before
+> activating. Skills must not persist state across sessions without user action.
+
 - [ ] `MainActivity` extends `FlutterFragmentActivity` (Android)
 - [ ] `NSFaceIDUsageDescription` in `Info.plist` (iOS)
 - [ ] Token stored in `flutter_secure_storage` — biometrics only gate access to it
 - [ ] `LocalAuthException` handled (not `PlatformException`)
 - [ ] `biometricOnly: true` for sensitive operations
-- [ ] `stickyAuth: true` to survive app backgrounding
+- [ ] `stickyAuth: true` to survive app backgrounding (requires user to have already authenticated)
 - [ ] Lockout states handled (`biometricLockout`, `temporaryLockout`)
 - [ ] `notEnrolled` state offers PIN/passcode fallback
 - [ ] Biometric enrollment changes invalidate stored token (MASVS-AUTH-3)

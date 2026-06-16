@@ -1,0 +1,17 @@
+{
+  "skill_name": "flutter-app-size-optimization",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our Flutter app APK is 48MB and the Play Store team is asking us to reduce it. I think the icon fonts and some large dependencies are the main culprits. How do I analyze what's taking up space and what are the most impactful optimizations I can apply?",
+      "expected_output": "flutter build apk --analyze-size output interpretation, --split-per-abi for reducing per-device download size, tree-shaking of icon fonts (--no-tree-shake-icons flag explained), deferred components for large features, identifying large packages with the size analysis tool, obfuscation + split-debug-info for code size.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm bundling a lot of image assets in my Flutter app. Some are only used in specific features that not all users visit. What strategies can I use to avoid bundling all assets upfront and reduce the initial download size?",
+      "expected_output": "Deferred loading with loadLibrary() for feature-specific assets, network-loaded assets with caching (CachedNetworkImage), WebP/AVIF format conversion for size reduction, asset variants (1x/2x/3x) explained, flutter build appbundle vs apk for Play Store delivery optimization.",
+      "files": []
+    }
+  ]
+}

@@ -1054,7 +1054,8 @@ abstract class PushProviderModule {
 
     <application ...>
 
-        <!-- Disable WorkManager auto-init to control initialization manually -->
+        <!-- WorkManager auto-init is disabled here to allow manual initialization.
+             This prevents premature initialization before app configuration is complete. -->
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
@@ -1123,7 +1124,9 @@ import workmanager
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
-        // Register WorkManager background tasks
+        // Register WorkManager background tasks.
+        // setMinimumBackgroundFetchInterval is a system hint only — iOS controls
+        // actual scheduling. No state is persisted without OS-managed task execution.
         UIApplication.shared.setMinimumBackgroundFetchInterval(
             TimeInterval(60 * 15) // 15 minutes minimum
         )

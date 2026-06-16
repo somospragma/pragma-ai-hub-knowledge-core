@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-concurrency",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My Flutter app has a payment form and users are tapping the submit button multiple times, causing duplicate payment requests. I'm using BLoC. How do I prevent this double-submit problem at the BLoC level?",
+      "expected_output": "Recommends droppable() transformer on the submit event handler to ignore subsequent events while the first is in flight. Shows bloc_concurrency import, on<SubmitPaymentEvent>(_onSubmit, transformer: droppable()). Explains why droppable() vs sequential() vs restartable() for this case. Alternative: _isSubmitting flag with guard.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I have a Flutter app where multiple parts of the codebase can trigger an OAuth token refresh simultaneously when they all get a 401. This causes a race condition — multiple refresh requests fire at once and most of them fail. How do I implement a thread-safe token refresh that ensures only one refresh happens at a time and all waiters get the result?",
+      "expected_output": "Shows Lock + Completer pattern from flutter-concurrency: Lock from synchronized package, _refreshCompleter Completer<String>?, check if completer already active, if so await its future, otherwise create new completer, do the refresh, complete all waiters. Explains why a plain boolean guard is not enough for async races.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I have a Flutter screen that loads a user profile from three independent API endpoints (profile data, recent orders, notification preferences). Currently I'm awaiting them sequentially which takes 3x longer than needed. How do I run them in parallel and handle the case where any one of them fails?",
+      "expected_output": "Shows Future.wait with Dart 3 record syntax: final (profile, orders, prefs) = await (fetchProfile(), fetchOrders(), fetchPrefs()).wait. Alternatively Future.wait([...]) with error handling. Explains the difference between Future.wait (fails fast on first error) vs gathering all results. Shows Either-based error handling per call before passing to .wait.",
+      "files": []
+    }
+  ]
+}

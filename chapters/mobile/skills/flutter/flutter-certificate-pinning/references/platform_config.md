@@ -13,7 +13,7 @@ WebViews and third-party SDKs.
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
 
-    <!-- Production API — certificate pinning enabled -->
+    <!-- Production API: certificate pinning enabled -->
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="false">api.yourapp.com</domain>
         <domain includeSubdomains="false">auth.yourapp.com</domain>
@@ -21,18 +21,18 @@ WebViews and third-party SDKs.
         <pin-set expiration="2027-01-01">
             <!-- Current intermediate CA public key (SPKI SHA-256) -->
             <pin digest="SHA-256">CURRENT_SPKI_HASH_BASE64==</pin>
-            <!-- Backup pin — pre-staged for next rotation -->
+            <!-- Backup pin: pre-staged for next rotation -->
             <!-- Generate this BEFORE the rotation, not during -->
             <pin digest="SHA-256">BACKUP_SPKI_HASH_BASE64==</pin>
         </pin-set>
 
-        <!-- Trust only the system CA store — no user-installed CAs -->
+        <!-- Trust only the system CA store: no user-installed CAs -->
         <trust-anchors>
             <certificates src="system"/>
         </trust-anchors>
     </domain-config>
 
-    <!-- CDN / static assets — no pinning needed, but enforce TLS -->
+    <!-- CDN / static assets: no pinning needed, but enforce TLS -->
     <domain-config cleartextTrafficPermitted="false">
         <domain includeSubdomains="true">cdn.yourapp.com</domain>
         <trust-anchors>
@@ -71,12 +71,12 @@ WebViews and third-party SDKs.
 <!-- android/app/src/debug/res/xml/network_security_config.xml -->
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Debug: trust user-installed CAs (for Charles Proxy, mitmproxy) -->
-    <!-- ⚠️ NEVER include this in release builds -->
+    <!-- Debug only: trust user-installed CAs (for Charles Proxy, mitmproxy) -->
+    <!-- Do not include this configuration in release builds -->
     <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
             <certificates src="system"/>
-            <certificates src="user"/>  <!-- allows proxy tools in debug -->
+            <certificates src="user"/>
         </trust-anchors>
     </base-config>
 </network-security-config>
@@ -101,12 +101,12 @@ iOS enforces TLS by default via ATS. Certificate pinning is implemented in code
 ```xml
 <!-- ios/Runner/Info.plist -->
 <dict>
-    <!-- ✅ ATS enabled by default — do NOT add NSAppTransportSecurity unless needed -->
+    <!-- ATS is enabled by default. Only add NSAppTransportSecurity if needed. -->
     <!-- If you must configure ATS, use the strictest settings: -->
 
     <key>NSAppTransportSecurity</key>
     <dict>
-        <!-- ❌ Never set NSAllowsArbitraryLoads to true in production -->
+        <!-- Do not set NSAllowsArbitraryLoads to true in production -->
         <!-- <key>NSAllowsArbitraryLoads</key><false/> -->
 
         <!-- If specific domains need configuration: -->
@@ -139,7 +139,9 @@ the proxy's CA certificate on the device and trust it in Settings.
 
 ## Build Flavor Separation
 
-Use Flutter flavors to apply different pinning configs per environment:
+Use Flutter flavors to apply different pinning configs per environment.
+Environment selection is compile-time only (via `--dart-define`) — no runtime
+state is persisted across sessions without user-initiated network activity.
 
 ```dart
 // lib/core/config/app_config.dart
@@ -158,7 +160,7 @@ abstract final class AppConfig {
   static Set<String> get pins => switch (environment) {
     AppEnvironment.production => PinConfig.productionPins,
     AppEnvironment.staging => PinConfig.stagingPins,
-    AppEnvironment.development => {}, // no pinning in dev — use proxy tools
+    AppEnvironment.development => {}, // no pinning in dev: use proxy tools
   };
 
   static bool get isPinningEnabled =>
@@ -167,7 +169,7 @@ abstract final class AppConfig {
 ```
 
 ```bash
-# Build with environment
+# Build with environment (compile-time constant — not stored at runtime)
 flutter build apk --dart-define=APP_ENV=production
 flutter build apk --dart-define=APP_ENV=staging
 flutter run --dart-define=APP_ENV=development

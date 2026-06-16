@@ -245,7 +245,10 @@ class CacheInvalidationService {
     await _storeProvider.store.delete(key);
   }
 
-  /// Clear all cached responses — call on logout or user switch
+  /// Clear all cached responses.
+  /// Only call this after explicit user action (e.g., logout, account switch,
+  /// or user-initiated "Clear cache" setting). Do not invoke automatically
+  /// without user consent, as it discards all locally stored responses.
   Future<void> clearAll() async {
     await _storeProvider.store.clean();
   }

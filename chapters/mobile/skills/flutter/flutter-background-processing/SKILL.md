@@ -1,10 +1,11 @@
 ---
 id: flutter-background-processing
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-background-processing
 description: >
   Implements background tasks with WorkManager 0.5.x and push message background handling using a Strategy pattern to support multiple providers (FCM, OneSignal, custom), clean architecture, fpdart, and modern Flutter patterns.
 ---
@@ -133,13 +134,18 @@ abstract interface class PushNotificationRepository {
 
 ### Android
 - `minSdkVersion 23` required
-- Disable WorkManager auto-init in `AndroidManifest.xml`
+- Configure WorkManager initialization in `AndroidManifest.xml` (manual init pattern)
 - Request `RECEIVE_BOOT_COMPLETED` and `POST_NOTIFICATIONS` permissions
 
 ### iOS
 - Enable **Background Modes**: Background fetch + Remote notifications + Background processing
 - Register background task identifiers in `Info.plist`
 - Register tasks in `AppDelegate.swift`
+- Background task scheduling is OS-controlled; the app only registers identifiers and hints
+
+> **Note on session state:** WorkManager periodic tasks and push notification handlers
+> run in isolated background contexts. Each execution initializes its own DI container
+> independently — no cross-session state is shared without explicit user action.
 
 ## Testing Strategy
 

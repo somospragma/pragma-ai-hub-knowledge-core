@@ -1,104 +1,29 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-biometrics`  
-**Scanned:** 2026-06-03 17:41:51 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-biometrics`  
+**Scanned:** 2026-06-12 22:02:04 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 100/100 |
-| Severity | CRITICAL |
-| Recommendation | DO NOT INSTALL |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
 ## Components (4)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 162 | No |
+| `SKILL.md` | markdown | 171 | No |
 | `references/biometric_service.md` | markdown | 433 | No |
 | `references/passkeys.md` | markdown | 603 | No |
-| `references/platform_setup.md` | markdown | 271 | No |
+| `references/platform_setup.md` | markdown | 276 | No |
 
-## Issues (7)
+## Issues (0)
 
-### 🔴 HIGH: PE3
-
-**Location:** `SKILL.md:64`  
-**Confidence:** 70%  
-
-**Message:** Credential Access
-
-**Remediation:** Remove references to credential paths. Use environment variables or secrets managers. For docs, use placeholder paths (e.g., /path/to/config). Never load .env or token files in production code paths.
-
----
-
-### 🔴 HIGH: P2
-
-**Location:** `references/platform_setup.md:21`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:139`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:149`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:161`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/platform_setup.md:80`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/platform_setup.md:83`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 

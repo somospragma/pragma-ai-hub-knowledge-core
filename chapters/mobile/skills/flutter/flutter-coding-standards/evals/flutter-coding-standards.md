@@ -1,75 +1,32 @@
 # SkillSpector Security Report
 
 **Skill:** flutter-coding-standards  
-**Source:** `chapters/mobile/skills/flutter/flutter-coding-standards`  
-**Scanned:** 2026-06-03 17:42:05 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-coding-standards`  
+**Scanned:** 2026-06-15 19:18:47 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 30/100 |
-| Severity | MEDIUM |
-| Recommendation | CAUTION |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
-## Components (8)
+## Components (7)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `LICENSE.txt` | text | 11 | No |
-| `SKILL.md` | markdown | 459 | No |
-| `evals/evals.json` | json | 442 | No |
-| `evals/flutter-coding-standards.md` | markdown | 35 | No |
+| `SKILL.md` | markdown | 460 | No |
+| `evals/evals.json` | json | 23 | No |
 | `references/documentation-patterns.md` | markdown | 344 | No |
 | `references/exception-handling.md` | markdown | 171 | No |
-| `references/linting-rules.md` | markdown | 537 | No |
+| `references/linting-rules.md` | markdown | 542 | No |
 | `references/null-safety.md` | markdown | 178 | No |
 
-## Issues (4)
+## Issues (0)
 
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
-
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
-
-### 🟡 MEDIUM: EA2
-
-**Location:** `references/linting-rules.md:372`  
-**Confidence:** 75%  
-
-**Message:** Autonomous Decision Making
-
-**Remediation:** Add human-in-the-loop confirmation for destructive, irreversible, or high-impact operations. Never auto-execute commands that modify files, send data, or alter system state.
-
----
-
-### 🟡 MEDIUM: P4
-
-**Location:** `SKILL.md:215`  
-**Confidence:** 70%  
-
-**Message:** Behavior Manipulation
-
-**Remediation:** Review content for implicit steering or bias. Ensure instructions are explicit and align with the skill's stated purpose.
-
----
+No security issues detected.
 
 ## Metadata
 

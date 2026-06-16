@@ -1,14 +1,14 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-caching-strategy`  
-**Scanned:** 2026-06-03 17:41:55 UTC  
+**Skill:** flutter-caching-strategy  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-caching-strategy`  
+**Scanned:** 2026-06-15 19:07:59 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 20/100 |
+| Score | 0/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
@@ -16,35 +16,15 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 175 | No |
-| `evals/flutter-caching-strategy.md` | markdown | 41 | No |
+| `SKILL.md` | markdown | 176 | No |
+| `evals/evals.json` | json | 17 | No |
 | `references/data_ttl_cache.md` | markdown | 373 | No |
-| `references/http_cache.md` | markdown | 292 | No |
+| `references/http_cache.md` | markdown | 295 | No |
 | `references/image_cache.md` | markdown | 195 | No |
 
-## Issues (2)
+## Issues (0)
 
-### 🟡 MEDIUM: EA2
-
-**Location:** `evals/flutter-caching-strategy.md:33`  
-**Confidence:** 85%  
-
-**Message:** Autonomous Decision Making
-
-**Remediation:** Add human-in-the-loop confirmation for destructive, irreversible, or high-impact operations. Never auto-execute commands that modify files, send data, or alter system state.
-
----
-
-### 🟡 MEDIUM: EA2
-
-**Location:** `references/http_cache.md:221`  
-**Confidence:** 80%  
-
-**Message:** Autonomous Decision Making
-
-**Remediation:** Add human-in-the-loop confirmation for destructive, irreversible, or high-impact operations. Never auto-execute commands that modify files, send data, or alter system state.
-
----
+No security issues detected.
 
 ## Metadata
 

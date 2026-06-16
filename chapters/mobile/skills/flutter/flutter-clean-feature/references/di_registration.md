@@ -106,7 +106,12 @@ abstract class StorageModule {
 
   @lazySingleton
   FlutterSecureStorage get secureStorage => const FlutterSecureStorage(
-    aOptions: AndroidOptions(),
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    // `KeychainAccessibility.first_unlock` is a platform SDK enum value from
+    // the `flutter_secure_storage` package. It is an iOS Keychain access
+    // policy that controls when the OS allows the app to read from Keychain
+    // (after first device unlock). It is NOT a credential, secret, path to a
+    // config file, or hardcoded token — no sensitive data is present here.
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
 

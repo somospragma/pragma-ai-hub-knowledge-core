@@ -1,0 +1,17 @@
+{
+  "skill_name": "flutter-ci-optimization",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our Flutter CI pipeline on GitHub Actions takes 18 minutes. The biggest bottleneck is pub get and Gradle downloading dependencies on every run. We have about 40 unit tests and 15 widget tests. How can we add caching for pub packages and Gradle to bring the time down, and what's the correct cache key strategy to avoid stale caches?",
+      "expected_output": "GitHub Actions workflow with actions/cache for ~/.pub-cache (key on pubspec.lock hash), Gradle cache (~/.gradle/caches, key on build.gradle hash), restore-keys fallback strategy. Explanation of why cache key should include lock file hash. Estimated time savings.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I want to split our Flutter test suite into parallel shards on GitHub Actions to reduce pipeline time. We have 200 unit tests. Show me how to set up matrix-based test sharding with coverage collection and then merge the coverage reports at the end.",
+      "expected_output": "GitHub Actions matrix strategy with shard count, flutter test --shard-index and --total-shards flags, upload-artifact per shard, merge job with download-artifact, lcov merge command with validation, coverage threshold check. Notes on pre-installing lcov in runner image vs inline installation.",
+      "files": []
+    }
+  ]
+}

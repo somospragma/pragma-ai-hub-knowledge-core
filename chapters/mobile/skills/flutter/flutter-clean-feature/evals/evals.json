@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-clean-feature",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to create a complete 'User Profile' feature in my Flutter app following Clean Architecture. The feature should: fetch the profile from a REST API, allow editing name and avatar, show a loading state, handle errors gracefully, and use BLoC for state management with GetIt/Injectable for DI. Walk me through the full folder structure and all the files I need to create.",
+      "expected_output": "Full feature scaffold: domain (UserProfile entity, UserProfileRepository interface, GetUserProfile and UpdateUserProfile use cases), data (UserProfileRepositoryImpl, UserProfileApiDataSource, UserProfileDto), presentation (UserProfileBloc with events/states, UserProfilePage, UserProfileForm widget), DI module registration with @injectable annotations.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I'm setting up dependency injection for a new feature in our Flutter monorepo using GetIt and Injectable. The feature has a repository, two use cases, and a BLoC. Show me the correct annotations and how to register everything in the feature's DI module so that the BLoC gets its use cases injected automatically.",
+      "expected_output": "Injectable annotations: @injectable on BLoC, @Injectable(as: Repository) on RepositoryImpl, @lazySingleton on data source, @module abstract class with @injectable factory for BLoC, proper constructor injection, explanation of @preResolve for async dependencies, running build_runner to regenerate injection.config.dart.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "My team is reviewing a PR and they say my feature has a Clean Architecture violation: I'm calling an HTTP client directly from my BLoC. They want me to fix it. Show me the refactored version with the correct layered structure.",
+      "expected_output": "Before/after showing anti-pattern (BLoC importing Dio directly) vs correct pattern (BLoC depends on UseCase → UseCase depends on Repository interface → Repository impl imports Dio in data layer). Explanation of dependency rule: outer layers depend on inner layers, never reverse.",
+      "files": []
+    }
+  ]
+}

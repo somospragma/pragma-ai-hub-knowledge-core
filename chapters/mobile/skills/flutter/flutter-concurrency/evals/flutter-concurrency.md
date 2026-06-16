@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-concurrency`  
-**Scanned:** 2026-06-03 17:42:08 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-concurrency`  
+**Scanned:** 2026-06-15 19:45:03 UTC  
 
 ## Risk Assessment
 
@@ -17,7 +17,7 @@
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 146 | No |
-| `evals/flutter-concurrency.md` | markdown | 32 | No |
+| `evals/evals.json` | json | 23 | No |
 | `references/completer_cancel.md` | markdown | 367 | No |
 | `references/mutex_lock.md` | markdown | 273 | No |
 | `references/parallel_debounce.md` | markdown | 406 | No |

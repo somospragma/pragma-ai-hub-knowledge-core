@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-bloc-pattern",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a Flutter app and need to implement authentication state management using BLoC. The user can log in with email/password, the app should show a loading spinner while the request is in flight, navigate to the home screen on success, and show an error snackbar on failure. Show me the full BLoC with events, states (using Freezed), and how to connect it to the UI.",
+      "expected_output": "AuthBloc with AuthEvent (loginRequested, logoutRequested), AuthState (initial, loading, authenticated, unauthenticated, error) using Freezed, BlocBuilder for UI rendering, BlocListener for navigation/snackbar side effects, event handler with async operation and fpdart Either for error handling.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "How do I write unit tests for a Flutter BLoC that makes an async API call? I have a UserProfileBloc that fetches user data when it receives a LoadProfileEvent. Show me how to test the success path, the error path, and the loading state transitions using bloc_test.",
+      "expected_output": "bloc_test setUp with mock repository using Mocktail, blocTest() for happy path (expect [loading, loaded]), blocTest() for error path (expect [loading, error]), blocTest() for empty state, verification that repository method was called exactly once.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "In my Flutter app I have a ShoppingCartBloc and a UserBloc that both need to react to the same login/logout events. What's the recommended pattern to communicate between BLoCs without coupling them directly?",
+      "expected_output": "BlocListener or StreamSubscription pattern to listen to one BLoC from another, explanation of why direct BLoC-to-BLoC injection is an anti-pattern, recommendation to use a shared domain event/stream (via repository or event bus), or parent BLoC orchestration pattern.",
+      "files": []
+    }
+  ]
+}

@@ -1,37 +1,27 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-app-size-optimization`  
-**Scanned:** 2026-06-03 17:41:47 UTC  
+**Skill:** flutter-app-size-optimization  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-app-size-optimization`  
+**Scanned:** 2026-06-12 21:46:57 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 10/100 |
+| Score | 0/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (3)
+## Components (2)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 351 | No |
-| `evals/flutter-app-size-optimization.md` | markdown | 30 | No |
+| `SKILL.md` | markdown | 352 | No |
 | `references/implementation_guide.md` | markdown | 552 | No |
 
-## Issues (1)
+## Issues (0)
 
-### 🟡 MEDIUM: P4
-
-**Location:** `SKILL.md:70`  
-**Confidence:** 70%  
-
-**Message:** Behavior Manipulation
-
-**Remediation:** Review content for implicit steering or bias. Ensure instructions are explicit and align with the skill's stated purpose.
-
----
+No security issues detected.
 
 ## Metadata
 

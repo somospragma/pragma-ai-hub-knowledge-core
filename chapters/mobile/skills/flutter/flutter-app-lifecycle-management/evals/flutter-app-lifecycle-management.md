@@ -1,59 +1,27 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-app-lifecycle-management`  
-**Scanned:** 2026-06-03 17:41:45 UTC  
+**Skill:** flutter-app-lifecycle-management  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-app-lifecycle-management`  
+**Scanned:** 2026-06-12 21:46:10 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 30/100 |
-| Severity | MEDIUM |
-| Recommendation | CAUTION |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
-## Components (3)
+## Components (2)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 404 | No |
-| `evals/flutter-app-lifecycle-management.md` | markdown | 30 | No |
+| `SKILL.md` | markdown | 405 | No |
 | `references/background_services.md` | markdown | 256 | No |
 
-## Issues (3)
+## Issues (0)
 
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:190`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:238`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/background_services.md:157`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 

@@ -1,94 +1,30 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-certificate-pinning`  
-**Scanned:** 2026-06-03 17:41:56 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-certificate-pinning`  
+**Scanned:** 2026-06-15 19:09:44 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 100/100 |
-| Severity | CRITICAL |
-| Recommendation | DO NOT INSTALL |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
 ## Components (5)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 118 | No |
-| `evals/flutter-certificate-pinning.md` | markdown | 41 | No |
+| `evals/evals.json` | json | 23 | No |
 | `references/flutter_implementation.md` | markdown | 338 | No |
-| `references/platform_config.md` | markdown | 208 | No |
+| `references/platform_config.md` | markdown | 210 | No |
 | `references/rotation_and_backend.md` | markdown | 288 | No |
 
-## Issues (6)
+## Issues (0)
 
-### 🟡 MEDIUM: E1
-
-**Location:** `references/flutter_implementation.md:328`  
-**Confidence:** 50%  
-
-**Message:** External Transmission
-
-**Remediation:** Verify the destination URL is trusted and necessary. Remove or replace with documented APIs. Ensure no secrets, tokens, or PII are transmitted.
-
----
-
-### 🔴 HIGH: P2
-
-**Location:** `references/platform_config.md:12`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🔴 HIGH: P2
-
-**Location:** `references/platform_config.md:35`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🔴 HIGH: P2
-
-**Location:** `references/platform_config.md:61`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/platform_config.md:99`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/platform_config.md:102`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 

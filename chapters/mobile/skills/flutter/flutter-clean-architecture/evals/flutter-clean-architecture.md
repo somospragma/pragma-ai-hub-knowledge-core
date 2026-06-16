@@ -1,14 +1,14 @@
 # SkillSpector Security Report
 
 **Skill:** flutter-clean-architecture  
-**Source:** `chapters/mobile/skills/flutter/flutter-clean-architecture`  
-**Scanned:** 2026-06-03 17:42:01 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-clean-architecture`  
+**Scanned:** 2026-06-16 13:45:35 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 10/100 |
+| Score | 0/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
@@ -28,29 +28,9 @@
 | `references/presentation-layer.md` | markdown | 527 | No |
 | `references/violations-guide.md` | markdown | 361 | No |
 
-## Issues (2)
+## Issues (0)
 
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
-
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
+No security issues detected.
 
 ## Metadata
 

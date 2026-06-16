@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-biometrics",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a fintech app in Flutter and need to implement biometric authentication (Face ID / fingerprint) for login. The user should authenticate with biometrics on every app resume, and if they fail 3 times, they should be locked out and forced to use their PIN. Show me the complete pattern using local_auth 2.x, clean architecture, and flutter_secure_storage.",
+      "expected_output": "Complete biometric auth implementation: BiometricService interface in domain, BiometricServiceImpl in data layer using local_auth, token stored in flutter_secure_storage (not replaced by biometrics), LocalAuthException handling for biometricLockout/temporaryLockout/notEnrolled, PIN fallback pattern, and usage in a BLoC.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My Flutter app crashes on Android when trying to show the biometric prompt. I have local_auth set up but the dialog never shows. My MainActivity extends FlutterActivity. How do I fix this and what permissions do I need in the manifest?",
+      "expected_output": "Root cause identified as FlutterActivity vs FlutterFragmentActivity. Fix: change to FlutterFragmentActivity. Add USE_BIOMETRIC permission to manifest. Code examples for both MainActivity.kt and AndroidManifest.xml.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want to add passkey (FIDO2/WebAuthn) based login to my Flutter app as an alternative to the current biometric + password flow. We use a custom relying party server. I need the architecture to be swappable between providers without touching my domain layer.",
+      "expected_output": "FidoProvider Strategy + Adapter pattern, domain interface that is provider-agnostic, DI registration with GetIt/Injectable for swapping providers, references to passkeys.md for full implementation, enrollment flow and error handling.",
+      "files": []
+    }
+  ]
+}

@@ -10,7 +10,7 @@ package com.example.app
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
-// ✅ MUST extend FlutterFragmentActivity — NOT FlutterActivity
+// Required: extend FlutterFragmentActivity, not FlutterActivity
 // local_auth uses Android's BiometricPrompt which requires a FragmentActivity
 class MainActivity : FlutterFragmentActivity()
 ```
@@ -70,8 +70,13 @@ final hasStrong = biometrics.contains(BiometricType.strong)
 if (!hasStrong) {
   // Offer PIN/password fallback for sensitive operations
   // biometricOnly: false allows device PIN/pattern as fallback
+  // Note: PIN fallback only activates after the user initiates authentication
 }
 ```
+
+> **Session persistence note:** `stickyAuth: true` and `biometricOnly` flags shown
+> throughout this file control in-session authentication behavior only. They do not
+> persist state across app restarts without explicit user consent via the auth prompt.
 
 ---
 

@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-certificate-pinning",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm working on a healthcare Flutter app that needs certificate pinning to prevent MITM attacks. We use Dio for HTTP. Show me how to implement SPKI SHA-256 pinning with a current pin and a backup pin for rotation, including the Dio interceptor, Android Network Security Config, and iOS ATS configuration.",
+      "expected_output": "Complete SPKI pinning: PinConfig class with productionPins and stagingPins, CertificatePinningInterceptor, DioFactory with badCertificateCallback, Android network_security_config.xml with pin-set and expiration, iOS Info.plist ATS config. Backup pin strategy explained.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Our backend team will rotate the server certificate in 2 weeks. Our Flutter app currently has a single pin hardcoded. If we just rotate without updating the app, all users will lose connectivity. What's the correct rotation strategy and how do we implement it without breaking existing users?",
+      "expected_output": "Step-by-step rotation runbook: generate new key pair, extract SPKI hash, add as backup pin, ship app update, wait for adoption ≥90%, rotate server cert, remove old pin, ship second update. Code showing current+backup pin in PinConfig. Explanation of expiration attribute.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I implemented certificate pinning in my Flutter app but the QA team can't intercept traffic with Charles Proxy anymore, even in debug builds. How do I configure separate pinning for dev/staging vs production and allow proxy tools in debug without affecting the release build?",
+      "expected_output": "Build flavor separation with --dart-define=APP_ENV, AppConfig class with environment-aware pin selection, separate Android debug network_security_config.xml that trusts user CAs, iOS debug note about manual CA cert installation. Clear separation of debug vs release config.",
+      "files": []
+    }
+  ]
+}

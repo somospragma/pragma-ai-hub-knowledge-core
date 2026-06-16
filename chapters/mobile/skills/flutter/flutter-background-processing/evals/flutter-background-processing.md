@@ -1,70 +1,28 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-background-processing`  
-**Scanned:** 2026-06-03 17:41:49 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-background-processing`  
+**Scanned:** 2026-06-15 18:59:53 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 55/100 |
-| Severity | HIGH |
-| Recommendation | DO NOT INSTALL |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
 ## Components (3)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 153 | No |
-| `evals/flutter-background-processing.md` | markdown | 30 | No |
-| `references/implementation_guide.md` | markdown | 1349 | No |
+| `SKILL.md` | markdown | 158 | No |
+| `evals/evals.json` | json | 17 | No |
+| `references/implementation_guide.md` | markdown | 1352 | No |
 
-## Issues (4)
+## Issues (0)
 
-### 🔴 HIGH: P2
-
-**Location:** `references/implementation_guide.md:1050`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:141`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/implementation_guide.md:434`  
-**Confidence:** 80%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/implementation_guide.md:1093`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 
