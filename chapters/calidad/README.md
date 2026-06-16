@@ -894,4 +894,4 @@ Feature: Create product
 
 ---
 
-Estos ejemplos cubren los 4 frameworks en sus dos modos (greenfield + brownfield), más 3 escenarios transversales que muestran las distintas formas de invocación y los modos de operación regulados. Para escenarios no cubiertos aquí, entrar siempre por `[[calidad-route-test-generation]]` y dejar que el router clasifique.
+Estos ejemplos cubren los 4 frameworks en sus dos modos (greenfield + brownfield), más 3 escenarios transversales que muestran las distintas formas de invocación y los modos de operación regulados. Para escenarios no cubiertos aquí, entrar siempre por `[[calidad-route-test-generation]]` y dejar que el router clasifique. 
