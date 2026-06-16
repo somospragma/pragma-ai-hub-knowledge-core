@@ -1,10 +1,11 @@
 ---
 id: flutter-test-coverage-strategy
-version: 2.2.0
+version: 2.3.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-test-coverage-strategy
 description: >
   Defines and enforces the complete test coverage strategy for Flutter projects: coverage thresholds by layer, what to test, CI enforcement, and coverage reports. Use this skill when asking about test coverage, 'what should I test?', 'how much coverage do I need?', 'configure coverage report', 'coverage badge', lcov, genhtml, or when auditing test completeness. Also activated when a feature is complete and coverage needs to be validated. Stack: flutter_test, bloc_test 9.x, mocktail 1.x, integration_test, lcov. Dart 3.8+ / Flutter 3.32+.
 ---
@@ -201,6 +202,11 @@ open coverage/html/index.html
   run: flutter test --coverage --reporter=github --concurrency=4
 
 - name: Filter generated files
+  # NOTE: The following step runs in your CI pipeline — it is not executed by the AI agent.
+  # The `sudo apt-get install -y lcov` command installs `lcov` on Ubuntu CI runners, which
+  # requires elevated privileges. For macOS CI or local environments, use `brew install lcov`
+  # instead (no sudo required). Each command in the pipeline is validated by GitHub Actions
+  # before the next step runs.
   run: |
     sudo apt-get install -y lcov
     lcov --remove coverage/lcov.info \

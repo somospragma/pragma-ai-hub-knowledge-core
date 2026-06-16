@@ -1,0 +1,67 @@
+{
+  "skill": "flutter-push-strategy",
+  "version": "1.2.0",
+  "created": "2026-06-12",
+  "evals": [
+    {
+      "id": "eval-01-fcm-full-lifecycle",
+      "prompt": "How do I set up FCM push notifications in Flutter from scratch? I need to handle foreground, background, and when the app is terminated.",
+      "_tool_scope": "flutter-push-strategy",
+      "assertions": [
+        "Response covers all three app states: foreground (onForegroundMessage stream + local notification), background (top-level @pragma('vm:entry-point') handler registered via FirebaseMessaging.onBackgroundMessage), and terminated (getInitialMessage() on startup)",
+        "Response uses the Strategy / Clean Architecture pattern: PushMessage entity in domain, FcmPushProvider in data layer, NotificationBloc in presentation — no direct firebase_messaging imports outside the data layer",
+        "Response includes the required Firebase initialization in main() before runApp, and the background handler must be a top-level function that calls configureDependencies() independently"
+      ]
+    },
+    {
+      "id": "eval-02-notification-bloc-deep-link",
+      "prompt": "My NotificationBloc needs to navigate to a specific screen when the user taps a notification. How do I handle deep link navigation from push messages?",
+      "_tool_scope": "flutter-push-strategy",
+      "assertions": [
+        "Response listens to onMessageOpenedApp stream (background tap) AND calls getInitialMessage() at startup (terminated tap) inside NotificationBloc or an InitializePushUseCase",
+        "Response extracts the route/deep-link from PushMessage.data and delegates navigation without importing go_router or Navigator directly into the BLoC — navigation is triggered via a BLoC state that the UI layer consumes",
+        "Response distinguishes the two tap scenarios: background tap uses onMessageOpenedApp stream, terminated tap uses getInitialMessage() in the initialization flow"
+      ]
+    },
+    {
+      "id": "eval-03-fcm-token-management-spanish",
+      "prompt": "¿Cómo manejo el token de FCM y lo envío al servidor cuando se actualiza? El token puede cambiar después de que el usuario reinstala la app.",
+      "_tool_scope": "flutter-push-strategy",
+      "assertions": [
+        "La respuesta cubre tanto la obtención inicial del token (getToken()) como la escucha de actualizaciones (FirebaseMessaging.instance.onTokenRefresh stream) dentro del FcmPushProvider o el repositorio",
+        "La respuesta indica que el token debe enviarse al servidor propio cada vez que cambie (no solo en el primer login), e incluye un ejemplo de GetPushTokenUseCase o equivalente en la capa de dominio",
+        "La respuesta está en español (idioma del prompt) y menciona que el token puede invalidarse por reinstalación de la app, restauración de backup o rotación de claves FCM"
+      ]
+    },
+    {
+      "id": "eval-04-provider-swap-fcm-to-onesignal",
+      "prompt": "I want to be able to switch from FCM to OneSignal without rewriting my BLoC or domain layer. How?",
+      "_tool_scope": "flutter-push-strategy",
+      "assertions": [
+        "Response explains the Strategy pattern: PushProvider abstract interface in the data layer with FcmPushProvider and OneSignalPushProvider as concrete implementations — the BLoC and all domain use cases depend only on PushNotificationRepository, never on FCM or OneSignal directly",
+        "Response shows how the active provider is selected at build time via --dart-define=PUSH_PROVIDER=fcm or PUSH_PROVIDER=onesignal, resolved in PushProviderModule with GetIt/Injectable",
+        "Response confirms that swapping providers requires zero changes in domain or presentation layers — only pubspec.yaml dependencies and the dart-define flag change"
+      ]
+    },
+    {
+      "id": "eval-05-notification-bloc-unit-testing",
+      "prompt": "How do I test my NotificationBloc in unit tests without needing a real FCM connection?",
+      "_tool_scope": "flutter-push-strategy",
+      "assertions": [
+        "Response mocks PushNotificationRepository (the domain interface) using Mocktail — NOT FcmPushProvider or FirebaseMessaging directly, keeping tests provider-agnostic",
+        "Response uses bloc_test with a fake stream for onForegroundMessage and onMessageOpenedApp to verify state transitions without any real Firebase dependency",
+        "Response explicitly states that background top-level handlers (@pragma vm:entry-point) should NOT be unit-tested directly — test the UseCases they delegate to (e.g., ProcessBackgroundMessageUseCase)"
+      ]
+    },
+    {
+      "id": "eval-06-notification-permission-scope-boundary",
+      "prompt": "How do I request notification permission from the user?",
+      "_tool_scope": "flutter-push-strategy",
+      "assertions": [
+        "Response addresses the FCM/messaging side within this skill: FirebaseMessaging.instance.requestPermission() (iOS) and POST_NOTIFICATIONS Android manifest entry (Android 13+), or the equivalent in PushNotificationRepository.requestPermission()",
+        "Response explicitly scopes the OS-level permission request flow (permission_handler, PermissionService, point-of-use UX patterns, rationale dialogs) to the flutter-permissions skill, not this skill",
+        "Response does not conflate the two concerns: this skill owns the FCM/push infrastructure and token lifecycle; flutter-permissions owns the OS permission dialog orchestration and status handling"
+      ]
+    }
+  ]
+}

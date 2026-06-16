@@ -1,10 +1,11 @@
 ---
 id: flutter-streams-advanced
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-streams-advanced
 description: >
   Implements advanced Dart Stream patterns using only native Dart and Flutter: single vs broadcast, StreamController, custom transformers, stream composition, and real-world use cases. State management covered with BLoC (bloc_concurrency) and Riverpod (StreamProvider, AsyncNotifier). No rxdart dependency. Use this skill when implementing reactive data flows, live search, real-time updates, event buses, pagination, or combining multiple async data sources.
 ---

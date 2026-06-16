@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-push-strategy`  
-**Scanned:** 2026-06-03 17:43:43 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-push-strategy`  
+**Scanned:** 2026-06-12 21:05:15 UTC  
 
 ## Risk Assessment
 
@@ -17,19 +17,19 @@
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 157 | No |
-| `evals/flutter-push-strategy.md` | markdown | 30 | No |
-| `references/implementation_guide.md` | markdown | 1219 | No |
+| `evals/evals.json` | json | 67 | No |
+| `references/implementation_guide.md` | markdown | 1223 | No |
 
 ## Issues (1)
 
-### 🟡 MEDIUM: RA2
+### 🟡 MEDIUM: SSD-2
 
-**Location:** `references/implementation_guide.md:934`  
-**Confidence:** 75%  
+**Location:** `references/implementation_guide.md:758–777`  
+**Confidence:** 100%  
 
-**Message:** Session Persistence
+**Message:** The `_handleNavigation` function implements a pattern where the application's internal routing logic is directly controlled by data received from an external, untrusted source (a push notification payload). An attacker who gains control over the notification payload (via a compromised backend, a Man-in-the-Middle attack on the provider, or a spoofed provider) can perform 'Intent Redirection.' By injecting specific keys like `route: 'profile'` and `id: 'victim_account_id'`, they can force the user's app to navigate to sensitive screens. While this is a common pattern for UX, it is dangerous because it lacks validation of the `id` or the user's current authorization state at the moment of navigation.
 
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
+**Remediation:** 1. Implement strict validation for all parameters extracted from `message.data`. 2. Do not rely on the notification payload to dictate the 'state' of the app; instead, use the payload only as a hint to fetch fresh, authorized data from the backend. 3. Ensure the target route/component performs its own authorization check (e.g., checking if the user is allowed to view `/order/$id`) before rendering the view.
 
 ---
 

@@ -1,60 +1,30 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-test-coverage-strategy`  
-**Scanned:** 2026-06-03 17:44:04 UTC  
+**Skill:** flutter-test-coverage-strategy  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-test-coverage-strategy`  
+**Scanned:** 2026-06-16 15:21:44 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 58/100 |
-| Severity | HIGH |
-| Recommendation | DO NOT INSTALL |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
-## Components (4)
+## Components (5)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 257 | No |
+| `SKILL.md` | markdown | 263 | No |
+| `evals/evals.json` | json | 99 | No |
 | `references/mocktail_patterns.md` | markdown | 261 | No |
 | `references/widget_testing.md` | markdown | 334 | No |
-| `scripts/check_coverage.sh` | shell | 101 | Yes |
+| `scripts/check_coverage.sh` | shell | 106 | Yes |
 
-## Issues (3)
+## Issues (0)
 
-### 🟡 MEDIUM: PE2
-
-**Location:** `SKILL.md:205`  
-**Confidence:** 70%  
-
-**Message:** Sudo/Root Execution
-
-**Remediation:** Avoid sudo/root unless strictly required. Prefer least-privilege patterns. If elevation is needed, document the justification and scope.
-
----
-
-### 🟡 MEDIUM: PE2
-
-**Location:** `scripts/check_coverage.sh:22`  
-**Confidence:** 70%  
-
-**Message:** Sudo/Root Execution
-
-**Remediation:** Avoid sudo/root unless strictly required. Prefer least-privilege patterns. If elevation is needed, document the justification and scope.
-
----
-
-### 🔴 HIGH: TM2
-
-**Location:** `SKILL.md:204`  
-**Confidence:** 75%  
-
-**Message:** Chaining Abuse
-
-**Remediation:** Limit tool chaining depth and validate the output of each tool before passing it to the next. Require explicit user approval for multi-step chains.
-
----
+No security issues detected.
 
 ## Metadata
 

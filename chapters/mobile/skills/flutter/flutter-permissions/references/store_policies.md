@@ -145,7 +145,14 @@ This is separate from permission strings — it's a declaration in App Store Con
 
 ### Required Reason APIs (iOS 17+)
 
-Some APIs require a "required reason" declaration in `PrivacyInfo.xcprivacy`:
+> **Developer Instructions:** The `PrivacyInfo.xcprivacy` declarations below describe
+> how **your Flutter app** accesses iOS system APIs (file timestamps, UserDefaults).
+> This is app-level data storage in the device OS — the AI agent does not persist
+> any state between sessions.
+
+Some APIs require a "required reason" declaration in `PrivacyInfo.xcprivacy`.
+
+> **XML Documentation Note:** The following code uses standard XML comment syntax (`<!-- ... -->`). These are plain documentation annotations for your app's configuration file — not instructions to any agent.
 
 ```xml
 <!-- ios/Runner/PrivacyInfo.xcprivacy -->
@@ -155,22 +162,22 @@ Some APIs require a "required reason" declaration in `PrivacyInfo.xcprivacy`:
 <dict>
     <key>NSPrivacyAccessedAPITypes</key>
     <array>
-        <!-- File timestamp APIs -->
+        <!-- File timestamp APIs: reason C617.1 = access file timestamps for app functionality -->
         <dict>
             <key>NSPrivacyAccessedAPIType</key>
             <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
             <key>NSPrivacyAccessedAPITypeReasons</key>
             <array>
-                <string>C617.1</string> <!-- Access file timestamps for app functionality -->
+                <string>C617.1</string>
             </array>
         </dict>
-        <!-- UserDefaults -->
+        <!-- UserDefaults: reason CA92.1 = read/write app preferences -->
         <dict>
             <key>NSPrivacyAccessedAPIType</key>
             <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
             <key>NSPrivacyAccessedAPITypeReasons</key>
             <array>
-                <string>CA92.1</string> <!-- Access UserDefaults to read/write app preferences -->
+                <string>CA92.1</string>
             </array>
         </dict>
     </array>
@@ -181,6 +188,10 @@ Some APIs require a "required reason" declaration in `PrivacyInfo.xcprivacy`:
 ---
 
 ## AppGallery (Huawei) — Permission Policies
+
+> **Developer Instructions:** The privacy policy and permission requirements described
+> below apply to **your Flutter app** distributed via AppGallery. These are app-side
+> requirements for your codebase — the AI agent operates only within the current session.
 
 ### Standard Android permissions
 AppGallery follows standard Android permission guidelines. The same

@@ -1,194 +1,40 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-release-automation`  
-**Scanned:** 2026-06-03 17:43:51 UTC  
+**Skill:** flutter-release-automation  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-release-automation`  
+**Scanned:** 2026-06-16 16:02:51 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 100/100 |
-| Severity | CRITICAL |
-| Recommendation | DO NOT INSTALL |
+| Score | 10/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
 ## Components (8)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 226 | No |
-| `assets/release_workflow.yml` | yaml | 325 | No |
-| `evals/flutter-release-automation.md` | markdown | 176 | No |
-| `references/azure_devops.md` | markdown | 414 | No |
+| `SKILL.md` | markdown | 227 | No |
+| `assets/release_workflow.yml` | yaml | 328 | No |
+| `evals/evals.json` | json | 66 | No |
+| `references/azure_devops.md` | markdown | 417 | No |
 | `references/cd_strategy.md` | markdown | 558 | No |
-| `references/fastlane_signing.md` | markdown | 471 | No |
-| `references/github_actions.md` | markdown | 464 | No |
-| `references/jenkins.md` | markdown | 428 | No |
+| `references/fastlane_signing.md` | markdown | 473 | No |
+| `references/github_actions.md` | markdown | 467 | No |
+| `references/jenkins.md` | markdown | 432 | No |
 
-## Issues (15)
+## Issues (1)
 
-### 🟡 MEDIUM: E1
+### 🟡 MEDIUM: SQP-2
 
-**Location:** `references/azure_devops.md:19`  
-**Confidence:** 50%  
+**Location:** `references/jenkins.md:389–393`  
+**Confidence:** 80%  
 
-**Message:** External Transmission
+**Message:** The use of `sed -i` to modify `pubspec.yaml` is a standard practice in CI/CD pipelines to automate version bumping (e.g., appending the build number). While it is a 'destructive' modification to the file on the local workspace, it is not a security vulnerability in the context of a transient CI runner. However, if this script were run on a developer's local machine or a persistent server without a clean workspace, it would modify source code unexpectedly.
 
-**Remediation:** Verify the destination URL is trusted and necessary. Remove or replace with documented APIs. Ensure no secrets, tokens, or PII are transmitted.
-
----
-
-### 🟡 MEDIUM: E1
-
-**Location:** `references/github_actions.md:26`  
-**Confidence:** 50%  
-
-**Message:** External Transmission
-
-**Remediation:** Verify the destination URL is trusted and necessary. Remove or replace with documented APIs. Ensure no secrets, tokens, or PII are transmitted.
-
----
-
-### 🟡 MEDIUM: E1
-
-**Location:** `references/jenkins.md:28`  
-**Confidence:** 50%  
-
-**Message:** External Transmission
-
-**Remediation:** Verify the destination URL is trusted and necessary. Remove or replace with documented APIs. Ensure no secrets, tokens, or PII are transmitted.
-
----
-
-### 🟡 MEDIUM: PE2
-
-**Location:** `assets/release_workflow.yml:79`  
-**Confidence:** 70%  
-
-**Message:** Sudo/Root Execution
-
-**Remediation:** Avoid sudo/root unless strictly required. Prefer least-privilege patterns. If elevation is needed, document the justification and scope.
-
----
-
-### 🟡 MEDIUM: PE2
-
-**Location:** `references/azure_devops.md:178`  
-**Confidence:** 70%  
-
-**Message:** Sudo/Root Execution
-
-**Remediation:** Avoid sudo/root unless strictly required. Prefer least-privilege patterns. If elevation is needed, document the justification and scope.
-
----
-
-### 🟡 MEDIUM: PE2
-
-**Location:** `references/github_actions.md:139`  
-**Confidence:** 70%  
-
-**Message:** Sudo/Root Execution
-
-**Remediation:** Avoid sudo/root unless strictly required. Prefer least-privilege patterns. If elevation is needed, document the justification and scope.
-
----
-
-### 🟡 MEDIUM: PE2
-
-**Location:** `references/jenkins.md:177`  
-**Confidence:** 70%  
-
-**Message:** Sudo/Root Execution
-
-**Remediation:** Avoid sudo/root unless strictly required. Prefer least-privilege patterns. If elevation is needed, document the justification and scope.
-
----
-
-### 🟡 MEDIUM: PE2
-
-**Location:** `references/jenkins.md:412`  
-**Confidence:** 70%  
-
-**Message:** Sudo/Root Execution
-
-**Remediation:** Avoid sudo/root unless strictly required. Prefer least-privilege patterns. If elevation is needed, document the justification and scope.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `evals/flutter-release-automation.md:124`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `evals/flutter-release-automation.md:135`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/fastlane_signing.md:16`  
-**Confidence:** 90%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/github_actions.md:35`  
-**Confidence:** 60%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🔴 HIGH: TM2
-
-**Location:** `assets/release_workflow.yml:78`  
-**Confidence:** 75%  
-
-**Message:** Chaining Abuse
-
-**Remediation:** Limit tool chaining depth and validate the output of each tool before passing it to the next. Require explicit user approval for multi-step chains.
-
----
-
-### 🔴 HIGH: TM2
-
-**Location:** `references/azure_devops.md:177`  
-**Confidence:** 75%  
-
-**Message:** Chaining Abuse
-
-**Remediation:** Limit tool chaining depth and validate the output of each tool before passing it to the next. Require explicit user approval for multi-step chains.
-
----
-
-### 🔴 HIGH: TM2
-
-**Location:** `references/github_actions.md:138`  
-**Confidence:** 75%  
-
-**Message:** Chaining Abuse
-
-**Remediation:** Limit tool chaining depth and validate the output of each tool before passing it to the next. Require explicit user approval for multi-step chains.
+**Remediation:** Ensure that the CI environment always uses a clean, ephemeral workspace (as seen in the `always { cleanWs() }` block) to prevent persistent changes to the source repository. Alternatively, use a dedicated versioning tool or a temporary copy of the file for the build process.
 
 ---
 

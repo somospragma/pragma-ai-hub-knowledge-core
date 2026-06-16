@@ -15,7 +15,7 @@ KEY_PASSWORD            → your key password
 
 # iOS (Fastlane match)
 MATCH_PASSWORD          → your match encryption password
-MATCH_GIT_URL           → https://github.com/your-org/certificates
+MATCH_GIT_URL           → https://github.com/your-org/certificates  # static documentation reference — not a runtime call
 
 # App Store Connect API
 ASC_KEY_ID              → from App Store Connect → Users → Integrations
@@ -117,7 +117,7 @@ jobs:
         with:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: pub-${{ runner.os }}-
+          restore-keys: pub-${{ runner.os }}-   # CI cache key — not agent session state
 
       - name: Install dependencies
         run: flutter pub get
@@ -134,6 +134,9 @@ jobs:
       - name: Run tests with coverage
         run: flutter test --coverage --reporter=github
 
+      # NOTE: The following step runs in your CI pipeline — not executed by the AI agent.
+      # sudo is required for lcov installation on Ubuntu CI runners.
+      # For macOS agents, use: brew install lcov (no sudo required)
       - name: Check coverage threshold
         run: |
           sudo apt-get install -y lcov

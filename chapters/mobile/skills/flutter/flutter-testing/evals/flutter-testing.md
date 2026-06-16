@@ -1,14 +1,14 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-testing`  
-**Scanned:** 2026-06-03 17:44:07 UTC  
+**Skill:** flutter-testing  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-testing`  
+**Scanned:** 2026-06-16 15:19:28 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 0/100 |
+| Score | 5/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 443 | No |
-| `evals/flutter-testing.md` | markdown | 46 | No |
+| `SKILL.md` | markdown | 444 | No |
+| `evals/evals.json` | json | 144 | No |
 | `references/INDEX.md` | markdown | 25 | No |
 | `references/golden-testing.md` | markdown | 278 | No |
 | `references/integration-testing.md` | markdown | 259 | No |
@@ -27,9 +27,18 @@
 | `references/unit-testing.md` | markdown | 354 | No |
 | `references/widget-testing.md` | markdown | 299 | No |
 
-## Issues (0)
+## Issues (1)
 
-No security issues detected.
+### 🟢 LOW: SDI-2
+
+**Location:** `SKILL.md:372–373`  
+**Confidence:** 100%  
+
+**Message:** The finding identifies a code snippet that uses `File(...).readAsStringSync()`. While this is a synchronous I/O operation, in the context of a 'Test Fixture' example within a documentation/skill file, this is a standard and necessary pattern for loading test data (JSON/YAML) from the filesystem during unit or widget testing. It is not a vulnerability in the skill itself, but rather a demonstration of how a developer would implement a helper function in their own test suite. It does not pose a security risk to the agent or the user unless the user blindly copies it into a production environment without sanitizing the input path.
+
+**Remediation:** No remediation is required for the skill content itself as it is an educational example. However, as a best practice, developers should be advised to use `package:path` for cross-platform path handling and ensure that file paths are not derived from untrusted user input to prevent Path Traversal vulnerabilities.
+
+---
 
 ## Metadata
 

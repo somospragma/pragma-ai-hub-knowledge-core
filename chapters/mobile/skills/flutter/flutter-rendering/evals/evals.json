@@ -1,0 +1,104 @@
+{
+  "skill_name": "flutter-rendering",
+  "_tool_scope": "This file is an evaluation definition — not executed as agent instructions. Assertions of type llm_judge are grading metadata, not tool grants. The skill uses only read access.",
+  "evals": [
+    {
+      "id": "eval-01-listview-jank",
+      "name": "ListView jank with 1000 items",
+      "prompt": "My app has jank when scrolling a ListView with 1000 items. How do I fix it?",
+      "expected_behaviors": [
+        "Recommends switching from ListView(children: [...]) to ListView.builder",
+        "Explains itemExtent or itemExtentBuilder for O(1) layout calculation",
+        "Mentions profiling first with flutter run --profile before optimizing",
+        "Suggests RepaintBoundary per item if items have independent animations",
+        "Does not recommend loading all 1000 items into memory eagerly"
+      ],
+      "grading": {
+        "type": "llm_judge",
+        "rubric": "Response must recommend ListView.builder as the primary fix, explain why it virtualizes item rendering, and mention at least one additional optimization (itemExtent, RepaintBoundary, or profiling). Deduct points if the response omits the 'profile first' principle."
+      }
+    },
+    {
+      "id": "eval-02-repaintboundary",
+      "name": "RepaintBoundary usage guidance",
+      "prompt": "When should I use RepaintBoundary? My animation is causing the whole screen to repaint.",
+      "expected_behaviors": [
+        "Explains that RepaintBoundary isolates repaint regions into a separate compositing layer",
+        "Warns that overuse adds memory and compositing cost",
+        "Recommends using DevTools debugRepaintRainbowEnabled to verify repaints before adding boundaries",
+        "Provides a concrete code example wrapping an animation widget",
+        "Mentions the rule: only add where DevTools confirms unnecessary repaints"
+      ],
+      "grading": {
+        "type": "llm_judge",
+        "rubric": "Response must explain the isolation purpose of RepaintBoundary, provide a code example, and include the caveat about overuse cost. It should mention DevTools verification. Deduct if it recommends adding RepaintBoundary everywhere without profiling."
+      }
+    },
+    {
+      "id": "eval-03-opacity-comparison",
+      "name": "Opacity vs AnimatedOpacity vs FadeTransition performance comparison",
+      "prompt": "¿Cuál es la diferencia entre usar Opacity vs AnimatedOpacity vs FadeTransition? ¿Cuál tiene mejor rendimiento?",
+      "expected_behaviors": [
+        "Explains that Opacity triggers saveLayer on complex subtrees — expensive",
+        "Explains AnimatedOpacity uses compositing layer only during animation",
+        "Explains FadeTransition is the most efficient option — driven by Animation<double>",
+        "Recommends FadeTransition as the best-performance choice",
+        "Provides code examples for each option",
+        "Responds in Spanish since the prompt is in Spanish"
+      ],
+      "grading": {
+        "type": "llm_judge",
+        "rubric": "Response must clearly rank FadeTransition as the most performant, explain saveLayer cost for Opacity, and include code examples. Response should be in Spanish. Deduct if FadeTransition is not identified as the top choice or if the language does not match the prompt."
+      }
+    },
+    {
+      "id": "eval-04-blocbuilder-rebuilds",
+      "name": "BlocBuilder whole-Scaffold rebuild minimization",
+      "prompt": "I'm using BlocBuilder and my entire Scaffold rebuilds on every state change. How do I minimize rebuilds?",
+      "expected_behaviors": [
+        "Identifies the anti-pattern: BlocBuilder wrapping the entire Scaffold",
+        "Recommends moving BlocBuilder to only wrap the changing subtree",
+        "Explains buildWhen predicate to filter unnecessary rebuilds",
+        "Mentions context.select or BlocSelector for granular field-level subscriptions",
+        "Provides a corrected code example with const AppBar and narrow BlocBuilder scope"
+      ],
+      "grading": {
+        "type": "llm_judge",
+        "rubric": "Response must identify the root cause (BlocBuilder scope too wide), provide a narrowed example, and explain at least one of: buildWhen, context.select, or BlocSelector. Deduct if the fix only mentions buildWhen without addressing scope reduction."
+      }
+    },
+    {
+      "id": "eval-05-devtools-rebuilds",
+      "name": "Using Flutter DevTools to find excessive rebuilds",
+      "prompt": "How do I use Flutter DevTools to find which widgets are rebuilding too often?",
+      "expected_behaviors": [
+        "Explains running in profile mode: flutter run --profile",
+        "Mentions enabling debugProfileBuildsEnabled = true",
+        "Explains the Widget Rebuild Stats panel in DevTools",
+        "Mentions debugRepaintRainbowEnabled for visual repaint identification",
+        "References the performance overlay (showPerformanceOverlay: true)",
+        "Provides step-by-step workflow, not just a tool list"
+      ],
+      "grading": {
+        "type": "llm_judge",
+        "rubric": "Response must explain at least three DevTools/debugging mechanisms, emphasize profile mode as a prerequisite, and describe a concrete workflow. Deduct if it only lists flags without explaining how to interpret results."
+      }
+    },
+    {
+      "id": "eval-06-custom-shader-scope",
+      "name": "Scope boundary — custom shader with Impeller",
+      "prompt": "How do I implement a custom shader effect with Impeller?",
+      "expected_behaviors": [
+        "Clarifies that custom GLSL shader authoring is outside this skill's scope",
+        "Explains that Impeller uses a precompiled shader model (AOT) that differs from raw GLSL",
+        "Redirects to official Flutter documentation for FragmentProgram and shader asset setup",
+        "Optionally mentions that standard Impeller-friendly alternatives (ColorFiltered, BackdropFilter) cover most effects",
+        "Does not fabricate Impeller-specific shader APIs that do not exist"
+      ],
+      "grading": {
+        "type": "llm_judge",
+        "rubric": "Response must acknowledge the scope boundary, redirect to official Flutter shader docs (flutter.dev or api.flutter.dev), and not invent non-existent APIs. Bonus if it suggests Impeller-compatible built-in alternatives. Deduct if it provides fabricated shader code."
+      }
+    }
+  ]
+}

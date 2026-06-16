@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-streams-advanced`  
-**Scanned:** 2026-06-03 17:44:03 UTC  
+**Skill:** flutter-streams-advanced  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-streams-advanced`  
+**Scanned:** 2026-06-16 15:26:25 UTC  
 
 ## Risk Assessment
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 147 | No |
-| `evals/flutter-streams-advanced.md` | markdown | 33 | No |
+| `SKILL.md` | markdown | 148 | No |
+| `evals/evals.json` | json | 133 | No |
 | `references/bloc_streams.md` | markdown | 381 | No |
 | `references/real_world_patterns.md` | markdown | 431 | No |
 | `references/riverpod_streams.md` | markdown | 396 | No |

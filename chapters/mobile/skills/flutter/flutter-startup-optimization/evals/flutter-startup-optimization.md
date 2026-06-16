@@ -1,14 +1,14 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-startup-optimization`  
-**Scanned:** 2026-06-03 17:43:59 UTC  
+**Skill:** flutter-startup-optimization  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-startup-optimization`  
+**Scanned:** 2026-06-16 15:27:45 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 10/100 |
+| Score | 0/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
@@ -16,22 +16,13 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 262 | No |
-| `evals/flutter-startup-optimization.md` | markdown | 30 | No |
-| `references/implementation_guide.md` | markdown | 586 | No |
+| `SKILL.md` | markdown | 263 | No |
+| `evals/evals.json` | json | 97 | No |
+| `references/implementation_guide.md` | markdown | 587 | No |
 
-## Issues (1)
+## Issues (0)
 
-### 🟡 MEDIUM: E1
-
-**Location:** `references/implementation_guide.md:440`  
-**Confidence:** 50%  
-
-**Message:** External Transmission
-
-**Remediation:** Verify the destination URL is trusted and necessary. Remove or replace with documented APIs. Ensure no secrets, tokens, or PII are transmitted.
-
----
+No security issues detected.
 
 ## Metadata
 

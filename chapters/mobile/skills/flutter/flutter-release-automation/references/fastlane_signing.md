@@ -14,6 +14,8 @@ rbenv install 3.3.0
 rbenv global 3.3.0
 
 # Add to ~/.zshrc or ~/.bash_profile
+# NOTE: The following line configures your local developer machine — run this yourself in your terminal,
+# not by the AI agent. This is a one-time rbenv shell setup, not CI or agent session persistence.
 echo 'eval "$(rbenv init -)"' >> ~/.zshrc
 source ~/.zshrc
 

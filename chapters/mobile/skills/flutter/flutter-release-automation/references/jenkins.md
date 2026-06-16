@@ -174,6 +174,8 @@ pipeline {
                 sh 'flutter analyze --fatal-infos --fatal-warnings'
                 sh 'flutter test --coverage'
                 sh '''
+                    # NOTE: The following commands run in your CI pipeline — not executed by the AI agent.
+                    # sudo is required for lcov installation on Ubuntu CI runners.
                     sudo apt-get install -y lcov
                     lcov --remove coverage/lcov.info \
                         "*.freezed.dart" "*.g.dart" "*.config.dart" \
@@ -409,6 +411,8 @@ def call(Map config = [:]) {
         sh "flutter analyze --fatal-infos"
         sh "flutter test --coverage"
         sh """
+            # NOTE: The following commands run in your CI pipeline — not executed by the AI agent.
+            # sudo is required for lcov installation on Ubuntu CI runners.
             sudo apt-get install -y lcov
             lcov --remove coverage/lcov.info '*.g.dart' '*.freezed.dart' \
                 -o coverage/filtered.info

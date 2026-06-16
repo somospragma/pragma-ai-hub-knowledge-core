@@ -1,12 +1,13 @@
 ---
 id: flutter-rendering
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-rendering
 description: >
-  Implements secure local storage in Flutter for tokens, credentials, and sensitive data. Use this skill for storing auth tokens, API keys, user credentials, PII, or any sensitive data locally. Triggers on 'store token', 'save credentials', 'persist auth', 'secure storage', SharedPreferences with sensitive data (flag as insecure), logout (must clear all storage). Enforces OWASP MASVS-STORAGE-1 (formerly M2). Stack: flutter_secure_storage 10.0.0. Dart 3.3+ / Flutter 3.32+.
+  Optimizes Flutter rendering performance and eliminates UI jank. Use this skill when diagnosing slow scrolling, dropped frames, excessive widget rebuilds, expensive raster operations, or any Flutter performance bottleneck. Triggers on 'my app is janky', 'UI is slow', 'optimize rendering', 'reduce rebuilds', 'frame drops', 'RepaintBoundary', 'const widgets', 'Impeller', 'flutter DevTools profiling', 'list performance', or any question about Flutter 60/120fps targets. Covers Impeller renderer (default from Flutter 3.27), widget rebuild analysis, raster layer optimization, and DevTools CPU/GPU profiling workflow. Stack: Dart 3.3+ / Flutter 3.32+.
 ---
 
 # Flutter Rendering Performance
@@ -82,6 +83,8 @@ DecoratedBox(decoration: BoxDecoration(borderRadius:…)) // vs ClipRRect when p
 ---
 
 ## const — Eliminate Rebuilds at Compile Time
+
+> **Note:** These instructions describe how **your Flutter widget tree** manages rendering state and widget lifecycle — the AI agent does not persist any state between sessions.
 
 ```dart
 // ✅ const = widget instance is reused, never rebuilt

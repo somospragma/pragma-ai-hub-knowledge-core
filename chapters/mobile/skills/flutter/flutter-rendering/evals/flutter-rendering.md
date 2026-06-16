@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-rendering`  
-**Scanned:** 2026-06-03 17:43:53 UTC  
+**Skill:** flutter-rendering  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-rendering`  
+**Scanned:** 2026-06-16 15:46:46 UTC  
 
 ## Risk Assessment
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 452 | No |
-| `evals/flutter-rendering.md` | markdown | 40 | No |
+| `SKILL.md` | markdown | 455 | No |
+| `evals/evals.json` | json | 104 | No |
 | `references/common_jank_fixes.md` | markdown | 266 | No |
 | `references/devtools_profiling.md` | markdown | 144 | No |
 
@@ -25,7 +25,7 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `SKILL.md:78`  
+**Location:** `SKILL.md:79`  
 **Confidence:** 75%  
 
 **Message:** Session Persistence

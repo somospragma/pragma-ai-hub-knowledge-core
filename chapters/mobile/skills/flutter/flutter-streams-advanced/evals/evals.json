@@ -1,0 +1,133 @@
+{
+  "skill_name": "flutter-streams-advanced",
+  "_tool_scope": "This file is an evaluation definition — not executed as agent instructions. Assertions of type llm_judge are grading metadata, not tool grants. The skill uses only read access.",
+  "evals": [
+    {
+      "id": "eval-01",
+      "name": "live-search-bloc-no-rxdart",
+      "prompt": "How do I implement live search in Flutter using BLoC without rxdart? I want debounce behavior.",
+      "assertions": [
+        {
+          "id": "a01-1",
+          "type": "llm_judge",
+          "description": "Response must explain and show the debounceRestartable EventTransformer combining _DebounceTransformer with restartable() from bloc_concurrency — no rxdart import anywhere."
+        },
+        {
+          "id": "a01-2",
+          "type": "llm_judge",
+          "description": "Response must provide a concrete SearchBloc code example using on<QueryChangedEvent> with transformer: debounceRestartable(Duration(milliseconds: 300))."
+        },
+        {
+          "id": "a01-3",
+          "type": "llm_judge",
+          "description": "Response must include the _DebounceTransformer implementation or reference it explicitly, and must NOT suggest installing rxdart."
+        }
+      ]
+    },
+    {
+      "id": "eval-02",
+      "name": "event-transformer-double-submit",
+      "prompt": "What EventTransformer should I use for a form submit button — I want to prevent double-submit?",
+      "assertions": [
+        {
+          "id": "a02-1",
+          "type": "llm_judge",
+          "description": "Response must recommend droppable() from bloc_concurrency and clearly explain that it ignores new events while the current handler is still executing."
+        },
+        {
+          "id": "a02-2",
+          "type": "llm_judge",
+          "description": "Response must include a code snippet showing on<SubmitFormEvent>(_onSubmit, transformer: droppable()) or equivalent."
+        },
+        {
+          "id": "a02-3",
+          "type": "llm_judge",
+          "description": "Response must contrast droppable() against the other transformers (restartable, sequential, concurrent) to justify the choice."
+        }
+      ]
+    },
+    {
+      "id": "eval-03",
+      "name": "combinar-dos-streamproviders-riverpod",
+      "prompt": "¿Cómo combino dos StreamProviders de Riverpod para mostrar datos de usuario y sus pedidos al mismo tiempo?",
+      "assertions": [
+        {
+          "id": "a03-1",
+          "type": "llm_judge",
+          "description": "La respuesta debe mostrar composición de providers mediante ref.watch de dos providers distintos (usuario y pedidos) dentro de un único provider derivado o AsyncNotifier."
+        },
+        {
+          "id": "a03-2",
+          "type": "llm_judge",
+          "description": "La respuesta debe demostrar el patrón whenData/flatten o un AsyncNotifier que suscribe a los dos streams con ref.onDispose para limpieza automática."
+        },
+        {
+          "id": "a03-3",
+          "type": "llm_judge",
+          "description": "La respuesta debe estar en español (idioma del prompt) y no debe sugerir rxdart ni combineLatest de rxdart."
+        }
+      ]
+    },
+    {
+      "id": "eval-04",
+      "name": "broadcast-stream-multiple-listeners",
+      "prompt": "I have a StreamController that I need multiple widgets to listen to. What type should I use?",
+      "assertions": [
+        {
+          "id": "a04-1",
+          "type": "llm_judge",
+          "description": "Response must recommend StreamController.broadcast() and explain that a single-subscription StreamController throws StateError on a second listen."
+        },
+        {
+          "id": "a04-2",
+          "type": "llm_judge",
+          "description": "Response must include a code example showing StreamController<T>.broadcast() and must advise exposing only the .stream getter (never the controller itself)."
+        }
+      ]
+    },
+    {
+      "id": "eval-05",
+      "name": "error-handling-without-termination",
+      "prompt": "How do I handle errors in a Dart stream without the stream terminating?",
+      "assertions": [
+        {
+          "id": "a05-1",
+          "type": "llm_judge",
+          "description": "Response must explain at least two native Dart mechanisms: cancelOnError: false in listen() and stream.handleError()."
+        },
+        {
+          "id": "a05-2",
+          "type": "llm_judge",
+          "description": "Response must include concrete code showing both approaches with a comment or explanation of why the stream continues without terminating."
+        },
+        {
+          "id": "a05-3",
+          "type": "llm_judge",
+          "description": "Response must warn against silently swallowing errors and show logging or fallback handling in the examples."
+        }
+      ]
+    },
+    {
+      "id": "eval-06",
+      "name": "scope-boundary-rxdart-switchmap",
+      "prompt": "How do I add rxdart to my project for switchMap?",
+      "assertions": [
+        {
+          "id": "a06-1",
+          "type": "llm_judge",
+          "description": "Response must actively discourage adding rxdart and explain that the skill's scope excludes it."
+        },
+        {
+          "id": "a06-2",
+          "type": "llm_judge",
+          "description": "Response must provide the native Dart alternative to switchMap: restartable() EventTransformer for BLoC and/or stream.asyncExpand() for raw streams."
+        },
+        {
+          "id": "a06-3",
+          "type": "llm_judge",
+          "description": "Response must include a working code example of the native alternative so the developer has a direct replacement without needing rxdart."
+        }
+      ]
+    }
+  ]
+}

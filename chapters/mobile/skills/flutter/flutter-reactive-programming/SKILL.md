@@ -5,6 +5,7 @@ scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-reactive-programming
 description: > 
   Implements reactive programming patterns in Flutter: unidirectional data flow, reactive repositories (watch streams), reactive state with BLoC and Riverpod, ValueNotifier for lightweight local state, ChangeNotifier for simple reactive models, and reactive UI composition. No rxdart. Use this skill when designing how data flows reactively through the entire app — from data source to UI — or when choosing between BLoC, Riverpod, ValueNotifier, and ChangeNotifier for a given use case.
 ---

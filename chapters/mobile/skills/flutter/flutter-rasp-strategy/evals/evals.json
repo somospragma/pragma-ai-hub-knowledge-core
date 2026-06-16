@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "skill": "flutter-rasp-strategy",
+    "version": "1.2.0",
+    "created": "2026-06-12",
+    "_tool_scope": "flutter-rasp-strategy"
+  },
+  "evals": [
+    {
+      "id": "eval-01-root-detection-android",
+      "prompt": "How do I integrate freeRASP in my Flutter app to detect if it's running on a rooted Android device?",
+      "_tool_scope": "flutter-rasp-strategy",
+      "assertions": [
+        {
+          "id": "A01-1",
+          "description": "Response references TalsecConfig with AndroidConfig.expectedPackageName and expectedSigningCertificateHashes",
+          "type": "contains_concept",
+          "expected": "TalsecConfig + AndroidConfig setup with expectedPackageName and expectedSigningCertificateHashes"
+        },
+        {
+          "id": "A01-2",
+          "description": "Response references onRootDetected callback and routing to RaspBloc or equivalent handler",
+          "type": "contains_concept",
+          "expected": "onRootDetected callback that dispatches a threat event (e.g., RaspEvent.threatDetected(RaspThreat.root))"
+        },
+        {
+          "id": "A01-3",
+          "description": "Response includes Talsec.instance.start() call placed before runApp in main.dart",
+          "type": "contains_concept",
+          "expected": "Talsec.instance.start(FreeRaspConfig.config) called in main() before runApp"
+        }
+      ]
+    },
+    {
+      "id": "eval-02-frida-response-strategy",
+      "prompt": "What should my app do when freeRASP detects a Frida hooking attack? Should I just log it?",
+      "_tool_scope": "flutter-rasp-strategy",
+      "assertions": [
+        {
+          "id": "A02-1",
+          "description": "Response explicitly says logging alone is NOT sufficient for hook detection",
+          "type": "must_include",
+          "expected": "No — logging alone is insufficient. Hook/Frida detection is a critical threat requiring the app to block operations or terminate."
+        },
+        {
+          "id": "A02-2",
+          "description": "Response recommends blocking the app and references the threat response table or equivalent guidance",
+          "type": "contains_concept",
+          "expected": "Block the app immediately for onHookDetected — active attack in progress"
+        },
+        {
+          "id": "A02-3",
+          "description": "Response warns against calling exit() directly from the callback and recommends dispatching to BLoC",
+          "type": "contains_concept",
+          "expected": "Dispatch via _bloc.add(RaspEvent.threatDetected(RaspThreat.hook)) — do not call exit() directly in the callback"
+        }
+      ]
+    },
+    {
+      "id": "eval-03-debug-emulator-config-spanish",
+      "prompt": "¿Cómo configuro freeRASP para que funcione en modo debug sin bloquear el emulador de desarrollo?",
+      "_tool_scope": "flutter-rasp-strategy",
+      "assertions": [
+        {
+          "id": "A03-1",
+          "description": "Response explains isProd: kReleaseMode (false in debug) to disable strict checks",
+          "type": "contains_concept",
+          "expected": "isProd: kReleaseMode — se establece en false automáticamente en modo debug, deshabilitando verificaciones estrictas"
+        },
+        {
+          "id": "A03-2",
+          "description": "Response explains that the emulator threat should be handled conditionally — blocked in production, allowed in debug",
+          "type": "contains_concept",
+          "expected": "onEmulatorDetected se puede ignorar o no bloquear cuando kReleaseMode es false"
+        },
+        {
+          "id": "A03-3",
+          "description": "Response mentions including the debug signing certificate hash in expectedSigningCertificateHashes",
+          "type": "contains_concept",
+          "expected": "Incluir el hash del certificado de debug en expectedSigningCertificateHashes con guarda if (!kReleaseMode)"
+        }
+      ]
+    },
+    {
+      "id": "eval-04-strategy-pattern-swap",
+      "prompt": "I need to be able to swap freeRASP for a commercial RASP solution later without touching my BLoC or domain code. How?",
+      "_tool_scope": "flutter-rasp-strategy",
+      "assertions": [
+        {
+          "id": "A04-1",
+          "description": "Response describes the RaspProvider abstract interface in the domain layer",
+          "type": "contains_concept",
+          "expected": "Define an abstract interface class RaspProvider in the domain layer that BLoC depends on"
+        },
+        {
+          "id": "A04-2",
+          "description": "Response explains FreeRaspAdapter implementing RaspProvider in the data layer",
+          "type": "contains_concept",
+          "expected": "FreeRaspAdapter implements RaspProvider in the data layer — BLoC never imports freeRASP SDK directly"
+        },
+        {
+          "id": "A04-3",
+          "description": "Response explains that swapping providers only requires changing the DI binding",
+          "type": "contains_concept",
+          "expected": "To swap, only the DI binding changes: bind RaspProvider → CommercialRaspAdapter — no BLoC or domain changes needed"
+        }
+      ]
+    },
+    {
+      "id": "eval-05-signing-cert-hash-extraction",
+      "prompt": "How do I extract the signing certificate hash needed for freeRASP's expectedSigningCertificateHashes config?",
+      "_tool_scope": "flutter-rasp-strategy",
+      "assertions": [
+        {
+          "id": "A05-1",
+          "description": "Response provides at least one concrete shell command to extract the base64-encoded SHA-256 hash",
+          "type": "contains_concept",
+          "expected": "Shell command using keytool, apksigner, or Play Console SHA-256 converted with xxd -r -p | base64"
+        },
+        {
+          "id": "A05-2",
+          "description": "Response mentions the Play Console path for release builds (App Signing Key Certificate → SHA-256)",
+          "type": "contains_concept",
+          "expected": "Play Console → Setup → App Signing → App Signing Key Certificate → SHA-256"
+        },
+        {
+          "id": "A05-3",
+          "description": "Response clarifies the need to include both release and debug hashes during development",
+          "type": "contains_concept",
+          "expected": "Include both the release hash and the debug hash (guarded with if (!kReleaseMode)) during development"
+        }
+      ]
+    },
+    {
+      "id": "eval-06-scope-boundary-cert-pinning",
+      "prompt": "Does this skill cover certificate pinning?",
+      "_tool_scope": "flutter-rasp-strategy",
+      "assertions": [
+        {
+          "id": "A06-1",
+          "description": "Response clearly states that certificate pinning is out of scope for this skill",
+          "type": "must_include",
+          "expected": "No — certificate pinning is outside the scope of flutter-rasp-strategy"
+        },
+        {
+          "id": "A06-2",
+          "description": "Response redirects the user to the flutter-certificate-pinning skill",
+          "type": "must_include",
+          "expected": "Refer to the flutter-certificate-pinning skill for TLS/certificate pinning implementation"
+        },
+        {
+          "id": "A06-3",
+          "description": "Response briefly explains what this skill does cover (RASP / MASVS-RESILIENCE)",
+          "type": "contains_concept",
+          "expected": "This skill covers runtime threat detection (root, hook, tamper, emulator) under OWASP MASVS-RESILIENCE"
+        }
+      ]
+    }
+  ]
+}

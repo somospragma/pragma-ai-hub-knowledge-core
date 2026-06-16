@@ -1,0 +1,62 @@
+{
+  "skill": "flutter-permissions",
+  "version": "1.2.0",
+  "created": "2026-06-12",
+  "_eval_scope_note": "This file is an evaluation definition — not executed as agent instructions. All assertions are grading metadata only.",
+  "evals": [
+    {
+      "id": "eval-01-camera-point-of-use",
+      "prompt": "How do I request camera permission in Flutter at the point where the user taps 'Take Photo'? I want to show a rationale dialog first.",
+      "assertions": [
+        "Response requests permission inside the tap handler (point of use), NOT at app startup or initState",
+        "Response includes a rationale dialog check using shouldShowRequestRationale before calling Permission.camera.request()",
+        "Response handles all permission states: granted (proceed to camera), denied (snackbar/message), permanentlyDenied (openAppSettings)"
+      ]
+    },
+    {
+      "id": "eval-02-permanently-denied-location",
+      "prompt": "What should I do when the user has permanently denied location permission? My app shows a blank screen.",
+      "assertions": [
+        "Response identifies isPermanentlyDenied status and recommends openAppSettings() to redirect to OS settings",
+        "Response does NOT suggest re-requesting the permission (it would be silently ignored after permanent denial)",
+        "Response suggests showing an explanatory UI (dialog or snackbar) before redirecting to settings so the user understands why"
+      ]
+    },
+    {
+      "id": "eval-03-ios-camera-microphone-infoplist",
+      "prompt": "¿Cómo configuro los permisos de cámara y micrófono en iOS? Necesito las UsageDescription strings correctas para no ser rechazado en el App Store.",
+      "assertions": [
+        "Response provides the correct Info.plist keys: NSCameraUsageDescription and NSMicrophoneUsageDescription",
+        "Response includes example strings that are specific and accurate (not vague like 'Used by the app') and explains that vague strings are rejected",
+        "Response mentions the Podfile macros (PERMISSION_CAMERA=1, PERMISSION_MICROPHONE=1) needed to enable the permissions in the permission_handler build"
+      ]
+    },
+    {
+      "id": "eval-04-background-location-play-policy",
+      "prompt": "My app needs background location for a delivery tracking feature. What are the Google Play policy requirements?",
+      "assertions": [
+        "Response identifies ACCESS_BACKGROUND_LOCATION as the required Android manifest permission and explains it requires Play Console declaration",
+        "Response mentions the April 2026 policy: background location is only allowed for core features like navigation or delivery tracking — the scenario qualifies",
+        "Response includes the step-by-step Play Console declaration process (App content > Sensitive app permissions > background location form)"
+      ]
+    },
+    {
+      "id": "eval-05-clean-architecture-permission-service",
+      "prompt": "How do I integrate permission handling cleanly with Clean Architecture — where does PermissionService live?",
+      "assertions": [
+        "Response places PermissionService as an abstract interface in the core/domain layer, NOT in presentation or data layers directly",
+        "Response describes the correct dependency flow: Presentation (BLoC/Widget) → Domain (PermissionUseCase) → Core (PermissionService abstract) → permission_handler",
+        "Response explains that the concrete implementation lives in the infrastructure/data layer and is injected via GetIt or similar DI"
+      ]
+    },
+    {
+      "id": "eval-06-push-notification-scope-boundary",
+      "prompt": "How do I request push notification permission?",
+      "assertions": [
+        "Response covers the permission request side: POST_NOTIFICATIONS for Android 13+ (API 33+) in AndroidManifest and Permission.notification.request() via permission_handler",
+        "Response notes that iOS notifications do NOT need an Info.plist key — they use UNUserNotificationCenter (or firebase_messaging.requestPermission)",
+        "Response explicitly scopes firebase_messaging setup, FCM token handling, and notification routing to a separate skill (flutter-push-strategy or equivalent), not covered by this skill"
+      ]
+    }
+  ]
+}

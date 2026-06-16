@@ -1,169 +1,38 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-permissions`  
-**Scanned:** 2026-06-03 17:43:42 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-permissions`  
+**Scanned:** 2026-06-12 20:57:31 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 100/100 |
-| Severity | CRITICAL |
-| Recommendation | DO NOT INSTALL |
+| Score | 10/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
-## Components (5)
+## Components (6)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 136 | No |
-| `evals/flutter-permissions.md` | markdown | 41 | No |
+| `SKILL.md` | markdown | 140 | No |
+| `evals/evals.json` | json | 62 | No |
+| `evals/flutter-permissions.md` | markdown | 251 | No |
 | `references/permission_service.md` | markdown | 389 | No |
-| `references/platform_config.md` | markdown | 256 | No |
-| `references/store_policies.md` | markdown | 226 | No |
+| `references/platform_config.md` | markdown | 258 | No |
+| `references/store_policies.md` | markdown | 237 | No |
 
-## Issues (13)
+## Issues (1)
 
-### 🔴 HIGH: P2
+### 🟡 MEDIUM: SDI-3
 
-**Location:** `references/platform_config.md:9`  
-**Confidence:** 70%  
+**Location:** `references/platform_config.md:55–148`  
+**Confidence:** 80%  
 
-**Message:** Hidden Instructions
+**Message:** The skill's metadata limits its scope to specific permissions (camera, location, etc.), but the documentation provides templates for many other sensitive permissions (Bluetooth, Phone State, Calendar, etc.). While this is common in developer documentation, it creates a discrepancy where the agent might inadvertently include or suggest permissions that exceed the intended scope of the skill, potentially leading to over-privileged app manifests and subsequent store rejection or privacy concerns.
 
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🔴 HIGH: P2
-
-**Location:** `references/platform_config.md:31`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🔴 HIGH: P2
-
-**Location:** `references/platform_config.md:91`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🔴 HIGH: P2
-
-**Location:** `references/platform_config.md:223`  
-**Confidence:** 70%  
-
-**Message:** Hidden Instructions
-
-**Remediation:** Audit all comments and invisible characters. Remove any instructions that direct the agent to perform unauthorized actions. Use plain, reviewable content.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:126`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `SKILL.md:135`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/platform_config.md:83`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/platform_config.md:89`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/platform_config.md:120`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/store_policies.md:153`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/store_policies.md:153`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/store_policies.md:154`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/store_policies.md:178`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
+**Remediation:** Align the skill's metadata description strictly with the permissions documented in the file, or generalize the description to include all sensitive permissions provided in the templates.
 
 ---
 

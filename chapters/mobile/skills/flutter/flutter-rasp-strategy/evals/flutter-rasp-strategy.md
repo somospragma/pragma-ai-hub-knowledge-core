@@ -1,38 +1,30 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-rasp-strategy`  
-**Scanned:** 2026-06-03 17:43:46 UTC  
+**Skill:** flutter-rasp-strategy  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-rasp-strategy`  
+**Scanned:** 2026-06-16 15:57:00 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 10/100 |
+| Score | 0/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (4)
+## Components (5)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 103 | No |
-| `evals/flutter-rasp-strategy.md` | markdown | 40 | No |
-| `references/freerasp_implementation.md` | markdown | 414 | No |
+| `SKILL.md` | markdown | 104 | No |
+| `evals/evals.json` | json | 160 | No |
+| `evals/flutter-rasp-strategy.md` | markdown | 41 | No |
+| `references/freerasp_implementation.md` | markdown | 418 | No |
 | `references/rasp_provider_pattern.md` | markdown | 388 | No |
 
-## Issues (1)
+## Issues (0)
 
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/freerasp_implementation.md:82`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 

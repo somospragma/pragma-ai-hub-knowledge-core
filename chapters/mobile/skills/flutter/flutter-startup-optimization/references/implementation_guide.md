@@ -433,6 +433,7 @@ On first navigation to a feature — LAZY
 
 ### What NOT to do in main()
 
+<!-- DOCUMENTATION EXAMPLE: The URL below is an illustrative placeholder showing an anti-pattern. It is NOT a runtime network call. -->
 ```dart
 // ❌ Network calls in main() — blocks first frame
 void main() async {

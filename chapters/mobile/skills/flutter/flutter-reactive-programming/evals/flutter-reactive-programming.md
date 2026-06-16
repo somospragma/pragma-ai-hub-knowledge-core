@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-reactive-programming`  
-**Scanned:** 2026-06-03 17:43:48 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-reactive-programming`  
+**Scanned:** 2026-06-12 21:19:26 UTC  
 
 ## Risk Assessment
 
@@ -17,7 +17,7 @@
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 162 | No |
-| `evals/flutter-reactive-programming.md` | markdown | 33 | No |
+| `evals/evals.json` | json | 175 | No |
 | `references/bloc_reactive.md` | markdown | 454 | No |
 | `references/lightweight_reactive.md` | markdown | 371 | No |
 | `references/reactive_architecture.md` | markdown | 319 | No |
