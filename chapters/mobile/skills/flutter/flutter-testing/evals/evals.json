@@ -1,0 +1,144 @@
+{
+  "skill_name": "flutter-testing",
+  "_tool_scope": "This file is an evaluation definition — not executed as agent instructions. Assertions of type llm_judge are grading metadata, not tool grants. The skill uses only read access.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "How do I write a BLoC test that verifies my ProductBloc emits [loading, success] states when LoadRequested is dispatched?",
+      "expected_output": "A complete blocTest using bloc_test package showing: MockGetProductUseCase setup, when() stub returning Right(product), act dispatching loadRequested, expect with [loading, success] states, and verify call.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response includes a blocTest<ProductBloc, ProductState> code block",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows the expect list containing loading and a success state",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes tearDown(() => sut.close()) or equivalent bloc close call",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write a widget test for a ProductCard that shows different UI based on BLoC state (loading, success, error)",
+      "expected_output": "A widget test file with MockProductBloc, three testWidgets cases (loading shows CircularProgressIndicator, success shows ProductCard/content, error shows error message), using BlocProvider.value to inject mock bloc.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses MockBloc pattern: class MockProductBloc extends MockBloc",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes all three state cases: loading, success, and error testWidgets",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response uses BlocProvider",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "¿Cómo mockeo un repositorio con mocktail para un UseCase test en Clean Architecture?",
+      "expected_output": "Explanation in Spanish covering: class MockXRepository extends Mock implements XRepository, registerFallbackValue for custom types, when().thenAnswer() stubs, verify().called(1), and verifyNoMoreInteractions.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response includes: extends Mock implements",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response explains registerFallbackValue usage for custom parameter types",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes verifyNoMoreInteractions",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want to write an integration test for the login flow — user enters credentials, taps login, sees home screen",
+      "expected_output": "An integration test using IntegrationTestWidgetsFlutterBinding.ensureInitialized(), tester.enterText() for credential fields, tester.tap() for login button, tester.pumpAndSettle() to wait for navigation, and expect/find to verify home screen is shown.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response mentions IntegrationTestWidgetsFlutterBinding",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses tester.enterText() to fill credential fields",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes tester.pumpAndSettle() after tapping login to await navigation",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "When should I use pumpAndSettle() vs pump() in widget tests? My test hangs.",
+      "expected_output": "Clear explanation distinguishing pump() for immediate state changes/BLoC emits vs pumpAndSettle() for animations/transitions, with the key warning that pumpAndSettle() hangs when ongoing timers or streams are active, and guidance to use pump() or pump(Duration(...)) in those cases.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response explains that pumpAndSettle() can hang when ongoing timers are present",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends pump() for immediate setState / BLoC emit scenarios",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response does NOT suggest pumpAndSettle() as the universal solution for all widget test scenarios",
+          "type": "not_contains"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "How do I configure lcov coverage threshold in CI to fail the build when coverage drops below 80%?",
+      "expected_output": "The skill should redirect the user to flutter-test-coverage-strategy since coverage thresholds, lcov reports, and CI enforcement are out of scope for flutter-testing.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response mentions flutter-test-coverage-strategy",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response does NOT provide lcov threshold configuration details, redirecting instead",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains that coverage thresholds and CI enforcement are out of scope for this skill",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

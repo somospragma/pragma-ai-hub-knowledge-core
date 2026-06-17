@@ -1,0 +1,56 @@
+{
+  "skill_name": "flutter-ds-figma-checklist",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just implemented a DS button component. The Figma spec shows it with a primary blue fill, rounded corners, white text 'Continuar', 16px padding, and a loading spinner state. Walk me through a complete fidelity audit against the Figma spec.",
+      "expected_output": "Walks through all checklist sections: design context, variants, color tokens, typography, spacing/padding, sizes, border radius. Mentions verifying light/dark mode. Checks literal text 'Continuar' exactly. Mentions verification commands.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response covers color token verification — checking fill, text color, and border against design tokens",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response emphasizes that the literal text 'Continuar' must match Figma exactly — no translations, corrections, or rewriting",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response verifies the component in both light and dark mode",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response includes verification commands (flutter analyze and/or flutter test)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a horizontal card component with a product title on the left and a price badge on the right. In compact screens (320px wide) I'm getting RenderFlex overflow errors. How do I address this without changing the Figma text?",
+      "expected_output": "Uses Flexible or Expanded on the title text to let it shrink. Does NOT shorten the literal text. Warns against hardcoding widths without Figma backing. Shows overflow safety section of the checklist.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses Flexible or Expanded on the text widget to handle overflow",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explicitly states the literal Figma text must NOT be shortened or truncated without Figma contract backing",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response does NOT suggest adding TextOverflow.ellipsis without explicit Figma contract",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

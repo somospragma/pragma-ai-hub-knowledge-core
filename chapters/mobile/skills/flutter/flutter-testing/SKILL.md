@@ -1,10 +1,11 @@
 ---
 id: flutter-testing
-version: 2.1.0
+version: 2.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-testing
 description: >
   Defines how to write tests in Flutter- unit tests, widget tests, integration tests, golden tests, mutation tests, and native plugin testing. Use this skill when asking 'how do I test this?', 'how do I mock a dependency?', 'how do I write a BLoC test?', 'how do I test a widget?', 'how do I test a plugin?', or when implementing any test from scratch. For coverage thresholds, CI enforcement, and lcov reports, see flutter-test-coverage-strategy. Stack: flutter_test, bloc_test, mocktail, integration_test, fake_async.
 ---

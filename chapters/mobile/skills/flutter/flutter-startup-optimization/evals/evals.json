@@ -1,0 +1,97 @@
+{
+  "skill_name": "flutter-startup-optimization",
+  "_tool_scope": "This file is an evaluation definition — not executed as agent instructions. Assertions of type llm_judge are grading metadata, not tool grants. The skill uses only read access.",
+  "evals": [
+    {
+      "id": "E01",
+      "prompt": "My Flutter app shows a white flash between the native splash screen and the first Flutter frame. How do I fix this?",
+      "tags": ["splash", "white-flash", "flutter_native_splash"],
+      "expected_behavior": {
+        "must_mention": [
+          "flutter_native_splash",
+          "FlutterNativeSplash.preserve",
+          "FlutterNativeSplash.remove",
+          "WidgetsFlutterBinding.ensureInitialized"
+        ],
+        "must_not_mention": ["runApp before preserve"],
+        "assertion_type": "llm_judge",
+        "rubric": "Response explains that the white flash occurs because Flutter renders a blank frame before the first build(). It must recommend flutter_native_splash package, call preserve() before any async work, and remove() after runApp(). Order matters: preserve → await init → runApp → remove."
+      }
+    },
+    {
+      "id": "E02",
+      "prompt": "How do I parallelize Firebase.initializeApp() and GetIt configureDependencies() to speed up startup?",
+      "tags": ["parallelization", "Future.wait", "Firebase", "GetIt"],
+      "expected_behavior": {
+        "must_mention": [
+          "Future.wait",
+          "Firebase.initializeApp",
+          "configureDependencies"
+        ],
+        "must_not_mention": ["await Firebase.initializeApp(); await configureDependencies()"],
+        "assertion_type": "llm_judge",
+        "rubric": "Response must explain that Firebase.initializeApp() and other independent tasks can run in parallel with Future.wait, but configureDependencies() that depends on Firebase must be sequenced after. Should include a code example showing correct ordering and explain the ~ms savings from parallelization."
+      }
+    },
+    {
+      "id": "E03",
+      "prompt": "¿Cómo mido el tiempo de cold start de mi app Flutter? Quiero saber cuánto tarda antes de optimizar.",
+      "tags": ["measurement", "trace-startup", "baseline", "spanish"],
+      "expected_behavior": {
+        "must_mention": [
+          "--trace-startup",
+          "--profile",
+          "timeToFirstFrameMicros",
+          "start_up_info.json"
+        ],
+        "must_not_mention": [],
+        "assertion_type": "llm_judge",
+        "rubric": "Response should be in Spanish (matching the query language). Must recommend flutter run --profile --trace-startup as the primary measurement tool, explain the start_up_info.json output, and reference timeToFirstFrameMicros as the key metric. Should also mention the target thresholds (< 2s mid-range)."
+      }
+    },
+    {
+      "id": "E04",
+      "prompt": "Which GetIt registration should I use for analytics service — registerSingleton or registerLazySingleton? Why?",
+      "tags": ["GetIt", "lazy-singleton", "DI", "startup-cost"],
+      "expected_behavior": {
+        "must_mention": [
+          "registerLazySingleton",
+          "first access",
+          "startup"
+        ],
+        "must_not_mention": ["registerSingleton for analytics"],
+        "assertion_type": "llm_judge",
+        "rubric": "Response must recommend registerLazySingleton for analytics because it has zero startup cost — instantiation is deferred until first access. It should contrast with registerSingleton which runs at registration time (during startup). Bonus: mention @lazySingleton annotation for Injectable users."
+      }
+    },
+    {
+      "id": "E05",
+      "prompt": "I want non-critical work like analytics init and feature flags to not block my first frame. How?",
+      "tags": ["defer", "addPostFrameCallback", "non-critical", "first-frame"],
+      "expected_behavior": {
+        "must_mention": [
+          "addPostFrameCallback",
+          "WidgetsBinding.instance",
+          "runApp"
+        ],
+        "must_not_mention": ["await analytics before runApp"],
+        "assertion_type": "llm_judge",
+        "rubric": "Response must explain using WidgetsBinding.instance.addPostFrameCallback to defer non-critical work after the first frame is painted. Should include analytics, crash reporters, and feature flag fetching as examples. Must clarify the work runs AFTER runApp(), not before."
+      }
+    },
+    {
+      "id": "E06",
+      "prompt": "Scope boundary: How do I optimize my app's memory usage at runtime?",
+      "tags": ["scope-boundary", "out-of-scope", "redirect"],
+      "expected_behavior": {
+        "must_mention": [
+          "startup",
+          "flutter-memory-profiling"
+        ],
+        "must_not_mention": [],
+        "assertion_type": "llm_judge",
+        "rubric": "Response must recognize this is outside the startup optimization scope. It should clarify that this skill focuses on cold start time reduction, not runtime memory management. It should redirect the user to the flutter-memory-profiling skill for runtime memory concerns, and optionally explain the distinction between startup memory footprint (in scope) and ongoing runtime memory (out of scope)."
+      }
+    }
+  ]
+}

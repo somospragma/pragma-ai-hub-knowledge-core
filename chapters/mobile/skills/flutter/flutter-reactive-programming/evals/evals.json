@@ -1,0 +1,175 @@
+{
+  "skill_name": "flutter-reactive-programming",
+  "_tool_scope": "Evaluation definition only — not executed as agent instructions. The skill uses read access.",
+  "evals": [
+    {
+      "id": "eval-01",
+      "name": "reactive-repository-watch-stream",
+      "prompt": "How do I make my ProductRepository expose a stream that updates the UI automatically when data changes in the local database?",
+      "expected_output": "Explain the reactive repository pattern: declare a watchProducts() method returning Stream<Either<Failure, List<Product>>> in the abstract interface, implement it using a Drift DAO watchByCategory() stream (or equivalent watch query), and explain that writes to the DB automatically trigger the stream — no manual notification needed.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a01-1",
+          "text": "Response must define a watchProducts() method in the abstract repository interface returning Stream<Either<Failure, List<Product>>> or equivalent typed stream.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a01-2",
+          "text": "Response must explain that the DB layer (e.g. Drift DAO) emits a new value on every write, so the UI updates automatically without polling or manual refresh.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a01-3",
+          "text": "Response must contrast watch*() reactive methods against get*() one-shot futures and explain when to use each.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a01-4",
+          "text": "Response must NOT suggest Timer.periodic, polling, or manual notifyListeners() after a DB write as the solution.",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": "eval-02",
+      "name": "bloc-emit-foreach-reactive",
+      "prompt": "I'm using BLoC — how do I subscribe to a stream from my repository so the BLoC emits new states reactively without using StreamSubscription directly?",
+      "expected_output": "Show emit.forEach inside a BLoC event handler, subscribing to the repository stream and mapping each Either<Failure, T> result to a UI state. Explain that emit.forEach manages the subscription lifecycle automatically — no manual StreamSubscription or cancel() call needed.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a02-1",
+          "text": "Response must show emit.forEach subscribing to a repository stream and mapping onData results to BLoC states.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a02-2",
+          "text": "Response must explain that the StreamSubscription is cancelled automatically when the event handler completes or the BLoC is closed — the developer does not manage it manually.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a02-3",
+          "text": "Response must include onError handling within emit.forEach or explain how to propagate stream errors to an error state.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a02-4",
+          "text": "Response must NOT suggest creating a StreamSubscription field and overriding close() as the primary recommended approach — emit.forEach is the idiomatic answer.",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": "eval-03",
+      "name": "riverpod-multi-source-provider-composition",
+      "prompt": "¿Cómo combino el estado de usuario y el carrito de compras en un único provider de Riverpod que actualice la UI cuando cambie cualquiera de los dos?",
+      "expected_output": "Show two independent StreamProviders (one for user, one for cart), then a composed provider using ref.watch on both. Demonstrate combining AsyncValues with whenData or a DashboardNotifier subscribing to both streams. Response must be in Spanish.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a03-1",
+          "text": "La respuesta debe mostrar dos StreamProviders independientes (usuario y carrito) y un provider compuesto que use ref.watch de ambos.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a03-2",
+          "text": "La respuesta debe demostrar cómo combinar los AsyncValue resultantes (por ejemplo con whenData/flatten o un AsyncNotifier) para producir un único estado en la UI.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a03-3",
+          "text": "La respuesta debe estar en español (idioma del prompt) y NO debe sugerir rxdart ni combineLatest de rxdart.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a03-4",
+          "text": "La respuesta debe explicar que el provider compuesto se re-evalúa automáticamente cuando cualquiera de las dependencias cambia, sin necesidad de suscripciones manuales.",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": "eval-04",
+      "name": "valuenotifier-vs-changenotifier-simple-counter",
+      "prompt": "I just need a counter that updates a widget when it increments. Do I need a BLoC for this?",
+      "expected_output": "Recommend ValueNotifier<int> with ValueListenableBuilder as the correct lightweight tool. Explain that BLoC adds unnecessary overhead for a single-value local state. Show the complete counter pattern with dispose().",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a04-1",
+          "text": "Response must recommend ValueNotifier<int> as the correct tool for a simple counter — not BLoC or Riverpod.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a04-2",
+          "text": "Response must show ValueListenableBuilder<int> consuming the ValueNotifier and rebuilding only the affected widget.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a04-3",
+          "text": "Response must explain the decision criteria: ValueNotifier for single local value, ChangeNotifier for multiple fields, BLoC/Riverpod for cross-feature or complex state.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a04-4",
+          "text": "Response must include dispose() of the ValueNotifier to prevent memory leaks.",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": "eval-05",
+      "name": "dashboard-multi-source-composition",
+      "prompt": "My dashboard shows user info, cart, and notifications from 3 different sources. How do I compose them reactively?",
+      "expected_output": "Show either the Riverpod provider composition pattern (three StreamProviders + composed AsyncValue) or the BLoC dashboard pattern with a native Dart combineLatest helper. Emphasize no rxdart, no polling.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a05-1",
+          "text": "Response must provide a concrete reactive composition strategy for combining 3 data sources — either Riverpod ref.watch composition or BLoC with a manual stream combinator.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a05-2",
+          "text": "Response must NOT use rxdart's combineLatest or any rxdart operator. Native Dart stream coordination or Riverpod provider composition must be used instead.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a05-3",
+          "text": "Response must address lifecycle and cleanup: auto-dispose via Riverpod ref.onDispose, or StreamSubscription cancellation in BLoC close().",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a05-4",
+          "text": "Response must explain that the UI updates automatically when any of the 3 sources emits a new value — no manual refresh needed.",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": "eval-06",
+      "name": "scope-boundary-asyncmap-redirect",
+      "prompt": "How do I use asyncMap() to transform events in a stream?",
+      "expected_output": "Recognize that asyncMap() is a raw stream operator outside this skill's scope. Redirect the user to flutter-streams-advanced for stream operators, transformers, and low-level stream manipulation. Briefly confirm the boundary without going deep into asyncMap implementation.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a06-1",
+          "text": "Response must recognize that asyncMap() is a raw stream operator and is outside the scope of flutter-reactive-programming.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a06-2",
+          "text": "Response must redirect the user to the flutter-streams-advanced skill for stream operators, custom transformers, and raw stream manipulation.",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a06-3",
+          "text": "Response must NOT provide a full asyncMap() tutorial or deep-dive implementation — it should acknowledge the boundary and point elsewhere.",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

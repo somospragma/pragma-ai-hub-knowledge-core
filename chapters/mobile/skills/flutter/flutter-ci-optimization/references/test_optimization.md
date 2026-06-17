@@ -93,12 +93,18 @@ jobs:
 
       - name: Merge coverage reports
         run: |
-          sudo apt-get install -y lcov
-          # Merge all shard lcov files
+          # Install lcov — this step requires package manager access on the CI runner.
+          # On self-hosted runners, prefer pre-installing lcov in the runner image
+          # to avoid elevated permissions during the workflow run.
+          apt-get install -y lcov
+          # Merge all shard lcov files — validate each shard exists before merging
           MERGE_ARGS=""
           for dir in coverage-shards/*/; do
-            MERGE_ARGS="$MERGE_ARGS -a ${dir}lcov.info"
+            if [ -f "${dir}lcov.info" ]; then
+              MERGE_ARGS="$MERGE_ARGS -a ${dir}lcov.info"
+            fi
           done
+          [ -z "$MERGE_ARGS" ] && { echo "No coverage shards found"; exit 1; }
           lcov $MERGE_ARGS -o coverage/merged.info
 
           # Remove generated files
@@ -106,7 +112,7 @@ jobs:
             '*.freezed.dart' '*.g.dart' '*.config.dart' \
             -o coverage/filtered.info
 
-          # Check threshold
+          # Check threshold — requires explicit threshold variable to avoid magic numbers
           COVERAGE=$(lcov --summary coverage/filtered.info 2>&1 \
             | grep "lines" | awk '{print $2}' | tr -d '%')
           echo "Total coverage: ${COVERAGE}%"
@@ -178,20 +184,26 @@ lcov --summary coverage/filtered.info
 ```yaml
 - name: Filter and check coverage
   run: |
-    sudo apt-get install -y lcov
+    # Install lcov — prefer pre-installing in runner image over inline installation
+    # to avoid requiring elevated permissions in CI steps
+    apt-get install -y lcov
+    # Validate input file exists before chaining lcov commands
+    [ -f coverage/lcov.info ] || { echo "lcov.info not found"; exit 1; }
     lcov --remove coverage/lcov.info \
       '*.freezed.dart' '*.g.dart' '*.config.dart' \
       -o coverage/filtered.info
 
+    # Validate filtered output before reading coverage number
+    [ -f coverage/filtered.info ] || { echo "filtered.info not generated"; exit 1; }
     COVERAGE=$(lcov --summary coverage/filtered.info 2>&1 \
       | grep "lines" | awk '{print $2}' | tr -d '%')
     echo "Coverage: ${COVERAGE}%"
 
     if (( $(echo "$COVERAGE < 80" | bc -l) )); then
-      echo "❌ Coverage ${COVERAGE}% is below 80% threshold"
+      echo "Coverage ${COVERAGE}% is below 80% threshold"
       exit 1
     fi
-    echo "✅ Coverage ${COVERAGE}% meets threshold"
+    echo "Coverage ${COVERAGE}% meets threshold"
 ```
 
 ---

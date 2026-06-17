@@ -1,10 +1,11 @@
 ---
 id: flutter-caching-strategy
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-caching-strategy
 description: >
   Implements caching strategies in Flutter: HTTP response caching with dio_cache_interceptor (ETag, TTL, stale-while-revalidate, offline fallback), in-memory LRU cache, data-layer TTL cache with Drift/Isar, and image caching with cached_network_image. Use this skill when implementing API response caching, reducing redundant network calls, serving stale data while revalidating, or caching images and assets.
 ---
@@ -18,12 +19,12 @@ See the reference files for complete patterns and code examples.
 ## Cache Layers
 
 ```
-┌─────────────────────────────────────────────────────┐
+┌────────────────────────────────────────────────────────┐
 │  1. In-memory (LRU)     — microseconds, process-scoped │
 │  2. HTTP cache          — milliseconds, disk-backed    │
 │  3. Data-layer TTL      — milliseconds, DB-backed      │
 │  4. Image cache         — disk + memory, auto-managed  │
-└─────────────────────────────────────────────────────┘
+└────────────────────────────────────────────────────────┘
 ```
 
 ## Package Status (April 2026)

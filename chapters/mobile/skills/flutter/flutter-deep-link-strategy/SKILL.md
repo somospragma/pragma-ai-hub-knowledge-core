@@ -1,12 +1,13 @@
 ---
 id: flutter-deep-link-strategy
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-deep-link-strategy
 description: >
-  Comprehensive deep link implementation using go_router 17.2.2, fpdart functional programming, clean architecture patterns, route guards, dynamic parameters, and platform-specific configuration.
+  Comprehensive deep link implementation using go_router 17.2.2, fpdart functional programming, clean architecture patterns, route guards, dynamic parameters, and platform-specific configuration. Use when implementing deep links, configuring StatefulShellRoute for bottom nav, adding route guards with typed Either<DeepLinkFailure, T> error handling, or setting up Android App Links and iOS Universal Links.
 ---
 
 # Deep Link Strategy

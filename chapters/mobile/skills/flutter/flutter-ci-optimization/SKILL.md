@@ -1,10 +1,11 @@
 ---
 id: flutter-ci-optimization
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ci-optimization
 description: >
   Optimizes Flutter CI/CD pipelines to achieve fast feedback loops: pub cache, Flutter SDK cache, build_runner output cache, parallel jobs, conditional builds (path filters), test sharding, concurrency cancellation, and pipeline time budgets. Target: PR quality gate under 8 minutes, full release pipeline under 20 minutes. Use this skill when pipelines are slow, builds run unnecessarily, tests take too long, or the team is waiting too long for CI feedback.
 ---

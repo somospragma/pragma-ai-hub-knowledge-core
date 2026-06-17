@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-dart-coding-standard",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a new feature in a Flutter app using Clean Architecture. What should the file names look like for the BLoC, events, states, use case, repository interface, repository implementation, remote data source, DTO, and mapper? Show me the full naming convention for a 'checkout' feature.",
+      "expected_output": "Shows all file suffix conventions from the skill: checkout_bloc.dart, checkout_event.dart, checkout_state.dart (presentation/bloc/), checkout_page.dart (presentation/pages/), checkout_ui_mapper.dart (presentation/mappers/), checkout_repository.dart (domain/repositories/), submit_checkout_use_case.dart (domain/use_cases/), checkout_repository_impl.dart (data/repositories/), checkout_remote_data_source.dart + _impl.dart (data/data_sources/remote/), checkout_dto.dart (data/models/), checkout_mapper.dart (data/mappers/).",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My teammate wrote this Dart code and I think it violates several coding standards. Can you review it and point out everything that should be fixed?\n\n```dart\nclass AuthBloc extends Bloc<AuthEvent, AuthState> {\n  var repo;\n  bool loading = false;\n  \n  AuthBloc(this.repo): super(AuthInitialState());\n  \n  Future getData() async {\n    loading = true;\n    try {\n      var data = await repo.getUser();\n      emit(AuthLoadedState(data));\n    } catch(e) {\n      print(e);\n    }\n    loading = false;\n  }\n}\n```",
+      "expected_output": "Identifies: untyped repo field (var), public mutable field (loading), no return type on getData(), Future<dynamic> instead of Future<void>, try/catch with print (not Either), mutable state field in BLoC (should be in state), no @injectable, no bloc_concurrency transformer. Shows corrected version with typed fields, @injectable, final, Either, no print.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "What are the Dart 3.8 language features I should be using in my Flutter code? I keep hearing about records, sealed classes, null-aware elements, and strict_top_level_inference but I'm not sure when to apply each one.",
+      "expected_output": "Covers all Dart 3.x features from the skill: records for simple groupings (return type, destructuring), sealed classes for exhaustive pattern matching (AuthState, Failure), switch expressions for sealed class dispatch, null-aware collection elements (?value in lists/maps to omit nulls without if-null boilerplate), strict_top_level_inference (explicit type on Logger vs const literals), extension types for zero-cost wrappers. Each with code examples.",
+      "files": []
+    }
+  ]
+}

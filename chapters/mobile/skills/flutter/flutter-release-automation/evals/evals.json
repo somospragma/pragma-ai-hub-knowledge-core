@@ -1,0 +1,66 @@
+{
+  "skill": "flutter-release-automation",
+  "version": "1.2.0",
+  "evals": [
+    {
+      "id": "eval-01-github-actions-setup",
+      "prompt": "I want to set up a GitHub Actions pipeline that builds my Flutter app, signs it, and uploads to the Play Store when I push a v1.2.3 tag. Where do I start?",
+      "_tool_scope": "flutter-release-automation",
+      "assertions": [
+        "Response directs the user to copy assets/release_workflow.yml to .github/workflows/release.yml",
+        "Response mentions configuring GitHub secrets (KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD, PLAY_SERVICE_ACCOUNT_JSON) before triggering the pipeline",
+        "Response explains the pipeline is triggered by a semver tag push (v1.2.3 pattern) and describes the pipeline stages: quality gates → build → sign → distribute"
+      ]
+    },
+    {
+      "id": "eval-02-android-signing-secrets",
+      "prompt": "How do I configure Android signing secrets in GitHub Actions so my keystore never gets committed to the repo?",
+      "_tool_scope": "flutter-release-automation",
+      "assertions": [
+        "Response explains base64-encoding the .jks file and storing it as KEYSTORE_BASE64 secret in GitHub repo Settings → Secrets",
+        "Response shows that the workflow decodes the secret at runtime: echo \"${{ secrets.KEYSTORE_BASE64 }}\" | base64 -d > android/app/keystore.jks",
+        "Response mentions adding android/app/keystore.jks and android/key.properties to .gitignore to prevent accidental commits"
+      ]
+    },
+    {
+      "id": "eval-03-ios-fastlane-azure-devops",
+      "prompt": "¿Cómo configuro la firma de iOS en mi pipeline de Azure DevOps usando Fastlane match? No tenemos Mac agents propios.",
+      "_tool_scope": "flutter-release-automation",
+      "assertions": [
+        "La respuesta indica usar vmImage: macos-latest como agente alojado por Microsoft para builds de iOS en Azure DevOps",
+        "La respuesta menciona configurar MATCH_PASSWORD y MATCH_GIT_URL como variables secretas en el Variable Group de Azure DevOps Library",
+        "La respuesta referencia references/fastlane_signing.md para el setup completo de Fastlane match, incluyendo Matchfile, Appfile y el lane release"
+      ]
+    },
+    {
+      "id": "eval-04-staging-vs-production",
+      "prompt": "My CI pipeline is deploying to production on every push to main. How do I separate staging from production deployments?",
+      "_tool_scope": "flutter-release-automation",
+      "assertions": [
+        "Response references the Continuous Delivery Strategy section and explains the branch → environment → store mapping (release/* → staging, main/tag → production)",
+        "Response explains using different --dart-define values per environment: STAGING_API_URL with IS_PRODUCTION=false for staging, PROD_API_URL with IS_PRODUCTION=true for production",
+        "Response recommends using semver tags (v*.*.*) to trigger production deployments instead of plain pushes to main, and directing release/* branches to Play Store internal track / TestFlight"
+      ]
+    },
+    {
+      "id": "eval-05-firebase-crashlytics-symbols",
+      "prompt": "How do I upload debug symbols to Firebase Crashlytics automatically after each release build?",
+      "_tool_scope": "flutter-release-automation",
+      "assertions": [
+        "Response shows using --obfuscate --split-debug-info=build/symbols/android (and /ios) flags on flutter build commands to generate debug symbols",
+        "Response shows the post-release step: npm install -g firebase-tools && firebase crashlytics:symbols:upload --app=$FIREBASE_APP_ID_ANDROID build/symbols/android/ using FIREBASE_TOKEN secret",
+        "Response mentions uploading symbols as a post-release job that depends on both distribute-android and distribute-ios completing successfully"
+      ]
+    },
+    {
+      "id": "eval-06-coverage-scope-boundary",
+      "prompt": "How do I set up test coverage enforcement in CI?",
+      "_tool_scope": "flutter-release-automation",
+      "assertions": [
+        "Response mentions the quality gate step in the pipeline that uses lcov to enforce an 80% coverage threshold and fails the build if coverage drops below it",
+        "Response notes that detailed coverage configuration strategies (exclusions, per-package thresholds, reporting) are outside this skill's scope and references flutter-test-coverage-strategy for that",
+        "Response provides the essential snippet: flutter test --coverage followed by sudo apt-get install -y lcov and the lcov --summary check pattern"
+      ]
+    }
+  ]
+}

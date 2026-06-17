@@ -1,15 +1,18 @@
 ---
 id: flutter-ds-a11y-semantics
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-a11y-semantics
 description: >
   Accessibility and semantics rules for Design System components.
   Use when implementing interactive widgets, adding semantic labels,
   handling images, communicating states to screen readers, or writing
-  accessibility tests.
+  accessibility tests. Always activate for icon buttons (need explicit label
+  + 48×48 touch area), decorative images (must exclude from semantics),
+  and multi-state widgets (loading, error, disabled must all be communicated).
 ---
 
 # Accessibility & Semantics
@@ -35,6 +38,19 @@ Semantics(
 // ✅ Material widgets (automatic semantics)
 ElevatedButton(onPressed: onAddToCart, child: Text('Add to cart'))
 ```
+
+> Icon buttons always need an explicit label AND a 48×48 minimum touch area:
+> ```dart
+> Semantics(
+>   button: true,
+>   label: 'Add $productName to cart',  // context-aware, not just 'Add to cart'
+>   child: SizedBox(
+>     width: 48,
+>     height: 48,
+>     child: IconButton(onPressed: onAction, icon: Icon(Icons.add_shopping_cart)),
+>   ),
+> )
+> ```
 
 ## Images
 

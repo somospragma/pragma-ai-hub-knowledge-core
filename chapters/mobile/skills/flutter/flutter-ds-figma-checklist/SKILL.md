@@ -1,14 +1,17 @@
 ---
 id: flutter-ds-figma-checklist
-version: 1.2.0
+version: 1.3.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-figma-checklist
 description: >
   Complete comparison checklist between Flutter implementation and Figma spec.
   Use when auditing visual fidelity, verifying token mapping accuracy,
   checking variant/state coverage, or validating anatomy against Figma layers.
+  Always activate when fixing overflow errors, checking typography fidelity,
+  reviewing color tokens, or verifying that a component matches a Figma design.
 ---
 
 # Figma Comparison Checklist
@@ -40,7 +43,7 @@ description: >
 - [ ] Each text uses correct color token
 - [ ] Icons use correct semantic color per variant
 - [ ] Borders use correct token
-- [ ] Verified in both **light** and **dark**
+- [ ] Verified in both **light** and **dark** — run golden test or Widgetbook preview in both `ThemeMode.light` and `ThemeMode.dark`
 
 ## 4. Typography
 - [ ] Each text uses correct typography token
@@ -68,11 +71,30 @@ description: >
 - [ ] Missing Figma constraints are warnings when mitigated, not blockers
 
 ## 6b. Overflow Safety
+
+> **Critical rule:** Text is a Figma contract. `TextOverflow.ellipsis` or `maxLines` truncation is ONLY acceptable when Figma explicitly defines truncation for that text node (fixed-size container with truncate behavior, or Development annotation). If Figma is silent on truncation, preserve the full text and adapt the layout instead.
+
 - [ ] No `RenderFlex overflow` risk in known compact widths
 - [ ] No fixed width/height added without Figma backing
 - [ ] `Wrap` or scroll used for groups that can exceed available space
-- [ ] `TextOverflow.ellipsis` only when Figma or contract defines truncation
-- [ ] Long literal text is preserved; layout adapts instead of shortening copy
+- [ ] `TextOverflow.ellipsis` only when Figma or contract **explicitly** defines truncation — document the Figma backing
+- [ ] Long literal text is preserved; `Flexible`/`Expanded` adapts the layout, not the text
+- [ ] When overflow mitigation uses inference (Figma silent), record a warning in the spec
+
+**Pattern — overflow-safe horizontal layout without truncating text:**
+```dart
+Row(
+  children: [
+    Flexible(           // title shrinks, text preserved intact
+      child: Text(productTitle),
+    ),
+    const SizedBox(width: 8),
+    PriceBadge(price: price), // badge keeps its natural width
+  ],
+)
+// ❌ WRONG without Figma contract:
+// Text(productTitle, overflow: TextOverflow.ellipsis, maxLines: 1)
+```
 
 ## 7. Border Radius
 - [ ] Main container radius matches token
@@ -89,6 +111,8 @@ description: >
 See [extended checklist](references/EXTENDED-CHECKLIST.md) for anatomy, states, interaction, modularity, and assets verification.
 
 ## Verification Commands
+
+Always run these commands before closing any audit. They are non-optional.
 
 | Check | Command |
 |-------|---------|

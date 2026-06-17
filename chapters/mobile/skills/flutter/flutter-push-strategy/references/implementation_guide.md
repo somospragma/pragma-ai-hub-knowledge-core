@@ -933,6 +933,10 @@ abstract class FirebaseModule {
 
 ### iOS — Info.plist
 
+> **Developer Instructions:** The following code describes how **your Flutter app** sets up
+> push notification listeners and background handlers. This is app lifecycle code —
+> the AI agent does not persist any state between sessions.
+
 ```xml
 <!-- Background Modes -->
 <key>UIBackgroundModes</key>

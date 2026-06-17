@@ -1,0 +1,23 @@
+{
+  "skill_name": "flutter-dart-async-patterns",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a Flutter BLoC that subscribes to a stream from a repository in its constructor. The stream keeps a database connection alive. How do I correctly subscribe to the stream inside a BLoC and make sure it gets cancelled when the BLoC is closed?",
+      "expected_output": "Shows two patterns: (1) emit.forEach — preferred, auto-cancels when BLoC closes, no manual subscription needed; (2) StreamSubscription with late field, cancel in close() override calling super.close(). Explains why emit.forEach is preferred. Notes no rxdart, native Dart streams only.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My Flutter app's search screen fires an API request on every keystroke. I need to debounce it so the request only fires when the user stops typing for 300ms. I'm using BLoC. What's the correct pattern — I don't want to use rxdart.",
+      "expected_output": "Shows restartable() transformer from bloc_concurrency on the SearchQueryChanged event + Future.delayed inside the handler. Code: on<SearchQueryChanged>(_onSearch, transformer: restartable()); inside handler: await Future<void>.delayed(Duration(milliseconds: 300)); then fire request. Explains why restartable() cancels the previous handler including the delay. Explicitly states no rxdart needed.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "What are the most common async anti-patterns in Dart/Flutter that I should avoid? My team is doing a code review and I want to know what to look for.",
+      "expected_output": "Covers all 6 anti-patterns from the skill: fire-and-forget (no await in business logic), swallowed exceptions (empty catch), uncancelled subscriptions (memory leak), dynamic async types (Future<dynamic>), rxdart usage (FORBIDDEN), and compute() legacy usage (use Isolate.run() instead). Each with bad/good code examples.",
+      "files": []
+    }
+  ]
+}

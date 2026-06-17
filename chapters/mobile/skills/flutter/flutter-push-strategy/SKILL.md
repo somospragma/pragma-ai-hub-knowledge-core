@@ -1,10 +1,11 @@
 ---
 id: flutter-push-strategy
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-push-strategy
 description: >
   Implements push notifications with a Strategy pattern supporting multiple providers (FCM, OneSignal, custom). Covers permission handling, token management, foreground/ background/terminated states, topic subscriptions, and deep link navigation from notifications. Uses clean architecture, fpdart, and modern Flutter patterns.
 ---

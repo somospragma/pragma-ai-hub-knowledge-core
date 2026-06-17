@@ -1,10 +1,11 @@
 ---
 id: flutter-bloc-pattern
-version: 2.1.0
+version: 2.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-bloc-pattern
 description: >
   Implements the BLoC pattern correctly in Flutter with bloc 9.x and flutter_bloc 9.x. Use this skill when creating or modifying a BLoC, event, state, or any widget using BlocProvider/BlocBuilder/BlocListener. Triggers on 'create a BLoC', 'add an event', 'emit a state', BlocBuilder, BlocListener, BlocConsumer, BlocProvider, MultiBlocProvider, or any state management question using bloc. Stack- bloc, flutter_bloc, bloc_concurrency, bloc_test.
 ---

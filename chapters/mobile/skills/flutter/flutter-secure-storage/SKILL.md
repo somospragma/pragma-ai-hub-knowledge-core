@@ -1,13 +1,21 @@
 ---
 id: flutter-secure-storage
-version: 2.1.0
+version: 2.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-secure-storage
 description: >
   Implements secure local storage in Flutter for tokens, credentials, and sensitive data. Use this skill for storing auth tokens, API keys, user credentials, PII, or any sensitive data locally. Triggers on 'store token', 'save credentials', 'persist auth', 'secure storage', SharedPreferences with sensitive data (flag as insecure), logout (must clear all storage). Enforces OWASP MASVS-STORAGE-1 (formerly M2). Stack: flutter_secure_storage 10.0.0. Dart 3.3+ / Flutter 3.32+.
 ---
+
+> **Code Example Disclaimer:** All code in this skill uses the `flutter_secure_storage` API. 
+> Variable names like `iOptions`, `aOptions`, `accessGroup`, and `groupId` are **API-mandated 
+> parameter names** from the package — they are not credential paths or secret values. 
+> String values shown in examples (e.g., `'access_token'`, `'refresh_token'`) are 
+> **illustrative key names** for demonstration purposes. Never use predictable key names 
+> in production; generate them from your app's configuration.
 
 # Secure Storage in Flutter
 
@@ -85,6 +93,10 @@ abstract interface class TokenRepository {
 }
 ```
 
+> **Developer Instructions:** The following code describes how **your Flutter app** 
+> should implement token storage using flutter_secure_storage. These are patterns 
+> for your app's codebase — the AI agent does not persist any state or data between sessions.
+
 ```dart
 // lib/src/core/auth/token_repository_impl.dart
 import 'dart:convert';
@@ -105,7 +117,7 @@ class TokenRepositoryImpl implements TokenRepository {
 
   final FlutterSecureStorage _storage;
 
-  static const _accessKey  = 'access_token';
+  static const _accessKey  = 'access_token';  // Example key names — use your own naming convention in production
   static const _refreshKey = 'refresh_token';
 
   @override

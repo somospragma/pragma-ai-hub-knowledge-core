@@ -74,6 +74,9 @@ jobs:
       - name: Run tests with coverage
         run: flutter test --coverage --reporter=github
 
+      # NOTE: The following step runs in your CI pipeline — not executed by the AI agent.
+      # sudo is required for lcov installation on Ubuntu CI runners.
+      # For macOS agents, use: brew install lcov (no sudo required)
       - name: Enforce coverage threshold (80%)
         run: |
           sudo apt-get install -y lcov

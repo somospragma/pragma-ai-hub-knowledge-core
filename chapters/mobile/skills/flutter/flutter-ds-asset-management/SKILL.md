@@ -1,10 +1,11 @@
 ---
 id: flutter-ds-asset-management
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-asset-management
 description: >
   Graphic asset management (SVGs, icons, images) for the Design System.
   Use when downloading assets from Figma, optimizing SVGs, registering

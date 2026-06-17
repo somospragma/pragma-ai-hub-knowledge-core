@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-dependency-injection-pattern",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just created a new ProductRepository and ProductRepositoryImpl in my Flutter feature. How do I register it with GetIt + Injectable so it gets injected into my ProductBloc?",
+      "expected_output": "Shows @LazySingleton(as: ProductRepository) on ProductRepositoryImpl, @injectable on ProductBloc, getIt<ProductBloc>() in BlocProvider, and build_runner command to regenerate.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses @LazySingleton(as: ProductRepository) annotation on the implementation class",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses @injectable annotation on the BLoC class",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response shows build_runner build command to regenerate injection.config.dart",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response shows getIt<ProductBloc>() usage inside BlocProvider in the UI",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to inject SharedPreferences and FlutterSecureStorage into my app. These are third-party types that don't have Injectable constructors. How do I register them with GetIt?",
+      "expected_output": "Shows @module abstract class with @preResolve for SharedPreferences and @lazySingleton for FlutterSecureStorage. Explains the module pattern for third-party types.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses @module abstract class pattern for third-party registrations",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses @preResolve for SharedPreferences.getInstance() async initialization",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response uses @lazySingleton for FlutterSecureStorage",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I have a multi-step checkout flow in Flutter and I need a CheckoutFlowController that's shared across 3 screens in the same flow, but disposed when the flow ends. How do I configure this in GetIt + Injectable?",
+      "expected_output": "Shows @Injectable(cache: true) for flow-scoped instances with getIt.releaseInstance() when flow ends. Explains the difference from @singleton.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses @Injectable(cache: true) or mentions cached factory for flow-scoped instances",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions getIt.releaseInstance() or equivalent cleanup when the flow ends",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains the difference between cached factory and singleton",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

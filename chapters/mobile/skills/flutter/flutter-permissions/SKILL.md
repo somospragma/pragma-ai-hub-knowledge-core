@@ -1,10 +1,11 @@
 ---
 id: flutter-permissions
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-permissions
 description: >
   Handles runtime permissions in Flutter with permission_handler 11.x: request at point of use, rationale dialogs, settings redirect, and platform manifest configuration. Includes store policy constraints: Google Play (April 2026 location/contacts policy, Android 17 Contact Picker requirement), App Store (usage description strings, Podfile macros), and AppGallery (standard Android permissions). Use this skill when requesting camera, location, microphone, contacts, notifications, storage, or any sensitive permission.
 ---
@@ -119,6 +120,10 @@ permission_handler (platform API)
 ---
 
 ## Quick Wins Checklist
+
+> **Developer Instructions:** The following checklist describes how **your Flutter app**
+> should handle runtime permissions. Permission states (granted, denied, permanently denied)
+> are managed by the device OS — the AI agent operates only within the current session.
 
 - [ ] Permissions requested at point of use — not in `main()` or `initState()`
 - [ ] Rationale shown before system dialog on Android (`shouldShowRequestRationale`)

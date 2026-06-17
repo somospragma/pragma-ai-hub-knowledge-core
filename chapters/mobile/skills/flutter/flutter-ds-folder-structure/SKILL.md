@@ -1,15 +1,20 @@
 ---
 id: flutter-ds-folder-structure
-version: 1.3.0
+version: 1.4.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-folder-structure
 description: >
   Official folder structure for the Flutter Design System package.
   Use when creating new files, locating existing components, setting up
   test paths, or verifying file placement during code audit.
   Covers lib/, test/, widgetbook/, and pipeline output directories.
+  Always activate when adding new screens/views (go in lib/src/presentation/views/
+  with private widgets using _ prefix), new DS atoms/molecules/organisms (go in
+  lib/src/{level}/), or when a legacy path like lib/atoms/ is detected (register
+  alert, keep new code in lib/src/).
 ---
 
 # Folder Structure
@@ -95,10 +100,16 @@ See [full tree reference](references/TREE.md) for the complete expanded structur
 
 ### Vistas/Pantallas (app-level, fuera del DS)
 10. **Views** live in `structure.views_path` (default: `lib/src/presentation/views/`)
-11. **Each view** gets its own subfolder if it has private section widgets
-12. **View widgets** (shared across views) go to `structure.view_widgets_path`
-13. Views **do NOT** carry the DS prefix — they belong to the app
-14. Views **do NOT** get exported in the DS barrel file
+11. **Each view** with private section widgets gets its own subfolder, and those private widgets use the **underscore prefix** (`_`) in their filename:
+    ```
+    lib/src/presentation/views/product_detail/
+    ├── product_detail_view.dart          ← main view (no DS prefix)
+    ├── _product_detail_hero_section.dart ← private widget (underscore prefix)
+    └── _product_detail_content_list.dart ← private widget (underscore prefix)
+    ```
+12. **View widgets** shared across multiple views go to `structure.view_widgets_path` (e.g., `lib/src/presentation/widgets/`)
+13. Views **do NOT** carry the DS prefix — they belong to the app, not the DS package
+14. Views **do NOT** get exported in the DS barrel file (`lib/{{package_name}}.dart`)
 15. En flujo canónico `/new-view`, la vista completa **sí** genera:
    - `test/presentation/views/[view]/[view]_view_golden_test.dart`
    - `{structure.widgetbook_screens_path}/features/[feature]/[view]/[view]_use_case.dart`

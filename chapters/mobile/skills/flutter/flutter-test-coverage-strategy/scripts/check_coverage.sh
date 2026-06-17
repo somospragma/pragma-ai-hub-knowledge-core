@@ -17,13 +17,18 @@ echo "  Project   : $(pwd)"
 echo ""
 
 # ── Prerequisite: lcov ────────────────────────────────────────────────────────
+# This script never installs dependencies — doing so from an automated tool
+# would require sudo / brew, violate least-privilege, and can hang CI pipelines
+# waiting for interactive prompts. Install lcov once in your environment:
+#   macOS : brew install lcov
+#   Ubuntu: sudo apt-get install -y lcov
+#   CI    : add the install step to your workflow before invoking this script
 if ! command -v lcov &> /dev/null; then
-  echo "  lcov not found — installing..."
-  sudo apt-get install -y lcov 2>/dev/null || brew install lcov 2>/dev/null
-  if ! command -v lcov &> /dev/null; then
-    echo "  ❌ Could not install lcov. Install it manually and retry."
-    exit 1
-  fi
+  echo "  ❌ lcov is not installed or not on PATH."
+  echo "     macOS : brew install lcov"
+  echo "     Ubuntu: sudo apt-get install -y lcov"
+  echo "     CI    : add the install step to your workflow before running this script"
+  exit 1
 fi
 
 # ── Step 1: Run tests with coverage ──────────────────────────────────────────

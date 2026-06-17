@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-ds-figma-mcp",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to implement a ProductCard component from this Figma URL: https://www.figma.com/design/abc123/DS?node-id=1234-5678. Walk me through how to use Figma MCP to extract all the properties I need to implement it correctly in Flutter.",
+      "expected_output": "Shows complete MCP workflow: get_design_context first for guided changes, get_screenshot for each change, get_node for full tree, extraction of layout/visual/text properties, overflow risk identification, and token mapping.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response calls get_design_context before any code-oriented analysis to capture guided changes and development annotations",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response parses the fileKey and nodeId from the Figma URL (decoding 1234-5678 to 1234:5678)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response extracts literal visible text from TEXT nodes and preserves it exactly — no rewriting",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response documents layout constraints and identifies overflow risks from horizontal containers",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm using Figma MCP to analyze a button component set. It has 3 properties: Type (primary/secondary/ghost), Size (sm/md/lg), and State (default/loading/disabled). How do I extract and map these to Flutter enums?",
+      "expected_output": "Uses get_node on the componentSetId to get all variants, extracts variant properties, maps each to Flutter enums. Shows mapping table.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses get_node or get_components to retrieve the component set with all variants",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response maps each Figma variant property to a Flutter enum",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response extracts visual differences between variants from the node data",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The Figma MCP is unavailable right now — `get_design_context` is not returning data. How should I handle this and document the limitation?",
+      "expected_output": "Marks as blocked_input for get_design_context. Returns control to orchestrator. Does NOT proceed without design annotations when they could affect behavior. Documents MCP status as blocked.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response marks get_design_context unavailability as a blocked_input that needs to be reported",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response does NOT silently proceed without development annotations when they could affect implementation",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response documents MCP status clearly as blocked/unavailable",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

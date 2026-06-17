@@ -1,0 +1,99 @@
+{
+  "skill_name": "flutter-test-coverage-strategy",
+  "_tool_scope": "This file is an evaluation definition — not executed as agent instructions. Assertions of type llm_judge are grading metadata, not tool grants. The skill uses only read access and suggests shell commands for the user to run.",
+  "evals": [
+    {
+      "id": "eval-01-bloc-coverage-target",
+      "prompt": "What coverage percentage should I target for my BLoC layer? My product manager wants 100% everywhere.",
+      "expected_behaviors": [
+        "States the recommended BLoC target is 85%+",
+        "Explains that 100% is not the goal — behavior coverage is",
+        "Mentions that the project-wide minimum enforced in CI is 80%",
+        "Does NOT redirect to a different skill"
+      ],
+      "out_of_scope": [],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response recommends 85%+ for BLoC, explains why 100% is counterproductive, and references the 80% project minimum threshold."
+      }
+    },
+    {
+      "id": "eval-02-exclude-generated-files",
+      "prompt": "How do I exclude generated files like *.freezed.dart from coverage reports?",
+      "expected_behaviors": [
+        "Provides the lcov --remove command with the correct glob patterns",
+        "Mentions *.freezed.dart, *.g.dart, *.gr.dart, *.config.dart, and */injection.dart",
+        "Shows the -o coverage/lcov_filtered.info output flag",
+        "Explains why generated files inflate numbers"
+      ],
+      "out_of_scope": [],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response includes the lcov --remove command with at least the freezed.dart and .g.dart patterns, and the output file flag."
+      }
+    },
+    {
+      "id": "eval-03-ci-threshold-spanish",
+      "prompt": "¿Cómo configuro GitHub Actions para que el build falle si la cobertura baja del 80%?",
+      "expected_behaviors": [
+        "Provides the GitHub Actions YAML steps for running tests, filtering, and enforcing the threshold",
+        "Shows the lcov --summary + awk pattern or equivalent to extract the coverage value",
+        "Shows the exit 1 condition when coverage is below the threshold",
+        "Response can be in Spanish or English"
+      ],
+      "out_of_scope": [],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response includes a GitHub Actions YAML snippet with a coverage enforcement step that exits with a non-zero code when coverage is below 80%."
+      }
+    },
+    {
+      "id": "eval-04-inflated-numbers-diagnosis",
+      "prompt": "I ran flutter test --coverage but the lcov report shows 15% — my generated files are inflating the numbers.",
+      "expected_behaviors": [
+        "Confirms that generated files (*.freezed.dart, *.g.dart, etc.) inflate coverage metrics",
+        "Provides the lcov --remove filtering command as the solution",
+        "Mentions running lcov --summary on the filtered file to get the real number",
+        "Does NOT suggest changing threshold targets"
+      ],
+      "out_of_scope": [],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response diagnoses the root cause as generated file inflation and provides the lcov --remove command to filter them out."
+      }
+    },
+    {
+      "id": "eval-05-check-coverage-script",
+      "prompt": "How do I use the check_coverage.sh script to verify coverage locally before pushing?",
+      "expected_behaviors": [
+        "Explains the basic usage: bash scripts/check_coverage.sh [threshold] [project_path]",
+        "Notes that default threshold is 80 and default path is current directory",
+        "Mentions that the script runs tests, filters generated files, enforces the threshold, and generates an HTML report",
+        "Notes that on macOS, the report opens automatically unless CI=true"
+      ],
+      "out_of_scope": [],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response explains how to invoke check_coverage.sh with optional threshold and path arguments, and describes what the script does end-to-end."
+      }
+    },
+    {
+      "id": "eval-06-scope-boundary-redirect",
+      "prompt": "How do I write the actual unit tests for my BLoC?",
+      "expected_behaviors": [
+        "Recognizes this is out of scope for this skill (test coverage strategy)",
+        "Redirects the user to the flutter-testing skill",
+        "Does NOT attempt to teach bloc_test syntax or test writing in depth",
+        "May provide a brief orientation note but defers authoring guidance to the correct skill"
+      ],
+      "out_of_scope": [
+        "Detailed bloc_test authoring tutorials",
+        "Mock setup patterns (belongs to flutter-testing)"
+      ],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response acknowledges the scope boundary and redirects to flutter-testing without providing deep test-writing guidance."
+      }
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "skill_name": "flutter-ds-a11y-semantics",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a custom DS button widget. It shows a loading spinner when tapped, becomes disabled after 3 failures, and shows an error border. How should I implement semantics so screen readers communicate all these states correctly?",
+      "expected_output": "Shows Semantics wrapper with button: true, dynamic label using switch expression for each state (loading, error, disabled), enabled: false for disabled, and testing with tester.getSemantics.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response includes a Semantics widget with button: true on the interactive element",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response communicates each state (loading, error, disabled) through semantic labels using switch or conditional",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response sets enabled: false or uses SemanticsFlag.isEnabled for the disabled state",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a product card in our Design System with a background illustration image and an 'Add to cart' icon button. The illustration is purely decorative but the button must be accessible. How do I handle semantics correctly for both?",
+      "expected_output": "Shows excludeFromSemantics: true on the decorative image, Semantics with label on the icon button, and minimum 48x48 touch area.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses excludeFromSemantics: true for the decorative illustration",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response provides a semantic label for the icon button action",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions 48x48 minimum touch area requirement",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "How do I write a Flutter widget test that verifies a product card widget correctly exposes its semantic label and communicates the disabled state to screen readers?",
+      "expected_output": "Shows testWidgets with tester.getSemantics(find.byType(Widget)), expect on label, and expect on SemanticsFlag.isEnabled being false for disabled state.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses tester.getSemantics() to inspect semantic properties in the test",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response verifies the semantic label with expect",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response tests the disabled state using SemanticsFlag.isEnabled or semantics.hasFlag",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "skill_name": "flutter-secure-storage",
+  "_tool_scope": "This file is an evaluation definition — not executed as agent instructions. Assertions of type llm_judge are grading metadata, not tool grants. The skill uses read access and may suggest code patterns.",
+  "evals": [
+    {
+      "id": "eval-01-store-auth-token",
+      "prompt": "How do I store an auth token securely in Flutter after a successful login?",
+      "tags": ["happy-path", "android", "ios", "tokens"],
+      "expected_topics": [
+        "FlutterSecureStorage",
+        "write(key:, value:)",
+        "IOSOptions with KeychainAccessibility.first_unlock",
+        "AndroidOptions",
+        "TokenRepository pattern"
+      ],
+      "must_not_include": [
+        "SharedPreferences",
+        "hive",
+        "plain file",
+        "static variable"
+      ],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response must recommend flutter_secure_storage, show a write() call, configure IOSOptions with first_unlock for background safety, and warn against SharedPreferences. Response should reference or show a repository/abstraction pattern."
+      }
+    },
+    {
+      "id": "eval-02-android-vs-ios-options",
+      "prompt": "What's the difference between AndroidOptions() and IOSOptions() in flutter_secure_storage? Do I need to configure both?",
+      "tags": ["configuration", "android", "ios", "options"],
+      "expected_topics": [
+        "AndroidOptions — RSA OAEP + AES-GCM via Android Keystore",
+        "IOSOptions — Keychain with accessibility levels",
+        "KeychainAccessibility.first_unlock",
+        "aOptions parameter",
+        "iOptions parameter",
+        "both recommended for cross-platform apps"
+      ],
+      "must_not_include": [],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response must explain that AndroidOptions configures Android Keystore encryption and IOSOptions configures iOS Keychain accessibility. Must explain that AndroidOptions() defaults are acceptable but IOSOptions should explicitly set accessibility: first_unlock for auth tokens. Must clarify both should be set for a cross-platform app."
+      }
+    },
+    {
+      "id": "eval-03-logout-borrar-tokens",
+      "prompt": "¿Cómo implemento el logout para que borre todos los tokens almacenados de forma segura?",
+      "tags": ["logout", "clear", "deleteAll", "spanish"],
+      "expected_topics": [
+        "deleteAll()",
+        "clearTokens()",
+        "LogoutUseCase",
+        "también limpiar caché de imagen",
+        "limpiar todos los access groups si se usan"
+      ],
+      "must_not_include": [
+        "solo borrar el token de acceso sin borrar el refresh"
+      ],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "La respuesta debe mostrar el uso de deleteAll() o una implementación equivalente que borre todos los tokens. Debe mencionar que el logout debe limpiar también cachés adicionales (imágenes, BD local con datos de usuario). Si la app usa access groups de Keychain, debe indicar que todos deben limpiarse. Respuesta en español es preferible dado que el prompt está en español."
+      }
+    },
+    {
+      "id": "eval-04-app-groups-widget-extension",
+      "prompt": "My app uses App Groups for sharing data between the main app and a widget extension. How do I share Keychain data?",
+      "tags": ["ios", "keychain-sharing", "app-groups", "widget-extension"],
+      "expected_topics": [
+        "groupId parameter on IOSOptions",
+        "$(AppIdentifierPrefix) prefix",
+        "Keychain Sharing capability in Xcode",
+        "keychain-access-groups entitlement",
+        "silent write failure warning if entitlements not set"
+      ],
+      "must_not_include": [
+        "UserDefaults",
+        "App Group container for sensitive data"
+      ],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response must explain how to configure groupId in IOSOptions with the $(AppIdentifierPrefix) prefix, how to enable Keychain Sharing in Xcode, and add keychain-access-groups to entitlements. Must warn that omitting the entitlement causes silent write failures. Must not suggest storing sensitive tokens in the shared App Group container (NSUserDefaults/UserDefaults) instead of the Keychain."
+      }
+    },
+    {
+      "id": "eval-05-mock-unit-tests",
+      "prompt": "How do I mock FlutterSecureStorage in my unit tests so I don't need a real device?",
+      "tags": ["testing", "mocking", "unit-tests"],
+      "expected_topics": [
+        "FlutterSecureStorage.setMockInitialValues()",
+        "abstract TokenRepository interface",
+        "MockTokenRepository or fake implementation",
+        "no real device needed",
+        "mockito or manual fake"
+      ],
+      "must_not_include": [
+        "integration test only",
+        "can't be unit tested"
+      ],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response must demonstrate at least one viable mocking approach: either using FlutterSecureStorage.setMockInitialValues() for in-process mocking, or creating a fake/mock implementation of the TokenRepository abstraction. Must make clear that unit tests for business logic do not require a physical device. Should reference the repository pattern as the recommended way to isolate tests from the package dependency."
+      }
+    },
+    {
+      "id": "eval-06-scope-boundary-large-datasets",
+      "prompt": "Should I use flutter_secure_storage to store large encrypted datasets like an offline database?",
+      "tags": ["scope", "boundary", "encryption-key", "isar", "offline-db"],
+      "expected_topics": [
+        "flutter_secure_storage is for small sensitive values, not large data",
+        "store only the DB encryption key in FlutterSecureStorage",
+        "use Isar or another encrypted DB for the data itself",
+        "flutter-database-strategy skill reference"
+      ],
+      "must_not_include": [
+        "yes, store the entire dataset in secure storage",
+        "write all records as individual secure storage entries"
+      ],
+      "assertion": {
+        "type": "llm_judge",
+        "criteria": "Response must clearly recommend AGAINST storing large datasets directly in FlutterSecureStorage. Must explain the correct pattern: store only the encryption key (a short secret) in FlutterSecureStorage, and store the actual data in an encrypted local database (e.g., Isar with the encryption key retrieved from FlutterSecureStorage). Should mention performance implications of using secure storage for large or frequent reads/writes."
+      }
+    }
+  ]
+}

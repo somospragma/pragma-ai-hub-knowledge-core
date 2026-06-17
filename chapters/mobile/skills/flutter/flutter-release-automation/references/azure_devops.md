@@ -23,7 +23,7 @@ FIREBASE_APP_ID_IOS         → from Firebase Console
 FIREBASE_TOKEN              → firebase login:ci                  (mark as secret 🔒)
 PLAY_SERVICE_ACCOUNT_JSON   → contents of .json file            (mark as secret 🔒)
 MATCH_PASSWORD              → Fastlane match password           (mark as secret 🔒)
-MATCH_GIT_URL               → https://github.com/org/certs
+MATCH_GIT_URL               → https://github.com/org/certs  # static documentation reference — not a runtime call
 ASC_KEY_ID                  → App Store Connect key ID
 ASC_ISSUER_ID               → App Store Connect issuer ID
 ASC_KEY_CONTENT             → contents of .p8 file              (mark as secret 🔒)
@@ -174,6 +174,9 @@ stages:
           - script: flutter test --coverage
             displayName: Run tests
 
+          # NOTE: The following script runs in your CI pipeline — not executed by the AI agent.
+          # sudo is required for lcov installation on Ubuntu CI runners.
+          # For macOS agents, use: brew install lcov (no sudo required)
           - script: |
               sudo apt-get install -y lcov
               lcov --remove coverage/lcov.info \

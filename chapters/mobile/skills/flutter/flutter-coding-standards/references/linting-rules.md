@@ -373,20 +373,25 @@ class UserCard extends StatelessWidget {
 
 **Why:** Prevents runtime errors if widget is disposed before async completes.
 
+> **Note on `dart fix --apply`:** The commands shown in this file (`dart fix --apply`,
+> `dart format`, `dart analyze`) modify source files. Always review changes
+> interactively before applying them to production code — confirm with your team
+> before running bulk auto-fixes on a shared branch.
+
 ```dart
-// ✅ CORRECT - Check mounted before using context
+// Good — check mounted before using context
 void _loadUser() async {
   final result = await loadUserData();
   
-  if (!mounted) return;  // Check!
+  if (!mounted) return;
   
   Navigator.of(context).pushReplacementNamed('/home');
 }
 
-// ❌ INCORRECT - Uses context after await
+// Avoid — uses context after await without mounted check
 void _loadUser() async {
   final result = await loadUserData();
-  Navigator.of(context).pushReplacementNamed('/home');  // Unsafe
+  Navigator.of(context).pushReplacementNamed('/home'); // unsafe
 }
 ```
 

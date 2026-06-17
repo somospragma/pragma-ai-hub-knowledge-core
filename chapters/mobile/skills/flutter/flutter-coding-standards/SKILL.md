@@ -1,6 +1,6 @@
 ---
 id: flutter-coding-standards
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: skill
 chapter: mobile
@@ -212,14 +212,15 @@ final result = await useCase.call(
 
 ### String Interpolation
 
-Always prefer interpolation over concatenation:
+Prefer interpolation over concatenation for readability and consistency
+with `prefer_interpolation_to_compose_strings`:
 
 ```dart
-// ✅ CORRECT - Clear and readable
+// Good — clear and readable
 final message = 'User $userId logged in at $loginTime';
 final interpolated = 'Value is ${value + 10} units';
 
-// ❌ INCORRECT - Concatenation is hard to read
+// Avoid — concatenation reduces readability
 final message = 'User ' + userId + ' logged in at ' + loginTime;
 ```
 

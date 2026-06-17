@@ -52,6 +52,10 @@ apksigner verify --print-certs your-app.apk \
 
 ## TalsecConfig — Full Configuration
 
+> **Developer Instructions:** The following code describes how **your Flutter app** initializes
+> the freeRASP runtime monitoring service. This is app-level runtime protection code —
+> the AI agent does not persist any state between sessions.
+
 ```dart
 // lib/core/security/rasp/freerasp_config.dart
 import 'package:freerasp/freerasp.dart';

@@ -1,14 +1,16 @@
 ---
 id: flutter-ds-component-template
-version: 1.2.0
+version: 1.3.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-component-template
 description: >
   Base templates for creating Flutter Design System components by atomic level.
   Use when generating new atom, molecule, or organism widget code.
   Provides starter code structure with proper anatomy, tokens, and patterns.
+  Always activate when writing a new DS widget to ensure correct _build*/_resolve* structure and token-based spacing.
 ---
 
 # Component Templates
@@ -25,8 +27,29 @@ description: >
 - Resolves its own colors/tokens per state and variant
 - Prefix: `{{DS_PREFIX}}` + name
 - Constructor: `const`, `super.key`, required params first, callbacks last
-- Build delegates to `_build*` methods per state
-- Resolvers `_resolve*` for token lookup per variant/state
+- **`build()` must delegate to `_build*` methods** — one per state (`_buildDefault`, `_buildLoading`, etc.). Never put rendering logic directly in `build()`.
+- **`_resolve*` methods** handle token lookup per variant/state (e.g., `_resolveBackgroundColor`, `_resolvePadding`). Never hardcode tokens inline.
+
+```dart
+// ✅ Correct structure
+@override
+Widget build(BuildContext context) {
+  return switch (state) {
+    DSButtonState.loading  => _buildLoading(context),
+    DSButtonState.disabled => Opacity(opacity: 0.5, child: IgnorePointer(child: _buildDefault(context))),
+    _                      => _buildDefault(context),
+  };
+}
+
+Widget _buildDefault(BuildContext context) { ... }
+Widget _buildLoading(BuildContext context) { ... }
+Color _resolveBackgroundColor() => switch (variant) { ... };
+EdgeInsets _resolvePadding() => switch (size) { ... };
+
+// ❌ Wrong — separate widget classes per variant instead of _build*/_resolve*
+class _PrimaryButton extends StatelessWidget { ... }
+class _SecondaryButton extends StatelessWidget { ... }
+```
 
 ## Molecule Rules
 
@@ -34,10 +57,30 @@ description: >
 - **DELEGATE** visual properties to child atoms
 - **PROPAGATE** states to child atoms
 - **PARAMETERS** are data (`String title`), NOT widgets (`Widget header`)
-- **SPACINGS** between children use tokens
+- **SPACINGS** between children use tokens — never hardcoded pixel values like `SizedBox(width: 8)` or `EdgeInsets.only(top: 4)`; use `SizedBox(height: DSSpacing.xs)` or `SizedBox(width: DSSpacing.sm)`
 - **TEXT** values come from the Figma literal text contract; do not rewrite copy
 - **OVERFLOW** in horizontal layouts is mitigated with `Flexible`/`Expanded` or
   `Wrap` when allowed by the contract
+
+```dart
+// ✅ Token-based spacing in a molecule
+Column(
+  children: [
+    DSText(text: currentPrice, variant: DSTextVariant.priceCurrent),
+    SizedBox(height: DSSpacing.xxs),  // ✅ token
+    DSBadge(label: discountLabel!, variant: DSBadgeVariant.discount),
+  ],
+)
+
+// ❌ Hardcoded spacing — not allowed
+Column(
+  children: [
+    DSText(text: currentPrice, ...),
+    SizedBox(height: 4),   // ❌ magic number
+    DSBadge(label: discountLabel!, ...),
+  ],
+)
+```
 
 ## Organism Rules
 

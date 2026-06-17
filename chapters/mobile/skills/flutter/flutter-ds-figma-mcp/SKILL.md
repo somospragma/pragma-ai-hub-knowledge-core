@@ -1,18 +1,41 @@
 ---
 id: flutter-ds-figma-mcp
-version: 1.2.0
+version: 1.3.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-figma-mcp
 description: >
   Figma MCP (Model Context Protocol) integration for accessing design data
   programmatically. Use when extracting component properties, navigating
   Figma file trees, reading styles/tokens, analyzing full screens or pages,
-  and comparing implementation against design specs.
+  and comparing implementation against design specs. Always activate when
+  working with Figma URLs, extracting design tokens, or handling MCP unavailability.
 ---
 
 # Figma MCP Integration
+
+## Critical Protocol: `blocked_input`
+
+When `get_design_context` is unavailable or returns no data, you **must** mark as `blocked_input` and return control to the orchestrator. Do NOT proceed with implementation.
+
+Development annotations may contain state rules, interaction behaviors, and copy overrides that are invisible in the static design tree. Proceeding without them risks an incomplete or incorrect implementation.
+
+```
+# When get_design_context is unavailable:
+Status: blocked_input
+Tool: figma/get_design_context
+Impact: Development annotations missing — implementation cannot be certified as behavior-complete.
+Required to unblock: MCP restored, get_design_context returning valid data.
+Do NOT: proceed with get_node or code generation until unblocked.
+
+# Exception — when tool responds but returns empty annotations:
+Status: Continue
+Note: "Development annotations: none"
+```
+
+> `blocked_input` ≠ "no annotations found". If the tool returns a result (even empty), continue and mark `Development annotations: none`. Only block when the **tool itself** is unavailable or errors.
 
 ## Overview
 

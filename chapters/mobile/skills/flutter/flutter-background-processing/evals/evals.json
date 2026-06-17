@@ -1,0 +1,17 @@
+{
+  "skill_name": "flutter-background-processing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to implement a periodic background task in my Flutter app that syncs user data with our server every 30 minutes, even when the app is closed. It should only run when the device has an internet connection and is not on low battery. Show me the full implementation with WorkManager, clean architecture, and proper DI setup.",
+      "expected_output": "callbackDispatcher top-level function with @pragma('vm:entry-point'), WorkManager periodic task registration with frequency and Constraints (network/battery), clean arch layers (domain UseCase, data DataSource), DI setup with configureDependencies() in background isolate, iOS BGTaskSchedulerPermittedIdentifiers config.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "My Flutter app needs to handle FCM push notifications when the app is in the background or terminated. The notification handler should process the payload using the same domain logic as the foreground handler, and I want to be able to swap from FCM to OneSignal later without rewriting everything. What's the recommended architecture?",
+      "expected_output": "Strategy pattern with PushProvider interface, FcmPushProvider and OneSignalPushProvider implementations, PushNotificationRepository delegating to active strategy, firebaseMessagingBackgroundHandler as top-level function with @pragma, provider selection via --dart-define=PUSH_PROVIDER, NotificationBloc provider-agnostic.",
+      "files": []
+    }
+  ]
+}

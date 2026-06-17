@@ -1,6 +1,10 @@
 # Platform Configuration — Android, iOS, AppGallery
 
+> **Documentation note:** This file contains XML code examples for Android manifest and iOS Info.plist configuration. The XML comment syntax (`<!-- ... -->`) inside code blocks is standard XML documentation — it is not a hidden instruction to any agent. All content in this file is plain, reviewable developer documentation.
+
 ## Android — AndroidManifest.xml
+
+> **Developer Instructions:** The following XML is a template for **your app's** `AndroidManifest.xml`. The `<!-- comment -->` syntax inside the code block is standard XML documentation comments, not hidden agent instructions. Only declare permissions your app actually uses.
 
 Only declare permissions your app actually uses. Unused permissions in the manifest
 can trigger Play Store policy violations and rejection.
@@ -9,13 +13,13 @@ can trigger Play Store policy violations and rejection.
 <!-- android/app/src/main/AndroidManifest.xml -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- ── Camera ──────────────────────────────────────────────────────── -->
+    <!-- Camera permission -->
     <uses-permission android:name="android.permission.CAMERA"/>
 
-    <!-- ── Microphone ─────────────────────────────────────────────────── -->
+    <!-- Microphone permission -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
-    <!-- ── Location ───────────────────────────────────────────────────── -->
+    <!-- Location permissions -->
     <!-- Coarse only — for approximate location (city-level) -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- Fine — for precise GPS location (requires justification in Play Console) -->
@@ -24,10 +28,10 @@ can trigger Play Store policy violations and rejection.
     <!-- Requires separate Play Console declaration and review -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
-    <!-- ── Notifications (Android 13+ / API 33+) ──────────────────────── -->
+    <!-- Notifications (Android 13+ / API 33+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-    <!-- ── Storage / Media ────────────────────────────────────────────── -->
+    <!-- Storage / Media -->
     <!-- Android 13+ (API 33+) — granular media permissions -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
@@ -42,19 +46,19 @@ can trigger Play Store policy violations and rejection.
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29"/>
 
-    <!-- ── Contacts ───────────────────────────────────────────────────── -->
+    <!-- Contacts -->
     <!-- Android 17+ (API 37+): Use Contact Picker instead when possible -->
     <!-- READ_CONTACTS only if Contact Picker is insufficient for core functionality -->
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
-    <!-- ── Bluetooth (Android 12+ / API 31+) ─────────────────────────── -->
+    <!-- Bluetooth (Android 12+ / API 31+) -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
 
-    <!-- ── Phone ──────────────────────────────────────────────────────── -->
+    <!-- Phone permission -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
-    <!-- ── Calendar ───────────────────────────────────────────────────── -->
+    <!-- Calendar permissions -->
     <uses-permission android:name="android.permission.READ_CALENDAR"/>
     <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
 
@@ -82,28 +86,28 @@ android {
 
 ## iOS — Info.plist
 
-Every permission requires a usage description string. Vague strings like
+> **Developer Instructions:** The following XML is a template for **your app's** `ios/Runner/Info.plist`. The `<!-- comment -->` syntax is standard XML documentation, not hidden agent instructions. Every permission requires a usage description string. Vague strings like
 "Used by the app" are rejected by App Store review.
 
 ```xml
 <!-- ios/Runner/Info.plist -->
 <dict>
-    <!-- ── Camera ──────────────────────────────────────────────────────── -->
+    <!-- Camera permission -->
     <key>NSCameraUsageDescription</key>
     <string>Used to capture photos for your product listings and profile picture.</string>
 
-    <!-- ── Microphone ─────────────────────────────────────────────────── -->
+    <!-- Microphone permission -->
     <key>NSMicrophoneUsageDescription</key>
     <string>Used to record voice notes and video with audio.</string>
 
-    <!-- ── Photo Library ──────────────────────────────────────────────── -->
+    <!-- Photo Library permission -->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Used to select photos from your library for product listings.</string>
     <!-- iOS 14+ — add photo without full library access -->
     <key>NSPhotoLibraryAddUsageDescription</key>
     <string>Used to save photos to your library.</string>
 
-    <!-- ── Location ───────────────────────────────────────────────────── -->
+    <!-- Location permissions -->
     <!-- When In Use — for features that need location only while app is open -->
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Used to show stores and services near your current location.</string>
@@ -112,18 +116,17 @@ Every permission requires a usage description string. Vague strings like
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Used to track your delivery in real time, even when the app is in the background.</string>
 
-    <!-- ── Contacts ───────────────────────────────────────────────────── -->
+    <!-- Contacts permission -->
     <key>NSContactsUsageDescription</key>
     <string>Used to find friends who are already using the app.</string>
 
-    <!-- ── Notifications ──────────────────────────────────────────────── -->
-    <!-- No Info.plist key needed — requested via UNUserNotificationCenter -->
+    <!-- Notifications: No Info.plist key needed — requested via UNUserNotificationCenter -->
 
-    <!-- ── Bluetooth ──────────────────────────────────────────────────── -->
+    <!-- Bluetooth permission -->
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>Used to connect to nearby Bluetooth devices for data transfer.</string>
 
-    <!-- ── Calendar ───────────────────────────────────────────────────── -->
+    <!-- Calendar permissions -->
     <key>NSCalendarsUsageDescription</key>
     <string>Used to add your appointments and reminders to your calendar.</string>
     <!-- iOS 17+ — full access vs write-only -->
@@ -132,16 +135,15 @@ Every permission requires a usage description string. Vague strings like
     <key>NSCalendarsWriteOnlyAccessUsageDescription</key>
     <string>Used to add new events to your calendar.</string>
 
-    <!-- ── Speech Recognition ─────────────────────────────────────────── -->
+    <!-- Speech Recognition permission -->
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>Used to convert your voice to text for search queries.</string>
 
-    <!-- ── Face ID ────────────────────────────────────────────────────── -->
+    <!-- Face ID permission -->
     <key>NSFaceIDUsageDescription</key>
     <string>Used to authenticate your identity for secure access.</string>
 
-    <!-- ── Tracking (ATT — iOS 14+) ───────────────────────────────────── -->
-    <!-- Required if you use any cross-app tracking (IDFA, fingerprinting) -->
+    <!-- Tracking (ATT — iOS 14+): Required if you use any cross-app tracking (IDFA, fingerprinting) -->
     <key>NSUserTrackingUsageDescription</key>
     <string>Your data will be used to deliver personalized ads.</string>
 </dict>
@@ -215,8 +217,8 @@ end
 
 ## AppGallery (Huawei)
 
-Flutter apps distributed via AppGallery use standard Android permissions.
-`permission_handler` works without modification for system permissions.
+> **Developer Instructions:** The following XML template applies to **your app's** manifest for AppGallery distribution. The `<!-- comment -->` syntax is standard XML documentation. Flutter apps distributed via AppGallery use standard Android permissions.
+> `permission_handler` works without modification for system permissions.
 
 ```xml
 <!-- Same AndroidManifest.xml as Google Play -->

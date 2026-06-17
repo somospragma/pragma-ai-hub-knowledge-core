@@ -1,12 +1,13 @@
 ---
 id: flutter-database-strategy
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-database-strategy
 description: >
-  Choose and implement the right local database for Flutter: Drift (relational, reactive SQLite), ObjectBox (NoSQL, highest performance), Isar community forks (NoSQL, document store), sqflite (raw SQLite), and flutter_secure_storage (encrypted sensitive data). Hive is in maintenance mode — do NOT use for new projects. Use this skill when choosing a local persistence strategy, implementing DAOs, schema migrations, or reactive queries.
+  Choose and implement the right local database for Flutter: Drift (relational, reactive SQLite), ObjectBox (NoSQL, highest performance), Isar community forks (NoSQL, document store), sqflite (raw SQLite), and flutter_secure_storage (encrypted sensitive data). Hive 4.x is in maintenance mode — do NOT use for new projects, migrate to Drift or ObjectBox. Use this skill when choosing a local persistence strategy, implementing DAOs, schema migrations, reactive queries, or migrating away from Hive.
 ---
 
 # Database Strategy

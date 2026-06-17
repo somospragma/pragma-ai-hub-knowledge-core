@@ -1,0 +1,121 @@
+{
+  "skill_name": "commit-conventions",
+  "_tool_scope": "This file is an evaluation definition — it is not executed as agent instructions. Assertions of type 'llm_judge' are grading metadata, not tool grants. The skill itself uses only read access and text suggestions directed at the user.",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Escribe el mensaje de commit para agregar autenticación JWT al sistema. El cambio incluye un nuevo middleware de validación de tokens, el repositorio de sesiones y las pruebas unitarias correspondientes.",
+      "expected_output": "A conventional commit message of type 'feat' with scope 'auth', an imperative description under 50 chars, a body explaining what and why, and optionally a footer referencing an issue.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "The response begins with 'feat(auth):' following the <type>(<scope>): format",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "The description uses imperative mood (e.g., 'add', 'implement') and does not exceed 50 characters",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "The response includes a body that explains what the commit does and optionally references included files or functionality",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Write a commit message for a bug fix: the user avatar image is not displaying on the profile page because the URL field from the API response was being read as 'response.image' instead of 'response.avatar_url'. This relates to issue #234.",
+      "expected_output": "A conventional commit message of type 'fix' with an appropriate scope, a clear description, a body explaining the root cause, and a footer with 'Closes #234' or 'Fixes #234'.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "The response starts with 'fix(' followed by a relevant scope and colon",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "The footer includes 'Closes #234' or 'Fixes #234' referencing the issue",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "The body explains the root cause of the bug (wrong field name from API response)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I need to write a commit for a breaking change: the API client authentication header format changed from 'Authorization: Bearer <token>' to 'X-Auth-Token: <token>'. This affects all API consumers.",
+      "expected_output": "A conventional commit with '!' after type/scope (e.g., feat(api_client)!:), a BREAKING CHANGE footer describing the old and new format, and optionally a migration guide.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "The commit type/scope includes the '!' marker to signal a breaking change (e.g., 'feat(api_client)!:')",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "The footer contains 'BREAKING CHANGE:' followed by a description of what changed",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "The response shows both the old format ('Bearer <token>') and the new format ('X-Auth-Token') to help consumers migrate",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "What scope should I use for a commit that refactors the GetIt dependency injection registration in the 'di' package? The change extracts service locator bindings into a separate module.",
+      "expected_output": "The agent recommends 'di' as the scope and explains the scope selection rationale per SKILL.md guidelines, suggesting something like 'refactor(di): extract service locator bindings into separate module'.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "The response recommends 'di' as the appropriate scope for the dependency injection layer",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "The response provides a concrete example commit message using the recommended scope",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "The response uses 'refactor' as the type since no feature or bug fix is involved",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "¿Qué es un commit?",
+      "expected_output": "The agent explains what a commit is in the context of Conventional Commits and describes the format, without writing a specific commit message on behalf of the user (since no code change was provided). It should explain the structure and offer to help if the user provides context.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "The response explains the Conventional Commits format (<type>(<scope>): <description>) at a conceptual level",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "The response does NOT produce a ready-to-use commit message since no specific change context was given",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "The response offers to help the user write a commit message if they provide details about their change",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

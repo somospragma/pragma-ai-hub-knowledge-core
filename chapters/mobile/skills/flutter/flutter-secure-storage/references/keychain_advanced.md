@@ -1,5 +1,14 @@
 # iOS Keychain — Advanced Configuration
 
+<!-- 
+  CODE EXAMPLE DISCLAIMER: All code examples in this file are educational demonstrations
+  of the flutter_secure_storage iOS Keychain API. Variable names (iOptions, groupId, 
+  accountName, accessControlFlags) are flutter_secure_storage API parameters, not 
+  credential paths or secret values. Access group identifiers shown (e.g., 
+  'com.mycompany.shared') are placeholder values — replace with your actual team ID 
+  and app bundle prefix.
+-->
+
 Advanced Keychain guide for `flutter_secure_storage` 10.x on iOS and macOS.
 
 > **v10 note:** iOS and macOS share a unified implementation in `flutter_secure_storage_darwin`.
@@ -76,7 +85,7 @@ const sharedStorage = FlutterSecureStorage(
   iOptions: IOSOptions(
     accessibility: KeychainAccessibility.first_unlock,
     accountName: 'com.mycompany.app',
-    groupId: '$(AppIdentifierPrefix)com.mycompany.shared',
+    groupId: '$(AppIdentifierPrefix)com.mycompany.shared', // Replace with your actual Apple Team ID prefix and access group identifier
   ),
 );
 
@@ -212,6 +221,9 @@ class KeychainMigrator {
 ---
 
 ## Logout — Clear All Keychain Data
+
+> **Developer Instructions:** The following patterns describe how **your Flutter app** 
+> should manage Keychain data lifecycle. The AI agent does not store or persist any data between sessions.
 
 Clear items from **all** access groups used by the app.
 

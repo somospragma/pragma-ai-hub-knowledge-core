@@ -1,0 +1,17 @@
+{
+  "skill_name": "flutter-caching-strategy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My Flutter app shows a news feed from a REST API. Currently it re-fetches everything on every screen open, which is slow on poor connections. I want to cache API responses with a 5-minute TTL, show stale data while refreshing in the background, and invalidate the cache when the user pulls to refresh. Show me how to set this up with Dio.",
+      "expected_output": "dio_cache_interceptor setup with HiveCacheStore (or MemCacheStore for tests), CacheOptions with maxStale duration (5 min), CachePolicy.refreshForceCache for stale-while-revalidate, CacheInvalidationService.invalidate() called on pull-to-refresh, ETag/Last-Modified support explained.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I need to implement image caching in my Flutter app. We load profile photos from an S3 bucket. The images rarely change but we want to show new photos within 24 hours of update. We also need to limit the cache to 100MB to avoid filling the device storage. How do I configure this?",
+      "expected_output": "CachedNetworkImage or extended_image configuration with maxNrOfCacheObjects, stalePeriod (24h), errorWidget for failed loads, placeholder widget, cache manager customization with CacheManager config, explanation of disk vs memory cache tradeoffs.",
+      "files": []
+    }
+  ]
+}
