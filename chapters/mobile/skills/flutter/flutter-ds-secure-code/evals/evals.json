@@ -1,0 +1,69 @@
+{
+  "skill_name": "flutter-ds-secure-code",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a DSTextField atom for our Design System. It accepts user text input. What security rules do I need to apply?",
+      "expected_output": "Shows validator parameter, maxLength with LengthLimitingTextInputFormatter, no print/log of user data. Notes DS widgets may only depend on authorized packages (flutter, own DS, alchemist/widgetbook/flutter_test as dev only).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response includes input validation with validator parameter and/or LengthLimitingTextInputFormatter",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explicitly prohibits print() or logging of user data",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions that DS widgets may only depend on authorized packages: flutter/material.dart, own DS package, and dev deps (alchemist, widgetbook, flutter_test)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "A colleague added `import 'package:http/http.dart'` to a DS button widget to fetch some data from an API. Is this allowed?",
+      "expected_output": "FORBIDDEN — violates DS-007 unauthorized dependencies. DS components don't make HTTP requests. DS may only depend on flutter/material, own DS package, and dev deps. Logic must stay outside the DS at the feature/data layer.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response clearly states this is FORBIDDEN — it violates the unauthorized dependencies rule (DS-007)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explains DS components should not make HTTP requests — that logic belongs at the feature/data layer",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response lists the only allowed DS dependencies: flutter/material.dart, own DS package, and dev deps (alchemist, widgetbook, flutter_test)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My DS widget has an onPressed callback and sometimes it crashes when it's null. How do I handle nullable callbacks safely?",
+      "expected_output": "Uses onPressed?.call() safe call pattern instead of onPressed!(). Shows null-safe callback invocation. Also notes that disabled state should use IgnorePointer + Opacity pattern.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends onPressed?.call() safe call pattern",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response explicitly says to never force unwrap onPressed with !() unless certain it's non-null",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

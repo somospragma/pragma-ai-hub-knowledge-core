@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-theming-tokens`  
-**Scanned:** 2026-06-03 17:42:54 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-theming-tokens`  
+**Scanned:** 2026-06-22 15:53:52 UTC  
 
 ## Risk Assessment
 
@@ -12,12 +12,13 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (3)
+## Components (4)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 98 | No |
-| `evals/flutter-ds-theming-tokens.md` | markdown | 30 | No |
+| `evals/evals.json` | json | 69 | No |
+| `evals/flutter-ds-theming-tokens.md` | markdown | 31 | No |
 | `references/TOKEN-CATALOG.md` | markdown | 73 | No |
 
 ## Issues (0)

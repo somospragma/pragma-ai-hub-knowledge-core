@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-responsive-layout`  
-**Scanned:** 2026-06-03 17:42:47 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-responsive-layout`  
+**Scanned:** 2026-06-22 15:23:26 UTC  
 
 ## Risk Assessment
 
@@ -12,12 +12,13 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (2)
+## Components (3)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 152 | No |
-| `evals/flutter-ds-responsive-layout.md` | markdown | 29 | No |
+| `SKILL.md` | markdown | 160 | No |
+| `evals/evals.json` | json | 74 | No |
+| `evals/flutter-ds-responsive-layout.md` | markdown | 30 | No |
 
 ## Issues (0)
 

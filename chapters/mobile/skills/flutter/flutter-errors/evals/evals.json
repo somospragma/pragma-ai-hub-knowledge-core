@@ -1,0 +1,92 @@
+{
+  "skill_name": "flutter-errors",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "failure-hierarchy",
+      "prompt": "I need to implement a proper error hierarchy for my Flutter app. I use Dio for HTTP requests and Firebase for auth. How should I structure the Failure sealed class hierarchy and how does FailureMessageKey work?",
+      "expected_output": "sealed class Failure hierarchy with no hardcoded String messages, FailureMessageKey enum as the i18n bridge, localizedMessage(context) for UI resolution, ValidationFailure as the only justified literal String exception.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses sealed class Failure hierarchy with final class leaf nodes",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses FailureMessageKey enum — Failure carries a key, NOT a hardcoded String message",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response shows localizedMessage(context) as the UI resolution method — never exposes literalMessage directly",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response distinguishes ValidationFailure/BusinessRuleFailure as the only exceptions that carry a literal String",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "task-either-datasource",
+      "prompt": "Show me how to implement a datasource method that fetches a user profile from an API using TaskEither.tryCatch. The method should handle DioException and map it to the correct Failure type using ErrorHandler.",
+      "expected_output": "TaskEither.tryCatch with ErrorHandler.map as tear-off, DioErrorInterceptor as prerequisite that converts DioException to AppException before ErrorHandler sees it, repository returning Either<Failure,T> with no own throw.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses TaskEither.tryCatch with ErrorHandler.map in the second argument",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions DioErrorInterceptor as the prerequisite that converts DioException to AppException BEFORE ErrorHandler.map runs",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response shows repository calling .run() and returning Either<Failure,T> with no own try-catch or throw",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "global-error-handler",
+      "prompt": "How do I set up global error handling in Flutter so that unhandled exceptions and Flutter framework errors are always captured? Show me what to add to main().",
+      "expected_output": "GlobalErrorHandler.initialize() before runApp, FlutterError.onError, PlatformDispatcher.instance.onError, runZonedGuarded wrapper, BlocObserver for BLoC projects, ProviderObserver for Riverpod.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response registers FlutterError.onError for framework errors",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response registers PlatformDispatcher.instance.onError for platform/async errors",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response wraps runApp in runZonedGuarded",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response uses a GlobalErrorHandler class with initialize() called before runApp — not just standalone functions",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a5",
+          "text": "Response includes BlocObserver (for BLoC) and/or ProviderObserver (for Riverpod) as additional error capture layers",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

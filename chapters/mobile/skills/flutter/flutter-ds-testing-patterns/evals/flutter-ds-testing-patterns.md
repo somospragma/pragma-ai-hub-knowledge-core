@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-testing-patterns`  
-**Scanned:** 2026-06-03 17:42:51 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-testing-patterns`  
+**Scanned:** 2026-06-22 15:53:24 UTC  
 
 ## Risk Assessment
 
@@ -12,13 +12,14 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (3)
+## Components (4)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 90 | No |
+| `SKILL.md` | markdown | 96 | No |
 | `assets/widget_test_template.dart.txt` | text | 133 | No |
-| `evals/flutter-ds-testing-patterns.md` | markdown | 30 | No |
+| `evals/evals.json` | json | 69 | No |
+| `evals/flutter-ds-testing-patterns.md` | markdown | 31 | No |
 
 ## Issues (0)
 

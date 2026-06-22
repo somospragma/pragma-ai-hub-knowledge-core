@@ -1,0 +1,69 @@
+{
+  "skill_name": "flutter-ds-theming-tokens",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a DSCard molecule for our DS. It needs a 16px padding, a background color, and a border radius. How do I reference these values correctly without hardcoding them?",
+      "expected_output": "Uses DSSpacing.m for 16px padding, tokens.colors.backgroundDefaultSurface or context.tokens for background, DSBorderRadius.s or equivalent for border radius. Explains both access methods (context extension vs Theme.of). Zero hardcoding rule.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses DSSpacing.m (or equivalent token) for 16px padding — not EdgeInsets.all(16)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses a color token (context.tokens.colors or Theme.of extension) — not hardcoded Color(0xFF...) or Colors.*",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response states the zero hardcode rule: forbidden patterns include hex values, Colors.*, magic numbers",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What's wrong with this widget code?\n```dart\nContainer(\n  color: Color(0xFF6200EE),\n  padding: EdgeInsets.all(16),\n  child: Text('Hello', style: TextStyle(fontSize: 14)),\n)\n```",
+      "expected_output": "Identifies all 3 violations: (1) Color(0xFF...) hex hardcode → use token, (2) EdgeInsets.all(16) magic number → use DSSpacing.m, (3) TextStyle(fontSize: 14) → use typography token. Shows corrected version using tokens.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies the hardcoded hex color Color(0xFF6200EE) as a violation",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response identifies EdgeInsets.all(16) as a hardcoded magic number that should use a spacing token",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response identifies TextStyle(fontSize: 14) as a violation — should use a typography token",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What spacing token should I use for a gap between two items in a Row inside a DS molecule? I need exactly 8px. And how do I reference it?",
+      "expected_output": "DSSpacing.s = 8px. Shows both access methods: context extension (context.tokens) or static class (DSSpacing.s). Reminds to import the package properly.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies DSSpacing.s (or equivalent) as the 8px spacing token",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows how to use it in code — either as DSSpacing.s or via context.tokens equivalent",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

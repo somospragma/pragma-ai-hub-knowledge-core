@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-ds-widgetbook",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just finished building a DSButton atom with variant (primary/secondary/ghost) and size (sm/md/lg) enums, plus an onPressed callback. Create the Widgetbook use case for it as a DS component.",
+      "expected_output": "Creates use case with Playground use case using context.knobs.list for variant and size enums (with labelBuilder), boolean knob for enabled/disabled toggling onPressed, setCodePreview. Scope is DS_COMPONENTS. Uses developer.log not print. No color knobs.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses context.knobs.list() for enum knobs (variant and size) with labelBuilder",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses boolean knob + ternary for the VoidCallback (enabled ? () => developer.log(...) : null)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes context.setCodePreview()",
+          "type": "contains"
+        },
+        {
+          "id": "a4",
+          "text": "Response does NOT add a knob for Color — colors come from theme/tokens only",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I'm building a Widgetbook story for a ProductDetailScreen (app screen, not a DS component). What's different about the setup compared to a DS component story?",
+      "expected_output": "Uses APP_SCREENS scope. File goes in widgetbook_screens_path/features/[feature]/[screen]/. Required use cases: Default, Loading, Empty, Error. Uses wrappers/mocks, NOT real navigation. File is [screen]_use_case.dart.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses APP_SCREENS scope (not DS_COMPONENTS) for app screen use cases",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes Default, Loading, Empty, and Error use cases for the screen",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response specifies using mocks/providers and NOT real navigation for app screens",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "After creating my Widgetbook use case file, what commands do I need to run to make it appear in Widgetbook?",
+      "expected_output": "First run dart analyze on the widgetbook path. Then run dart run build_runner build --delete-conflicting-outputs. Mentions NEVER use part '*.g.dart' in use_case files.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response includes dart analyze before build_runner",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes dart run build_runner build --delete-conflicting-outputs",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response warns that part '*.g.dart' must NOT be used in *.use_case.dart files",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

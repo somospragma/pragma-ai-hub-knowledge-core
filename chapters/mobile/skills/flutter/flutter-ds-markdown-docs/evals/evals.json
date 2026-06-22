@@ -1,0 +1,51 @@
+{
+  "skill_name": "flutter-ds-markdown-docs",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just finished building a ProductCard organism for our Design System. It uses DSImage, DSText, DSBadge atoms, and has variants (compact/expanded) and states (default/loading/empty). I need to write the README. What sections are required and what should I include?",
+      "expected_output": "Lists all 9 required sections: Title, Usage (compiling example), API table, Enums, Tokens, Composition tree, States, Figma URL, Anti-patterns. Notes organisms always require README. Provides structure/template guidance.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response lists all 9 required README sections: Title, Usage, API, Enums, Tokens, Composition, States, Figma, Anti-patterns",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response states that organisms ALWAYS require a README",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response emphasizes the Usage section must include a functional code example that compiles",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Do I need to write a README for every atom in the Design System? What about molecules?",
+      "expected_output": "Atoms normally don't need a separate README. Molecules need one only if composition logic is non-obvious. Organisms always need one. Distinguishes between inline code comments (not mandatory) and separate README docs.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response states atoms normally do NOT require a separate README",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response states molecules need README only when composition logic is non-obvious",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response states organisms ALWAYS need a README",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

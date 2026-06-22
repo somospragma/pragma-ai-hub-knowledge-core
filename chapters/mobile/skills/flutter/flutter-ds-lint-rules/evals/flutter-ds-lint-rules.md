@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-lint-rules`  
-**Scanned:** 2026-06-03 17:42:41 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-lint-rules`  
+**Scanned:** 2026-06-22 14:49:45 UTC  
 
 ## Risk Assessment
 
@@ -12,12 +12,13 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (3)
+## Components (4)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 79 | No |
-| `evals/flutter-ds-lint-rules.md` | markdown | 30 | No |
+| `evals/evals.json` | json | 79 | No |
+| `evals/flutter-ds-lint-rules.md` | markdown | 31 | No |
 | `references/LINT-CHECKLIST.md` | markdown | 16 | No |
 
 ## Issues (0)

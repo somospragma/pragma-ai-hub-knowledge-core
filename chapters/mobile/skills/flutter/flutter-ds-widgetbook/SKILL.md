@@ -1,10 +1,11 @@
 ---
 id: flutter-ds-widgetbook
-version: 2.4.0
+version: 2.5.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-widgetbook
 description: >
   Widgetbook patterns for interactive documentation of Design System components
   and app screens in canonical `/new-view`. Use when creating or updating
@@ -14,122 +15,98 @@ description: >
 
 # Widgetbook Patterns (Deterministic Scope)
 
-## Scope obligatorio (con fallback canónico)
+## Step 0 — Define the scope first
 
-Antes de generar use cases, definir `WIDGETBOOK_SCOPE`:
+Before generating any code, identify which scope applies:
 
-- `DS_COMPONENTS` → componentes del Design System
-- `APP_SCREENS` → pantallas/vistas de app
-
-Si no llega `WIDGETBOOK_SCOPE`:
-
-- en flujo canónico DS (`MODE=DS_WIDGETBOOK`), usar `DS_COMPONENTS` por defecto.
-- en modo pantallas (`MODE=APP_WIDGETBOOK_SCREENS`), usar `APP_SCREENS` por defecto.
-
-## Resolución de rutas (desde config)
-
-Leer `project.config.yaml`:
-
-- `WIDGETBOOK_COMPONENTS_ROOT = structure.widgetbook_components_path`
-  (fallback `structure.widgetbook_path`)
-- `WIDGETBOOK_SCREENS_ROOT = structure.widgetbook_screens_path`
-  (fallback `structure.widgetbook_path`)
-
-En este ecosistema ambos pueden apuntar a la misma ruta base (recomendado por
-default), pero deben resolverse explícitamente.
-
-## Tabla de scope
-
-| Scope | Qué documenta | Ubicación esperada |
+| Scope | When to use | File goes in |
 |---|---|---|
-| `DS_COMPONENTS` | Atoms, molecules, organisms | `{WIDGETBOOK_COMPONENTS_ROOT}/atoms|molecules|organisms/[sub]/` |
-| `APP_SCREENS` | Pantallas de app con estado y mocks | `{WIDGETBOOK_SCREENS_ROOT}/features/[feature]/[screen]/` |
+| `DS_COMPONENTS` | DS atoms, molecules, organisms | `{WIDGETBOOK_COMPONENTS_ROOT}/atoms\|molecules\|organisms/[name]/` |
+| `APP_SCREENS` | App screens/views (`/new-view` pipeline) | `{WIDGETBOOK_SCREENS_ROOT}/features/[feature]/[screen]/` |
 
-## Regla de precedencia en este pipeline
+If `WIDGETBOOK_SCOPE` is not provided explicitly:
+- In DS flow (`MODE=DS_WIDGETBOOK`) → default to `DS_COMPONENTS`
+- In screen flow (`MODE=APP_WIDGETBOOK_SCREENS`) → default to `APP_SCREENS`
 
-- En `/new-component`, usar `DS_COMPONENTS`.
-- En `/new-view`, usar ambos scopes en fases distintas:
-  - `DS_COMPONENTS` en la fase `DS_WIDGETBOOK`.
-  - `APP_SCREENS` en la fase `APP_WIDGETBOOK_SCREENS`.
-- Si el usuario lo vuelve a pedir explícitamente, no duplicar artefactos canónicos.
+Read paths from `project.config.yaml`:
+- Components: `structure.widgetbook_components_path` (fallback: `structure.widgetbook_path`)
+- Screens: `structure.widgetbook_screens_path` (fallback: `structure.widgetbook_path`)
 
-## Required Use Cases por scope
+## Required Use Cases per scope
 
-### A) `DS_COMPONENTS`
-Archivo: `[componente]_use_case.dart`
+### DS_COMPONENTS
+File: `[component]_use_case.dart`
 
-1. `Overview` (opcional si componente simple)
-2. `Playground` (obligatorio)
-3. Estados relevantes (`loading`, `disabled`, `error`) como knobs o use cases fijos
-4. `All Variants` (obligatorio cuando existe enum de variantes)
+1. `Overview` (optional for simple components)
+2. `Playground` (**mandatory**)
+3. State variants: `loading`, `disabled`, `error` — as knobs or fixed use cases
+4. `All Variants` (**mandatory** when a variant enum exists)
 
-### B) `APP_SCREENS`
-Archivo: `[screen]_use_case.dart`
+### APP_SCREENS
+File: `[screen]_use_case.dart`
 
-1. `Default`
-2. `Loading`
-3. `Empty` (si aplica)
-4. `Error` (si aplica)
-5. Variantes de negocio adicionales (si aplica: `prefilled`, `validation_error`, etc.)
+1. `Default` (**mandatory**)
+2. `Loading` (**mandatory**)
+3. `Empty` (if the screen has an empty state)
+4. `Error` (if the screen handles errors)
+5. Domain-specific variants as needed
 
-Para pantallas, usar wrappers/mocks y evitar navegación real.
+For screen use cases, always use wrappers/mocks. Never use real navigation — replace all navigation callbacks with `developer.log(...)`.
 
 ## Knobs
 
-| Dart Type | Knob | Regla |
+| Dart Type | Knob | Rule |
 |---|---|---|
-| `String` | `context.knobs.string()` | valores de dominio reales |
+| `String` | `context.knobs.string()` | Use real domain values |
 | `bool` | `context.knobs.boolean()` | |
-| `enum` | `context.knobs.list()` | siempre con `labelBuilder` |
-| `double` | `context.knobs.double.slider()` | min/max razonables |
-| `int` | `context.knobs.int.slider()` | min/max razonables |
-| `Color` | sin knob | viene del theme/tokens |
+| `enum` | `context.knobs.list()` | **Always** include `labelBuilder` |
+| `double` | `context.knobs.double.slider()` | Set reasonable min/max |
+| `int` | `context.knobs.int.slider()` | Set reasonable min/max |
+| `Color` | ❌ no knob | Colors come from theme/tokens only |
 | `VoidCallback?` | boolean + ternary | `enabled ? () => developer.log('...') : null` |
 
-> Cuando uses `developer.log(...)` en snippets, importar
-> `dart:developer` como `developer`.
+Import `developer` explicitly: `import 'dart:developer' as developer;`
 
 ## Code Preview
 
-Cada use case debe incluir `context.setCodePreview(...)`.
+Every use case must include `context.setCodePreview(...)`. This is not optional.
 
-## Reglas obligatorias
-
-- ALWAYS incluir `labelBuilder` en knobs enum/list.
-- ALWAYS usar textos literales de Figma en knobs/mocks cuando existan.
-- Si Figma no define el valor, usar datos del dominio real y marcarlos como
-  ejemplo; no inventar copy de interfaz.
-- NEVER agregar knobs para colores.
-- ALWAYS usar `developer.log(...)` en callbacks de ejemplo (no `print`).
-- NEVER usar `part '*.g.dart'` en archivos `*.use_case.dart`.
-- ALWAYS ejecutar `dart analyze` antes de `build_runner`.
-- Para `APP_SCREENS`, ALWAYS usar mocks/providers de prueba y no navegación real.
-
-## Comandos
+## Commands — run in this exact order
 
 ```bash
-# Analizar DS
+# 1. Analyze first — catch errors before generating
 dart analyze {WIDGETBOOK_COMPONENTS_ROOT}/atoms {WIDGETBOOK_COMPONENTS_ROOT}/molecules {WIDGETBOOK_COMPONENTS_ROOT}/organisms
 
-# Analizar pantallas (si se usa APP_SCREENS)
-dart analyze {WIDGETBOOK_SCREENS_ROOT}/features
+# For APP_SCREENS:
+# dart analyze {WIDGETBOOK_SCREENS_ROOT}/features
 
-# Generar archivos de widgetbook
+# 2. Generate only after analyze is clean
 dart run build_runner build --delete-conflicting-outputs
 ```
 
+`dart analyze` must run **before** `build_runner`. Running build_runner on code with errors produces broken generated files that are harder to debug than the original error.
+
+## Critical rules
+
+- `labelBuilder` is **mandatory** on every `knobs.list()` / enum knob
+- **Never** add a knob for `Color` — colors come from the theme
+- **Never** use `print` in callbacks — use `developer.log(...)`
+- **Never** add `part '*.g.dart'` inside `*.use_case.dart` files — this breaks code generation
+- For `APP_SCREENS`: always use test mocks/providers, never real navigation
+
 ## Checklist
 
-- [ ] `WIDGETBOOK_SCOPE` definido (`DS_COMPONENTS` o `APP_SCREENS`)
-- [ ] Archivo `*_use_case.dart` en ruta correcta para el scope
-- [ ] Cobertura de estados relevantes
-- [ ] `context.setCodePreview(...)` presente
-- [ ] `labelBuilder` en knobs enum/list
-- [ ] Sin `print`, usar `developer.log`
-- [ ] `dart analyze` limpio
-- [ ] `build_runner` ejecutado
+- [ ] `WIDGETBOOK_SCOPE` defined (`DS_COMPONENTS` or `APP_SCREENS`)
+- [ ] File `*_use_case.dart` at the correct path for the scope
+- [ ] Required use cases covered for the scope
+- [ ] `context.setCodePreview(...)` present in every use case
+- [ ] `labelBuilder` on all enum/list knobs
+- [ ] No `print` — uses `developer.log`
+- [ ] No `part '*.g.dart'` in use case files
+- [ ] `dart analyze` ran clean
+- [ ] `dart run build_runner build --delete-conflicting-outputs` ran
 
-## Referencias
+## Reference files
 
 | Topic | File |
 |---|---|

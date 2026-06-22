@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-markdown-docs`  
-**Scanned:** 2026-06-03 17:42:42 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-markdown-docs`  
+**Scanned:** 2026-06-22 14:58:26 UTC  
 
 ## Risk Assessment
 
@@ -16,9 +16,9 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 45 | No |
+| `SKILL.md` | markdown | 63 | No |
 | `assets/COMPONENT-README-TEMPLATE.md` | markdown | 94 | No |
-| `evals/flutter-ds-markdown-docs.md` | markdown | 30 | No |
+| `evals/evals.json` | json | 51 | No |
 
 ## Issues (0)
 
