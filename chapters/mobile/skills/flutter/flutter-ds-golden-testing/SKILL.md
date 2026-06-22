@@ -1,10 +1,11 @@
 ---
 id: flutter-ds-golden-testing
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-golden-testing
 description: >
   Golden testing (visual regression) patterns using Alchemist for Flutter DS.
   Use when creating visual snapshot tests, verifying pixel-perfect rendering,

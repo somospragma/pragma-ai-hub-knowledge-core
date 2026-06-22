@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-ds-golden-testing",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to write golden tests for a new DSButton atom in our Flutter Design System. It has 3 variants (primary, secondary, ghost) and 3 states (default, loading, disabled). What goldens do I need and how do I structure them with Alchemist?",
+      "expected_output": "Shows goldens for all-variants grid, all-states grid, dark mode, and at least one combination. Uses GoldenTestGroup with children (not scenarios). Uses @Tags(['golden']). Wraps each scenario in SizedBox with fixed dimensions. Uses fileName naming convention.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response covers the 5 required golden types: all-variants, all-states, dark mode, combination, and sizes",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses GoldenTestGroup with children parameter (NOT scenarios)",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response uses @Tags(['golden']) annotation for CI filtering",
+          "type": "contains"
+        },
+        {
+          "id": "a4",
+          "text": "Response wraps each scenario child in SizedBox with fixed dimensions",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What are the standard dimensions I should use for golden tests in the Flutter DS? My button atom is small and I also have a ProductCard organism that spans the full card width.",
+      "expected_output": "Provides the standard dimensions table: mobile (327px), desktop (610px), grid (400px), icon (48x48px). Warns against variable dimensions for reproducibility.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response mentions 327px for mobile/card width",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions 610px for desktop width",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains that fixed dimensions are required for reproducibility — variable dimensions are forbidden",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "How do I run golden tests in our DS project? I want to regenerate them after a design change and also verify them in CI.",
+      "expected_output": "Shows both the update command (--update-goldens --tags golden) and the verify command (--tags golden without --update-goldens). Explains the difference.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response includes the --update-goldens flag for regenerating golden files",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes --tags golden to filter only golden tests",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains that CI runs without --update-goldens (verify mode) and local runs use --update-goldens (generate mode)",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

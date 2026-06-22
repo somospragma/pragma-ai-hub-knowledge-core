@@ -1,0 +1,87 @@
+{
+  "skill_name": "flutter-environments",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "setup-three-flavors",
+      "prompt": "I'm setting up Flutter flavors for the first time on a project that currently only has a single `main.dart`. I need three flavors: dev, staging, and prod. What files do I need to create, what should each entry point contain, and how do I protect my API keys using envied?",
+      "expected_output": "Creates three entry points (main_dev.dart, main_staging.dart, main_prod.dart), AppFlavor enum, AppConfig typed class, three @Envied classes with obfuscate:true, .env files gitignored, .env.example committed. AppConfig is the single access point for env values.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response creates three separate entry point files: main_dev.dart, main_staging.dart, main_prod.dart",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses envied with obfuscate:true on all @Envied classes",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response states .env files must be gitignored and .env.example should be committed",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response shows AppConfig (or equivalent typed config) as the single access point — no direct imports of EnvDev/Staging/Prod outside of app_config.dart",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "android-flavors",
+      "prompt": "How do I configure Android productFlavors for dev, staging, and prod? I need separate google-services.json files for each environment and different applicationIds. Show me the build.gradle configuration.",
+      "expected_output": "Shows productFlavors with flavorDimensions, unique applicationId per flavor, google-services.json placement in src/dev/, src/staging/, src/prod/ directories, signingConfigs for each flavor, key.properties gitignored.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response shows productFlavors with flavorDimensions in build.gradle",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response places google-services.json files in src/dev/, src/staging/, src/prod/ directories",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes separate applicationId per flavor",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response includes signingConfigs per flavor and states key.properties must be gitignored",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "ci-secret-injection",
+      "prompt": "Our team never commits .env files to git. How do we handle API keys in CI/CD with GitHub Actions? I want the pipeline to generate the .env files from secrets and then build the app.",
+      "expected_output": "GitHub Actions workflow generates .env files from secrets before running build_runner. Order is mandatory: generate .env files → build_runner → flutter build. Uses cat <<EOF pattern. .gitignore blocks .env files. obfuscate:true ensures no plain-text values in binary.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response generates .env files from GitHub secrets in the CI workflow (cat or echo pattern)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows build_runner running AFTER .env file generation and BEFORE flutter build",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions obfuscate:true or that .g.dart files must also be gitignored",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

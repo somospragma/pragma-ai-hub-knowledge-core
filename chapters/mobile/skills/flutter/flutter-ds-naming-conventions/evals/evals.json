@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-ds-naming-conventions",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm creating a new Button atom for our DS package with prefix 'Pragma'. What should I name: the file, the widget class, the state enum, the variant enum, the size enum, the golden test file, and the Widgetbook story file?",
+      "expected_output": "File: pragma_button.dart, Class: PragmaButton, State enum: PragmaButtonState, Variant: PragmaButtonVariant, Size: PragmaButtonSize. Golden: pragma_button_golden_test.dart. Widgetbook: pragma_button_use_case.dart. Notes default_ for reserved keyword.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses DS_PREFIX + PascalCase for widget class name (e.g., PragmaButton)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response names state enum as [Widget]State (e.g., PragmaButtonState) and variant as [Widget]Variant",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response names golden test file with *_golden_test.dart suffix and widgetbook story as *_use_case.dart",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response mentions that default is a reserved Dart keyword and should be named default_ in enums",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What's the correct naming for Git branches and commits when adding a new DSBadge atom to the Design System?",
+      "expected_output": "Branch: feat/ds-badge (using naming.branch_prefix from config). Commits: Conventional Commits format — feat: add DSBadge atom component, test: add widget and golden tests for Badge, docs: add widgetbook stories for Badge.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response provides branch naming pattern using feat/ds-[slug] convention",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response provides Conventional Commits format for at least feat:, test:, and docs: types",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions that branch prefix comes from naming.branch_prefix in project.config.yaml",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "In Figma we have a component called 'Card / Product' and another called 'Button / Primary / Medium'. How should I map these to Dart class names and constructor calls?",
+      "expected_output": "Card/Product → organism DSProductCard (DS_PREFIX + PascalCase). Button/Primary/Medium → DSButton(variant: .primary, size: .md) — maps Figma variant/size properties to enum parameters.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response maps 'Card / Product' to DSProductCard as an organism with DS prefix",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response maps 'Button / Primary / Medium' to DSButton with variant: .primary and size: .md parameters",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains that Figma variant properties map to enum constructor parameters in Flutter",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

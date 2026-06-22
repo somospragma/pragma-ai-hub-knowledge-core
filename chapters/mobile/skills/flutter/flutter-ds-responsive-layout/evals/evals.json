@@ -1,0 +1,74 @@
+{
+  "skill_name": "flutter-ds-responsive-layout",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm implementing a ProductCard organism. On mobile (< 360px) it should show a compact vertical layout, and on larger screens it should show the standard horizontal layout. How do I implement this?",
+      "expected_output": "Uses LayoutBuilder with constraints.maxWidth < 360 breakpoint. Delegates to _buildCompact() and _buildDefault(). Explains that organisms should ALWAYS consider responsiveness. Uses ConstrainedBox for max widths instead of hardcoded SizedBox.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses LayoutBuilder with constraints.maxWidth to detect breakpoints",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses < 360px as the compact breakpoint",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response states organisms should ALWAYS consider responsiveness",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I have a horizontal Row with a product title Text on the left and a price badge on the right. On compact screens I'm getting overflow errors. How do I fix it without changing the Figma text?",
+      "expected_output": "Wraps title in Flexible or Expanded. Explicitly states TextOverflow.ellipsis only when Figma defines truncation. Never shorten, translate, or rewrite Figma text. Layout adapts, text is preserved.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response wraps the title Text in Flexible or Expanded to allow shrinking",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explicitly states that TextOverflow.ellipsis should only be used when Figma or the technical contract defines truncation",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response states that Figma literal text must NOT be shortened to avoid overflow — layout adapts instead",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I'm implementing a DS ProductCard for both mobile and desktop. What are the correct max widths to use for each platform, and what pattern should I use to switch between them?",
+      "expected_output": "Mobile max width: 327px, desktop max width: 610px. Uses platform parameter (TargetPlatform) and ConstrainedBox with BoxConstraints. Never hardcodes SizedBox with fixed width in production widgets (only in golden tests).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses 327px for mobile and 610px for desktop max widths",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses ConstrainedBox with BoxConstraints to apply max widths",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response warns against hardcoding fixed widths in production widgets (only acceptable in golden tests)",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

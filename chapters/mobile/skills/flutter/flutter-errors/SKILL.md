@@ -1,10 +1,11 @@
 ---
 id: flutter-errors
-version: 2.1.0
+version: 2.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-errors
 description: >
   Advanced error handling skill for Flutter with Dart 3.3+, using fpdart (Either/TaskEither), exception hierarchy with sealed classes, integration with Riverpod and BLoC/Cubit, and global error handling with FlutterError.onError and PlatformDispatcher. Use this skill whenever the user mentions errors in Flutter, exceptions, Either pattern, Result type, handling failures in REST APIs with Dio, Firebase, local databases (ObjectBox, Drift/SQLite), unexpected crashes, or when asking for a file structure for error handling. Also applies when the user wants to improve their error architecture, refactor scattered try/catch blocks, or implement error boundaries. Use it even if the user only mentions 'how to handle errors in Flutter' without specifying the exact pattern. Stack: Dart 3.3+, fpdart, flutter_bloc, riverpod_annotation.
 ---
@@ -20,8 +21,40 @@ These principles explain the *why* behind each decision — keep them in mind wh
 - **Errors are values, not exceptions.** Using `Either<Failure, T>` instead of `throw` lets the compiler enforce error handling at the call site, eliminating silent omissions.
 - **The domain does not know the error source.** Mapping to `Failure` in the datasource before the error propagates upward keeps the domain layer clean and testable without dependencies on Firebase, Dio, or SQLite.
 - **Every error has an explicit type.** `sealed class` makes pattern matching exhaustive: if you add a new error type, the compiler flags every place that ignores it.
-- **Error messages are resolved in the UI.** `Failure` carries a `FailureMessageKey`, not a hardcoded `String`, because the locale is only known in the presentation layer where `BuildContext` exists.
-- **Unexpected crashes are always captured.** Registering `FlutterError.onError` and `PlatformDispatcher.onError` in `main()` ensures no error escapes without being logged.
+- **Error messages are resolved in the UI, not in the domain.** `Failure` carries a `FailureMessageKey` enum value, NOT a hardcoded `String message`. The locale is only known in the presentation layer where `BuildContext` exists. The UI resolves the key to a translated string by calling `failure.localizedMessage(context)`. Hardcoded English strings in `Failure` are a violation — they prevent localization and couple domain to display.
+- **Dio errors go through two stages before becoming a `Failure`.** Stage 1: `DioErrorInterceptor` on the Dio client converts `DioException` → typed `AppException`. Stage 2: `ErrorHandler.map` in the datasource's `TaskEither.tryCatch` converts `AppException` → `Failure`. This two-stage pipeline keeps each layer responsible for one thing. Without `DioErrorInterceptor`, datasources must inspect raw DioException internals directly.
+- **Unexpected crashes are always captured.** Registering `GlobalErrorHandler.initialize()` (which sets `FlutterError.onError`, `PlatformDispatcher.onError`, and a `runZonedGuarded` wrapper) in `main()` before `runApp` ensures no error escapes. `BlocObserver` and `ProviderObserver` capture errors from state management layers.
+
+---
+
+## Critical Patterns at a Glance
+
+```dart
+// ✅ Failure carries a KEY, not a String
+final class NetworkFailure extends Failure {
+  const NetworkFailure();
+  @override
+  FailureMessageKey get messageKey => FailureMessageKey.network;
+}
+
+// ❌ WRONG — hardcoded String in Failure breaks i18n
+final class NetworkFailure extends Failure {
+  const NetworkFailure(this.message); // never do this
+  final String message;
+}
+
+// ✅ UI resolves the key to a translated string
+Text(failure.localizedMessage(context))  // calls messageKey.resolve(context)
+Text(failure.message)  // ❌ WRONG — string not translatable
+
+// ✅ Two-stage Dio error pipeline
+// Stage 1: DioErrorInterceptor (on Dio client) → AppException
+// Stage 2: ErrorHandler.map in datasource → Failure
+TaskEither<Failure, T> fetchSomething() => TaskEither.tryCatch(
+  () async { /* Dio call */ },
+  (error, stackTrace) => ErrorHandler.map(error, stackTrace),  // error is already AppException
+);
+```
 
 ---
 
@@ -111,15 +144,16 @@ TaskEither<Failure, T> fetchSomething() => TaskEither.tryCatch(
 ## Pre-delivery Checklist
 
 - [ ] Datasource uses `TaskEither.tryCatch` with `ErrorHandler.map`
-- [ ] Dio errors pass through `DioErrorInterceptor` before reaching the datasource
+- [ ] `DioErrorInterceptor` is registered on the Dio client — converts `DioException` → `AppException` **before** `ErrorHandler.map` runs
 - [ ] Repository returns `Either<Failure, T>` — no own `throw`
 - [ ] BLoC / Notifier performs explicit `fold()` — not `getOrElse` that hides the Left
 - [ ] Error state carries a `Failure`, not a `String`
-- [ ] `GlobalErrorHandler.initialize()` is called in `main()` before `runApp`
+- [ ] `GlobalErrorHandler.initialize()` is called in `main()` before `runApp` — registers `FlutterError.onError`, `PlatformDispatcher.onError`, and `runZonedGuarded`
+- [ ] `Bloc.observer` set to `AppBlocObserver` (BLoC projects) / `ProviderScope` includes `AppProviderObserver` (Riverpod projects)
 - [ ] Firebase exceptions mapped from `FirebaseException.code`
 - [ ] ObjectBox errors wrapped in `ObjectBoxException`
 - [ ] Drift errors wrapped in `DriftException` with `sqliteCode` if available
-- [ ] `Failure` uses `FailureMessageKey` — no hardcoded `String message`
+- [ ] `Failure` uses `FailureMessageKey` — **no hardcoded `String message`**
 - [ ] UI calls `failure.localizedMessage(context)` — never accesses `literalMessage` directly
 - [ ] Retry button uses `l.retryButton` from the ARB
 - [ ] Every new key exists in **both** `app_en.arb` and `app_es.arb`

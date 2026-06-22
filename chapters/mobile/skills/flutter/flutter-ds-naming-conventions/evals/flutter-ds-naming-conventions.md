@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-naming-conventions`  
-**Scanned:** 2026-06-03 17:42:45 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-naming-conventions`  
+**Scanned:** 2026-06-22 15:07:15 UTC  
 
 ## Risk Assessment
 
@@ -12,12 +12,13 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (3)
+## Components (4)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 81 | No |
-| `evals/flutter-ds-naming-conventions.md` | markdown | 30 | No |
+| `SKILL.md` | markdown | 122 | No |
+| `evals/evals.json` | json | 79 | No |
+| `evals/flutter-ds-naming-conventions.md` | markdown | 31 | No |
 | `references/NAMING-REFERENCE.md` | markdown | 37 | No |
 
 ## Issues (0)

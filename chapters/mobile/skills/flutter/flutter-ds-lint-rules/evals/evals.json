@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-ds-lint-rules",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I just wrote this DS button widget code and I want to audit it for lint violations before submitting:\n```dart\nclass MyButton extends StatelessWidget {\n  final Color bgColor;\n  final String text;\n  MyButton({required this.bgColor, required this.text});\n  \n  @override\n  Widget build(BuildContext context) {\n    return Container(\n      color: bgColor, // passed from outside\n      padding: EdgeInsets.all(16),\n      child: Text(text, style: TextStyle(fontSize: 14, color: Colors.white)),\n    );\n  }\n}\n```\nWhat rules does this violate?",
+      "expected_output": "Identifies: DS-001 hardcoded EdgeInsets.all(16), DS-002 Colors.white, DS-003 TextStyle with fontSize/fontWeight hardcoded, missing DS prefix (DS naming), missing const constructor. Categorizes each by severity.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies DS-001 or equivalent — hardcoded spacing value (EdgeInsets.all(16))",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response identifies DS-002 or equivalent — direct Colors.* usage (Colors.white)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response identifies DS-003 or equivalent — manual TextStyle with fontSize hardcoded",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "Response categorizes at least one violation as BLOCKER severity",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What's the correct way to configure analysis_options.yaml for a Flutter DS package using very_good_analysis?",
+      "expected_output": "Shows the very_good_analysis configuration with include directive and public_member_api_docs: false. Mentions the lint package is determined by project.config.yaml. Distinguishes this from flutter_lints config.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response shows include: package:very_good_analysis/analysis_options.yaml",
+          "type": "contains"
+        },
+        {
+          "id": "a2",
+          "text": "Response sets public_member_api_docs: false",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains that flutter_lints is the alternative configuration option",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What DS-specific lint rules apply to the DS package that wouldn't be covered by standard Dart/Flutter linting? Give me the full list of blockers.",
+      "expected_output": "Lists DS-001 through DS-015 with focus on the BLOCKER ones: DS-001 (hardcoded values), DS-002 (Colors.*), DS-003 (manual TextStyle), DS-005 (1 widget per file), DS-007 (unauthorized deps). Explains scope vs flutter-dart-coding-standard.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies all 5 BLOCKER rules: DS-001, DS-002, DS-003, DS-005, DS-007",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response clarifies scope: DS-specific rules (tokens, prefix, structure) vs general Dart/Flutter rules in flutter-dart-coding-standard",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions DS-007 unauthorized dependencies as BLOCKER — DS may only depend on flutter, own DS package, and dev deps (alchemist, widgetbook, flutter_test)",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

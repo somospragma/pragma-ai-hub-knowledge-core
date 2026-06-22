@@ -1,0 +1,69 @@
+{
+  "skill_name": "flutter-ds-testing-patterns",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to write widget tests for a new DSButton atom with variants (primary, secondary, ghost), states (default, loading, disabled), and an onPressed callback. What are the required test sections and what patterns should I follow?",
+      "expected_output": "Lists 6 required sections: basic rendering, states, variants, interactions, defaults, accessibility. Uses pumpApp helper. AAA pattern. Names follow 'should [verb] when [condition]'. Variant loop pattern. Disabled state verifies callback not invoked.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response covers all 6 required test sections: basic rendering, states, variants, interactions, defaults, accessibility",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses pumpApp helper (not pumpWidget directly) to mount widgets",
+          "type": "contains"
+        },
+        {
+          "id": "a3",
+          "text": "Response shows the disabled state test verifying that the callback is NOT invoked when tapped",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "How do I efficiently test all 3 variants of my DSButton without writing 3 separate copy-paste tests?",
+      "expected_output": "Shows the variant loop pattern: for (final variant in DSButtonVariant.values) { testWidgets('should render ${variant.name}', ...) }. Explains test independence — each test stands alone.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses a for loop over WidgetVariant.values to iterate all variants",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response keeps each test independent — no shared mutable state between iterations",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My DSButton test is crashing when I pass null for the onPressed callback. How should I write a null-safety test to verify it doesn't crash?",
+      "expected_output": "Shows testWidgets with null onPressed, calls pumpApp with widget, taps widget, asserts no exception thrown. Explains that null callbacks must not crash — test passes if no exception.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response shows a test that pumps the widget with onPressed: null (not provided or explicitly null)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response taps the widget and verifies no exception is thrown — passing without an exception is the success condition",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response follows the 'should not crash when callback is null' naming convention",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

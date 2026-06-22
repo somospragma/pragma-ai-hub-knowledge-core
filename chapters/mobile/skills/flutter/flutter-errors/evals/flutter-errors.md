@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-errors`  
-**Scanned:** 2026-06-03 17:43:02 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-errors`  
+**Scanned:** 2026-06-22 17:29:15 UTC  
 
 ## Risk Assessment
 
@@ -12,12 +12,13 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (11)
+## Components (12)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 127 | No |
-| `evals/flutter-errors.md` | markdown | 38 | No |
+| `SKILL.md` | markdown | 160 | No |
+| `evals/evals.json` | json | 92 | No |
+| `evals/flutter-errors.md` | markdown | 39 | No |
 | `references/bloc_integration.md` | markdown | 221 | No |
 | `references/dio_interceptor.md` | markdown | 201 | No |
 | `references/exceptions.md` | markdown | 204 | No |

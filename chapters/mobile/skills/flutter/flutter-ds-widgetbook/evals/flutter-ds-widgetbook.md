@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-ds-widgetbook`  
-**Scanned:** 2026-06-03 17:42:58 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-widgetbook`  
+**Scanned:** 2026-06-22 15:56:50 UTC  
 
 ## Risk Assessment
 
@@ -12,13 +12,14 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (10)
+## Components (11)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 142 | No |
+| `SKILL.md` | markdown | 118 | No |
 | `assets/knobs_reference.md` | markdown | 338 | No |
-| `evals/flutter-ds-widgetbook.md` | markdown | 37 | No |
+| `evals/evals.json` | json | 79 | No |
+| `evals/flutter-ds-widgetbook.md` | markdown | 38 | No |
 | `references/coverage_audit.md` | markdown | 237 | No |
 | `references/features_guide.md` | markdown | 370 | No |
 | `references/mocks.md` | markdown | 207 | No |

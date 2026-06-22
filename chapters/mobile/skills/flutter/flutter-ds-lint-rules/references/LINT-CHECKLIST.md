@@ -8,7 +8,7 @@ Before delivering code, verify:
 - [ ] **DS-004**: No inline/block/doc comments unless fundamental and justified?
 - [ ] **DS-005**: Only 1 public widget in the file?
 - [ ] **DS-006**: Constructor is `const`?
-- [ ] **DS-007**: Only authorized imports (Flutter + DS package)?
+- [ ] **DS-007**: Only authorized imports (Flutter SDK + own DS package; dev only: `alchemist`, `widgetbook`, `flutter_test`)?
 - [ ] **DS-008**: All parameters are named?
 - [ ] **DS-009**: Package imports (no `../`)?
 - [ ] **DS-010**: No commented or dead code?

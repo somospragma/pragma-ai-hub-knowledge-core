@@ -1,0 +1,74 @@
+{
+  "skill_name": "flutter-ds-widget-anatomy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "What's the correct internal structure order for a Flutter DS widget file? I'm creating a DSBadge atom with primary/secondary variants and default/disabled/loading states.",
+      "expected_output": "Shows strict order: 1. Imports (package only, never relative) 2. Widget class with const constructor/properties/computed getters/build/build* methods/resolve* methods 3. Enums (State, Variant, Size) 4. Private helper classes. Emphasizes 1 public widget per file.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response shows the 4-section order: imports → widget class → enums → private helpers",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response places enums AFTER the widget class in the same file",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response states 1 public widget per file is mandatory — no exceptions",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Show me the correct structure for a build() method in a DS widget with loading, disabled, and default states. It should call separate private methods.",
+      "expected_output": "Shows build() using switch expression on state → delegates to _buildLoading(), _buildDefault(). Disabled uses Opacity(0.5, child: IgnorePointer(child: _buildDefault())). _resolve* methods handle token lookup.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses a switch expression on state inside build() that delegates to private _build* methods",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response implements disabled state as Opacity(opacity: 0.5, child: IgnorePointer(child: _buildDefault()))",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes _resolve* private methods for token lookup per variant/state (e.g., _resolveBackgroundColor)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My DS widget file is getting large with a private helper widget at the bottom. When is it acceptable to have private helper classes in the same file?",
+      "expected_output": "Private helpers allowed only if they're simple (< 30 lines). If complex, extract to separate files. The file limit is ~200 lines overall. Named with underscore prefix (_HelperClass). Explains why: 1 public widget rule but private helpers are internal implementation.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response states private helpers are only acceptable if simple — under ~30 lines each",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions the ~200 lines per file limit for the whole file",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response confirms that inline comments should be avoided by default — only allowed for fundamental non-obvious technical notes",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

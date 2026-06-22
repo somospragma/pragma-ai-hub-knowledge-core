@@ -1,6 +1,6 @@
 ---
 id: flutter-feature-development
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: skill
 chapter: mobile
@@ -144,7 +144,7 @@ dev_dependencies:
 
 ### Step 2: Define Domain Layer
 
-Start with domain layer entities, repositories, and usecases:
+Start with domain layer entities, repositories, and usecases. The domain layer must have **no Flutter imports** — it is pure Dart. Entities use Equatable (via `props` override) for value comparison. Repository interfaces return `Result<T, Exception>` or `Either<Failure, T>` to make error handling explicit at the call site.
 
 **Entity:**
 ```dart
@@ -397,17 +397,18 @@ export 'src/routes/routes.dart';
 
 Before submitting a feature for code review:
 
-- [ ] All files created and organized per template
+- [ ] All files created and organized per template — `di/` directory is **inside the feature** (`lib/src/features/{feature}/di/`), not at the app level
 - [ ] Domain layer implemented (entities, repositories, usecases)
 - [ ] Data layer implemented (models, datasources, mappers, repositories)
 - [ ] Presentation layer implemented (states, cubits, pages, widgets)
-- [ ] DI configuration complete and tested
+- [ ] DI configuration complete and tested — `FeatureRegisterModule` uses `@module` + `@Named` to distinguish remote/local datasources when both implement the same interface
+- [ ] **No `GetIt.instance.get()` calls inside Widgets or Pages** — cubits and dependencies are injected via BlocProvider/constructor, not fetched directly in UI code
 - [ ] All unit tests written and passing (target: >80% coverage)
 - [ ] All files formatted with `dart format`
 - [ ] No linting errors (`dart analyze`)
 - [ ] Code follows naming conventions
 - [ ] Documentation added where needed
-- [ ] Public API exports correct in barrel files
+- [ ] Public API exports correct in barrel files — **data layer internals (models, datasources, mappers, repository impls) are NOT exported**
 - [ ] Feature can be imported and used
 
 ## Testing Strategy

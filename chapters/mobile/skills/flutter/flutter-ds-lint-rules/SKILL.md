@@ -1,10 +1,11 @@
 ---
 id: flutter-ds-lint-rules
-version: 1.2.0
+version: 1.3.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-lint-rules
 description: >
   Linting and code quality rules for Design System components.
   Use when writing code, auditing code quality, configuring analysis_options,
@@ -25,7 +26,7 @@ description: >
 | DS-004 | No inline/block/doc comments unless fundamental and justified | 🟡 WARNING | No |
 | DS-005 | 1 public widget per file | 🔴 BLOCKER | No |
 | DS-006 | Const correctness | 🟡 WARNING | Yes |
-| DS-007 | No unauthorized dependencies | 🔴 BLOCKER | No |
+| DS-007 | No unauthorized dependencies (allowed: `flutter` SDK, own DS package; dev: `alchemist`, `widgetbook`, `flutter_test`) | 🔴 BLOCKER | No |
 | DS-008 | Named parameters always | 🟡 WARNING | No |
 | DS-009 | Package imports (no relative) | 🟡 WARNING | Yes |
 | DS-010 | No dead or commented code | 🟡 WARNING | No |

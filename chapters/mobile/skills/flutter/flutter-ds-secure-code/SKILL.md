@@ -1,10 +1,11 @@
 ---
 id: flutter-ds-secure-code
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-ds-secure-code
 description: >
   Security rules for Design System code based on OWASP Mobile Application
   Security and Pragma standards. Use when auditing code security, validating
@@ -23,6 +24,28 @@ description: >
 4. Secure communication (HTTPS/TLS)
 5. Keep dependencies updated
 6. Handle errors without exposing internal information
+
+## Authorized Dependencies
+
+DS components are UI-only. They must not import infrastructure, networking, or persistence packages. The allowed dependency list is strict:
+
+| Type | Allowed packages |
+|------|-----------------|
+| **Production** | `flutter` / `material.dart`, own DS package (e.g., `pragma_ds`) |
+| **Dev only** | `alchemist`, `widgetbook`, `flutter_test` |
+| **Forbidden** | `http`, `dio`, `shared_preferences`, `flutter_secure_storage`, `firebase_*`, any API/network/storage package |
+
+Adding any forbidden package to a DS widget is a **BLOCKER** — it violates both the Single Responsibility Principle and the DS security boundary. HTTP calls, data persistence, and encryption belong in the feature/data layer, not in DS widgets.
+
+```dart
+// ✅ CORRECT — DS widget stays pure UI
+import 'package:flutter/material.dart';
+import 'package:pragma_ds/pragma_ds.dart';
+
+// ❌ FORBIDDEN in DS production code
+import 'package:http/http.dart';              // DS doesn't make requests
+import 'package:shared_preferences/...';      // DS doesn't persist data
+```
 
 ## DS-Specific Rules
 
@@ -56,21 +79,6 @@ String get _displayText => isMasked ? '•' * text.length : text;
 print('User input: $sensitiveData');
 ```
 
-### Authorized Dependencies Only
-
-```dart
-// ✅ DS may only depend on:
-//   - flutter/material.dart
-//   - own DS package
-//   - alchemist (dev only)
-//   - widgetbook (dev only)
-//   - flutter_test (dev only)
-
-// ❌ FORBIDDEN
-import 'package:http/http.dart';             // DS doesn't make requests
-import 'package:shared_preferences/...';      // DS doesn't persist data
-```
-
 ### Safe Error Handling
 
 ```dart
@@ -96,7 +104,7 @@ onPressed!();
 
 - [ ] No `print()` in production code
 - [ ] No sensitive data in logs or error messages
-- [ ] No unauthorized dependencies
+- [ ] No unauthorized dependencies (only flutter, own DS package; dev: alchemist, widgetbook, flutter_test)
 - [ ] Text inputs with `maxLength` and/or `inputFormatters`
 - [ ] Nullable callbacks with safe call (`?.call()`)
 - [ ] No unnecessary force unwrap (`!`)
