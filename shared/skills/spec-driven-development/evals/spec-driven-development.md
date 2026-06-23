@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** spec-driven-development  
-**Source:** `/Users/jrestrepo/Develop/WorkSpace/somospragma/pragma-ai-hub-knowledge-core/shared/skills/spec-driven-development`  
-**Scanned:** 2026-06-23 00:40:28 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/shared/skills/spec-driven-development`  
+**Scanned:** 2026-06-23 01:01:08 UTC  
 
 ## Risk Assessment
 
