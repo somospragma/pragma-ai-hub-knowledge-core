@@ -26,6 +26,10 @@ The decision follows the atomic level of the component:
 
 **What counts as "non-obvious" for molecules?** Conditional sub-component rendering, state propagation across children, layout rules that depend on data combinations — anything where the *why* of the composition isn't clear from the code structure alone. A straightforward `Label + Input + ErrorText` molecule is obvious; a `SearchBar` that swaps content based on mode is not.
 
+> **Important:** "Complexity" alone is not the threshold for molecules. Complexity criteria like "has multiple variants" or "is used in many features" do NOT trigger README — only ambiguous composition logic does. When in doubt, apply the two-developer test.
+
+
+
 ## README Template
 
 The full starter template is at [assets/COMPONENT-README-TEMPLATE.md](assets/COMPONENT-README-TEMPLATE.md). Use it as your scaffold.
@@ -33,6 +37,8 @@ The full starter template is at [assets/COMPONENT-README-TEMPLATE.md](assets/COM
 ## Required Sections
 
 These 9 sections are mandatory for every README. Don't add, remove, or rename them — consistency across components lets developers navigate any README without relearning the structure.
+
+> **DS-specific sections** (not in generic Flutter docs): **Enums** (DS enum tables), **Tokens** (DS token wiring), **Figma** (design file URL + atomic level), and **Anti-patterns** (explicit ❌ misuse list). These four are what differentiate a DS README from a standard Flutter component doc — always include them.
 
 1. **Title** — Component name (`DSComponentName`) + one-sentence description
 2. **Usage** — A Dart code example that **actually compiles**. No pseudo-code. Copy-paste must work.

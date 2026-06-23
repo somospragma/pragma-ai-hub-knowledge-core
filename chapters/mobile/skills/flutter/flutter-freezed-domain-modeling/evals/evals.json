@@ -1,0 +1,101 @@
+{
+  "skill_name": "flutter-freezed-domain-modeling",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "entity-vs-dto-json",
+      "prompt": "I'm modeling a Product in my Flutter Clean Architecture app. Should the domain entity have fromJson/toJson? Where does JSON serialization belong?",
+      "expected_output": "Domain entities NEVER have fromJson/toJson. JSON serialization belongs exclusively in the data layer (DTOs). ProductDto has @freezed + fromJson/toJson. ProductMapper converts between them. Product entity has no json annotation.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response explicitly states domain entities NEVER have fromJson/toJson — JSON is a data layer concern",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response places JSON serialization in a DTO class in the data layer, not in the entity",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions a Mapper (or equivalent) to convert between DTO and domain entity",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "fpdart-match-vs-fold",
+      "prompt": "I'm migrating from dartz to fpdart in my Flutter project. What changes do I need to make to my Either handling code?",
+      "expected_output": "Main change: .fold((l) => ..., (r) => ...) becomes .match((l) => ..., (r) => ...) in fpdart. Right/Left unchanged. Option/Some/None mostly unchanged. TaskEither available for async composition. Shows migration table.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies that .fold() becomes .match() in fpdart — this is the primary breaking change",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response correctly states that Right(value) and Left(failure) usage is unchanged",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions TaskEither as a new addition in fpdart for async composition",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "sealed-class-bloc-state",
+      "prompt": "Show me how to create BLoC states for a product detail screen using Freezed. The screen can be loading, showing a product, or in an error state.",
+      "expected_output": "Uses @freezed sealed class ProductState with factory constructors for initial/loading/success/error. Uses Dart 3 switch expression for exhaustive matching in build(). State class is sealed (not plain class) for Freezed 3.x compatibility and exhaustive switch.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses @freezed sealed class (not just @freezed class) for the union state type",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows Dart 3 switch expression for exhaustive pattern matching in the widget/build method",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response includes all required states: at minimum loading, success (with product data), and error",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "value-object-extension-type",
+      "prompt": "I want to model an Email value object and a Money value object in my Flutter domain layer using Dart 3.3+. How do I do this without Freezed?",
+      "expected_output": "Uses Dart 3.3+ extension types: extension type Email(String value) implements String with factory Email.parse() that validates, tryParse(), and _isValid(). extension type Money(double value) with arithmetic operators. Both are zero-cost wrappers — no runtime overhead.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses Dart 3.3+ extension types (extension type Email(String value)) — not a class wrapper",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes a factory Email.parse() constructor that validates the value and throws on invalid input",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response shows Email.tryParse() as a null-returning alternative for safe parsing",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "skill_name": "flutter-isolates",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "api-selection-one-shot",
+      "prompt": "I need to parse a large JSON response (about 5MB) in Flutter without blocking the UI. What's the recommended way to do this in modern Dart?",
+      "expected_output": "Use Isolate.run() — it's the modern preferred API (Dart 2.19+) for one-shot tasks. It's preferred over compute(). Annotate the entry function with @pragma('vm:entry-point'). The function must be top-level or static.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends Isolate.run() as the preferred modern API for one-shot tasks (not compute() as primary recommendation)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions the entry point function must be top-level or static",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions @pragma('vm:entry-point') annotation to prevent AOT tree-shaking",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "what-belongs-in-isolate",
+      "prompt": "My team is debating what should go in isolates. Should we put our Dio HTTP requests in an isolate? What about image resizing? Database queries with Drift?",
+      "expected_output": "HTTP requests (Dio) should NOT go in isolates — they're already async/non-blocking. Drift/ObjectBox handle their own isolates internally. Image resizing SHOULD go in an isolate — it's CPU-intensive. The rule: if it takes >16ms on the main thread, isolate it.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response correctly states network requests (Dio) should NOT go in isolates — they are already non-blocking async",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response correctly identifies image processing/resizing as a good use case for isolates (CPU-intensive)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response correctly notes Drift (or ObjectBox) handles its own isolate management internally",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "worker-manager-cancellation",
+      "prompt": "I'm using isolates to process items in a list. The user can navigate away before processing completes. How do I cancel in-progress isolate work when the widget is disposed?",
+      "expected_output": "Uses worker_manager with cancelable tasks. Cancel the cancelable in BLoC close() or widget dispose(). Shows workerManager.execute() returning a CancelableOperation. Cancel on navigation away.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses worker_manager (or similar) with cancelable task execution",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response cancels the isolate work in dispose() or BLoC close() — not leaving it running after widget is gone",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

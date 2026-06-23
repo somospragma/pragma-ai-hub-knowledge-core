@@ -2,15 +2,15 @@
 
 **Skill:** spec-driven-development  
 **Source:** `/Users/jrestrepo/Develop/WorkSpace/somospragma/pragma-ai-hub-knowledge-core/shared/skills/spec-driven-development`  
-**Scanned:** 2026-06-12 17:09:59 UTC  
+**Scanned:** 2026-06-23 00:40:28 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 45/100 |
-| Severity | MEDIUM |
-| Recommendation | CAUTION |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
 ## Components (20)
 
@@ -27,7 +27,7 @@
 | `assets/requirements.md` | markdown | 109 | No |
 | `assets/tasks.md` | markdown | 132 | No |
 | `evals/evals.json` | json | 302 | No |
-| `evals/spec-driven-development.md` | markdown | 78 | No |
+| `evals/spec-driven-development.md` | markdown | 48 | No |
 | `references/example-workflows.md` | markdown | 108 | No |
 | `references/sdd-overview.md` | markdown | 114 | No |
 | `references/subagent-protocol.md` | markdown | 147 | No |
@@ -37,40 +37,9 @@
 | `scripts/pyproject.toml` | toml | 30 | No |
 | `scripts/validate_context.py` | python | 241 | Yes |
 
-## Issues (3)
+## Issues (0)
 
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
-
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
-
-### 🔴 HIGH: SC4
-
-**Location:** `scripts/pyproject.toml:14`  
-**Confidence:** 80%  
-
-**Message:** Known Vulnerable Dependency: requires-python — 1 advisory(ies): MAL-2025-41747 (Malicious code in requires-python (PyPI))
-
-**Remediation:** Update the dependency to a patched version that addresses the known CVE. Check OSV (osv.dev) or NVD for details on the vulnerability.
-
----
+No security issues detected.
 
 ## Metadata
 

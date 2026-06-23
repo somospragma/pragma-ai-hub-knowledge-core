@@ -1,0 +1,42 @@
+{
+  "skill_name": "flutter-firebase-analytics",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "strategy-pattern-setup",
+      "prompt": "I want to implement analytics in my Flutter app but I might need to switch from Firebase to Mixpanel later. How should I structure the analytics layer so changing providers doesn't touch business logic?",
+      "expected_output": "AnalyticsProvider interface in domain. Adapters: FirebaseAnalyticsAdapter, MixpanelAnalyticsAdapter, NoOpAnalyticsAdapter. DI binding AnalyticsProvider→FirebaseAnalyticsAdapter. CompositeAnalyticsAdapter for multi-provider fan-out.",
+      "files": [],
+      "assertions": [
+        {"id": "a1", "text": "Response creates an AnalyticsProvider abstract interface — not a concrete Firebase class", "type": "llm_judge"},
+        {"id": "a2", "text": "Response creates at least FirebaseAnalyticsAdapter and NoOpAnalyticsAdapter implementing the interface", "type": "llm_judge"},
+        {"id": "a3", "text": "Response binds AnalyticsProvider to FirebaseAnalyticsAdapter via DI — changing the provider only requires a DI rebind", "type": "llm_judge"},
+        {"id": "a4", "text": "Response mentions CompositeAnalyticsAdapter for sending events to multiple providers simultaneously", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "screen-tracking-gorouter",
+      "prompt": "How do I set up automatic screen tracking in Flutter when using go_router?",
+      "expected_output": "AnalyticsRouteObserver registered on GoRouter observers. Uses AnalyticsProvider interface not Firebase SDK directly. Sets screen name on each navigation.",
+      "files": [],
+      "assertions": [
+        {"id": "a1", "text": "Response uses a GoRouter observer (NavigatorObserver) for automatic screen tracking", "type": "llm_judge"},
+        {"id": "a2", "text": "Response uses AnalyticsProvider interface (not Firebase SDK directly) in the observer", "type": "llm_judge"},
+        {"id": "a3", "text": "Response adds the observer to GoRouter observers list", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "consent-and-event-naming",
+      "prompt": "I need to implement GDPR-compliant analytics — disable collection until the user consents. Also, what are the correct event naming conventions?",
+      "expected_output": "setAnalyticsCollectionEnabled(false) on init, true after consent. Event names: snake_case, action-oriented (product_viewed not ProductViewed). No color knobs, no screen_shown events.",
+      "files": [],
+      "assertions": [
+        {"id": "a1", "text": "Response disables analytics collection on initialization and enables it only after user consent", "type": "llm_judge"},
+        {"id": "a2", "text": "Response uses snake_case event names that are action-oriented (e.g. product_viewed, checkout_started)", "type": "llm_judge"},
+        {"id": "a3", "text": "Response warns against generic event names like button_clicked or screen_shown — recommends descriptive action-oriented names", "type": "llm_judge"}
+      ]
+    }
+  ]
+}

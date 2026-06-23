@@ -1,10 +1,11 @@
 ---
 id: flutter-generated-code-validation
-version: 2.1.0
+version: 2.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-generated-code-validation
 description: >
   Validates, runs, and troubleshoots Flutter code generation: build_runner, Freezed, json_serializable, Injectable, AutoRoute. Use this skill when the user mentions build_runner, generated files (.g.dart, .freezed.dart, .gr.dart, .config.dart), 'run code generation', 'my generated code is broken', 'build failed', annotations such as @freezed, @injectable, @JsonSerializable, @AutoRouterConfig, or questions about configuring code generation. Apply BEFORE and AFTER modifying any annotated Dart class. Stack: build_runner, freezed, freezed_annotation, json_serializable, json_annotation, injectable, injectable_generator, auto_route, auto_route_generator.
 ---
@@ -41,7 +42,8 @@ dev_dependencies:
 - **`freezed_annotation` 3.x** — major version bump; incompatible with 2.x. Update both packages together.
 - **`when()`/`map()` removed in 3.0, restored in a later 3.x patch** — they are available again, but Dart 3 `switch` expressions are the canonical and recommended approach.
 - **Classes must be `abstract`, `sealed`, or manually implement `_$MyClass`** — plain `class` without one of these will throw at generation time.
-- **`sealed` is the preferred modifier for union types** — enables exhaustive `switch` without `default`.
+- **Use `sealed` for union types** (BLoC states, events, result types) — enables exhaustive `switch` without `default`.
+- **Use `abstract` for DTOs and simple immutable classes** — single constructor, no union behavior needed.
 - **Immutable collections by default** — `List`, `Map`, `Set` in generated classes are `UnmodifiableListView`/`UnmodifiableMapView`/`UnmodifiableSetView`. Disable per class with `@Freezed(makeCollectionsUnmodifiable: false)`.
 - **`MyClass._()` can now accept parameters** — enables inheritance and non-constant default values (see Mixed Mode below).
 - **Mixed Mode** — Freezed now supports both factory-based and regular constructor syntax in the same class.
@@ -184,6 +186,15 @@ class User with _$User {
 ```
 
 ### Freezed 3.x — class must be abstract, sealed, or implement _$MyClass
+
+**Rule: every `@freezed` class must be declared with one of these modifiers:**
+
+| Class type | Modifier to use | Why |
+|---|---|---|
+| Union types (BLoC states, events, results) | `sealed` | Enables exhaustive `switch` without `default` — compiler enforces all cases |
+| DTOs and simple immutable classes | `abstract` | Single constructor, no union — `abstract` is correct |
+| Classes needing inheritance or non-constant defaults | (implements `_$MyClass` manually) | Advanced use only — see Mixed Mode |
+
 ```dart
 // ❌ Freezed 3.x will throw at generation time
 @freezed
@@ -199,7 +210,7 @@ sealed class MyState with _$MyState {
   const factory MyState.success(String data) = _Success;
 }
 
-// ✅ Or abstract for simple immutable classes
+// ✅ Use abstract for simple immutable classes and DTOs
 @freezed
 abstract class UserDto with _$UserDto {
   const factory UserDto({required String id}) = _UserDto;

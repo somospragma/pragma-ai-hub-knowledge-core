@@ -1,6 +1,6 @@
 ---
 id: flutter-mason-clean-project
-version: 2.0.0
+version: 2.1.0
 scope: stack
 type: skill
 chapter: mobile
@@ -18,6 +18,8 @@ metadata:
 
 ## Quick Overview
 
+**⚠️ Scope**: This skill is **exclusively** for Flutter project generation using Mason's `flutter_clean_project` brick. It does not cover application development, feature implementation, or infrastructure setup beyond project scaffolding.
+
 `flutter_clean_project` is a Mason brick that generates a complete Flutter monorepo scaffold with:
 
 - **Multiple apps**: Main app + WidgetBook companion app (for design system presentation)
@@ -28,7 +30,13 @@ metadata:
 
 **Use this skill when**: Starting a new Flutter project, setting up monorepo structure, defining design tokens, creating features within the new app.
 
-## Prerequisites
+## Security & Prerequisites
+
+**⚠️ Important Security Notes**:
+- This skill guides you through **generation steps only**. Your system must have Flutter, Dart, and Mason already installed.
+- System package installation (e.g., `brew install`, `apt-get`) is **your responsibility**. This skill provides informational commands only.
+- Destructive operations (removing directories, modifying system files) require **your explicit confirmation**. Never run commands blindly.
+- Environment PATH modifications are **optional**; document any changes for your team.
 
 Before generating a Flutter Clean Project, ensure:
 
@@ -54,9 +62,16 @@ mason make flutter_clean_project -o /path/to/output
 ```bash
 mason make flutter_clean_project -o /path/to/output -c config.json
 # All variables read from JSON, no prompts
+# Note: the flag is -c (short), not --config-path
 ```
 
 Create `config.json` starting from the brick's `config-example.json` or See [config-schema-reference.md](references/config-schema-reference.md) for complete schema with examples.
+
+> **Critical config rules (full schema in config-schema-reference.md):**
+> - `organization`: plain company name, all lowercase, no spaces — e.g., `"mycompany"` (NOT `"com.mycompany"`)
+> - Hex color values: **no `#` prefix** — e.g., `"1565c0"` not `"#1565c0"`
+> - Color structure: use `isMaterialColor: true` + `value` array of `{level, value}` objects (levels 50–900)
+> - `fontFamily`: exact Google Fonts names in an array — e.g., `["Roboto", "Poppins"]`
 
 ### Step 2: Generate Project Structure
 
@@ -174,7 +189,7 @@ When setting `organization`, `name`, and `prefix` values, follow these casing ru
 
 | Field | Format | Example | Usage |
 |-------|--------|---------|-------|
-| **organization** | lowercase, no spaces | `mycompany` | Bundle ID: `com.mycompany.myapp` |
+| **organization** | lowercase, no spaces | `mycompany` | Plain company name only — bundle ID `com.mycompany.myapp` is built by the brick automatically |
 | **name** | camelCase or lowercase | `mobileApp` or `mobile_app` | Directory: `mobile_app/`, workspace name |
 | **prefix** | lowercase, short | `app` or `ui` | Files: `app_radius.dart`, Classes: `AppRadius` |
 
@@ -202,6 +217,8 @@ Result: Invalid characters, spaces, inconsistent casing in generated files.
 
 ## Common Issues
 
+**⚠️ Before reporting issues**: Verify your system has Flutter, Dart, Melos, and Mason installed. This skill cannot install system dependencies for you.
+
 **Issue: "Mason brick not found"**
 - Ensure brick is installed globally: `mason add -g flutter_clean_project --git-url git@github.com:somospragma/pragma-mason-bricks.git --git-path bricks/flutter_clean_project --git-ref develop`
 - Verify brick name exactly matches (case-sensitive)
@@ -209,6 +226,18 @@ Result: Invalid characters, spaces, inconsistent casing in generated files.
 **Issue: "flutter create failed"**
 - Confirm Flutter SDK is in PATH: `flutter --version`
 - Check disk space in output directory
+- **Note**: If Flutter is not installed, see your system's Flutter installation guide—this skill does not cover installation.
+
+## Out of Scope
+
+This skill **does not cover**:
+- System package manager usage (`brew`, `apt-get`, `pacman`, `choco`, etc.)
+- Modifying user system environment variables permanently
+- Installing dependencies on your system
+- Infrastructure or CI/CD configuration
+- Application feature development post-generation
+- Mobile app distribution or publishing
+- Dependency version management beyond initial bootstrap
 
 **Issue: "Bundle ID generation failed" or rename skipped**
 - Optional: `rename` package not installed
@@ -251,7 +280,27 @@ Result:
 
 ## Integration with Features
 
-After creating the base project, add features using **skill-flutter-clean-feature**. See [features-integration-reference.md](references/features-integration-reference.md) for detailed steps.
+After creating the base project, add features using the **`flutter_clean_feature`** Mason brick:
+
+```bash
+# Navigate to your generated project root
+cd my_app
+
+# Create a feature config (profile_config.json):
+# {
+#   "name": "profile",
+#   "stateManagementType": "bloc",   // or "cubit"
+#   "packages": ["commons"],
+#   "shareds": ["l10n"],
+#   "isFromCleanProject": true
+# }
+
+mason make flutter_clean_feature -o features -c profile_config.json
+```
+
+Then integrate: add the feature to the main app's `pubspec.yaml`, register its DI module in `AppInjector`, and add its routes to your GoRouter config.
+
+See [features-integration-reference.md](references/features-integration-reference.md) for the full workflow including DI, routes, and pubspec wiring.
 
 ## For Extended Guidance
 

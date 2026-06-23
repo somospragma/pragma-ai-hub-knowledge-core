@@ -1,10 +1,11 @@
 ---
 id: flutter-firebase-analytics
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-firebase-analytics
 description: >
   Implements analytics event tracking and user properties in Flutter using Firebase Analytics as the primary provider. Uses a Strategy + Adapter pattern so the analytics provider can be swapped (Firebase → Mixpanel → Amplitude → custom) without touching domain or presentation layers. Covers screen tracking via go_router observer, custom events, user properties, and consent management.
 ---
@@ -32,6 +33,11 @@ See the reference files for complete patterns and code examples.
 
 ## Provider Strategy Pattern
 
+The key architectural constraint: **nothing in BLoC, domain, or Cubits imports Firebase Analytics SDK directly.** All analytics calls go through the `AnalyticsProvider` interface. This means:
+- Swapping providers (Firebase → Mixpanel) is a single DI rebind — zero changes in business code
+- Tests use `NoOpAnalyticsAdapter` — no Firebase SDK needed in tests
+- Multiple providers simultaneously use `CompositeAnalyticsAdapter` — fan-out to Firebase + Mixpanel in one call
+
 ```
 Domain (AnalyticsProvider interface)
   ↓ abstract interface class — knows nothing about Firebase or any SDK
@@ -41,7 +47,48 @@ Data (AnalyticsProviderAdapter)
   ├── CompositeAnalyticsAdapter  implements AnalyticsProvider  ← fan-out to multiple
   └── NoOpAnalyticsAdapter       implements AnalyticsProvider  ← tests / debug
 DI
-  └── bind AnalyticsProvider → FirebaseAnalyticsAdapter  ← change to swap
+  └── bind AnalyticsProvider → FirebaseAnalyticsAdapter  ← change this line to swap
+```
+
+### Screen tracking observer uses the interface, not Firebase directly
+
+The `AnalyticsRouteObserver` must inject `AnalyticsProvider`, not `FirebaseAnalytics`. Using the interface keeps the observer swappable along with the rest of the analytics stack:
+
+```dart
+// ✅ Observer uses the interface
+class AnalyticsRouteObserver extends NavigatorObserver {
+  AnalyticsRouteObserver(this._analytics);
+  final AnalyticsProvider _analytics;  // interface, not FirebaseAnalytics
+
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    final name = route.settings.name;
+    if (name != null) _analytics.setCurrentScreen(name);
+  }
+}
+
+GoRouter(
+  observers: [AnalyticsRouteObserver(ref.read(analyticsProvider))],
+  routes: [...],
+)
+
+// ❌ DO NOT inject FirebaseAnalytics directly — defeats swappability
+class AnalyticsRouteObserver extends NavigatorObserver {
+  AnalyticsRouteObserver(this._firebase);
+  final FirebaseAnalytics _firebase;  // SDK coupling — wrong
+}
+```
+
+### CompositeAnalyticsAdapter for multi-provider scenarios
+
+When you need to send events to both Firebase and Mixpanel simultaneously:
+
+```dart
+// DI binding
+bind AnalyticsProvider → CompositeAnalyticsAdapter([
+  FirebaseAnalyticsAdapter(FirebaseAnalytics.instance),
+  MixpanelAnalyticsAdapter(mixpanel),
+])
 ```
 
 ---

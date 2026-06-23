@@ -1,0 +1,67 @@
+{
+  "skill_name": "flutter-l10n-i18n-strategy",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "package-selection-default",
+      "prompt": "I want to add multi-language support to my Flutter app. Which localization package should I use and why?",
+      "expected_output": "Default recommendation: flutter_localizations + gen-l10n (official Flutter SDK, no extra package, ARB files, compile-time safe). slang as alternative when JSON/YAML format needed or Flutter-independent. NOT easy_localization as default (runtime parsing, less safe). Explains the tradeoffs.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends flutter_localizations + gen-l10n as the default choice — it is the official Flutter SDK approach requiring no extra package",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions slang as an alternative for type-safe JSON/YAML support, not as the default",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response does NOT recommend easy_localization as the default (it has runtime parsing and is less type-safe)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "rtl-layout-directional",
+      "prompt": "We're adding Arabic support to our app. Some of our layouts use EdgeInsets.only(left: 16) for padding. Will this work correctly in RTL mode?",
+      "expected_output": "No — EdgeInsets.only(left:) is hardcoded to the left, which breaks RTL. Use EdgeInsetsDirectional.only(start: 16) instead. 'start' maps to left in LTR and right in RTL automatically. Also use AlignmentDirectional instead of Alignment for alignments.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies EdgeInsets.only(left:) as problematic for RTL — it always applies to the physical left side",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends EdgeInsetsDirectional.only(start:) as the correct RTL-aware replacement",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "plurals-icu-rules",
+      "prompt": "In our app we show messages like '1 item in cart' or '3 items in cart'. How should I handle pluralization in Flutter localization? I don't want to use a ternary operator in my widget code.",
+      "expected_output": "Uses ICU plural rules in the ARB file (or slang equivalent). The widget just calls l10n.cartItems(count) — the plural form is resolved by the framework. Avoids count == 1 ? 'item' : 'items' in widget code.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses ICU plural rules in the translation file (ARB or equivalent) — not a ternary in widget code",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows the widget calling a single localization method with a count parameter — the plural logic is in the translation file",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

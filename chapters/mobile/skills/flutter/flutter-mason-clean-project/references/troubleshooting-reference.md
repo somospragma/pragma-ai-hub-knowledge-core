@@ -1,5 +1,7 @@
 # Troubleshooting Reference
 
+**IMPORTANT**: This reference provides **diagnostic information only**. While the diagnostic steps themselves are transient, some resolution procedures described below may involve permanent changes to your local environment (such as modifying shell profiles or global tool configurations) if you choose to follow them. You have full control over what gets executed.
+
 Common issues during `flutter_clean_project` generation with diagnosis and resolution steps.
 
 ## Table of Contents
@@ -85,36 +87,59 @@ df -h /path/to/output/directory
 
 ### Fix
 
-**Option 1: Add Flutter to PATH (macOS/Linux)**
+**Option 1: Add Flutter to PATH - SESSION-ONLY (RECOMMENDED)**
+
+**This is TEMPORARY** — PATH changes apply to current terminal session ONLY and are automatically cleared when you close the terminal. No permanent system changes.
+
 ```bash
 # Find Flutter installation
 which flutter
 # or
 find ~ -name "flutter" -type d 2>/dev/null
 
-# Export PATH in ~/.zprofile or ~/.bash_profile
+# Temporarily add to PATH (this session only - no persistence):
 export PATH="$PATH:/path/to/flutter/bin"
-source ~/.zprofile
 
 # Verify
 flutter --version
 ```
 
+After closing the terminal, `flutter` will not be in PATH again until you run the `export` command again in a new terminal.
+
+**Option 1b: Permanent PATH modification (OPTIONAL — requires manual shell setup)**
+
+**SKIP THIS unless you plan to use Flutter frequently and want permanent access.** This involves editing your shell profile file and is entirely your choice.
+
+To make Flutter available in ALL future terminal sessions, **you would need to manually edit** your shell profile file (`~/.zprofile` on macOS, `~/.bashrc` or `~/.bash_profile` on Linux) to include the same `export` command. This requires:
+- Your understanding of shell configuration
+- Manual documentation of what was changed (for your team)
+- Testing that it works correctly
+
+For detailed instructions, consult your shell documentation or Flutter's official setup guide at https://docs.flutter.dev/get-started/install.
+
 **Option 2: Reinstall Flutter (if SDK corrupted)**
 ```bash
 # Follow Flutter docs: https://docs.flutter.dev/get-started/install
-# After reinstall, verify with flutter doctor
-
+# After reinstall, verify with flutter doctor (no sudo required)
 flutter pub get
 flutter pub upgrade
 ```
 
-**Option 3: Clean and retry**
-```bash
-# Remove partial generation
-rm -rf /path/to/output/my_app
+**Option 3: Clean and retry (use safe directory removal)**
 
-# Try generation again with shorter path (fewer chars)
+If generation partially failed and left files behind:
+```bash
+# Option 3a: Use file manager (safest)
+# 1. Open Finder (macOS) or File Explorer (Linux/Windows)
+# 2. Navigate to /path/to/output/
+# 3. Find my_app folder → delete via UI
+
+# Option 3b: If comfortable with terminal (verify first):
+# List what's in the directory before deleting
+ls -la /path/to/output/my_app
+# Then carefully remove ONLY what you need removed
+
+# Only after verification, try generation again:
 mason make flutter_clean_project -o ./output
 ```
 
@@ -207,13 +232,27 @@ rename --version
 
 ### Fix
 
-**Option 1: Install rename tool (recommended)**
+**Option 1: Install rename tool (COMPLETELY OPTIONAL)**
+
+**SKIP THIS unless you really need the rename tool.** This step:
+- Installs a tool that will **persist** in your Dart/pub environment until you manually uninstall it
+- Modifies your system state (adds global dependency)
+- Is **entirely optional** — you can manually update bundle IDs instead (see Option 2)
+
+Only use this if you plan to rename bundles frequently across multiple projects:
+
 ```bash
+# Optional: Install globally (persists until uninstalled)
 dart pub global activate rename
 
-# Verify
+# Verify installation
 rename --version
+
+# To uninstall later if needed:
+# dart pub global deactivate rename
 ```
+
+**Recommendation**: Start with Option 2 (manual). Only if you find yourself renaming bundles repeatedly should you consider this step.
 
 **Option 2: Manual bundle ID configuration (if rename unavailable)**
 
@@ -223,9 +262,9 @@ After generation completes, manually update bundle IDs:
 ```bash
 cd apps/my_app/ios
 
-# Use Xcode or sed/awk to replace bundle ID
-# Example (macOS/Linux):
-sed -i '' 's/com\.example\.myApp/com\.mycompany\.myapp/g' Runner.xcodeproj/project.pbxproj
+# Use Xcode or a text editor to replace bundle ID
+# in the Xcode project file (Runner.xcodeproj/project.pbxproj)
+# Or use Xcode GUI to update the bundle identifier
 ```
 
 **Android** (`android/app/build.gradle`):
@@ -237,8 +276,9 @@ cd apps/my_app/android/app
 # New: applicationId "com.mycompany.my_app"
 
 # For iOS:
-cd ../../../ios
-# Edit ios/Runner/Info.plist or use Xcode GUI
+cd apps/my_app/ios
+# Replace bundle ID in Info.plist using Xcode or a text editor
+# Or use Xcode GUI to update the bundle identifier
 ```
 
 **Option 3: Ignore (for development only)**
@@ -317,20 +357,33 @@ cd /path/to/output && git status
 
 ### Fix
 
-**Option 1: Install Git (if not present)**
-```bash
-# macOS (Homebrew)
-brew install git
+**IMPORTANT: This skill does NOT provide install commands**
 
-# Linux (Ubuntu/Debian)
-sudo apt-get install git
+Git installation is **your system administrator's responsibility**. This skill cannot and will not execute system package manager commands.
 
-# Windows
-# Download from https://git-scm.com/download/win
+**To get Git installed:**
 
-# Verify
-git --version
-```
+1. **Best option**: Contact your IT/System Administrator
+   - Email: `<your-admin-email>`
+   - Request: "Please install Git on my system"
+   - They will handle it safely and securely
+
+2. **Alternative**: Consult official documentation
+   - macOS: https://git-scm.com/download/mac
+   - Linux: https://git-scm.com/download/linux  
+   - Windows: https://git-scm.com/download/win
+
+3. **After Git is installed**, verify it works:
+   ```bash
+   # Run this to check (safe, read-only)
+   git --version
+   ```
+
+**Why we recommend contacting your admin**: 
+- System package managers require elevated privileges
+- Your organization likely has specific security policies
+- Admins ensure proper audit trails and compliance
+- Professional environments standardize tool versions
 
 **Option 2: Manual git init (if auto hook failed)**
 ```bash
@@ -422,11 +475,27 @@ mason make flutter_clean_project -o output -c my_config.json
 
 ### Issue: "FileSystemException: File already exists"
 - Output directory already contains a project
-- **Fix**: Use different output path or remove existing directory:
+- **Fix**: Choose ONE of these approaches:
+
+**Option A: Use different output path** (RECOMMENDED - safest):
 ```bash
-rm -rf /path/to/output/my_app
+mason make flutter_clean_project -o /path/to/different/output/my_app
+```
+
+**Option B: Manually inspect and remove** (requires confirmation):
+```bash
+# First, verify the directory you want to remove
+ls -la /path/to/output/my_app
+
+# Only if you're certain, use this (not a script - do it step by step):
+# 1. Open file manager or Terminal
+# 2. Navigate to /path/to/output/
+# 3. Right-click my_app folder → Move to Trash (or delete)
+# 4. Then run generation in clean directory:
 mason make flutter_clean_project -o /path/to/output
 ```
+
+**WARNING**: Do NOT use `rm -rf` command without careful consideration. Accidental data loss is permanent.
 
 ### Issue: "Cannot find module: commons"
 - Dependencies not installed yet

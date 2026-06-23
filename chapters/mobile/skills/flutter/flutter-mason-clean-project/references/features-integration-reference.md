@@ -105,11 +105,13 @@ features/
 
 Ensure `flutter_clean_feature` brick is installed:
 
+**SECURITY WARNING**: Before installing bricks from remote repositories, verify the authenticity and integrity of the Git URL and the source. It is highly recommended to audit the contents of the repository (e.g., `bricks/flutter_clean_feature`) for any malicious scripts or unauthorized changes. For reproducible and verifiable builds, use specific tags or commit hashes instead of mutable branches like `develop`.
+
 ```bash
 # Check if installed globally
 mason list --global | grep flutter_clean_feature
 
-# If not, install
+# If not, install (Verify the URL before running!)
 mason add -g flutter_clean_feature --git-url git@github.com:somospragma/pragma-mason-bricks.git --git-path bricks/flutter_clean_feature --git-ref develop
 ```
 
