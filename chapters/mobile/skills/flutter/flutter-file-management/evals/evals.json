@@ -1,0 +1,42 @@
+{
+  "skill_name": "flutter-file-management",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "secure-file-storage",
+      "prompt": "I need to save a user's downloaded PDF report to the device. Where should I store it and what security requirements must I follow?",
+      "expected_output": "Uses getApplicationDocumentsDirectory() (not external). Sanitizes filename. Validates MIME type from bytes. References MASVS-STORAGE-1.",
+      "files": [],
+      "assertions": [
+        {"id": "a1", "text": "Response uses getApplicationDocumentsDirectory() or getApplicationSupportDirectory() — NOT getExternalStorageDirectory()", "type": "llm_judge"},
+        {"id": "a2", "text": "Response sanitizes the filename using path.basename() to prevent path traversal", "type": "llm_judge"},
+        {"id": "a3", "text": "Response validates MIME type from file bytes (not just extension)", "type": "llm_judge"},
+        {"id": "a4", "text": "Response references MASVS-STORAGE-1 or equivalent security requirement for internal-only sensitive files", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "download-with-progress",
+      "prompt": "Show me how to download a file from a URL using Dio with progress tracking. The download progress should be exposed to a BLoC.",
+      "expected_output": "Dio download with onReceiveProgress callback, Stream<double> exposed to BLoC, Either<FileFailure,T> return type, CancelToken for cancellation.",
+      "files": [],
+      "assertions": [
+        {"id": "a1", "text": "Response uses Dio with onReceiveProgress callback for progress tracking", "type": "llm_judge"},
+        {"id": "a2", "text": "Response exposes progress as Stream<double> to the BLoC layer", "type": "llm_judge"},
+        {"id": "a3", "text": "Response includes CancelToken for download cancellation", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "share-file-safely",
+      "prompt": "How do I share a file from my app's internal storage with another app on Android? What's the safe way to do this?",
+      "expected_output": "Uses share_plus (SharePlus.instance.shareXFiles) which handles FileProvider internally. Never exposes raw internal paths via Intent. References MASVS-PLATFORM-2.",
+      "files": [],
+      "assertions": [
+        {"id": "a1", "text": "Response uses share_plus (shareXFiles) — NOT raw Intent or file:// URI", "type": "llm_judge"},
+        {"id": "a2", "text": "Response states share_plus handles FileProvider internally — raw paths are never exposed", "type": "llm_judge"},
+        {"id": "a3", "text": "Response references MASVS-PLATFORM-2 or the principle that files must be shared via FileProvider on Android", "type": "llm_judge"}
+      ]
+    }
+  ]
+}

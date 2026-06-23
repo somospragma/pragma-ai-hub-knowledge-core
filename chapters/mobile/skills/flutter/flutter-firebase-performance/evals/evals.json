@@ -1,0 +1,72 @@
+{
+  "skill_name": "flutter-firebase-performance",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "strategy-pattern-setup",
+      "prompt": "I want to add performance monitoring to my Flutter app using Firebase Performance. How should I structure it so I can swap to Sentry later without changing my BLoC or domain code?",
+      "expected_output": "Creates PerformanceMonitor abstract interface class in domain. FirebasePerformanceAdapter implements it. NoOpPerformanceAdapter for tests/debug. DI binds PerformanceMonitor to FirebasePerformanceAdapter. BLoC/domain only depends on the interface, never FirebasePerformance SDK directly.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response creates an abstract PerformanceMonitor interface — not using FirebasePerformance SDK directly in BLoC or domain",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes a NoOpPerformanceAdapter for debug builds and tests",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response binds PerformanceMonitor to FirebasePerformanceAdapter via DI — changing provider requires only a DI rebind",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "custom-trace-checkout",
+      "prompt": "How do I measure how long our checkout flow takes in production? I need to track it from when the user taps 'Checkout' to when the order confirmation appears. I also want to attach some metadata so I can filter results in the Firebase console.",
+      "expected_output": "Uses startTrace('checkout_flow'), putAttribute() with non-sensitive categorical attributes (e.g., 'payment_type': 'card_scheme' or 'user_tier': 'premium'), stop() at the end. Warns against attaching PII or sensitive financial identifiers. Shows the trace wrapping the user flow.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses startTrace with a descriptive name (e.g., 'checkout_flow') and stop() at the end",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses putAttribute to attach non-sensitive categorical metadata to the trace for filtering",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response uses the PerformanceMonitor interface or PerformanceMonitorAdapter — not calling FirebasePerformance.instance directly in business logic",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "http-latency-dio",
+      "prompt": "How do I automatically track API response times for all my Dio HTTP calls? I don't want to manually add tracing to every API method.",
+      "expected_output": "Adds PerformanceHttpInterceptor to Dio interceptors. This automatically tracks response time, payload size, and status code for all HTTP calls. References the skill's Dio interceptor pattern.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response adds a performance interceptor to Dio interceptors (not manual tracing per method)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions the interceptor automatically tracks response time / latency for HTTP calls",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

@@ -1,73 +1,32 @@
 # SkillSpector Security Report
 
 **Skill:** flutter-mason-clean-project  
-**Source:** `chapters/mobile/skills/flutter/flutter-mason-clean-project`  
-**Scanned:** 2026-06-03 17:43:27 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-mason-clean-project`  
+**Scanned:** 2026-06-23 00:22:57 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 30/100 |
-| Severity | MEDIUM |
-| Recommendation | CAUTION |
+| Score | 0/100 |
+| Severity | LOW |
+| Recommendation | SAFE |
 
-## Components (6)
+## Components (7)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `LICENSE.txt` | text | 11 | No |
 | `SKILL.md` | markdown | 283 | No |
-| `evals/flutter-mason-clean-project.md` | markdown | 36 | No |
+| `evals/evals.json` | json | 79 | No |
+| `evals/flutter-mason-clean-project.md` | markdown | 33 | No |
 | `references/config-schema-reference.md` | markdown | 432 | No |
 | `references/features-integration-reference.md` | markdown | 481 | No |
 | `references/troubleshooting-reference.md` | markdown | 525 | No |
 
-## Issues (4)
+## Issues (0)
 
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
-
-### 🟢 LOW: EA3
-
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
-
-**Message:** Scope Creep
-
-**Remediation:** Limit the skill's scope to its documented purpose. Remove instructions that enable the agent to perform actions outside its stated functionality.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/troubleshooting-reference.md:62`  
-**Confidence:** 60%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/troubleshooting-reference.md:280`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
+No security issues detected.
 
 ## Metadata
 

@@ -58,7 +58,8 @@ This reference documents the complete schema with examples and validation rules.
 
 **Rules**:
 - Lowercase or camelCase
-- No special characters
+- No special characters (alphanumeric only)
+- **Security**: Avoid using path traversal sequences like `../` or absolute paths to prevent writing files outside the intended directory.
 - Becomes directory: `apps/{name}/`
 - Template transforms: `.snakeCase()`, `.titleCase()`, `.pascalCase()`
 
@@ -81,6 +82,7 @@ This reference documents the complete schema with examples and validation rules.
 
 **Rules**:
 - Lowercase, short (2–5 chars recommended)
+- **Security**: Ensure the prefix contains only alphanumeric characters to prevent directory traversal or malicious file naming.
 - Becomes file prefix: `app_colors.dart`
 - Becomes class prefix: `AppColors`
 - Transforms: `.pascalCase()` for class names

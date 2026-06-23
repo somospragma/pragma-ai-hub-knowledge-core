@@ -1,0 +1,79 @@
+{
+  "skill_name": "flutter-mason-clean-project",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to bootstrap a new Flutter project for my company 'TechCorp'. The app is called 'myStore', the prefix is 'store'. We want two colors: a primary blue (#1565c0 with shades from 50 to 900) and a secondary green (#2e7d32). We'll use 'Roboto' for body text and 'Poppins' for headings, both from Google Fonts. Typography should include 'body' (Roboto, 16px, color + fontWeight params) and 'heading' (Poppins, 24px, color + fontWeight bold). No initial features. Show me the complete config.json and the mason command to run.",
+      "expected_output": "A complete, valid config.json with organization=techcorp, name=myStore, prefix=store, two color objects with isMaterialColor:true and hex values without #, fontFamily array with Roboto and Poppins, typography array with body and heading styles matching the requested params. Plus the correct mason make command with -c flag.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Config JSON includes organization field as lowercase 'techcorp' (no spaces, no uppercase)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Color hex values in config.json do NOT include the '#' prefix (e.g., '1565c0' not '#1565c0')",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Both color objects include 'isMaterialColor': true and a 'value' array with shade level objects (e.g., {level: 50, value: '...'})",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a4",
+          "text": "The mason command uses '-c' flag to point to the config file (e.g., mason make flutter_clean_project -o ... -c config.json)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What naming rules should I follow for 'organization', 'name', and 'prefix' fields in the flutter_clean_project config? Our company is 'Pragma Soft', the app is called 'Payment Gateway Pro', and we want to use our company initials 'ps' as prefix. Show me the correct values and what they result in (file names, bundle ID, class names).",
+      "expected_output": "organization='pragmasoft' (lowercase, no spaces), name='paymentGatewayPro' or 'payment_gateway_pro' (camelCase or lowercase), prefix='ps' (lowercase short). Bundle ID result: com.pragmasoft.payment_gateway_pro. File examples: ps_colors.dart, ps_radius.dart. Class examples: PsColors, PsRadius. Explanation of Mason template transforms (snakeCase, pascalCase).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response shows 'organization' as lowercase with no spaces (pragmasoft, not 'Pragma Soft' or 'PragmaSoft')",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows the resulting bundle ID format: com.{organization}.{name} (e.g., com.pragmasoft.payment_gateway_pro)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions Mason template transforms (snakeCase, pascalCase, or titleCase) that are applied automatically to the name/prefix values",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I already generated my Flutter project with flutter_clean_project. Now I need to add a new 'profile' feature with BLoC state management that uses the commons package and l10n. How do I do that?",
+      "expected_output": "Post-generation feature approach using flutter_clean_feature brick. Navigate to project, run mason make flutter_clean_feature -o features -c profile_config.json. Profile config example with name='profile', stateManagementType='bloc', packages=['commons'], shareds=['l10n']. Mention verifying brick is installed, then integration steps (add to pubspec.yaml, routes, DI). Reference to skill-flutter-clean-feature for full details.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses 'flutter_clean_feature' brick (not flutter_clean_project) for adding a post-generation feature",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response includes a feature config with 'name', 'packages', and 'shareds' fields (matching the FeatureObject schema)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions integration steps after feature generation: at minimum routes OR dependency injection OR pubspec.yaml dependency update",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

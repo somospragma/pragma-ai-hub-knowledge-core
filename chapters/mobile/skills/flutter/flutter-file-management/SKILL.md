@@ -1,10 +1,11 @@
 ---
 id: flutter-file-management
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-file-management
 description: >
   Handles file operations in Flutter: pick, read/write, download with progress, upload, share, and manage app storage directories. Includes OWASP MASVS-STORAGE security requirements: internal-only storage for sensitive files, path traversal prevention, MIME validation, and no sensitive data in external/shared storage. Use this skill when implementing file picker, document download, file upload, file sharing, or any local file I/O.
 ---
@@ -40,66 +41,73 @@ These are **mandatory** — not optional — for any app handling files.
 | **MASVS-CODE-4** | Validate MIME type and extension before processing | L1 |
 | **MASVS-CODE-4** | Prevent path traversal — sanitize all file names | L1 |
 
-### Storage location rules
+### The three rules you must always apply
 
-```
+**Rule 1 — Internal storage only (MASVS-STORAGE-1)**
+```dart
 ✅ getApplicationDocumentsDirectory()  — internal sandbox, app-private
 ✅ getApplicationSupportDirectory()    — internal sandbox, app-private
-✅ getTemporaryDirectory()             — temp, cleared by OS
 ❌ getExternalStorageDirectory()       — world-readable on Android < 10
 ❌ /sdcard/, /storage/emulated/0/      — never write sensitive data here
-❌ Hardcoded absolute paths            — path traversal risk
 ```
 
----
-
-## Core Patterns
-
-### 1. Safe file path construction (no path traversal)
+**Rule 2 — Sanitize filenames with `path.basename()` (MASVS-CODE-4)**
 ```dart
-// ❌ Path traversal vulnerability
+// ❌ Path traversal vulnerability — user controls ../../../etc/passwd
 final file = File('${dir.path}/$userInput');
 
-// ✅ Sanitize filename — strip directory separators
-String sanitizeFileName(String name) {
-  return path.basename(name)                    // strip directory components
-      .replaceAll(RegExp(r'[^\w\s\-.]'), '_')  // allow only safe chars
-      .trim();
-}
+// ✅ Strip directory components before using any user-supplied name
+String sanitizeFileName(String name) =>
+    path.basename(name).replaceAll(RegExp(r'[^\w\s\-.]'), '_').trim();
 final file = File(path.join(dir.path, sanitizeFileName(userInput)));
 ```
 
-### 2. MIME validation before processing
+**Rule 3 — Validate MIME type from file bytes, not just extension (MASVS-CODE-4)**
 ```dart
-// ❌ Trust file extension only — easily spoofed
-if (file.path.endsWith('.pdf')) { ... }
+// ❌ Extension is easily spoofed — rename malware.exe to report.pdf
+if (file.path.endsWith('.pdf')) { /* unsafe */ }
 
-// ✅ Validate actual MIME type from file bytes
+// ✅ Check magic bytes — PDF always starts with %PDF (0x25 0x50 0x44 0x46)
 Future<bool> isValidPdf(File file) async {
   final bytes = await file.openRead(0, 4).first;
-  // PDF magic bytes: %PDF
   return bytes.length >= 4 &&
       bytes[0] == 0x25 && bytes[1] == 0x50 &&
       bytes[2] == 0x44 && bytes[3] == 0x46;
 }
 ```
 
-### 3. Internal storage only for sensitive files
+**Rule 4 — Share via FileProvider, never raw paths (MASVS-PLATFORM-2)**
 ```dart
-// ✅ Always use app-sandboxed directories
-final dir = await getApplicationDocumentsDirectory();
-final file = File(path.join(dir.path, 'report.pdf'));
-
-// ❌ Never write sensitive data to external storage
-// final dir = await getExternalStorageDirectory(); // world-readable
-```
-
-### 4. Share via FileProvider (Android) — never raw paths
-```dart
-// ✅ share_plus handles FileProvider internally
+// ✅ share_plus handles FileProvider internally on Android
 await SharePlus.instance.shareXFiles([XFile(file.path)]);
 
-// ❌ Never expose raw internal paths via Intent
+// ❌ Never expose raw internal paths via Intent — FileProvider required
+```
+
+---
+
+## Download with Progress
+
+The `CancelToken` is required for download/upload so the user can cancel in-flight operations:
+
+```dart
+final cancelToken = CancelToken();
+
+// Stream<double> progress so BLoC can emit progress states
+Stream<double> downloadFile(String url, String fileName) async* {
+  final dir = await getApplicationDocumentsDirectory();
+  final sanitized = sanitizeFileName(fileName);
+  final savePath = path.join(dir.path, sanitized);
+
+  await _dio.download(
+    url,
+    savePath,
+    cancelToken: cancelToken,             // ← required
+    onReceiveProgress: (received, total) {
+      if (total > 0) yield received / total;
+    },
+  );
+}
 ```
 
 ---

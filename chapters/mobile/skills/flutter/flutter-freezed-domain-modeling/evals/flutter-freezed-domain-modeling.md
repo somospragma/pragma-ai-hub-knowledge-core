@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-freezed-domain-modeling`  
-**Scanned:** 2026-06-03 17:43:13 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-freezed-domain-modeling`  
+**Scanned:** 2026-06-22 23:11:43 UTC  
 
 ## Risk Assessment
 
@@ -12,12 +12,13 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (3)
+## Components (4)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 284 | No |
-| `evals/flutter-freezed-domain-modeling.md` | markdown | 30 | No |
+| `evals/evals.json` | json | 101 | No |
+| `evals/flutter-freezed-domain-modeling.md` | markdown | 31 | No |
 | `references/all_freezed_patterns.md` | markdown | 241 | No |
 
 ## Issues (0)

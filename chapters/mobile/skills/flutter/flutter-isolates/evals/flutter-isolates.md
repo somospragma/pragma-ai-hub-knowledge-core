@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-isolates`  
-**Scanned:** 2026-06-03 17:43:17 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-isolates`  
+**Scanned:** 2026-06-23 00:01:27 UTC  
 
 ## Risk Assessment
 
@@ -12,12 +12,13 @@
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (5)
+## Components (6)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 148 | No |
-| `evals/flutter-isolates.md` | markdown | 52 | No |
+| `SKILL.md` | markdown | 170 | No |
+| `evals/evals.json` | json | 72 | No |
+| `evals/flutter-isolates.md` | markdown | 33 | No |
 | `references/long_lived_isolates.md` | markdown | 302 | No |
 | `references/one_shot_isolates.md` | markdown | 233 | No |
 | `references/worker_packages.md` | markdown | 354 | No |

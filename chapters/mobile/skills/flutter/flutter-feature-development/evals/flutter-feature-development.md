@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** flutter-feature-development  
-**Source:** `chapters/mobile/skills/flutter/flutter-feature-development`  
-**Scanned:** 2026-06-03 17:43:04 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-feature-development`  
+**Scanned:** 2026-06-22 17:57:39 UTC  
 
 ## Risk Assessment
 
@@ -17,10 +17,10 @@
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `LICENSE.txt` | text | 11 | No |
-| `SKILL.md` | markdown | 435 | No |
+| `SKILL.md` | markdown | 436 | No |
 | `assets/checklist.md` | markdown | 223 | No |
 | `evals/evals.json` | json | 147 | No |
-| `evals/flutter-feature-development.md` | markdown | 42 | No |
+| `evals/flutter-feature-development.md` | markdown | 54 | No |
 | `references/feature-workflow.md` | markdown | 880 | No |
 
 ## Issues (2)

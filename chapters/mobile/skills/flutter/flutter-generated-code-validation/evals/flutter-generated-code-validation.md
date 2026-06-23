@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-generated-code-validation`  
-**Scanned:** 2026-06-03 17:43:16 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-generated-code-validation`  
+**Scanned:** 2026-06-22 23:36:57 UTC  
 
 ## Risk Assessment
 
@@ -16,8 +16,8 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 302 | No |
-| `evals/flutter-generated-code-validation.md` | markdown | 31 | No |
+| `SKILL.md` | markdown | 312 | No |
+| `evals/evals.json` | json | 72 | No |
 | `references/freezed_complete_guide.md` | markdown | 325 | No |
 | `scripts/run_codegen.sh` | shell | 62 | Yes |
 

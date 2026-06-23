@@ -1,0 +1,72 @@
+{
+  "skill_name": "flutter-generated-code-validation",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "part-directive-order",
+      "prompt": "I have a Freezed DTO that also uses json_serializable. My generated code has errors about undefined symbols. What's the correct way to write the part directives?",
+      "expected_output": "The freezed part must come BEFORE the .g.dart part. Correct order: part 'user_dto.freezed.dart'; then part 'user_dto.g.dart'; — reversed order causes undefined symbol errors. Also needs fromJson factory.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response explicitly states the .freezed.dart part directive must come BEFORE the .g.dart part directive",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows the correct order: freezed first, then .g.dart",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions the fromJson factory constructor is required when using @JsonSerializable on a @freezed class",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "freezed3-sealed-class-requirement",
+      "prompt": "After upgrading to Freezed 3.x, my build_runner is failing with an error about my state class. What changed in Freezed 3.x that could cause this?",
+      "expected_output": "Freezed 3.x requires classes to be abstract, sealed, or manually implement _$MyClass. Plain class MyState with _$MyState no longer works. For union types/BLoC states, use sealed class. For DTOs, use abstract class. Shows corrected code.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies that Freezed 3.x requires classes to be abstract, sealed, or implement _$MyClass — plain class is no longer allowed",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends sealed class for union types (BLoC states, events) — enables exhaustive switch without default",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response recommends abstract class for DTOs and simple immutable value objects",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "gitignore-generated-files",
+      "prompt": "Should I add *.g.dart and *.freezed.dart to .gitignore so the generated files aren't committed to the repo?",
+      "expected_output": "NO — generated files should be committed. CI does NOT run build_runner. The CI workflow verifies generated files are up-to-date (git diff --exit-code on *.g.dart). Adding them to .gitignore breaks CI because the generated files won't be present.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response says NOT to add generated files to .gitignore — they should be committed",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explains that CI does not run build_runner — it verifies committed generated files are up-to-date",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

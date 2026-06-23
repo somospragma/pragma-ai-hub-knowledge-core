@@ -242,15 +242,33 @@ class FileStorageDataSource {
     }
   }
 
-  /// Delete all files in the app temp directory.
+  /// Delete all files written by this app under the scoped temp sub-directory.
+  ///
+  /// Deletes only `<tempDir>/app_cache/`, not the OS temp root itself.
+  /// This avoids interfering with files owned by the OS or third-party SDKs
+  /// that also write to `getTemporaryDirectory()`.
   Future<void> clearTempFiles() async {
-    try {
-      final tempDir = await getTemporaryDirectory();
-      if (await tempDir.exists()) {
-        await tempDir.delete(recursive: true);
-        await tempDir.create();
+    final tempDir = await getTemporaryDirectory();
+    final appTempDir = Directory('${tempDir.path}/app_cache');
+    if (!await appTempDir.exists()) return;
+
+    int deleted = 0;
+    int errors = 0;
+    await for (final entity in appTempDir.list(recursive: true)) {
+      if (entity is File) {
+        try {
+          await entity.delete();
+          deleted++;
+        } catch (e) {
+          // File may be in use by another isolate or pending I/O — skip it.
+          errors++;
+          debugPrint('[FileDataSource] clearTempFiles: could not delete '
+              '${entity.path} — $e');
+        }
       }
-    } catch (_) {}
+    }
+    debugPrint('[FileDataSource] clearTempFiles: '
+        'deleted=$deleted errors=$errors');
   }
 
   // ── Exists / Metadata ─────────────────────────────────────────────────

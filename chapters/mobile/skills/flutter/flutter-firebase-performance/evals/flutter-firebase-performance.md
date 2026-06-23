@@ -1,14 +1,14 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-firebase-performance`  
-**Scanned:** 2026-06-03 17:43:12 UTC  
+**Skill:** flutter-firebase-performance  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-firebase-performance`  
+**Scanned:** 2026-06-23 00:05:50 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 0/100 |
+| Score | 5/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
@@ -16,14 +16,23 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 101 | No |
-| `evals/flutter-firebase-performance.md` | markdown | 51 | No |
+| `SKILL.md` | markdown | 135 | No |
+| `evals/evals.json` | json | 72 | No |
 | `references/firebase_implementation.md` | markdown | 365 | No |
 | `references/performance_provider_pattern.md` | markdown | 394 | No |
 
-## Issues (0)
+## Issues (1)
 
-No security issues detected.
+### 🟢 LOW: SQP-2
+
+**Location:** `references/firebase_implementation.md:162–244`  
+**Confidence:** 85%  
+
+**Message:** The `PerformanceHttpInterceptor` implementation contains a potential data leakage vulnerability. While the code currently only uses `_estimateSize` (which calculates length) to track payload sizes, the pattern of intercepting and processing request/response bodies in a performance monitoring context is highly dangerous. If a developer modifies this interceptor to log payloads for debugging or if the `_estimateSize` function is expanded to include actual data snippets, sensitive information (PII, authentication tokens, or credentials) would be captured. Even in its current state, the lack of a warning regarding the interception of potentially sensitive traffic is a significant security oversight for a library intended for wide use.
+
+**Remediation:** 1. Explicitly document the security implications of using interceptors for performance monitoring. 2. Implement a 'sanitization' or 'redaction' layer that ensures only metadata (size, status code, duration) is captured and never the actual body content. 3. Provide a mechanism to exclude specific URLs or request types (e.g., `/login`, `/payment`) from being intercepted by the performance monitor.
+
+---
 
 ## Metadata
 

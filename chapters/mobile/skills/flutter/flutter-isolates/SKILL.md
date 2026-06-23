@@ -1,10 +1,11 @@
 ---
 id: flutter-isolates
-version: 1.1.0
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
+name: flutter-isolates
 description: >
   Runs CPU-intensive work off the main thread using Dart isolates: compute(), Isolate.run() for one-shot tasks, Isolate.spawn() for long-lived workers, worker_manager for isolate pools with cancellation and progress, and isolate_manager for cross-platform support (VM + Web Workers + WASM). Use this skill when JSON parsing, image processing, encryption, data transformation, or any CPU-bound work causes UI jank or dropped frames.
 ---
@@ -49,23 +50,45 @@ This eliminates race conditions but means large objects have a copy cost.
 
 ### One-shot (Isolate.run — preferred)
 ```dart
+// ⚠️ REQUIRED: top-level or static function + @pragma annotation (prevents AOT tree-shaking)
+@pragma('vm:entry-point')
+List<Product> parseHeavyJson(String rawJson) => /* ... */;
+
 // Runs fn in a new isolate, returns result, isolate is killed automatically
 final result = await Isolate.run(() => parseHeavyJson(rawJson));
 ```
 
-### Isolate pool with cancellation (worker_manager)
+> **Why `@pragma('vm:entry-point')`?** Without it, the Dart AOT compiler may tree-shake the
+> entry function in release builds, causing a `MissingPluginException` or silent null result
+> in production. Always annotate isolate entry points.
+
+### Isolate pool with cancellation (worker_manager — recommended for cancellable work)
 ```dart
+// ✅ PREFERRED pattern when you need cancellation — use worker_manager, not Isolate.kill()
+@pragma('vm:entry-point')
+List<Product> parseProducts(String rawJson) => /* ... */;
+
 final cancelable = workerManager.execute<List<Product>>(
   () => parseProducts(rawJson),
   priority: WorkPriority.immediately,
 );
-// Cancel if user navigates away
+
+// Cancel cleanly when user navigates away — no need for manual SendPort signalling
 cancelable.cancel();
 ```
+
+> **Why `worker_manager` for cancellation?** `Isolate.kill()` is a hard kill that can corrupt
+> shared resources. `worker_manager`'s `Cancelable<T>` uses a cooperative pool shutdown —
+> the isolate completes its current micro-task and exits cleanly. Always cancel in `dispose()`
+> or BLoC `close()`.
 
 ### Long-lived worker (Isolate.spawn)
 ```dart
 // Bidirectional communication — worker stays alive, processes multiple messages
+// Entry point MUST be top-level or static + @pragma annotated
+@pragma('vm:entry-point')
+void workerEntryPoint(SendPort sendPort) { /* ... */ }
+
 final worker = await IsolateWorker.create();
 final result = await worker.send(WorkerMessage.process(data));
 worker.dispose(); // kill when done

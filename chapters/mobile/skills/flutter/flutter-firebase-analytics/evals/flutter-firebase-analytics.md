@@ -1,47 +1,37 @@
 # SkillSpector Security Report
 
 **Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-firebase-analytics`  
-**Scanned:** 2026-06-03 17:43:08 UTC  
+**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-firebase-analytics`  
+**Scanned:** 2026-06-22 20:18:07 UTC  
 
 ## Risk Assessment
 
 | Metric | Value |
 |--------|-------|
-| Score | 20/100 |
+| Score | 5/100 |
 | Severity | LOW |
 | Recommendation | SAFE |
 
-## Components (4)
+## Components (5)
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 121 | No |
-| `evals/flutter-firebase-analytics.md` | markdown | 62 | No |
+| `SKILL.md` | markdown | 167 | No |
+| `evals/evals.json` | json | 42 | No |
+| `evals/flutter-firebase-analytics.md` | markdown | 52 | No |
 | `references/analytics_provider_pattern.md` | markdown | 319 | No |
 | `references/firebase_implementation.md` | markdown | 321 | No |
 
-## Issues (2)
+## Issues (1)
 
-### 🟡 MEDIUM: RA2
+### 🟢 LOW: SQP-2
 
-**Location:** `references/firebase_implementation.md:315`  
-**Confidence:** 75%  
+**Location:** `SKILL.md:113–123`  
+**Confidence:** 85%  
 
-**Message:** Session Persistence
+**Message:** The finding correctly identifies a lack of guidance regarding PII (Personally Identifiable Information) and data privacy. While the skill provides a mechanism for setting User IDs and properties, it fails to warn developers against passing sensitive data (e.g., email addresses, real names, or precise GPS coordinates) into these methods. In a production environment, sending PII to third-party providers like Firebase or Mixpanel can lead to violations of GDPR, CCPA, and other privacy regulations, and increases the risk of data breaches if the third-party provider is compromised.
 
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
-
----
-
-### 🟡 MEDIUM: RA2
-
-**Location:** `references/firebase_implementation.md:318`  
-**Confidence:** 75%  
-
-**Message:** Session Persistence
-
-**Remediation:** Remove any persistence mechanisms (cron jobs, startup scripts, state files). Skills should not maintain state across sessions without explicit user consent.
+**Remediation:** Update the documentation to include a 'Privacy & Data Security' section. Explicitly instruct developers to: 1) Never pass PII (emails, names, phone numbers) as User IDs or User Properties. 2) Use anonymized internal UUIDs for `setUserId`. 3) Sanitize all event parameters to ensure no sensitive data is leaked in the `parameters` map. 4) Implement a data scrubbing layer within the `AnalyticsProviderAdapter` to strip prohibited keys.
 
 ---
 
