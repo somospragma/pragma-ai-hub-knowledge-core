@@ -125,4 +125,4 @@ Cross-links con otros assets del chapter:
 - `[[calidad-playwright-greenfield]]`
 - `[[calidad-k6-greenfield]]`
 - `[[calidad-appium-screenplay-android]]`
-- `[[calidad-test-self-correction-loop]]` (workflow)
+- `[[calidad-test-self-correction-loop-workflow]]` (workflow)

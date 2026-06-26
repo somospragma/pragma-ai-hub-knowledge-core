@@ -1,5 +1,5 @@
 ---
-id: calidad-test-self-correction-loop
+id: calidad-test-self-correction-loop-workflow
 version: 1.0.0
 scope: chapter
 type: workflow
