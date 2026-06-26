@@ -34,7 +34,6 @@ chapters/calidad/
 │   ├── _all/
 │   │   ├── brownfield-vs-greenfield.md
 │   │   ├── business-driven-prioritization.md
-│   │   ├── delivery-gate-contract.md
 │   │   ├── environment-blocker-evidence.md
 │   │   ├── execution-metadata-schema.md
 │   │   ├── intent-detection.md
@@ -48,151 +47,96 @@ chapters/calidad/
 │   │   ├── streaming-files-protocol.md
 │   │   ├── test-evidence-and-traceability.md
 │   │   ├── test-organization-by-scenario.md
-│   │   │
+│   │   ├── transversal-capabilities.md
+│   │   ├── visual-regression.md
+│   │   ├── accessibility/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{audit-report-structure, design-review, disability-types-and-barriers, regulatory-framework, severity-and-findings, wcag-pour}.md
 │   │   ├── cicd-integration/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{allure-aggregation, azure-devops-pipeline-templates,
-│   │   │                   github-actions-workflows, gitlab-ci-jobs, mobile-cloud-providers,
-│   │   │                   quality-gates, rp-integration, secrets-in-pipelines,
-│   │   │                   sharding-and-parallelization}.md
-│   │   │
+│   │   │   └── references/{allure-aggregation, azure-devops-pipeline-templates, github-actions-workflows, gitlab-ci-jobs, mobile-cloud-providers, quality-gates, rp-integration, secrets-in-pipelines, sharding-and-parallelization}.md
 │   │   ├── context-determined-defaults/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{data-class-public-internal-confidential-restricted,
-│   │   │                   operational-criticality-tiers, regulatory-exposure-mapping,
-│   │   │                   traffic-class-and-peak-analysis, user-impact-and-blast-radius}.md
-│   │   │
+│   │   │   └── references/{data-class-public-internal-confidential-restricted, operational-criticality-tiers, regulatory-exposure-mapping, traffic-class-and-peak-analysis, user-impact-and-blast-radius}.md
 │   │   ├── contract-testing/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{asyncapi-event-contracts, cdc-vs-schema-first,
-│   │   │                   contract-testing-vs-karate-match, openapi-diff-breaking-changes,
-│   │   │                   pact-broker-pactflow, pact-consumer-tests,
-│   │   │                   pact-provider-verification, schema-registry-confluent,
-│   │   │                   spring-cloud-contract}.md
-│   │   │
+│   │   │   └── references/{asyncapi-event-contracts, cdc-vs-schema-first, contract-testing-vs-karate-match, openapi-diff-breaking-changes, pact-broker-pactflow, pact-consumer-tests, pact-provider-verification, schema-registry-confluent, spring-cloud-contract}.md
+│   │   ├── delivery-gate-contract/
+│   │   │   └── SKILL.md
+│   │   ├── executive-report-generator/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{appium-report-template, failure-classification-rules, k6-report-template, karate-report-template, playwright-report-template, report-structure, templates}.md
 │   │   ├── failure-triage-and-classification/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{bug-vs-test-design-decision-tree, failure-pattern-catalog,
-│   │   │                   quarantine-pattern, re-run-protocol-for-determinism,
-│   │   │                   stability-score-metric}.md
-│   │   │
+│   │   │   └── references/{bug-vs-test-design-decision-tree, failure-pattern-catalog, quarantine-pattern, re-run-protocol-for-determinism, stability-score-metric}.md
 │   │   ├── security-testing/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{api-fuzzing-schemathesis-restler, auth-testing-patterns,
-│   │   │                   compliance-regulatory-mapping, dast-with-owasp-zap,
-│   │   │                   owasp-api-top-10-2023, sast-sca-dast-pipeline,
-│   │   │                   secrets-management}.md
-│   │   │
+│   │   │   └── references/{api-fuzzing-schemathesis-restler, auth-testing-patterns, compliance-regulatory-mapping, dast-with-owasp-zap, owasp-api-top-10-2023, sast-sca-dast-pipeline, secrets-management}.md
+│   │   ├── seo/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{accessibility, hreflang, images, on-page, performance, schema, sitemap, technical}.md
 │   │   ├── sut-types-and-adaptations/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{data-pipeline-batch-streaming, event-driven-messaging,
-│   │   │                   graphql-api, grpc-service, legacy-soap-ejb,
-│   │   │                   ml-inference-service, rest-microservice,
-│   │   │                   serverless-functions}.md
-│   │   │
+│   │   │   └── references/{data-pipeline-batch-streaming, event-driven-messaging, graphql-api, grpc-service, legacy-soap-ejb, ml-inference-service, rest-microservice, serverless-functions}.md
 │   │   ├── test-data-management/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{anonymization-pii, builder-factory-objectmother-patterns,
-│   │   │                   data-for-perf-testing, datasets-versioning,
-│   │   │                   seeding-cleanup-transactional, synthetic-data-faker,
-│   │   │                   test-data-strategies}.md
-│   │   │
+│   │   │   └── references/{anonymization-pii, builder-factory-objectmother-patterns, data-for-perf-testing, datasets-versioning, seeding-cleanup-transactional, synthetic-data-faker, test-data-strategies}.md
 │   │   ├── test-execution-orchestration/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{evidence-archival, execute-and-capture-by-framework,
-│   │   │                   executor-as-skill-vs-as-pipeline, output-parsers,
-│   │   │                   result-schema-common}.md
-│   │   │
+│   │   │   └── references/{evidence-archival, execute-and-capture-by-framework, executor-as-skill-vs-as-pipeline, output-parsers, result-schema-common}.md
 │   │   ├── test-self-correction-loop/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{anti-cheating-guardrails, correction-audit-log,
-│   │   │                   correction-loop-state-machine, diff-aware-repair-rules,
-│   │   │                   iteration-limits-and-escalation, regulated-client-overrides}.md
-│   │   │
+│   │   │   └── references/{anti-cheating-guardrails, correction-audit-log, correction-loop-state-machine, diff-aware-repair-rules, iteration-limits-and-escalation, regulated-client-overrides}.md
 │   │   └── test-self-healing/
 │   │       ├── SKILL.md
-│   │       └── references/{commercial-vs-oss-healing-tools, healing-aware-page-object,
-│   │                       healing-strategies-by-framework, llm-driven-selector-repair,
-│   │                       multi-locator-fallback-pattern, over-healing-guardrails,
-│   │                       visual-ai-healing}.md
+│   │       └── references/{commercial-vs-oss-healing-tools, healing-aware-page-object, healing-strategies-by-framework, llm-driven-selector-repair, multi-locator-fallback-pattern, over-healing-guardrails, visual-ai-healing}.md
 │   │
 │   ├── appium/
 │   │   ├── appium-run-and-tags.md
-│   │   ├── appium-screenplay-android/
-│   │   │   ├── SKILL.md
-│   │   │   └── references/{android-only-scope-rationale, deferred-locators-strategy,
-│   │   │                   gherkin-syntax-rules, gradle-version-matrix,
-│   │   │                   health-check-pipeline, mandatory-inputs-validation,
-│   │   │                   mobile-accessibility, mobile-visual-regression,
-│   │   │                   no-aggregate-collision, preflight, project-structure,
-│   │   │                   screenplay-layers, smoke-gate-gradle,
-│   │   │                   smoke-vs-proposed-scenarios}.md
 │   │   ├── appium-apk-auto-discovery/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{adb-and-emulator-bootstrap, appium-inspector-rest-api,
-│   │   │                   crawler-strategy, locator-confidence-scoring,
-│   │   │                   safety-and-cleanup, selector-extraction-rules}.md
-│   │   └── appium-brownfield/
+│   │   │   └── references/{adb-and-emulator-bootstrap, appium-inspector-rest-api, crawler-strategy, locator-confidence-scoring, safety-and-cleanup, selector-extraction-rules}.md
+│   │   ├── appium-brownfield/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{convention-detection, selector-update-strategy}.md
+│   │   └── appium-screenplay-android/
 │   │       ├── SKILL.md
-│   │       └── references/{convention-detection, selector-update-strategy}.md
+│   │       └── references/{android-only-scope-rationale, contractual-questions, deferred-locators-strategy, gherkin-syntax-rules, gradle-version-matrix, health-check-pipeline, mandatory-inputs-validation, metadata-emitter-appium, mobile-accessibility, mobile-visual-regression, no-aggregate-collision, preflight, project-structure, screenplay-layers, smoke-gate-gradle, smoke-vs-proposed-scenarios, step-isolation-appium, templates}.md
 │   │
 │   ├── k6/
 │   │   ├── k6-run-and-suite.md
-│   │   ├── k6-greenfield/
+│   │   ├── k6-brownfield/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{auth-strategy-setup-vs-per-vu, availability-metric-from-rnf,
-│   │   │                   config-and-utils-modules, contractual-checks-from-user-story,
-│   │   │                   coverage-formula, crud-dynamic-id-correlation,
-│   │   │                   enums-headers-security-extraction, execution-status-and-blockers,
-│   │   │                   five-script-types, handle-summary-evidence,
-│   │   │                   k6-discovery-checklist, modular-architecture,
-│   │   │                   options-scenarios-executors, preflight, project-structure,
-│   │   │                   realistic-sleep-policy, results-structure-and-metadata,
-│   │   │                   smoke-1-1-gate, tag-policy-and-metrics-isolation,
-│   │   │                   templates/, threshold-tier-justification,
-│   │   │                   thresholds-three-tiers, vocabulary-and-scenario-mapping}.md
-│   │   └── k6-brownfield/
+│   │   │   └── references/{convention-detection, extension-patterns}.md
+│   │   └── k6-greenfield/
 │   │       ├── SKILL.md
-│   │       └── references/{convention-detection, extension-patterns}.md
+│   │       └── references/{auth-strategy-setup-vs-per-vu, availability-metric-from-rnf, config-and-utils-modules, contractual-checks-from-user-story, coverage-formula, crud-dynamic-id-correlation, enums-headers-security-extraction, execution-status-and-blockers, five-script-types, handle-summary-evidence, k6-discovery-checklist, modular-architecture, options-scenarios-executors, preflight, project-structure, realistic-sleep-policy, results-structure-and-metadata, smoke-1-1-gate, tag-policy-and-metrics-isolation, templates, threshold-tier-justification, thresholds-three-tiers, vocabulary-and-scenario-mapping}.md
 │   │
 │   ├── karate/
 │   │   ├── karate-run-and-tags.md
-│   │   ├── karate-greenfield/
+│   │   ├── karate-brownfield/
 │   │   │   ├── SKILL.md
-│   │   │   └── references/{cobertura-comment-enforcement, contract-testing-match-patterns,
-│   │   │                   encrypted-payloads, feature-design-dsl,
-│   │   │                   file-location-constraint, metadata-emitter-karate,
-│   │   │                   negative-coverage-formula, preflight, project-structure,
-│   │   │                   smoke-gate-mvn, step-isolation-karate, templates/}.md
-│   │   └── karate-brownfield/
+│   │   │   └── references/{client-specific-conventions, convention-detection, mandatory-inputs-brownfield}.md
+│   │   └── karate-greenfield/
 │   │       ├── SKILL.md
-│   │       └── references/{client-specific-conventions, convention-detection,
-│   │                       mandatory-inputs-brownfield}.md
+│   │       └── references/{cobertura-comment-enforcement, contract-testing-match-patterns, encrypted-payloads, feature-design-dsl, file-location-constraint, metadata-emitter-karate, negative-coverage-formula, preflight, project-structure, smoke-gate-mvn, step-isolation-karate, templates}.md
 │   │
 │   └── playwright/
 │       ├── playwright-run-and-modes.md
-│       ├── playwright-greenfield/
-│       │   ├── SKILL.md
-│       │   └── references/{accessibility-axe-wcag, auth-detection-rules,
-│       │                   auth-storage-state, coherence-checks,
-│       │                   contractual-checks-from-ui, coverage-formula,
-│       │                   execution-modes-live-mocked-hybrid, fixtures-composition,
-│       │                   metadata-emitter-playwright, mocks-page-route,
-│       │                   page-object-model, playwright-config-strict-ts,
-│       │                   playwright-native-tags-v142, preflight, project-structure,
-│       │                   selector-priority, smoke-gate-playwright,
-│       │                   step-isolation-playwright, templates/, ui-source-priority,
-│       │                   visual-regression, waits-policy}.md
 │       ├── playwright-brownfield/
 │       │   ├── SKILL.md
 │       │   └── references/{convention-detection, selector-update-strategy}.md
-│       └── playwright-from-live-app/
-│           └── SKILL.md
+│       ├── playwright-from-live-app/
+│       │   └── SKILL.md
+│       └── playwright-greenfield/
+│           ├── SKILL.md
+│           └── references/{accessibility-axe-wcag, auth-detection-rules, auth-storage-state, coherence-checks, contractual-checks-from-ui, coverage-formula, execution-modes-live-mocked-hybrid, fixtures-composition, metadata-emitter-playwright, mocks-page-route, page-object-model, playwright-config-strict-ts, playwright-native-tags-v142, preflight, project-structure, selector-priority, smoke-gate-playwright, step-isolation-playwright, templates, ui-source-priority, visual-regression, waits-policy}.md
 │
 ├── workflows/
 │   ├── _all/
 │   │   ├── generate-executive-report.workflow.md
 │   │   ├── route-test-generation.workflow.md
+│   │   ├── seo-audit.workflow.md
 │   │   └── test-self-correction-loop.workflow.md
 │   ├── appium/
 │   │   ├── complete-deferred-locators.workflow.md
@@ -293,6 +237,15 @@ chapters/calidad/
 | `context-determined-defaults/SKILL.md` | Defaults inferidos del contexto del cliente (data class, criticality tiers, regulatory exposure, peak).      |
 | `sut-types-and-adaptations/SKILL.md`   | Adaptaciones por tipo de SUT (REST, GraphQL, gRPC, eventos, ML inference, serverless, SOAP/EJB, batch).      |
 | `test-data-management/SKILL.md`        | Builder/Factory/ObjectMother, datasets versionados, anonimización PII, data para perf, sintética.            |
+
+#### Capacidades transversales complementarias (accesibilidad, SEO, visual)
+
+| Asset                                  | Descripción                                                                                                  |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------|
+| `transversal-capabilities.md`          | Detecta qué capas complementarias (accesibilidad, SEO, seguridad, visual, contract, performance) teje el diseño según intent + tipo de SUT + contexto regulatorio. La invoca el Paso 2.5 del router. |
+| `accessibility/SKILL.md`               | Accesibilidad WCAG/POUR: revisión desde diseño (Product Designer) + pruebas automatizadas, con marco normativo (foco banca/financiero), severidad, formato de hallazgo y estructura de reporte. Bundle con 6 references. |
+| `seo/SKILL.md`                         | Auditoría SEO técnica agnóstica de stack para pruebas web; 8 dimensiones (técnico, on-page, performance, schema, imágenes, sitemap, hreflang, accesibilidad) como references. |
+| `visual-regression.md`                 | Política transversal de regresión visual (web/móvil): baselines, dinamismo, match levels, anti-patrones.    |
 
 ### Skills per-framework
 
@@ -504,7 +457,7 @@ El objetivo es ilustrar el **contrato completo** del chapter: no basta con gener
 
 Existen **tres modos de invocación**. Elegir uno u otro depende del nivel de control que el QA quiera tener sobre el routing.
 
-1. **Workflow completo (recomendado por default)** — el QA describe la intención (qué quiere lograr, sobre qué SUT) y deja que el router `[[calidad-route-test-generation]]` clasifique el caso y delegue al workflow correcto. Es la entrada natural y aplica los guardrails de `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-intent-detection]]`, `[[calidad-spec-validation]]` y `[[calidad-brownfield-vs-greenfield]]` antes de generar nada.
+1. **Workflow completo (recomendado por default)** — el QA describe la intención (qué quiere lograr, sobre qué SUT) y deja que el router `[[calidad-route-test-generation]]` clasifique el caso y delegue al workflow correcto. Es la entrada natural y aplica los guardrails de `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-intent-detection]]`, `[[calidad-transversal-capabilities]]` (Paso 2.5: detecta y propone capas complementarias — accesibilidad, SEO, seguridad, visual, contract, performance — según intent, tipo de SUT y contexto regulatorio), `[[calidad-spec-validation]]` y `[[calidad-brownfield-vs-greenfield]]` antes de generar nada.
 2. **Skill directo** — cuando el QA ya sabe exactamente qué framework y modo aplica. Invoca el skill por id (ej. `@karate-greenfield`, `@playwright-brownfield`) y se salta el router. Kiro asume defaults de `[[calidad-context-determined-defaults]]` y solo pregunta lo crítico.
 3. **Prompt directo** — cuando solo necesita un artefacto puntual (un `.feature` aislado, un `setupMocks(page)`, un script K6). Invoca el prompt por id (ej. `@karate-generate-feature-prompt`) y obtiene un fragmento listo para pegar, sin scaffold de proyecto.
 
