@@ -1,5 +1,5 @@
 ---
-id: k6-run-and-suite
+id: calidad-k6-run-and-suite
 version: 1.0.0
 scope: stack
 type: skill
@@ -11,7 +11,7 @@ tags: [k6, cli, install, run, env-vars, run-all]
 
 # Ejecución de K6 — comandos y suite
 
-Una vez generado el proyecto con `[[k6-greenfield]]`, los scripts se ejecutan vía CLI directo (`k6 run`), vía `npm run` o vía `run-all.sh`.
+Una vez generado el proyecto con `[[calidad-k6-greenfield]]`, los scripts se ejecutan vía CLI directo (`k6 run`), vía `npm run` o vía `run-all.sh`.
 
 ## Instalación
 
@@ -74,4 +74,4 @@ Exporta primero la variable: `export BASE_URL=https://api.example.com/v1` y lueg
 
 - Nunca hardcodear `BASE_URL` o `AUTH_TOKEN` dentro de los scripts; siempre vía `__ENV` con fallback en `config.js`.
 - Si el spec no define security, no exportar `AUTH_TOKEN` ni incluirlo en los comandos.
-- Los resultados quedan en `results/` (ver `[[k6-handle-summary-evidence]]`); esa carpeta debe estar en `.gitignore`.
+- Los resultados quedan en `results/` (ver `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)`); esa carpeta debe estar en `.gitignore`.

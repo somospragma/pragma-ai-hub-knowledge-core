@@ -4,7 +4,7 @@ Antes de declarar `success` en cualquier suite K6 generada en modo `full`, el ag
 
 ## Comando obligatorio
 
-Según el vocabulario de escenarios elegido (ver `[[k6-vocabulary-and-scenario-mapping]]`):
+Según el vocabulario de escenarios elegido (ver ``vocabulary-and-scenario-mapping.md``):
 
 ```bash
 # Nomenclatura de negocio (default si user_story usa "linea base"):
@@ -23,7 +23,7 @@ k6 run tests/smoke/main.js --vus 1 --iterations 1
 
 - NO ejecuta el escenario completo (no aplica stages, no llega a target VUs).
 - NO valida thresholds de carga.
-- NO sustituye la ejecución formal de Carga / Estrés / Spike / Soak (esos se ejecutan via `[[calibrate-k6-thresholds]]` bajo ventana coordinada).
+- NO sustituye la ejecución formal de Carga / Estrés / Spike / Soak (esos se ejecutan via `[[calidad-calibrate-k6-thresholds]]` bajo ventana coordinada).
 - NO se ejecuta en modo `dry-run` ni `scaffold-only`.
 
 ## Persistencia
@@ -37,8 +37,8 @@ Y persistir el output completo en `.evidence/smoke-1-1-<timestamp>.log`.
 
 ## Cross-links
 
-- `[[k6-greenfield]]`
-- `[[k6-vocabulary-and-scenario-mapping]]`
+- `[[calidad-k6-greenfield]]`
+- ``vocabulary-and-scenario-mapping.md``
 - `[[calidad-post-generation-protocol]]`
 - `[[calidad-delivery-gate-contract]]`
 - `[[calidad-test-self-correction-loop]]`

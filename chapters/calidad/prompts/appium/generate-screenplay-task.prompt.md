@@ -1,5 +1,5 @@
 ---
-id: appium-generate-screenplay-task-prompt
+id: calidad-appium-generate-screenplay-task-prompt
 version: 1.0.0
 scope: stack
 type: prompt

@@ -1,5 +1,5 @@
 ---
-id: playwright-from-live-app
+id: calidad-playwright-from-live-app
 version: 1.0.0
 scope: stack
 type: skill
@@ -19,7 +19,7 @@ Cuando el usuario quiere generar un proyecto Playwright y:
 - No hay Figma actualizado ni Storybook publicado.
 - Se desea capturar selectores reales del DOM, no inferidos.
 
-Es el camino preferido cuando existe una URL viva: produce selectores precisos y rutas frontend reales. Es el complemento natural de `[[playwright-greenfield]]` para la fuente UI tipo `live-url`.
+Es el camino preferido cuando existe una URL viva: produce selectores precisos y rutas frontend reales. Es el complemento natural de `[[calidad-playwright-greenfield]]` para la fuente UI tipo `live-url`.
 
 Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta inputs con `[[calidad-mandatory-inputs-protocol]]`.
 
@@ -31,10 +31,10 @@ Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta
    - **MCP browser tools** — si el LLM tiene capacidad de browser, navegar la app y capturar `getByRole` / `getByLabel` / `getByTestId` programáticamente.
    - **Crawler headless** — para apps grandes, ejecutar un script que visite rutas conocidas y extraiga estructura.
 3. **Explorar flujos provistos** — Para cada `flow` declarado en `flows_to_explore`, navegar la app y registrar: rutas visitadas, headings, form fields, botones de acción, transiciones, errores observados.
-4. **Extraer páginas** — Invoca `[[playwright-extract-pages-from-live-app-prompt]]` con `base_url`, `auth_credentials` y `flows_to_explore`. Output: JSON con páginas, selectores reales con estrategia `getByTestId > getByRole > getByLabel > getByText`, navegación, form fields.
+4. **Extraer páginas** — Invoca `[[calidad-playwright-extract-pages-from-live-app-prompt]]` con `base_url`, `auth_credentials` y `flows_to_explore`. Output: JSON con páginas, selectores reales con estrategia `getByTestId > getByRole > getByLabel > getByText`, navegación, form fields.
 5. **Validar selectores** — Para cada selector emitido, validar que sea único y estable (no clases generadas, no índices de hijos frágiles). Preferir `getByTestId` si el DOM expone `data-testid`; degradar a `getByRole` con `name`.
 6. **Generar POM + tests** — Aplica `[POM](../playwright-greenfield/references/page-object-model.md)` (usando `route` frontend reales) y `[selector-priority](../playwright-greenfield/references/selector-priority.md)`. Por defecto los tests llevan tag `@live` — ver `[execution-modes](../playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)`.
-7. **Continuar con el workflow** — Delega el resto del proyecto (fixtures, config, README) a `[[generate-playwright-greenfield]]` con `ui_source_type: live-url` y el JSON de páginas extraído como `ui_source`.
+7. **Continuar con el workflow** — Delega el resto del proyecto (fixtures, config, README) a `[[calidad-generate-playwright-greenfield]]` con `ui_source_type: live-url` y el JSON de páginas extraído como `ui_source`.
 
 ## Inputs mínimos
 
@@ -47,7 +47,7 @@ Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta
 
 ## Salidas
 
-- JSON estructurado con páginas detectadas (mismo formato que `[[playwright-detect-pages-from-ui-source-prompt]]`).
+- JSON estructurado con páginas detectadas (mismo formato que `[[calidad-playwright-detect-pages-from-ui-source-prompt]]`).
 - Snippets de Codegen capturados (opcional, para evidencia).
 - Recomendaciones de testids faltantes (cuando los selectores caen a estrategias frágiles).
 
@@ -60,8 +60,8 @@ Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta
 
 ## Relación con otros skills
 
-- Si la aplicación viva **ya tiene un proyecto Playwright** en el repo (con `playwright.config.ts`, `tests/`, `pages/`), no generes uno nuevo: usa `[[playwright-brownfield]]` para extenderlo, y aprovecha la exploración descrita aquí únicamente para **validar selectores actuales contra el DOM real** antes de modificar Page Objects.
-- Si no existe proyecto Playwright y la app está viva, este skill es el camino preferido y luego delega la materialización a `[[generate-playwright-greenfield]]` / `[[playwright-greenfield]]`.
+- Si la aplicación viva **ya tiene un proyecto Playwright** en el repo (con `playwright.config.ts`, `tests/`, `pages/`), no generes uno nuevo: usa `[[calidad-playwright-brownfield]]` para extenderlo, y aprovecha la exploración descrita aquí únicamente para **validar selectores actuales contra el DOM real** antes de modificar Page Objects.
+- Si no existe proyecto Playwright y la app está viva, este skill es el camino preferido y luego delega la materialización a `[[calidad-generate-playwright-greenfield]]` / `[[calidad-playwright-greenfield]]`.
 
 ## Cross-links
 
@@ -69,6 +69,6 @@ Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta
 - POM: `[page-object-model](../playwright-greenfield/references/page-object-model.md)`
 - Selectores: `[selector-priority](../playwright-greenfield/references/selector-priority.md)`
 - Modos de corrida: `[execution-modes-live-mocked-hybrid](../playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)`
-- Extender proyecto existente: `[[playwright-brownfield]]`
-- Continuación: `[[generate-playwright-greenfield]]`, `[[playwright-greenfield]]`
-- Prompt asociado: `[[playwright-extract-pages-from-live-app-prompt]]`
+- Extender proyecto existente: `[[calidad-playwright-brownfield]]`
+- Continuación: `[[calidad-generate-playwright-greenfield]]`, `[[calidad-playwright-greenfield]]`
+- Prompt asociado: `[[calidad-playwright-extract-pages-from-live-app-prompt]]`

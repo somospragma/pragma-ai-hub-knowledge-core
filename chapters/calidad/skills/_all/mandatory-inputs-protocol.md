@@ -53,23 +53,23 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 1. Pedir al usuario los obligatorios faltantes, uno por uno o en bloque (preferir bloque para no fragmentar).
 2. Si un input está incompleto → indicar exactamente QUÉ falta, no devolver "está incompleto".
 3. Confirmar opcionales relevantes según framework detectado (firma, user_story, extra_params).
-4. Para proyectos con convenciones cliente-específicas detectadas (ver `[[karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
+4. Para proyectos con convenciones cliente-específicas detectadas (ver `[[calidad-karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
 5. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
 ```
 
 ### K6-specific inputs
 
-Para proyectos K6, además de los inputs base de la tabla anterior, el agente DEBE completar el checklist K6-específico (perfil de carga por escenario, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente). Ver [[k6-greenfield]] (consultar `references/k6-discovery-checklist.md`).
+Para proyectos K6, además de los inputs base de la tabla anterior, el agente DEBE completar el checklist K6-específico (perfil de carga por escenario, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente). Ver [[calidad-k6-greenfield]] (consultar `references/k6-discovery-checklist.md`).
 
 Sin este checklist, K6 no puede generar `options.stages` ni `options.thresholds` defendibles y debe degradar a `scaffold-only`.
 
 ## Overrides por convenciones cliente-específicas
 
-Algunos clientes/proyectos imponen overrides sobre los inputs opcionales. Patrón típico: clientes con convenciones brownfield estrictas (ver `[[karate-brownfield]]` y su reference `client-specific-conventions.md`) elevan `user_story` y `firma` a obligatorios.
+Algunos clientes/proyectos imponen overrides sobre los inputs opcionales. Patrón típico: clientes con convenciones brownfield estrictas (ver `[[calidad-karate-brownfield]]` y su reference `client-specific-conventions.md`) elevan `user_story` y `firma` a obligatorios.
 
 | Escenario                                                            | Skill / asset                      | Inputs que pasan a obligatorios                                                                                                                                       |
 |----------------------------------------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Karate brownfield con convenciones cliente-específicas detectadas    | `[[karate-brownfield]]`            | `user_story` y `firma` son **obligatorios** (no opcionales). Convenciones genéricas detalladas en el reference `client-specific-conventions.md` dentro del skill `karate-brownfield`. |
+| Karate brownfield con convenciones cliente-específicas detectadas    | `[[calidad-karate-brownfield]]`            | `user_story` y `firma` son **obligatorios** (no opcionales). Convenciones genéricas detalladas en el reference `client-specific-conventions.md` dentro del skill `karate-brownfield`. |
 
 ### Pattern para nuevos overrides
 

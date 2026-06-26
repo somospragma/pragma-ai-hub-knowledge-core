@@ -1,5 +1,5 @@
 ---
-id: complete-deferred-locators
+id: calidad-complete-deferred-locators
 version: 1.0.0
 scope: stack
 type: workflow
@@ -13,13 +13,13 @@ tags: [appium, locators, inspector, smoke, technical-debt, completion]
 
 ## Cuándo usar
 
-Después de generar el scaffold con `[[generate-appium-screenplay-android]]`, cuando el equipo ya tiene el APK funcional instalado en un dispositivo/emulador y va a reemplazar los placeholders `// TODO: update real locator` por selectores reales para que los `@smoke` validen contra el DOM real (en vez del flag en memoria).
+Después de generar el scaffold con `[[calidad-generate-appium-screenplay-android]]`, cuando el equipo ya tiene el APK funcional instalado en un dispositivo/emulador y va a reemplazar los placeholders `// TODO: update real locator` por selectores reales para que los `@smoke` validen contra el DOM real (en vez del flag en memoria).
 
 ## Inputs
 
 | Input | Obligatorio | Notas |
 |---|---|---|
-| Proyecto generado | Sí | Output de `[[generate-appium-screenplay-android]]`. |
+| Proyecto generado | Sí | Output de `[[calidad-generate-appium-screenplay-android]]`. |
 | APK funcional | Sí | El mismo `apk_path` validado. |
 | Device/emulador Android | Sí | Conectado y visible en `adb devices`. |
 | Appium Server | Sí | Corriendo en `appium_server_url` (default `http://127.0.0.1:4723`). |
@@ -81,7 +81,7 @@ Agregar este step al pipeline CI para que falle si quedan TODOs.
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` porque por definición este workflow se ejecuta con device/emulador + Appium server + APK ya disponibles (son inputs obligatorios). Clientes regulados (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) defaultean a `dry-run` (entregar diff de locators sin aplicar). `scaffold-only` no aplica acá.
 2. **Ejecutar** los 2 escenarios `@android @smoke` (ahora contra DOM real) vía `[[calidad-test-execution-orchestration]]`: `./gradlew clean test -Dcucumber.filter.tags=@smoke`. Capturar `target/site/serenity/` como evidencia.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky. Causas típicas: locator extraído mal en Appium Inspector, drift del DOM entre versiones del APK, `accessibilityId` no único, race condition con `WebDriverWait`, capability `automationName` desalineada.
-4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback en orden `accessibilityId → id → xpath`, LLM-driven selector repair contra el page source). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca volver al `TODO: update real locator`, nunca reemplazar la `Interaction` real (`TapOn`, `Enter`) por el flag en memoria, nunca debilitar `AppIsResponsive`, nunca downgrade a smoke trivial (`assertTrue(true)`) para forzar verde.
+4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback en orden `accessibilityId → id → xpath`, LLM-driven selector repair contra el page source). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca volver al `TODO: update real locator`, nunca reemplazar la `Interaction` real (`TapOn`, `Enter`) por el flag en memoria, nunca debilitar `AppIsResponsive`, nunca downgrade a smoke trivial (`assertTrue(true)`) para forzar verde.
 5. Reportar estado final: `success` (los 2 smokes pasan contra DOM real) | `partial` (algún locator quedó pendiente y requiere otra sesión con Appium Inspector) | `failed` (escalado a humano con stage, screenshot del Inspector, page source y locator propuesto).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Si el guardrail CI del paso 6 detecta `TODO` residual, marca el reporte como `partial` automáticamente.
 
@@ -99,4 +99,4 @@ Agregar este step al pipeline CI para que falle si quedan TODOs.
 10. Si el modo es `dry-run`: diff de locators propuesto entregado; ningún cambio aplicado sin aprobación humana.
 11. Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@accessibility` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).
 
-Ver `[[appium-deferred-locators-strategy]]` para el rationale del patrón y `[[appium-smoke-vs-proposed-scenarios]]` para la división original.
+Ver `[[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)` para el rationale del patrón y `[[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder)` para la división original.

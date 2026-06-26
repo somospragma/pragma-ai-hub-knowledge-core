@@ -21,7 +21,7 @@ Aplica este skill **cada vez que una suite generada debe correr en pipeline**, y
 
 Pragma trabaja predominantemente con **Azure DevOps Pipelines** como plataforma CI/CD primaria, pero los clientes pueden requerir **GitHub Actions** o **GitLab CI** según su stack interno. Este skill cubre las tres plataformas con paridad funcional.
 
-Activa este skill después de generar suites con `[[karate-greenfield]]`, `[[karate-brownfield]]`, `[[playwright-greenfield]]`, `[[playwright-brownfield]]`, `[[k6-greenfield]]` o `[[appium-screenplay-android]]`, y siempre en paralelo con `[[calidad-test-evidence-and-traceability]]` para asegurar que los reportes generados queden archivados como evidencia auditable.
+Activa este skill después de generar suites con `[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-playwright-brownfield]]`, `[[calidad-k6-greenfield]]` o `[[calidad-appium-screenplay-android]]`, y siempre en paralelo con `[[calidad-test-evidence-and-traceability]]` para asegurar que los reportes generados queden archivados como evidencia auditable.
 
 ## Instrucción
 

@@ -58,10 +58,10 @@ Feature: Retrieve transactions
 
 - `Background:` NO debe contener aserciones de dominio (`match`, `assert`). Sólo configuración (url, headers, helpers).
 - Cada `Scenario:` declara su tag de step. Un escenario con tag `@main` que también tenga `@happy-path` cuenta para cobertura; un `@auth` no cuenta.
-- La fórmula de cobertura `[[karate-negative-coverage-formula]]` cuenta SOLO escenarios `@main` (con sus tags refinados `@happy-path`, `@contract`, etc.). NO cuenta `@auth` ni `@cleanup`.
+- La fórmula de cobertura ``negative-coverage-formula.md`` cuenta SOLO escenarios `@main` (con sus tags refinados `@happy-path`, `@contract`, etc.). NO cuenta `@auth` ni `@cleanup`.
 - Filtrado en `mvn test`: `mvn test -Dkarate.options="--tags @main"` corre sólo el flujo principal; útil para smoke gates.
 - En el `karate-summary.json`, separar el conteo por tag permite reportar "main passed / auth passed / cleanup failed" en el `metadata.json` (ver `[metadata-emitter-karate](./metadata-emitter-karate.md)`).
 
 ## Cross-links
 
-`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[feature-design-dsl](./feature-design-dsl.md)`, `[[karate-negative-coverage-formula]]`, `[metadata-emitter-karate](./metadata-emitter-karate.md)`, `[[karate-greenfield]]`.
+`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[feature-design-dsl](./feature-design-dsl.md)`, ``negative-coverage-formula.md``, `[metadata-emitter-karate](./metadata-emitter-karate.md)`, `[[calidad-karate-greenfield]]`.

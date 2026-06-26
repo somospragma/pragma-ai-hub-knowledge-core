@@ -74,4 +74,4 @@ public class TransactionsSteps {
 
 ## Cross-links
 
-`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[screenplay-layers](./screenplay-layers.md)`, `[gherkin-syntax-rules](./gherkin-syntax-rules.md)`, `[metadata-emitter-appium](./metadata-emitter-appium.md)`, `[[appium-screenplay-android]]`.
+`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[screenplay-layers](./screenplay-layers.md)`, `[gherkin-syntax-rules](./gherkin-syntax-rules.md)`, `[metadata-emitter-appium](./metadata-emitter-appium.md)`, `[[calidad-appium-screenplay-android]]`.

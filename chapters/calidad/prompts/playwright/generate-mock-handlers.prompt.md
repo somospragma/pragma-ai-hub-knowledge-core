@@ -1,5 +1,5 @@
 ---
-id: playwright-generate-mock-handlers-prompt
+id: calidad-playwright-generate-mock-handlers-prompt
 version: 2.0.0
 scope: stack
 type: prompt
@@ -18,17 +18,17 @@ tags: [playwright, prompt, mocks, page-route, network-interception, opt-in]
 - `mock_mode: full` — toda la red interceptada (tests con tag `@mocked`).
 - `mock_endpoints: ["/api/v1/users", ...]` — mock dirigido para suite híbrida (tests con tag `@hybrid`).
 
-Si el workflow `[[generate-playwright-greenfield]]` no recibió esos campos en sus inputs, **omite este prompt** y no generes la carpeta `mocks/`.
+Si el workflow `[[calidad-generate-playwright-greenfield]]` no recibió esos campos en sus inputs, **omite este prompt** y no generes la carpeta `mocks/`.
 
 ## Variables
 
-- `{{endpoints}}` — Lista declarativa de endpoints `{ path, method, status, sample_response? }` que el usuario quiere mockear. Fuentes válidas en orden de preferencia (ver [[playwright-greenfield]] (consultar `references/mocks-page-route.md`)): captura del live app (Codegen/MCP/HAR) → Postman collection → OpenAPI/Swagger del backend → lista manual.
+- `{{endpoints}}` — Lista declarativa de endpoints `{ path, method, status, sample_response? }` que el usuario quiere mockear. Fuentes válidas en orden de preferencia (ver [[calidad-playwright-greenfield]] (consultar `references/mocks-page-route.md`)): captura del live app (Codegen/MCP/HAR) → Postman collection → OpenAPI/Swagger del backend → lista manual.
 - `{{sample_payloads}}` — Mapa opcional de payloads de muestra. Preferir capturas reales del live app; payloads inferidos desde un schema (OpenAPI o Postman example) son aceptables como punto de partida pero deben revisarse contra runtime.
 - `{{mock_mode}}` — `full | partial`. Cuando es `partial`, los paths no listados deben caer a `route.continue()` (no romper integración real).
 
 ## Instrucción para el LLM
 
-Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente [[playwright-greenfield]] (consultar `references/mocks-page-route.md`):
+Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente [[calidad-playwright-greenfield]] (consultar `references/mocks-page-route.md`):
 
 - Exporta `async function setupMocks(page: Page): Promise<void>`.
 - Declara `let nextId = 1000;` al inicio.
@@ -42,7 +42,7 @@ Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente [[playwri
 
 ## Recordatorio sobre el riesgo de mockear
 
-Los tests `@mocked` validan que el frontend habla con el contrato del mock, no con el backend real. Pueden pasar verde aunque la API esté caída. La estrategia recomendada es: smoke suite siempre `@live`; mocks solo para aislamiento UI puntual, contract regression del mock o desarrollo offline. Ver [[playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md`).
+Los tests `@mocked` validan que el frontend habla con el contrato del mock, no con el backend real. Pueden pasar verde aunque la API esté caída. La estrategia recomendada es: smoke suite siempre `@live`; mocks solo para aislamiento UI puntual, contract regression del mock o desarrollo offline. Ver [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md`).
 
 ## Snippet de salida esperado
 

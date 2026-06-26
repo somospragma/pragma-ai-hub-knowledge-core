@@ -1,5 +1,5 @@
 ---
-id: playwright-greenfield
+id: calidad-playwright-greenfield
 version: 2.0.0
 scope: stack
 type: skill
@@ -15,13 +15,13 @@ tags: [playwright, greenfield, e2e, typescript, page-object-model, ui-first, liv
 
 Cuando el usuario solicita generar un proyecto Playwright **desde cero** para automatización E2E web. A diferencia de pruebas de API, Playwright valida la **capa de presentación**, por lo que el insumo principal debe describir la UI, no el contrato backend.
 
-Si el usuario ya cuenta con un proyecto Playwright previo y quiere extender o ajustar selectores, usa `[[playwright-brownfield]]` en su lugar (ver `[[calidad-brownfield-vs-greenfield]]`).
+Si el usuario ya cuenta con un proyecto Playwright previo y quiere extender o ajustar selectores, usa `[[calidad-playwright-brownfield]]` en su lugar (ver `[[calidad-brownfield-vs-greenfield]]`).
 
 Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]`, recolecta inputs obligatorios con `[[calidad-mandatory-inputs-protocol]]`, recorre `[[calidad-pre-generation-protocol]]` y aplica la perspectiva del chapter con `[[calidad-chapter-perspective]]`.
 
 ### Fuentes UI válidas (en orden de preferencia)
 
-1. **URL de aplicación viva** (preferida) — usa Playwright Codegen (`npx playwright codegen URL`), MCP browser tools o un crawler para extraer páginas, selectores reales y navegación. Ver `[[playwright-from-live-app]]`.
+1. **URL de aplicación viva** (preferida) — usa Playwright Codegen (`npx playwright codegen URL`), MCP browser tools o un crawler para extraer páginas, selectores reales y navegación. Ver `[[calidad-playwright-from-live-app]]`.
 2. **Figma, wireframes o mockups UI** — descripciones visuales con jerarquía de componentes, rutas tentativas y form fields.
 3. **User stories con flujos UI explícitos** — historias que enumeran páginas, transiciones y acciones (no historias que solo describen reglas de negocio).
 4. **Storybook o sistema de diseño existente** — componentes catalogados con sus rutas demo.
@@ -32,13 +32,13 @@ Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]`,
    - Si es Figma: link público o screenshots con jerarquía de páginas.
    - Si es user story: que liste páginas y flujos UI explícitos (no solo reglas backend).
    - Si no hay descripción de UI, **detente** y pide una fuente válida según `[ui-source-priority](references/ui-source-priority.md)`.
-2. **Detectar páginas** — Invoca `[[playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content`, `user_story` y `priority_assignments`. Extrae `route` (frontend), `page_type`, `form_fields`, `navigation` y `selectors_hint` directamente desde la fuente UI.
+2. **Detectar páginas** — Invoca `[[calidad-playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content`, `user_story` y `priority_assignments`. Extrae `route` (frontend), `page_type`, `form_fields`, `navigation` y `selectors_hint` directamente desde la fuente UI.
 3. **Detectar flujos** — Clasifica los flujos de usuario observados en la UI: navegación entre páginas, formularios multi-paso, autenticación, listados con paginación. Cada flujo se traducirá en uno o más `.spec.ts`.
 4. **Decidir modo de ejecución** — Pregunta al usuario: `@live` (default, contra backend real), `@mocked` (opt-in, mocks via `page.route()`) o `@hybrid` (live + mock de endpoints específicos). Ver `[execution-modes-live-mocked-hybrid](references/execution-modes-live-mocked-hybrid.md)`.
 5. **Planificar tests** — Para cada página: aplicar la fórmula de `references/coverage-formula.md` (mínimo 8 por HU). Declarar `effective_minimum` por HU en `.evidence/coverage-declared.json` ANTES de emitir. Para páginas `CRITICAL` y `HIGH` (según `priority_assignments` provistas por el usuario/PO), añade visual regression (`[ver visual](references/visual-regression.md)`) y accesibilidad WCAG 2.1 AA (`[ver a11y](references/accessibility-axe-wcag.md)`). Detectar necesidad de autenticación con `references/auth-detection-rules.md` ANTES de planificar fixtures.
 6. **Emitir archivos en orden de prioridad** — Primero `tests/*.spec.ts`, luego Page Objects, después fixtures, y por último infraestructura. Las plantillas inmutables viven en `references/templates/`: `playwright.config.ts.tpl`, `tsconfig.json.tpl`, `package.json.tpl`, `auth.setup.ts.tpl`, `a11y-audit.spec.ts.tpl`, `xss-prevention.spec.ts.tpl`. Cada test debe declarar tags nativos v1.42+ (`references/playwright-native-tags-v142.md`). Aplicar `references/waits-policy.md` (prohibido `waitForTimeout` y `networkidle` en SPAs). Los mocks (`mocks/api-handlers.ts`) se emiten SOLO si el usuario declaró `mock_mode != off` con su lista `mock_endpoints` (ver `[mocks-page-route](references/mocks-page-route.md)` para fuentes válidas y orden de preferencia). Usa `[[calidad-streaming-files-protocol]]` para la entrega.
 7. **Validar coherencia** — Aplicar `references/coherence-checks.md`: ningún fixture/mock/data file generado puede quedar huérfano (sin importadores). Resolver refactorizando tests para consumirlo o eliminándolo.
-8. **Validar** — Recorre `[[generate-playwright-greenfield]]` (criterios de finalización), `[[calidad-post-generation-protocol]]`, valida `[[calidad-delivery-gate-contract]]` y enlaza la traza según `[[calidad-test-evidence-and-traceability]]`.
+8. **Validar** — Recorre `[[calidad-generate-playwright-greenfield]]` (criterios de finalización), `[[calidad-post-generation-protocol]]`, valida `[[calidad-delivery-gate-contract]]` y enlaza la traza según `[[calidad-test-evidence-and-traceability]]`.
 
 ## Modo de ejecución
 
@@ -66,7 +66,7 @@ La prioridad de cada página (`CRITICAL | HIGH | MEDIUM | LOW`) **no se infiere 
 2. El risk assessment del Product Owner.
 3. Una pregunta explícita al usuario cuando no exista ninguno de los anteriores.
 
-El prompt `[[playwright-detect-pages-from-ui-source-prompt]]` recibe `priority_assignments` como input externo y NUNCA infiere prioridad desde el nombre de la página.
+El prompt `[[calidad-playwright-detect-pages-from-ui-source-prompt]]` recibe `priority_assignments` como input externo y NUNCA infiere prioridad desde el nombre de la página.
 
 ## Salidas
 

@@ -18,7 +18,7 @@
             └── {resource}.feature
 ```
 
-**Constraint crítico:** todos los archivos no-Java viven dentro de `src/test/java/`. Ver `[[karate-feature-file-location-constraint]]`.
+**Constraint crítico:** todos los archivos no-Java viven dentro de `src/test/java/`. Ver ``file-location-constraint.md``.
 
 ## `pom.xml`
 

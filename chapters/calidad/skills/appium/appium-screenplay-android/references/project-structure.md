@@ -5,7 +5,7 @@
 
 ```
 {project_name}/
-├── build.gradle                    # Versiones inmutables (ver [[appium-gradle-version-matrix]])
+├── build.gradle                    # Versiones inmutables (ver `gradle-version-matrix.md`)
 ├── settings.gradle                 # rootProject.name = '{project_name}'
 ├── gradlew                         # wrapper Unix (mode 0755)
 ├── gradlew.bat                     # wrapper Windows
@@ -46,13 +46,13 @@
 
 ## Contenido canónico por archivo
 
-- **`build.gradle`**: plugins, scopes, dependencies con versiones fijas. NO redefinir `aggregate`/`reports`/`clean` (`[[appium-no-aggregate-collision]]`).
+- **`build.gradle`**: plugins, scopes, dependencies con versiones fijas. NO redefinir `aggregate`/`reports`/`clean` (``no-aggregate-collision.md``).
 - **`settings.gradle`**: una sola línea `rootProject.name = '{project_name}'`.
 - **`gradlew` / `gradlew.bat`**: wrappers oficiales Gradle 8.10. Unix con shebang `#!/usr/bin/env sh` y mode 0755.
 - **`gradle/wrapper/gradle-wrapper.properties`**: `distributionUrl=https\://services.gradle.org/distributions/gradle-8.10-bin.zip`.
 - **`serenity.properties`**: `webdriver.driver=appium` y referencia a `serenity.conf`.
-- **`android.conf`**: capabilities por defecto (HOCON) usando los valores normalizados de `[[appium-mandatory-inputs-validation]]`.
-- **`README.md`**: instrucciones en español: instalar JDK 21, `chmod +x gradlew`, comandos de `[[appium-run-and-tags]]`, TODO de `app_package`/`app_activity` si se usaron defaults.
+- **`android.conf`**: capabilities por defecto (HOCON) usando los valores normalizados de ``mandatory-inputs-validation.md``.
+- **`README.md`**: instrucciones en español: instalar JDK 21, `chmod +x gradlew`, comandos de `[[calidad-appium-run-and-tags]]`, TODO de `app_package`/`app_activity` si se usaron defaults.
 - **`tasks/LoginTask.java`**: implementa `Task`, factory anotada `@Step`, `performAs` registra `appResponsive=true` (deferred).
 - **`questions/AppIsResponsive.java`**: `static value(Actor)` retorna `Boolean`.
 - **`interactions/TapOn.java`**: implementa `Interaction`, factory `theElement(Target)` con `@Step`.
@@ -62,7 +62,7 @@
 - **`resources/serenity.conf`**: HOCON con `webdriver.driver` y bloque `appium { ... }` con las capabilities.
 - **`resources/logback-test.xml`**: log al console nivel INFO, package `co.com.pragma` en DEBUG.
 - **`resources/junit-platform.properties`**: `cucumber.plugin=pretty,html:target/cucumber-report.html,json:target/cucumber.json` + `cucumber.glue=co.com.pragma.stepdefinitions`.
-- **`resources/features/login.feature`**: 2 escenarios `@android @smoke` (siempre) + `@android @proposed` opcionales (ver `[[appium-smoke-vs-proposed-scenarios]]`).
+- **`resources/features/login.feature`**: 2 escenarios `@android @smoke` (siempre) + `@android @proposed` opcionales (ver ``smoke-vs-proposed-scenarios.md``).
 - **`.gitkeep`** en directorios vacíos para no perderlos en git.
 
-Detalle de versiones en `[[appium-gradle-version-matrix]]`; ejecución en `[[appium-run-and-tags]]`.
+Detalle de versiones en ``gradle-version-matrix.md``; ejecución en `[[calidad-appium-run-and-tags]]`.

@@ -77,9 +77,9 @@ En **brownfield Playwright** detecta y respeta:
 
 **Detección brownfield:** el `project_root` (= `output_path`) contiene mínimo `tests/config.js` + `tests/utils.js` + ≥1 `tests/*-test.js`. Si falta alguno, tratar como greenfield.
 
-**Acción greenfield:** invocar `[[k6-greenfield]]` y el workflow `[[generate-k6-suite]]`.
+**Acción greenfield:** invocar `[[calidad-k6-greenfield]]` y el workflow `[[calidad-generate-k6-suite]]`.
 
-**Acción brownfield:** invocar `[[k6-brownfield]]` y el workflow `[[extend-k6-brownfield]]`. NO regenerar infraestructura. Reusar `config.js` y `utils.js` (entregar patches incrementales, no archivos completos).
+**Acción brownfield:** invocar `[[calidad-k6-brownfield]]` y el workflow `[[calidad-extend-k6-brownfield]]`. NO regenerar infraestructura. Reusar `config.js` y `utils.js` (entregar patches incrementales, no archivos completos).
 
 En **brownfield K6** detecta y respeta:
 
@@ -94,7 +94,7 @@ En **brownfield K6** detecta y respeta:
 | `existing_id_correlation_pattern`| Cómo se extrae el id del response del POST y se reusa en GET/PUT/DELETE                      | `const id = res.json('id');` + guard     |
 | `handle_summary_path`            | Destino dentro de `handleSummary()`: `results/` (default) vs `reports/`                       | `results/${timestamp}-summary.json`      |
 
-Detalle del algoritmo en `[[k6-convention-detection]]`. Patrones de extensión en `[[k6-extension-patterns]]`.
+Detalle del algoritmo en `[[calidad-k6-brownfield]] (consultar `references/convention-detection.md` en su subfolder)`. Patrones de extensión en `[[calidad-k6-brownfield]] (consultar `references/extension-patterns.md` en su subfolder)`.
 
 ### Appium
 
@@ -102,17 +102,17 @@ Pragma's Chapter Calidad soporta **tanto greenfield como brownfield** en Appium,
 
 | Modo        | Plataforma soportada              | Asset destino                                                                                  |
 |-------------|-----------------------------------|------------------------------------------------------------------------------------------------|
-| greenfield  | Android (vía scaffolder V2)       | `[[appium-screenplay-android]]`                                                                |
+| greenfield  | Android (vía scaffolder V2)       | `[[calidad-appium-screenplay-android]]`                                                                |
 | greenfield  | iOS (vía scaffold manual)         | Guidance manual en `references/android-only-scope-rationale.md` del skill greenfield           |
-| brownfield  | Android **e** iOS                 | `[[appium-brownfield]]`                                                                        |
+| brownfield  | Android **e** iOS                 | `[[calidad-appium-brownfield]]`                                                                        |
 
 **Detección brownfield Appium:** `project_root` contiene `build.gradle` o `pom.xml`, **más** `src/test/resources/features/` (o equivalente), **más** ≥1 archivo `.feature`. Si además existen UserInterfaces bajo `src/main/java/.../userinterfaces/`, refuerza brownfield.
 
-**Acción brownfield:** invocar `[[appium-brownfield]]`. Preservar infraestructura (`build.gradle`/`pom.xml`, `gradlew`, `serenity.conf`, runner Cucumber). Respetar convenciones detectadas (`base_package`, `gherkin_language`, tags, naming). Soporta Android y iOS — la plataforma se detecta leyendo `automationName` en las capabilities (`UiAutomator2` → android, `XCUITest` → ios).
+**Acción brownfield:** invocar `[[calidad-appium-brownfield]]`. Preservar infraestructura (`build.gradle`/`pom.xml`, `gradlew`, `serenity.conf`, runner Cucumber). Respetar convenciones detectadas (`base_package`, `gherkin_language`, tags, naming). Soporta Android y iOS — la plataforma se detecta leyendo `automationName` en las capabilities (`UiAutomator2` → android, `XCUITest` → ios).
 
-**Acción greenfield Android:** invocar `[[appium-screenplay-android]]` (scaffolder V2 produce proyecto completo Gradle + Screenplay + Serenity + Cucumber). Solo Android — es una limitación del auto-generador, no del chapter.
+**Acción greenfield Android:** invocar `[[calidad-appium-screenplay-android]]` (scaffolder V2 produce proyecto completo Gradle + Screenplay + Serenity + Cucumber). Solo Android — es una limitación del auto-generador, no del chapter.
 
-**Acción greenfield iOS:** el scaffolder V2 NO genera proyectos iOS. Apuntar al usuario al workaround manual descrito en `references/android-only-scope-rationale.md` del skill `[[appium-screenplay-android]]`. V3 del scaffolder incluirá iOS.
+**Acción greenfield iOS:** el scaffolder V2 NO genera proyectos iOS. Apuntar al usuario al workaround manual descrito en `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`. V3 del scaffolder incluirá iOS.
 
 ## Restricciones
 
@@ -126,7 +126,7 @@ Pragma's Chapter Calidad soporta **tanto greenfield como brownfield** en Appium,
 
 En brownfield, la auto-corrección aplica EXCLUSIVAMENTE a tests recién generados/modificados por el agente. NUNCA aplicar correcciones automáticas a tests preexistentes del cliente, aunque fallen. Si tests preexistentes fallan: reportar al humano, NO modificar (puede esconder bugs, romper convenciones del cliente, o violar el contrato implícito de no-modificación).
 
-Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`) y a sus invocaciones desde cualquier workflow brownfield del chapter (`[[extend-karate-brownfield]]`, `[[update-playwright-brownfield]]`, `[[extend-k6-brownfield]]`, `[[extend-appium-brownfield]]`). El alcance de la auto-corrección se delimita por el conjunto de archivos producidos o modificados en la corrida actual; cualquier fallo fuera de ese conjunto se reporta y escala, no se repara.
+Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`) y a sus invocaciones desde cualquier workflow brownfield del chapter (`[[calidad-extend-karate-brownfield]]`, `[[calidad-update-playwright-brownfield]]`, `[[calidad-extend-k6-brownfield]]`, `[[calidad-extend-appium-brownfield]]`). El alcance de la auto-corrección se delimita por el conjunto de archivos producidos o modificados en la corrida actual; cualquier fallo fuera de ese conjunto se reporta y escala, no se repara.
 
 ## Paridad de garantías universales brownfield ↔ greenfield
 

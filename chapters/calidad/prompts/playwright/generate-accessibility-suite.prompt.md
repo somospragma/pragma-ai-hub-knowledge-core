@@ -1,5 +1,5 @@
 ---
-id: playwright-generate-a11y-prompt
+id: calidad-playwright-generate-a11y-prompt
 version: 1.0.0
 scope: stack
 type: prompt
@@ -17,7 +17,7 @@ tags: [playwright, prompt, accessibility, a11y, wcag, axe]
 
 ## Instrucción para el LLM
 
-Genera UN solo archivo `tests/accessibility.spec.ts` siguiendo estrictamente `[[playwright-accessibility-axe-wcag]]`:
+Genera UN solo archivo `tests/accessibility.spec.ts` siguiendo estrictamente `[[calidad-playwright-greenfield]] (consultar `references/accessibility-axe-wcag.md` en su subfolder)`:
 
 - Importa `test` y `expect` desde `@fixtures/base.fixture`.
 - Importa `injectAxe` y `checkA11y` desde `axe-playwright`.

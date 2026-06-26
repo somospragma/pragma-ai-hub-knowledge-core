@@ -1,5 +1,5 @@
 ---
-id: calibrate-k6-thresholds
+id: calidad-calibrate-k6-thresholds
 version: 1.0.0
 scope: stack
 type: workflow
@@ -13,7 +13,7 @@ tags: [k6, thresholds, calibration, baseline, smoke]
 
 ## Cuándo usar
 
-Después de la primera corrida smoke con datos reales del servicio. Los thresholds iniciales generados con `[[k6-greenfield]]` son una estimación (Moderate por default — ver `[[k6-thresholds-three-tiers]]`); este workflow los alinea al comportamiento observado.
+Después de la primera corrida smoke con datos reales del servicio. Los thresholds iniciales generados con `[[calidad-k6-greenfield]]` son una estimación (Moderate por default — ver `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`); este workflow los alinea al comportamiento observado.
 
 Aplícalo también cuando:
 
@@ -23,7 +23,7 @@ Aplícalo también cuando:
 
 ## Inputs
 
-- **Obligatorio**: JSON summary del smoke run anterior (archivo `results/${timestamp}-summary.json` exportado por `[[k6-handle-summary-evidence]]`).
+- **Obligatorio**: JSON summary del smoke run anterior (archivo `results/${timestamp}-summary.json` exportado por `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)`).
 - **Opcional**: `user_story.SLA` y/o `firma.SLA` actualizados, si el contexto de negocio cambió.
 
 ## Pasos
@@ -39,7 +39,7 @@ Lee el JSON del smoke y extrae:
 
 ### Paso 2 — Seleccionar tier
 
-Compara los valores medidos contra los tres tiers (`[[k6-thresholds-three-tiers]]`):
+Compara los valores medidos contra los tres tiers (`[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`):
 
 - Si P95 medido < 500 ms y error rate < 0.001 → candidato Conservative.
 - Si P95 medido < 1000 ms y error rate < 0.01 → Moderate.
@@ -49,11 +49,11 @@ Si el `user_story` o `firma` declaran un SLA más estricto que el baseline, prev
 
 ### Paso 3 — Actualizar `options.thresholds`
 
-Aplica los valores del tier seleccionado a los 5 scripts (`smoke`, `load`, `stress`, `spike`, `soak`). Usa el snippet correspondiente de `[[k6-thresholds-three-tiers]]`.
+Aplica los valores del tier seleccionado a los 5 scripts (`smoke`, `load`, `stress`, `spike`, `soak`). Usa el snippet correspondiente de `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`.
 
 ### Paso 4 — Re-correr smoke como validación
 
-Ejecuta `npm run smoke` (ver `[[k6-run-and-suite]]`). Si los nuevos thresholds pasan, la calibración es válida. Si fallan, revisa si el servicio degradó o si el tier es demasiado estricto para el baseline real.
+Ejecuta `npm run smoke` (ver `[[calidad-k6-run-and-suite]]`). Si los nuevos thresholds pasan, la calibración es válida. Si fallan, revisa si el servicio degradó o si el tier es demasiado estricto para el baseline real.
 
 ### Paso 5 — Documentar
 
@@ -74,7 +74,7 @@ En el `README.md` del proyecto, registra:
    - **Tier demasiado estricto vs. baseline real** → ajuste legítimo de tier hacia uno más permisivo, dentro de los tres tiers canónicos. NO inventar tiers ad-hoc.
    - **Servicio degradado** → NO relajar el threshold; reportar al humano que el SUT degradó y mantener el tier alineado al SLA.
    - **Flakiness por ambiente o saturación de red** → reportar y proponer ventana o instancia dedicada; no maquillar con thresholds.
-4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]`. `[[calidad-test-self-healing]]` típicamente NO aplica acá (no hay selectores). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros de calibración**: jamás cruzar el SLA declarado por el negocio en `user_story` / `firma`; jamás eliminar métricas de `options.thresholds`; jamás convertir `http_req_failed` en un porcentaje absurdo (>0.1) para forzar verde.
+4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]`. `[[calidad-test-self-healing]]` típicamente NO aplica acá (no hay selectores). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros de calibración**: jamás cruzar el SLA declarado por el negocio en `user_story` / `firma`; jamás eliminar métricas de `options.thresholds`; jamás convertir `http_req_failed` en un porcentaje absurdo (>0.1) para forzar verde.
 5. Reportar estado final: `success` (smoke pasa con tier elegido y SLA respetado) | `partial` (no se pudo ejecutar smoke; se entregaron thresholds propuestos en diff) | `failed` (servicio degradado o flakiness no atribuible a thresholds — escalado a humano con métricas, SLA y razonamiento).
 6. Archivar evidencia + audit log de cambios de threshold según `[[calidad-test-evidence-and-traceability]]`. Conservar el JSON del baseline previo y del baseline post-calibración para auditoría.
 

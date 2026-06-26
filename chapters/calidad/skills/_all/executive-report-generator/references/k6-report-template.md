@@ -73,4 +73,4 @@ Estos casos NO son `SUT_BUG` y NO son `THRESHOLD_TOO_STRICT`: requieren coordina
 - `tier` de thresholds (`Conservative` / `Moderate` / `Relaxed`).
 - Paths a `summary.json` por escenario.
 - Hardware del runner (cpu / ram / región si está en metadata) — relevante para reproducir latencias.
-- Recordar al lector: si los thresholds resultaron irreales (`THRESHOLD_TOO_STRICT` recurrente), invocar `[[calibrate-k6-thresholds]]` antes de la siguiente corrida.
+- Recordar al lector: si los thresholds resultaron irreales (`THRESHOLD_TOO_STRICT` recurrente), invocar `[[calidad-calibrate-k6-thresholds]]` antes de la siguiente corrida.

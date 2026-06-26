@@ -1,5 +1,5 @@
 ---
-id: extend-karate-brownfield
+id: calidad-extend-karate-brownfield
 version: 1.0.0
 scope: stack
 type: workflow
@@ -17,7 +17,7 @@ Cuando `[[calidad-intent-detection]]` y `[[calidad-brownfield-vs-greenfield]]` i
 
 ### Pre-flight (OBLIGATORIO)
 
-Antes de cualquier acción, ejecutar [[karate-greenfield]] (consultar `references/preflight.md` en su subfolder) del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+Antes de cualquier acción, ejecutar [[calidad-karate-greenfield]] (consultar `references/preflight.md` en su subfolder) del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
 
 Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
 
@@ -38,7 +38,7 @@ Refuerzos adicionales:
 
 ### Paso previo — Análisis condicional con STRATEGY.md
 
-Si el alcance del brownfield es **grande** (≥3 endpoints/HUs/escenarios nuevos, o cambios cross-cutting que afectan multiple features preexistentes): generar `STRATEGY.md` según el template [[karate-greenfield]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+Si el alcance del brownfield es **grande** (≥3 endpoints/HUs/escenarios nuevos, o cambios cross-cutting que afectan multiple features preexistentes): generar `STRATEGY.md` según el template [[calidad-karate-greenfield]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
 
 Si el alcance es **pequeño** (1-2 cambios puntuales): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
 
@@ -56,7 +56,7 @@ Respetar convenciones del proyecto cliente: el STRATEGY del brownfield documenta
 | `user_story` | Obligatorio si el cliente impone convenciones | Tag `@user-story:{ticket-id}`. |
 | `firma` | Obligatorio si el cliente impone convenciones | Documento técnico. |
 
-Lista completa en `[[karate-mandatory-inputs-brownfield]]`.
+Lista completa en `[[calidad-karate-brownfield]] (consultar `references/mandatory-inputs-brownfield.md` en su subfolder)`.
 
 ## Pasos
 
@@ -67,10 +67,10 @@ Pistas: paths con prefix de ticket (`{TICKET-XXX}`), variable de base URL no est
 Si el cliente impone convenciones, exigir `user_story` y `firma`. Validar `Body_Mode` ∈ {A, B}. Si falta cualquier obligatorio, detente y solicítalo (`[[calidad-mandatory-inputs-protocol]]`).
 
 ### 3. Analizar convenciones existentes
-Aplicar el algoritmo de `[[karate-convention-detection]]`. Anota `features_dir`, `bodies_dir`, `package_name`, `base_url_var`, `header_style`, `body_loading_style`, `scenario_naming_pattern`, variables de `karate-config.js`. Si hay conflicto entre convención autodetectada y convenciones declaradas por el cliente, las del cliente ganan.
+Aplicar el algoritmo de `[[calidad-karate-brownfield]] (consultar `references/convention-detection.md` en su subfolder)`. Anota `features_dir`, `bodies_dir`, `package_name`, `base_url_var`, `header_style`, `body_loading_style`, `scenario_naming_pattern`, variables de `karate-config.js`. Si hay conflicto entre convención autodetectada y convenciones declaradas por el cliente, las del cliente ganan.
 
 ### 4. Calcular cobertura
-Aplica `[[karate-negative-coverage-formula]]`. Si hay headers transversales obligatorios del cliente, súmalos aunque el spec no los marque como required (ver `references/client-specific-conventions.md`).
+Aplica `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`. Si hay headers transversales obligatorios del cliente, súmalos aunque el spec no los marque como required (ver `references/client-specific-conventions.md`).
 
 ### 5. Generar SOLO `.feature` y body JSON
 - `.feature` en `features_dir` detectado, con naming y tags del proyecto (siguiendo las convenciones cliente-específicas detectadas si aplican).
@@ -81,7 +81,7 @@ Aplica `[[karate-negative-coverage-formula]]`. Si hay headers transversales obli
 - Convenciones detectadas respetadas al 100% (header_style, body_loading_style, naming, tags).
 - Convenciones cliente-específicas aplicadas si corresponde (naming, headers transversales obligatorios, assertions field-by-field).
 - Ningún archivo de infraestructura generado.
-- Verifica que el `pom.xml` existente cumpla `[[karate-feature-file-location-constraint]]`; si no, repórtalo al usuario sin modificarlo.
+- Verifica que el `pom.xml` existente cumpla `[[calidad-karate-greenfield]] (consultar `references/file-location-constraint.md` en su subfolder)`; si no, repórtalo al usuario sin modificarlo.
 
 Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-test-evidence-and-traceability]]`.
 
@@ -92,14 +92,14 @@ Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP — clientes con convenciones cliente-específicas estrictas suelen ameritar `dry-run`) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin `mvn`, sin acceso al ambiente del cliente), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` filtrado por el tag de la nueva historia (`mvn test -Dkarate.options="--tags @user-story:{ticket-id}"`), de modo que la corrida toque sólo los features nuevos.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz. Si un test preexistente del cliente falla por daño colateral (p. ej. cambio compartido en `karate-config.js`), detenerse y reportar — NO auto-corregir.
-4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar headers transversales del cliente, aserciones de negocio o status codes para forzar verde.
+4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar headers transversales del cliente, aserciones de negocio o status codes para forzar verde.
 5. Reportar estado final: `success` (todos los nuevos tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con feature, scenario, assertion, response y hipótesis).
 6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
 7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths, grep imports cruzados, compile/lint dry-run sobre archivos nuevos) antes de cerrar.
 8. **Smoke gate universal (tests nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [[calidad-smoke-gate-policy]]. En brownfield Karate, el gate ejecuta **únicamente los features nuevos** filtrados por tag: `mvn test -Dkarate.options="--tags @smoke and @new"` o equivalente filtrado por path del feature recién generado. Los features preexistentes NO se ejecutan en el gate para no inflar tiempo ni contaminar resultados. Si fallan tests preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado.
 9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/SSL), emitir `.evidence/execution-status.json` según [[calidad-environment-blocker-evidence]]. El estado pasa a `partial` con razón.
 10. **Metadata por corrida**: emitir `results/karate/{date}/{ISO}-metadata.json` según el schema universal [[calidad-execution-metadata-schema]]. En brownfield, el campo `workload_or_scope` debe distinguir "N features/scenarios nuevos sobre M preexistentes".
-11. **Reporte ejecutivo**: invocar `[[generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `karate-report-template.md`. El reporte debe segregar explícitamente "features/scenarios nuevos (en scope de esta sesión)" de "features preexistentes (referencia, no ejecutados en el gate)".
+11. **Reporte ejecutivo**: invocar `[[calidad-generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `karate-report-template.md`. El reporte debe segregar explícitamente "features/scenarios nuevos (en scope de esta sesión)" de "features preexistentes (referencia, no ejecutados en el gate)".
 12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización

@@ -60,4 +60,4 @@ test.describe('Transactions list', { tag: ['@HU-101'] }, () => {
 
 ## Cross-links
 
-`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[playwright-native-tags-v142](./playwright-native-tags-v142.md)`, `[coverage-formula](./coverage-formula.md)`, `[auth-storage-state](./auth-storage-state.md)`, `[metadata-emitter-playwright](./metadata-emitter-playwright.md)`, `[[playwright-greenfield]]`.
+`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[playwright-native-tags-v142](./playwright-native-tags-v142.md)`, `[coverage-formula](./coverage-formula.md)`, `[auth-storage-state](./auth-storage-state.md)`, `[metadata-emitter-playwright](./metadata-emitter-playwright.md)`, `[[calidad-playwright-greenfield]]`.

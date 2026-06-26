@@ -16,7 +16,7 @@ tags: {
 
 - `endpoint`: identifica la operación de negocio (preferir `operationId` del spec; si no existe, usar `<verb>-<resource>`). NO usar la URL cruda con `{id}` interpolados — eso explota la cardinalidad.
 - `step`: ubica el request dentro del flujo. `auth` aísla todo lo relativo a obtención/refresco de token. `main` cubre el endpoint objetivo (el SUT). `cleanup` cubre teardown (DELETE de recursos creados, logout, etc.).
-- `scenario`: alinea con el vocabulario decidido en `[[vocabulary-and-scenario-mapping]]`. Permite filtrar métricas cuando varios scripts vuelcan al mismo backend de observabilidad.
+- `scenario`: alinea con el vocabulario decidido en ``vocabulary-and-scenario-mapping.md``. Permite filtrar métricas cuando varios scripts vuelcan al mismo backend de observabilidad.
 
 ## Thresholds aislados por tag
 
@@ -86,10 +86,10 @@ La política de tags NO es un mecanismo para aflojar thresholds. Aislar métrica
 
 ## Cross-links
 
-- `[[k6-greenfield]]`
-- `[[k6-thresholds-three-tiers]]`
-- `[[auth-strategy-setup-vs-per-vu]]`
-- `[[results-structure-and-metadata]]`
+- `[[calidad-k6-greenfield]]`
+- ``thresholds-three-tiers.md``
+- ``auth-strategy-setup-vs-per-vu.md``
+- ``results-structure-and-metadata.md``
 - `[[calidad-pre-generation-protocol]]`
 - `[[calidad-post-generation-protocol]]`
 - `[[calidad-delivery-gate-contract]]`

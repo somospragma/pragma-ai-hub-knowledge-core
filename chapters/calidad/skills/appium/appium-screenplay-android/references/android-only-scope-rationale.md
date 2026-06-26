@@ -3,14 +3,14 @@
 
 Este documento separa dos cosas que históricamente se confundieron:
 
-1. La **limitación del scaffolder V2** (auto-generador `[[appium-screenplay-android]]`).
+1. La **limitación del scaffolder V2** (auto-generador `[[calidad-appium-screenplay-android]]`).
 2. La **capacidad real del Chapter Calidad** para automatizar Appium en iOS y Android.
 
 No son lo mismo. El scaffolder no agotó las capacidades del Chapter.
 
 ## 1. Limitación del scaffolder V2 (Android-only)
 
-El generador automático `[[appium-screenplay-android]]` produce hoy **únicamente** proyectos Android. Las razones son tooling, no estrategia:
+El generador automático `[[calidad-appium-screenplay-android]]` produce hoy **únicamente** proyectos Android. Las razones son tooling, no estrategia:
 
 - **Driver UiAutomator2.** El stack V2 fija `automation_name=UiAutomator2`, que es exclusivo de Android.
 - **Selector mapping limitado.** El generador soporta `AppiumBy.id`, `AppiumBy.xpath` y `AppiumBy.accessibilityId`. NO emite `AppiumBy.iOSClassChain` ni `AppiumBy.iOSNsPredicateString`, que son los selectores idiomáticos de XCUITest.
@@ -27,7 +27,7 @@ Este mensaje aplica **al scaffolder**, no al chapter completo.
 
 ## 2. Capacidad del Chapter Calidad (Android e iOS)
 
-Pragma's Chapter Calidad **sí soporta automatización Appium para iOS** usando exactamente el mismo patrón Screenplay + Serenity + Cucumber documentado en `[[appium-screenplay-android]]`. Lo que cambia es:
+Pragma's Chapter Calidad **sí soporta automatización Appium para iOS** usando exactamente el mismo patrón Screenplay + Serenity + Cucumber documentado en `[[calidad-appium-screenplay-android]]`. Lo que cambia es:
 
 - El **driver** (`XCUITest` en lugar de `UiAutomator2`).
 - Las **capabilities** (`platformName=iOS`, `deviceName`, `platformVersion`, `bundleId` o `app`, `udid` para device real).
@@ -39,9 +39,9 @@ Las capas Screenplay (Task, Question, Interaction, UserInterface), el runner Ser
 Para un proyecto Appium iOS hoy, el desarrollador debe **scaffold manual** usando:
 
 - La documentación oficial de Appium (driver XCUITest).
-- La referencia `[[appium-screenplay-layers]]` para el patrón.
+- La referencia ``screenplay-layers.md`` para el patrón.
 - Las convenciones mobile QA del Chapter (package base `co.com.pragma.*`, tags, naming, gherkin language coherente con el proyecto).
-- El skill `[[appium-brownfield]]` si extiende un proyecto iOS preexistente.
+- El skill `[[calidad-appium-brownfield]]` si extiende un proyecto iOS preexistente.
 
 ## Workaround para iOS hoy
 
@@ -113,7 +113,7 @@ El proyecto resultante respeta las mismas restricciones del chapter (no redefini
 ## Roadmap
 
 - **V3 del scaffolder** incluirá un generador iOS con perfiles dual Android/iOS, mapeo de selectores `iOSClassChain` y `iOSNsPredicateString`, plantillas de capabilities para simulador y device real, y health-check específico para XCUITest.
-- **Mientras tanto**, el scaffold manual está **totalmente soportado por el Chapter Calidad**: se aplican `[[appium-screenplay-layers]]`, `[[appium-gherkin-syntax-rules]]`, `[[appium-smoke-vs-proposed-scenarios]]`, `[[appium-deferred-locators-strategy]]` y `[[appium-run-and-tags]]` sin cambios.
-- Para extender proyectos iOS o Android existentes, usar `[[appium-brownfield]]`: detecta plataforma desde las capabilities del proyecto y respeta sus convenciones.
+- **Mientras tanto**, el scaffold manual está **totalmente soportado por el Chapter Calidad**: se aplican ``screenplay-layers.md``, ``gherkin-syntax-rules.md``, ``smoke-vs-proposed-scenarios.md``, ``deferred-locators-strategy.md`` y `[[calidad-appium-run-and-tags]]` sin cambios.
+- Para extender proyectos iOS o Android existentes, usar `[[calidad-appium-brownfield]]`: detecta plataforma desde las capabilities del proyecto y respeta sus convenciones.
 
-Ver también las restricciones declaradas en `[[appium-screenplay-android]]`.
+Ver también las restricciones declaradas en `[[calidad-appium-screenplay-android]]`.

@@ -54,11 +54,11 @@ Acción:
 
 ## Anti-patrón
 
-NO derivar la necesidad de autenticación desde el spec OpenAPI (presencia de `security`). Una API puede requerir token y aun así la UI que se está testeando puede ser una landing pública. La fuente de verdad es la UI/HU descrita por el usuario, no el contrato backend (espejo de `[[playwright-greenfield/references/auth-storage-state.md]]`).
+NO derivar la necesidad de autenticación desde el spec OpenAPI (presencia de `security`). Una API puede requerir token y aun así la UI que se está testeando puede ser una landing pública. La fuente de verdad es la UI/HU descrita por el usuario, no el contrato backend (espejo de ``auth-storage-state.md``).
 
 ## Cross-links
 
-- Detalle del flujo storage state: `[[playwright-greenfield/references/auth-storage-state.md]]`.
+- Detalle del flujo storage state: ``auth-storage-state.md``.
 - Plantilla del setup: `[[playwright-greenfield/references/templates/auth.setup.ts.tpl]]`.
 - Plantilla del config con project `setup`: `[[playwright-greenfield/references/templates/playwright.config.ts.tpl]]`.
 - Recolección de inputs obligatorios: `[[calidad-mandatory-inputs-protocol]]`.

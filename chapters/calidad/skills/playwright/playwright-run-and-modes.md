@@ -1,5 +1,5 @@
 ---
-id: playwright-run-and-modes
+id: calidad-playwright-run-and-modes
 version: 2.0.0
 scope: stack
 type: skill

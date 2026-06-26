@@ -43,11 +43,11 @@ Filtrado: `npx playwright test --tag @smoke` (flag dedicado, no grep) o `--grep 
 Cada test debe declarar exactamente dos categorías de tags:
 
 1. **Tag de suite** — uno y solo uno de: `@smoke`, `@regression`, `@security`, `@a11y`, `@visual`, `@perf`.
-2. **Tag de HU** — uno y solo uno con la convención `@HU-<id>`, donde `<id>` corresponde a la HU declarada en `.evidence/coverage-declared.json` (ver `[[playwright-greenfield/references/coverage-formula.md]]`).
+2. **Tag de HU** — uno y solo uno con la convención `@HU-<id>`, donde `<id>` corresponde a la HU declarada en `.evidence/coverage-declared.json` (ver ``coverage-formula.md``).
 
 Tags opcionales (no excluyentes con los anteriores):
 
-- `@live` / `@mocked` / `@hybrid` — modo de ejecución; ver `[[playwright-greenfield/references/execution-modes-live-mocked-hybrid.md]]`.
+- `@live` / `@mocked` / `@hybrid` — modo de ejecución; ver ``execution-modes-live-mocked-hybrid.md``.
 - `@critical` / `@high` / `@medium` / `@low` — espejo del `risk_factor`.
 
 ## Filtrado en CLI
@@ -72,7 +72,7 @@ Este número debe coincidir con `effective_minimum` declarado para esa HU. Si no
 
 ## Cross-links
 
-- Cobertura por HU: `[[playwright-greenfield/references/coverage-formula.md]]`.
-- Modos `@live` / `@mocked` / `@hybrid`: `[[playwright-greenfield/references/execution-modes-live-mocked-hybrid.md]]`.
-- Coherencia y data-driven (uso de `for...of` con tags por iteración): `[[playwright-greenfield/references/coherence-checks.md]]`.
+- Cobertura por HU: ``coverage-formula.md``.
+- Modos `@live` / `@mocked` / `@hybrid`: ``execution-modes-live-mocked-hybrid.md``.
+- Coherencia y data-driven (uso de `for...of` con tags por iteración): ``coherence-checks.md``.
 - Documentación oficial: Playwright Release Notes 1.42, sección "Tagging tests".

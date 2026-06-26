@@ -145,9 +145,9 @@ Registrar la estrategia elegida en `.evidence/auth-strategy.md` con:
 
 ## Cross-links
 
-- `[[k6-greenfield]]`
-- `[[k6-enums-headers-security-extraction]]`
-- `[[tag-policy-and-metrics-isolation]]`
+- `[[calidad-k6-greenfield]]`
+- ``enums-headers-security-extraction.md``
+- ``tag-policy-and-metrics-isolation.md``
 - `[[calidad-pre-generation-protocol]]`
 - `[[calidad-post-generation-protocol]]`
 - `[[calidad-delivery-gate-contract]]`

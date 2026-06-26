@@ -46,7 +46,7 @@ Combinar siempre con `[[calidad-chapter-perspective]]` (perspectiva del chapter)
 
 4. **Configurar healing telemetry obligatoria.** Cada vez que un locator alternativo se activa o un campo opcional cambia, emitir un **structured log** JSON con: `test_id`, `framework`, `locator_original`, `locator_resolved`, `strategy_idx`, `timestamp`, `suite`, `tags`. El log alimenta el dashboard de healing y dispara alertas cuando se cruza el threshold (ver Restricciones). Sin telemetría, el healing está prohibido — curar en silencio es esconder bugs.
 
-5. **Si el healing requiere LLM-driven repair** (todas las estrategias del fallback agotadas), invocar `[[playwright-extract-pages-from-live-app-prompt]]` con: DOM snapshot, screenshot del estado actual, último selector válido conocido y mensaje de error. Validar el selector propuesto contra el live app (smoke local) **antes** de hacer commit; nunca aceptar la salida del LLM directo a `main`. Ver `references/llm-driven-selector-repair.md` para el prompt completo, costos y latencia.
+5. **Si el healing requiere LLM-driven repair** (todas las estrategias del fallback agotadas), invocar `[[calidad-playwright-extract-pages-from-live-app-prompt]]` con: DOM snapshot, screenshot del estado actual, último selector válido conocido y mensaje de error. Validar el selector propuesto contra el live app (smoke local) **antes** de hacer commit; nunca aceptar la salida del LLM directo a `main`. Ver `references/llm-driven-selector-repair.md` para el prompt completo, costos y latencia.
 
 6. **Verificar que el healing no enmascara bugs reales** ejecutando `[[calidad-test-self-correction-loop]]` sobre el suite reparado y cruzando los resultados con `[[calidad-failure-triage-and-classification]]`. Si el triage indica que la fragilidad es un cambio de contrato del SUT, el healing se revierte y se abre ticket de bug. Las reglas duras están en `references/over-healing-guardrails.md`.
 
@@ -83,8 +83,8 @@ Cross-links con otros assets del chapter:
 - `[[calidad-test-execution-orchestration]]`
 - `[[calidad-failure-triage-and-classification]]`
 - `[[calidad-test-self-correction-loop]]`
-- `[[karate-greenfield]]`
-- `[[playwright-greenfield]]`
-- `[[k6-greenfield]]`
-- `[[appium-screenplay-android]]`
-- `[[playwright-extract-pages-from-live-app-prompt]]`
+- `[[calidad-karate-greenfield]]`
+- `[[calidad-playwright-greenfield]]`
+- `[[calidad-k6-greenfield]]`
+- `[[calidad-appium-screenplay-android]]`
+- `[[calidad-playwright-extract-pages-from-live-app-prompt]]`

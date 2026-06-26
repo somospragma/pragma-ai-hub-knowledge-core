@@ -35,7 +35,7 @@ Si la declaracion no existe en `.evidence/`, la generacion debe abortar.
 Aflojar el tier **despues** de ver fallar el smoke es **violacion grave** del contrato de calidad:
 
 - Si smoke falla en Moderate y el agente cambia a Relaxed solo para que pase, esta ocultando un bug del SUT detras de un threshold permisivo. La metrica deja de ser una senal y se convierte en ruido.
-- Si smoke falla, la respuesta correcta es: (a) reportar el fallo como bug y abrir issue contra el SUT, (b) calibrar con `[[calibrate-k6-thresholds]]` usando datos reales del baseline (NO ajustes arbitrarios), o (c) bajar de tier SOLO si la firma o user_story lo soporta documentalmente.
+- Si smoke falla, la respuesta correcta es: (a) reportar el fallo como bug y abrir issue contra el SUT, (b) calibrar con `[[calidad-calibrate-k6-thresholds]]` usando datos reales del baseline (NO ajustes arbitrarios), o (c) bajar de tier SOLO si la firma o user_story lo soporta documentalmente.
 
 Tres reglas asociadas:
 
@@ -45,10 +45,10 @@ Tres reglas asociadas:
 
 ## Cross-links
 
-- `[[k6-thresholds-three-tiers]]` — tabla completa de tiers con snippets.
-- `[[k6-five-script-types]]` — todos los 5 scripts deben respetar el mismo tier.
+- ``thresholds-three-tiers.md`` — tabla completa de tiers con snippets.
+- ``five-script-types.md`` — todos los 5 scripts deben respetar el mismo tier.
 - `[[calidad-test-self-correction-loop/references/anti-cheating-guardrails]]` — politica chapter-wide de no aflojar para hacer pasar.
-- `[[calibrate-k6-thresholds]]` — la unica via legitima para mover thresholds despues de la primera corrida.
+- `[[calidad-calibrate-k6-thresholds]]` — la unica via legitima para mover thresholds despues de la primera corrida.
 - `[[calidad-pre-generation-protocol]]` — donde se persiste la declaracion.
 - `[[calidad-post-generation-protocol]]` — donde se verifica.
 - `[[calidad-delivery-gate-contract]]` — bloqueo de entrega si falta la declaracion.

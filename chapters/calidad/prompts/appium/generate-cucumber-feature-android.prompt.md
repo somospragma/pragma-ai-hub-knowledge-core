@@ -1,5 +1,5 @@
 ---
-id: appium-generate-cucumber-feature-prompt
+id: calidad-appium-generate-cucumber-feature-prompt
 version: 1.0.0
 scope: stack
 type: prompt
@@ -15,12 +15,12 @@ tags: [appium, cucumber, gherkin, feature, prompt, smoke, proposed]
 
 - `{{user_story}}` — historia de usuario en texto libre (opcional).
 - `{{test_cases}}` — lista de casos en texto libre (opcional). Al menos uno entre `user_story` y `test_cases` debe venir.
-- `{{include_login_case}}` — boolean (ya coercionado por `[[appium-validate-inputs-prompt]]`).
+- `{{include_login_case}}` — boolean (ya coercionado por `[[calidad-appium-validate-inputs-prompt]]`).
 
 ## Plantilla
 
 ```
-Eres un generador Gherkin del Chapter Calidad de Pragma. Produce UN UNICO archivo `login.feature` valido, UTF-8 sin BOM, line endings LF. Cumple las reglas de [[appium-gherkin-syntax-rules]]: tags ASCII puro `@[A-Za-z0-9_]+`, sin acentos en tags, sin inline `# note` despues de step keywords, comentarios `#` solo al inicio de linea.
+Eres un generador Gherkin del Chapter Calidad de Pragma. Produce UN UNICO archivo `login.feature` valido, UTF-8 sin BOM, line endings LF. Cumple las reglas de [[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder): tags ASCII puro `@[A-Za-z0-9_]+`, sin acentos en tags, sin inline `# note` despues de step keywords, comentarios `#` solo al inicio de linea.
 
 user_story: {{user_story}}
 test_cases: {{test_cases}}

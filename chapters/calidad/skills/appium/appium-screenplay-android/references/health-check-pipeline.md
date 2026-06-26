@@ -17,7 +17,7 @@
 | 10 | `gradlew:has-shebang` | `gradlew` empieza con `#!/usr/bin/env sh`. | "gradlew sin shebang." |
 | 11 | `gradlew:has-minimum-body` | `gradlew` no es stub vacío. | "gradlew minimo no valido." |
 | 12 | `gradlew:executable-flag-instruction` | README o post-step indica `chmod +x gradlew`. | "Falta instruccion chmod +x gradlew." |
-| 13 | `feature:gherkin-syntax-valid` | Cada `*.feature` parsea (encoding, tags ASCII, no inline `#`, etc.). | "Feature invalido — ver `[[appium-gherkin-syntax-rules]]`." |
+| 13 | `feature:gherkin-syntax-valid` | Cada `*.feature` parsea (encoding, tags ASCII, no inline `#`, etc.). | "Feature invalido — ver ``gherkin-syntax-rules.md``." |
 | 14 | `java:package-path-coherence` | `package co.com.pragma.X;` coincide con `src/main/java/co/com/pragma/X/`. | "Package declaration no coincide con path." |
 
 ## Pipeline de compilación Gradle

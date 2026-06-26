@@ -1,5 +1,5 @@
 ---
-id: playwright-generate-page-object-prompt
+id: calidad-playwright-generate-page-object-prompt
 version: 1.0.0
 scope: stack
 type: prompt
@@ -19,7 +19,7 @@ tags: [playwright, prompt, page-object-model, typescript]
 
 ## Instrucción para el LLM
 
-Genera UNA clase TypeScript siguiendo estrictamente `[[playwright-page-object-model]]` y `[[playwright-selector-priority]]`:
+Genera UNA clase TypeScript siguiendo estrictamente `[[calidad-playwright-greenfield]] (consultar `references/page-object-model.md` en su subfolder)` y `[[calidad-playwright-greenfield]] (consultar `references/selector-priority.md` en su subfolder)`:
 
 - Archivo `pages/{{page_spec.name}}.ts`.
 - Constructor `(private page: Page)`.

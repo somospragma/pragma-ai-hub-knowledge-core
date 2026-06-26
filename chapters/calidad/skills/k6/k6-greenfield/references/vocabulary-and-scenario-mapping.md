@@ -61,8 +61,8 @@ Uso típico en `run-all.sh` y en `handleSummary()`: resolver el label de negocio
 
 ## Cross-links
 
-- `[[k6-greenfield]]`
-- `[[k6-five-script-types]]`
-- `[[k6-thresholds-three-tiers]]`
+- `[[calidad-k6-greenfield]]`
+- ``five-script-types.md``
+- ``thresholds-three-tiers.md``
 - `[[calidad-mandatory-inputs-protocol]]`
 - `[[calidad-delivery-gate-contract]]`

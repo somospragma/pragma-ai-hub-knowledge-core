@@ -1,5 +1,5 @@
 ---
-id: appium-run-and-tags
+id: calidad-appium-run-and-tags
 version: 1.0.0
 scope: stack
 type: skill
@@ -51,7 +51,7 @@ gradlew.bat clean test aggregate
 
 | Tarea | Para qué |
 |---|---|
-| `clean` | Limpia `build/` y `target/`. NO redefinir (`[[appium-no-aggregate-collision]]`). |
+| `clean` | Limpia `build/` y `target/`. NO redefinir (`[[calidad-appium-screenplay-android]] (consultar `references/no-aggregate-collision.md` en su subfolder)`). |
 | `compileJava` | Compila `src/main` — usa Serenity/Appium del scope `implementation`. |
 | `compileTestJava` | Compila `src/test` — runners y step definitions. |
 | `testClasses` | Asegura que los tests compilan sin ejecutarlos. |
@@ -80,4 +80,4 @@ Alternativa sin chmod:
 sh ./gradlew clean test aggregate
 ```
 
-El health-check stage `gradlew:executable-flag-instruction` exige que el README documente este paso (`[[appium-health-check-pipeline]]`).
+El health-check stage `gradlew:executable-flag-instruction` exige que el README documente este paso (`[[calidad-appium-screenplay-android]] (consultar `references/health-check-pipeline.md` en su subfolder)`).

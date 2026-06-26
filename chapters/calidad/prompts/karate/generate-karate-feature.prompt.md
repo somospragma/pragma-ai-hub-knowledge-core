@@ -1,5 +1,5 @@
 ---
-id: karate-generate-feature-prompt
+id: calidad-karate-generate-feature-prompt
 version: 1.0.0
 scope: stack
 type: prompt
@@ -13,7 +13,7 @@ tags: [karate, gherkin, feature, prompt, generation]
 
 ## Variables
 
-- `{{endpoint_info}}` — objeto JSON de un endpoint (proveniente de `[[karate-analyze-openapi-prompt]]`).
+- `{{endpoint_info}}` — objeto JSON de un endpoint (proveniente de `[[calidad-karate-analyze-openapi-prompt]]`).
 - `{{user_story}}` — identificador de historia de usuario.
 - `{{firma}}` — documento técnico complementario.
 - `{{client_conventions}}` — opcional; convenciones detectadas del proyecto brownfield o convenciones cliente-específicas (ver `karate-brownfield/references/client-specific-conventions.md`).

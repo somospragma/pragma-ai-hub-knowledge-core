@@ -1,5 +1,5 @@
 ---
-id: extend-k6-brownfield
+id: calidad-extend-k6-brownfield
 version: 1.0.0
 scope: stack
 type: workflow
@@ -13,11 +13,11 @@ tags: [k6, brownfield, workflow, performance, conventions]
 
 ## Cuándo usar
 
-Cuando `[[calidad-route-test-generation]]` (paso 5) y `[[calidad-brownfield-vs-greenfield]]` identifican un escenario brownfield K6: el `project_root` contiene mínimo `tests/config.js` + `tests/utils.js` + ≥1 `tests/*-test.js`. El skill subyacente es `[[k6-brownfield]]`.
+Cuando `[[calidad-route-test-generation]]` (paso 5) y `[[calidad-brownfield-vs-greenfield]]` identifican un escenario brownfield K6: el `project_root` contiene mínimo `tests/config.js` + `tests/utils.js` + ≥1 `tests/*-test.js`. El skill subyacente es `[[calidad-k6-brownfield]]`.
 
 ### Pre-flight (OBLIGATORIO)
 
-Antes de cualquier acción, ejecutar [[k6-greenfield]] (consultar `references/preflight.md` en su subfolder) del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
+Antes de cualquier acción, ejecutar [[calidad-k6-greenfield]] (consultar `references/preflight.md` en su subfolder) del stack. En brownfield aplica los mismos checks de versión/tooling. Si falla → degradar a `scaffold-only` con razón documentada.
 
 Cumplir el protocolo `[[calidad-pre-generation-protocol]]` incluso en brownfield: confirmar inputs (incluido `modo`), declarar coverage de los archivos NUEVOS (no de los preexistentes), esperar confirmación del usuario.
 
@@ -34,11 +34,11 @@ Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-se
 
 Refuerzos adicionales:
 - **Step isolation** (ver `[[calidad-step-isolation-pattern]]`) aplica a los `group()` / `check()` de los scripts NUEVOS. Los scripts preexistentes mantienen su estructura aunque no cumplan el patrón; no se les aplica refactor.
-- **Validación contractual no superficial** según [[k6-greenfield]] (consultar `references/contractual-checks-from-user-story.md`) aplica solo a scripts/escenarios nuevos. NO re-escribir checks preexistentes.
+- **Validación contractual no superficial** según [[calidad-k6-greenfield]] (consultar `references/contractual-checks-from-user-story.md`) aplica solo a scripts/escenarios nuevos. NO re-escribir checks preexistentes.
 
 ### Paso previo — Análisis condicional con STRATEGY.md
 
-Si el alcance del brownfield es **grande** (≥3 endpoints/escenarios nuevos, o cambios cross-cutting que afectan multiple scripts preexistentes, o migración de `auth_mode`): generar `STRATEGY.md` según el template [[k6-greenfield]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+Si el alcance del brownfield es **grande** (≥3 endpoints/escenarios nuevos, o cambios cross-cutting que afectan multiple scripts preexistentes, o migración de `auth_mode`): generar `STRATEGY.md` según el template [[calidad-k6-greenfield]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
 
 Si el alcance es **pequeño** (1-2 cambios puntuales, p. ej. añadir un endpoint o recalibrar un threshold): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
 
@@ -74,11 +74,11 @@ Inspecciona `project_root`. Verifica que cumple los criterios brownfield (`tests
 
 ### Paso 2 — Detectar convenciones
 
-Aplica el algoritmo de `[[k6-convention-detection]]`. Consolida: `tests_dir`, `script_naming`, `groups_naming`, `auth_mode` actual, `existing_thresholds` (tier dominante), `existing_payload_builders`, `existing_id_correlation_pattern`, `handle_summary_path`, `import_style`, `env_vars_in_use`. Estos valores son el contrato para todo lo que se genere a continuación.
+Aplica el algoritmo de `[[calidad-k6-brownfield]] (consultar `references/convention-detection.md` en su subfolder)`. Consolida: `tests_dir`, `script_naming`, `groups_naming`, `auth_mode` actual, `existing_thresholds` (tier dominante), `existing_payload_builders`, `existing_id_correlation_pattern`, `handle_summary_path`, `import_style`, `env_vars_in_use`. Estos valores son el contrato para todo lo que se genere a continuación.
 
 ### Paso 3 — Determinar tipo de cambio
 
-Mapea el `change_request` a uno o varios de los patrones de `[[k6-extension-patterns]]`:
+Mapea el `change_request` a uno o varios de los patrones de `[[calidad-k6-brownfield]] (consultar `references/extension-patterns.md` en su subfolder)`:
 
 - Añadir endpoint a script existente → patch.
 - Crear nuevo script → archivo nuevo.
@@ -101,7 +101,7 @@ Cada modificación a un archivo existente se entrega como **diff legible** (lín
 
 ### Paso 5 — Preservar `handleSummary()`
 
-Bajo ninguna circunstancia regenerar `handleSummary()` con un formato distinto al detectado. Si los scripts existentes exportan a `results/${timestamp}-summary.json` con un timestamp ISO específico, los scripts nuevos usan exactamente la misma función (idealmente copiada literal del primer script existente). Si el proyecto usa `vendor/k6-summary.js` (ver `[[k6-handle-summary-evidence]]` sección offline), los nuevos scripts también lo importan de ahí.
+Bajo ninguna circunstancia regenerar `handleSummary()` con un formato distinto al detectado. Si los scripts existentes exportan a `results/${timestamp}-summary.json` con un timestamp ISO específico, los scripts nuevos usan exactamente la misma función (idealmente copiada literal del primer script existente). Si el proyecto usa `vendor/k6-summary.js` (ver `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)` sección offline), los nuevos scripts también lo importan de ahí.
 
 ### Paso 6 — Validar checklist
 
@@ -119,7 +119,7 @@ k6 run -e BASE_URL=$BASE_URL tests/<nuevo-script>-test.js
 k6 run -e BASE_URL=$BASE_URL -e AUTH_TOKEN=$AUTH_TOKEN tests/<nuevo-script>-test.js
 ```
 
-Detalle de comandos en `[[k6-run-and-suite]]`.
+Detalle de comandos en `[[calidad-k6-run-and-suite]]`.
 
 ### Fase final obligatoria — Ejecutar, triar y auto-corregir
 
@@ -128,14 +128,14 @@ Detalle de comandos en `[[k6-run-and-suite]]`.
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin `k6`, sin red al `BASE_URL`, sin `AUTH_TOKEN` cuando aplique), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` sólo el smoke individual del nuevo script (`k6 run -e BASE_URL=$BASE_URL tests/<nuevo-script>-test.js`). Si el cambio fue patch a `utils.js`/`config.js`, correr el smoke del primer script afectado. Capturar `results/${timestamp}-summary.json`.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky. Causas típicas: payload mal correlacionado con el nuevo endpoint, header faltante, `AUTH_TOKEN` mal seteado, threshold heredado irreal para el nuevo flujo. Fallos de scripts preexistentes del cliente por daño colateral del patch: detenerse y reportar, NO auto-corregir el legado.
-4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar `checks`, `http_req_failed` ni `http_req_duration`; las correcciones deben respetar las convenciones detectadas (`script_naming`, `groups_naming`, `auth_mode`, `existing_thresholds`, `handle_summary_path`).
+4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar `checks`, `http_req_failed` ni `http_req_duration`; las correcciones deben respetar las convenciones detectadas (`script_naming`, `groups_naming`, `auth_mode`, `existing_thresholds`, `handle_summary_path`).
 5. Reportar estado final: `success` | `partial` | `failed` con script, métricas, threshold violado e hipótesis cuando se escala.
-6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Recordar que la calibración formal de thresholds para el nuevo flujo se hace via `[[calibrate-k6-thresholds]]`.
+6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Recordar que la calibración formal de thresholds para el nuevo flujo se hace via `[[calidad-calibrate-k6-thresholds]]`.
 7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths `tests/*.js`, grep `handleSummary` en scripts nuevos, `k6 inspect tests/<nuevo-script>-test.js` validación de sintaxis) antes de cerrar.
 8. **Smoke gate universal (scripts nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [[calidad-smoke-gate-policy]]. En brownfield K6, el gate ejecuta **únicamente smoke individual de los scripts/escenarios nuevos** con la mínima carga: `k6 run tests/<nuevo-script>-test.js --vus 1 --iterations 1` (o `-e BASE_URL=...` y `AUTH_TOKEN` cuando aplique). Bajo NINGÚN concepto re-ejecutar `load/stress/spike/soak` preexistentes en el gate (esos tienen otro propósito y duración). Si la nomenclatura del proyecto cliente usa línea-base en vez de smoke, aplicar el equivalente local manteniendo carga mínima. Si fallan scripts preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado.
 9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/throughput cap), emitir `.evidence/execution-status.json` según [[calidad-environment-blocker-evidence]]. El estado pasa a `partial` con razón.
 10. **Metadata por corrida**: emitir `results/k6/{date}/{ISO}-metadata.json` según el schema universal [[calidad-execution-metadata-schema]]. En brownfield, el campo `workload_or_scope` debe distinguir "N scripts/escenarios nuevos sobre M preexistentes" e incluir VUs/iterations efectivos.
-11. **Reporte ejecutivo**: invocar `[[generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `k6-report-template.md`. El reporte debe segregar explícitamente "scripts nuevos (en scope de esta sesión)" de "scripts preexistentes (referencia, no ejecutados en el gate)" e incluir comparación corrida nueva vs baseline preexistente si los `results/*-summary.json` previos están disponibles.
+11. **Reporte ejecutivo**: invocar `[[calidad-generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `k6-report-template.md`. El reporte debe segregar explícitamente "scripts nuevos (en scope de esta sesión)" de "scripts preexistentes (referencia, no ejecutados en el gate)" e incluir comparación corrida nueva vs baseline preexistente si los `results/*-summary.json` previos están disponibles.
 12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/patches, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, `results/${timestamp}-summary.json` si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en scripts preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
@@ -144,7 +144,7 @@ Detalle de comandos en `[[k6-run-and-suite]]`.
 2. Convenciones detectadas (`script_naming`, `groups_naming`, `auth_mode`, `existing_thresholds`, `existing_payload_builders`, `existing_id_correlation_pattern`, `handle_summary_path`, `import_style`) respetadas al 100%.
 3. Los nuevos scripts pasan smoke test individual (verificable con el comando entregado en el paso 7). Si el usuario no puede correrlo localmente, al menos `k6 inspect tests/<nuevo-script>-test.js` debe correr sin errores de parseo.
 4. Cada nuevo `check()` valida campos del response (no solo status code).
-5. Flujos CRUD nuevos usan IDs dinámicos (`[[k6-crud-dynamic-id-correlation]]`); cero IDs hardcodeados, aun si scripts viejos los tuvieran.
+5. Flujos CRUD nuevos usan IDs dinámicos (`[[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)`); cero IDs hardcodeados, aun si scripts viejos los tuvieran.
 6. `handleSummary()` preservado: ruta de salida, formato de timestamp y origen de `textSummary` (jslib remota o vendor local) idénticos a los del proyecto.
 7. Si hubo migración a `auth_mode = external`, el usuario fue notificado de actualizar `README.md` y CI con `AUTH_TOKEN` como variable obligatoria.
 8. Mensaje final al usuario enumera: (a) archivos nuevos, (b) patches a archivos existentes con path y resumen del cambio, (c) comando de ejecución, (d) cualquier acción manual pendiente.

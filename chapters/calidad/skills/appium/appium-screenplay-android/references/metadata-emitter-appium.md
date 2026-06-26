@@ -77,10 +77,10 @@ test.finalizedBy emitMetadata
 
 - Path final: `results/appium/{YYYY-MM-DD}/{ISO}-metadata.json` (alineado con `[results-structure-universal](../../../_all/results-structure-universal.md)`).
 - `test.finalizedBy emitMetadata` garantiza ejecución incluso ante falla del `test` task — clave para evidencia de corridas rojas.
-- NUNCA registrar la task con `tasks.register('aggregate')` ni redefinirla; respeta `[[appium-no-aggregate-collision]]`. `emitMetadata` es una task nueva, no choca con `aggregate`/`reports`/`clean`.
+- NUNCA registrar la task con `tasks.register('aggregate')` ni redefinirla; respeta ``no-aggregate-collision.md``. `emitMetadata` es una task nueva, no choca con `aggregate`/`reports`/`clean`.
 - Si el preflight (`preflight-appium.sh`) reporta device unavailable o JDK wrong, NO se ejecuta `test`; el script preflight escribe directamente `.evidence/execution-status.json` con `reason=environment_device_unavailable` o `environment_jdk_missing_or_wrong`.
 - NO omitir claves: si Appium no aplica una semántica, usar enum o valor neutro del schema (ej. `auth_strategy: "none"`).
 
 ## Cross-links
 
-`[execution-metadata-schema](../../../_all/execution-metadata-schema.md)`, `[results-structure-universal](../../../_all/results-structure-universal.md)`, `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`, `[[appium-no-aggregate-collision]]`, `[[appium-screenplay-android]]`, `[[calidad-delivery-gate-contract]]`.
+`[execution-metadata-schema](../../../_all/execution-metadata-schema.md)`, `[results-structure-universal](../../../_all/results-structure-universal.md)`, `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`, ``no-aggregate-collision.md``, `[[calidad-appium-screenplay-android]]`, `[[calidad-delivery-gate-contract]]`.

@@ -79,4 +79,4 @@ thresholds: {
 },
 ```
 
-Los valores de thresholds varían según el tier — ver `[[k6-thresholds-three-tiers]]`.
+Los valores de thresholds varían según el tier — ver ``thresholds-three-tiers.md``.

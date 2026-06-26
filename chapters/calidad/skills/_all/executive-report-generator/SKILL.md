@@ -24,7 +24,7 @@ Aplica este skill al final de toda generación de tests (todos los workflows gre
 
 El skill convierte los JSON, XML y reportes técnicos de cada stack en un informe ejecutivo presentable: un documento con narrativa en español, tablas de cumplimiento de SLAs, comparación entre corridas, fallos clasificados con causa raíz sugerida y recomendaciones concretas por rol (Dev / Infra / QA / PO).
 
-Es invocado por el workflow `[[generate-executive-report]]` como último paso del ciclo de entrega.
+Es invocado por el workflow `[[calidad-generate-executive-report]]` como último paso del ciclo de entrega.
 
 ## Instrucción
 
@@ -135,4 +135,4 @@ Otros assets del chapter:
 - `[[calidad-failure-triage-and-classification]]`
 - `[[calidad-test-evidence-and-traceability]]`
 - `[[calidad-delivery-gate-contract]]`
-- `[[generate-executive-report]]`
+- `[[calidad-generate-executive-report]]`

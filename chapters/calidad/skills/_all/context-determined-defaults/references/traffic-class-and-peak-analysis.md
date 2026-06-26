@@ -1,6 +1,6 @@
 # Traffic Class y Peak Analysis
 
-Define cómo medir la clase de tráfico real de un sistema para derivar VUs, stages y thresholds de k6 (`[[k6-thresholds-three-tiers]]`).
+Define cómo medir la clase de tráfico real de un sistema para derivar VUs, stages y thresholds de k6 (`[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`).
 
 ## Fuentes de datos
 

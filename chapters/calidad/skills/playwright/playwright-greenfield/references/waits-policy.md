@@ -82,5 +82,5 @@ const results = await page.getByRole('listitem').count();
 ## Cross-links
 
 - `[[playwright-greenfield/references/templates/package.json.tpl]]` — la regla ESLint vive aquí.
-- `[[playwright-greenfield/references/coherence-checks.md]]` — auditoría de coherencia.
+- ``coherence-checks.md`` — auditoría de coherencia.
 - `[[calidad-post-generation-protocol]]` — la corrida de lint forma parte del post-protocolo.

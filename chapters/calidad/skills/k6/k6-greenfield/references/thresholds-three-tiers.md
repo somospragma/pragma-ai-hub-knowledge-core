@@ -16,7 +16,7 @@ K6 expone `options.thresholds` para definir criterios de pass/fail por métrica.
 1. Si `user_story` declara un SLA explícito (P95 o tiempo máximo), usa ese SLA.
 2. Si no hay SLA en la historia pero la `firma` (perfil del cliente) lo declara, usa el de la firma.
 3. Si ninguno aplica, usa **Moderate** por default.
-4. Tras la primera corrida real de smoke, **calibra** con `[[calibrate-k6-thresholds]]` para alinear los thresholds al baseline observado.
+4. Tras la primera corrida real de smoke, **calibra** con `[[calidad-calibrate-k6-thresholds]]` para alinear los thresholds al baseline observado.
 
 ## Snippet por tier
 
@@ -45,4 +45,4 @@ thresholds: {
 
 ## Requerimiento
 
-Los thresholds generados desde un spec sin baseline real son una estimación. Es **obligatorio** recalibrar después del primer smoke con datos reales del servicio (workflow `[[calibrate-k6-thresholds]]`). Documenta el tier elegido y la justificación en el `README.md` del proyecto.
+Los thresholds generados desde un spec sin baseline real son una estimación. Es **obligatorio** recalibrar después del primer smoke con datos reales del servicio (workflow `[[calidad-calibrate-k6-thresholds]]`). Documenta el tier elegido y la justificación en el `README.md` del proyecto.

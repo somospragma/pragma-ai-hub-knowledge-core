@@ -66,9 +66,9 @@ Si cualquiera de las 3 verificaciones falla, la generacion es invalida y se debe
 
 ## Cross-links
 
-- `[[k6-five-script-types]]` — perfil VU/duracion por script.
-- `[[k6-thresholds-three-tiers]]` — tiers y derivacion.
-- `[[k6-handle-summary-evidence]]` — formato de evidencia por corrida.
+- ``five-script-types.md`` — perfil VU/duracion por script.
+- ``thresholds-three-tiers.md`` — tiers y derivacion.
+- ``handle-summary-evidence.md`` — formato de evidencia por corrida.
 - `[[calidad-pre-generation-protocol]]` — donde se persiste `.evidence/coverage-declared.json`.
 - `[[calidad-post-generation-protocol]]` — donde se verifica.
 - `[[calidad-delivery-gate-contract]]` — bloqueo de entrega si coverage no se cumple.

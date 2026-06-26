@@ -1,5 +1,5 @@
 ---
-id: generate-karate-greenfield
+id: calidad-generate-karate-greenfield
 version: 1.0.0
 scope: stack
 type: workflow
@@ -32,7 +32,7 @@ Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`.
 
 ### 1. Pre-flight check del stack (OBLIGATORIO)
 
-Antes de cualquier otra acción, ejecutar el pre-flight según [[karate-greenfield]] (consultar `references/preflight.md` en su subfolder):
+Antes de cualquier otra acción, ejecutar el pre-flight según [[calidad-karate-greenfield]] (consultar `references/preflight.md` en su subfolder):
 - Si pasa: continuar al paso 2.
 - Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
 - Persistir el resultado en `.evidence/preflight-result.json`.
@@ -54,19 +54,19 @@ Aplica `[[calidad-spec-validation]]`. OpenAPI > 200 chars, WSDL > 100 chars, deb
 Service name kebab-case desde `info.title` (fallback: filename). `base_url` desde `servers[0].url` / `schemes+host+basePath` / `soap:address`. Variable de URL: camelCase + `Url`.
 
 ### 5. Inventario de endpoints y schemas
-Para cada path×method: required headers, body fields, response codes, enums, formatos. Convierte `components.schemas` o `definitions` a la notación match (`[[karate-greenfield/references/contract-testing-match-patterns.md]]`).
+Para cada path×method: required headers, body fields, response codes, enums, formatos. Convierte `components.schemas` o `definitions` a la notación match (`[[calidad-karate-greenfield]] (consultar `references/contract-testing-match-patterns.md` en su subfolder)`).
 
 ### 6. Decidir cobertura por endpoint
-Aplica `[[karate-negative-coverage-formula]]`. Declara el número objetivo de escenarios por endpoint ANTES de generar.
+Aplica `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`. Declara el número objetivo de escenarios por endpoint ANTES de generar.
 
 ### 7. Generar features
-Invoca `[[karate-greenfield]]` paso 5. Usa los tipos y tags de `references/feature-design-dsl.md`. Si hay señales de cifrado, añade los escenarios de `references/encrypted-payloads.md`. Aplica `[[calidad-route-test-generation]]` para mapear endpoint → archivos.
+Invoca `[[calidad-karate-greenfield]]` paso 5. Usa los tipos y tags de `references/feature-design-dsl.md`. Si hay señales de cifrado, añade los escenarios de `references/encrypted-payloads.md`. Aplica `[[calidad-route-test-generation]]` para mapear endpoint → archivos.
 
 ### 8. Generar schemas `-match.json`
 Uno por schema utilizado en respuestas. Respeta `#type` vs `##type`.
 
 ### 9. Generar infraestructura
-`pom.xml`, `karate-config.js`, `logback-test.xml`, `TestRunner.java` según `references/project-structure.md`. Versiones exactas: `karate-junit5` 1.4.1, `maven-surefire-plugin` 3.2.2. Bloque `<testResources>` obligatorio (`[[karate-feature-file-location-constraint]]`).
+`pom.xml`, `karate-config.js`, `logback-test.xml`, `TestRunner.java` según `references/project-structure.md`. Versiones exactas: `karate-junit5` 1.4.1, `maven-surefire-plugin` 3.2.2. Bloque `<testResources>` obligatorio (`[[calidad-karate-greenfield]] (consultar `references/file-location-constraint.md` en su subfolder)`).
 
 ### 10. Asegurar resource files y validar DoD
 Detecta referencias a `classpath:resources/files/*` y crea archivos por defecto. Recorre el checklist de finalización antes de entregar. Entrega con `[[calidad-streaming-files-protocol]]` y registra trazabilidad por `[[calidad-test-evidence-and-traceability]]`.
@@ -75,18 +75,18 @@ Detecta referencias a `classpath:resources/files/*` y crea archivos por defecto.
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.**
 
-0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[karate-greenfield]] (consultar `references/smoke-gate-mvn.md`). Comando: `mvn test -Dkarate.options="--tags @smoke"`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_karate"` y escalar al usuario; NO continuar a ejecución completa de la suite.
+0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[calidad-karate-greenfield]] (consultar `references/smoke-gate-mvn.md`). Comando: `mvn test -Dkarate.options="--tags @smoke"`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_karate"` y escalar al usuario; NO continuar a ejecución completa de la suite.
 
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin `mvn`, sin red al SUT), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** `mvn test` (o el filtro por tag de la nueva historia) vía `[[calidad-test-execution-orchestration]]`. Capturar `target/karate-reports/karate-summary.json` como evidencia primaria y parsear a esquema común.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz (bug del SUT, contrato mal asumido, payload inválido, environment, timing, infra).
-4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique (p. ej. schema-drift tolerable en `match`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar aserciones de negocio, status code o headers de seguridad para forzar verde.
+4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique (p. ej. schema-drift tolerable en `match`). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca relajar aserciones de negocio, status code o headers de seguridad para forzar verde.
 5. Reportar estado final: `success` (todos los tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con contexto completo: feature, scenario, assertion, response real, hipótesis).
 6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
 
 ### Paso final — Reporte ejecutivo
 
-Invocar `[[generate-executive-report]]` con `results_path`, `strategy_md_path` y `output_format` (preguntar al usuario o usar default `html`). El reporte se persiste en `.evidence/report-{ISO}.{ext}` y se referencia en el `delivery_gate.evidence_persisted.executive_report`. Si modo es `scaffold-only` o `dry-run` → omitir este paso y registrar `null`.
+Invocar `[[calidad-generate-executive-report]]` con `results_path`, `strategy_md_path` y `output_format` (preguntar al usuario o usar default `html`). El reporte se persiste en `.evidence/report-{ISO}.{ext}` y se referencia en el `delivery_gate.evidence_persisted.executive_report`. Si modo es `scaffold-only` o `dry-run` → omitir este paso y registrar `null`.
 
 ## Criterios de finalización (DoD — 14 items)
 

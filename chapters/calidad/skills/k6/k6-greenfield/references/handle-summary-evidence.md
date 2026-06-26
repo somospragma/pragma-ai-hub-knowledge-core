@@ -48,7 +48,7 @@ Cuándo aplicar esta alternativa: cuando el `firma` del cliente incluye "CI sin 
 
 - **Trazabilidad**: cada corrida deja un JSON único e inmutable con métricas (`http_req_duration`, `http_req_failed`, `checks`, etc.).
 - **Comparación entre corridas**: los archivos con timestamp ISO permiten diff entre baselines y validar tendencias.
-- **Calibración**: el workflow `[[calibrate-k6-thresholds]]` lee estos JSON para derivar thresholds reales.
+- **Calibración**: el workflow `[[calidad-calibrate-k6-thresholds]]` lee estos JSON para derivar thresholds reales.
 - **Integración CI**: el JSON se puede subir como artefacto del pipeline y `textSummary` da feedback inmediato en logs.
 
 ## Reglas

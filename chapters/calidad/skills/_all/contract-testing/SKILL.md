@@ -20,7 +20,7 @@ Aplica este skill cuando:
 - Las pruebas E2E o de integración son lentas, caras o frágiles — los contract tests dan feedback en segundos.
 - El cliente tiene equipos distribuidos donde consumer y provider son **propiedad de teams distintos** (Conway's Law aplica).
 
-No aplica como **único** mecanismo: contract testing valida el contrato (estructura, tipos, requeridos), no el comportamiento funcional. Siempre se combina con suites funcionales (`[[karate-greenfield]]`, `[[karate-brownfield]]`, `[[playwright-greenfield]]`).
+No aplica como **único** mecanismo: contract testing valida el contrato (estructura, tipos, requeridos), no el comportamiento funcional. Siempre se combina con suites funcionales (`[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`).
 
 Activa este skill en combinación con `[[calidad-chapter-perspective]]` para confirmar que el contexto del cliente justifica la inversión (un monolito sin integraciones externas raramente lo necesita) y con `[[calidad-mandatory-inputs-protocol]]` para inventariar pares consumer-provider antes de elegir herramienta.
 

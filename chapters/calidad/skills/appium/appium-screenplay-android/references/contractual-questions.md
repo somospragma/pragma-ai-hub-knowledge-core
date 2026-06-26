@@ -6,7 +6,7 @@ Una Question como `ElementIsDisplayed.of(...)` o `WebElementQuestion.the(...).is
 
 **Regla obligatoria**: cada `.feature` de Appium que valide datos del dominio debe expresar el contrato funcional con Questions específicas (cantidad esperada, formato esperado, texto del dominio, transición post-acción), además de la existencia estructural del elemento.
 
-Aplica al workflow `[[generate-appium-screenplay-android]]` paso 6 ("Generar escenarios") y se audita como parte del DoD (`[[calidad-delivery-gate-contract]]`).
+Aplica al workflow `[[calidad-generate-appium-screenplay-android]]` paso 6 ("Generar escenarios") y se audita como parte del DoD (`[[calidad-delivery-gate-contract]]`).
 
 ## Anti-pattern frecuente
 
@@ -92,4 +92,4 @@ public class TransactionsList {
 
 ## Cross-links
 
-`[step-isolation-appium](./step-isolation-appium.md)`, `[screenplay-layers](./screenplay-layers.md)`, `[gherkin-syntax-rules](./gherkin-syntax-rules.md)`, `[[appium-screenplay-android]]`, `[[calidad-delivery-gate-contract]]`.
+`[step-isolation-appium](./step-isolation-appium.md)`, `[screenplay-layers](./screenplay-layers.md)`, `[gherkin-syntax-rules](./gherkin-syntax-rules.md)`, `[[calidad-appium-screenplay-android]]`, `[[calidad-delivery-gate-contract]]`.

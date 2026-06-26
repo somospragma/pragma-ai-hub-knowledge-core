@@ -46,7 +46,7 @@ Política por defecto:
 ## Instrucción
 
 1. **Resolver modo** según contexto del cliente y capacidad técnica del agente. Confirmar con `[[calidad-mandatory-inputs-protocol]]` si hay ambigüedad. Si se degrada a `scaffold-only`, registrar la razón.
-2. **Construir comando** usando el skill de run del framework correspondiente: `[[karate-run-and-tags]]`, `[[playwright-run-and-modes]]`, `[[k6-run-and-suite]]`, `[[appium-run-and-tags]]`. Detalle por framework en `references/execute-and-capture-by-framework.md`.
+2. **Construir comando** usando el skill de run del framework correspondiente: `[[calidad-karate-run-and-tags]]`, `[[calidad-playwright-run-and-modes]]`, `[[calidad-k6-run-and-suite]]`, `[[calidad-appium-run-and-tags]]`. Detalle por framework en `references/execute-and-capture-by-framework.md`.
 3. **Ejecutar y capturar** stdout + stderr + exit code + artefactos (HTML reports, JSON summaries, screenshots, traces, videos). Usar `tee` para no perder log y a la vez tenerlo en archivo.
 4. **Parsear output** a esquema común definido en `references/result-schema-common.md` según el framework usado. Parsers concretos por framework en `references/output-parsers.md`.
 5. **Archivar evidencia** según política de cliente — naming, storage, retención — definida en `references/evidence-archival.md`. Enlazar el archivado con `[[calidad-test-evidence-and-traceability]]`.
@@ -80,7 +80,7 @@ Para decidir si la ejecución la hace el AI o el pipeline CI ver `references/exe
 - `[[calidad-test-self-healing]]`
 - `[[calidad-failure-triage-and-classification]]`
 - `[[calidad-test-self-correction-loop]]`
-- `[[karate-run-and-tags]]`
-- `[[playwright-run-and-modes]]`
-- `[[k6-run-and-suite]]`
-- `[[appium-run-and-tags]]`
+- `[[calidad-karate-run-and-tags]]`
+- `[[calidad-playwright-run-and-modes]]`
+- `[[calidad-k6-run-and-suite]]`
+- `[[calidad-appium-run-and-tags]]`

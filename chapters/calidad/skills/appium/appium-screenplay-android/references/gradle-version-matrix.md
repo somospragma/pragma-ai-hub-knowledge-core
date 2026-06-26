@@ -75,4 +75,4 @@ rootProject.name = '{project_name}'
 distributionUrl=https\://services.gradle.org/distributions/gradle-8.10-bin.zip
 ```
 
-Ver también `[[appium-no-aggregate-collision]]` para las tareas que NO se deben redefinir.
+Ver también ``no-aggregate-collision.md`` para las tareas que NO se deben redefinir.

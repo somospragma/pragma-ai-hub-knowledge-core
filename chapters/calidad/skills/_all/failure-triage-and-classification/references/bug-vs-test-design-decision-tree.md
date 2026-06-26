@@ -56,7 +56,7 @@ La spec dice "el sistema debe responder rápido"; el test asume `<200ms`. El SUT
 
 - **NO** ajustar el threshold del test ni reportar bug.
 - Escalar al humano; pedir clarificación cuantitativa de "rápido".
-- Calibrar con `[[calibrate-k6-thresholds]]` si aplica.
+- Calibrar con `[[calidad-calibrate-k6-thresholds]]` si aplica.
 
 ### Caso C: cambio de UX que rompe selector pero funcionalidad sigue válida
 

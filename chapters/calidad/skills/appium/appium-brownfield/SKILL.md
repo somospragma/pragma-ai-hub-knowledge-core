@@ -1,5 +1,5 @@
 ---
-id: appium-brownfield
+id: calidad-appium-brownfield
 version: 1.0.0
 scope: stack
 type: skill
@@ -20,7 +20,7 @@ Cuando el usuario provee un **proyecto Appium ya inicializado** (Android **o** i
 - Actualizar selectores tras un cambio de UI o nueva versión de la app.
 - Refactor localizado de Screenplay (renombrar Task, mover método, extraer Question) sin reescribir el runner ni el build.
 
-Si el proyecto **no existe** todavía, no aplicar este skill: usar el scaffolder greenfield `[[appium-screenplay-android]]` para Android, o el workaround manual descrito en `references/android-only-scope-rationale.md` para iOS. Decisión brownfield vs greenfield en `[[calidad-brownfield-vs-greenfield]]`.
+Si el proyecto **no existe** todavía, no aplicar este skill: usar el scaffolder greenfield `[[calidad-appium-screenplay-android]]` para Android, o el workaround manual descrito en `references/android-only-scope-rationale.md` para iOS. Decisión brownfield vs greenfield en `[[calidad-brownfield-vs-greenfield]]`.
 
 Antes de activar este skill, confirma intent con `[[calidad-intent-detection]]` y recolecta inputs obligatorios con `[[calidad-mandatory-inputs-protocol]]`. Aplica la perspectiva del chapter en `[[calidad-chapter-perspective]]`.
 
@@ -46,11 +46,11 @@ Antes de activar este skill, confirma intent con `[[calidad-intent-detection]]` 
    - `refactor`: cambios mínimos enfocados; no introducir nuevas capas ni renombrar paquetes.
 5. **NO modificar build/infra** — `build.gradle`, `settings.gradle`, `pom.xml`, `gradlew`, `serenity.conf`, `serenity.properties`, `junit-platform.properties`, `logback-test.xml`, runner Cucumber existente: NO se tocan. Excepción única: si el cambio requiere una dependencia nueva (ej. una librería de visual regression), se reporta al usuario para que apruebe la edición puntual del `build.gradle`/`pom.xml`; no se decide unilateralmente.
 6. **Validar coherencia** — Antes de entregar:
-   - Validar Gherkin (`[[appium-gherkin-syntax-rules]]`) en cada `.feature` nuevo o tocado.
+   - Validar Gherkin (`[[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder)`) en cada `.feature` nuevo o tocado.
    - Validar que el `package` de cada `.java` nuevo coincide con el path físico bajo `base_package` detectado.
    - Validar que los tags usados son subset o extensión coherente de los `scenario_tag_conventions` detectados.
    - Validar que el `gherkin_language` se respetó.
-7. **Comando run** — Reportar al usuario el comando de ejecución filtrado por el tag de la nueva historia, usando el build system detectado y las convenciones de `[[appium-run-and-tags]]`. Entregar archivos con `[[calidad-streaming-files-protocol]]` y trazabilidad por `[[calidad-test-evidence-and-traceability]]`.
+7. **Comando run** — Reportar al usuario el comando de ejecución filtrado por el tag de la nueva historia, usando el build system detectado y las convenciones de `[[calidad-appium-run-and-tags]]`. Entregar archivos con `[[calidad-streaming-files-protocol]]` y trazabilidad por `[[calidad-test-evidence-and-traceability]]`.
 
 ## Salidas
 

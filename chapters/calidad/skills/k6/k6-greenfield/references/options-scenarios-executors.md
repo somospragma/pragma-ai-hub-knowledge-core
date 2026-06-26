@@ -1,8 +1,8 @@
 # `options.scenarios` y executors nativos de K6
 
-Documento de referencia para elegir el executor adecuado al objetivo de cada workload bajo la arquitectura modular (`[[k6-modular-architecture]]`).
+Documento de referencia para elegir el executor adecuado al objetivo de cada workload bajo la arquitectura modular (``modular-architecture.md``).
 
-Cross-links: `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[k6-greenfield]]`, `[[k6-modular-architecture]]`.
+Cross-links: `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-k6-greenfield]]`, ``modular-architecture.md``.
 
 ## Por qué `options.scenarios` y no `vus + duration`
 
@@ -44,6 +44,6 @@ Cross-links: `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-p
 
 - **Usar solo `vus + duration` sin `scenarios`**: se pierde control de carga, tagging por escenario y composabilidad. **Prohibido en proyectos greenfield modulares.**
 - **Usar `ramping-vus` para stress real cuando el SLA es QPS**: si el backend se degrada, el QPS efectivo cae y el test deja de aplicar la presión declarada. Para stress por QPS, usar `ramping-arrival-rate`.
-- **Mezclar lógica HTTP y `options` en el mismo archivo bajo `scenarios/`**: viola la separación scenario vs workload (`[[k6-modular-architecture]]`).
+- **Mezclar lógica HTTP y `options` en el mismo archivo bajo `scenarios/`**: viola la separación scenario vs workload (``modular-architecture.md``).
 - **Omitir `tags: { scenario: '...' }`**: impide segmentar métricas por workload en dashboards.
 - **`preAllocatedVUs` muy bajo en `arrival-rate`**: K6 emite warning `insufficient VUs` y el rate efectivo cae. Dimensionar `preAllocatedVUs` ≈ rate × latencia_p95_segundos.

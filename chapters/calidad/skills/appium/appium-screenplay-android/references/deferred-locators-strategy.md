@@ -31,7 +31,7 @@ public class LoginPage {
 **Falsa confianza** y **audit risk**: `@smoke` verde no prueba que la app realmente responda. Mitigación:
 
 - Marcar `// TODO: update real locator` como **deuda explícita** (no comentario decorativo).
-- Ejecutar workflow `[[complete-deferred-locators]]` antes de promover a CI productivo.
+- Ejecutar workflow `[[calidad-complete-deferred-locators]]` antes de promover a CI productivo.
 - Extraer selectores reales con Appium Inspector y reemplazar las constantes `Target`.
 - Reemplazar `LoginTask.performAs` para invocar `TapOn.theElement(LoginPage.LOGIN_BUTTON)` y similares.
 - Reforzar `AppIsResponsive` para validar visibilidad real (no flag en memoria).
@@ -44,4 +44,4 @@ if grep -R "// TODO: update real locator" src/ ; then
 fi
 ```
 
-Ver también `[[appium-smoke-vs-proposed-scenarios]]` para el split entre escenarios ejecutables y aspiracionales.
+Ver también ``smoke-vs-proposed-scenarios.md`` para el split entre escenarios ejecutables y aspiracionales.

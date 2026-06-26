@@ -1,5 +1,5 @@
 ---
-id: generate-executive-report
+id: calidad-generate-executive-report
 version: 1.0.0
 scope: chapter
 type: workflow

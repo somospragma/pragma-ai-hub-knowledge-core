@@ -29,7 +29,7 @@ Aplica este skill **únicamente después** de que `[[calidad-failure-triage-and-
 
 **NUNCA** aplicar sobre fallos clasificados como `deterministic + bug del SUT`, `deterministic + breaking change`, ni cuando el triage no pudo concluir. En esos casos el control pasa al humano y al equipo del cliente vía `[[calidad-failure-triage-and-classification]]`.
 
-Este skill es invocado como **fase final obligatoria** del workflow `[[test-self-correction-loop]]`, que a su vez es la cola común de todos los workflows de construcción de tests del chapter (Karate, Playwright, K6, Appium, greenfield y brownfield).
+Este skill es invocado como **fase final obligatoria** del workflow `[[calidad-test-self-correction-loop]]`, que a su vez es la cola común de todos los workflows de construcción de tests del chapter (Karate, Playwright, K6, Appium, greenfield y brownfield).
 
 Cruzar siempre con `[[calidad-chapter-perspective]]`, `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-security-testing]]` y `[[calidad-cicd-integration]]`.
 
@@ -121,8 +121,8 @@ Cross-links con otros assets del chapter:
 - `[[calidad-test-execution-orchestration]]`
 - `[[calidad-failure-triage-and-classification]]`
 - `[[calidad-test-self-healing]]`
-- `[[karate-greenfield]]`
-- `[[playwright-greenfield]]`
-- `[[k6-greenfield]]`
-- `[[appium-screenplay-android]]`
-- `[[test-self-correction-loop]]` (workflow)
+- `[[calidad-karate-greenfield]]`
+- `[[calidad-playwright-greenfield]]`
+- `[[calidad-k6-greenfield]]`
+- `[[calidad-appium-screenplay-android]]`
+- `[[calidad-test-self-correction-loop]]` (workflow)

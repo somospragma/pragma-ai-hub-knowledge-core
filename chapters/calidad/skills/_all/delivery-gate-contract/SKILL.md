@@ -107,4 +107,4 @@ verification:
 
 ## Cross-links
 
-`[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-executive-report-generator]]`, `[[generate-executive-report]]`.
+`[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-executive-report-generator]]`, `[[calidad-generate-executive-report]]`.

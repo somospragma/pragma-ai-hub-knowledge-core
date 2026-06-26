@@ -15,7 +15,7 @@ Politica de think-time entre requests dentro de un VU. K6 no inyecta latencia hu
 import { randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2.0/index.js';
 ```
 
-Si el entorno es air-gapped, vendorizar `k6-utils` igual que `k6-summary` (ver `[[k6-handle-summary-evidence]]`).
+Si el entorno es air-gapped, vendorizar `k6-utils` igual que `k6-summary` (ver ``handle-summary-evidence.md``).
 
 ## Tabla cuando-cada-uno
 
@@ -51,6 +51,6 @@ Tampoco es valido eliminar todos los sleeps "para maximizar RPS". Maximizar RPS 
 
 ## Cross-links
 
-- `[[k6-five-script-types]]` — perfiles VU/duracion.
-- `[[k6-crud-dynamic-id-correlation]]` — donde aplican los sleeps entre POST/GET/DELETE.
+- ``five-script-types.md`` — perfiles VU/duracion.
+- ``crud-dynamic-id-correlation.md`` — donde aplican los sleeps entre POST/GET/DELETE.
 - `[[calidad-test-self-correction-loop/references/anti-cheating-guardrails]]` — entrega que aflojar es trampa; eliminar sleeps lo es tambien.

@@ -1,5 +1,5 @@
 ---
-id: karate-analyze-openapi-prompt
+id: calidad-karate-analyze-openapi-prompt
 version: 1.0.0
 scope: stack
 type: prompt

@@ -1,5 +1,5 @@
 ---
-id: k6-extract-config-prompt
+id: calidad-k6-extract-config-prompt
 version: 1.0.0
 scope: stack
 type: prompt
@@ -60,4 +60,4 @@ Reglas estrictas:
 
 ## Notas
 
-Salida esperada: el contenido literal de `tests/config.js`, listo para persistir. Consume las reglas de `[[k6-enums-headers-security-extraction]]` y `[[k6-config-and-utils-modules]]`.
+Salida esperada: el contenido literal de `tests/config.js`, listo para persistir. Consume las reglas de `[[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)` y `[[calidad-k6-greenfield]] (consultar `references/config-and-utils-modules.md` en su subfolder)`.

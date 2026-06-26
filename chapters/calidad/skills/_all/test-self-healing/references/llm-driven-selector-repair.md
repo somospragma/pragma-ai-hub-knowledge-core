@@ -10,7 +10,7 @@ Cuando la cadena de fallback (`multi-locator-fallback-pattern.md`) se agota, en 
    - Screenshot completa (`page.screenshot({ fullPage: true })`).
    - El error con la lista completa de selectors intentados.
    - El último selector que se sabe que funcionó (último commit donde el test pasó).
-3. **Invocar el prompt** `[[playwright-extract-pages-from-live-app-prompt]]` con esos cuatro inputs. El prompt está parametrizado para devolver selector siguiendo la prioridad del chapter (`getByTestId > getByRole > getByLabel`).
+3. **Invocar el prompt** `[[calidad-playwright-extract-pages-from-live-app-prompt]]` con esos cuatro inputs. El prompt está parametrizado para devolver selector siguiendo la prioridad del chapter (`getByTestId > getByRole > getByLabel`).
 4. **Validar el selector propuesto** ejecutando el test contra el live app **localmente** (smoke), nunca contra CI. El test debe pasar tres veces consecutivas antes de aceptar la propuesta.
 5. **Abrir PR** con el cambio del Page Object, incluyendo en la descripción: el log de healing original, la propuesta del LLM, el costo del call y la captura de las tres ejecuciones verdes. El PR pasa por code review humano obligatorio.
 

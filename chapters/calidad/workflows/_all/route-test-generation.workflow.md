@@ -44,7 +44,7 @@ Aplica `[[calidad-intent-detection]]`:
 
 - Determina si la solicitud es Karate, K6, Playwright o Appium.
 - Si el intent es ambiguo, **pregunta**; no asumas Playwright por defecto.
-- Si el usuario pide mobile iOS greenfield, no abortes: el scaffolder V2 no lo genera automáticamente, pero el chapter sí soporta iOS via scaffold manual (apuntar a `references/android-only-scope-rationale.md` del skill `[[appium-screenplay-android]]`). Si es mobile iOS brownfield, enrutar a `[[appium-brownfield]]`.
+- Si el usuario pide mobile iOS greenfield, no abortes: el scaffolder V2 no lo genera automáticamente, pero el chapter sí soporta iOS via scaffold manual (apuntar a `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`). Si es mobile iOS brownfield, enrutar a `[[calidad-appium-brownfield]]`.
 
 ### Paso 3 — Validar el spec
 
@@ -68,16 +68,16 @@ Transfiere el control al workflow concreto según el resultado de los pasos 2 y 
 
 | Framework + modo            | Workflow destino                              |
 |-----------------------------|-----------------------------------------------|
-| Karate greenfield           | `[[generate-karate-greenfield]]`              |
-| Karate brownfield           | `[[extend-karate-brownfield]]`                |
-| Playwright greenfield       | `[[generate-playwright-greenfield]]`          |
-| Playwright brownfield       | `[[update-playwright-brownfield]]`            |
-| K6 greenfield               | `[[generate-k6-suite]]`                       |
-| K6 brownfield               | `[[extend-k6-brownfield]]`                    |
-| Appium greenfield (Android, V2)   | `[[generate-appium-screenplay-android]]`    |
-| Appium brownfield (Android / iOS) | `[[extend-appium-brownfield]]`              |
+| Karate greenfield           | `[[calidad-generate-karate-greenfield]]`              |
+| Karate brownfield           | `[[calidad-extend-karate-brownfield]]`                |
+| Playwright greenfield       | `[[calidad-generate-playwright-greenfield]]`          |
+| Playwright brownfield       | `[[calidad-update-playwright-brownfield]]`            |
+| K6 greenfield               | `[[calidad-generate-k6-suite]]`                       |
+| K6 brownfield               | `[[calidad-extend-k6-brownfield]]`                    |
+| Appium greenfield (Android, V2)   | `[[calidad-generate-appium-screenplay-android]]`    |
+| Appium brownfield (Android / iOS) | `[[calidad-extend-appium-brownfield]]`              |
 
-> Nota Appium: el scaffolder greenfield V2 solo genera proyectos Android (limitación de tooling). Para greenfield iOS, apuntar al usuario al workaround manual descrito en `references/android-only-scope-rationale.md` del skill `[[appium-screenplay-android]]`. El brownfield Appium sí soporta Android e iOS (la plataforma se detecta del proyecto), ver `[[appium-brownfield]]`.
+> Nota Appium: el scaffolder greenfield V2 solo genera proyectos Android (limitación de tooling). Para greenfield iOS, apuntar al usuario al workaround manual descrito en `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`. El brownfield Appium sí soporta Android e iOS (la plataforma se detecta del proyecto), ver `[[calidad-appium-brownfield]]`.
 
 ### Paso 6 — Emitir archivos con disciplina
 
@@ -103,10 +103,10 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 1. **Resolver modo de operación universal** con el usuario si el workflow delegado no lo hizo (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin entornos, sin credenciales), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` con el comando idiomático del framework delegado.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz.
-4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros del chapter**.
+4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros del chapter**.
 5. Reportar estado final agregado: `success` (todos los tests pasan determinísticamente en el framework delegado) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con contexto completo del framework correspondiente).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. El router NO finaliza con éxito si esta fase quedó sin cerrar.
-7. **Invocar `[[generate-executive-report]]`** para producir el reporte consolidado post-corrida en formato HTML/PPTX/DOC. Si modo es `scaffold-only` o `dry-run` → omitir y registrar `null` en el `delivery_gate.evidence_persisted.executive_report`.
+7. **Invocar `[[calidad-generate-executive-report]]`** para producir el reporte consolidado post-corrida en formato HTML/PPTX/DOC. Si modo es `scaffold-only` o `dry-run` → omitir y registrar `null` en el `delivery_gate.evidence_persisted.executive_report`.
 8. **Emitir `[[calidad-delivery-gate-contract]]`** con el bloque YAML completo antes del mensaje final. Sin este bloque, la entrega se considera incompleta.
 
 ## Criterios de finalización

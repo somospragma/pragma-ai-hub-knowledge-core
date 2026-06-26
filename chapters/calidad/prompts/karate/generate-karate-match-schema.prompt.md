@@ -1,5 +1,5 @@
 ---
-id: karate-generate-match-schema-prompt
+id: calidad-karate-generate-match-schema-prompt
 version: 1.0.0
 scope: stack
 type: prompt

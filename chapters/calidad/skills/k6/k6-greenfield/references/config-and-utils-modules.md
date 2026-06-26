@@ -10,7 +10,7 @@ El contenido exacto depende del **modo de autenticación** elegido. Hay dos modo
 | `spec` (default) | Sin input explícito. El spec **sí** declara `security` → se incluye; si no, se omite. | Solo si el spec define `security`. | Solo si el spec define `security`. | Requerida solo si el spec define `security`. | Microservicios cuyo OpenAPI describe completa y fielmente su autenticación. |
 | `external` (override) | Input `auth_mode: external` o env `EXTERNAL_AUTH=true`. | **Siempre** incluido. | **Siempre** incluido. | **Obligatoria** (documentar en README). | Gateway delante del servicio, IdP externo (Cognito/Keycloak/Okta), AWS SigV4 / JWS, mTLS, tokens out-of-band. |
 
-Detalle del modo y rationale en `[[k6-enums-headers-security-extraction]]`.
+Detalle del modo y rationale en ``enums-headers-security-extraction.md``.
 
 ## `tests/config.js` — Modo `spec` (default)
 
@@ -32,7 +32,7 @@ export const config = {
 Reglas:
 - `baseUrl` siempre desde `__ENV.BASE_URL` con fallback local.
 - `authToken` SOLO si el spec define `security`. Si no, omitir la propiedad.
-- Los arrays de enums se generan a partir de `schema.enum` (top-level) o `properties.{field}.enum` (property-level). Ver `[[k6-enums-headers-security-extraction]]`.
+- Los arrays de enums se generan a partir de `schema.enum` (top-level) o `properties.{field}.enum` (property-level). Ver ``enums-headers-security-extraction.md``.
 
 ## `tests/config.js` — Modo `external` (override)
 
@@ -126,4 +126,4 @@ export function buildCreateUserBody() {
 Reglas generales (ambos modos):
 - `uuidv4()` RFC 4122 v4 (la versión es el `4` literal y el variant es `8|9|a|b`).
 - `getDefaultHeaders()` incluye Content-Type, Accept, headers de UUID/correlation/transaction generados, enum random. `Authorization` se incluye según el modo.
-- Un `buildXxxBody()` por cada endpoint con request body; el sufijo es PascalCase derivado del `operationId` (ver `[[k6-enums-headers-security-extraction]]`).
+- Un `buildXxxBody()` por cada endpoint con request body; el sufijo es PascalCase derivado del `operationId` (ver ``enums-headers-security-extraction.md``).

@@ -82,4 +82,4 @@ Cross-links con otros assets del chapter:
 - `[[calidad-test-execution-orchestration]]`
 - `[[calidad-test-self-healing]]`
 - `[[calidad-test-self-correction-loop]]`
-- `[[calibrate-k6-thresholds]]`
+- `[[calidad-calibrate-k6-thresholds]]`

@@ -4,10 +4,10 @@ Antes de generar la suite K6 el agente debe validar el entorno local, la accesib
 
 ## Validaciones obligatorias
 
-- `k6 version` debe responder. Versión recomendada ≥ 0.50.0; versiones inferiores no garantizan `handleSummary()` ni los thresholds compuestos usados por la suite (`[[k6-thresholds-three-tiers]]`).
+- `k6 version` debe responder. Versión recomendada ≥ 0.50.0; versiones inferiores no garantizan `handleSummary()` ni los thresholds compuestos usados por la suite (``thresholds-three-tiers.md``).
 - `BASE_URL` accesible vía `curl -sI --max-time 5 "$BASE_URL"`. Si responde 4xx/5xx pero el host resuelve, considerarlo alcanzable para el pre-flight (el smoke detectará el detalle).
 - `AUTH_TOKEN` exportado si el spec declara `security` (`auth_mode = spec` con security activa) o si el operador eligió `auth_mode = external`. Si falta, degradar el smoke a `partial` y reportar al usuario.
-- Conectividad a `jslib.k6.io` (HTTPS) para resolver los imports del runtime estándar. Si el ambiente es air-gapped, validar que existe una copia vendored y ajustar los imports — el patrón está documentado en `[[k6-handle-summary-evidence]]`.
+- Conectividad a `jslib.k6.io` (HTTPS) para resolver los imports del runtime estándar. Si el ambiente es air-gapped, validar que existe una copia vendored y ajustar los imports — el patrón está documentado en ``handle-summary-evidence.md``.
 
 ## Degradación
 

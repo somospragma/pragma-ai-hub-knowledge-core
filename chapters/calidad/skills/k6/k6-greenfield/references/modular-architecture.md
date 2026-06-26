@@ -2,7 +2,7 @@
 
 Documento de referencia para la generación de proyectos K6 greenfield bajo la arquitectura modular idiomática. Sustituye al enfoque monolítico de un script por escenario (smoke/load/stress/spike/soak) heredado en `references/templates/*-test.js.tpl`.
 
-Cross-links: `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[k6-greenfield]]`, `[[k6-options-scenarios-executors]]`.
+Cross-links: `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-k6-greenfield]]`, ``options-scenarios-executors.md``.
 
 ## Por qué separar scenarios / workloads / tests
 
@@ -27,7 +27,7 @@ Cross-links: `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-p
 - Exporta `options` con `scenarios:` (executors, vus/rate, stages, duration, tags).
 - Importa `thresholds` desde `shared/thresholds.js` (`thresholdsBaseline`, `thresholdsCarga`, `thresholdsEstres`).
 - Asigna `tags: { scenario: 'linea-base'|'carga'|'estres' }` en cada bloque para correlacionar métricas por workload.
-- Decide el **executor** según el objetivo (ver `[[k6-options-scenarios-executors]]`).
+- Decide el **executor** según el objetivo (ver ``options-scenarios-executors.md``).
 
 ### `tests/{escenario}/main.js`
 
@@ -114,4 +114,4 @@ Si el flow requiere autenticación previa, se compone delegando a `scenarios/aut
 
 ## Convivencia con templates monolíticos
 
-Los templates `smoke-test.js.tpl`, `load-test.js.tpl`, `stress-test.js.tpl`, `spike-test.js.tpl` y `soak-test.js.tpl` quedan marcados como **DEPRECATED** al inicio del archivo y se conservan únicamente para proyectos brownfield que ya nacieron con estructura monolítica (`[[k6-brownfield]]`). Todo proyecto greenfield nuevo debe generarse con la estructura modular descrita en este documento.
+Los templates `smoke-test.js.tpl`, `load-test.js.tpl`, `stress-test.js.tpl`, `spike-test.js.tpl` y `soak-test.js.tpl` quedan marcados como **DEPRECATED** al inicio del archivo y se conservan únicamente para proyectos brownfield que ya nacieron con estructura monolítica (`[[calidad-k6-brownfield]]`). Todo proyecto greenfield nuevo debe generarse con la estructura modular descrita en este documento.

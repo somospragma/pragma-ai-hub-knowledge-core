@@ -116,7 +116,7 @@ export async function setupMocks(page: Page): Promise<void> {
 ## Cuándo NO mockear
 
 - Smoke pipeline: siempre `@live`, sin excepciones.
-- Validar contratos reales backend-frontend (para esto se usa `[[karate-greenfield]]`, no Playwright).
+- Validar contratos reales backend-frontend (para esto se usa `[[calidad-karate-greenfield]]`, no Playwright).
 - Pruebas de regresión que el negocio cuenta como evidencia de integración funcionando.
 
 ## Cuándo SÍ mockear

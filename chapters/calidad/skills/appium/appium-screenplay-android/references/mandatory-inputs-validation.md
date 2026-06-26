@@ -48,4 +48,4 @@ Mapear `package: name='X'` → `app_package = X`; `launchable-activity: name='Y'
 
 Si `aapt` no está disponible o `app_package`/`app_activity` no se pueden inferir, generar con los defaults y dejar TODO en README pidiendo al usuario completar.
 
-Rationale del scope Android-only en `[[appium-android-only-scope-rationale]]`.
+Rationale del scope Android-only en ``android-only-scope-rationale.md``.

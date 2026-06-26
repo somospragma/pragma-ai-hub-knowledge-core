@@ -1,5 +1,5 @@
 ---
-id: k6-generate-script-prompt
+id: calidad-k6-generate-script-prompt
 version: 1.0.0
 scope: stack
 type: prompt
@@ -89,4 +89,4 @@ Reglas estrictas:
 
 ## Notas
 
-Invocar este prompt una vez por `script_type` (5 invocaciones por proyecto). Stages y thresholds detallados en `[[k6-five-script-types]]` y `[[k6-thresholds-three-tiers]]`. Correlación CRUD en `[[k6-crud-dynamic-id-correlation]]`. Evidencia en `[[k6-handle-summary-evidence]]`.
+Invocar este prompt una vez por `script_type` (5 invocaciones por proyecto). Stages y thresholds detallados en `[[calidad-k6-greenfield]] (consultar `references/five-script-types.md` en su subfolder)` y `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`. Correlación CRUD en `[[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)`. Evidencia en `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)`.

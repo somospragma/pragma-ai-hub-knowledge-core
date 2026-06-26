@@ -8,7 +8,7 @@ Estas reglas son determinísticas: dada la evidencia disponible (status code, st
 |---|---|---|
 | Status code distinto al esperado, consistente entre N re-runs, response body coherente con un bug de negocio (campo faltante, total mal calculado) | `SUT_BUG` | El SUT responde rápido y de forma reproducible, pero el valor es incorrecto. NO es problema del test ni del ambiente. |
 | Body o headers diferentes al contrato declarado en el spec OpenAPI y consistente | `SUT_BUG` | Drift de contrato del SUT respecto al spec aprobado. |
-| K6: p95 incumplido pero p50 dentro del SLA, error rate < 1%, ningún 5xx | `THRESHOLD_TOO_STRICT` | El SUT responde correctamente; el SLA p95 inicial era irreal para el ambiente. Calibrar con `[[calibrate-k6-thresholds]]`. |
+| K6: p95 incumplido pero p50 dentro del SLA, error rate < 1%, ningún 5xx | `THRESHOLD_TOO_STRICT` | El SUT responde correctamente; el SLA p95 inicial era irreal para el ambiente. Calibrar con `[[calidad-calibrate-k6-thresholds]]`. |
 | Status 403 con headers tipo `X-Permitted-Cross-Domain-Policies`, `Server: cloudfront`, `cf-mitigated`, `incap_ses_*`, body con captcha o página HTML | `ENVIRONMENT_BLOCKED` | WAF / CDN intercepta. NO es bug del SUT ni del test. |
 | Timeouts de red consistentes, DNS no resuelve, TLS handshake falla, certificado expirado | `ENVIRONMENT_BLOCKED` | Infraestructura. Escalar a Infra. |
 | Status 429 sostenido | `ENVIRONMENT_BLOCKED` (rate limit). Si el test es K6 con carga real planificada, puede ser `SUT_BUG` (rate limit mal dimensionado) — diferenciar por el SLA declarado en STRATEGY.md. |

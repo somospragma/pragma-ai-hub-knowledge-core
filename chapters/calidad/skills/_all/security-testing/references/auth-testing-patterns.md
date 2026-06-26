@@ -113,7 +113,7 @@ Scenario: petición sin cert es rechazada (handshake)
   Then status == 0 || status == 403
 ```
 
-Para Appium/mobile, verificar pinning con `[[appium-screenplay-android]]` + un proxy MITM (mitmproxy) y un cert no pineado: la app debe rechazar la conexión.
+Para Appium/mobile, verificar pinning con `[[calidad-appium-screenplay-android]]` + un proxy MITM (mitmproxy) y un cert no pineado: la app debe rechazar la conexión.
 
 ## Session-based (cookies)
 

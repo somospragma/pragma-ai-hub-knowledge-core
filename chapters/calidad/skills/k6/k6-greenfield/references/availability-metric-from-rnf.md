@@ -27,7 +27,7 @@ Cuando el RNF lo justifica, declarar el threshold equivalente para que k6 falle 
 'http_req_failed{step:main}': ['rate<0.001'],
 ```
 
-Filtrar por `{step:main}` para que la disponibilidad se evalúe sobre el endpoint objetivo, no contaminada por fallos de auth o cleanup (ver `[[tag-policy-and-metrics-isolation]]`).
+Filtrar por `{step:main}` para que la disponibilidad se evalúe sobre el endpoint objetivo, no contaminada por fallos de auth o cleanup (ver ``tag-policy-and-metrics-isolation.md``).
 
 ## Snippet `handleSummary()` con cálculo de disponibilidad
 
@@ -75,7 +75,7 @@ export function handleSummary(data) {
 
 ## Reporte en `metadata.json`
 
-El `metadata.json` por corrida (schema completo en `[[results-structure-and-metadata]]`) debe incluir:
+El `metadata.json` por corrida (schema completo en ``results-structure-and-metadata.md``) debe incluir:
 
 ```json
 {
@@ -112,9 +112,9 @@ Cuando `met === false`, registrar la brecha en `delivery_gate.blockers` (ver `[[
 
 ## Cross-links
 
-- `[[k6-greenfield]]`
-- `[[tag-policy-and-metrics-isolation]]`
-- `[[k6-thresholds-three-tiers]]`
-- `[[results-structure-and-metadata]]`
+- `[[calidad-k6-greenfield]]`
+- ``tag-policy-and-metrics-isolation.md``
+- ``thresholds-three-tiers.md``
+- ``results-structure-and-metadata.md``
 - `[[calidad-delivery-gate-contract]]`
 - `[[calidad-post-generation-protocol]]`

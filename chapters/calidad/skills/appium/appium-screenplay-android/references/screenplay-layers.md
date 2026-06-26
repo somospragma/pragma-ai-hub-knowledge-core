@@ -106,4 +106,4 @@ public class LoginPage {
 - `OnStage.setTheStage(OnlineCast.whereEveryoneCan(...))` — ambigüedad de sobrecargas en Serenity 4.1.14. Usar `new OnlineCast()`.
 - Task sin `@Step` en factory: invisible en el reporte.
 - Question con side effects (escribe en UI): rompe el contrato Screenplay.
-- Locators sueltos fuera de `userinterfaces/`: duplica selectores y dificulta `[[complete-deferred-locators]]`.
+- Locators sueltos fuera de `userinterfaces/`: duplica selectores y dificulta `[[calidad-complete-deferred-locators]]`.

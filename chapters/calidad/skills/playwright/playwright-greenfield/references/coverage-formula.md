@@ -1,6 +1,6 @@
 # Fórmula de cobertura mínima (Playwright)
 
-Análoga a la fórmula de Karate (ver `[[karate-negative-coverage-formula]]`), pero adaptada a UI E2E. La cobertura mínima por historia de usuario (HU) NO es un round number; se calcula y se declara antes de generar.
+Análoga a la fórmula de Karate (ver `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`), pero adaptada a UI E2E. La cobertura mínima por historia de usuario (HU) NO es un round number; se calcula y se declara antes de generar.
 
 ## Fórmula
 
@@ -79,8 +79,8 @@ Si el conteo real es menor, regenerar el archivo añadiendo los tests faltantes.
 
 ## Cross-links
 
-- Fórmula homóloga API: `[[karate-negative-coverage-formula]]`.
-- Comentario de cobertura por archivo (equivalente en Karate): `[[karate-greenfield/references/cobertura-comment-enforcement.md]]`.
-- Tags nativos v1.42+ obligatorios por HU: `[[playwright-greenfield/references/playwright-native-tags-v142.md]]`.
-- Coherencia de artefactos: `[[playwright-greenfield/references/coherence-checks.md]]`.
+- Fórmula homóloga API: `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`.
+- Comentario de cobertura por archivo (equivalente en Karate): `[[calidad-karate-greenfield]] (consultar `references/cobertura-comment-enforcement.md` en su subfolder)`.
+- Tags nativos v1.42+ obligatorios por HU: ``playwright-native-tags-v142.md``.
+- Coherencia de artefactos: ``coherence-checks.md``.
 - Gate de entrega: `[[calidad-delivery-gate-contract]]`.

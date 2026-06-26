@@ -68,7 +68,7 @@ check(res, {
 }, { endpoint: 'createUser', step: 'main', scenario: __ENV.SCENARIO_NAME });
 ```
 
-El check `response has id` es lo que permite el `[[k6-crud-dynamic-id-correlation]]`: sin id correlacionado, GET/PUT/DELETE quedan sin sujeto.
+El check `response has id` es lo que permite el ``crud-dynamic-id-correlation.md``: sin id correlacionado, GET/PUT/DELETE quedan sin sujeto.
 
 ### CRUD DELETE
 
@@ -114,11 +114,11 @@ Consecuencia: un endpoint que responde 200 con `{}` aprueba el check, pero el co
 
 ## Cross-links
 
-- `[[k6-greenfield]]`
-- `[[k6-enums-headers-security-extraction]]`
-- `[[k6-crud-dynamic-id-correlation]]`
-- `[[tag-policy-and-metrics-isolation]]`
-- `[[availability-metric-from-rnf]]`
+- `[[calidad-k6-greenfield]]`
+- ``enums-headers-security-extraction.md``
+- ``crud-dynamic-id-correlation.md``
+- ``tag-policy-and-metrics-isolation.md``
+- ``availability-metric-from-rnf.md``
 - `[[calidad-pre-generation-protocol]]`
 - `[[calidad-post-generation-protocol]]`
 - `[[calidad-delivery-gate-contract]]`

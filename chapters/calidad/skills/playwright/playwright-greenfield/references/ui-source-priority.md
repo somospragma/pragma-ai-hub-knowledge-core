@@ -35,7 +35,7 @@ Playwright valida la capa de presentación. El insumo debe describir UI real. Es
 
 ## Herramientas recomendadas por fuente
 
-- **URL viva** → `npx playwright codegen URL`, MCP browser tools (`browser_navigate`, `browser_snapshot`), o crawlers headless. Skill: `[[playwright-from-live-app]]`.
+- **URL viva** → `npx playwright codegen URL`, MCP browser tools (`browser_navigate`, `browser_snapshot`), o crawlers headless. Skill: `[[calidad-playwright-from-live-app]]`.
 - **Figma** → plugin oficial de Figma para exportar specs; OCR sobre screenshots si solo hay imagen.
 - **User story** → leer en voz alta el flujo y mapearlo a páginas; pedir al PO los flujos faltantes.
 - **Storybook** → `npm run storybook` y crawlear `iframe.html?id=...` con Playwright.
@@ -51,4 +51,4 @@ Playwright valida la capa de presentación. El insumo debe describir UI real. Es
 
 ## Especificaciones backend
 
-Specs como OpenAPI/Swagger/WSDL describen contrato backend, no UI: no aplican aquí. Si el usuario solo trae un spec backend y su intención es validar el contrato, deriva a `[[karate-greenfield]]` (funcional) o `[[k6-greenfield]]` (performance). Para mocks dentro de un proyecto Playwright (modo `@mocked` o `@hybrid`), las fuentes de `mock_endpoints` se documentan en `[mocks-page-route](mocks-page-route.md)`.
+Specs como OpenAPI/Swagger/WSDL describen contrato backend, no UI: no aplican aquí. Si el usuario solo trae un spec backend y su intención es validar el contrato, deriva a `[[calidad-karate-greenfield]]` (funcional) o `[[calidad-k6-greenfield]]` (performance). Para mocks dentro de un proyecto Playwright (modo `@mocked` o `@hybrid`), las fuentes de `mock_endpoints` se documentan en `[mocks-page-route](mocks-page-route.md)`.

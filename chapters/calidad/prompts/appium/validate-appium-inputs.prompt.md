@@ -1,5 +1,5 @@
 ---
-id: appium-validate-inputs-prompt
+id: calidad-appium-validate-inputs-prompt
 version: 1.0.0
 scope: stack
 type: prompt

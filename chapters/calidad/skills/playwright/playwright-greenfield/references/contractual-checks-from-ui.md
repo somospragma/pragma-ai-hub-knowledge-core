@@ -6,7 +6,7 @@
 
 **Regla obligatoria**: cada `.spec.ts` que valide datos del dominio debe expresar el contrato funcional con aserciones específicas — cantidad esperada, formato esperado, texto del dominio, navegación post-acción — además de la visibilidad estructural.
 
-Aplica al workflow `[[generate-playwright-greenfield]]` paso 7 ("Planificar tests") y se audita como parte del DoD (`[[calidad-delivery-gate-contract]]`).
+Aplica al workflow `[[calidad-generate-playwright-greenfield]]` paso 7 ("Planificar tests") y se audita como parte del DoD (`[[calidad-delivery-gate-contract]]`).
 
 ## Anti-pattern frecuente
 
@@ -158,8 +158,8 @@ Si `total_visible > total_specific` y los tests validan datos del dominio, **la 
 
 ## Cross-links
 
-- Coherencia y data-driven: `[[playwright-greenfield/references/coherence-checks.md]]`.
-- Cobertura por HU: `[[playwright-greenfield/references/coverage-formula.md]]`.
-- Modo de ejecución: `[[playwright-greenfield/references/execution-modes-live-mocked-hybrid.md]]`.
+- Coherencia y data-driven: ``coherence-checks.md``.
+- Cobertura por HU: ``coverage-formula.md``.
+- Modo de ejecución: ``execution-modes-live-mocked-hybrid.md``.
 - Auditoría post-emisión: `[[calidad-post-generation-protocol]]`.
 - Gate de entrega: `[[calidad-delivery-gate-contract]]`.

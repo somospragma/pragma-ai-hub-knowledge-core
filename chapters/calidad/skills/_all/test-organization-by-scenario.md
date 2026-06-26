@@ -49,4 +49,4 @@ Cuando una HU adicional llevaría el conteo a 3, refactorizar:
 
 ## Cross-links
 
-`[results-structure-universal](./results-structure-universal.md)`, `[[karate-greenfield]]`, `[[playwright-greenfield]]`, `[[k6-greenfield]]`, `[[appium-screenplay-android]]`.
+`[results-structure-universal](./results-structure-universal.md)`, `[[calidad-karate-greenfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]`, `[[calidad-appium-screenplay-android]]`.

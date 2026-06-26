@@ -91,4 +91,4 @@ Casos legítimos en los que el spec NO refleja la autenticación real:
 
 ## Regla crítica
 
-Por defecto, si el spec NO tiene security, no agregues `Authorization`. Excepción: modo external-auth explícito (input `auth_mode: external` o env `EXTERNAL_AUTH=true`). En ese caso, `authToken` y `Authorization` se incluyen siempre y `AUTH_TOKEN` se documenta como obligatorio en el README. El skill `[[k6-greenfield]]` valida ambas ramas en su checklist DoD.
+Por defecto, si el spec NO tiene security, no agregues `Authorization`. Excepción: modo external-auth explícito (input `auth_mode: external` o env `EXTERNAL_AUTH=true`). En ese caso, `authToken` y `Authorization` se incluyen siempre y `AUTH_TOKEN` se documenta como obligatorio en el README. El skill `[[calidad-k6-greenfield]]` valida ambas ramas en su checklist DoD.

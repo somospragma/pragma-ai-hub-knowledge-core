@@ -10,7 +10,7 @@ La primera línea no vacía del archivo `.feature` DEBE coincidir con:
 # cobertura: <N>
 ```
 
-donde `<N>` es el `effective_minimum` calculado mediante la fórmula descrita en `[[karate-negative-coverage-formula]]` (con `risk_factor` aplicado).
+donde `<N>` es el `effective_minimum` calculado mediante la fórmula descrita en ``negative-coverage-formula.md`` (con `risk_factor` aplicado).
 
 Si el archivo coloca `Feature:` en la primera línea por restricción de un cliente, el comentario `# cobertura:` puede vivir en la segunda línea. No se acepta ninguna otra ubicación.
 
@@ -52,6 +52,6 @@ Cualquier línea de salida `MISSING cobertura: ...` invalida la entrega para ese
 
 ## Cross-links
 
-- Fórmula y cálculo: `[[karate-negative-coverage-formula]]`.
+- Fórmula y cálculo: ``negative-coverage-formula.md``.
 - Consumo por el gate de entrega: `[[calidad-delivery-gate-contract]]`.
 - Cómo se reporta en el evidence pack: `[[calidad-post-generation-protocol]]`.

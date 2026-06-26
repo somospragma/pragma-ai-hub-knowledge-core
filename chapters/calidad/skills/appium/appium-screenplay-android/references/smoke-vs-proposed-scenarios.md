@@ -26,7 +26,7 @@ Scenario: Validacion de carga y DOM de la aplicacion
   Then la pantalla principal es visible y la app responde
 ```
 
-Estos escenarios deben pasar sin selectores reales (ver `[[appium-deferred-locators-strategy]]`).
+Estos escenarios deben pasar sin selectores reales (ver ``deferred-locators-strategy.md``).
 
 ## `@proposed` (condicional, opt-in)
 
@@ -59,4 +59,4 @@ Scenario: Login con credenciales invalidas muestra mensaje de error
 ./gradlew clean test aggregate -Dcucumber.filter.tags='@smoke or @proposed'
 ```
 
-Ver `[[appium-run-and-tags]]` para más combinaciones.
+Ver `[[calidad-appium-run-and-tags]]` para más combinaciones.

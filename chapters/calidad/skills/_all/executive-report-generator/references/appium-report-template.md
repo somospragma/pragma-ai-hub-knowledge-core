@@ -54,7 +54,7 @@ Si el workflow eligió auto-discovery en el Paso 4:
 | DashboardPage | 12 | 9 | 3 | 0.78 |
 | CheckoutPage | 8 | 4 | 4 | 0.61 |
 
-Los locators deferred pendientes deben completarse con `[[complete-deferred-locators]]` antes de promover.
+Los locators deferred pendientes deben completarse con `[[calidad-complete-deferred-locators]]` antes de promover.
 
 ## Sección 4 — Comparación entre corridas (vista Appium)
 

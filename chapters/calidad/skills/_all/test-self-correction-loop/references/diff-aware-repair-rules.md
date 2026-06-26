@@ -77,7 +77,7 @@ Reglas para decidir, dado el diff entre lo esperado y lo observado, si el cambio
    - error_rate subió > umbral baseline       → BUG.
 3. el único ajuste permitido sobre el test K6 es:
    - corregir errores de scripting (typos, refactor de setup) que no tocan thresholds.
-   - thresholds se recalibran solo vía [[calibrate-k6-thresholds]] con evidencia.
+   - thresholds se recalibran solo vía [[calidad-calibrate-k6-thresholds]] con evidencia.
 ```
 
 ## Snippet: pseudo-código de detección automática

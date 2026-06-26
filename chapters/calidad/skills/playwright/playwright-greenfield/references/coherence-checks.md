@@ -13,7 +13,7 @@ Nunca entregar artefactos huérfanos justificando "es para uso futuro".
 
 ## Verificación post-emisión
 
-Ejecutar al final del workflow `[[generate-playwright-greenfield]]`, antes del delivery gate:
+Ejecutar al final del workflow `[[calidad-generate-playwright-greenfield]]`, antes del delivery gate:
 
 ```bash
 # Cada path bajo fixtures/ debe ser importado por ≥1 archivo bajo tests/.
@@ -73,7 +73,7 @@ for (const term of searchTerms) {
 
 ## Cross-links
 
-- Modo de ejecución y proyectos: `[[playwright-greenfield/references/execution-modes-live-mocked-hybrid.md]]`.
-- Cobertura por HU: `[[playwright-greenfield/references/coverage-formula.md]]`.
-- Tags nativos v1.42+: `[[playwright-greenfield/references/playwright-native-tags-v142.md]]`.
+- Modo de ejecución y proyectos: ``execution-modes-live-mocked-hybrid.md``.
+- Cobertura por HU: ``coverage-formula.md``.
+- Tags nativos v1.42+: ``playwright-native-tags-v142.md``.
 - Auditoría general post-emisión: `[[calidad-post-generation-protocol]]`.

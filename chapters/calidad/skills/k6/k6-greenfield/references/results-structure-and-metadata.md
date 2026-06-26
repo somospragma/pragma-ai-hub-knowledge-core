@@ -21,7 +21,7 @@ results/
 
 Reglas:
 
-- Primer nivel: `results/{scenario}/` con el vocabulario decidido en `[[vocabulary-and-scenario-mapping]]` (`linea-base|carga|estres|spike|soak` o `smoke|load|stress|spike|soak`).
+- Primer nivel: `results/{scenario}/` con el vocabulario decidido en ``vocabulary-and-scenario-mapping.md`` (`linea-base|carga|estres|spike|soak` o `smoke|load|stress|spike|soak`).
 - Segundo nivel: `results/{scenario}/{YYYY-MM-DD}/`.
 - Por corrida: `{ISO-timestamp-safe}-summary.json` + `{ISO-timestamp-safe}-metadata.json`.
 - Timestamp safe: `new Date().toISOString().replace(/[:.]/g, '-')`. Reemplazar `:` y `.` por `-` evita problemas en filesystems Windows y en URLs.
@@ -59,15 +59,15 @@ Reglas:
 - `environment`: `__ENV.ENVIRONMENT` (`staging|qa|preprod|prod-canary|...`).
 - `workload`: descripción legible de los stages (auto-generable desde `options.stages`).
 - `sut_endpoint`: URL principal del SUT (no la URL de auth).
-- `auth_strategy`: `setup|refresh|per-vu` según `[[auth-strategy-setup-vs-per-vu]]`.
+- `auth_strategy`: `setup|refresh|per-vu` según ``auth-strategy-setup-vs-per-vu.md``.
 - `exit_code`: `0` si la corrida fue normal y todos los thresholds pasaron, distinto de 0 si falló alguno.
 - `started_at`, `finished_at`: ISO-8601 UTC.
 - `duration_seconds`: `data.state.testRunDurationMs / 1000` redondeado.
 - `vu_max`: `data.metrics.vus_max.values.max`.
 - `iterations_total`: `data.metrics.iterations.values.count`.
 - `thresholds_met`: `Object.values(data.metrics).every(m => !m.thresholds || Object.values(m.thresholds).every(t => t.ok))`.
-- `availability_target`, `availability_observed`: ver `[[availability-metric-from-rnf]]`. `null` si el RNF no declara objetivo.
-- `blockers`: array; vacío en corridas limpias. Esquema de entrada en `[[execution-status-and-blockers]]`.
+- `availability_target`, `availability_observed`: ver ``availability-metric-from-rnf.md``. `null` si el RNF no declara objetivo.
+- `blockers`: array; vacío en corridas limpias. Esquema de entrada en ``execution-status-and-blockers.md``.
 
 ## `handleSummary()` corregido
 
@@ -152,10 +152,10 @@ El `handleSummary` lee de `__ENV` para evitar acoplar el script a un entorno con
 
 ## Cross-links
 
-- `[[k6-greenfield]]`
-- `[[k6-handle-summary-evidence]]`
-- `[[vocabulary-and-scenario-mapping]]`
-- `[[availability-metric-from-rnf]]`
-- `[[execution-status-and-blockers]]`
+- `[[calidad-k6-greenfield]]`
+- ``handle-summary-evidence.md``
+- ``vocabulary-and-scenario-mapping.md``
+- ``availability-metric-from-rnf.md``
+- ``execution-status-and-blockers.md``
 - `[[calidad-delivery-gate-contract]]`
 - `[[calidad-post-generation-protocol]]`

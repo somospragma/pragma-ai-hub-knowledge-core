@@ -1,5 +1,5 @@
 ---
-id: playwright-extract-pages-from-live-app-prompt
+id: calidad-playwright-extract-pages-from-live-app-prompt
 version: 1.0.0
 scope: stack
 type: prompt

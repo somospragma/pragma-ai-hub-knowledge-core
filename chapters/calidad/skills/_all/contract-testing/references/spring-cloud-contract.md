@@ -203,7 +203,7 @@ java -jar wiremock-standalone.jar --port 8080 --root-dir /path/to/extracted/stub
 ## Cross-link
 
 - Si el cliente combina SCC con Pact, ver `references/cdc-vs-schema-first.md` para el modelo híbrido.
-- Para validación funcional adicional, combinar con `[[karate-greenfield]]`.
+- Para validación funcional adicional, combinar con `[[calidad-karate-greenfield]]`.
 
 ## Anti-patterns
 

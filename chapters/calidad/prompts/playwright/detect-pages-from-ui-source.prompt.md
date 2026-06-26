@@ -1,5 +1,5 @@
 ---
-id: playwright-detect-pages-from-ui-source-prompt
+id: calidad-playwright-detect-pages-from-ui-source-prompt
 version: 1.0.0
 scope: stack
 type: prompt

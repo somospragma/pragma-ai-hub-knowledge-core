@@ -30,7 +30,7 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
    - `scaffold-only`: omitir ejecución; documentar razón.
    - `execute-only`: solo ejecuta sin generar.
 
-   **Nota K6 — modo `full`**: el smoke gate 1:1 es obligatorio (ver [[k6-greenfield]] (consultar `references/smoke-1-1-gate.md`)). Solo después del smoke OK se ejecutan los otros escenarios (Carga / Estrés y opt-in Spike / Soak). Si el smoke 1:1 falla, status `partial` con `blocker: "smoke_1_1_failed"`, sin intentar correr Carga ni Estrés.
+   **Nota K6 — modo `full`**: el smoke gate 1:1 es obligatorio (ver [[calidad-k6-greenfield]] (consultar `references/smoke-1-1-gate.md`)). Solo después del smoke OK se ejecutan los otros escenarios (Carga / Estrés y opt-in Spike / Soak). Si el smoke 1:1 falla, status `partial` con `blocker: "smoke_1_1_failed"`, sin intentar correr Carga ni Estrés.
 
 3. **Aplicar re-run N=3 sobre fallos** (modo full):
    - Por cada test fallido, re-ejecutar 2 veces más.

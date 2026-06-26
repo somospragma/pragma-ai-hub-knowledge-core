@@ -1,5 +1,5 @@
 ---
-id: test-self-correction-loop
+id: calidad-test-self-correction-loop
 version: 1.0.0
 scope: chapter
 type: workflow
@@ -16,17 +16,17 @@ Invocado como **fase final obligatoria** de todo workflow de generación o exten
 
 Workflows que deben encadenar este workflow al cierre:
 
-- `[[generate-karate-greenfield]]`
-- `[[extend-karate-brownfield]]`
-- `[[generate-playwright-greenfield]]`
-- `[[update-playwright-brownfield]]`
-- `[[playwright-from-live-app]]`
-- `[[generate-k6-suite]]`
-- `[[extend-k6-brownfield]]`
-- `[[calibrate-k6-thresholds]]`
-- `[[generate-appium-screenplay-android]]`
-- `[[complete-deferred-locators]]`
-- `[[extend-appium-brownfield]]`
+- `[[calidad-generate-karate-greenfield]]`
+- `[[calidad-extend-karate-brownfield]]`
+- `[[calidad-generate-playwright-greenfield]]`
+- `[[calidad-update-playwright-brownfield]]`
+- `[[calidad-playwright-from-live-app]]`
+- `[[calidad-generate-k6-suite]]`
+- `[[calidad-extend-k6-brownfield]]`
+- `[[calidad-calibrate-k6-thresholds]]`
+- `[[calidad-generate-appium-screenplay-android]]`
+- `[[calidad-complete-deferred-locators]]`
+- `[[calidad-extend-appium-brownfield]]`
 
 El workflow rector `[[calidad-route-test-generation]]` lo encadena automáticamente como paso terminal.
 

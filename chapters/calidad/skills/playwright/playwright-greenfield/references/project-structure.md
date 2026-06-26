@@ -31,9 +31,9 @@
 ## Responsabilidades por carpeta
 
 - `tests/` — Solo specs. Importan Page Objects vía fixture; no instancian Page Objects directamente.
-- `pages/` — Page Object Model (ver `[[playwright-page-object-model]]`). Una clase por página. Sin aserciones.
-- `fixtures/` — Composición de test extendido (ver `[[playwright-fixtures-composition]]`) y, opcionalmente, `auth.setup.ts` (ver `[[playwright-auth-storage-state]]`).
-- `mocks/` — Handlers de red (ver `[[playwright-mocks-page-route]]`) y datos sintéticos en `mocks/data/`.
+- `pages/` — Page Object Model (ver ``page-object-model.md``). Una clase por página. Sin aserciones.
+- `fixtures/` — Composición de test extendido (ver ``fixtures-composition.md``) y, opcionalmente, `auth.setup.ts` (ver ``auth-storage-state.md``).
+- `mocks/` — Handlers de red (ver ``mocks-page-route.md``) y datos sintéticos en `mocks/data/`.
 - `utils/` — Factories de datos de test y helpers puros.
 - `.auth/` (runtime) — Generada por `auth.setup.ts`. Listada en `.gitignore`.
 - `test-results/`, `playwright-report/`, `tests/__screenshots__/` — Artefactos de corrida; los baselines de screenshots SÍ se versionan.

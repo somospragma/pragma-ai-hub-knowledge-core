@@ -75,8 +75,8 @@ echo '=== All tests completed ==='
 
 Debe documentar:
 
-- Cómo instalar K6 (ver `[[k6-run-and-suite]]`).
+- Cómo instalar K6 (ver `[[calidad-k6-run-and-suite]]`).
 - Env vars: `BASE_URL` (requerido), `AUTH_TOKEN` (solo si el spec define security).
 - Comandos npm: `smoke`, `load`, `stress`, `spike`, `soak`, `all`.
-- Tier de thresholds elegido y justificación (Conservative / Moderate / Relaxed — ver `[[k6-thresholds-three-tiers]]`).
-- Política de calibración (`[[calibrate-k6-thresholds]]`).
+- Tier de thresholds elegido y justificación (Conservative / Moderate / Relaxed — ver ``thresholds-three-tiers.md``).
+- Política de calibración (`[[calidad-calibrate-k6-thresholds]]`).

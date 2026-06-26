@@ -1,5 +1,5 @@
 ---
-id: appium-apk-auto-discovery
+id: calidad-appium-apk-auto-discovery
 version: 1.0.0
 scope: stack
 type: skill
@@ -25,7 +25,7 @@ Cuando se genera un proyecto Appium Android greenfield Y el usuario provee APK Y
 
 ## Cómo encaja en el workflow
 
-Invocado desde `[[generate-appium-screenplay-android]]` en su paso (después de pre-flight) cuando se verifican capacidades. Si el usuario acepta auto-discovery → este skill toma el control de la generación de Page Objects con selectores reales. Si rechaza → se sigue con `[[appium-deferred-locators-strategy]]` (comportamiento default actual).
+Invocado desde `[[calidad-generate-appium-screenplay-android]]` en su paso (después de pre-flight) cuando se verifican capacidades. Si el usuario acepta auto-discovery → este skill toma el control de la generación de Page Objects con selectores reales. Si rechaza → se sigue con `[[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)` (comportamiento default actual).
 
 ## Instrucción
 
@@ -48,4 +48,4 @@ Invocado desde `[[generate-appium-screenplay-android]]` en su paso (después de 
 
 ## Cross-links
 
-`[[generate-appium-screenplay-android]]`, `[[appium-deferred-locators-strategy]]` (alternativa), `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-test-self-healing]]`.
+`[[calidad-generate-appium-screenplay-android]]`, `[[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)` (alternativa), `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-test-self-healing]]`.

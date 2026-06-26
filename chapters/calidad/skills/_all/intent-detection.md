@@ -28,10 +28,10 @@ Tu trabajo aquí es **enrutar**, no generar. El resultado del skill es el nombre
 
 | Framework  | Keywords disparadoras                                                                                                  | Señal brownfield                                                  | Skill / workflow destino                                                |
 |------------|------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------------------|
-| Karate     | "pruebas funcionales", "API testing", "REST", "SOAP", "OpenAPI", "Swagger", "WSDL", "contract testing", "Karate"       | "proyecto existente", "agregar tests", "integrar", "ya tenemos"   | greenfield → `[[karate-greenfield]]` · brownfield → `[[karate-brownfield]]` |
-| K6         | "performance", "carga", "load", "stress", "spike", "soak", "K6", "VUs", "latencia", "throughput", "p95", "p99"          | (no se trata brownfield)                                          | `[[k6-greenfield]]`                                                     |
-| Playwright | "web", "browser", "E2E", "UI", "frontend", "Playwright", "page object", "visual", "accessibility", "regresión visual" | "proyecto existente", "actualizar selectores", "ya hay tests web" | greenfield → `[[playwright-greenfield]]` · brownfield → `[[playwright-brownfield]]` |
-| Appium     | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity"                        | (no se trata brownfield)                                          | `[[appium-screenplay-android]]`                                         |
+| Karate     | "pruebas funcionales", "API testing", "REST", "SOAP", "OpenAPI", "Swagger", "WSDL", "contract testing", "Karate"       | "proyecto existente", "agregar tests", "integrar", "ya tenemos"   | greenfield → `[[calidad-karate-greenfield]]` · brownfield → `[[calidad-karate-brownfield]]` |
+| K6         | "performance", "carga", "load", "stress", "spike", "soak", "K6", "VUs", "latencia", "throughput", "p95", "p99"          | (no se trata brownfield)                                          | `[[calidad-k6-greenfield]]`                                                     |
+| Playwright | "web", "browser", "E2E", "UI", "frontend", "Playwright", "page object", "visual", "accessibility", "regresión visual" | "proyecto existente", "actualizar selectores", "ya hay tests web" | greenfield → `[[calidad-playwright-greenfield]]` · brownfield → `[[calidad-playwright-brownfield]]` |
+| Appium     | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity"                        | (no se trata brownfield)                                          | `[[calidad-appium-screenplay-android]]`                                         |
 
 ## Restricciones
 

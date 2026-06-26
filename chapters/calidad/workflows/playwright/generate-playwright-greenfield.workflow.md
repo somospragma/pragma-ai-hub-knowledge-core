@@ -1,5 +1,5 @@
 ---
-id: generate-playwright-greenfield
+id: calidad-generate-playwright-greenfield
 version: 2.0.0
 scope: stack
 type: workflow
@@ -27,7 +27,7 @@ Cuando `[[calidad-intent-detection]]` clasifica la petición como **automation E
 | `backend_url`       | no          | URL del backend que el frontend consume. Si falta, usar `process.env.BACKEND_URL`.                                 |
 | `priority_assignments` | no       | Mapa `pageName -> CRITICAL | HIGH | MEDIUM | LOW` provisto por usuario/PO. Si falta, preguntar.                  |
 | `mock_mode`         | no          | `off | full | partial`. Default `off`. Solo declarar si el usuario quiere mocks.                                  |
-| `mock_endpoints`    | no          | Lista declarativa de paths a mockear cuando `mock_mode != off`. Fuentes válidas en orden de preferencia: captura live app → Postman → OpenAPI/Swagger del backend → lista manual (ver [[playwright-greenfield]] (consultar `references/mocks-page-route.md`)). |
+| `mock_endpoints`    | no          | Lista declarativa de paths a mockear cuando `mock_mode != off`. Fuentes válidas en orden de preferencia: captura live app → Postman → OpenAPI/Swagger del backend → lista manual (ver [[calidad-playwright-greenfield]] (consultar `references/mocks-page-route.md`)). |
 | `spec`              | no          | OpenAPI/Swagger del backend. Solo se usa, si se provee, como insumo del prompt de mocks cuando `mock_mode != off`. |
 | `user_story`        | no          | Contexto funcional adicional.                                                                                      |
 | `firma`             | no          | Identidad del autor para README/reporte.                                                                           |
@@ -38,7 +38,7 @@ La recolección sigue `[[calidad-mandatory-inputs-protocol]]`.
 
 ### Paso 1 (OBLIGATORIO) — Pre-flight check del stack
 
-Antes de cualquier otra acción, ejecutar el pre-flight según [[playwright-greenfield]] (consultar `references/preflight.md` en su subfolder):
+Antes de cualquier otra acción, ejecutar el pre-flight según [[calidad-playwright-greenfield]] (consultar `references/preflight.md` en su subfolder):
 - Si pasa: continuar al paso 2.
 - Si falla: aplicar las degradaciones documentadas en `preflight.md` y reportar al usuario antes de proceder.
 - Persistir el resultado en `.evidence/preflight-result.json`.
@@ -60,8 +60,8 @@ NUNCA generar código sin STRATEGY.md aprobado explícitamente.
    - `figma`: link público o screenshots con jerarquía de páginas.
    - `user-story`: historia con flujos UI explícitos (no solo reglas backend).
    - `storybook`: URL del Storybook publicada.
-   - Si no hay `ui_source` (aunque venga un `spec` o una colección Postman), **detente**: el insumo principal debe describir UI. Solicita una fuente UI según [[playwright-greenfield]] (consultar `references/ui-source-priority.md`). Si la intención del usuario es validar el contrato backend o medir performance, deriva a `[[karate-greenfield]]` o `[[k6-greenfield]]`.
-4. **Detectar páginas** — Invoca `[[playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content = ui_source`, `user_story` y `priority_assignments`. Output: lista de páginas con `route` (frontend), `form_fields`, `navigation`, `selectors_hint`, `page_type` y `priority`.
+   - Si no hay `ui_source` (aunque venga un `spec` o una colección Postman), **detente**: el insumo principal debe describir UI. Solicita una fuente UI según [[calidad-playwright-greenfield]] (consultar `references/ui-source-priority.md`). Si la intención del usuario es validar el contrato backend o medir performance, deriva a `[[calidad-karate-greenfield]]` o `[[calidad-k6-greenfield]]`.
+4. **Detectar páginas** — Invoca `[[calidad-playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content = ui_source`, `user_story` y `priority_assignments`. Output: lista de páginas con `route` (frontend), `form_fields`, `navigation`, `selectors_hint`, `page_type` y `priority`.
 5. **Resolver prioridades faltantes** — Para cada página con `priority: UNKNOWN`, pregunta al usuario/PO antes de continuar. Nunca infieras prioridad desde el nombre.
 6. **Detectar flujos de usuario** — Clasifica navegación, formularios, auth, listados/paginación a partir de la UI detectada. Cada flujo mapeará a uno o más `.spec.ts`.
 7. **Decidir `mock_mode`** — Pregunta explícita al usuario si no lo declaró:
@@ -69,28 +69,28 @@ NUNCA generar código sin STRATEGY.md aprobado explícitamente.
    - `full` → genera mocks y suite `@mocked` además de `@live`.
    - `partial` → genera mocks dirigidos para `mock_endpoints` y suite `@hybrid`.
 8. **Planificar tests** — Para cada página: 5-8 escenarios funcionales con tag `@live` por defecto. Marcar visual + a11y en páginas `CRITICAL` y `HIGH`. Aplicar `[[calidad-route-test-generation]]` para mapear flujo UI → test.
-9. **Generar Page Objects** — Por cada página, invoca `[[playwright-generate-page-object-prompt]]` siguiendo [[playwright-greenfield]] (consultar `references/page-object-model.md`) + [[playwright-greenfield]] (consultar `references/selector-priority.md`). `navigate()` usa la `route` frontend detectada (anti-patrón rutas inventadas).
-10. **Generar mocks (opt-in)** — SOLO si `mock_mode != off`, invoca `[[playwright-generate-mock-handlers-prompt]]` con `endpoints = mock_endpoints` (o derivados del `spec` si se aportó) y `mock_mode`. Sigue [[playwright-greenfield]] (consultar `references/mocks-page-route.md`). Si `mock_mode = off`, **no se crea** la carpeta `mocks/` ni el fixture `mockApi`.
-11. **Generar tests** — Emite primero los `tests/*.spec.ts` con tag `@live` por defecto (`[[playwright-greenfield]]` paso 6). Tests que ejerciten error states con mocks llevan `@mocked` o `@hybrid` y declaran `mockApi` en la firma. Para suites de accesibilidad invoca `[[playwright-generate-a11y-prompt]]`; para visual aplica [[playwright-greenfield]] (consultar `references/visual-regression.md`).
-12. **Emitir infraestructura** — `playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md` según [[playwright-greenfield]] (consultar `references/playwright-config-strict-ts.md`) y [[playwright-greenfield]] (consultar `references/project-structure.md`). Incluir `BASE_URL`, `BACKEND_URL` y projects filtrados por tag (`@live`, `@mocked`, `@hybrid`). Si la UI tiene login real, además `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` según [[playwright-greenfield]] (consultar `references/auth-storage-state.md`).
-13. **Entregar y trazar** — Usa `[[calidad-streaming-files-protocol]]` para la entrega ordenada. Vincula la evidencia con `[[calidad-test-evidence-and-traceability]]`. Documenta los modos en [[playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md`) y referencia `[[playwright-run-and-modes]]`.
+9. **Generar Page Objects** — Por cada página, invoca `[[calidad-playwright-generate-page-object-prompt]]` siguiendo [[calidad-playwright-greenfield]] (consultar `references/page-object-model.md`) + [[calidad-playwright-greenfield]] (consultar `references/selector-priority.md`). `navigate()` usa la `route` frontend detectada (anti-patrón rutas inventadas).
+10. **Generar mocks (opt-in)** — SOLO si `mock_mode != off`, invoca `[[calidad-playwright-generate-mock-handlers-prompt]]` con `endpoints = mock_endpoints` (o derivados del `spec` si se aportó) y `mock_mode`. Sigue [[calidad-playwright-greenfield]] (consultar `references/mocks-page-route.md`). Si `mock_mode = off`, **no se crea** la carpeta `mocks/` ni el fixture `mockApi`.
+11. **Generar tests** — Emite primero los `tests/*.spec.ts` con tag `@live` por defecto (`[[calidad-playwright-greenfield]]` paso 6). Tests que ejerciten error states con mocks llevan `@mocked` o `@hybrid` y declaran `mockApi` en la firma. Para suites de accesibilidad invoca `[[calidad-playwright-generate-a11y-prompt]]`; para visual aplica [[calidad-playwright-greenfield]] (consultar `references/visual-regression.md`).
+12. **Emitir infraestructura** — `playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md` según [[calidad-playwright-greenfield]] (consultar `references/playwright-config-strict-ts.md`) y [[calidad-playwright-greenfield]] (consultar `references/project-structure.md`). Incluir `BASE_URL`, `BACKEND_URL` y projects filtrados por tag (`@live`, `@mocked`, `@hybrid`). Si la UI tiene login real, además `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` según [[calidad-playwright-greenfield]] (consultar `references/auth-storage-state.md`).
+13. **Entregar y trazar** — Usa `[[calidad-streaming-files-protocol]]` para la entrega ordenada. Vincula la evidencia con `[[calidad-test-evidence-and-traceability]]`. Documenta los modos en [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md`) y referencia `[[calidad-playwright-run-and-modes]]`.
 
 ### Fase final obligatoria — Ejecutar, triar y auto-corregir
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.**
 
-0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[playwright-greenfield]] (consultar `references/smoke-gate-playwright.md`). Comando: `npx playwright test --grep @smoke --project=chromium-live --workers=1 --max-failures=1`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_playwright"` y escalar al usuario; NO continuar a ejecución completa de la suite.
+0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[calidad-playwright-greenfield]] (consultar `references/smoke-gate-playwright.md`). Comando: `npx playwright test --grep @smoke --project=chromium-live --workers=1 --max-failures=1`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_playwright"` y escalar al usuario; NO continuar a ejecución completa de la suite.
 
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin navegadores instalados, sin red al frontend, sin `BASE_URL` accesible), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` el proyecto correspondiente según `mock_mode` (`npx playwright test --project=live-chromium`, o `mocked-*`/`hybrid-*` cuando aplique). Capturar `playwright-report/`, `test-results/` y traces como evidencia.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky y diagnosticar causa raíz (selector stale, race con red, auth state expirado, bug del SUT, snapshot visual desactualizado).
-4. Si triage habilita correcciones: invocar `[[test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback, LLM-driven selector repair, visual AI healing) cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca convertir aserciones de negocio en `toBeVisible()` triviales, ni inflar `timeout` para esconder race conditions reales, ni reemplazar `expect` por `try/catch` silenciosos.
+4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback, LLM-driven selector repair, visual AI healing) cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca convertir aserciones de negocio en `toBeVisible()` triviales, ni inflar `timeout` para esconder race conditions reales, ni reemplazar `expect` por `try/catch` silenciosos.
 5. Reportar estado final: `success` (todos los tests pasan determinísticamente) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con test, paso fallido, locator, trace, screenshot e hipótesis).
 6. Archivar evidencia + audit log de correcciones aplicadas según `[[calidad-test-evidence-and-traceability]]`.
 
 ### Paso final — Reporte ejecutivo
 
-Invocar `[[generate-executive-report]]` con `results_path`, `strategy_md_path` y `output_format` (preguntar al usuario o usar default `html`). El reporte se persiste en `.evidence/report-{ISO}.{ext}` y se referencia en el `delivery_gate.evidence_persisted.executive_report`. Si modo es `scaffold-only` o `dry-run` → omitir este paso y registrar `null`.
+Invocar `[[calidad-generate-executive-report]]` con `results_path`, `strategy_md_path` y `output_format` (preguntar al usuario o usar default `html`). El reporte se persiste en `.evidence/report-{ISO}.{ext}` y se referencia en el `delivery_gate.evidence_persisted.executive_report`. Si modo es `scaffold-only` o `dry-run` → omitir este paso y registrar `null`.
 
 ## Criterios de finalización (DoD)
 

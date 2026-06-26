@@ -15,7 +15,7 @@ Para cada escenario (Línea Base, Carga, Estrés, y opt-in Spike/Soak si aplica)
 - **Ramp-down**: duración del descenso (ej: `2m`).
 - **Target VUs**: pico de virtual users (ej: `50`).
 
-Si el usuario no provee, sugerir defaults derivados de `[[k6-five-script-types]]` y confirmar explícitamente antes de generar `options.stages`.
+Si el usuario no provee, sugerir defaults derivados de ``five-script-types.md`` y confirmar explícitamente antes de generar `options.stages`.
 
 ### 2. Dependencias externas
 
@@ -25,7 +25,7 @@ Si el usuario no provee, sugerir defaults derivados de `[[k6-five-script-types]]
 
 ### 3. Disponibilidad objetivo
 
-SLA de disponibilidad en porcentaje (ej: `99.5%`, `99.9%`, `99.99%`). Determina el threshold de `http_req_failed` y el tier (`[[k6-thresholds-three-tiers]]`).
+SLA de disponibilidad en porcentaje (ej: `99.5%`, `99.9%`, `99.99%`). Determina el threshold de `http_req_failed` y el tier (``thresholds-three-tiers.md``).
 
 ### 4. Data de prueba
 
@@ -65,7 +65,7 @@ Estos números determinan los `target VUs` de Carga y Estrés y la decisión de 
 ## Cross-links
 
 - `[[calidad-mandatory-inputs-protocol]]`
-- `[[k6-greenfield]]`
-- `[[k6-thresholds-three-tiers]]`
-- `[[k6-five-script-types]]`
+- `[[calidad-k6-greenfield]]`
+- ``thresholds-three-tiers.md``
+- ``five-script-types.md``
 - `[[calidad-pre-generation-protocol]]`

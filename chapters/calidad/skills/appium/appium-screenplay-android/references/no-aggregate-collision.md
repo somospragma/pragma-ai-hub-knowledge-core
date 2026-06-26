@@ -43,4 +43,4 @@ A problem occurred evaluating root project '{project_name}'.
 
 Si aparece este error, eliminar la redefinición y usar `tasks.named(...)`. La misma regla aplica para `reports` y `clean` (que `java` plugin también registra).
 
-Ver health-check stage `gradle:no-custom-aggregate` y `gradle:no-task-collisions` en `[[appium-health-check-pipeline]]`.
+Ver health-check stage `gradle:no-custom-aggregate` y `gradle:no-task-collisions` en ``health-check-pipeline.md``.

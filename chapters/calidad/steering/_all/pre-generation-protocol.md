@@ -30,7 +30,7 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
    - Para K6, además de los inputs base, completar el checklist K6-específico (perfil de carga, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente) según `[[calidad-mandatory-inputs-protocol]]`
 
 2. **Ejecutar pre-flight check del stack** invocando la reference correspondiente:
-   - Karate → [[karate-greenfield]] (consultar `references/preflight.md` en su subfolder)
+   - Karate → [[calidad-karate-greenfield]] (consultar `references/preflight.md` en su subfolder)
    - Playwright → `references/preflight.md` análogo
    - K6 → análogo
    - Appium → análogo
@@ -38,9 +38,9 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
    Si pre-flight falla → reportar al usuario y **degradar a `scaffold-only`** con razón documentada. No continuar a generación full.
 
 3. **Declarar coverage upfront** antes de generar:
-   - Karate: por endpoint, calcular `effective_minimum` con fórmula `[[karate-negative-coverage-formula]]` y mostrar al usuario `{endpoint: N}`.
+   - Karate: por endpoint, calcular `effective_minimum` con fórmula `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)` y mostrar al usuario `{endpoint: N}`.
    - Playwright: por HU, calcular `effective_minimum = happy + 2_boundary + 2_negative + 1_edge ≈ 8` mínimo.
-   - K6: los 3 escenarios Línea Base / Carga / Estrés (Smoke / Load / Stress en docs k6) son obligatorios. Spike y Soak son opt-in con justificación documentada en `.evidence/scenarios-opt-in.md` (ver [[k6-greenfield]] (consultar `references/vocabulary-and-scenario-mapping.md`)). Declarar también tier (Conservative/Moderate/Relaxed) con razón.
+   - K6: los 3 escenarios Línea Base / Carga / Estrés (Smoke / Load / Stress en docs k6) son obligatorios. Spike y Soak son opt-in con justificación documentada en `.evidence/scenarios-opt-in.md` (ver [[calidad-k6-greenfield]] (consultar `references/vocabulary-and-scenario-mapping.md`)). Declarar también tier (Conservative/Moderate/Relaxed) con razón.
    - Appium: número de escenarios `@smoke` ejecutables + escenarios `@proposed` planeados.
 
 4. **Generar `STRATEGY.md` y esperar aprobación del usuario antes de proceder a templates.** Aplicar `[[calidad-pre-design-strategy-document]]`. El documento se materializa en `output_path/STRATEGY.md` usando el `STRATEGY.md.tpl` del stack correspondiente (Karate / Playwright / K6 / Appium). El agente lo presenta, itera ante "modificar X" y SOLO avanza al paso 5 al recibir "aprobado" (o equivalente explícito). NUNCA se emite código antes de esta aprobación.
@@ -57,4 +57,4 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 
 ## Cross-links
 
-`[[calidad-mandatory-inputs-protocol]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-test-execution-orchestration]]`, `[[karate-negative-coverage-formula]]`, `[[calidad-business-driven-prioritization]]`, `[[calidad-delivery-gate-contract]]`, `[[generate-executive-report]]`.
+`[[calidad-mandatory-inputs-protocol]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`, `[[calidad-business-driven-prioritization]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-generate-executive-report]]`.

@@ -16,7 +16,7 @@ Aplica este skill **antes de elegir el framework de testing** para cualquier ent
 
 SUTs fuera de este alcance (desktop nativo, embedded, IoT, hardware-in-the-loop) están fuera del scope del Chapter Calidad — escalar para evaluación caso a caso.
 
-Activa este skill antes de `[[karate-greenfield]]`, `[[playwright-greenfield]]`, `[[k6-greenfield]]` o cualquier otro generador específico de framework, y combínalo con `[[calidad-chapter-perspective]]` y `[[calidad-context-determined-defaults]]`.
+Activa este skill antes de `[[calidad-karate-greenfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]` o cualquier otro generador específico de framework, y combínalo con `[[calidad-chapter-perspective]]` y `[[calidad-context-determined-defaults]]`.
 
 ## Instrucción
 
@@ -24,7 +24,7 @@ Activa este skill antes de `[[karate-greenfield]]`, `[[playwright-greenfield]]`,
 2. **Revisar la reference correspondiente** — Cada tipo de SUT dentro del alcance tiene un documento en `references/` con patrones, antipatrones y frameworks recomendados.
 3. **Elegir framework primario y complementarios** — Usa la matriz de la sección siguiente. El primario cubre el flujo principal; los complementarios cubren perf, contract, seguridad y otros ángulos.
 4. **Mapear los patrones específicos del SUT** — Cada SUT tiene patrones propios (idempotencia REST, N+1 GraphQL, streaming RPC, cold-start serverless, exactly-once en event-driven, drift en ML, etc.). Estos patrones cambian las assertions, no solo las herramientas.
-5. **Activar skills cross-cutting según aplique** — `[[calidad-security-testing]]`, `[[calidad-business-driven-prioritization]]`, `[[calidad-test-evidence-and-traceability]]` aplican independiente del SUT; los thresholds (`[[k6-thresholds-three-tiers]]`) y la fórmula de cobertura (`[[karate-negative-coverage-formula]]`) se interpretan según el SUT.
+5. **Activar skills cross-cutting según aplique** — `[[calidad-security-testing]]`, `[[calidad-business-driven-prioritization]]`, `[[calidad-test-evidence-and-traceability]]` aplican independiente del SUT; los thresholds (`[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`) y la fórmula de cobertura (`[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`) se interpretan según el SUT.
 
 ## Matriz SUT → Framework principal → Complementarios
 
@@ -67,5 +67,5 @@ Activa este skill antes de `[[karate-greenfield]]`, `[[playwright-greenfield]]`,
 - `[[calidad-business-driven-prioritization]]`
 - `[[calidad-context-determined-defaults]]`
 - `[[calidad-security-testing]]`
-- `[[k6-thresholds-three-tiers]]`
-- `[[karate-negative-coverage-formula]]`
+- `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`
+- `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`

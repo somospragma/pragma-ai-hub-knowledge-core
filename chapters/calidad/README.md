@@ -453,7 +453,7 @@ Ese workflow se encarga de:
 9. **Resolver modo de operación** con el usuario (`[[calidad-post-generation-execution-prompt]]`): `full` / `dry-run` / `scaffold-only` / `execute-only`.
 10. **Smoke gate 1:1 obligatorio** (`[[calidad-smoke-gate-policy]]`) antes de declarar success. Si falla → status `partial`, no continúa a suite completa.
 11. **Ejecución + triage + auto-corrección** del ciclo: `[[calidad-test-execution-orchestration]]` → `[[calidad-failure-triage-and-classification]]` → `[[calidad-test-self-correction-loop]]` (con `[[calidad-test-self-healing]]` cuando aplica). Bloqueos de ambiente se reportan vía `[[calidad-environment-blocker-evidence]]` (no se intenta auto-corregir el ambiente).
-12. **Executive report** consolidado HTML/PPTX/DOC (`[[generate-executive-report]]`) cuando el modo es `full` o `execute-only`.
+12. **Executive report** consolidado HTML/PPTX/DOC (`[[calidad-generate-executive-report]]`) cuando el modo es `full` o `execute-only`.
 13. **Delivery gate contract** YAML (`[[calidad-delivery-gate-contract]]`) emitido como bloque final con `status`, `blockers[]`, `evidence_persisted{}` y `audit_log`. Sin ese bloque, la entrega se considera incompleta.
 
 No saltar pasos: el router protege contra la generación con inputs incompletos, sin diseño aprobado o sin ejecución verificada.
