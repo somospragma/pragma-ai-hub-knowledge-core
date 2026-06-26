@@ -51,11 +51,11 @@ Detalle completo de cada archivo en `references/project-structure.md`.
 
 **Fuente autoritativa de archivos a copiar** — las plantillas inmutables viven en `references/templates/`:
 
-- `pom.xml.tpl` — pom.xml completo con `1.0.0-SNAPSHOT`, `karate-junit5` 1.4.1, surefire 3.2.2 con `<include>**/TestRunner.java</include>`, y `<testResources>` excluyendo `**/*.java`.
-- `karate-config.js.tpl` — config con retorno explícito del objeto, sin `karate.configure()`.
-- `TestRunner.java.tpl` — runner con `.relativeTo(getClass())`, sin paths hardcodeados.
-- `feature.tpl` — feature con comentario `# cobertura:` obligatorio en primera línea (ver `references/cobertura-comment-enforcement.md`) y bloques por cada escenario mínimo (`@happy-path`, `@contract`, `@data-driven`, y un negativo separado por cada required field / header).
-- `body.json.tpl` — body JSON externo (Body Mode A).
+- `pom.xml` — pom.xml completo con `1.0.0-SNAPSHOT`, `karate-junit5` 1.4.1, surefire 3.2.2 con `<include>**/TestRunner.java</include>`, y `<testResources>` excluyendo `**/*.java`.
+- `karate-config.js` — config con retorno explícito del objeto, sin `karate.configure()`.
+- `TestRunner.java` — runner con `.relativeTo(getClass())`, sin paths hardcodeados.
+- `feature` — feature con comentario `# cobertura:` obligatorio en primera línea (ver `references/cobertura-comment-enforcement.md`) y bloques por cada escenario mínimo (`@happy-path`, `@contract`, `@data-driven`, y un negativo separado por cada required field / header).
+- `body.json` — body JSON externo (Body Mode A).
 
 Copiar textualmente. Solo rellenar `{{slots}}` declarados.
 

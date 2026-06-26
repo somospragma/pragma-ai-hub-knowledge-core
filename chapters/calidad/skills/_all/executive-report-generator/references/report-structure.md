@@ -29,7 +29,7 @@ Tabla con todos los SLAs declarados en `STRATEGY.md` versus lo observado. Cada f
 | Error rate global | < 1% | 1.8% | FAIL |
 | Disponibilidad smoke | 100% | 100% | OK |
 
-Convención: `OK` para cumplido, `FAIL` para incumplido, `N/A` para no aplica, `no medido` para sin evidencia. En la conversión a HTML, `OK` se renderiza con badge verde y `FAIL` con badge rojo (ver `templates/report.html-style.css.tpl`).
+Convención: `OK` para cumplido, `FAIL` para incumplido, `N/A` para no aplica, `no medido` para sin evidencia. En la conversión a HTML, `OK` se renderiza con badge verde y `FAIL` con badge rojo (ver ``references/templates.md` (sección `report.html-style.css`)`).
 
 Si un SLA es no aplicable al stack actual (p. ej. latencia p95 en Appium), marcar `N/A`. Si un SLA no fue medido por falta de evidencia, marcar `no medido` (NO inferir). Esta sección se omite si no hay `STRATEGY.md` y se sustituye por nota de "sección omitida — STRATEGY.md ausente".
 

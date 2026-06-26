@@ -25,7 +25,7 @@ Aplica a los 4 stacks (Karate, Playwright, K6, Appium) en greenfield. En brownfi
 
 ## Estructura genérica del STRATEGY.md
 
-Las secciones 1 a 6 son comunes a todos los stacks. La sección 7 ("Estrategia por stack") se rellena con el bloque específico cuyo detalle está en el `STRATEGY.md.tpl` de la skill del stack correspondiente.
+Las secciones 1 a 6 son comunes a todos los stacks. La sección 7 ("Estrategia por stack") se rellena con el bloque específico cuyo detalle está en el `STRATEGY.md` de la skill del stack correspondiente.
 
 ### 1. Contexto
 
@@ -77,7 +77,7 @@ Si un SLA no se conoce, declararlo explícitamente como "a determinar" — NUNCA
 
 ### 7. Estrategia por stack
 
-Esta sección la rellena el `STRATEGY.md.tpl` del stack específico:
+Esta sección la rellena el `STRATEGY.md` del stack específico:
 
 - Karate: cobertura por endpoint con `effective_minimum`, risk_map, conventions cliente (si brownfield), Body_Mode, Scenario_Prefix.
 - Playwright: pages identificadas, `mock_mode`, priorities por página, mock_endpoints, auth strategy.

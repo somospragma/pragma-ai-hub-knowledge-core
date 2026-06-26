@@ -35,7 +35,7 @@ Este paso es enforcement obligatorio según `[[calidad-pre-generation-protocol]]
 
 ### Paso 2 — Análisis previo (STRATEGY.md)
 
-Antes de generar cualquier código, generar `STRATEGY.md` en el `output_path` según `references/templates/STRATEGY.md.tpl` y `[[calidad-pre-design-strategy-document]]`. Presentar al usuario y esperar:
+Antes de generar cualquier código, generar `STRATEGY.md` en el `output_path` según ``references/templates.md` (sección `STRATEGY.md`)` y `[[calidad-pre-design-strategy-document]]`. Presentar al usuario y esperar:
 - "aprobado" → continuar al siguiente paso.
 - "modificar X" → iterar el documento; volver a presentar.
 

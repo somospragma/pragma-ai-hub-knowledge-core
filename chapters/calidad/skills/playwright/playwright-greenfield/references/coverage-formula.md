@@ -26,7 +26,7 @@ Para HUs `CRITICAL` o `HIGH` (según `priority_assignments` provistas por el PO;
 
 - `visual_regression`: 1 test por página priorizada (Chromium-only).
 - `accessibility`: 1 test por página priorizada (WCAG 2.0 A + AA con `@axe-core/playwright`).
-- `security` (opcional, recomendado en CRITICAL): la suite de `templates/xss-prevention.spec.ts.tpl`.
+- `security` (opcional, recomendado en CRITICAL): la suite de ``references/templates.md` (sección `xss-prevention.spec.ts`)`.
 
 Para HUs `MEDIUM` o `LOW`, los 8 mínimos siguen siendo el piso. No bajar de 8 incluso en `LOW`.
 

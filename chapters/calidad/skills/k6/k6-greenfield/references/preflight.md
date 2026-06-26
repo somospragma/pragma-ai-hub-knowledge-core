@@ -18,4 +18,4 @@ Antes de generar la suite K6 el agente debe validar el entorno local, la accesib
 
 ## Script shippeable
 
-El agente debe copiar `templates/preflight-k6.sh` al proyecto generado bajo `scripts/preflight.sh`. El script reproduce las validaciones en CI o en máquinas de desarrolladores. Ver `[[calidad-delivery-gate-contract]]` para la convención de entregables y `[[calidad-post-generation-protocol]]` para el archivado del resultado del pre-flight.
+El agente debe copiar ``references/templates.md` (sección `preflight-k6.sh`)` al proyecto generado bajo `scripts/preflight.sh`. El script reproduce las validaciones en CI o en máquinas de desarrolladores. Ver `[[calidad-delivery-gate-contract]]` para la convención de entregables y `[[calidad-post-generation-protocol]]` para el archivado del resultado del pre-flight.

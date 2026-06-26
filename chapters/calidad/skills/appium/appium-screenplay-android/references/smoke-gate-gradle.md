@@ -10,7 +10,7 @@ Implementación Appium/Serenity-Cucumber de la política universal `[smoke-gate-
 
 Notas:
 
-- Cucumber JUnit Platform 7.x lee `cucumber.filter.tags` desde system properties; `build.gradle` ya hace `systemProperties System.getProperties()` (ver `templates/build.gradle.tpl`), por lo que el `-D` se propaga al JVM de tests.
+- Cucumber JUnit Platform 7.x lee `cucumber.filter.tags` desde system properties; `build.gradle` ya hace `systemProperties System.getProperties()` (ver ``references/templates.md` (sección `build.gradle`)`), por lo que el `-D` se propaga al JVM de tests.
 - El task `test` retorna exit code 0 si todos los escenarios `@smoke` pasan; ≠ 0 si alguno falla.
 - NUNCA usar `--tests` style filtering (eso es JUnit puro, ignora Cucumber tags). Tampoco usar `--tests "*Smoke*"` por nombre de runner — el escenario `@smoke` puede vivir en cualquier runner.
 

@@ -45,11 +45,11 @@ Para proyectos iOS, la misma capa Screenplay es portable; solo cambia el set de 
 
 Estructura completa Gradle + Screenplay en ``references/project-structure.md``. La fuente autoritativa del contenido textual de los archivos clave está en `references/templates/`:
 
-- `build.gradle.tpl` — matriz inmutable de versiones + scopes correctos.
-- `gradle-wrapper.properties.tpl` — distribution URL Gradle 8.10.
-- `gradlew.tpl` — nota operativa (el script lo genera `gradle wrapper`, no el agente).
-- `junit-platform.properties.tpl` — naming-strategy, plugin, glue, features path.
-- `LoginRunner.java.tpl` — runner canónico filtrado por `@smoke`.
+- `build.gradle` — matriz inmutable de versiones + scopes correctos.
+- `gradle-wrapper.properties` — distribution URL Gradle 8.10.
+- `gradlew` — nota operativa (el script lo genera `gradle wrapper`, no el agente).
+- `junit-platform.properties` — naming-strategy, plugin, glue, features path.
+- `LoginRunner.java` — runner canónico filtrado por `@smoke`.
 
 ```
 {project_name}/
@@ -76,12 +76,12 @@ Estructura completa Gradle + Screenplay en ``references/project-structure.md``. 
 - **No usar `OnStage.setTheStage(OnlineCast.whereEveryoneCan(...))`.** Ambigüedad de sobrecargas en Serenity 4.1.14. Usar `new OnlineCast()`.
 - **No `# note` inline tras step keyword.** Gherkin lo rechaza. Comentarios solo al inicio de línea.
 - **Package declarations deben coincidir con el path físico** (`co.com.pragma.tasks` → `src/main/java/co/com/pragma/tasks/`). De lo contrario, cascade de `cannot find symbol` en `compileJava`.
-- **`build.gradle` DEBE seguir la matriz inmutable** de ``references/gradle-version-matrix.md`` y `references/templates/build.gradle.tpl`: Serenity 4.1.14, Appium Java Client 8.6.0, Cucumber JUnit Platform 7.14.0, JUnit Jupiter 5.10.2, JUnit Platform Suite 1.10.2.
+- **`build.gradle` DEBE seguir la matriz inmutable** de ``references/gradle-version-matrix.md`` y ``references/templates.md` (sección `build.gradle`)`: Serenity 4.1.14, Appium Java Client 8.6.0, Cucumber JUnit Platform 7.14.0, JUnit Jupiter 5.10.2, JUnit Platform Suite 1.10.2.
 - **Wrapper Gradle obligatorio** (`gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.properties`, `gradle/wrapper/gradle-wrapper.jar`) generado con `gradle wrapper --gradle-version 8.10`. `gradlew` con permisos `0755`.
 - **JUnit Platform obligatorio**: `useJUnitPlatform()` en `test { }`. NO `useJUnit()` (eso es JUnit 4 y rompe Cucumber JUnit Platform).
 - **Scopes correctos**: src/main → `implementation` (Serenity Core/Cucumber/Screenplay/Screenplay-WebDriver, Appium Java Client, SLF4J, Logback). Tests → `testImplementation` (Cucumber JUnit Platform engine, JUnit Platform Suite, JUnit Jupiter, AssertJ). Lombok → `compileOnly` + `annotationProcessor`.
-- **`junit-platform.properties` obligatorio** en `src/test/resources/` con `cucumber.glue`, `cucumber.features`, `cucumber.plugin`, `cucumber.junit-platform.naming-strategy=long`. Ver `references/templates/junit-platform.properties.tpl`.
-- **Runner canónico `LoginRunner`** (`co.com.pragma.runners.LoginRunner`) con `@Suite + @IncludeEngines("cucumber") + @SelectClasspathResource("features")` y filtro `@smoke`. Ver `references/templates/LoginRunner.java.tpl`.
+- **`junit-platform.properties` obligatorio** en `src/test/resources/` con `cucumber.glue`, `cucumber.features`, `cucumber.plugin`, `cucumber.junit-platform.naming-strategy=long`. Ver ``references/templates.md` (sección `junit-platform.properties`)`.
+- **Runner canónico `LoginRunner`** (`co.com.pragma.runners.LoginRunner`) con `@Suite + @IncludeEngines("cucumber") + @SelectClasspathResource("features")` y filtro `@smoke`. Ver ``references/templates.md` (sección `LoginRunner.java`)`.
 - **Step isolation obligatorio** cuando el escenario tiene setup/auth/main/cleanup: Tasks separadas para Setup vs Main; Questions de dominio (contractuales) evaluadas SOLO en main; cleanup en `@After` con falla no-fatal. La cobertura sólo cuenta escenarios `@main-step`. Detalle en `references/step-isolation-appium.md`.
 - **Questions contractuales obligatorias** para validar datos del dominio: regla "no sólo `displayed()`" — usar Questions que devuelvan valores específicos (`rowCount`, `firstRowAmountText`, `paginationText`) comparados con matchers explícitos. Detalle, tabla por tipo de pantalla y anti-patterns en `references/contractual-questions.md`.
 - Aplica `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]` y `[[calidad-delivery-gate-contract]]` para declarar/verificar la matriz de versiones y la presencia del wrapper antes de cerrar la entrega.

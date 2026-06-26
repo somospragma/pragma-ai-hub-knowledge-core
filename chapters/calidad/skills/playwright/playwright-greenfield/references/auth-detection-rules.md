@@ -18,8 +18,8 @@ Si NO aparece ninguno de estos términos, generar sin auth setup. Asumir auth do
 
 ## Stack obligatorio cuando se detecta auth
 
-1. **`tests/auth/login.setup.ts`** — copiar `templates/auth.setup.ts.tpl` y rellenar slots. El path es exactamente `tests/auth/login.setup.ts`; el config la captura vía `testMatch: /.*\.setup\.ts/`.
-2. **`playwright.config.ts`** — debe contener el project `setup` y `storageState: '.auth/user.json'` en cada project que requiera sesión (ver `templates/playwright.config.ts.tpl`, ya cubierto).
+1. **`tests/auth/login.setup.ts`** — copiar ``references/templates.md` (sección `auth.setup.ts`)` y rellenar slots. El path es exactamente `tests/auth/login.setup.ts`; el config la captura vía `testMatch: /.*\.setup\.ts/`.
+2. **`playwright.config.ts`** — debe contener el project `setup` y `storageState: '.auth/user.json'` en cada project que requiera sesión (ver ``references/templates.md` (sección `playwright.config.ts`)`, ya cubierto).
 3. **`fixtures/auth.fixture.ts`** o extensión de `fixtures/base.fixture.ts` — exponer una fixture `authenticated` que asegure que el contexto trae la storageState cargada.
 4. **`.gitignore`** — debe incluir `.auth/` para no commitear cookies reales.
 5. **Tests** — los que requieran sesión deben pertenecer a un project con `dependencies: ['setup']`. Esto es lo que garantiza que `auth.setup.ts` corra primero.
@@ -59,6 +59,6 @@ NO derivar la necesidad de autenticación desde el spec OpenAPI (presencia de `s
 ## Cross-links
 
 - Detalle del flujo storage state: ``auth-storage-state.md``.
-- Plantilla del setup: `[[playwright-greenfield/references/templates/auth.setup.ts.tpl]]`.
-- Plantilla del config con project `setup`: `[[playwright-greenfield/references/templates/playwright.config.ts.tpl]]`.
+- Plantilla del setup: ``references/templates.md` (sección `auth.setup.ts`)`.
+- Plantilla del config con project `setup`: ``references/templates.md` (sección `playwright.config.ts`)`.
 - Recolección de inputs obligatorios: `[[calidad-mandatory-inputs-protocol]]`.

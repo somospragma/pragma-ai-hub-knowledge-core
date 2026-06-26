@@ -1,6 +1,6 @@
 # Arquitectura modular K6 (scenarios + workloads + tests + shared)
 
-Documento de referencia para la generación de proyectos K6 greenfield bajo la arquitectura modular idiomática. Sustituye al enfoque monolítico de un script por escenario (smoke/load/stress/spike/soak) heredado en `references/templates/*-test.js.tpl`.
+Documento de referencia para la generación de proyectos K6 greenfield bajo la arquitectura modular idiomática. Sustituye al enfoque monolítico de un script por escenario (smoke/load/stress/spike/soak) heredado en los `*-test.js` (consolidados en `references/templates.md`).
 
 Cross-links: `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-k6-greenfield]]`, ``options-scenarios-executors.md``.
 
@@ -114,4 +114,4 @@ Si el flow requiere autenticación previa, se compone delegando a `scenarios/aut
 
 ## Convivencia con templates monolíticos
 
-Los templates `smoke-test.js.tpl`, `load-test.js.tpl`, `stress-test.js.tpl`, `spike-test.js.tpl` y `soak-test.js.tpl` quedan marcados como **DEPRECATED** al inicio del archivo y se conservan únicamente para proyectos brownfield que ya nacieron con estructura monolítica (`[[calidad-k6-brownfield]]`). Todo proyecto greenfield nuevo debe generarse con la estructura modular descrita en este documento.
+Los templates `smoke-test.js`, `load-test.js`, `stress-test.js`, `spike-test.js` y `soak-test.js` quedan marcados como **DEPRECATED** al inicio del archivo y se conservan únicamente para proyectos brownfield que ya nacieron con estructura monolítica (`[[calidad-k6-brownfield]]`). Todo proyecto greenfield nuevo debe generarse con la estructura modular descrita en este documento.

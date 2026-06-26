@@ -39,7 +39,7 @@ Refuerzos adicionales:
 
 ### Paso previo — Análisis condicional con STRATEGY.md
 
-Si el alcance del brownfield es **grande** (≥3 escenarios/HUs/pages nuevos, o `selector-update` masivo cross-cutting): generar `STRATEGY.md` según el template [[calidad-appium-screenplay-android]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+Si el alcance del brownfield es **grande** (≥3 escenarios/HUs/pages nuevos, o `selector-update` masivo cross-cutting): generar `STRATEGY.md` según el template [[calidad-appium-screenplay-android]] (template en ``references/templates.md` (sección `STRATEGY.md`)`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
 
 Si el alcance es **pequeño** (1-2 cambios puntuales, p. ej. un selector-update aislado o un único `new-page`): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
 

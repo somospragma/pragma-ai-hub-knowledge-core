@@ -12,7 +12,7 @@ Notas:
 
 - `-f pom.xml` resuelve el POM de forma explícita; evita que `mvn` busque ascendiendo el árbol y termine corriendo el módulo equivocado en monorepos.
 - `-Dkarate.options="--tags @smoke"` filtra escenarios a aquellos con tag `@smoke` exclusivamente.
-- `-Dtest=TestRunner` limita el ciclo a la clase runner única del proyecto (ver `templates/TestRunner.java.tpl`); evita escaneos de tests anexos generados por terceros.
+- `-Dtest=TestRunner` limita el ciclo a la clase runner única del proyecto (ver ``references/templates.md` (sección `TestRunner.java`)`); evita escaneos de tests anexos generados por terceros.
 - Surefire devuelve exit code 0 si todos los escenarios `@smoke` pasan; ≠ 0 si alguno falla.
 
 ## Asegurar al menos un escenario `@smoke`

@@ -10,7 +10,7 @@ Razones:
 - Los timeouts fijos son arbitrarios: o son demasiado cortos (flake) o demasiado largos (CI lento).
 - Ocultan el evento real que se está esperando, lo que rompe la trazabilidad cuando un test falla.
 
-El proyecto incluye una regla ESLint que falla el lint si encuentra `.waitForTimeout(` en cualquier archivo. La regla ya está inyectada en `templates/package.json.tpl` bajo `eslintConfig.rules.no-restricted-syntax`.
+El proyecto incluye una regla ESLint que falla el lint si encuentra `.waitForTimeout(` en cualquier archivo. La regla ya está inyectada en ``references/templates.md` (sección `package.json`)` bajo `eslintConfig.rules.no-restricted-syntax`.
 
 ### 2. `page.waitForLoadState('networkidle')` en SPAs con WebSockets o long-polling
 
@@ -81,6 +81,6 @@ const results = await page.getByRole('listitem').count();
 
 ## Cross-links
 
-- `[[playwright-greenfield/references/templates/package.json.tpl]]` — la regla ESLint vive aquí.
+- ``references/templates.md` (sección `package.json`)` — la regla ESLint vive aquí.
 - ``coherence-checks.md`` — auditoría de coherencia.
 - `[[calidad-post-generation-protocol]]` — la corrida de lint forma parte del post-protocolo.

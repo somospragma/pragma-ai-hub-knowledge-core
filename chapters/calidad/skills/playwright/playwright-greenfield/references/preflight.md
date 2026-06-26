@@ -22,4 +22,4 @@ Si `BASE_URL` o `BACKEND_URL` no responden dentro del timeout:
 
 ## Script shippeable
 
-El agente debe copiar `templates/preflight-playwright.sh` al proyecto generado bajo `scripts/preflight.sh`. El script reproduce las validaciones en CI o en máquinas de desarrolladores. Ver `[[calidad-delivery-gate-contract]]` para la convención de entregables y `[[calidad-post-generation-protocol]]` para el archivado del resultado.
+El agente debe copiar ``references/templates.md` (sección `preflight-playwright.sh`)` al proyecto generado bajo `scripts/preflight.sh`. El script reproduce las validaciones en CI o en máquinas de desarrolladores. Ver `[[calidad-delivery-gate-contract]]` para la convención de entregables y `[[calidad-post-generation-protocol]]` para el archivado del resultado.

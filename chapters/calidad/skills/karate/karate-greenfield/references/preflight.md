@@ -41,4 +41,4 @@ Si el usuario no autoriza el override, degradar a `scaffold-only` y documentar l
 
 ## Script shippeable
 
-El agente debe copiar `templates/preflight-karate.sh` al proyecto generado bajo `scripts/preflight.sh` y darle permisos `0755`. Ese script reproduce las mismas validaciones en CI o en máquinas de desarrolladores sin necesidad de re-invocar al agente. Ver `[[calidad-delivery-gate-contract]]` para la convención de scripts entregables y `[[calidad-post-generation-protocol]]` para el archivado de la evidencia.
+El agente debe copiar ``references/templates.md` (sección `preflight-karate.sh`)` al proyecto generado bajo `scripts/preflight.sh` y darle permisos `0755`. Ese script reproduce las mismas validaciones en CI o en máquinas de desarrolladores sin necesidad de re-invocar al agente. Ver `[[calidad-delivery-gate-contract]]` para la convención de scripts entregables y `[[calidad-post-generation-protocol]]` para el archivado de la evidencia.

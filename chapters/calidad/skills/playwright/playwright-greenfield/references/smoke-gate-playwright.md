@@ -21,7 +21,7 @@ Notas:
 - `--max-failures=1` aborta tras el primer fallo (no malgastes minutos de CI re-corriendo si el scaffold está roto).
 - `--reporter=json,list` produce JSON parseable + output amigable en stdout.
 
-> Si el `project` canónico tiene otro nombre (ej. `live-chromium` en `playwright.config.ts.tpl`), usar ese identificador. El requisito es que sea el project `live` con `chromium`.
+> Si el `project` canónico tiene otro nombre (ej. `live-chromium` en `playwright.config.ts`), usar ese identificador. El requisito es que sea el project `live` con `chromium`.
 
 ## Asegurar al menos un test `@smoke`
 

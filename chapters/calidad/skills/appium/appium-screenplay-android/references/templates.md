@@ -75,7 +75,7 @@ Override de capabilities:
 Al generar el proyecto, el agente pregunta cuál estrategia usar para los selectores:
 
 - **(a) Auto-descubrir selectores reales** recorriendo la app con Appium Inspector / crawler (~3-5 minutos extra; recomendado si el `.apk` está disponible). Resultado: locators reales en `userinterfaces/`.
-- **(b) Locators diferidos** marcados con `// TODO: update real locator`. Permite que `@smoke` pase con BUILD SUCCESSFUL pero sin gestos reales. El equipo completa locators después via workflow `[[calidad-complete-deferred-locators]]`.
+- **(b) Locators diferidos** marcados con `// TODO: update real locator`. Permite que `@smoke` pase con BUILD SUCCESSFUL pero sin gestos reales. El equipo completa locators después via workflow `[[complete-deferred-locators]]`.
 
 ## Estructura del proyecto
 
@@ -121,7 +121,7 @@ Tras cada `./gradlew test aggregate`:
 | `adb devices` vacío | Emulador no arrancó o device no conectado. | `emulator -avd <name>` o conectar device con USB-debug. |
 | `ECONNREFUSED 4723` | Appium server no corre. | `appium` en otra terminal. |
 | `UnsupportedClassVersionError` | JDK < 21. | Instalar JDK 21 (Temurin, Corretto). |
-| `Task 'aggregate' not found` | Plugin Serenity no aplicado. | Revisar `build.gradle` (ver `[no-aggregate-collision](no-aggregate-collision.md)`). |
+| `Task 'aggregate' not found` | Plugin Serenity no aplicado. | Revisar `build.gradle` (ver `[[appium-no-aggregate-collision]]`). |
 | `cannot find symbol` en `compileJava` | Package declarations no coinciden con path físico. | Verificar `co.com.pragma.*` ↔ `src/main/java/co/com/pragma/*`. |
 ````
 
@@ -140,7 +140,7 @@ Documento de estrategia previo a la generación de scaffolding Gradle / Screenpl
 - Stakeholders consultables: {{stakeholders}}
 - Stack tecnológico de la app: {{app_stack}}
 - Tipo de relación: greenfield (proyecto Appium nuevo)
-- iOS: NO está en scope (`[android-only-scope-rationale](android-only-scope-rationale.md)`).
+- iOS: NO está en scope (`[[appium-android-only-scope-rationale]]`).
 - APK: {{apk_path}} (validado vía `aapt dump badging`)
 - `app_package`: {{app_package}} (default `com.example.app` si falta — declarar TODO en README)
 - `app_activity`: {{app_activity}} (default `.MainActivity` si falta — declarar TODO en README)
@@ -227,13 +227,13 @@ Appium cubre validación E2E mobile. Los SLAs aplicables:
 ### 7.4 Locator strategy
 
 - Modo: {{locator_mode}} (`auto-discovery` o `deferred`).
-- Si `auto-discovery`: el agente recorre la app vía APK + emulador + Appium server (paso 4 del workflow) y persiste resultados en `.evidence/locators-discovered.json` con score de confianza por locator. Aplica `[[calidad-appium-apk-auto-discovery]]`.
-- Si `deferred`: cada Page Object queda con `// TODO: update real locator`. El usuario completa después con `[[calidad-complete-deferred-locators]]` usando Appium Inspector.
+- Si `auto-discovery`: el agente recorre la app vía APK + emulador + Appium server (paso 4 del workflow) y persiste resultados en `.evidence/locators-discovered.json` con score de confianza por locator. Aplica `[[appium-apk-auto-discovery]]`.
+- Si `deferred`: cada Page Object queda con `// TODO: update real locator`. El usuario completa después con `[[complete-deferred-locators]]` usando Appium Inspector.
 
 ### 7.5 Escenarios `@smoke` y `@proposed`
 
 - 2 escenarios `@android @smoke` mínimos siempre: arranque + login básico (si `include_login_case = true`).
-- N escenarios `@android @proposed` derivados de `user_story` / `test_cases`. Cumplir `[gherkin-syntax-rules](gherkin-syntax-rules.md)` (≤80 chars por línea, newlines a espacios).
+- N escenarios `@android @proposed` derivados de `user_story` / `test_cases`. Cumplir `[[appium-gherkin-syntax-rules]]` (≤80 chars por línea, newlines a espacios).
 
 ## Aprobación
 
@@ -329,7 +329,7 @@ zipStorePath=wrapper/dists
 # Reglas:
 #   - El agente DEBE correr `chmod +x gradlew` despues de generar el wrapper.
 #     Sin esto, el health-check del workflow falla con "Permission denied" en
-#     la primera invocacion ./gradlew. Ver [health-check-pipeline](health-check-pipeline.md) y
+#     la primera invocacion ./gradlew. Ver [[appium-health-check-pipeline]] y
 #     el acceptance criteria #5 del skill.
 #   - El distribution URL fijado debe coincidir con `gradle-wrapper.properties.tpl`
 #     (Gradle 8.10). NO regenerar wrapper con otra version.

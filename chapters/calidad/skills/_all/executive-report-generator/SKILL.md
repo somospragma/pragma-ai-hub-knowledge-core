@@ -87,7 +87,7 @@ NUNCA clasificar sin evidencia explícita (status code, stack trace, screenshot,
 
 ### Paso 6 — Generar reporte Markdown desde plantilla
 
-Renderizar `references/templates/report.md.tpl` rellenando los slots `{{summary}}`, `{{slas_table}}`, `{{scenarios_table}}`, `{{runs_comparison_table}}`, `{{findings}}`, `{{recommendations}}`, `{{annexes}}`. La estructura canónica está en `references/report-structure.md`. Usar la plantilla específica del stack para las secciones "Resultados por escenario" y "Anexos":
+Renderizar ``references/templates.md` (sección `report.md`)` rellenando los slots `{{summary}}`, `{{slas_table}}`, `{{scenarios_table}}`, `{{runs_comparison_table}}`, `{{findings}}`, `{{recommendations}}`, `{{annexes}}`. La estructura canónica está en `references/report-structure.md`. Usar la plantilla específica del stack para las secciones "Resultados por escenario" y "Anexos":
 
 - Karate → `references/karate-report-template.md`.
 - Playwright → `references/playwright-report-template.md`.
@@ -98,7 +98,7 @@ Renderizar `references/templates/report.md.tpl` rellenando los slots `{{summary}
 
 Según `output_format` solicitado:
 
-- `html` (default) — `pandoc report.md -o report.html --standalone --self-contained --css=report.html-style.css.tpl`.
+- `html` (default) — `pandoc report.md -o report.html --standalone --self-contained --css=report.html-style.css`.
 - `pptx` — `pandoc report.md -o report.pptx`.
 - `doc` — `pandoc report.md -o report.docx --reference-doc=template.docx`.
 - `md` — emitir directamente sin conversión.
@@ -127,8 +127,8 @@ References específicas del skill:
 - `references/playwright-report-template.md`
 - `references/k6-report-template.md`
 - `references/appium-report-template.md`
-- `references/templates/report.md.tpl`
-- `references/templates/report.html-style.css.tpl`
+- ``references/templates.md` (sección `report.md`)`
+- ``references/templates.md` (sección `report.html-style.css`)`
 
 Otros assets del chapter:
 

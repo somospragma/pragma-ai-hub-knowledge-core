@@ -38,7 +38,7 @@ Refuerzos adicionales:
 
 ### Paso previo — Análisis condicional con STRATEGY.md
 
-Si el alcance del brownfield es **grande** (≥3 endpoints/HUs/escenarios nuevos, o cambios cross-cutting que afectan multiple features preexistentes): generar `STRATEGY.md` según el template [[calidad-karate-greenfield]] (template en `references/templates/STRATEGY.md.tpl`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
+Si el alcance del brownfield es **grande** (≥3 endpoints/HUs/escenarios nuevos, o cambios cross-cutting que afectan multiple features preexistentes): generar `STRATEGY.md` según el template [[calidad-karate-greenfield]] (template en ``references/templates.md` (sección `STRATEGY.md`)`) y el skill `[[calidad-pre-design-strategy-document]]`. Esperar aprobación del usuario antes de continuar.
 
 Si el alcance es **pequeño** (1-2 cambios puntuales): omitir STRATEGY.md y proceder directo a generación, documentando la decisión en `.evidence/scope-decision.md`.
 
