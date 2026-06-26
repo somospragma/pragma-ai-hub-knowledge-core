@@ -70,7 +70,7 @@ Esta suite incluye 3 escenarios **obligatorios** y hasta 2 escenarios **opt-in**
 
 ## Evidencia
 
-Cada ejecución genera `results/<timestamp>-summary.json`. Conservar para trazabilidad y para alimentar `[[calibrate-k6-thresholds]]`.
+Cada ejecución genera `results/<timestamp>-summary.json`. Conservar para trazabilidad y para alimentar `[[calidad-calibrate-k6-thresholds]]`.
 ````
 
 ## `STRATEGY.md`
@@ -157,7 +157,7 @@ Los 3 escenarios obligatorios siempre se generan. `spike` y `soak` son opt-in co
 
 - Tier: {{thresholds_tier}} (Conservative / Moderate / Relaxed)
 - Justificación: {{tier_reason}} (deriva de `user_story.SLA` → `firma.SLA` → default Moderate)
-- Aplicar `[[k6-thresholds-three-tiers]]` para los valores numéricos exactos por tier.
+- Aplicar `[thresholds-three-tiers](thresholds-three-tiers.md)` para los valores numéricos exactos por tier.
 
 ### 7.3 Auth strategy
 
@@ -168,7 +168,7 @@ Los 3 escenarios obligatorios siempre se generan. `spike` y `soak` son opt-in co
 ### 7.4 Data correlation y CRUD
 
 - Flows CRUD detectados (full / partial): {{crud_detail}}
-- IDs dinámicos: aplicar `[[k6-crud-dynamic-id-correlation]]` con guard clause.
+- IDs dinámicos: aplicar `[crud-dynamic-id-correlation](crud-dynamic-id-correlation.md)` con guard clause.
 - Payload builders en `utils.js` (`buildXxxBody`).
 
 ### 7.5 Bloqueos esperados de ambiente
@@ -434,7 +434,7 @@ export { handleSummary } from '../../shared/handle-summary.js';
 
 El mismo scenario se reutiliza para linea-base, carga y estres cambiando solo el workload importado.
 
-Detalle en `[[k6-modular-architecture]]`.
+Detalle en `[modular-architecture](modular-architecture.md)`.
 ````
 
 ## `scenarios/auth.js`
@@ -596,7 +596,7 @@ export function handleSummary(data) {
 // {{project_name}} — shared/thresholds.js
 // Thresholds centralizados por tier (Conservative / Moderate / Relaxed) y por escenario.
 //
-// Tiers (ver [[k6-thresholds-three-tiers]] y [[k6-threshold-tier-justification]]):
+// Tiers (ver [thresholds-three-tiers](thresholds-three-tiers.md) y [threshold-tier-justification](threshold-tier-justification.md)):
 //   - Conservative: SLAs estrictos, sistemas criticos (banca, salud).
 //   - Moderate:     default, sistemas productivos estandar.
 //   - Relaxed:      MVP, sistemas nuevos sin baseline, batch internos.

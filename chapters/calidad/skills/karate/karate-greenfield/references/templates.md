@@ -146,13 +146,13 @@ Karate cubre validación funcional y contract. Los SLAs de performance no se eje
 
 - Archivos a generar (alto nivel): `pom.xml`, `karate-config.js`, `TestRunner.java`, features bajo `src/test/java/com/testing/features/`, schemas `-match.json`.
 - Comando de ejecución: `mvn test` (filtros opcionales por tag).
-- Reporte ejecutivo: formato {{report_format}} (default `html`) generado por `[[generate-executive-report]]` al cierre.
+- Reporte ejecutivo: formato {{report_format}} (default `html`) generado por `[[calidad-generate-executive-report]]` al cierre.
 
 ## 7. Estrategia Karate
 
 ### 7.1 Cobertura por endpoint (effective_minimum)
 
-Aplicar la fórmula `[[karate-negative-coverage-formula]]`. Declarar antes de generar:
+Aplicar la fórmula `[negative-coverage-formula](negative-coverage-formula.md)`. Declarar antes de generar:
 
 | Endpoint | Effective minimum | Required fields | Headers críticos | Cobertura cifrado | Risk |
 |---|---|---|---|---|---|

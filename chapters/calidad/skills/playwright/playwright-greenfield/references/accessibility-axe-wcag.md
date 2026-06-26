@@ -1,6 +1,8 @@
 
 # Accesibilidad — WCAG 2.1 AA
 
+> Política transversal (cuándo, dimensiones, severidad, evidencia): `[[calidad-accessibility-testing]]`. Esta referencia cubre la implementación **Playwright (web)**.
+
 ## Stack
 
 - Dependencia: `@axe-core/playwright` `^4.9.0` (peer de `axe-playwright`).

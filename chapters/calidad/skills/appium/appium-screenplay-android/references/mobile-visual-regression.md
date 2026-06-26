@@ -1,6 +1,8 @@
 
 # Regresión visual mobile en Appium Screenplay
 
+> Política transversal (cuándo, baselines, dinamismo, anti-patrones): `[[calidad-visual-regression]]`. Esta referencia cubre la implementación **Appium/Screenplay (móvil)**.
+
 Esta referencia cubre cómo integrar regresión visual en una suite Appium del Chapter Calidad. Aplica a Android y iOS (los SDK propietarios soportan ambas).
 
 ## Herramientas

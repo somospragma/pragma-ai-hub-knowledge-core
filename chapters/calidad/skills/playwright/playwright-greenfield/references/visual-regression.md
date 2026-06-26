@@ -1,6 +1,8 @@
 
 # Regresión visual
 
+> Política transversal (cuándo, baselines, dinamismo, anti-patrones): `[[calidad-visual-regression]]`. Esta referencia cubre la implementación **Playwright (web)**.
+
 ## Reglas
 
 - Solo Chromium. En `tests/visual.spec.ts` se hace skip explícito para los proyectos `firefox` y `webkit` para evitar baselines duplicados (las diferencias de render entre engines no se persiguen aquí).

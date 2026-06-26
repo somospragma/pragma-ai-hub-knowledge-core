@@ -1,6 +1,8 @@
 
 # Accesibilidad mobile en Appium Screenplay
 
+> Política transversal (cuándo, dimensiones, severidad, evidencia): `[[calidad-accessibility-testing]]`. Esta referencia cubre la implementación **Appium/Screenplay (móvil)**.
+
 Esta referencia cubre cómo integrar checks de accesibilidad en una suite Appium Screenplay del Chapter Calidad. Aplica principalmente a Android (donde el tooling es más maduro); la lógica Screenplay es portable a iOS sustituyendo la integración por XCUITest accessibility audit.
 
 ## Herramientas
