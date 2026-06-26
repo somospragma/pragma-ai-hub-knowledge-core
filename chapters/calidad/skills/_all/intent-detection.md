@@ -16,6 +16,8 @@ Aplica este skill **siempre** al inicio de cualquier solicitud de generación de
 
 Tu trabajo aquí es **enrutar**, no generar. El resultado del skill es el nombre del workflow/skill específico que el agente debe invocar a continuación.
 
+Esta skill decide **con qué framework** se generan las pruebas. La decisión de **qué capas transversales complementarias** (accesibilidad, SEO, seguridad, regresión visual, contract, performance) tejer la toma `[[calidad-transversal-capabilities]]` en el paso 2.5 del router. Algunas keywords de abajo (p.ej. "accessibility", "visual") sirven aquí solo como señal de que el SUT es web (framework Playwright); la capa transversal correspondiente la resuelve esa otra skill.
+
 ## Instrucción
 
 1. Lee el campo `intent` del usuario en su literalidad (no parafrasees).

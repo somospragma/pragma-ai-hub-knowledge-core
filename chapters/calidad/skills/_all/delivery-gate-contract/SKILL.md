@@ -37,6 +37,16 @@ delivery_gate:
     user_story: "HUT-001" | null
     firma: "..." | null
     risk_map: { addPet: HIGH, findPetsByStatus: MEDIUM, ... }
+  transversal_capabilities:               # capas complementarias evaluadas (paso 2.5 del router)
+    detected:
+      - capability: accessibility | seo | security | visual | contract | performance
+        skill: calidad-accessibility-testing
+        tag: "@accessibility"
+        rationale: "..."                  # por qué aplica (risk-first / SUT / sector)
+        confirmed_by_user: true | false
+    omitted:
+      - capability: seo
+        reason: "..."                     # por qué no aplica / fuera de alcance / descartada
   coverage:
     declared:
       addPet: 10        # effective_minimum por endpoint/HU/script
@@ -90,6 +100,7 @@ delivery_gate:
 - Si `status: success` pero `execution.exit_code != 0` → contradicción, reportar `failed`.
 - Si modo es `dry-run` o `scaffold-only` → `execution.*` puede ser `null` pero documentar en `blockers` por qué.
 - Si modo es `full` y no se ejecutó → `status: partial` con `blocker: "execution_skipped"`.
+- `transversal_capabilities` debe estar presente: si no aplica ninguna capa, declarar `detected: []` y justificar en `omitted`. Una capa con `confirmed_by_user: false` no debe haberse tejido en la suite.
 
 ## Verification
 
@@ -103,6 +114,8 @@ verification:
     failure_message: "Bloqueado: contradicción entre status declarado y exit_code reportado."
   - check: "modo full sin ejecución real reporta status: partial con blocker execution_skipped"
     failure_message: "Bloqueado: no se puede declarar success en modo full sin evidencia de ejecución."
+  - check: "bloque transversal_capabilities presente (detected/omitted); capas tejidas solo si confirmed_by_user"
+    failure_message: "Bloqueado: faltó evaluar/registrar las capacidades transversales complementarias (accesibilidad, SEO, seguridad, visual, contract, performance)."
 ```
 
 ## Cross-links

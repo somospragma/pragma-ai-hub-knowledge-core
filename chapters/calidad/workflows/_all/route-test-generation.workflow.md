@@ -46,6 +46,16 @@ Aplica `[[calidad-intent-detection]]`:
 - Si el intent es ambiguo, **pregunta**; no asumas Playwright por defecto.
 - Si el usuario pide mobile iOS greenfield, no abortes: el scaffolder V2 no lo genera automáticamente, pero el chapter sí soporta iOS via scaffold manual (apuntar a `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`). Si es mobile iOS brownfield, enrutar a `[[calidad-appium-brownfield]]`.
 
+### Paso 2.5 — Detectar capacidades transversales complementarias
+
+Aplica `[[calidad-transversal-capabilities]]`:
+
+- A partir del `intent`, el framework detectado, el tipo de SUT (`[[calidad-sut-types-and-adaptations]]`) y el contexto regulatorio, identifica qué capas complementarias hacen la prueba integral: **accesibilidad** (`[[calidad-accessibility-testing]]`), **SEO** (`[[calidad-seo]]`), **seguridad** (`[[calidad-security-testing]]`), **regresión visual** (`[[calidad-visual-regression]]`), **contract testing** (`[[calidad-contract-testing]]`) y **performance** como suite K6 aparte.
+- Aplica *risk-first* (`[[calidad-chapter-perspective]]`): en flujos críticos (login, MFA/OTP, pagos, transferencias, firma, onboarding) y sectores regulados (banca, salud, gobierno), seguridad y accesibilidad pasan de sugeridas a recomendadas con fuerza.
+- **Propón** las capas detectadas al usuario con su justificación; no las asumas. Confirma alcance.
+- Pasa al workflow específico (paso 5) la lista de capacidades confirmadas: cada una se teje como tag/suite (`@accessibility`, `@seo`, `@security`, `@visual`, `@contract`) dentro del proyecto del framework, o como suite separada cuando requiere otro runtime (performance K6).
+- Registra las capas detectadas, confirmadas y omitidas (con motivo) para el bloque `transversal_capabilities` del delivery-gate.
+
 ### Paso 3 — Validar el spec
 
 Aplica `[[calidad-spec-validation]]`:
@@ -114,6 +124,7 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 Este workflow se considera completo **solo cuando**:
 
 - [ ] El framework destino y el modo (greenfield / brownfield) fueron resueltos correctamente para los **4 frameworks soportados** (Karate, Playwright, K6, Appium) en cualquiera de sus dos modos.
+- [ ] Las **capacidades transversales complementarias** (accesibilidad, SEO, seguridad, regresión visual, contract, performance) fueron evaluadas con `[[calidad-transversal-capabilities]]`, propuestas al usuario y registradas (aplicadas u omitidas con motivo) en el bloque `transversal_capabilities` del delivery-gate.
 - [ ] Todos los archivos de prueba esperados están escritos en `output_path` y son consistentes con el spec/firma.
 - [ ] En greenfield, la infraestructura completa (`pom.xml`/`package.json`/`build.gradle`, configs, runners, README) está presente.
 - [ ] En brownfield (Karate, Playwright, K6 y Appium), **no** se sobrescribió infraestructura existente y las convenciones detectadas se respetaron.
