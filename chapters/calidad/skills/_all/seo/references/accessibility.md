@@ -1,13 +1,3 @@
----
-id: calidad-seo-accessibility
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Auditoría de accesibilidad y HTML semántico agnóstica de tecnología: WCAG 2.2 (ISO/IEC 40500:2025), estructura semántica, landmarks ARIA, contraste de color, foco de teclado, skip links, idioma declarado y formularios accesibles. Las características de accesibilidad son señales de calidad de página para Google, Bing y motores IA. Integración con axe-core para QA pipelines automatizados. Usar cuando se mencione 'accesibilidad', 'semántica HTML', 'ARIA', 'contraste', 'WCAG', 'lector de pantalla', 'a11y' o 'HTML semántico'."
-tags: [seo, web, accesibilidad, wcag, aria]
----
-
 # Accesibilidad y HTML Semántico — Señales de Calidad SEO
 
 ## Por Qué Importa para SEO Multi-Motor

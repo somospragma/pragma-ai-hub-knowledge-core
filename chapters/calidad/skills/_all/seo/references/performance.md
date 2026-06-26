@@ -1,13 +1,3 @@
----
-id: calidad-seo-performance
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Auditoría de rendimiento agnóstica de tecnología: Core Web Vitals (LCP, INP, CLS), TTFB, HTTP/2 y HTTP/3, compresión, caché, fuentes web, scripts de terceros, resource hints y presupuesto de rendimiento para CI/CD. Válido para cualquier stack tecnológico y cualquier motor de búsqueda. Usar cuando se mencione 'velocidad', 'Core Web Vitals', 'LCP', 'INP', 'CLS', 'PageSpeed', 'Lighthouse', 'performance' o 'tiempo de carga'."
-tags: [seo, web, performance, core-web-vitals]
----
-
 # Performance SEO — Rendimiento Web y Core Web Vitals
 
 ## Cobertura Multi-Motor

@@ -1,13 +1,3 @@
----
-id: calidad-seo-schema
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Detección, validación y generación de datos estructurados (JSON-LD) con cobertura multi-motor: Google Rich Results, Bing, Yahoo, Yandex, Apple y motores de búsqueda potenciados por IA (Perplexity, ChatGPT, Copilot). Schema.org fue creado por Google, Bing, Yahoo y Yandex — funciona en todos. Usar cuando se mencione 'schema', 'datos estructurados', 'JSON-LD', 'rich results', 'marcado estructurado', 'resultados enriquecidos' o 'IA search'."
-tags: [seo, web, schema, json-ld, datos-estructurados]
----
-
 # Schema / Datos Estructurados — Multi-Motor
 
 ## Por Qué Schema Importa Más que Nunca en 2026

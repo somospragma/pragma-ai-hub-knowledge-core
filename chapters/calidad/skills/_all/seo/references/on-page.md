@@ -1,13 +1,3 @@
----
-id: calidad-seo-on-page
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Auditoría on-page agnóstica de tecnología con cobertura multi-motor: title tags, meta descriptions, estructura de headings, canonical, meta robots, Open Graph, Twitter/X Cards, breadcrumbs, enlazado interno, y etiquetas específicas para Bing, Yandex y motores IA. Usar cuando se mencione 'on-page', 'title tag', 'meta description', 'headings', 'H1', 'Open Graph', 'canonical' o 'etiquetas HTML'."
-tags: [seo, web, on-page, metadata, headings]
----
-
 # On-Page SEO — Elementos HTML por Página
 
 ## Principio Agnóstico

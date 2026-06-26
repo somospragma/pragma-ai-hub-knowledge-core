@@ -1,13 +1,3 @@
----
-id: calidad-seo-images
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Auditoría de imágenes agnóstica de tecnología: alt text, formatos modernos (WebP/AVIF), peso, dimensiones explícitas para prevenir CLS, estrategia de carga (lazy/eager/fetchpriority), imágenes responsivas, nombres de archivo y OG image. Válido para cualquier motor de búsqueda y stack tecnológico. Usar cuando se mencione 'imágenes', 'alt text', 'WebP', 'lazy loading', 'peso de imágenes', 'optimización de imágenes', 'LCP imagen' o 'CLS imágenes'."
-tags: [seo, web, imagenes, alt, cls]
----
-
 # SEO Imágenes — Optimización Técnica
 
 ## Cobertura Multi-Motor

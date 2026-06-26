@@ -1,13 +1,3 @@
----
-id: calidad-seo-hreflang
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Auditoría e implementación de hreflang agnóstica de tecnología con cobertura multi-motor: Google, Bing, Yandex y motores IA. Cubre anotaciones de idioma/región, autorreferencia, x-default, reciprocidad bidireccional, cobertura completa y errores comunes (31% de sitios internacionales tienen directivas conflictivas). Activar solo si el sitio tiene o planea variantes por idioma o región. Usar cuando se mencione 'hreflang', 'i18n', 'internacionalización', 'multi-idioma' o 'variantes por país'."
-tags: [seo, web, hreflang, i18n]
----
-
 # Hreflang / Internacionalización — Multi-Motor
 
 ## Cuándo Activar Este Skill

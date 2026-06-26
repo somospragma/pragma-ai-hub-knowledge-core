@@ -18,7 +18,7 @@ stack correspondiente. No dupliques esta política dentro de un stack: enlázala
 
 Aplica a accesibilidad de aplicaciones bajo prueba (web y móvil). Para accesibilidad
 a nivel del HTML servido por una página (auditoría SEO/on-page) ver
-`[[calidad-seo-accessibility]]`, que es complementaria a esta.
+`[[calidad-seo]]`, que es complementaria a esta.
 
 ## Cuándo aplicar
 

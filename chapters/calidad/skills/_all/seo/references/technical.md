@@ -1,13 +1,3 @@
----
-id: calidad-seo-technical
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Auditoría técnica SEO agnóstica de tecnología: rastreabilidad, indexabilidad, seguridad, estructura de URLs, mobile, JavaScript rendering, crawl budget, faceted navigation, Service Workers, protocolo IndexNow, gestión de crawlers IA y cobertura multi-motor (Google, Bing, Yandex, Baidu, AI Search). Activar cuando se mencione 'SEO técnico', 'robots.txt', 'indexación', 'canonical', 'redirects', 'HTTPS', 'headers de seguridad', 'mobile-first', 'JavaScript SEO', 'crawl budget' o cualquier aspecto de infraestructura."
-tags: [seo, web, tecnico, indexacion, crawl]
----
-
 # SEO Técnico — Auditoría de Infraestructura
 
 ## Principio Agnóstico

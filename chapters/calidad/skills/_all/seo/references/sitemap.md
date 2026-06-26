@@ -1,13 +1,3 @@
----
-id: calidad-seo-sitemap
-version: 1.0.0
-scope: chapter
-type: skill
-chapter: calidad
-description: "Auditoría y configuración del sitemap XML agnóstica de tecnología: existencia, formato válido, cobertura de URLs indexables, exclusiones correctas, fechas lastmod, sitemap index, integración con IndexNow para Bing/Yandex y hreflang en sitemap. Compatible con cualquier CMS, framework o generador estático. Usar cuando se mencione 'sitemap', 'sitemap.xml', 'mapa del sitio', 'cobertura de indexación' o 'descubrimiento de URLs'."
-tags: [seo, web, sitemap, indexnow]
----
-
 # Sitemap XML — Guía de Rastreo Multi-Motor
 
 ## Cobertura Multi-Motor
