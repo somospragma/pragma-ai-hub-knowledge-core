@@ -1,120 +1,120 @@
-# Variantes — Cuántas y Cuáles Generar
+# Variants — How Many and Which to Generate
 
 ---
 
-## Regla general
+## General rule
 
-### UI System (componentes)
+### UI System (components)
 
-| Complejidad del widget | Variantes mínimas |
+| Widget complexity | Minimum variants |
 |---|---|
-| Atom simple (botón, badge, icono) | 2-4 |
+| Simple atom (button, badge, icon) | 2-4 |
 | Molecule (card, list tile) | 2-3 |
 | Organism (form, list) | 2-3 |
-| Widget con muchos estados | Una por estado relevante |
+| Widget with many states | One per relevant state |
 
-### Features (pantallas)
+### Features (screens)
 
-| Tipo de pantalla | Variantes mínimas |
+| Screen type | Minimum variants |
 |---|---|
-| Listado (home, catálogo, historial) | 3-4: default, loading, empty, error |
-| Detalle (producto, perfil, orden) | 2-3: default, loading, error |
-| Formulario (login, registro, checkout) | 2-3: default, validation_error, prefilled |
-| Dashboard / resumen | 2-3: default, loading, empty |
+| List (home, catalog, history) | 3-4: default, loading, empty, error |
+| Detail (product, profile, order) | 2-3: default, loading, error |
+| Form (login, signup, checkout) | 2-3: default, validation_error, prefilled |
+| Dashboard / summary | 2-3: default, loading, empty |
 
-Para la guía completa de variantes de pantallas, ver `references/features_guide.md`.
+For the complete guide to screen variants, see `references/features_guide.md`.
 
-Más variantes no siempre es mejor — cada una debe demostrar algo
-que las otras no muestran.
+More variants is not always better — each one must demonstrate something
+that the others do not show.
 
 ---
 
-## Estados que siempre hay que cubrir (si el widget los tiene)
+## States you must always cover (if the widget has them)
 
-> **Regla de implementación:** si el estado se controla con un parámetro del constructor (`isLoading`, `isEnabled`, `isEmpty`...) → **knob**. Solo crear un `@UseCase` separado si el widget renderiza una estructura visual diferente que no puede controlarse con un parámetro.
+> **Implementation rule:** if the state is controlled by a constructor parameter (`isLoading`, `isEnabled`, `isEmpty`...) → **knob**. Only create a separate `@UseCase` if the widget renders a different visual structure that cannot be controlled with a parameter.
 
-| Estado | `name` si es `@UseCase` | Knob equivalente | Implementación preferida |
+| State | `name` if it is a `@UseCase` | Equivalent knob | Preferred implementation |
 |---|---|---|---|
-| Estado base funcional | `'default'` | — | `@UseCase` siempre |
-| Cargando datos | `'loading'` | `context.knobs.boolean(label: 'Loading')` | **Knob** si hay un prop `isLoading` |
-| Deshabilitado | `'disabled'` | `context.knobs.boolean(label: 'Enabled')` | **Knob** si hay un prop `isEnabled` / `enabled` |
-| Sin datos / vacío | `'empty'` | `context.knobs.boolean(label: 'Empty')` | **Knob** si el widget acepta lista vacía o nullable |
-| Error | `'error'` | `context.knobs.boolean(label: 'Error')` | **Knob** si hay un prop `hasError` / `errorMessage` |
-| Con contenido máximo | `'full'` | `context.knobs.int.slider(label: 'itemCount')` | **Knob** con valor alto en el slider |
-| Solo lectura | `'read_only'` | `context.knobs.boolean(label: 'ReadOnly')` | **Knob** si hay un prop `readOnly` |
+| Functional base state | `'default'` | — | Always a `@UseCase` |
+| Loading data | `'loading'` | `context.knobs.boolean(label: 'Loading')` | **Knob** if there is an `isLoading` prop |
+| Disabled | `'disabled'` | `context.knobs.boolean(label: 'Enabled')` | **Knob** if there is an `isEnabled` / `enabled` prop |
+| No data / empty | `'empty'` | `context.knobs.boolean(label: 'Empty')` | **Knob** if the widget accepts an empty or nullable list |
+| Error | `'error'` | `context.knobs.boolean(label: 'Error')` | **Knob** if there is a `hasError` / `errorMessage` prop |
+| With maximum content | `'full'` | `context.knobs.int.slider(label: 'itemCount')` | **Knob** with a high value in the slider |
+| Read only | `'read_only'` | `context.knobs.boolean(label: 'ReadOnly')` | **Knob** if there is a `readOnly` prop |
 
 ---
 
-## Estrategia por tipo de componente
+## Strategy by component type
 
-### Botones
+### Buttons
 
-> **Regla:** Un único `@UseCase(name: 'default')` con knobs para todos los estados y variantes visuales. Solo crear `@UseCase` adicionales si el widget renderiza estructuras radicalmente distintas (ver Regla de oro más abajo).
+> **Rule:** A single `@UseCase(name: 'default')` with knobs for all states and visual variants. Only create additional `@UseCase`s if the widget renders radically different structures (see the Golden rule below).
 
 ```dart
-// default — un use case, con knobs:
+// default — one use case, with knobs:
 //   - label/text (string)
 //   - variant (list<ButtonVariant>)  ← primary, secondary, ghost, destructive…
 //   - size (list<ButtonSize>)        ← small, normal, large…
 //   - icon (list<IconData>)
 //   - iconPosition (list<IconPosition>) ← start, end
 //   - showIcon (boolean)
-//   - isLoading (boolean)            ← NO crear @UseCase 'loading' aparte
-//   - isEnabled (boolean)            ← NO crear @UseCase 'disabled' aparte
+//   - isLoading (boolean)            ← do NOT create a separate 'loading' @UseCase
+//   - isEnabled (boolean)            ← do NOT create a separate 'disabled' @UseCase
 ```
 
-### Campos de texto / inputs
+### Text fields / inputs
 ```dart
-// default   — campo vacío interactivo
-// with_value — campo con contenido
-// error      — mostrando mensaje de error
-// disabled   — no editable
+// default   — empty interactive field
+// with_value — field with content
+// error      — showing an error message
+// disabled   — not editable
 ```
 
 ### Cards / List tiles
 ```dart
-// default    — con datos completos
-// minimal    — con solo los campos requeridos
-// loading    — skeleton o shimmer (si aplica)
+// default    — with complete data
+// minimal    — with only the required fields
+// loading    — skeleton or shimmer (if applicable)
 ```
 
-### Listas
+### Lists
 ```dart
-// with_data   — lista con N items (usar List.generate para volumen realista)
-// empty       — sin items, estado vacío
-// loading     — estado de carga
+// with_data   — list with N items (use List.generate for realistic volume)
+// empty       — no items, empty state
+// loading     — loading state
 ```
 
-### Formularios
+### Forms
 ```dart
-// default     — campos vacíos
-// with_errors — validación activada con errores visibles
-// prefilled   — campos con datos de ejemplo
+// default     — empty fields
+// with_errors — validation triggered with visible errors
+// prefilled   — fields with example data
 ```
 
 ---
 
-## Regla de oro: knobs primero, variantes solo cuando hay diferencia estructural
+## Golden rule: knobs first, separate variants only when there is a structural difference
 
-> **Un `@UseCase` separado solo se justifica cuando el widget renderiza una estructura visual fundamentalmente diferente que no puede controlarse con un knob.**
+> **A separate `@UseCase` is only justified when the widget renders a fundamentally different visual structure that cannot be controlled with a knob.**
 
-| Situación | Decisión |
+| Situation | Decision |
 |---|---|
-| Estado `loading`, `disabled`, `showIcon`, posición del ícono... | **Knob** — el mismo widget, solo cambia un parámetro |
-| Variante visual del componente (`primary`, `secondary`, `ghost`...) | **Knob `list<Enum>`** — el mismo widget con una prop distinta |
-| El widget renderiza una estructura completamente diferente (ej. progress bar activa vs ícono) | **`@UseCase` separado** |
+| `loading`, `disabled`, `showIcon` state, icon position... | **Knob** — same widget, only one parameter changes |
+| Visual variant of the component (`primary`, `secondary`, `ghost`...) | **`list<Enum>` knob** — same widget with a different prop |
+| The widget renders a completely different structure (e.g. active progress bar vs. icon) | **Separate `@UseCase`** |
 
-### ✅ Patrón correcto para botones — una variante, todos los estados como knobs
+### ✅ Correct pattern for buttons — one variant, all states as knobs
 
-Todos los estados (loading, disabled) **y** los tipos visuales (primary, secondary...) se exponen como knobs dentro de un único `@UseCase`:
+All states (loading, disabled) **and** the visual types (primary, secondary...) are exposed as knobs within a single `@UseCase`:
 
 ```dart
 @UseCase(name: 'default', type: AppButton)
 Widget buildAppButtonUseCase(BuildContext context) {
-  // Knobs de contenido
-  final label = context.knobs.string(label: 'Text', initialValue: 'Continuar');
+  // Content knobs
+  final label = context.knobs.string(label: 'Text', initialValue: 'Continue');
 
-  // Knob de variante visual — dropdown con todos los tipos del enum
+  // Visual variant knob — dropdown with all the enum types
   final variant = context.knobs.list<ButtonVariant>(
     label: 'Variant',
     initialOption: ButtonVariant.primary,
@@ -122,7 +122,7 @@ Widget buildAppButtonUseCase(BuildContext context) {
     labelBuilder: (v) => v.name,
   );
 
-  // Knobs de tamaño y comportamiento
+  // Size and behavior knobs
   final size = context.knobs.list<ButtonSize>(
     label: 'Size',
     initialOption: ButtonSize.normal,
@@ -130,7 +130,7 @@ Widget buildAppButtonUseCase(BuildContext context) {
     labelBuilder: (v) => v.name,
   );
 
-  // Knobs del ícono
+  // Icon knobs
   final icon = context.knobs.list<IconData>(
     label: 'Icon',
     initialOption: Icons.balance,
@@ -150,13 +150,13 @@ Widget buildAppButtonUseCase(BuildContext context) {
     labelBuilder: (p) => p.name,
   );
 
-  // Knobs de estado — NO crear @UseCase separados para estos
+  // State knobs — do NOT create separate @UseCases for these
   final showIcon = context.knobs.boolean(label: 'Show icon', initialValue: true);
   final isLoading = context.knobs.boolean(label: 'Loading', initialValue: false);
   final isEnabled = context.knobs.boolean(label: 'Enabled', initialValue: true);
 
-  // El code preview muestra la instanciación del widget SIN el ColoredBox —
-  // ese wrapper es scaffolding del catálogo, no código de producción.
+  // The code preview shows the widget instantiation WITHOUT the ColoredBox —
+  // that wrapper is catalog scaffolding, not production code.
   context.setCodePreview('''
 AppButton(
   label: '$label',
@@ -170,8 +170,8 @@ AppButton(
   onPressed: () {},
 )''');
 
-  // Envolver en ColoredBox con el fondo correcto según el tema activo.
-  // El code preview ya registrado muestra solo AppButton(...) — sin este wrapper.
+  // Wrap in a ColoredBox with the correct background based on the active theme.
+  // The already-registered code preview only shows AppButton(...) — without this wrapper.
   final isDark = Theme.of(context).brightness == Brightness.dark;
   return ColoredBox(
     color: isDark ? AppColors.primary900 : AppColors.primary0,
@@ -195,28 +195,28 @@ AppButton(
 }
 ```
 
-### ✅ Variantes separadas justificadas — estructura visual radicalmente diferente
+### ✅ Justified separate variants — radically different visual structure
 
-Solo cuando el widget **no puede renderizar** todos sus estados con un único árbol de widgets controlado por parámetros:
+Only when the widget **cannot render** all of its states with a single widget tree controlled by parameters:
 
 ```dart
 @UseCase(name: 'default', type: UploadButton)
-Widget buildUploadButtonUseCase(BuildContext context) { /* estado normal */ }
+Widget buildUploadButtonUseCase(BuildContext context) { /* normal state */ }
 
 @UseCase(name: 'uploading', type: UploadButton)
-Widget buildUploadButtonUploadingUseCase(BuildContext context) { /* progress bar activa, estructura distinta */ }
+Widget buildUploadButtonUploadingUseCase(BuildContext context) { /* active progress bar, different structure */ }
 
 @UseCase(name: 'success', type: UploadButton)
-Widget buildUploadButtonSuccessUseCase(BuildContext context) { /* checkmark animado */ }
+Widget buildUploadButtonSuccessUseCase(BuildContext context) { /* animated checkmark */ }
 
 @UseCase(name: 'error', type: UploadButton)
-Widget buildUploadButtonErrorUseCase(BuildContext context) { /* ícono de error + retry */ }
+Widget buildUploadButtonErrorUseCase(BuildContext context) { /* error icon + retry */ }
 ```
 
-### ❌ Antipatrón — NO crear un @UseCase por estado cuando un knob basta
+### ❌ Antipattern — do NOT create one @UseCase per state when a knob is enough
 
 ```dart
-// ❌ Incorrecto: tres use cases para lo que son solo cambios de parámetros
+// ❌ Wrong: three use cases for what are only parameter changes
 @UseCase(name: 'primary_disabled', type: AppButton)
 Widget buildAppButtonPrimaryDisabledUseCase(BuildContext context) {
   return AppButton(variant: ButtonVariant.primary, isEnabled: false, ...);
@@ -231,38 +231,38 @@ Widget buildAppButtonPrimaryLoadingUseCase(BuildContext context) {
 Widget buildAppButtonPrimaryWithIconUseCase(BuildContext context) {
   return AppButton(variant: ButtonVariant.primary, showIcon: true, ...);
 }
-// ✅ Correcto: un solo use case 'default' con knobs isEnabled, isLoading y showIcon
+// ✅ Correct: a single 'default' use case with isEnabled, isLoading, and showIcon knobs
 ```
 
 ---
 
-## Datos de prueba y textos — contextualizados al proyecto
+## Test data and text — contextualized to the project
 
-**Regla clave:** para textos visibles, usar el valor literal de Figma cuando
-exista. Si Figma no define el valor, identificar el dominio de la app (fintech,
-e-commerce, salud, educación, logística, etc.) y usar datos de ejemplo coherentes
-con ese contexto. Nunca usar "lorem ipsum", "text", "value", "test" ni datos
-genéricos, y nunca inventar copy de interfaz.
+**Key rule:** for visible text, use the literal value from Figma when it
+exists. If Figma does not define the value, identify the app's domain (fintech,
+e-commerce, health, education, logistics, etc.) and use example data consistent
+with that context. Never use "lorem ipsum", "text", "value", "test", or generic
+data, and never make up interface copy.
 
-### Cómo identificar el dominio
+### How to identify the domain
 
-1. Revisar el nombre del paquete en `pubspec.yaml`
-2. Leer los modelos de datos en `lib/models/` o `lib/domain/`
-3. Ver las pantallas existentes en `lib/features/` o `lib/screens/`
-4. Inferir el dominio de la terminología usada en el código
+1. Check the package name in `pubspec.yaml`
+2. Read the data models in `lib/models/` or `lib/domain/`
+3. Look at the existing screens in `lib/features/` or `lib/screens/`
+4. Infer the domain from the terminology used in the code
 
-### Ejemplos por dominio
+### Examples by domain
 
-**Fintech / Banca:**
+**Fintech / Banking:**
 ```dart
-context.knobs.string(label: 'accountHolder', initialValue: 'María García López')
+context.knobs.string(label: 'accountHolder', initialValue: 'Maria Garcia Lopez')
 context.knobs.double.input(label: 'balance', initialValue: 2450.75)
-context.knobs.string(label: 'transactionDescription', initialValue: 'Transferencia a Carlos Pérez')
-context.knobs.list<String>(label: 'accountType', initialOption: 'Ahorros', options: ['Ahorros', 'Corriente', 'Nómina'])
+context.knobs.string(label: 'transactionDescription', initialValue: 'Transfer to Carlos Perez')
+context.knobs.list<String>(label: 'accountType', initialOption: 'Savings', options: ['Savings', 'Checking', 'Payroll'])
 
 final transactions = List.generate(15, (i) => Transaction(
   id: '$i',
-  description: 'Pago servicio ${['Luz', 'Agua', 'Internet', 'Gas'][i % 4]}',
+  description: '${['Electricity', 'Water', 'Internet', 'Gas'][i % 4]} bill payment',
   amount: (i + 1) * 23.50,
   date: DateTime.now().subtract(Duration(days: i)),
 ));
@@ -270,85 +270,85 @@ final transactions = List.generate(15, (i) => Transaction(
 
 **E-commerce:**
 ```dart
-context.knobs.string(label: 'productName', initialValue: 'Camiseta Básica Premium')
+context.knobs.string(label: 'productName', initialValue: 'Premium Basic T-Shirt')
 context.knobs.double.input(label: 'price', initialValue: 49.99)
 context.knobs.int.slider(label: 'stock', initialValue: 24, min: 0, max: 100)
-context.knobs.string(label: 'category', initialValue: 'Ropa deportiva')
+context.knobs.string(label: 'category', initialValue: 'Sportswear')
 
 final products = List.generate(20, (i) => Product(
   id: '$i',
-  name: 'Producto ${['Running', 'Training', 'Casual', 'Outdoor'][i % 4]} ${i + 1}',
+  name: '${['Running', 'Training', 'Casual', 'Outdoor'][i % 4]} Product ${i + 1}',
   price: 29.99 + (i * 10),
   imageUrl: 'https://picsum.photos/200/200?random=$i',
 ));
 ```
 
-**Salud / Telemedicina:**
+**Health / Telemedicine:**
 ```dart
-context.knobs.string(label: 'patientName', initialValue: 'Ana Martínez')
-context.knobs.string(label: 'specialty', initialValue: 'Cardiología')
-context.knobs.string(label: 'doctorName', initialValue: 'Dr. Roberto Sánchez')
+context.knobs.string(label: 'patientName', initialValue: 'Ana Martinez')
+context.knobs.string(label: 'specialty', initialValue: 'Cardiology')
+context.knobs.string(label: 'doctorName', initialValue: 'Dr. Roberto Sanchez')
 context.knobs.dateTime(label: 'appointmentDate', initialValue: DateTime.now().add(const Duration(days: 3)))
 
 final appointments = List.generate(8, (i) => Appointment(
   id: '$i',
-  doctorName: 'Dr. ${['López', 'García', 'Martín', 'Torres'][i % 4]}',
-  specialty: ['Cardiología', 'Dermatología', 'Pediatría', 'Neurología'][i % 4],
+  doctorName: 'Dr. ${['Lopez', 'Garcia', 'Martin', 'Torres'][i % 4]}',
+  specialty: ['Cardiology', 'Dermatology', 'Pediatrics', 'Neurology'][i % 4],
   dateTime: DateTime.now().add(Duration(days: i + 1)),
 ));
 ```
 
-**Educación:**
+**Education:**
 ```dart
-context.knobs.string(label: 'courseName', initialValue: 'Introducción a Flutter')
+context.knobs.string(label: 'courseName', initialValue: 'Introduction to Flutter')
 context.knobs.string(label: 'instructorName', initialValue: 'Prof. Laura Vega')
 context.knobs.int.slider(label: 'progressPercent', initialValue: 65, min: 0, max: 100)
 context.knobs.int.input(label: 'enrolledStudents', initialValue: 142)
 ```
 
-### ❌ Antipatrones — nunca usar estos valores
+### ❌ Antipatterns — never use these values
 
 ```dart
-// ❌ Genérico / sin contexto
+// ❌ Generic / no context
 context.knobs.string(label: 'text', initialValue: 'text')
 context.knobs.string(label: 'name', initialValue: 'Lorem ipsum')
 context.knobs.string(label: 'title', initialValue: 'Title')
 context.knobs.double.input(label: 'value', initialValue: 0.0)
 context.knobs.string(label: 'description', initialValue: 'Description here')
 
-// ❌ Datos test/placeholder
+// ❌ Test/placeholder data
 final items = List.generate(5, (i) => Item(name: 'Item $i'));
 ```
 
-### Para listas — volumen y datos de dominio
+### For lists — volume and domain data
 
 ```dart
-// ✅ Suficiente para probar scroll, rendimiento y variación visual
+// ✅ Enough to test scroll, performance, and visual variation
 final items = List.generate(20, (i) => ProductItem(
   id: '$i',
-  name: 'Producto ${i + 1}',
+  name: 'Product ${i + 1}',
   price: 19.99 + (i * 5.50),
 ));
 ```
 
 ---
 
-## Code preview por variante
+## Code preview per variant
 
-El code preview se muestra **fuera del device frame**, en el panel de la página de Widgetbook.
-Cada use case llama a `context.setCodePreview(...)` con la **llamada al constructor del widget**,
-interpolando los valores actuales de los knobs — el panel se actualiza en tiempo real.
+The code preview is shown **outside the device frame**, in the Widgetbook page panel.
+Each use case calls `context.setCodePreview(...)` with the **widget's constructor call**,
+interpolating the current knob values — the panel updates in real time.
 
-> El código mostrado es la instanciación del widget (lo que el desarrollador copiaría en su app),
-> no la función del use case. Nunca embeber paneles de código dentro del widget retornado.
+> The displayed code is the widget instantiation (what the developer would copy into their app),
+> not the use case function. Never embed code panels inside the returned widget.
 
 ```dart
 import '../../../shared/code_preview_addon.dart';
 
-// ✅ Un único use case — todos los estados son knobs, NO @UseCase separados
+// ✅ A single use case — all states are knobs, NOT separate @UseCases
 @UseCase(name: 'default', type: AppButton)
 Widget buildAppButtonUseCase(BuildContext context) {
-  final label    = context.knobs.string(label: 'Text', initialValue: 'Confirmar');
+  final label    = context.knobs.string(label: 'Text', initialValue: 'Confirm');
   final variant  = context.knobs.list<ButtonVariant>(
     label: 'Variant',
     initialOption: ButtonVariant.primary,
@@ -376,22 +376,22 @@ AppButton(
   );
 }
 
-// ❌ NO hacer esto — 'loading' no es una variante estructural, es un knob
+// ❌ Do NOT do this — 'loading' is not a structural variant, it is a knob
 // @UseCase(name: 'loading', type: AppButton)
 // Widget buildAppButtonLoadingUseCase(BuildContext context) { ... }
 ```
 
-### ✗ Antipatrón — nunca hacer esto
+### ✗ Antipattern — never do this
 
 ```dart
-// ❌ NO embeber code preview dentro del use case
+// ❌ Do NOT embed the code preview inside the use case
 @UseCase(name: 'loading', type: AppButton)
 Widget buildAppButtonLoadingUseCase(BuildContext context) {
   return Column(
     children: [
-      AppButton(label: 'Guardando...', isLoading: true, onPressed: () {}),
+      AppButton(label: 'Saving...', isLoading: true, onPressed: () {}),
       SizedBox(height: 24),
-      _CodePreviewPanel(tabs: [...]),  // ❌ Se renderiza DENTRO del móvil
+      _CodePreviewPanel(tabs: [...]),  // ❌ Renders INSIDE the phone
     ],
   );
 }

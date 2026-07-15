@@ -4,7 +4,7 @@ version: 1.0.0
 scope: chapter
 type: workflow
 chapter: mobile
-description: Workflow for building a complete feature following Clean Architecture   (domain → data → presentation) with optional DS
+description: Workflow for building a complete feature following Clean Architecture (domain → data → presentation) with optional DS component creation. Use when the user asks to create a new feature, implement a screen with backend logic, or scaffold a full module. Not for DS-only components (use /new-component) or view-only screens without logic (use /new-view).
 ---
 
 # Workflow: New Feature (Full Clean Architecture)

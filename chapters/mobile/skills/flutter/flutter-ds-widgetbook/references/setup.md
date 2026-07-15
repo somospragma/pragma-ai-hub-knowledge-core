@@ -1,40 +1,40 @@
-# Setup — Instalación desde Cero y Actualización
+# Setup — Installation from Scratch and Update
 
 ---
 
-## Tabla de contenidos
+## Table of contents
 
-1. [Setup desde cero](#1-setup-desde-cero)
-2. [Estructura inicial de carpetas](#2-estructura-inicial-de-carpetas)
-3. [main.dart completo](#3-maindart-completo)
-4. [Code Preview — panel externo fuera del device frame](#4-code-preview--panel-externo-fuera-del-device-frame)
-5. [Fondo del canvas — ColoredBox según el tema (UI System)](#5-fondo-del-canvas--coloredbox-según-el-tema-ui-system)
-6. [Troubleshooting — Tema oscuro no se aplica](#6-troubleshooting--tema-oscuro-no-se-aplica)
-7. [Actualizar dependencias en proyecto existente](#7-actualizar-dependencias-en-proyecto-existente)
-8. [Comandos de referencia](#8-comandos-de-referencia)
+1. [Setup from scratch](#1-setup-from-scratch)
+2. [Initial folder structure](#2-initial-folder-structure)
+3. [Complete main.dart](#3-complete-maindart)
+4. [Code Preview — external panel outside the device frame](#4-code-preview--external-panel-outside-the-device-frame)
+5. [Canvas background — ColoredBox based on the theme (UI System)](#5-canvas-background--coloredbox-based-on-the-theme-ui-system)
+6. [Troubleshooting — Dark theme is not applied](#6-troubleshooting--dark-theme-is-not-applied)
+7. [Update dependencies in an existing project](#7-update-dependencies-in-an-existing-project)
+8. [Reference commands](#8-reference-commands)
 ---
 
-## 1. Setup desde cero
+## 1. Setup from scratch
 
-### pubspec.yaml del proyecto principal
+### Main project pubspec.yaml
 
-Agregar Widgetbook solo como dependencia de desarrollo — no afecta el bundle de producción:
+Add Widgetbook as a development dependency only — it does not affect the production bundle:
 
 ```yaml
-# pubspec.yaml (proyecto principal)
+# pubspec.yaml (main project)
 dev_dependencies:
   widgetbook_annotation: ^3.11.0
   widgetbook_generator: ^3.22.0
   build_runner: ^2.4.0
 ```
 
-### pubspec.yaml de la carpeta widgetbook_[appname]/
+### pubspec.yaml of the widgetbook_[appname]/ folder
 
-Crear `widgetbook_[appname]/pubspec.yaml` como proyecto Flutter independiente:
+Create `widgetbook_[appname]/pubspec.yaml` as a standalone Flutter project:
 
 ```yaml
 name: widgetbook_[appname]
-description: Catálogo de componentes del Design System
+description: Design System component catalog
 
 publish_to: none
 
@@ -47,7 +47,7 @@ dependencies:
     sdk: flutter
   widgetbook: ^3.22.0
   widgetbook_annotation: ^3.11.0
-  # Importar el proyecto principal para acceder a los widgets reales
+  # Import the main project to access the real widgets
   your_app:
     path: ../
 
@@ -58,9 +58,9 @@ dev_dependencies:
     sdk: flutter
 ```
 
-### build.yaml — configuración del generador
+### build.yaml — generator configuration
 
-Crear `widgetbook_[appname]/build.yaml`:
+Create `widgetbook_[appname]/build.yaml`:
 
 ```yaml
 targets:
@@ -68,146 +68,146 @@ targets:
     builders:
       widgetbook_generator:
         options:
-          # Directorio raíz para buscar use cases anotados
+          # Root directory to search for annotated use cases
           root_dir: lib
 ```
 
-### Assets — imágenes e iconos del proyecto
+### Assets — project images and icons
 
-> **Crítico:** `widgetbook_[appname]/` es un proyecto Flutter independiente.
-> Los assets del proyecto principal (`your_app/assets/`) **no están disponibles**
-> automáticamente en Widgetbook aunque `your_app` sea una dependencia por `path:`.
-> Deben declararse explícitamente en `widgetbook_[appname]/pubspec.yaml`.
+> **Critical:** `widgetbook_[appname]/` is a standalone Flutter project.
+> The main project's assets (`your_app/assets/`) are **not available**
+> automatically in Widgetbook even though `your_app` is a `path:` dependency.
+> They must be declared explicitly in `widgetbook_[appname]/pubspec.yaml`.
 
-Agregar en `widgetbook_[appname]/pubspec.yaml` una sección `flutter.assets`
-que apunte a los assets del proyecto principal usando rutas relativas:
+Add a `flutter.assets` section in `widgetbook_[appname]/pubspec.yaml`
+that points to the main project's assets using relative paths:
 
 ```yaml
 # widgetbook_[appname]/pubspec.yaml
 flutter:
   uses-material-design: true
   assets:
-    # Apuntar a las carpetas de assets del proyecto principal
-    # El path es relativo desde widgetbook_[appname]/
+    # Point to the main project's asset folders
+    # The path is relative to widgetbook_[appname]/
     - ../assets/images/
     - ../assets/icons/
     - ../assets/fonts/
-    # Si los SVGs están en una subcarpeta específica:
+    # If the SVGs live in a specific subfolder:
     - ../assets/icons/svg/
-    # Agregar solo las carpetas que los use cases realmente usen
+    # Add only the folders that the use cases actually use
 ```
 
-> **Paths relativos:** `../` sube un nivel (sale de `widgetbook_[appname]/`
-> y entra al directorio raíz donde también está `your_app/`). Ajustar según
-> la estructura real del proyecto.
+> **Relative paths:** `../` goes up one level (out of `widgetbook_[appname]/`
+> and into the root directory where `your_app/` also lives). Adjust according to
+> the project's real structure.
 
-**Ejemplo con estructura real:**
+**Example with a real structure:**
 ```
-my_project/               ← raíz
-├── my_app/               ← proyecto principal
+my_project/               ← root
+├── my_app/               ← main project
 │   ├── assets/
-│   │   ├── images/       → declarar como: - ../my_app/assets/images/
-│   │   └── icons/        → declarar como: - ../my_app/assets/icons/
+│   │   ├── images/       → declare as: - ../my_app/assets/images/
+│   │   └── icons/        → declare as: - ../my_app/assets/icons/
 │   └── pubspec.yaml
 └── widgetbook_my_app/    ← widgetbook
-    └── pubspec.yaml      ← aquí se declaran los assets
+    └── pubspec.yaml      ← assets are declared here
 ```
 
-Si `widgetbook_[appname]/` está dentro de `your_app/`:
+If `widgetbook_[appname]/` lives inside `your_app/`:
 ```
 your_app/
 ├── assets/
-│   ├── images/           → declarar como: - assets/images/
-│   └── icons/            → declarar como: - assets/icons/
+│   ├── images/           → declare as: - assets/images/
+│   └── icons/            → declare as: - assets/icons/
 ├── lib/
 └── widgetbook_[appname]/
-    └── pubspec.yaml      ← usar: - ../assets/images/
+    └── pubspec.yaml      ← use: - ../assets/images/
 ```
 
-Después de agregar los assets, ejecutar:
+After adding the assets, run:
 ```bash
 cd widgetbook_[appname] && flutter pub get
 ```
 
-> **flutter_svg:** Si el proyecto usa SVG con `flutter_svg`, agregar el paquete
-> también en `widgetbook_[appname]/pubspec.yaml`:
+> **flutter_svg:** If the project uses SVG with `flutter_svg`, add the package
+> in `widgetbook_[appname]/pubspec.yaml` as well:
 > ```yaml
 > dependencies:
->   flutter_svg: ^2.0.0   # misma versión que el proyecto principal
+>   flutter_svg: ^2.0.0   # same version as the main project
 > ```
 
 ---
 
-## 2. Estructura inicial de carpetas
+## 2. Initial folder structure
 
-Crear la siguiente estructura según la organización del proyecto.
+Create the following structure according to the project's organization.
 
-**IMPORTANTE:** Siempre crear las carpetas raíz `ui_system/`, `features/` y `shared/` antes de generar use cases:
+**IMPORTANT:** Always create the root folders `ui_system/`, `features/`, and `shared/` before generating use cases:
 
 ```bash
-# Paso obligatorio — crear carpetas raíz
+# Mandatory step — create the root folders
 mkdir -p widgetbook_[appname]/lib/ui_system
 mkdir -p widgetbook_[appname]/lib/features
 mkdir -p widgetbook_[appname]/lib/shared
 ```
 
-### Con Atomic Design
+### With Atomic Design
 
 ```bash
-# Subcarpetas según Atomic Design
+# Subfolders following Atomic Design
 mkdir -p widgetbook_[appname]/lib/ui_system/atoms
 mkdir -p widgetbook_[appname]/lib/ui_system/molecules
 mkdir -p widgetbook_[appname]/lib/ui_system/organisms
 mkdir -p widgetbook_[appname]/lib/ui_system/templates
 ```
 
-Resultado:
+Result:
 ```
 widgetbook_[appname]/
 ├── pubspec.yaml
 ├── build.yaml
 └── lib/
-    ├── main.dart              ← Entry point de Widgetbook
-    ├── main.directories.g.dart ← Generado por build_runner (árbol de use cases)
+    ├── main.dart              ← Widgetbook entry point
+    ├── main.directories.g.dart ← Generated by build_runner (use case tree)
     ├── shared/
-    │   └── code_preview_addon.dart ← Addon de code preview (crear una sola vez)
-    ├── ui_system/              ← Componentes del Design System
-    │   ├── atoms/              ← Unidades mínimas: Button, TextField, Badge
-    │   ├── molecules/          ← Combinaciones: Card, SearchBar, FormField
-    │   ├── organisms/          ← Secciones complejas: Form, List, Nav
-    │   └── templates/          ← Layouts de pantalla
-    ├── features/               ← Pantallas del proyecto
-    └── shared/                 ← Widgets del catálogo
+    │   └── code_preview_addon.dart ← Code preview addon (create only once)
+    ├── ui_system/              ← Design System components
+    │   ├── atoms/              ← Minimal units: Button, TextField, Badge
+    │   ├── molecules/          ← Combinations: Card, SearchBar, FormField
+    │   ├── organisms/          ← Complex sections: Form, List, Nav
+    │   └── templates/          ← Screen layouts
+    ├── features/               ← Project screens
+    └── shared/                 ← Catalog widgets
 ```
 
-### Con carpetas de componentes
+### With component folders
 
 ```bash
 mkdir -p widgetbook_[appname]/lib/ui_system/components
 ```
 
-Resultado:
+Result:
 ```
 widgetbook_[appname]/
 ├── pubspec.yaml
 ├── build.yaml
 └── lib/
     ├── main.dart              ← Entry point
-    ├── main.directories.g.dart ← Generado por build_runner
+    ├── main.directories.g.dart ← Generated by build_runner
     ├── shared/
-    │   └── code_preview_addon.dart ← Addon de code preview (crear una sola vez)
-    ├── ui_system/              ← Componentes del Design System
+    │   └── code_preview_addon.dart ← Code preview addon (create only once)
+    ├── ui_system/              ← Design System components
     │   └── components/
     │       ├── buttons/
     │       ├── cards/
     │       └── forms/
-    ├── features/               ← Pantallas del proyecto
-    └── shared/                 ← Widgets del catálogo
+    ├── features/               ← Project screens
+    └── shared/                 ← Catalog widgets
 ```
 
 ---
 
-## 3. main.dart completo
+## 3. Complete main.dart
 
 ```dart
 // widgetbook_[appname]/lib/main.dart
@@ -232,11 +232,11 @@ class WidgetbookApp extends StatelessWidget {
     return Widgetbook.material(
       directories: directories,
       addons: [
-        // Code preview — panel de código debajo del device frame
-        // DEBE ir primero para que envuelva correctamente el uso de los demás addons
+        // Code preview — code panel below the device frame
+        // MUST come first so it correctly wraps the other addons' usage
         const CodePreviewAddon(),
 
-        // Tema claro/oscuro — se inyecta globalmente en todos los use cases
+        // Light/dark theme — injected globally into every use case
         MaterialThemeAddon(
           themes: [
             WidgetbookTheme(name: 'Light', data: AppTheme.light),
@@ -245,17 +245,17 @@ class WidgetbookApp extends StatelessWidget {
           initialTheme: WidgetbookTheme(name: 'Light', data: AppTheme.light),
         ),
 
-        // Escala de texto — prueba accesibilidad
+        // Text scale — test accessibility
         TextScaleAddon(min: 1.0, max: 2.0, initialScale: 1.0),
 
-        // Localización — prueba en/es sin cambiar el dispositivo
+        // Localization — test en/es without changing the device
         LocalizationAddon(
           locales: AppLocalizations.supportedLocales,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           initialLocale: const Locale('es'),
         ),
 
-        // Device frame — simula dispositivos reales
+        // Device frame — simulate real devices
         DeviceFrameAddon(
           devices: [
             Devices.ios.iPhone13,
@@ -267,10 +267,10 @@ class WidgetbookApp extends StatelessWidget {
           initialDevice: Devices.ios.iPhone13,
         ),
 
-        // Grid de alineación — útil para revisión con diseño
+        // Alignment grid — useful for design review
         GridAddon(gridSize: 8),
 
-        // Alignment — centrar o alinear el componente en el canvas
+        // Alignment — center or align the component on the canvas
         AlignmentAddon(initialAlignment: Alignment.center),
       ],
     );
@@ -280,24 +280,24 @@ class WidgetbookApp extends StatelessWidget {
 
 ---
 
-## 4. Code Preview — panel externo fuera del device frame
+## 4. Code Preview — external panel outside the device frame
 
-El code preview se muestra **debajo del device frame**, fuera del widget renderizado
-en el móvil. Muestra la llamada al constructor del widget con los **valores actuales
-de los knobs** — se actualiza en tiempo real al ajustar cualquier control.
+The code preview is shown **below the device frame**, outside the widget rendered
+in the phone. It shows the widget's constructor call with the **current knob
+values** — it updates in real time as you adjust any control.
 
-Se implementa con un **custom addon** (`CodePreviewAddon`) que:
-1. Envuelve cada use case en un `Column`: device frame arriba + panel de código abajo.
-2. Expone `context.setCodePreview(String)` para que cada use case inyecte su snippet.
-3. Muestra el panel con label DART, botón Copiar y texto seleccionable.
-4. Incluye un botón **Ocultar / Mostrar código** en el header del panel para colapsar o expandir el contenido sin perder el header de referencia.
+It is implemented with a **custom addon** (`CodePreviewAddon`) that:
+1. Wraps each use case in a `Column`: device frame on top + code panel below.
+2. Exposes `context.setCodePreview(String)` so each use case can inject its snippet.
+3. Displays the panel with a DART label, a Copy button, and selectable text.
+4. Includes a **Hide / Show code** button in the panel header to collapse or expand the content without losing the reference header.
 
 ---
 
-### Archivo: `widgetbook_[appname]/lib/shared/code_preview_addon.dart`
+### File: `widgetbook_[appname]/lib/shared/code_preview_addon.dart`
 
-Crear este archivo una sola vez. Todos los use cases lo usan vía la extensión
-`context.setCodePreview(...)`.
+Create this file only once. Every use case uses it via the
+`context.setCodePreview(...)` extension.
 
 ```dart
 import 'package:flutter/material.dart';
@@ -305,7 +305,7 @@ import 'package:flutter/services.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// InheritedWidget — propaga el ValueNotifier por el árbol del use case
+// InheritedWidget — propagates the ValueNotifier down the use case tree
 // ─────────────────────────────────────────────────────────────────────────────
 class _CodePreviewScope extends InheritedWidget {
   const _CodePreviewScope({
@@ -326,14 +326,14 @@ class _CodePreviewScope extends InheritedWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Extensión de BuildContext — API pública para los use cases
+// BuildContext extension — public API for the use cases
 // ─────────────────────────────────────────────────────────────────────────────
 extension CodePreviewExtension on BuildContext {
-  /// Registra el snippet de código que se mostrará debajo del device frame.
-  /// Llamar dentro del builder del use case, antes de retornar el widget.
+  /// Registers the code snippet shown below the device frame.
+  /// Call it inside the use case builder, before returning the widget.
   ///
-  /// El string debe contener la llamada al constructor del widget con los
-  /// valores actuales de los knobs interpolados:
+  /// The string must contain the widget's constructor call with the
+  /// current knob values interpolated:
   ///
   /// ```dart
   /// context.setCodePreview('''
@@ -351,7 +351,7 @@ extension CodePreviewExtension on BuildContext {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Addon — registrar en main.dart → addons: [CodePreviewAddon(), ...]
+// Addon — register in main.dart → addons: [CodePreviewAddon(), ...]
 // ─────────────────────────────────────────────────────────────────────────────
 class CodePreviewAddon extends WidgetbookAddon<void> {
   const CodePreviewAddon() : super(name: 'Code Preview');
@@ -379,7 +379,7 @@ class CodePreviewAddon extends WidgetbookAddon<void> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Panel visual — con toggle para mostrar/ocultar el código
+// Visual panel — with a toggle to show/hide the code
 // ─────────────────────────────────────────────────────────────────────────────
 class _CodePreviewPanel extends StatefulWidget {
   const _CodePreviewPanel({required this.code});
@@ -407,7 +407,7 @@ class _CodePreviewPanelState extends State<_CodePreviewPanel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header — siempre visible
+          // Header — always visible
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
@@ -415,7 +415,7 @@ class _CodePreviewPanelState extends State<_CodePreviewPanel> {
                 const Icon(Icons.code, size: 16, color: Color(0xFF89B4FA)),
                 const SizedBox(width: 8),
                 const Text(
-                  'Código Generado',
+                  'Generated code',
                   style: TextStyle(
                     color: Color(0xFFCDD6F4),
                     fontSize: 13,
@@ -425,7 +425,7 @@ class _CodePreviewPanelState extends State<_CodePreviewPanel> {
                 const SizedBox(width: 8),
                 if (_expanded)
                   Text(
-                    'Este código se actualiza según los controles que ajustes.',
+                    'This code updates according to the controls you adjust.',
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.45),
                       fontSize: 11,
@@ -434,7 +434,7 @@ class _CodePreviewPanelState extends State<_CodePreviewPanel> {
                 const Spacer(),
                 if (_expanded) _CopyButton(code: widget.code),
                 const SizedBox(width: 4),
-                // Botón toggle
+                // Toggle button
                 _ToggleButton(
                   expanded: _expanded,
                   onToggle: () => setState(() => _expanded = !_expanded),
@@ -442,9 +442,9 @@ class _CodePreviewPanelState extends State<_CodePreviewPanel> {
               ],
             ),
           ),
-          // Contenido colapsable
+          // Collapsible content
           if (_expanded) ...[
-            // Tag DART
+            // DART tag
             Padding(
               padding: const EdgeInsets.only(left: 16, bottom: 4),
               child: Text(
@@ -457,7 +457,7 @@ class _CodePreviewPanelState extends State<_CodePreviewPanel> {
                 ),
               ),
             ),
-            // Código
+            // Code
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -494,7 +494,7 @@ class _ToggleButton extends StatelessWidget {
         color: const Color(0xFF89B4FA),
       ),
       label: Text(
-        expanded ? 'Ocultar' : 'Mostrar código',
+        expanded ? 'Hide' : 'Show code',
         style: const TextStyle(
           fontSize: 12,
           color: Color(0xFF89B4FA),
@@ -537,7 +537,7 @@ class _CopyButtonState extends State<_CopyButton> {
         color: _copied ? const Color(0xFFA6E3A1) : const Color(0xFF89B4FA),
       ),
       label: Text(
-        _copied ? 'Copiado' : 'Copiar',
+        _copied ? 'Copied' : 'Copy',
         style: TextStyle(
           fontSize: 12,
           color: _copied ? const Color(0xFFA6E3A1) : const Color(0xFF89B4FA),
@@ -555,16 +555,16 @@ class _CopyButtonState extends State<_CopyButton> {
 
 ---
 
-### Patrón en el use case — widget + setCodePreview
+### Pattern in the use case — widget + setCodePreview
 
-Cada use case debe:
-1. Leer los knobs en variables locales.
-2. Llamar a `context.setCodePreview(...)` con la **llamada al constructor** del widget,
-   interpolando los valores de los knobs.
-3. Retornar el widget usando esas mismas variables.
+Each use case must:
+1. Read the knobs into local variables.
+2. Call `context.setCodePreview(...)` with the widget's **constructor call**,
+   interpolating the knob values.
+3. Return the widget using those same variables.
 
-> **El código mostrado es la instanciación del widget** (lo que el desarrollador
-> copiaría en su app), no la función del use case.
+> **The displayed code is the widget instantiation** (what the developer
+> would copy into their app), not the use case function.
 
 ```dart
 // widgetbook_[appname]/lib/ui_system/atoms/primary_button/primary_button.use_case.dart
@@ -577,12 +577,12 @@ import '../../../shared/code_preview_addon.dart';
 
 @UseCase(name: 'default', type: PrimaryButton)
 Widget buildPrimaryButtonUseCase(BuildContext context) {
-  // 1. Leer knobs en variables locales
-  final label = context.knobs.string(label: 'label', initialValue: 'Confirmar');
+  // 1. Read knobs into local variables
+  final label = context.knobs.string(label: 'label', initialValue: 'Confirm');
   final isLoading = context.knobs.boolean(label: 'isLoading', initialValue: false);
   final isEnabled = context.knobs.boolean(label: 'isEnabled', initialValue: true);
 
-  // 2. Registrar el código que se mostrará en el panel — interpolando los valores actuales
+  // 2. Register the code shown in the panel — interpolating the current values
   context.setCodePreview('''
 PrimaryButton(
   label: '$label',
@@ -591,7 +591,7 @@ PrimaryButton(
   onPressed: () {},
 )''');
 
-  // 3. Retornar el widget con las mismas variables
+  // 3. Return the widget with the same variables
   return PrimaryButton(
     label: label,
     isLoading: isLoading,
@@ -601,16 +601,16 @@ PrimaryButton(
 }
 ```
 
-### ✗ Antipatrón — embedded code preview dentro del widget
+### ✗ Antipattern — embedded code preview inside the widget
 
 ```dart
-// ❌ NUNCA — _CodePreviewPanel se renderizaría DENTRO del móvil
+// ❌ NEVER — _CodePreviewPanel would render INSIDE the phone
 @UseCase(name: 'default', type: PrimaryButton)
 Widget buildPrimaryButtonUseCase(BuildContext context) {
   return Column(
     children: [
-      PrimaryButton(label: 'Confirmar', onPressed: () {}),
-      _CodePreviewPanel(code: '...'),  // ❌ dentro del device frame
+      PrimaryButton(label: 'Confirm', onPressed: () {}),
+      _CodePreviewPanel(code: '...'),  // ❌ inside the device frame
     ],
   );
 }
@@ -618,31 +618,31 @@ Widget buildPrimaryButtonUseCase(BuildContext context) {
 
 ---
 
-## 5. Fondo del canvas — ColoredBox según el tema (UI System)
+## 5. Canvas background — ColoredBox based on the theme (UI System)
 
-Los componentes del **UI System** (atoms, molecules, organisms, components) deben enviarse al device frame sobre el fondo correcto de la app, no sobre el fondo gris del canvas de Widgetbook. Si no se hace, el componente puede parecer flotante o con contraste incorrecto al cambiar de Light a Dark.
+**UI System** components (atoms, molecules, organisms, components) must be sent to the device frame over the app's correct background, not over Widgetbook's gray canvas background. If you don't do this, the component may look floating or have incorrect contrast when switching from Light to Dark.
 
-> **No aplica a templates ni a Features.** Los templates ya definen un layout a pantalla completa; las screens de Features incluyen su propio `Scaffold`.
+> **Does not apply to templates or Features.** Templates already define a full-screen layout; Feature screens include their own `Scaffold`.
 
-### Patrón obligatorio para UI System
+### Mandatory pattern for the UI System
 
 ```dart
-import 'package:your_app/core/theme/app_colors.dart'; // donde vive AppColors
+import 'package:your_app/core/theme/app_colors.dart'; // where AppColors lives
 
 @UseCase(name: 'default', type: AppButton)
 Widget buildAppButtonUseCase(BuildContext context) {
-  final label = context.knobs.string(label: 'Text', initialValue: 'Continuar');
-  // ... resto de knobs ...
+  final label = context.knobs.string(label: 'Text', initialValue: 'Continue');
+  // ... rest of the knobs ...
 
-  // El code preview muestra la instanciación del widget SIN el ColoredBox:
-  // ese wrapper es scaffolding del catálogo, no código de producción.
+  // The code preview shows the widget instantiation WITHOUT the ColoredBox:
+  // that wrapper is catalog scaffolding, not production code.
   context.setCodePreview('''
 AppButton(
   label: '$label',
   onPressed: () {},
 )''');
 
-  // Fondo correcto según el tema activo — se actualiza solo al cambiar Light/Dark
+  // Correct background based on the active theme — updates on its own when switching Light/Dark
   final isDark = Theme.of(context).brightness == Brightness.dark;
   return ColoredBox(
     color: isDark ? AppColors.primary900 : AppColors.primary0,
@@ -659,78 +659,78 @@ AppButton(
 }
 ```
 
-### Regla de decisión
+### Decision rule
 
-| Tipo de use case | Wrapper |
+| Use case type | Wrapper |
 |---|---|
-| Atom / Molecule / Organism / Component | `ColoredBox` con `AppColors.primary0` o `AppColors.primary900` |
-| Template | Ninguno — define su propio layout full-screen |
-| Feature (pantalla completa) | Ninguno — tiene su propio `Scaffold` |
+| Atom / Molecule / Organism / Component | `ColoredBox` with `AppColors.primary0` or `AppColors.primary900` |
+| Template | None — defines its own full-screen layout |
+| Feature (full screen) | None — has its own `Scaffold` |
 
-### Qué colores usar
+### Which colors to use
 
-Usar los colores de fondo de la app tal como están definidos en el design system del proyecto. Los nombres típicos son:
+Use the app's background colors as defined in the project's design system. The typical names are:
 
-| Tema | Color | Equivalencia en Material |
+| Theme | Color | Material equivalent |
 |---|---|---|
-| Light | `AppColors.primary0` (blanco o tono muy claro) | `colorScheme.surface` |
-| Dark | `AppColors.primary900` (negro o tono muy oscuro) | `colorScheme.surface` |
+| Light | `AppColors.primary0` (white or a very light tone) | `colorScheme.surface` |
+| Dark | `AppColors.primary900` (black or a very dark tone) | `colorScheme.surface` |
 
-Si el proyecto no define `AppColors`, usar `Theme.of(context).colorScheme.surface` como fallback:
+If the project does not define `AppColors`, use `Theme.of(context).colorScheme.surface` as a fallback:
 
 ```dart
-// Fallback si no hay AppColors definido
+// Fallback if AppColors is not defined
 final bgColor = Theme.of(context).colorScheme.surface;
 return ColoredBox(
   color: bgColor,
   child: Center(child: Padding(
     padding: const EdgeInsets.all(24),
-    child: <TuWidget>(...),
+    child: <YourWidget>(...),
   )),
 );
 ```
 
 ---
 
-## 6. Troubleshooting — Tema oscuro no se aplica
+## 6. Troubleshooting — Dark theme is not applied
 
-Si al cambiar de Light a Dark en Widgetbook los componentes no reflejan el cambio:
+If, when switching from Light to Dark in Widgetbook, the components do not reflect the change:
 
-### Causa 1: Colores hardcodeados en el widget o use case
+### Cause 1: Hardcoded colors in the widget or use case
 ```dart
-// ❌ No respeta el tema — siempre se ve igual
+// ❌ Does not respect the theme — always looks the same
 Container(color: const Color(0xFF1E1E1E))
-Text('Hola', style: TextStyle(color: Colors.white))
+Text('Hello', style: TextStyle(color: Colors.white))
 
-// ✅ Se adapta al tema activo
+// ✅ Adapts to the active theme
 Container(color: Theme.of(context).colorScheme.surfaceContainerHighest)
-Text('Hola', style: TextStyle(color: Theme.of(context).colorScheme.onSurface))
+Text('Hello', style: TextStyle(color: Theme.of(context).colorScheme.onSurface))
 ```
 
-### Causa 2: Widget envuelto en su propio MaterialApp o Theme
-Si el use case envuelve el widget con `MaterialApp(...)` o `Theme(...)`, se ignora
-el tema inyectado por `MaterialThemeAddon`. **Nunca envolver** — el tema ya viene
-del addon global.
+### Cause 2: Widget wrapped in its own MaterialApp or Theme
+If the use case wraps the widget with `MaterialApp(...)` or `Theme(...)`, the theme
+injected by `MaterialThemeAddon` is ignored. **Never wrap** — the theme already comes
+from the global addon.
 
 ```dart
-// ❌ Sobreescribe el tema del addon
+// ❌ Overrides the addon's theme
 return MaterialApp(theme: ThemeData.light(), home: MyWidget());
 
-// ✅ El widget recibe el tema del addon directamente
+// ✅ The widget receives the addon's theme directly
 return MyWidget();
 ```
 
-### Causa 3: El widget no usa Theme.of(context)
-Si el widget original define sus colores con constantes en vez de leerlos del tema,
-el cambio de tema no tendrá efecto. Verificar que el widget usa:
+### Cause 3: The widget does not use Theme.of(context)
+If the original widget defines its colors with constants instead of reading them from the theme,
+the theme change will have no effect. Verify that the widget uses:
 ```dart
 final colors = Theme.of(context).colorScheme;
 final textTheme = Theme.of(context).textTheme;
 ```
 
-### Causa 4: initialTheme no configurado
-Si `MaterialThemeAddon` no tiene `initialTheme`, Widgetbook toma el primero de
-la lista. Para asegurar que ambos temas están disponibles y seleccionables:
+### Cause 4: initialTheme not configured
+If `MaterialThemeAddon` has no `initialTheme`, Widgetbook takes the first one in
+the list. To ensure both themes are available and selectable:
 ```dart
 MaterialThemeAddon(
   themes: [
@@ -741,49 +741,49 @@ MaterialThemeAddon(
 ),
 ```
 
-### Verificación rápida
-1. Abrir Widgetbook en Chrome
-2. En el panel lateral, buscar el selector de tema (dropdown "Theme")
-3. Cambiar entre Light y Dark
-4. Si el widget no cambia → revisar causas 1-3 arriba
+### Quick check
+1. Open Widgetbook in Chrome
+2. In the side panel, find the theme selector (the "Theme" dropdown)
+3. Switch between Light and Dark
+4. If the widget does not change → review causes 1-3 above
 
 ---
 
-## 7. Actualizar dependencias en proyecto existente
+## 7. Update dependencies in an existing project
 
-Cuando Widgetbook ya está instalado y se quiere actualizar:
+When Widgetbook is already installed and you want to update it:
 
 ```bash
-# Actualizar a la última versión 3.x
+# Update to the latest 3.x version
 flutter pub upgrade widgetbook widgetbook_annotation widgetbook_generator
 
-# Verificar versiones activas
+# Check the active versions
 flutter pub deps | grep widgetbook
 
-# Regenerar todo el árbol de directorios
+# Regenerate the entire directory tree
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-Si hay breaking changes al actualizar, revisar el [CHANGELOG de Widgetbook](https://github.com/widgetbook/widgetbook/blob/main/packages/widgetbook/CHANGELOG.md).
+If there are breaking changes when updating, review the [Widgetbook CHANGELOG](https://github.com/widgetbook/widgetbook/blob/main/packages/widgetbook/CHANGELOG.md).
 
 ---
 
-## 8. Comandos de referencia
+## 8. Reference commands
 
 ```bash
-# Generar/regenerar use cases y árbol de directorios
+# Generate/regenerate use cases and the directory tree
 dart run build_runner build --delete-conflicting-outputs
 
-# Watch mode durante desarrollo activo
+# Watch mode during active development
 dart run build_runner watch --delete-conflicting-outputs
 
-# Ejecutar Widgetbook en el dispositivo/simulador
-cd widgetbook_[appname] && flutter run -d chrome   # web (recomendado para diseño)
-cd widgetbook_[appname] && flutter run             # dispositivo conectado
+# Run Widgetbook on the device/simulator
+cd widgetbook_[appname] && flutter run -d chrome   # web (recommended for design)
+cd widgetbook_[appname] && flutter run             # connected device
 
-# Ejecutar golden tests
+# Run golden tests
 cd widgetbook_[appname] && flutter test
 ```
 
 
-> **Monorepo:** Si el proyecto es un monorepositorio, ver `references/monorepo.md` para la configuración completa (single widgetbook, per-package, Melos).
+> **Monorepo:** If the project is a monorepository, see `references/monorepo.md` for the complete configuration (single widgetbook, per-package, Melos).
