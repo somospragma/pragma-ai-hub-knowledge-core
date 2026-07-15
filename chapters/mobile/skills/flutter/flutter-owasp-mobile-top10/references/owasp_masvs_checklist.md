@@ -131,12 +131,12 @@ Reference: https://mas.owasp.org/MASVS/
 |---|---|---|---|
 | CODE-1 | The app requires an up-to-date platform version | `minSdkVersion 23+` (Android), iOS 12+. Device API level check | MASWE-0077, MASWE-0078 |
 | CODE-2 | The app has a mechanism for enforcing app updates | Force update via Remote Config, `package_info_plus` + backend version check | MASWE-0075 |
-| CODE-3 | The app only uses software components without known vulnerabilities | `dart pub audit`, pinned dependencies, SBOM generated | MASWE-0076 |
+| CODE-3 | The app only uses software components without known vulnerabilities | `osv-scanner --lockfile=pubspec.lock`, pinned dependencies, SBOM generated | MASWE-0076 |
 | CODE-4 | The app validates and sanitizes all untrusted inputs | Input validation on forms, parameterized SQL, sanitized deep links | MASWE-0079, MASWE-0086 |
 
 ### Flutter Checklist
 
-- [ ] `dart pub audit` runs in CI with zero vulnerabilities
+- [ ] `osv-scanner --lockfile=pubspec.lock` runs in CI with zero vulnerabilities
 - [ ] `dart pub outdated` reviewed periodically
 - [ ] Dependencies pinned to major version (`^x.y.z`), never `any` or `latest`
 - [ ] Input validation on all forms (email, phone, IDs)
@@ -146,7 +146,7 @@ Reference: https://mas.owasp.org/MASVS/
 - [ ] `minSdkVersion` >= 23 (Android 6.0) to leverage hardware Keystore
 - [ ] Force update mechanism implemented
 
-> **Scan:** `dart pub audit`
+> **Scan:** `osv-scanner --lockfile=pubspec.lock`
 > **Scan:** `dart pub outdated`
 
 ---

@@ -1,30 +1,30 @@
-# Auditoría de Cobertura — Detectar Gaps en el Widgetbook
+# Coverage Audit — Detect Gaps in the Widgetbook
 
-Verifica qué componentes y pantallas del proyecto principal **no están catalogados** en el
-widgetbook. Úsalo al incorporar un widgetbook existente a un proyecto con componentes ya creados,
-o periódicamente para detectar nuevos widgets/pantallas que se agregaron después del setup inicial.
+Verify which components and screens from the main project are **not cataloged** in the
+widgetbook. Use it when integrating an existing widgetbook into a project with components already
+created, or periodically to detect new widgets/screens added after the initial setup.
 
 ---
 
-## Cuándo ejecutar la auditoría
+## When to run the audit
 
-| Situación | Acción |
+| Situation | Action |
 |---|---|
-| Se incorporó widgetbook a un proyecto con componentes existentes | Auditar UI System completo |
-| Se agregaron nuevas pantallas al proyecto y no se catalogaron | Auditar Features |
-| El usuario pide "verifica qué falta en el widgetbook" / "qué componentes no están" | Auditoría completa |
-| Se actualizó el Design System y pueden existir componentes nuevos | Auditar UI System |
-| Se quiere saber la cobertura actual antes de una entrega | Auditoría completa |
+| Widgetbook was integrated into a project with existing components | Audit the full UI System |
+| New screens were added to the project and were not cataloged | Audit Features |
+| The user asks "check what's missing in the widgetbook" / "which components aren't there" | Full audit |
+| The Design System was updated and new components may exist | Audit the UI System |
+| You want to know the current coverage before a delivery | Full audit |
 
 ---
 
-## Proceso de auditoría — paso a paso
+## Audit process — step by step
 
-### Paso 1 — Escanear el proyecto principal
+### Step 1 — Scan the main project
 
-#### Para UI System (componentes)
+#### For the UI System (components)
 
-Buscar todos los archivos de widgets del Design System en la app principal. Las ubicaciones típicas son:
+Find all Design System widget files in the main app. Typical locations are:
 
 ```
 lib/core/widgets/
@@ -39,14 +39,14 @@ lib/molecules/
 lib/organisms/
 ```
 
-Buscar archivos que:
-- Terminen en `_widget.dart`, `_button.dart`, `_card.dart`, `_field.dart`, `_badge.dart`, `_tile.dart`, `_chip.dart`, `_icon.dart`, `_avatar.dart`, `_text.dart`
-- Estén dentro de carpetas nombradas `atoms/`, `molecules/`, `organisms/`, `components/`, `widgets/`
-- Exporten clases que extiendan `StatelessWidget` o `StatefulWidget`
+Look for files that:
+- End in `_widget.dart`, `_button.dart`, `_card.dart`, `_field.dart`, `_badge.dart`, `_tile.dart`, `_chip.dart`, `_icon.dart`, `_avatar.dart`, `_text.dart`
+- Live inside folders named `atoms/`, `molecules/`, `organisms/`, `components/`, `widgets/`
+- Export classes that extend `StatelessWidget` or `StatefulWidget`
 
-**Comando de exploración:**
+**Exploration command:**
 ```bash
-# Encontrar todos los archivos de widgets en el proyecto principal
+# Find all widget files in the main project
 find lib -name "*.dart" -path "*/widgets/*" -o \
          -name "*_widget.dart" -o \
          -name "*_button.dart" -o \
@@ -55,9 +55,9 @@ find lib -name "*.dart" -path "*/widgets/*" -o \
          -name "*_badge.dart" | sort
 ```
 
-#### Para Features (pantallas)
+#### For Features (screens)
 
-Buscar pantallas en las ubicaciones típicas:
+Look for screens in the typical locations:
 
 ```
 lib/features/**/presentation/
@@ -68,9 +68,9 @@ lib/pages/
 lib/presentation/
 ```
 
-**Comando de exploración:**
+**Exploration command:**
 ```bash
-# Encontrar todas las pantallas del proyecto principal
+# Find all screens in the main project
 find lib -name "*_screen.dart" -o \
          -name "*_page.dart" -o \
          -name "*_view.dart" | grep -v widgetbook | sort
@@ -78,90 +78,90 @@ find lib -name "*_screen.dart" -o \
 
 ---
 
-### Paso 2 — Escanear el widgetbook actual
+### Step 2 — Scan the current widgetbook
 
-#### Use cases de UI System ya catalogados
+#### UI System use cases already cataloged
 
 ```bash
-# Ver qué componentes ya tienen use case
+# See which components already have a use case
 find widgetbook_[appname]/lib/ui_system -name "*.use_case.dart" | sort
 ```
 
-#### Use cases de Features ya catalogados
+#### Feature use cases already cataloged
 
 ```bash
-# Ver qué pantallas ya tienen use case
+# See which screens already have a use case
 find widgetbook_[appname]/lib/features -name "*.use_case.dart" | sort
 ```
 
 ---
 
-### Paso 3 — Cruzar y detectar gaps
+### Step 3 — Cross-reference and detect gaps
 
-Comparar los resultados de los pasos 1 y 2:
+Compare the results of steps 1 and 2:
 
-**Para cada componente encontrado en el proyecto principal:**
-- Derivar el nombre del widget (clase Dart) del nombre del archivo
-- Buscar si existe `[nombre].use_case.dart` en `widgetbook_[appname]/lib/ui_system/`
-- Si NO existe → **gap detectado** → agregar a la lista de pendientes
+**For each component found in the main project:**
+- Derive the widget name (Dart class) from the file name
+- Check whether `[name].use_case.dart` exists in `widgetbook_[appname]/lib/ui_system/`
+- If it does NOT exist → **gap detected** → add it to the pending list
 
-**Para cada pantalla encontrada en el proyecto principal:**
-- Derivar el nombre de la clase del nombre del archivo
-- Buscar si existe `[nombre].use_case.dart` en `widgetbook_[appname]/lib/features/`
-- Si NO existe → **gap detectado** → agregar a la lista de pendientes
+**For each screen found in the main project:**
+- Derive the class name from the file name
+- Check whether `[name].use_case.dart` exists in `widgetbook_[appname]/lib/features/`
+- If it does NOT exist → **gap detected** → add it to the pending list
 
 ---
 
-### Paso 4 — Reportar el resultado antes de generar
+### Step 4 — Report the result before generating
 
-Antes de crear cualquier use case, presentar el reporte de cobertura al usuario:
+Before creating any use case, present the coverage report to the user:
 
 ```
-## Reporte de cobertura — Widgetbook
+## Coverage report — Widgetbook
 
 ### UI System
-| Componente         | Archivo fuente                              | En widgetbook |
+| Component          | Source file                                 | In widgetbook |
 |--------------------|---------------------------------------------|---------------|
-| PrimaryButton      | lib/core/widgets/primary_button.dart        | ✅ Catalogado  |
-| AppTextField       | lib/core/widgets/app_text_field.dart        | ✅ Catalogado  |
-| StatusBadge        | lib/shared/widgets/status_badge.dart        | ❌ Falta       |
-| ProductCard        | lib/features/catalog/widgets/product_card.dart | ❌ Falta    |
+| PrimaryButton      | lib/core/widgets/primary_button.dart        | ✅ Cataloged   |
+| AppTextField       | lib/core/widgets/app_text_field.dart        | ✅ Cataloged   |
+| StatusBadge        | lib/shared/widgets/status_badge.dart        | ❌ Missing     |
+| ProductCard        | lib/features/catalog/widgets/product_card.dart | ❌ Missing  |
 
-Cobertura UI System: 2/4 (50%)
+UI System coverage: 2/4 (50%)
 
 ### Features
-| Pantalla           | Archivo fuente                              | En widgetbook |
+| Screen             | Source file                                 | In widgetbook |
 |--------------------|---------------------------------------------|---------------|
-| LoginScreen        | lib/features/auth/login_screen.dart         | ✅ Catalogado  |
-| HomeScreen         | lib/features/home/home_screen.dart          | ✅ Catalogado  |
-| ProfileScreen      | lib/features/profile/profile_screen.dart    | ❌ Falta       |
-| CheckoutScreen     | lib/features/checkout/checkout_screen.dart  | ❌ Falta       |
-| OrderDetailScreen  | lib/features/orders/order_detail_screen.dart| ❌ Falta       |
+| LoginScreen        | lib/features/auth/login_screen.dart         | ✅ Cataloged   |
+| HomeScreen         | lib/features/home/home_screen.dart          | ✅ Cataloged   |
+| ProfileScreen      | lib/features/profile/profile_screen.dart    | ❌ Missing     |
+| CheckoutScreen     | lib/features/checkout/checkout_screen.dart  | ❌ Missing     |
+| OrderDetailScreen  | lib/features/orders/order_detail_screen.dart| ❌ Missing     |
 
-Cobertura Features: 2/5 (40%)
+Features coverage: 2/5 (40%)
 
-### Resumen
-- UI System: 2 faltantes → StatusBadge, ProductCard
-- Features: 3 faltantes → ProfileScreen, CheckoutScreen, OrderDetailScreen
-- Total gaps: 5 use cases por crear
+### Summary
+- UI System: 2 missing → StatusBadge, ProductCard
+- Features: 3 missing → ProfileScreen, CheckoutScreen, OrderDetailScreen
+- Total gaps: 5 use cases to create
 ```
 
-> **Regla:** Siempre mostrar el reporte completo antes de comenzar a generar. Nunca crear
-> use cases en silencio sin informar primero el estado de cobertura.
+> **Rule:** Always show the full report before starting to generate. Never create
+> use cases silently without first reporting the coverage status.
 
 ---
 
-### Paso 5 — Priorizar y generar los gaps
+### Step 5 — Prioritize and generate the gaps
 
-Después del reporte, preguntar al usuario (si no es claro) en qué orden priorizar,
-o proceder con todos si el usuario lo indica.
+After the report, ask the user (if unclear) in what order to prioritize,
+or proceed with all of them if the user says so.
 
-Para cada gap, seguir el proceso estándar según el tipo:
+For each gap, follow the standard process according to its type:
 
-- **Componentes faltantes** → seguir `references/project_structure.md` + `references/variants_guide.md`
-- **Pantallas faltantes** → seguir `references/features_guide.md`
+- **Missing components** → follow `references/project_structure.md` + `references/variants_guide.md`
+- **Missing screens** → follow `references/features_guide.md`
 
-Después de crear todos los use cases faltantes:
+After creating all the missing use cases:
 
 ```bash
 cd widgetbook_[appname] && dart run build_runner build --delete-conflicting-outputs
@@ -169,69 +169,69 @@ cd widgetbook_[appname] && dart run build_runner build --delete-conflicting-outp
 
 ---
 
-### Paso 6 — Verificar cobertura post-generación
+### Step 6 — Verify coverage after generation
 
-Después del `build_runner`, repetir el escaneo y confirmar que los gaps ya no existen:
+After running `build_runner`, repeat the scan and confirm that the gaps no longer exist:
 
 ```bash
-# Confirmar que el árbol de directorios incluye todos los nuevos use cases
+# Confirm the directory tree includes all the new use cases
 grep -E "name:|type:" widgetbook_[appname]/lib/main.directories.g.dart | sort
 ```
 
-Presentar el reporte actualizado comparando con el anterior.
+Present the updated report and compare it against the previous one.
 
 ---
 
-## Señales de que un elemento debe excluirse de la auditoría
+## Signals that an element should be excluded from the audit
 
-No todos los archivos `.dart` en carpetas de widgets deben catalogarse. Excluir:
+Not every `.dart` file in widget folders should be cataloged. Exclude:
 
-| Archivo | Motivo |
+| File | Reason |
 |---|---|
-| `*_mixin.dart` | Mixin, no widget renderizable |
-| `*_extension.dart` | Extension, no widget |
-| `*_theme.dart` | Tema/tokens de diseño, no widget |
-| `*_model.dart` / `*_entity.dart` | Modelo de datos |
+| `*_mixin.dart` | Mixin, not a renderable widget |
+| `*_extension.dart` | Extension, not a widget |
+| `*_theme.dart` | Design theme/tokens, not a widget |
+| `*_model.dart` / `*_entity.dart` | Data model |
 | `*_provider.dart` / `*_bloc.dart` / `*_cubit.dart` | State management |
-| `*_service.dart` / `*_repository.dart` | Servicios |
+| `*_service.dart` / `*_repository.dart` | Services |
 | `index.dart` / `barrel.dart` | Barrel files (re-exports) |
-| Widgets privados (`_MyWidget`) | Clases internas, no exportadas |
-| Widgets de layout genérico que no tienen variantes visuales propias | Wrappers sin props públicas |
+| Private widgets (`_MyWidget`) | Internal, non-exported classes |
+| Generic layout widgets with no visual variants of their own | Wrappers without public props |
 
 ---
 
-## Auditoría incremental — detectar cambios nuevos
+## Incremental audit — detect new changes
 
-Para proyectos que ya tienen widgetbook establecido, detectar solo lo agregado recientemente:
+For projects that already have an established widgetbook, detect only what was recently added:
 
 ```bash
-# Ver archivos de widgets modificados o creados en los últimos 30 días
+# See widget files modified or created in the last 30 days
 find lib -name "*.dart" -newer widgetbook_[appname]/lib/main.dart \
   \( -path "*/widgets/*" -o -name "*_screen.dart" -o -name "*_page.dart" \) | sort
 ```
 
-Este comando compara la fecha de modificación de los archivos con la del `main.dart` del
-widgetbook, encontrando todo lo agregado después de la última vez que se actualizó el catálogo.
+This command compares each file's modification date against the widgetbook's `main.dart`,
+finding everything added after the last time the catalog was updated.
 
 ---
 
-## Plantilla de reporte rápido
+## Quick report template
 
-Usar esta plantilla al reportar antes de crear use cases:
+Use this template when reporting before creating use cases:
 
 ```markdown
-## Auditoría Widgetbook — [nombre del proyecto]
+## Widgetbook audit — [project name]
 
-**UI System** — X/Y catalogados (Z%)
-- ✅ [ComponenteA] → ya tiene use case
-- ✅ [ComponenteB] → ya tiene use case
-- ❌ [ComponenteC] → falta use case → `lib/ruta/componente_c.dart`
-- ❌ [ComponenteD] → falta use case → `lib/ruta/componente_d.dart`
+**UI System** — X/Y cataloged (Z%)
+- ✅ [ComponentA] → already has a use case
+- ✅ [ComponentB] → already has a use case
+- ❌ [ComponentC] → missing use case → `lib/path/component_c.dart`
+- ❌ [ComponentD] → missing use case → `lib/path/component_d.dart`
 
-**Features** — X/Y catalogadas (Z%)
-- ✅ [ScreenA] → ya tiene use case
-- ❌ [ScreenB] → falta use case → `lib/features/feature/screen_b.dart`
-- ❌ [ScreenC] → falta use case → `lib/features/feature/screen_c.dart`
+**Features** — X/Y cataloged (Z%)
+- ✅ [ScreenA] → already has a use case
+- ❌ [ScreenB] → missing use case → `lib/features/feature/screen_b.dart`
+- ❌ [ScreenC] → missing use case → `lib/features/feature/screen_c.dart`
 
-**Acción propuesta:** Crear los N use cases faltantes. ¿Procedo con todos o prefieres priorizar alguno?
+**Proposed action:** Create the N missing use cases. Should I proceed with all of them, or would you prefer to prioritize any?
 ```
