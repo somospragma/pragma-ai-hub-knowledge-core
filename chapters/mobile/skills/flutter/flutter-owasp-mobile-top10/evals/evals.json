@@ -1,0 +1,235 @@
+{
+  "skill_name": "flutter-owasp-mobile-top10",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In my Flutter app I have `const apiKey = 'AIzaSyC1234567890abcdefghijklmnop';` hardcoded in a Dart config file so the app can call a third-party API. A teammate said this is a security problem. Is it, and how should I handle the key instead?",
+      "expected_output": "Confirms this is OWASP M1 (Improper Credential Usage) — secrets must never be hardcoded in source or committed to VCS. Recommends build-time injection via String.fromEnvironment / --dart-define for non-sensitive keys, and fetching truly sensitive keys at runtime from a backend endpoint behind an authenticated request. Notes the key should be rotated since it was exposed.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies hardcoded credentials as an OWASP M1 issue and says secrets must not live in source code or version control",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends String.fromEnvironment / --dart-define and/or fetching sensitive keys from a backend at runtime",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains fromEnvironment",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit my Flutter project's third-party dependencies against OWASP mobile guidance. My pubspec.yaml pins some packages with `any` and `latest`, and I want to catch vulnerable packages before release. What should I do?",
+      "expected_output": "Maps this to OWASP M2 (Inadequate Supply Chain Security). Notes Dart/Flutter have no built-in `dart pub audit` command; recommends `dart pub outdated` for stale deps and a vulnerability scanner such as OSV-Scanner (osv-scanner --lockfile=pubspec.lock) or GitHub Dependabot to detect known vulnerabilities, pinning major versions with caret constraints instead of `any`/`latest`, reviewing changelogs before upgrading, and adding a CI gate that fails the build on reported vulnerabilities.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response classifies this as OWASP M2 (supply chain security) and recommends dart pub outdated plus a vulnerability scanner such as OSV-Scanner or Dependabot",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response advises pinning major versions and rejecting any/latest constraints",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains dart pub outdated",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My Flutter app stores the JWT after login and reuses it on every request. I also hide the admin delete button with `if (user.role == 'admin')`. Is my authentication and authorization secure?",
+      "expected_output": "Flags OWASP M3 (Insecure Authentication/Authorization). Explains the JWT expiry must be validated before use (decode exp, refresh if near expiry) rather than reused blindly, tokens must be kept in secure storage (not SharedPreferences), and client-side role checks are only UX — authorization must be enforced by the backend, which should return 401/403. Shows decoding exp and a backend-validated action.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M3 and requires validating JWT expiry before use, refreshing when near expiry",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response states that role/permission checks must be enforced by the backend and client-side checks are only presentational",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response warns against reusing an unvalidated token and/or storing it in SharedPreferences",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I have a WebView in my Flutter app with JavaScript enabled (`JavaScriptMode.unrestricted`) that loads URLs coming from a deep link. Is there a security risk here and how do I harden it?",
+      "expected_output": "Identifies OWASP M4 (Insufficient Input/Output Validation). Recommends a NavigationDelegate with onNavigationRequest that enforces an allowlist of hosts and https-only scheme, preventing navigation to untrusted URLs, and validating deep link parameters before navigating (redirect on invalid input). Warns that loading arbitrary URLs with JS enabled enables injection/phishing.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M4 and recommends a WebView NavigationDelegate/onNavigationRequest with a host allowlist and https-only enforcement",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends validating deep link parameters/URLs before navigating",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains onNavigationRequest",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "My Dio requests were failing with an SSL handshake error, so I set `badCertificateCallback = (cert, host, port) => true` to make it work. Now everything connects. Is this okay for production?",
+      "expected_output": "Strongly warns this is OWASP M5 (Insecure Communication) — returning true from badCertificateCallback disables TLS validation and enables MITM attacks. Says to never ship this, fix the underlying certificate/trust chain instead, enforce HTTPS-only, set usesCleartextTraffic=false on Android and avoid NSAllowsArbitraryLoads on iOS, and consider certificate pinning (references flutter-certificate-pinning).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M5 and states that disabling certificate validation (badCertificateCallback => true) is insecure and must never reach production",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends HTTPS-only, disabling cleartext traffic, and/or certificate pinning as the correct fix",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response does not endorse keeping badCertificateCallback returning true",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "For debugging I added `print('User email: $email, token: $token')` in my login flow and I also send the user's email to Crashlytics as a custom key. Any privacy concerns with this in a Flutter app?",
+      "expected_output": "Flags OWASP M6 (Inadequate Privacy Controls). Explains PII and secrets (email, token, password) must never be written to logs or crash/analytics reports; use non-sensitive identifiers (userId) only, sanitize/redact before sending to Crashlytics or analytics, and strip debug logging from release builds. Shows logging only userId and setting only the ID as a custom key.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M6 and says PII/secrets (email, token) must not be logged or sent to crash/analytics reports",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends using non-sensitive identifiers (e.g. userId) and sanitizing/redacting data before crash reporting or analytics",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response advises removing sensitive debug logging from release builds",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Review my Flutter release build configuration for binary protection. Right now I just run `flutter build appbundle --release` and my android/app/build.gradle release block has `minifyEnabled false`. What am I missing per OWASP?",
+      "expected_output": "Maps to OWASP M7 (Insufficient Binary Protections). Recommends building with --obfuscate and --split-debug-info to obfuscate Dart code and separate symbols, enabling minifyEnabled true, shrinkResources true and ProGuard/R8 in the release build type, setting debuggable false, and ensuring CI always passes --obfuscate. Notes obfuscation is defense-in-depth, not a replacement for other controls.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M7 and recommends flutter build with --obfuscate and --split-debug-info",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends enabling minifyEnabled true / R8 / ProGuard and disabling debuggable in the release build",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains --obfuscate",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "Audit my AndroidManifest.xml for security misconfiguration. It has `android:allowBackup=\"true\"`, an activity with `android:exported=\"true\"` that is only used internally, and it declares READ_CONTACTS and WRITE_EXTERNAL_STORAGE which I'm not sure we use. What should I change?",
+      "expected_output": "Maps to OWASP M8 (Security Misconfiguration). Recommends setting allowBackup=false (or backup exclusion rules) to avoid exposing local DB/SharedPreferences, marking internal-only components exported=false, and removing unused/excessive permissions (READ_CONTACTS, WRITE_EXTERNAL_STORAGE) following least privilege.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M8 and recommends disabling allowBackup (or using backup exclusion rules)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends setting internal components to exported=false and removing unused/excessive permissions (least privilege)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains allowBackup",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "In my Flutter app I save the auth token and the user's session with `SharedPreferences.setString('token', token)`, and I store profile data in a plain SQLite database. Is my local data storage secure?",
+      "expected_output": "Flags OWASP M9 (Insecure Data Storage). Explains SharedPreferences is not encrypted and must never hold tokens/credentials — use flutter_secure_storage (Keychain/Keystore backed). For larger datasets, encrypt the local database (e.g. Isar/SQLCipher) with a key kept in secure storage. References the flutter-secure-storage and flutter-database-strategy skills.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M9 and states tokens/credentials must not be stored in SharedPreferences",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends flutter_secure_storage for tokens and encrypting the local database for sensitive datasets",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains flutter_secure_storage",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "I need to hash passwords and generate tokens locally in my Flutter app. I was going to use `md5.convert(...)` for hashing and `Random()` to generate the token. Is this cryptographically sound?",
+      "expected_output": "Flags OWASP M10 (Insufficient Cryptography). States MD5 (and SHA-1, DES, RC4, AES-ECB) are broken/forbidden and Random() is not cryptographically secure. Recommends PBKDF2-SHA256 (>=100k iterations) or Argon2 for password hashing, AES-256-GCM for encryption, SHA-256 for checksums, and Random.secure() for all key/token generation. Warns against the unmaintained package:encrypt. References flutter-data-encryption.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response identifies OWASP M10 and rejects MD5/SHA-1 for security and Random() for cryptographic use",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends PBKDF2/Argon2 for passwords, AES-256-GCM for encryption, and Random.secure() for token/key generation",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains Random.secure()",
+          "type": "contains"
+        }
+      ]
+    }
+  ]
+}

@@ -74,6 +74,75 @@
           "type": "llm_judge"
         }
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "After I run flutter_clean_project, what does the generated monorepo look like? Where do the main app, the WidgetBook app, the design system, and shared code live?",
+      "expected_output": "Describes the generated monorepo: apps/ containing the main Flutter app (with lib/src split into domain/data/presentation/di) and a WidgetBook companion app; packages/ containing commons and the auto-generated {prefix}_ui_kit design system; shared/ containing l10n; an empty features/ folder for flutter_clean_feature; docs/; and the Melos-managed workspace root (melos.yaml + workspace pubspec.yaml).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response describes apps/ with both the main app and the WidgetBook companion app",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions the auto-generated UI Kit design system package and shared code (commons, l10n)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response identifies it as a Melos-managed monorepo (melos.yaml + workspace root)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "What's the difference between running the brick with prompts versus with a config file, and what happens automatically after generation completes?",
+      "expected_output": "Explains the minimal approach (mason make flutter_clean_project -o output) prompts for organization, name and prefix and uses default design tokens, versus the custom approach (-c config.json) which reads all variables from JSON with no prompts. Then lists the post-generation hooks that run automatically: flutter create for the apps, bundle ID configuration (via rename), UI Kit generation from the config, melos bootstrap, dart format + dart fix, git init, and optional initial feature generation.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response contrasts the interactive prompt approach with the -c config-file approach (silent, all variables from JSON)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response lists post-generation hooks including flutter create, melos bootstrap, UI Kit generation, and git init",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains melos bootstrap",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "The mason command fails with 'brick not found', and I'm also wondering if this skill will install Flutter or set up my CI for me. Help me get the brick working and clarify what's out of scope.",
+      "expected_output": "Provides the brick installation command (mason add -g flutter_clean_project --git-url ... --git-path bricks/flutter_clean_project --git-ref develop) and notes the brick name is case-sensitive and prerequisites (Flutter, Dart, Mason) must already be installed. Clarifies the skill only covers project scaffolding and does NOT install system dependencies (brew/apt), modify environment permanently, configure CI/CD, or develop features post-generation.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response gives the brick installation command via `mason add -g` with the git-url/git-path/git-ref options",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response clarifies the skill is scoped to project generation only and does NOT install system dependencies or configure CI/CD",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains mason add",
+          "type": "contains"
+        }
+      ]
     }
   ]
 }
