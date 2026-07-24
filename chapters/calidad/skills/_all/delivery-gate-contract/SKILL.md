@@ -1,6 +1,6 @@
 ---
 id: calidad-delivery-gate-contract
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -26,6 +26,14 @@ delivery_gate:
   schema_version: "1.0"
   framework: karate | playwright | k6 | appium
   mode: full | dry-run | scaffold-only | execute-only
+  execution_target: real | mock | hybrid    # contra qué corrió la fase de ejecución (SUT readiness gate)
+  certification: certified | pending_real_integration   # certified SOLO si execution_target: real
+  mock_evidence:                            # null si execution_target: real
+    tool: mockoon
+    data_file: "mocks/mockoon/environment.json"
+    faker_seed: 12345
+    locator_map: "locator-map.json" | null  # solo front/mobile pre-desarrollo
+    switchover_plan: "STRATEGY.md#6"        # dónde quedó documentado el plan mock -> real
   preflight:
     tool_version: "11.0.21"           # Java/Node/k6/Gradle según stack
     verdict: pass | fail | skipped
@@ -101,6 +109,8 @@ delivery_gate:
 - Si modo es `dry-run` o `scaffold-only` → `execution.*` puede ser `null` pero documentar en `blockers` por qué.
 - Si modo es `full` y no se ejecutó → `status: partial` con `blocker: "execution_skipped"`.
 - `transversal_capabilities` debe estar presente: si no aplica ninguna capa, declarar `detected: []` y justificar en `omitted`. Una capa con `confirmed_by_user: false` no debe haberse tejido en la suite.
+- Si `execution_target: mock | hybrid` → `certification: pending_real_integration` es obligatorio, `mock_evidence` completo, y `next_steps` DEBE incluir la re-ejecución contra integraciones reales (switchover). `certification: certified` con `execution_target != real` es contradicción → entrega inválida.
+- Resultados contra mock JAMÁS se presentan como certificación de integración, performance o seguridad del SUT (regla maestra de `[[calidad-sut-readiness-gate]]`).
 
 ## Verification
 
@@ -116,6 +126,8 @@ verification:
     failure_message: "Bloqueado: no se puede declarar success en modo full sin evidencia de ejecución."
   - check: "bloque transversal_capabilities presente (detected/omitted); capas tejidas solo si confirmed_by_user"
     failure_message: "Bloqueado: faltó evaluar/registrar las capacidades transversales complementarias (accesibilidad, SEO, seguridad, visual, contract, performance)."
+  - check: "execution_target declarado; si es mock o hybrid, certification: pending_real_integration + mock_evidence completo + switchover en next_steps"
+    failure_message: "Bloqueado: la corrida contra mock no declara la certificación pendiente o carece de evidencia del mock y plan de switchover."
 ```
 
 ## Cross-links

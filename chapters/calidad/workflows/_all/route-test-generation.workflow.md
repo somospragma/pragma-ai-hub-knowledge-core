@@ -25,7 +25,7 @@ NO uses este workflow para:
 Inputs obligatorios y opcionales gobernados por `[[calidad-mandatory-inputs-protocol]]`:
 
 - **Obligatorios**: `intent`, `project_name`, `output_path`, `spec` (excepto algunos casos puntuales de Playwright greenfield sin contrato).
-- **Condicionales**: `base_url` (si no está en spec), `user_story` (obligatorio en Karate brownfield cuando el cliente impone convenciones cliente-específicas).
+- **Condicionales**: `base_url` (si no está en spec), `user_story` (obligatorio en Karate brownfield cuando el cliente impone convenciones cliente-específicas), y los que el SUT readiness gate endurece cuando se prueba antes del desarrollo (`spec` con response schemas, `locator_map` — ver paso 1.5).
 - **Opcionales**: `firma`, `extra_params`.
 
 ## Pasos
@@ -37,6 +37,15 @@ Aplica `[[calidad-mandatory-inputs-protocol]]`:
 - Verifica que `intent`, `project_name`, `output_path` y (cuando aplique) `spec` estén presentes y bien formados.
 - Pregunta por `user_story` y `firma`; recomiéndalos explícitamente.
 - Si falta algún obligatorio, **detente**, solicita exactamente lo que falta y espera.
+
+### Paso 1.5 — SUT readiness gate (¿desarrollo listo o pruebas antes del desarrollo?)
+
+Aplica `[[calidad-sut-readiness-gate]]` inmediatamente después de los inputs base, porque su resultado muta la obligatoriedad de los demás inputs:
+
+- Pregunta explícitamente: (1) ¿el desarrollo está desplegado y accesible? → `execution_target: real | hybrid | mock`; (2) ¿existen datos de prueba? → `data_strategy: real | synthetic`; (3) si el intent es front/mobile: ¿existe mapeo acordado de identificadores UI? → `locator_map: provided | missing` (`[[calidad-ui-locator-map-contract]]`).
+- Si `execution_target: mock | hybrid`, aplica la matriz de obligatoriedad por stack del gate: `spec` con response schemas completos (API), fuente UI + locator map (Playwright), locator map con accessibility ids (Appium). Si falta un insumo marcado STOP, **detente** y solicítalo.
+- Si `execution_target: mock | hybrid`, los mocks se gestionan con `[[calidad-service-virtualization-mockoon]]` y la data sintética con `[[calidad-test-data-management]]` (Faker + seed fijo compartido con el mock).
+- Registra los tres valores para el `STRATEGY.md` (paso de pre-diseño) y para el bloque final del delivery gate. **Regla maestra**: mock valida construcción, nunca certifica — la corrida contra mock cierra con `certification: pending_real_integration`.
 
 ### Paso 2 — Identificar framework
 
@@ -110,7 +119,7 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 
 **Esta fase es parte del contrato de entrega del router**: independientemente del workflow específico al que se haya delegado en el paso 5, el router exige que el ciclo de ejecución + triage + auto-corrección se haya cerrado. Cada workflow específico ya integra esta fase con adaptaciones por framework; el router la audita y confirma su cumplimiento antes de finalizar.
 
-1. **Resolver modo de operación universal** con el usuario si el workflow delegado no lo hizo (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin entornos, sin credenciales), degradar a `scaffold-only` y reportar `partial`.
+1. **Resolver modo de operación universal** con el usuario si el workflow delegado no lo hizo (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin entornos, sin credenciales), degradar a `scaffold-only` y reportar `partial`. Si `execution_target: mock | hybrid` (paso 1.5), levantar el mock (`[[calidad-service-virtualization-mockoon]]`) ANTES del smoke gate; la ejecución contra mock es válida como verificación de construcción y el delivery gate la registra como `certification: pending_real_integration`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` con el comando idiomático del framework delegado.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz.
 4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop-workflow]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros del chapter**.
@@ -124,6 +133,7 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 Este workflow se considera completo **solo cuando**:
 
 - [ ] El framework destino y el modo (greenfield / brownfield) fueron resueltos correctamente para los **4 frameworks soportados** (Karate, Playwright, K6, Appium) en cualquiera de sus dos modos.
+- [ ] El **SUT readiness gate** (paso 1.5) fue resuelto explícitamente: `execution_target`, `data_strategy` y (front/mobile) `locator_map` registrados en STRATEGY.md y delivery gate. Si `execution_target != real`, el delivery gate declara `certification: pending_real_integration` y `next_steps` incluye el switchover a integraciones reales.
 - [ ] Las **capacidades transversales complementarias** (accesibilidad, SEO, seguridad, regresión visual, contract, performance) fueron evaluadas con `[[calidad-transversal-capabilities]]`, propuestas al usuario y registradas (aplicadas u omitidas con motivo) en el bloque `transversal_capabilities` del delivery-gate.
 - [ ] Todos los archivos de prueba esperados están escritos en `output_path` y son consistentes con el spec/firma.
 - [ ] En greenfield, la infraestructura completa (`pom.xml`/`package.json`/`build.gradle`, configs, runners, README) está presente.

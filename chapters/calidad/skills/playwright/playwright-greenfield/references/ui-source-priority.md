@@ -16,13 +16,17 @@ Playwright valida la capa de presentación. El insumo debe describir UI real. Es
 ¿La app está corriendo en algún ambiente?
 ├── Sí → URL viva. Usa Playwright Codegen o MCP browser tools (preferido).
 └── No → ¿Existe Figma / mockup con rutas?
-        ├── Sí → Figma. Selectores serán inferidos y deberán validarse contra DOM real luego.
+        ├── Sí → Figma + LOCATOR MAP obligatorio (ver abajo).
         └── No → ¿Hay user story con flujos UI explícitos?
-                ├── Sí → User story. Mismo caveat de Figma para selectores.
+                ├── Sí → User story + LOCATOR MAP obligatorio. Mismo caveat de Figma.
                 └── No → ¿Hay Storybook publicado?
                         ├── Sí → Storybook. Cobertura limitada a componentes catalogados.
                         └── No → DETENTE. Solicita al usuario una fuente UI real.
 ```
+
+## Pre-desarrollo: fuente inferida exige locator map
+
+Cuando la fuente es Figma o user story porque la app **aún no existe** (`execution_target: mock` en `[[calidad-sut-readiness-gate]]`), inferir selectores no basta: la suite fallaría el día que llegue el desarrollo por drift de identificadores. En ese modo es **obligatorio** el contrato de mapeo `[[calidad-ui-locator-map-contract]]`: un `locator-map.json` acordado con el equipo de desarrollo del que salen TODOS los selectores (`getByTestId`), con validación de drift contra el DOM real antes de la primera corrida live. Sin locator map + Figma, la construcción pre-desarrollo se detiene (STOP del gate).
 
 ## Profundidad de extracción esperada por fuente
 

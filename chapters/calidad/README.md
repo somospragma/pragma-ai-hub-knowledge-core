@@ -11,12 +11,13 @@ Cubre cuatro frameworks de automatización:
 - **K6** — Performance testing.
 - **Appium** — Mobile testing (Android V2 con Screenplay + Serenity + Cucumber).
 
-Y cuatro ejes cross-cutting que aplican a los cuatro frameworks:
+Y cinco ejes cross-cutting que aplican a los cuatro frameworks:
 
 - **Seguridad** (OWASP API Top 10, DAST con ZAP).
 - **Datos de prueba** y trazabilidad requisito → test → resultado.
 - **CI/CD** (Azure DevOps, GitHub Actions, GitLab CI).
 - **Contract testing** y validación de specs.
+- **Shift-left y mocking**: construir y validar pruebas antes de que el desarrollo exista — service virtualization con Mockoon, datos sintéticos deterministas y contrato de mapeo de locators UI. Los mocks validan la construcción del test; la certificación formal siempre corre contra integraciones reales vía switchover solo-configuración.
 
 ## Mapa de assets
 
@@ -45,9 +46,11 @@ chapters/calidad/
 │   │   ├── spec-validation.md
 │   │   ├── step-isolation-pattern.md
 │   │   ├── streaming-files-protocol.md
+│   │   ├── sut-readiness-gate.md
 │   │   ├── test-evidence-and-traceability.md
 │   │   ├── test-organization-by-scenario.md
 │   │   ├── transversal-capabilities.md
+│   │   ├── ui-locator-map-contract.md
 │   │   ├── visual-regression.md
 │   │   ├── accessibility/
 │   │   │   ├── SKILL.md
@@ -75,6 +78,9 @@ chapters/calidad/
 │   │   ├── seo/
 │   │   │   ├── SKILL.md
 │   │   │   └── references/{accessibility, hreflang, images, on-page, performance, schema, sitemap, technical}.md
+│   │   ├── service-virtualization-mockoon/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{cli-docker-and-ci, dynamic-templating-and-faker-seed, mock-vs-real-switchover, mockoon-environment-file, openapi-to-mock, soap-xml-mocking, stateful-crud-and-data-buckets}.md
 │   │   ├── sut-types-and-adaptations/
 │   │   │   ├── SKILL.md
 │   │   │   └── references/{data-pipeline-batch-streaming, event-driven-messaging, graphql-api, grpc-service, legacy-soap-ejb, ml-inference-service, rest-microservice, serverless-functions}.md
@@ -154,6 +160,8 @@ chapters/calidad/
 │       └── update-playwright-brownfield.workflow.md
 │
 └── prompts/
+    ├── _all/
+    │   └── generate-mockoon-environment.prompt.md
     ├── appium/
     │   ├── generate-cucumber-feature-android.prompt.md
     │   ├── generate-screenplay-task.prompt.md
@@ -192,6 +200,7 @@ chapters/calidad/
 | `brownfield-vs-greenfield.md`          | Distingue proyectos existentes vs nuevos y define qué se genera y qué no en cada modo.                       |
 | `business-driven-prioritization.md`    | Asignación de prioridad CRITICAL/HIGH/MEDIUM/LOW por valor de negocio, nunca por keywords del path.          |
 | `pre-design-strategy-document.md`      | `STRATEGY.md` como design-doc obligatorio aprobado por humano antes de generar código (los 4 stacks en greenfield). |
+| `sut-readiness-gate.md`                | Gate del paso 1.5 del router: ¿desarrollo desplegado o pruebas antes del desarrollo? Resuelve `execution_target` (real/mock/hybrid), `data_strategy` (real/synthetic) y `locator_map`, y endurece los inputs obligatorios por stack en modo pre-desarrollo. Regla maestra: mock valida construcción, nunca certifica. |
 
 #### Generación (cómo se emite el scaffold)
 
@@ -236,7 +245,9 @@ chapters/calidad/
 | `contract-testing/SKILL.md`            | CDC con Pact, OpenAPI diff, AsyncAPI, Spring Cloud Contract, Schema Registry.                                |
 | `context-determined-defaults/SKILL.md` | Defaults inferidos del contexto del cliente (data class, criticality tiers, regulatory exposure, peak).      |
 | `sut-types-and-adaptations/SKILL.md`   | Adaptaciones por tipo de SUT (REST, GraphQL, gRPC, eventos, ML inference, serverless, SOAP/EJB, batch).      |
-| `test-data-management/SKILL.md`        | Builder/Factory/ObjectMother, datasets versionados, anonimización PII, data para perf, sintética.            |
+| `test-data-management/SKILL.md`        | Builder/Factory/ObjectMother, datasets versionados, anonimización PII, data para perf, sintética. Ante ausencia de datos reales, sintéticos deterministas (Faker + seed) coherentes con los data buckets del mock. |
+| `service-virtualization-mockoon/SKILL.md` | Service virtualization con Mockoon para construir/validar pruebas sin backend desplegado: environment JSON versionable, mock desde OpenAPI, CRUD stateful con data buckets, SOAP/XML, proxy hybrid, CLI/Docker en CI y switchover mock → real solo-configuración. Bundle con 7 references. |
+| `ui-locator-map-contract.md`           | Contrato QA+dev de identificadores UI (`data-testid` / accessibility ids) versionado en `locator-map.json`, para que las pruebas front/mobile construidas antes del desarrollo no fallen por drift de selectores; incluye validación de drift al llegar la app real. |
 
 #### Capacidades transversales complementarias (accesibilidad, SEO, visual)
 
@@ -312,6 +323,7 @@ Incluye references para capas Screenplay, locators diferidos vs auto-discovery (
 
 | Framework  | Prompts disponibles                                                                                                        |
 |------------|----------------------------------------------------------------------------------------------------------------------------|
+| Transversal (`_all`) | `generate-mockoon-environment` (data file Mockoon desde spec; opt-in cuando `execution_target` es mock/hybrid)   |
 | Karate     | `analyze-openapi-for-karate`, `generate-karate-feature`, `generate-karate-match-schema`                                    |
 | Playwright | `detect-pages-from-ui-source`, `generate-page-object`, `generate-accessibility-suite`, `generate-mock-handlers`            |
 | K6         | `extract-config-from-openapi`, `generate-k6-script`, `generate-utils-and-payloads`                                         |
@@ -365,9 +377,9 @@ Cada IDE soporta un subset de los tipos de asset. Esta es la matriz para el chap
 | Asset del Chapter | Cantidad | Kiro | Claude Code | GitHub Copilot | Amazon Q (IDE) | Amazon Q (CLI) |
 |---|---|---|---|---|---|---|
 | `steering`     | 3   | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `skill`        | 41  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `skill`        | 44  | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `workflow`     | 13  | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `prompt`       | 14  | ✓ | — | ✓ | ✓ | — |
+| `prompt`       | 15  | ✓ | — | ✓ | ✓ | — |
 
 Implicaciones operativas:
 
@@ -396,18 +408,19 @@ workflows/_all/route-test-generation.workflow.md
 Ese workflow se encarga de:
 
 1. Recolectar inputs obligatorios (`[[calidad-mandatory-inputs-protocol]]`).
-2. Identificar framework (`[[calidad-intent-detection]]`).
-3. Validar el spec si aplica (`[[calidad-spec-validation]]`).
-4. Decidir greenfield vs brownfield (`[[calidad-brownfield-vs-greenfield]]`).
-5. **Pre-diseño**: redactar `STRATEGY.md` y esperar aprobación humana (`[[calidad-pre-design-strategy-document]]`). En greenfield es obligatorio; en brownfield grande se simplifica a un delta-strategy.
-6. Delegar al workflow específico del framework + modo correspondiente.
-7. Emitir archivos con disciplina de scaffold por valor (`[[calidad-streaming-files-protocol]]`).
-8. Configurar evidencia y trazabilidad (`[[calidad-test-evidence-and-traceability]]` + `[[calidad-results-structure-universal]]` + `[[calidad-execution-metadata-schema]]`).
-9. **Resolver modo de operación** con el usuario (`[[calidad-post-generation-execution-prompt]]`): `full` / `dry-run` / `scaffold-only` / `execute-only`.
-10. **Smoke gate 1:1 obligatorio** (`[[calidad-smoke-gate-policy]]`) antes de declarar success. Si falla → status `partial`, no continúa a suite completa.
-11. **Ejecución + triage + auto-corrección** del ciclo: `[[calidad-test-execution-orchestration]]` → `[[calidad-failure-triage-and-classification]]` → `[[calidad-test-self-correction-loop]]` (con `[[calidad-test-self-healing]]` cuando aplica). Bloqueos de ambiente se reportan vía `[[calidad-environment-blocker-evidence]]` (no se intenta auto-corregir el ambiente).
-12. **Executive report** consolidado HTML/PPTX/DOC (`[[calidad-generate-executive-report]]`) cuando el modo es `full` o `execute-only`.
-13. **Delivery gate contract** YAML (`[[calidad-delivery-gate-contract]]`) emitido como bloque final con `status`, `blockers[]`, `evidence_persisted{}` y `audit_log`. Sin ese bloque, la entrega se considera incompleta.
+2. **SUT readiness gate** (`[[calidad-sut-readiness-gate]]`, paso 1.5): ¿el desarrollo está desplegado, o las pruebas deben ser ejecutables antes del desarrollo? Resuelve `execution_target` (real/mock/hybrid), `data_strategy` (real/synthetic) y, para front/mobile, la existencia del `locator_map` (`[[calidad-ui-locator-map-contract]]`). En modo pre-desarrollo endurece los inputs (spec con response schemas para API; Figma + locator map para Playwright; locator map para Appium) y activa `[[calidad-service-virtualization-mockoon]]`.
+3. Identificar framework (`[[calidad-intent-detection]]`).
+4. Validar el spec si aplica (`[[calidad-spec-validation]]`).
+5. Decidir greenfield vs brownfield (`[[calidad-brownfield-vs-greenfield]]`).
+6. **Pre-diseño**: redactar `STRATEGY.md` y esperar aprobación humana (`[[calidad-pre-design-strategy-document]]`). Incluye la sección "Execution target y plan de switchover" cuando se prueba antes del desarrollo. En greenfield es obligatorio; en brownfield grande se simplifica a un delta-strategy.
+7. Delegar al workflow específico del framework + modo correspondiente.
+8. Emitir archivos con disciplina de scaffold por valor (`[[calidad-streaming-files-protocol]]`).
+9. Configurar evidencia y trazabilidad (`[[calidad-test-evidence-and-traceability]]` + `[[calidad-results-structure-universal]]` + `[[calidad-execution-metadata-schema]]`).
+10. **Resolver modo de operación** con el usuario (`[[calidad-post-generation-execution-prompt]]`): `full` / `dry-run` / `scaffold-only` / `execute-only`. Si `execution_target` es mock/hybrid, el mock se levanta antes del smoke gate.
+11. **Smoke gate 1:1 obligatorio** (`[[calidad-smoke-gate-policy]]`) antes de declarar success. Si falla → status `partial`, no continúa a suite completa. Contra mock es gate de construcción válido y registra `executed_against`; K6 contra mock ejecuta SOLO el smoke 1:1 (jamás load/stress).
+12. **Ejecución + triage + auto-corrección** del ciclo: `[[calidad-test-execution-orchestration]]` → `[[calidad-failure-triage-and-classification]]` → `[[calidad-test-self-correction-loop]]` (con `[[calidad-test-self-healing]]` cuando aplica). Bloqueos de ambiente se reportan vía `[[calidad-environment-blocker-evidence]]` (no se intenta auto-corregir el ambiente).
+13. **Executive report** consolidado HTML/PPTX/DOC (`[[calidad-generate-executive-report]]`) cuando el modo es `full` o `execute-only`.
+14. **Delivery gate contract** YAML (`[[calidad-delivery-gate-contract]]`) emitido como bloque final con `status`, `blockers[]`, `evidence_persisted{}`, `audit_log`, `execution_target` y `certification` (`pending_real_integration` cuando se corrió contra mock; el switchover a integraciones reales es solo configuración). Sin ese bloque, la entrega se considera incompleta.
 
 No saltar pasos: el router protege contra la generación con inputs incompletos, sin diseño aprobado o sin ejecución verificada.
 

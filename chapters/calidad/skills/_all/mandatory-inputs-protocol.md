@@ -1,6 +1,6 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -16,6 +16,8 @@ verification:
     failure_message: "Bloqueado: se requiere el contenido completo del spec, no la ruta del archivo."
   - check: "risk_map confirmado por usuario o default HIGH reportado explícitamente para revisión"
     failure_message: "Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario."
+  - check: "sut_available, data_available y (front/mobile) locator_map resueltos vía SUT readiness gate antes de validar spec"
+    failure_message: "Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate."
 ---
 
 # Mandatory Inputs Protocol — Contrato de Entrada Antes de Generar
@@ -36,6 +38,9 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 | `user_story`   | Opcional (recomendado · obligatorio en Karate brownfield cuando el cliente impone convenciones cliente-específicas) | Historia de usuario (formato Gherkin libre o As-a/I-want/So-that) con criterios de aceptación   | Naming de escenarios, prioridad de endpoints, criterios negativos                                            |
 | `firma`        | Opcional (altamente recomendado)                | Documento técnico del servicio: reglas de negocio, ejemplos de datos reales, terminología, SLAs   | Enriquecimiento de payloads, escenarios `@negative`, vocabulario en nombres de escenarios                    |
 | `extra_params` | Opcional                                        | JSON con parámetros framework-specific                                                            | Ej.: `{"include_login_case": true}` para Appium, `{"thresholds": {"http_req_duration": "p(95)<500"}}` para K6 |
+| `sut_available` | Obligatorio (pregunta sí/parcial/no)           | ¿El desarrollo está desplegado y accesible?                                                       | Resuelve `execution_target: real | hybrid | mock` vía `[[calidad-sut-readiness-gate]]` (paso 1.5 del router)  |
+| `data_available` | Obligatorio (pregunta sí/no)                   | ¿Existen datos de prueba en el ambiente (o catálogo de datasets del cliente)?                     | Resuelve `data_strategy: real | synthetic` (`[[calidad-test-data-management]]`)                               |
+| `locator_map`  | Condicional (front/mobile; **obligatorio** si `execution_target != real`) | Mapeo acordado QA+dev de identificadores UI (`data-testid` / accessibility ids)  | Fuente única de selectores pre-desarrollo; formato y contrato en `[[calidad-ui-locator-map-contract]]`        |
 
 ## Reglas de uso
 
@@ -52,9 +57,10 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 ```
 1. Pedir al usuario los obligatorios faltantes, uno por uno o en bloque (preferir bloque para no fragmentar).
 2. Si un input está incompleto → indicar exactamente QUÉ falta, no devolver "está incompleto".
-3. Confirmar opcionales relevantes según framework detectado (firma, user_story, extra_params).
-4. Para proyectos con convenciones cliente-específicas detectadas (ver `[[calidad-karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
-5. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
+3. Resolver el SUT readiness gate ([[calidad-sut-readiness-gate]]): sut_available, data_available y (front/mobile) locator_map. El resultado puede endurecer los inputs restantes.
+4. Confirmar opcionales relevantes según framework detectado (firma, user_story, extra_params).
+5. Para proyectos con convenciones cliente-específicas detectadas (ver `[[calidad-karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
+6. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
 ```
 
 ### K6-specific inputs
@@ -70,6 +76,7 @@ Algunos clientes/proyectos imponen overrides sobre los inputs opcionales. Patró
 | Escenario                                                            | Skill / asset                      | Inputs que pasan a obligatorios                                                                                                                                       |
 |----------------------------------------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Karate brownfield con convenciones cliente-específicas detectadas    | `[[calidad-karate-brownfield]]`            | `user_story` y `firma` son **obligatorios** (no opcionales). Convenciones genéricas detalladas en el reference `client-specific-conventions.md` dentro del skill `karate-brownfield`. |
+| Pruebas antes del desarrollo (`execution_target: mock` o `hybrid`)   | `[[calidad-sut-readiness-gate]]`           | Karate/K6: `spec` con **response schemas completos y examples**. Playwright: fuente UI + `locator_map`. Appium: `locator_map` con accessibility ids. Matriz completa en el skill del gate. |
 
 ### Pattern para nuevos overrides
 

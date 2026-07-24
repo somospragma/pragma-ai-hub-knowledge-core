@@ -30,9 +30,10 @@ Cuando `[[calidad-intent-detection]]` identifica un escenario greenfield para Ap
 | `automation_name` | No | Default `UiAutomator2`. |
 | `appium_server_url` | No | Default `http://127.0.0.1:4723`. |
 | `selectors` | No | Si viene, mapeo `AppiumBy.id|xpath|accessibilityId`. |
+| `locator_map` | Condicional | **Obligatorio si las pruebas se construyen antes del desarrollo** (`execution_target != real`): accessibility ids acordados con dev según `[[calidad-ui-locator-map-contract]]`; alimenta los deferred locators. |
 | `firma` | No | Documento técnico complementario. |
 
-Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`.
+Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`, incluido el SUT readiness gate (`[[calidad-sut-readiness-gate]]`). Sin APK no hay runtime: pre-desarrollo el alcance es scaffold + deferred locators desde el `locator_map`, modo `scaffold-only`. Mock de backend (`[[calidad-service-virtualization-mockoon]]`) aplica solo si el APK existe y permite override de base URL.
 
 ## Pasos
 
@@ -78,7 +79,7 @@ Si el pre-flight (paso 1) detectó:
 
 - Si elige (a) → invocar `[[calidad-appium-apk-auto-discovery]]` antes de generar Page Objects (paso 8). Persistir resultados en `.evidence/locators-discovered.json`.
 - Si elige (b) o no respondió → comportamiento actual (deferred).
-- Si pre-flight no detectó capacidades → omitir la pregunta, ir directo a deferred.
+- Si pre-flight no detectó capacidades → omitir la pregunta, ir directo a deferred. Si hay `locator_map`, los deferred locators usan los accessibility ids del mapa (contrato con dev, no placeholders inventados — ver `[[calidad-ui-locator-map-contract]]` y `references/deferred-locators-strategy.md`).
 
 ### 6. Extraer flows y normalizar defaults
 Mapear `user_story` y `test_cases` a items para escenarios `@proposed` (≤80 chars, newlines → espacios). Normalizar defaults Android. Si falta `app_package`/`app_activity`, dejar TODO en README con `aapt dump badging`.

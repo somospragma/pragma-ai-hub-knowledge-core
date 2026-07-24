@@ -1,6 +1,6 @@
 ---
 id: calidad-test-data-management
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -33,6 +33,7 @@ Activa este skill en paralelo con `[[calidad-karate-greenfield]]`, `[[calidad-ka
 
 ## Instrucción
 
+0. **Confirmar disponibilidad de datos** — Pregunta del `[[calidad-sut-readiness-gate]]`: ¿existen datos de prueba en el ambiente (o catálogo de datasets del cliente)? Si NO (`data_strategy: synthetic`), la ausencia de datos NO detiene la construcción de la suite: se generan sintéticos deterministas (pasos 2-4) y, si hay mock de servicios (`[[calidad-service-virtualization-mockoon]]`), el mismo seed y locale alimentan sus data buckets para que test y mock sean coherentes end-to-end. El switchover a datos reales es parte del plan de certificación, no un cambio de código.
 1. **Definir alcance** — ¿el dato es para unit, integration, e2e o performance? La estrategia cambia drásticamente. Matriz en `references/test-data-strategies.md`.
 2. **Elegir estrategia** — `synthetic` (generado on-the-fly, default) vs `anonymized prod-like` (snapshot prod pasado por pipeline de anonimización, sólo cuando volumen/realismo lo exija). Anonimización detallada en `references/anonymization-pii.md`.
 3. **Diseñar el patrón de construcción** — Object Mother, Test Data Builder o Factory según contexto. Snippets canónicos por lenguaje en `references/builder-factory-objectmother-patterns.md`.
@@ -50,6 +51,7 @@ Activa este skill en paralelo con `[[calidad-karate-greenfield]]`, `[[calidad-ka
 - **NUNCA** mezclar cleanup transaccional con cleanup por API admin en la misma suite sin documentarlo: confunde la traza.
 - Encadena con `[[calidad-test-evidence-and-traceability]]` para que el `seed`, el ID del dataset y la versión queden registrados en cada reporte.
 - Sigue `[[calidad-mandatory-inputs-protocol]]` para confirmar al inicio: ¿hay catálogo de datasets del cliente? ¿qué framework de anonimización usa? ¿qué políticas de retención aplican?
+- Con `data_strategy: synthetic` + mock de servicios: las aserciones de los tests validan contrato y reglas de negocio (formato, presencia, eco del request), NUNCA valores literales que solo existen en el dataset sintético del mock — de lo contrario el switchover a datos reales rompe la suite.
 - Si el cliente requiere snapshot prod-like, exige el dataset anonimizado por el equipo de datos del cliente; **no** anonimices tú dumps productivos.
 
 ## Cross-links

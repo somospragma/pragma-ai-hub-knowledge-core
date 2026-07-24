@@ -26,7 +26,7 @@ Cuando `[[calidad-intent-detection]]` y `[[calidad-brownfield-vs-greenfield]]` i
 | `user_story` | No | Tag `@user-story:HUT-XXX`. |
 | `firma` | No | Documento técnico complementario. |
 
-Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`.
+Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`, incluido el SUT readiness gate (`[[calidad-sut-readiness-gate]]`). Si `execution_target: mock | hybrid` (pruebas antes del desarrollo), el `spec` DEBE incluir response schemas completos y examples — sin eso el mock no es fiel y el gate detiene el flujo.
 
 ## Pasos
 
@@ -75,7 +75,9 @@ Detecta referencias a `classpath:resources/files/*` y crea archivos por defecto.
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.**
 
-0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[calidad-karate-greenfield]] (consultar `references/smoke-gate-mvn.md`). Comando: `mvn test -Dkarate.options="--tags @smoke"`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_karate"` y escalar al usuario; NO continuar a ejecución completa de la suite.
+**Si `execution_target: mock | hybrid`** (resuelto por `[[calidad-sut-readiness-gate]]`): antes del smoke gate, generar el environment con `[[calidad-generate-mockoon-environment-prompt]]`, levantarlo (`mockoon-cli start --data mocks/mockoon/environment.json --port 3010 --faker-seed $FAKER_SEED &`) y verificar el health-probe. `karate-config.js` incluye env `mock` con `baseUrl` al mock; la suite corre con `-Dkarate.env=mock`. Ver `[[calidad-service-virtualization-mockoon]]`. El delivery gate registra `execution_target` y `certification: pending_real_integration`; el switchover a real es solo configuración (consultar `references/mock-vs-real-switchover.md` en su subfolder).
+
+0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[calidad-karate-greenfield]] (consultar `references/smoke-gate-mvn.md`). Comando: `mvn test -Dkarate.options="--tags @smoke"` (con `-Dkarate.env=mock` si aplica). Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_karate"` (o `mock_unavailable` si el mock no levantó) y escalar al usuario; NO continuar a ejecución completa de la suite.
 
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin `mvn`, sin red al SUT), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** `mvn test` (o el filtro por tag de la nueva historia) vía `[[calidad-test-execution-orchestration]]`. Capturar `target/karate-reports/karate-summary.json` como evidencia primaria y parsear a esquema común.

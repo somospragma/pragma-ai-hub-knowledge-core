@@ -1,6 +1,6 @@
 ---
 id: calidad-pre-design-strategy-document
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -25,7 +25,7 @@ Aplica a los 4 stacks (Karate, Playwright, K6, Appium) en greenfield. En brownfi
 
 ## Estructura genérica del STRATEGY.md
 
-Las secciones 1 a 6 son comunes a todos los stacks. La sección 7 ("Estrategia por stack") se rellena con el bloque específico cuyo detalle está en el `STRATEGY.md` de la skill del stack correspondiente.
+Las secciones 1 a 7 son comunes a todos los stacks. La sección 8 ("Estrategia por stack") se rellena con el bloque específico cuyo detalle está en el `STRATEGY.md` de la skill del stack correspondiente.
 
 ### 1. Contexto
 
@@ -68,14 +68,25 @@ Si un SLA no se conoce, declararlo explícitamente como "a determinar" — NUNCA
 - Datos sensibles: PII, PCI, PHI — política de masking y retención.
 - Restricciones regulatorias (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultean modo a `dry-run`.
 
-### 6. Próximos pasos y entregables
+### 6. Execution target y plan de switchover (mock vs real)
+
+Sale del `[[calidad-sut-readiness-gate]]` (paso 1.5 del router). Obligatoria aunque el target sea `real` (en ese caso, una línea que lo declare):
+
+- `execution_target`: `real` / `hybrid` / `mock` — ¿contra qué corre la fase de ejecución de esta entrega?
+- Si `mock` o `hybrid`: herramienta y ubicación del mock (`[[calidad-service-virtualization-mockoon]]`, data file en `mocks/mockoon/environment.json`), rutas mockeadas vs passthrough (hybrid), seed Faker compartido con la suite.
+- `data_strategy`: `real` / `synthetic` — y si es sintética, locale + seed (`[[calidad-test-data-management]]`).
+- Front/mobile: estado del locator map (`[[calidad-ui-locator-map-contract]]`) — versión acordada y con quién.
+- **Plan de switchover**: punto de configuración por el que se cambia mock → real (env/profile, cero cambios en tests), checklist de certificación y responsable de la re-ejecución contra integraciones reales. Detalle en `[[calidad-service-virtualization-mockoon]]` (consultar `references/mock-vs-real-switchover.md` en su subfolder).
+- Declaración explícita: la corrida contra mock valida construcción; la certificación queda `pending_real_integration` hasta la corrida real.
+
+### 7. Próximos pasos y entregables
 
 - Lista de archivos que el agente va a generar (alto nivel — no path-a-path).
 - Comando de ejecución que se entregará al usuario.
 - Reporte ejecutivo que se generará al cierre (formato pactado).
 - Hitos de revisión: post-scaffold, post-smoke, post-suite completa.
 
-### 7. Estrategia por stack
+### 8. Estrategia por stack
 
 Esta sección la rellena el `STRATEGY.md` del stack específico:
 

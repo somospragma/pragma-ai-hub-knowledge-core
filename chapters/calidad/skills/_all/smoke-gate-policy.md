@@ -1,6 +1,6 @@
 ---
 id: calidad-smoke-gate-policy
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -34,6 +34,15 @@ Aplica a los 4 frameworks del chapter (Karate, Playwright, K6, Appium) tanto en 
 - El agente DEBE garantizar que existe al menos un test/feature/escenario etiquetado o nombrado de modo que el comando smoke lo encuentre. Si no existe, el smoke gate se considera "no provisto" y bloquea con `blocker: "smoke_gate_missing_scenario_<framework>"`.
 - Si el smoke gate falla por causa ambiental (WAF, DNS, device caído), el blocker se reclasifica como `environment_blocked_*` según `[ver schema](./environment-blocker-evidence.md)`.
 
+## Smoke gate contra mock (`execution_target: mock | hybrid`)
+
+Cuando `[[calidad-sut-readiness-gate]]` resolvió que las pruebas se construyen antes del desarrollo, el smoke gate corre contra el mock (`[[calidad-service-virtualization-mockoon]]`), que debe estar levantado ANTES de ejecutar el comando:
+
+- El smoke verde contra mock es un **gate de construcción válido**: demuestra que el scaffold compila, corre end-to-end y es determinista. Habilita `status: success` de la entrega de construcción.
+- NO sustituye el gate contra el SUT real: el bloque `smoke_gate` registra `executed_against` y el delivery gate cierra con `certification: pending_real_integration`. Al momento del switchover, el smoke gate se re-ejecuta contra el ambiente real (checklist en `[[calidad-service-virtualization-mockoon]]`, consultar `references/mock-vs-real-switchover.md` en su subfolder).
+- Si el mock no levanta o el health-probe no responde, el blocker es `mock_unavailable` (no `environment_blocked_*`, que se reserva para ambientes reales).
+- K6: contra mock SOLO se ejecuta el smoke 1:1; jamás `load/stress/spike/soak` (las métricas del mock no representan al SUT).
+
 ## Wiring con el contrato
 
 El campo `smoke_gate` se agrega al bloque `delivery_gate` (ver `[[calidad-delivery-gate-contract]]`):
@@ -43,6 +52,7 @@ smoke_gate:
   framework: karate | playwright | k6 | appium
   command: "..."
   executed: true | false | skipped
+  executed_against: real | mock | hybrid
   exit_code: <int>
   duration_seconds: <int>
 ```

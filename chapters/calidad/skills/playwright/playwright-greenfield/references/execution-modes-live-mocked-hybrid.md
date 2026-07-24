@@ -96,3 +96,13 @@ test.describe('@live UsersPage CRUD', () => {
 ```
 
 Más detalle del fixture `mockApi` y por qué NO es `auto`: `[fixtures-composition](fixtures-composition.md)`. Patrón de handlers: `[mocks-page-route](mocks-page-route.md)`.
+
+## Mock a nivel backend con Mockoon (complementario, no reemplazo)
+
+`page.route()` intercepta en el browser context y es la **primera opción** para `@mocked`/`@hybrid`. Hay casos donde no alcanza y el mock debe ser un servidor de red real (`[[calidad-service-virtualization-mockoon]]`):
+
+- Tráfico que no pasa por el context (webviews, service workers con estrategias propias, llamadas server-side del frontend SSR).
+- Pruebas construidas **antes de que el backend exista** (`execution_target: mock` del `[[calidad-sut-readiness-gate]]`) donde el mismo mock se comparte con la suite Karate del proyecto — un solo contrato mockeado, dos suites.
+- CRUD stateful con correlación de IDs entre tests (data buckets), que con `page.route()` exige mantener estado a mano.
+
+En ese caso, `BACKEND_URL` apunta al mock (`http://localhost:3010`) y los tests siguen taggeados `@mocked`/`@hybrid` según el alcance; el switchover a real es cambiar `BACKEND_URL` (cero cambios en tests). La regla no cambia: smoke de certificación siempre `@live` contra backend real, y la corrida contra mock cierra con `certification: pending_real_integration` en el delivery gate.
