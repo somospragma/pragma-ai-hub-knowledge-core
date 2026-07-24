@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "schema_ref": "../../../../docs/templates/schemas/mobile-context.schema.json",
+  "run_id": "example-full-new-feature",
+  "workflow": "new-feature",
+  "spec_level": "full",
+  "workflow_controller": "feature-builder",
+  "status": "pending_human_review",
+  "current_phase": "spec_review",
+  "checkpoints": {
+    "initial_spec": {
+      "required": true,
+      "phase": "spec_review",
+      "status": "pending",
+      "decision_ref": "review.md"
+    },
+    "domain_layer": {
+      "required": true,
+      "phase": "domain_layer",
+      "status": "pending",
+      "decision_ref": "evidence/domain-checkpoint.md"
+    },
+    "data_layer": {
+      "required": true,
+      "phase": "data_layer",
+      "status": "pending",
+      "decision_ref": "evidence/data-checkpoint.md"
+    },
+    "presentation_layer": {
+      "required": true,
+      "phase": "presentation_layer",
+      "status": "pending",
+      "decision_ref": "evidence/presentation-checkpoint.md"
+    }
+  },
+  "pending_human_review": {
+    "kind": "initial_spec_approval",
+    "review_ref": "review.md"
+  },
+  "completed_phases": [],
+  "artifacts": {}
+}

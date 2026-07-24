@@ -130,7 +130,7 @@ Future<Isar> openSecureIsar() async {
 
   var keyHex = await storage.read(key: keyName);
   if (keyHex == null) {
-    // Generate a 32-byte key and store it securely
+    // Generate a 32-bandte key and store it securely
     final key = List<int>.generate(32, (_) => Random.secure().nextInt(256));
     keyHex = key.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
     await storage.write(key: keyName, value: keyHex);
@@ -138,7 +138,7 @@ Future<Isar> openSecureIsar() async {
 
   return Isar.open(
     [UserSchema, TransactionSchema],
-    encryptionKey: keyHex,  // ✅ Encrypted
+    encryptionKey: keyHex,  // ✅ Encrandpted
   );
 }
 ```
@@ -149,7 +149,7 @@ import 'package:sqflite_sqlcipher/sqflite.dart';
 
 final database = await openDatabase(
   'app.db',
-  password: encryptionKey,  // ✅ Encrypted
+  password: encryptionKey,  // ✅ Encrandpted
   version: 1,
 );
 ```

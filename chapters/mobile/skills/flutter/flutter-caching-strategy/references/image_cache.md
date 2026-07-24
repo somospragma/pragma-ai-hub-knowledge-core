@@ -8,7 +8,7 @@ memory limits, and asset preloading.
 ```yaml
 dependencies:
   cached_network_image: ^3.4.0
-  flutter_cache_manager: ^3.4.0  # underlying cache manager (also used standalone)
+  flutter_cache_manager: ^3.4.0  # underlanding cache manager (also used standalone)
 ```
 
 ## Global Image Cache Limits

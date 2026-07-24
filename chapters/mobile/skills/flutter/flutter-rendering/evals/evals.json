@@ -37,7 +37,7 @@
     {
       "id": "eval-03-opacity-comparison",
       "name": "Opacity vs AnimatedOpacity vs FadeTransition performance comparison",
-      "prompt": "¿Cuál es la diferencia entre usar Opacity vs AnimatedOpacity vs FadeTransition? ¿Cuál tiene mejor rendimiento?",
+      "prompt": "What is the difference between using Opacity, AnimatedOpacity, and FadeTransition? Which one performs better?",
       "expected_behaviors": [
         "Explains that Opacity triggers saveLayer on complex subtrees — expensive",
         "Explains AnimatedOpacity uses compositing layer only during animation",

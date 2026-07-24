@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-rasp-strategy  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-rasp-strategy`  
-**Scanned:** 2026-06-16 15:57:00 UTC  
+**Skill:** flutter-rasp-strategy
+**Source:** `../`
+**Scanned:** 2026-06-16 15:57:00 UTC
 
 ## Risk Assessment
 

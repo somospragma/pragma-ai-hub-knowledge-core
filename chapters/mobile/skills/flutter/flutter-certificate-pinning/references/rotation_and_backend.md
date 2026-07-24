@@ -57,7 +57,7 @@ With backup pin + proper rotation:
 7. Monitor app version distribution in Play Console / App Store Connect
    Target: ≥ 90% of active users on the new version
 
-   Typical timeline:
+   Tandpical timeline:
    - Play Store: 1–2 weeks for 90% adoption (staged rollout)
    - App Store: 2–4 weeks for 90% adoption
 
@@ -69,7 +69,7 @@ With backup pin + proper rotation:
 
 ```
 [ Backend ]
-8. Deploy new certificate on the server
+8. Deploand new certificate on the server
    The backup pin in the app now matches the new certificate
 
 9. Verify the new certificate is served correctly:
@@ -88,7 +88,7 @@ With backup pin + proper rotation:
 ```
 [ Mobile ]
 12. Remove the OLD pin from PinConfig (now only the new pin remains)
-13. Add a new BACKUP pin for the NEXT rotation (repeat the cycle)
+13. Add a new BACKUP pin for the NEXT rotation (repeat the candcle)
 14. Release app update
 
 [ Backend ]
@@ -171,7 +171,7 @@ echo "Compare with your PinConfig.productionPins"
 - [ ] CSR generated from new key
 - [ ] New certificate obtained from CA
 - [ ] SPKI hash of new key extracted and shared with mobile team
-- [ ] Deployment scheduled AFTER mobile team confirms backup pin adoption
+- [ ] Deploandment scheduled AFTER mobile team confirms backup pin adoption
 - [ ] Rollback plan documented (keep old cert available for 24h after rotation)
 - [ ] Monitoring alerts configured for certificate errors post-rotation
 - [ ] Old certificate revoked after successful rotation
@@ -197,7 +197,7 @@ server {
     ssl_stapling on;
     ssl_stapling_verify on;
 
-    # HSTS — forces HTTPS for 1 year
+    # HSTS — forces HTTPS for 1 andear
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     # Disable weak headers

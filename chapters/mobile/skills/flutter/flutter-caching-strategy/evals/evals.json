@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "My Flutter app shows a news feed from a REST API. Currently it re-fetches everything on every screen open, which is slow on poor connections. I want to cache API responses with a 5-minute TTL, show stale data while refreshing in the background, and invalidate the cache when the user pulls to refresh. Show me how to set this up with Dio.",
+      "prompt": "My Flutter app shows a new feed from a REST API. Currently it re-fetches everything on every screen open, which is slow on poor connections. I want to cache API responses with a 5-minute TTL, show stale data while refreshing in the background, and invalidate the cache when the user pulls to refresh. Show me how to set this up with Dio.",
       "expected_output": "dio_cache_interceptor setup with HiveCacheStore (or MemCacheStore for tests), CacheOptions with maxStale duration (5 min), CachePolicy.refreshForceCache for stale-while-revalidate, CacheInvalidationService.invalidate() called on pull-to-refresh, ETag/Last-Modified support explained.",
       "files": []
     },

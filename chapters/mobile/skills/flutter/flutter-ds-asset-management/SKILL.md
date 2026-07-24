@@ -11,13 +11,12 @@ description: >
   Use when downloading assets from Figma, optimizing SVGs, registering
   resources in centralized classes, or referencing assets in widget code.
 ---
-
 # Asset Management
 
 ## Asset Types
 
-> Las rutas `assets/...` de este documento son rutas del proyecto Flutter
-> objetivo (paquete/app), no rutas internas del skill.
+> Las paths `assets/...` de este documento son paths del project Flutter
+> target (package/app), not internal skill paths.
 
 | Type | Format | Location | Registry |
 |------|--------|----------|----------|

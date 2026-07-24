@@ -4,12 +4,12 @@ version: 1.0.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt para inventariar componentes existentes, clasificar reutilización y    construir el DAG de creación bottom-up. Us
+description: >
+  Prompt to inventory existing components, classify reuse, and build the bottom-up creation DAG. Use when Figma analysis must become a canonical component inventory and generation order.
 ---
+# Atomic Inventory, Canonical Spec, And DAG
 
-# Inventario Atómico, Spec Canónica y DAG
-
-## Skills de referencia
+## Reference Skills
 
 - flutter-ds-folder-structure
 - flutter-ds-naming-conventions
@@ -18,155 +18,168 @@ description: Prompt para inventariar componentes existentes, clasificar reutiliz
 - flutter-ds-asset-management
 - flutter-ds-responsive-layout
 
-## INSTRUCCIÓN
+## Instruction
 
-A partir del análisis de Figma (§1), generar la especificación canónica
-del componente, inventariar el repositorio y crear el plan de creación.
+From the structured Figma analysis, generate the canonical component
+specification, inventory the repository, and create the generation plan. If
+`spec_context` is provided, read `spec_ref` first; `PIPELINE_SPEC_PATH` remains
+the human report.
 
-## PROCESO
+## SDD Contract
 
-### Fase A: Especificación Canónica
+When `spec_context` exists:
 
-1. **Normalizar** cada valor de §1 a su token exacto del DS
-   - Consultar `flutter-ds-theming-tokens` y el catálogo del proyecto
-   - Si no hay token → ⚠️ ALERTA (no inventar tokens)
+- Read only `read_sections`.
+- Update `canonical_spec`, `inventory`, `dag`, `artifact_plan`, and `contracts`.
+- Record evidence in `{SPEC_PACKET_PATH}/evidence/planning-report.md`.
+- Do not copy the full analysis into handoffs.
 
-2. **Definir props** del componente:
-   - Nombre: `{{DS_PREFIX}}[Nombre]` o descriptivo según nivel
-   - Parámetros tipados con required/optional/defaults
-   - Enums: State, Variant, Size
-   - Callbacks tipados
-   - Comportamientos especiales desde `§1.3b Anotaciones Development`
-   - Contrato de vectores desde `§1.3c Vectores y Assets`
-   - Contrato de textos literales desde `§1.1b Textos Literales`
-   - Contrato de layout seguro desde `§1.1c Layout, Constraints y Riesgo de Overflow`
-   - No inventar copy ni UX adicional si no está sustentado por Figma/metadatos
+## Process
 
-3. **Escribir** §2 en `PIPELINE_SPEC_PATH`
+### Phase A: Canonical Specification
 
-### Fase B: Inventario del Repositorio
+1. **Normalize** each value of `visual_analysis` to its exact token in the DS.
+   - Consult `flutter-ds-theming-tokens` and the project catalog.
+   - If there is no token, generate a clear alert and do not invent tokens.
 
-Para CADA sub-componente de la descomposición atómica:
+2. **Define props** for the component:
+   - Name: `{{DS_PREFIX}}[Name]` or a descriptive name according to level.
+   - Typed parameters with required, optional, and default values.
+   - Enums: State, Variant, Size.
+   - Typed callbacks.
+   - Special behaviors from `design_source.annotations`.
+   - Vector contract from `assets`.
+   - Literal text contract from `literal_texts`.
+   - Safe layout contract from `layout_constraints`.
+   - Do not invent copy or extra UX if Figma/metadata does not support it.
 
-**Búsqueda en 4 pasos:**
+3. **Write** `canonical_spec` in `spec.yaml`.
 
-1. **Nombre exacto**: `symbol:[NombreComponente]` en el repo
-2. **Archivo esperado**: path según `flutter-ds-folder-structure`
-3. **Funcionalidad**: semantic search si pasos 1-2 no encuentran
-4. **Carpeta**: listar archivos en `lib/[nivel]/[subcarpeta]/`
+### Phase B: Repository Inventory
 
-**Para cada encontrado:**
-- Leer archivo completo
-- Extraer: constructor, parámetros, estados, variantes
-- Clasificar:
-  - ✅ Compatible → reutilizar
-  - ⚠️ Parcial → documentar qué falta
-  - ❌ Incompatible → crear nuevo
+For each sub-component in the atomic decomposition:
 
-**Para cada NO encontrado:**
-- 🆕 Marcar como "Por crear"
-- Asignar nivel atómico
-- Proponer path y nombre
+**Search in 4 steps:**
 
-### Fase C: DAG de Dependencias
+1. **Exact name**: `symbol:[NameComponent]` in the repo.
+2. **Expected file**: path according to `flutter-ds-folder-structure`.
+3. **Functionality**: semantic search if steps 1-2 find nothing.
+4. **Folder**: list files in `lib/[level]/[subfolder]/`.
 
-1. Inferir dependencias entre sub-componentes
-2. Clasificar:
-   - `reusar` → componente existente
-   - `separado` → nuevo widget independiente
-   - `inline` → widget privado del padre
-3. Generar orden bottom-up estricto
+**For each match:**
 
-### Fase D: Textos y Overflow
+- Read the full file.
+- Extract constructor, parameters, states, and variants.
+- Classify:
+  - Compatible: reuse.
+  - Partial: document what is missing.
+  - Incompatible: create new.
 
-1. Propagar los textos de `§1.1b` sin traducir, corregir, resumir ni mejorar.
-2. Si un estado requerido no trae texto desde Figma, registrar alerta de alcance
-   y deuda; no convertir un placeholder técnico en copy final. Para vistas,
-   mantener `loading`, `empty`, `error` y `populated` usando fallback estándar
-   del proyecto cuando Figma no los defina.
-3. Propagar riesgos de `§1.1c` y definir mitigación por componente/vista.
-4. Si faltan constraints detallados, no bloquear solo por eso: inferir una
-   mitigación conservadora anti-overflow y marcar la inferencia.
+**For each missing component:**
 
-## OUTPUT OBLIGATORIO
+- Mark as "To create".
+- Assign atomic level.
+- Propose path and name.
+
+### Phase C: Dependency DAG
+
+1. Infer dependencies between sub-components.
+2. Classify:
+   - `reuse`: existing component.
+   - `separate`: new independent widget.
+   - `inline`: private widget inside the parent.
+3. Generate a strict bottom-up order.
+
+### Phase D: Text And Overflow
+
+1. Propagate `literal_texts` without translating, fixing, summarizing, or improving them.
+2. If a required state has no text from Figma, record a scope/debt alert; do not
+   turn technical placeholders into final copy. For views, keep `loading`,
+   `empty`, `error`, and `populated` using the project standard fallback when
+   Figma does not define the state.
+3. Propagate `layout_constraints` risks and define mitigation per component/view.
+4. If detailed constraints are missing, do not block for that reason alone:
+   infer conservative anti-overflow mitigation and mark the inference.
+
+## Required Output
 
 ```markdown
-## §2 Especificación Canónica: [NombreComponente]
+## Canonical Specification: [NameComponent]
 
 ### Props
-| Parámetro | Tipo | Required | Default | Token/Ref |
+| Parameter | Type | Required | Default | Token/Ref |
 |-----------|------|----------|---------|-----------|
 
 ### Enums
-- {{DS_PREFIX}}[Nombre]State: default_, disabled, loading, focused, error
-- {{DS_PREFIX}}[Nombre]Variant: primary, secondary, ...
-- {{DS_PREFIX}}[Nombre]Size: sm, md, lg (si aplica)
+- {{DS_PREFIX}}[Name]State: default_, disabled, loading, focused, error
+- {{DS_PREFIX}}[Name]Variant: primary, secondary, ...
+- {{DS_PREFIX}}[Name]Size: sm, md, lg (if applicable)
 
 ### Callbacks
-| Callback | Tipo | Descripción |
+| Callback | Type | Description |
 |----------|------|-------------|
 
-### Comportamientos Especiales (desde §1.3b)
-| Regla/Annotation | Impacto UI | Prop/Estado/Callback requerido | Prioridad |
-|------------------|------------|-------------------------------|-----------|
+### Special Behaviors
+| Rule/Annotation | UI Impact | Required Prop/State/Callback | Priority |
+|------------------|------------|-------------------------------|----------|
 
-### Estados de Vista y Fallbacks (solo `/new-view`)
-| Estado | Fuente | Componente/Widget | Copy | Fallback estándar | Alerta |
-|--------|--------|-------------------|------|-------------------|--------|
+### View States And Fallbacks (only `/new-view`)
+| State | Source | Component/Widget | Copy | Standard Fallback | Alert |
+|-------|--------|------------------|------|-------------------|-------|
 
-### Contrato de Vectores (desde §1.3c)
-| Vector/Asset | Uso UI | Estrategia | Owner (DS/APP) | Ruta/Constante | Estado |
-|-------------|--------|------------|----------------|----------------|--------|
+### Vector Contract
+| Vector/Asset | UI Use | Strategy | Owner (DS/APP) | Path/Constant | State |
+|--------------|--------|----------|----------------|---------------|-------|
 
-### Contrato de Textos Literales (desde §1.1b)
-| Prop/Elemento | Texto exacto Figma | Node ID | Scope/Estado | Editable por agente |
-|---------------|--------------------|---------|--------------|---------------------|
+### Literal Text Contract
+| Prop/Element | Exact Figma Text | Node ID | Scope/State | Editable By Agent |
+|--------------|------------------|---------|-------------|-------------------|
 
-### Contrato de Layout Seguro (desde §1.1c)
-| Elemento | Riesgo de overflow | Mitigación requerida | Inferido por falta de constraints | Severidad |
-|----------|--------------------|-----------------------|-----------------------------------|-----------|
+### Safe Layout Contract
+| Element | Overflow Risk | Required Mitigation | Inferred From Missing Constraints | Severity |
+|---------|---------------|---------------------|-----------------------------------|----------|
 
-## §3 Inventario y DAG
+## Inventory And DAG
 
-### ✅ Existentes — Reutilizar
-| Componente | Nivel | Path | API |
+### Existing - Reuse
+| Component | Level | Path | API |
 |-----------|-------|------|-----|
 
-### ⚠️ Existentes — Requieren Extensión
-| Componente | Nivel | Path | Qué falta | Cambio propuesto |
-|-----------|-------|------|-----------|------------------|
+### Existing - Requires Extension
+| Component | Level | Path | Missing Capability | Proposed Change |
+|-----------|-------|------|--------------------|-----------------|
 
-### 🆕 Faltantes — Crear
-| Componente | Nivel | Path propuesto | Estrategia | Specs |
-|-----------|-------|---------------|-----------|-------|
+### Missing - Create
+| Component | Level | Proposed Path | Strategy | Specs |
+|-----------|-------|---------------|----------|-------|
 
-### 🎯 Inventario de Vectores/Assets
-| Vector/Asset | Estrategia final | Reutiliza DS Icon | Asset a crear/registrar | Ubicación |
-|-------------|------------------|-------------------|-------------------------|----------|
+### Vector/Asset Inventory
+| Vector/Asset | Final Strategy | Reuses DS Icon | Asset To Create/Register | Location |
+|--------------|----------------|----------------|--------------------------|----------|
 
-### 🧩 Inventario de Textos y Overflow
-| Componente/Widget | Textos literales usados | Mitigación overflow | Alertas |
-|-------------------|-------------------------|---------------------|---------|
+### Text And Overflow Inventory
+| Component/Widget | Literal Text Used | Overflow Mitigation | Alerts |
+|------------------|-------------------|---------------------|--------|
 
 ### DAG
-[Diagrama de dependencias]
+[Dependency diagram]
 
-### 📋 Orden de Creación (bottom-up)
-1. [Átomo 1] — sin dependencias
-2. [Átomo 2] — depende de Átomo 1
-3. [Molécula 1] — depende de Átomo 1, Átomo 2
-4. [Organismo] — depende de Molécula 1
+### Creation Order (bottom-up)
+1. [Atom 1] - no dependencies
+2. [Atom 2] - depends on Atom 1
+3. [Molecule 1] - depends on Atom 1, Atom 2
+4. [Organism] - depends on Molecule 1
 
-### ⚠️ Alertas
-- [ambigüedades, conflictos, decisiones pendientes]
+### Alerts
+- [ambiguities, conflicts, or pending decisions]
 ```
 
-## REGLA DE ORO
+## Golden Rule
 
-NUNCA propongas crear un componente que ya existe y es compatible.
-Si hay duda sobre compatibilidad, marca como ⚠️ Parcial con detalle.
-NUNCA ignores anotaciones `Development` reportadas en `§1.3b`.
-NUNCA ignores vectores reportados en `§1.3c`.
-NUNCA inventes, traduzcas, corrijas ni reescribas textos visibles de Figma.
-NUNCA bloquees solo por constraints incompletos si puedes mitigar overflow de
-forma conservadora y reportar la alerta.
+NEVER propose creating a component that already exists and is compatible.
+If compatibility is uncertain, mark it as Partial with details.
+NEVER ignore `Development` annotations reported in `design_source.annotations`.
+NEVER ignore vectors reported in `assets`.
+NEVER invent, translate, correct, or rewrite visible text from Figma.
+NEVER block only because constraints are incomplete if overflow can be mitigated
+conservatively and the alert can be reported.

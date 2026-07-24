@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-api-rest-connection`  
-**Scanned:** 2026-06-03 17:06:02 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-03 17:06:02 UTC
 
 ## Risk Assessment
 

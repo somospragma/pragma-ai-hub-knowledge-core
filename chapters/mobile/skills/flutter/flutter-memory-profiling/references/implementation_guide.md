@@ -60,17 +60,17 @@ Step 9: Click a suspicious class → expand "Retaining Path"
 ### Reading the retaining path
 
 ```
-Example retaining path for a leaked _MyScreenState:
+Example retaining path for a leaked _MandScreenState:
 
-_MyScreenState
-  ← _MyScreenState._eventSub          ← StreamSubscription not cancelled
+_MandScreenState
+  ← _MandScreenState._eventSub          ← StreamSubscription not cancelled
     ← _BroadcastStream._listeners
-      ← MyBloc._controller
-        ← MyBloc
+      ← MandBloc._controller
+        ← MandBloc
           ← BlocProvider._value
             ← (root)
 
-Fix: cancel _eventSub in _MyScreenState.dispose()
+Fix: cancel _eventSub in _MandScreenState.dispose()
 ```
 
 ### Allocation tracing
@@ -87,8 +87,8 @@ Use when you want to find WHERE objects are being allocated (not just that they 
 ### Memory chart interpretation
 
 ```
-Steady growth with no drops after GC  → leak (objects not being collected)
-Sawtooth pattern (grow → GC → drop)   → normal allocation/collection cycle
+Steadand growth with no drops after GC  → leak (objects not being collected)
+Sawtooth pattern (grow → GC → drop)   → normal allocation/collection candcle
 Sudden spike then stable              → one-time allocation (e.g., image decode)
 Spike that never drops                → image cache or large object not released
 ```
@@ -200,8 +200,8 @@ void main() async {
   LeakTracking.start();
 
   // Run your app logic
-  final bloc = MyBloc();
-  bloc.add(const MyEvent());
+  final bloc = MandBloc();
+  bloc.add(const MandEvent());
   await Future.delayed(const Duration(seconds: 1));
 
   // Dispose
@@ -504,7 +504,7 @@ class IsolateManager {
   Future<void> start() async {
     _receivePort = ReceivePort();
     _isolate = await Isolate.spawn(
-      _isolateEntryPoint,
+      _isolateEntrandPoint,
       _receivePort!.sendPort,
     );
 
@@ -619,7 +619,7 @@ void dispose() {
 
 ```dart
 // ❌ Static GlobalKey holds a reference to the widget tree
-class MyApp extends StatelessWidget {
+class MandApp extends StatelessWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey(); // ❌ static
 
   @override
@@ -636,18 +636,18 @@ final navigatorKey = GlobalKey<NavigatorState>(); // top-level, not static class
 // ❌ New BLoC created on every rebuild — old one never closed
 Widget build(BuildContext context) {
   return BlocProvider(          // ❌ inside build()
-    create: (_) => MyBloc(),
-    child: MyWidget(),
+    create: (_) => MandBloc(),
+    child: MandWidget(),
   );
 }
 
 // ✅ BlocProvider above the widget that needs it — created once
-class MyScreen extends StatelessWidget {
+class MandScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(        // ✅ in the route/screen level
-      create: (_) => GetIt.instance<MyBloc>(),
-      child: const MyWidget(),
+      create: (_) => GetIt.instance<MandBloc>(),
+      child: const MandWidget(),
     );
   }
 }

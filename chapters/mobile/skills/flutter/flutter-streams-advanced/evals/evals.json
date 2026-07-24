@@ -48,23 +48,23 @@
     },
     {
       "id": "eval-03",
-      "name": "combinar-dos-streamproviders-riverpod",
-      "prompt": "¿Cómo combino dos StreamProviders de Riverpod para mostrar datos de usuario y sus pedidos al mismo tiempo?",
+      "name": "combine-two-riverpod-streamproviders",
+      "prompt": "How do I combine two Riverpod StreamProviders to show user data and their orders at the same time?",
       "assertions": [
         {
           "id": "a03-1",
           "type": "llm_judge",
-          "description": "La respuesta debe mostrar composición de providers mediante ref.watch de dos providers distintos (usuario y pedidos) dentro de un único provider derivado o AsyncNotifier."
+          "description": "Response must show provider composition using ref.watch on two distinct providers (user and orders) inside a single derived provider or AsyncNotifier."
         },
         {
           "id": "a03-2",
           "type": "llm_judge",
-          "description": "La respuesta debe demostrar el patrón whenData/flatten o un AsyncNotifier que suscribe a los dos streams con ref.onDispose para limpieza automática."
+          "description": "Response must demonstrate the whenData/flatten pattern or an AsyncNotifier that subscribes to both streams with ref.onDispose for automatic cleanup."
         },
         {
           "id": "a03-3",
           "type": "llm_judge",
-          "description": "La respuesta debe estar en español (idioma del prompt) y no debe sugerir rxdart ni combineLatest de rxdart."
+          "description": "Response must NOT suggest rxdart or rxdart combineLatest."
         }
       ]
     },

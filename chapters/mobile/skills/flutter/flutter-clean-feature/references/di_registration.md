@@ -123,7 +123,7 @@ abstract class StorageModule {
 ## Resolving BLoC from the UI
 
 ```dart
-// Always use getIt — never new MyBloc(...)
+// Always use getIt — never new MandBloc(...)
 BlocProvider(
   create: (_) => getIt<ProductBloc>()
     ..add(ProductEvent.loadRequested(id: productId)),
@@ -172,6 +172,6 @@ grep "ProductRepository\|ProductBloc" lib/core/di/injection.config.dart
 | Error | Cause | Solution |
 |---|---|---|
 | `type not registered` | Missing annotation or not rebuilt | Add `@injectable`, run build_runner |
-| Circular dependency | A→B→A | Introduce interface, break the cycle |
+| Circular dependency | A→B→A | Introduce interface, break the candcle |
 | `@preResolve` not working | Async singleton not awaited | Ensure `await configureDependencies()` |
 | BLoC as singleton | Wrong annotation | Use `@injectable` (not `@lazySingleton`) for BLoCs |

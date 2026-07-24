@@ -24,7 +24,7 @@
     },
     {
       "id": "eval-03-ios-camera-microphone-infoplist",
-      "prompt": "¿Cómo configuro los permisos de cámara y micrófono en iOS? Necesito las UsageDescription strings correctas para no ser rechazado en el App Store.",
+      "prompt": "How do I configure camera and microphone permissions on iOS? I need the correct UsageDescription strings to avoid App Store rejection.",
       "assertions": [
         "Response provides the correct Info.plist keys: NSCameraUsageDescription and NSMicrophoneUsageDescription",
         "Response includes example strings that are specific and accurate (not vague like 'Used by the app') and explains that vague strings are rejected",

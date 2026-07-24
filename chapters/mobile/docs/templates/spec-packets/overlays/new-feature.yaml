@@ -1,0 +1,45 @@
+workflow: new-feature
+entry_agent: feature-builder
+base_spec_level: full
+purpose: Generate a complete feature across domain, data, presentation, wiring and documentation.
+required_inputs:
+  - feature_name
+  - description
+optional_inputs:
+  - figma_url
+  - api_contract
+  - entity_name
+  - fields
+  - api_endpoints
+  - user_story
+required_external_access:
+  figma_mcp:
+    required_when_input_exists: figma_url
+    preflight_agent: figma-analyzer
+    evidence: evidence/figma-mcp-preflight.md
+required_agents:
+  - feature-builder
+  - ds-orchestrator
+  - code-auditor
+  - delivery-manager
+conditional_agents:
+  figma_url:
+    - figma-analyzer
+artifact_groups:
+  - ds_components
+  - scaffold
+  - domain
+  - data
+  - presentation
+  - wiring
+  - docs
+  - audit
+  - delivery
+required_human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+notes:
+  - Project documentation must be represented as artifact_plan.planned[group=docs].
+  - feature-builder delegates Figma preflight and analysis to figma-analyzer when figma_url is provided.
+  - Delivery proposes branch, commit and PR text unless explicit git or gh permissions are granted.

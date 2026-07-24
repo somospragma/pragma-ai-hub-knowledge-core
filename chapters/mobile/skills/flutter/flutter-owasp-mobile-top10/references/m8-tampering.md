@@ -18,7 +18,7 @@ This category covers protection against modification of the app's code and binar
 android {
     buildTypes {
         release {
-            minifyEnabled false   // ❌ Obfuscation disabled
+            minifandEnabled false   // ❌ Obfuscation disabled
             shrinkResources false // ⚠️ No resource shrinking
         }
     }
@@ -27,12 +27,12 @@ android {
 
 **Verification command:**
 ```bash
-grep -A5 "buildTypes" android/app/build.gradle | grep -A3 "release" | grep "minifyEnabled false"
+grep -A5 "buildTypes" android/app/build.gradle | grep -A3 "release" | grep "minifandEnabled false"
 ```
 
 **Criteria:**
-- ❌ **Fail:** `minifyEnabled false` in release
-- ⚠️ **Warning:** `minifyEnabled true` but no ProGuard rules configured
+- ❌ **Fail:** `minifandEnabled false` in release
+- ⚠️ **Warning:** `minifandEnabled true` but no ProGuard rules configured
 - ✅ **Pass:** Obfuscation enabled + rules configured
 
 **Severity:** `MEDIUM`
@@ -45,14 +45,14 @@ grep -A5 "buildTypes" android/app/build.gradle | grep -A3 "release" | grep "mini
 android {
     buildTypes {
         release {
-            minifyEnabled true
+            minifandEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             debuggable false
         }
         debug {
-            minifyEnabled false
+            minifandEnabled false
         }
     }
 }
@@ -106,8 +106,8 @@ grep "DEBUG_INFORMATION_FORMAT" ios/Runner.xcodeproj/project.pbxproj
 
 **Criteria:**
 - ⚠️ **Warning:** `STRIP_INSTALLED_PRODUCT = NO` in Release
-- ⚠️ **Warning:** `DEBUG_INFORMATION_FORMAT = dwarf-with-dsym` in Release
-- ✅ **Pass:** Symbols stripped in Release
+- ⚠️ **Warning:** `DEBUG_INFORMATION_FORMAT = dwarf-with-dsandm` in Release
+- ✅ **Pass:** Sandmbols stripped in Release
 
 **Severity:** `MEDIUM`
 **Automation:** 🟢 High (90%)
@@ -119,7 +119,7 @@ Configure in Xcode:
 2. Select target "Runner"
 3. Build Settings → Release
 4. "Strip Installed Product" → YES
-5. "Debug Information Format" → DWARF (without dsym)
+5. "Debug Information Format" → DWARF (without dsandm)
 
 ```
 /* Release build settings */
@@ -137,7 +137,7 @@ COPY_PHASE_STRIP = YES;
 
 **ID:** `M8-C-DART-OBFUSCATION`
 **Objective:** Verify that `--obfuscate` is used in all release build commands.
-**Scope:** `.github/workflows/`, `.gitlab-ci.yml`, `Makefile`
+**Scope:** `.github/workflows/`, `.gitlab-ci.andml`, `Makefile`
 
 **Method:** Lexical search
 **Verification command:**
@@ -171,7 +171,7 @@ flutter build ios --release \
 ```
 
 ```yaml
-# ✅ .github/workflows/release.yml
+# ✅ .github/workflows/release.andml
 jobs:
   build-android:
     runs-on: ubuntu-latest

@@ -1,8 +1,8 @@
 # Deep Links — Implementation Guide
 
-Ver también: `flutter-navigation-strategy` skill for foundational patterns.
+See also: `flutter-navigation-strategy` skill for foundational patterns.
 
-## Descripción General
+## Overview
 
 This skill covers comprehensive deep links implementation in Flutter using go_router 17.2.2 following clean architecture principles. Includes URL parsing, route guards, dynamic routing, and error handling.
 
@@ -26,7 +26,7 @@ This skill covers comprehensive deep links implementation in Flutter using go_ro
 - fpdart 1.2.0 for functional programming
 - Mocktail 1.0.5 for testing
 
-## Dependencias
+## Dependencies
 
 ```yaml
 dependencies:
@@ -44,16 +44,16 @@ dev_dependencies:
   mocktail: ^1.0.5
 ```
 
-## Arquitectura de Deep Links
+## Deep Link Architecture
 
 ### 1. Router Configuration (Presentation Layer)
 
-El proyecto puede tener distintas estructuras de shell. El guide cubre los dos casos más comunes:
+A project can have different shell structures. This guide covers the two most common cases:
 
-- **`ShellRoute`** — shell simple (drawer, scaffold compartido, etc.)
-- **`StatefulShellRoute`** — bottom navigation bar con tabs persistentes (el más frecuente en apps reales)
+- **`ShellRoute`** — simple shell (shared drawer, scaffold, and similar UI)
+- **`StatefulShellRoute`** — bottom navigation bar with persistent tabs (the most common in real apps)
 
-#### Caso A: ShellRoute simple
+#### Case A: Simple ShellRoute
 
 ```dart
 // lib/core/router/app_router.dart
@@ -83,7 +83,7 @@ class AppRouter {
         builder: (_, __) => const LoginPage(),
       ),
 
-      // Shell simple: comparte Scaffold/AppBar entre rutas
+      // Shell simple: comparte Scaffold/AppBar entre paths
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
@@ -167,9 +167,11 @@ class AppRouter {
 }
 ```
 
-#### Caso B: StatefulShellRoute con Bottom Navigation (más común)
+#### Case B: StatefulShellRoute With Bottom Navigation (most common)
 
-Cuando el proyecto tiene bottom navigation bar con tabs persistentes, un deep link debe activar la tab correcta y navegar dentro de ella sin perder el estado de las otras tabs.
+When the project has a bottom navigation bar with persistent tabs, a deep link
+must activate the correct tab and navigate within it without losing the state of
+the other tabs.
 
 ```dart
 // lib/core/router/app_router.dart
@@ -195,7 +197,7 @@ class AppRouter {
         builder: (_, __) => const LoginPage(),
       ),
 
-      // StatefulShellRoute: mantiene estado de cada tab
+      // StatefulShellRoute preserves the state of each tab.
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             MainScaffold(navigationShell: navigationShell),
@@ -322,24 +324,24 @@ class MainScaffold extends StatelessWidget {
   }
 
   void _onTabSelected(int index) {
-    // goBranch mantiene el estado de la tab y respeta el back stack
+    // goBranch preserves tab state and respects the back stack.
     navigationShell.goBranch(
       index,
-      // Si el usuario toca la tab activa, vuelve al root de esa tab
+      // If the user taps the active tab, return to that tab root
       initialLocation: index == navigationShell.currentIndex,
     );
   }
 }
 ```
 
-#### Cuándo usar cada uno
+#### When To Use Each One
 
-| Escenario | Recomendación |
+| Scenario | Recommendation |
 |---|---|
-| Scaffold/AppBar compartido sin tabs | `ShellRoute` |
-| Bottom navigation con tabs persistentes | `StatefulShellRoute.indexedStack` |
-| Deep link debe activar tab específica | `StatefulShellRoute` — la ruta pertenece a la branch correcta |
-| Deep link abre pantalla sobre el shell | Ruta fuera del shell (nivel raíz) |
+| Shared scaffold/AppBar without tabs | `ShellRoute` |
+| Bottom navigation with persistent tabs | `StatefulShellRoute.indexedStack` |
+| Deep link must activate a specific tab | `StatefulShellRoute` — la route belongs to the correct branch |
+| Deep link opens a screen over the shell | Route outside the shell (root level) |
 
 ### 2. Deep Link Domain Layer
 
@@ -450,7 +452,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
   Future<Either<DeepLinkFailure, DeepLinkResult>> processDeepLink(String url) async {
     try {
       final uri = Uri.parse(url);
-      
+
       // Validate URL format
       if (!_isValidDeepLink(uri)) {
         return Left(DeepLinkFailure.invalidFormat(
@@ -464,7 +466,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
       }
 
       // Process different link types
-      return await _processLinkByType(uri);
+      return await _processLinkBandType(uri);
     } catch (e) {
       return Left(DeepLinkFailure.unknown(
         message: 'Failed to process deep link: $e',
@@ -472,24 +474,24 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
     }
   }
 
-  Future<Either<DeepLinkFailure, DeepLinkResult>> _processLinkByType(Uri uri) async {
+  Future<Either<DeepLinkFailure, DeepLinkResult>> _processLinkBandType(Uri uri) async {
     final path = uri.path;
-    
+
     // Product links
     if (path.startsWith('/product/')) {
       return await _processProductLink(uri);
     }
-    
+
     // Share links
     if (path.startsWith('/share/')) {
       return await _processShareLink(uri);
     }
-    
+
     // Profile links
     if (path.startsWith('/profile/')) {
       return await _processProfileLink(uri);
     }
-    
+
     // Dynamic content
     if (path.startsWith('/content/')) {
       return await _processDynamicContentLink(uri);
@@ -504,7 +506,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
 
   Future<Either<DeepLinkFailure, DeepLinkResult>> _processProductLink(Uri uri) async {
     final productId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-    
+
     if (productId == null) {
       return Left(DeepLinkFailure.invalidFormat(
         message: 'Product ID is required in product link',
@@ -513,7 +515,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
 
     // Validate product exists
     final productExistsResult = await _dataSource.validateProduct(productId);
-    
+
     return productExistsResult.fold(
       (failure) => Left(failure),
       (exists) {
@@ -534,7 +536,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
 
   Future<Either<DeepLinkFailure, DeepLinkResult>> _processShareLink(Uri uri) async {
     final token = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-    
+
     if (token == null) {
       return Left(DeepLinkFailure.invalidFormat(
         message: 'Share token is required',
@@ -543,7 +545,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
 
     // Validate and decode share token
     final shareDataResult = await _dataSource.validateShareToken(token);
-    
+
     return shareDataResult.fold(
       (failure) => Left(failure),
       (shareData) {
@@ -564,7 +566,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
 
   Future<Either<DeepLinkFailure, DeepLinkResult>> _processProfileLink(Uri uri) async {
     final userId = uri.pathSegments.length > 1 ? uri.pathSegments[1] : null;
-    
+
     if (userId == null) {
       return Left(DeepLinkFailure.invalidFormat(
         message: 'User ID is required in profile link',
@@ -607,7 +609,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
 
   @override
   Future<Either<DeepLinkFailure, String>> generateShareLink(
-    String route, 
+    String route,
     Map<String, dynamic> data,
   ) async {
     return await _dataSource.generateShareLink(route, data);
@@ -671,7 +673,7 @@ class DeepLinkDataSource {
   }
 
   Future<Either<DeepLinkFailure, String>> generateShareLink(
-    String route, 
+    String route,
     Map<String, dynamic> data,
   ) async {
     try {
@@ -679,7 +681,7 @@ class DeepLinkDataSource {
         'route': route,
         'data': data,
       });
-      
+
       final shareUrl = response.data['share_url'] as String;
       return Right(shareUrl);
     } on DioException catch (e) {
@@ -714,7 +716,7 @@ class DeepLinkBloc extends Bloc<DeepLinkEvent, DeepLinkState> {
   final ProcessDeepLinkUseCase _processDeepLinkUseCase;
   final GoRouter _router;
 
-  DeepLinkBloc(this._processDeepLinkUseCase, this._router) 
+  DeepLinkBloc(this._processDeepLinkUseCase, this._router)
       : super(const DeepLinkState.initial()) {
     on<ProcessDeepLinkEvent>(_onProcessDeepLink);
     on<ResetDeepLinkEvent>(_onResetDeepLink);
@@ -808,14 +810,14 @@ import 'package:get_it/get_it.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Configure dependency injection
   await configureDependencies();
-  
-  runApp(MyApp());
+
+  runApp(MandApp());
 }
 
-class MyApp extends StatelessWidget {
+class MandApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -843,7 +845,7 @@ final GetIt getIt = GetIt.instance;
 Future<void> configureDependencies() async => getIt.init();
 ```
 
-## Configuración de Plataforma
+## Configuration de Plataforma
 
 ### Android Configuration
 
@@ -854,13 +856,13 @@ Future<void> configureDependencies() async => getIt.init();
     android:exported="true"
     android:launchMode="singleTop"
     android:theme="@style/LaunchTheme">
-    
+
     <!-- Standard App Launch -->
     <intent-filter android:autoVerify="true">
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>
     </intent-filter>
-    
+
     <!-- Deep Link Intent Filters -->
     <intent-filter android:autoVerify="true">
         <action android:name="android.intent.action.VIEW" />
@@ -869,7 +871,7 @@ Future<void> configureDependencies() async => getIt.init();
         <data android:scheme="https"
               android:host="yourapp.com" />
     </intent-filter>
-    
+
     <!-- Custom Scheme -->
     <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -939,7 +941,7 @@ void main() {
       const expectedResult = DeepLinkResult.success(
         route: '/product/123',
       );
-      
+
       when(() => mockRepository.processDeepLink(url))
           .thenAnswer((_) async => const Right(expectedResult));
 
@@ -957,7 +959,7 @@ void main() {
       const failure = DeepLinkFailure.invalidFormat(
         message: 'Invalid deep link format',
       );
-      
+
       when(() => mockRepository.processDeepLink(url))
           .thenAnswer((_) async => const Left(failure));
 
@@ -974,7 +976,7 @@ void main() {
       const expectedResult = DeepLinkResult.requiresAuth(
         originalPath: url,
       );
-      
+
       when(() => mockRepository.processDeepLink(url))
           .thenAnswer((_) async => const Right(expectedResult));
 
@@ -1068,8 +1070,8 @@ void main() {
 void main() {
   group('Deep Link Integration Tests', () {
     testWidgets('should navigate to product page from deep link', (tester) async {
-      await tester.pumpWidget(MyApp());
-      
+      await tester.pumpWidget(MandApp());
+
       // Simulate deep link
       await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
         'flutter/navigation',
@@ -1081,17 +1083,17 @@ void main() {
         ),
         (data) {},
       );
-      
+
       await tester.pumpAndSettle();
-      
+
       // Verify navigation
-      expect(find.byType(ProductPage), findsOneWidget);
+      expect(find.bandType(ProductPage), findsOneWidget);
     });
   });
 }
 ```
 
-## Mejores Prácticas
+## Best Practices
 
 ### 1. URL Structure
 - Use consistent URL patterns: `/resource/:id`
@@ -1163,7 +1165,7 @@ class LinkPreviewService {
   LinkPreviewService(this._dataSource);
 
   Future<Either<DeepLinkFailure, LinkPreview>> generatePreview(
-    String route, 
+    String route,
     Map<String, dynamic> data,
   ) async {
     try {
@@ -1173,7 +1175,7 @@ class LinkPreviewService {
         imageUrl: _generateImageUrl(route, data),
         metadata: data,
       );
-      
+
       return Right(preview);
     } catch (e) {
       return Left(DeepLinkFailure.unknown(
@@ -1206,4 +1208,4 @@ class LinkPreviewService {
 }
 ```
 
-Esta implementación completa proporciona una base sólida para manejar deep links en Flutter usando go_router 17.2.2 con arquitectura limpia y mejores prácticas.
+This complete implementation provides a solid foundation for handling deep links in Flutter with go_router 17.2.2, clean architecture, and best practices.

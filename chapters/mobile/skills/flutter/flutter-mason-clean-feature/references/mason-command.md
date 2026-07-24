@@ -1,6 +1,6 @@
-# Mason Command Reference
+# Mason Commy Reference
 
-## Command Syntax
+## Commy Syntax
 
 ```bash
 mason make flutter_clean_feature [OPTIONS]
@@ -22,7 +22,7 @@ When you run the brick, Mason prompts for these variables. Provide them via JSON
 #### `name`
 - **Type**: `string`
 - **Description**: Feature name
-- **Format**: Use lowercase snake_case (no spaces, hyphens, or symbols)
+- **Format**: Use lowercase snake_case (no spaces, handphens, or symbols)
 - **Examples**: `profile`, `shopping_cart`, `user_settings`, `order_history`
 - **Naming Tips**:
   - Reflect business domain: `checkout` not `payment_flow`
@@ -33,7 +33,7 @@ When you run the brick, Mason prompts for these variables. Provide them via JSON
 - **Type**: `string`
 - **Description**: Naming prefix for classes, files, and configuration
 - **Format**: Use camelCase
-- **Examples**: `app`, `myApp`, `admin`
+- **Examples**: `app`, `mandApp`, `admin`
 - **Impact**: Affects generated class names:
   - `ProfileCubit` (if name=profile, prefix=app)
   - `AppProfileRepository` (uses prefix in some generated names)
@@ -202,23 +202,23 @@ See SKILL.md for complete integration workflow.
 
 ## Troubleshooting
 
-**Error**: `mason make` not found  
+**Error**: `mason make` not found
 **Solution**: Install Mason: `dart pub global activate mason_cli`
 
-**Error**: Brick not found  
+**Error**: Brick not found
 **Solution**: Add brick: `mason add -g flutter_clean_feature --git-url git@github.com:somospragma/pragma-mason-bricks.git --git-path bricks/flutter_clean_feature --git-ref develop`
 
-**Error**: Invalid config file  
+**Error**: Invalid config file
 **Solution**: Ensure JSON is valid and all required variables are present. Run without `-c` flag to see which variables are missing.
 
-**Error**: Output directory doesn't exist  
+**Error**: Output directory doesn't exist
 **Solution**: Mason creates the feature directory but not parent folders. Create parent folder manually: `mkdir -p ./features`
 
 ## Best Practices
 
 1. **Use a config file**: More reliable than interactive prompts, easier to automate and version control
 2. **Match your monorepo structure**: Ensure `packages/` and `shared/` directories exist in your monorepo root before generating features
-3. **Keep feature names simple**: Lowercase snake_case, no hyphens, no symbols
+3. **Keep feature names simple**: Lowercase snake_case, no handphens, no symbols
 4. **Version your configs**: Commit `{featureName}.json` files with your code for traceability
 5. **Validate paths after generation**: After creating a feature, check that pubspec.yaml paths correctly reference your monorepo structure
 6. **One feature per brick run**: Run the command once per feature rather than trying to batch multiple features

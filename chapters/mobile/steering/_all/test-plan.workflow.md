@@ -1,24 +1,22 @@
 ---
 id: test-plan
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: steering
 chapter: mobile
+entry_agent: test-coverage-engineer
+input_contract: ../docs/templates/spec-packets/overlays/test-plan.yaml
+invocation_mode: explicit_agent
 description: >
-  Workflow for analyzing, planning, and generating complete test coverage
-  for an existing feature. Inventories all source files, identifies missing
-  tests, generates unit/widget tests per layer, validates coverage targets,
-  and produces a testing report. Use when a feature exists but lacks tests
-  or has incomplete coverage.
+  Workflow for analyzing, planning, and generating complete test coverage for an existing feature. Use when the user provides a feature path and needs coverage inventory, test strategy, generated tests, execution evidence, and a testing report.
 ---
-
 # Workflow: Test Plan (Full Coverage for Existing Feature)
 
 ## When to Use
 
 Use this workflow when:
 
-- A feature exists and has no tests or incomplete test coverage
+- A feature exists and either has no tests or has incomplete test coverage
 - The user asks to "add tests", "improve coverage", "test the checkout feature"
 - After a `/new-feature` workflow completes (tests are a separate step)
 - After a `/refactor-feature` workflow if coverage is still below targets
@@ -35,11 +33,14 @@ Do NOT use for:
 ## Prerequisites
 
 - Feature must already exist at the given path with source code
-- `.copilot/config/project.config.yaml` valid (or run `/bootstrap-workspace` first)
+- `.sopp/config/project.config.yaml` valid (or run `/bootstrap-workspace` first)
 - Context resolved:
   - `PROJECT_ROOT`
-  - `TARGET_ROOT`
+  - `TARGET_REGISTRY`
+  - `ACTIVE_TARGET_ID` resolved from `feature_path`
+  - `ACTIVE_TARGET_ROOT = targets.registry[ACTIVE_TARGET_ID].root`
   - `TOPOLOGY_REPO_MODE`
+  - `SPEC_PACKET_PATH = {ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/specs/{feature_name}-test-plan`
 
 ---
 
@@ -83,6 +84,25 @@ target_root: packages/payments/
 
 ## Execution Sequence
 
+### PHASE 0 — Mobile Spec Packet (`full`)
+
+**Agent:** `@test-coverage-engineer`
+**Skill:** `mobile-sdd-spec-validation`
+
+Create `SPEC_PACKET_PATH` with:
+
+1. `spec.yaml` (`schema_ref: ../docs/templates/schemas/mobile-spec.schema.yaml`,
+   `spec_level: full`, `execution_mode: propose_then_apply`)
+2. `context.json`
+3. `review.md` in Spanish
+4. `evidence/validation-report.md`
+
+The spec records feature path, requested scope/focus, coverage targets by layer,
+integration-test expectations, report path, commands to run,
+`stage_checkpoints: required` and `agent_permissions`.
+
+---
+
 ### PHASE 1 — Feature Analysis
 
 **Agent:** `@test-coverage-engineer`
@@ -100,7 +120,9 @@ Steps:
    - Which source files have zero tests
 5. Produce coverage inventory table
 
-Output: Coverage inventory in console (or `PIPELINE_SPEC_PATH` if in pipeline).
+Output: `evidence/coverage-inventory.md`.
+Update `spec.yaml` sections `coverage_inventory`, `source_inventory` and
+`risk_map`.
 
 ---
 
@@ -116,14 +138,51 @@ Steps:
    - Fixtures needed (JSON responses, entity instances)
 2. Prioritize: domain → data → BLoC → pages
 3. Estimate total test cases to generate
+4. Add the mandatory testing report to `artifact_plan.planned`:
+   - `target_id: project_docs` or the configured docs target
+   - `path: docs/testing/{feature_name}-testing-report-{YYYY-MM-DD}.md`
+   - `action: create`
+   - `owner: test-coverage-engineer`
+   - `group: docs`
 
 Output: Test plan summary.
+Update `spec.yaml` sections `test_plan`, `artifact_plan`, `success_criteria`
+and `handoffs`.
+
+---
+
+### PHASE 2.5 — Validation + Human Review
+
+**Skill:** `mobile-sdd-spec-validation`
+
+Validate `spec.yaml` and present `review.md` in Spanish with:
+
+1. coverage gaps by layer
+2. test files to create/modify
+3. expected commands
+4. report path
+5. risks or manual validations
+
+Wait for explicit approval before generating tests.
 
 ---
 
 ### PHASE 3 — Test Generation
 
 **Agent:** `@test-coverage-engineer`
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: test_generation
+read_sections:
+  - test_plan
+  - artifact_plan
+  - success_criteria
+  - coverage_targets
+  - stage_checkpoints
+```
 
 Steps:
 1. Create test directory structure (mirror source)
@@ -173,6 +232,7 @@ Steps:
 6. Re-run until all targets met
 
 Output: All tests passing, coverage validated.
+Persist command output and coverage summary under `SPEC_PACKET_PATH/evidence/`.
 
 ---
 
@@ -185,6 +245,10 @@ Output: All tests passing, coverage validated.
 
 **Action:** Create a NEW file at this EXACT path:
 `{PROJECT_ROOT}/docs/testing/{feature_name}-testing-report-{YYYY-MM-DD}.md`
+
+This file must already be declared in `artifact_plan.planned[]` with
+`target_id=project_docs` or the configured docs target, `owner:
+test-coverage-engineer` and `group: docs`.
 
 **Steps:**
 1. If `docs/testing/` directory does not exist → CREATE IT
@@ -207,7 +271,7 @@ Output: Testing report file created at `docs/testing/`.
 ## Mandatory Post-Execution Checklist
 
 > **The agent MUST complete ALL items below before reporting to the user.
-> If any item is missing, the test plan is INCOMPLETE.**
+> If any item missing, the test plan is INCOMPLETE.**
 
 | # | Action | Verification |
 |---|---|---|
@@ -268,3 +332,6 @@ After all phases:
 - ALWAYS verify the report file exists on disk after creating it
 - ALWAYS run `flutter test` to confirm all unit + widget tests pass before finishing
 - NEVER attempt to run integration tests — they require a device/emulator
+- NEVER generate tests before `review.md` is approved.
+- ALWAYS validate generated/modified tests against `SPEC_PACKET_PATH/spec.yaml`.
+- ALWAYS use compact handoffs by `spec_ref` and `context_ref`.

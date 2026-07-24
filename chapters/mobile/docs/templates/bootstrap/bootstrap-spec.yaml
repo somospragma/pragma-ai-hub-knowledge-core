@@ -1,0 +1,88 @@
+schema_version: 1
+schema_ref: ../schemas/bootstrap-spec.schema.yaml
+workflow: bootstrap-workspace
+mode: propose_then_apply
+status: proposed
+
+inputs:
+  workspace_root: "{{WORKSPACE_ROOT}}"
+  workspace_file: "{{WORKSPACE_FILE_OR_NULL}}"
+  expected_app_repo_root: "{{EXPECTED_APP_REPO_ROOT_OR_NULL}}"
+  expected_app_package: "{{EXPECTED_APP_PACKAGE_OR_NULL}}"
+  expected_ds_package: "{{EXPECTED_DS_PACKAGE_OR_NULL}}"
+  expected_core_package: "{{EXPECTED_CORE_PACKAGE_OR_NULL}}"
+  expected_repo_mode: "{{EXPECTED_REPO_MODE_OR_NULL}}"
+  force_reconfigure: false
+
+resolved:
+  app_repo_root: "{{APP_REPO_ROOT}}"
+  workspace_roots:
+    - "{{WORKSPACE_ROOT}}"
+  repo_mode: "{{REPO_MODE}}"
+  target_registry:
+    app:
+      kind: "app"
+      location_strategy: "{{APP_LOCATION_STRATEGY}}"
+      repo_root: "{{APP_REPO_ROOT}}"
+      package_path: "{{APP_PACKAGE_PATH}}"
+      root: "{{APP_TARGET_ROOT}}"
+      package_name: "{{APP_PACKAGE_NAME}}"
+    design_system:
+      kind: "design_system"
+      location_strategy: "{{DS_LOCATION_STRATEGY}}"
+      repo_root: "{{DS_REPO_ROOT_OR_EMPTY}}"
+      package_path: "{{DS_PACKAGE_PATH_OR_EMPTY}}"
+      root: "{{DS_TARGET_ROOT_OR_EMPTY}}"
+      package_name: "{{DS_PACKAGE_NAME_OR_EMPTY}}"
+    core:
+      kind: "core"
+      location_strategy: "{{CORE_LOCATION_STRATEGY}}"
+      repo_root: "{{CORE_REPO_ROOT_OR_EMPTY}}"
+      package_path: "{{CORE_PACKAGE_PATH_OR_EMPTY}}"
+      root: "{{CORE_TARGET_ROOT_OR_EMPTY}}"
+      package_name: "{{CORE_PACKAGE_NAME_OR_EMPTY}}"
+    project_docs:
+      kind: "docs"
+      location_strategy: "single_repo"
+      repo_root: "{{APP_REPO_ROOT}}"
+      package_path: "."
+      root: "{{APP_REPO_ROOT}}"
+      package_name: "project_docs"
+
+contracts:
+  project_config:
+    output: proposed/project.config.yaml
+    schema_ref: ../schemas/project-config.schema.yaml
+    owns:
+      - project_identity
+      - topology
+      - targets
+      - active_target_defaults
+      - pipeline
+      - naming
+      - tokens
+      - testing
+      - figma
+  architecture_contract:
+    output: proposed/architecture-contract.yaml
+    schema_ref: ../schemas/architecture-contract.schema.yaml
+    owns:
+      - layer_rules
+      - generation_policies
+      - architecture_constraints
+      - domain_data_contracts
+  dependencies_contract:
+    output: proposed/dependencies-contract.yaml
+    schema_ref: ../schemas/dependencies-contract.schema.yaml
+    owns:
+      - dependency_catalog
+      - external_dependencies
+      - internal_dependencies
+      - allowed_dependency_matrix
+
+validation:
+  schema_valid: false
+  app_root_has_executable_signal: false
+  no_dependency_root_selected: false
+  target_registry_paths_resolved: false
+  no_contract_drift_detected: false

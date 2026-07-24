@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-melos-management`  
-**Scanned:** 2026-06-03 17:43:29 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:29 UTC
 
 ## Risk Assessment
 
@@ -25,8 +25,8 @@
 
 ### 🟡 MEDIUM: EA2
 
-**Location:** `SKILL.md:395`  
-**Confidence:** 85%  
+**Location:** `SKILL.md:395`
+**Confidence:** 85%
 
 **Message:** Autonomous Decision Making
 
@@ -36,8 +36,8 @@
 
 ### 🟡 MEDIUM: EA2
 
-**Location:** `references/versioning_guide.md:92`  
-**Confidence:** 85%  
+**Location:** `references/versioning_guide.md:92`
+**Confidence:** 85%
 
 **Message:** Autonomous Decision Making
 
@@ -47,8 +47,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/versioning_guide.md:190`  
-**Confidence:** 70%  
+**Location:** `references/versioning_guide.md:190`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -58,8 +58,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `SKILL.md:29`  
-**Confidence:** 90%  
+**Location:** `SKILL.md:29`
+**Confidence:** 90%
 
 **Message:** Session Persistence
 

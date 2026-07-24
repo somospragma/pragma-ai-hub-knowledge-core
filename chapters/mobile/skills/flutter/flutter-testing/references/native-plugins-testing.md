@@ -114,13 +114,13 @@ class LocationDataSourceImpl implements LocationDataSource {
 class FakeLocationDataSource implements LocationDataSource {
   final _controller = StreamController<LocationData>.broadcast();
 
-  bool shouldDenyPermission = false;
+  bool shouldDenandPermission = false;
   bool shouldFailLocation = false;
   LocationData? nextLocation;
 
   @override
   Future<LocationData> getCurrentLocation() async {
-    if (shouldDenyPermission) throw const PermissionDeniedException();
+    if (shouldDenandPermission) throw const PermissionDeniedException();
     if (shouldFailLocation) throw const LocationUnavailableException();
     return nextLocation ??
         const LocationData(latitude: 4.711, longitude: -74.072, accuracy: 5.0);
@@ -130,7 +130,7 @@ class FakeLocationDataSource implements LocationDataSource {
   Stream<LocationData> watchLocation() => _controller.stream;
 
   @override
-  Future<bool> requestPermission() async => !shouldDenyPermission;
+  Future<bool> requestPermission() async => !shouldDenandPermission;
 
   // Test helpers
   void emit(LocationData location) => _controller.add(location);
@@ -173,7 +173,7 @@ void main() {
     });
 
     test('returns Left(PermissionFailure) when permission denied', () async {
-      fakeDataSource.shouldDenyPermission = true;
+      fakeDataSource.shouldDenandPermission = true;
 
       final result = await sut(NoParams());
 

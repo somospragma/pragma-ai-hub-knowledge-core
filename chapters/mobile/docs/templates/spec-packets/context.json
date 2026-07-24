@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "schema_ref": "../schemas/mobile-context.schema.json",
+  "run_id": "{{RUN_ID}}",
+  "workflow": "{{WORKFLOW}}",
+  "spec_level": "{{SPEC_LEVEL}}",
+  "workflow_controller": "{{ENTRY_AGENT}}",
+  "status": "pending_human_review",
+  "current_phase": "spec_review",
+  "checkpoints": {
+    "initial_spec": {
+      "required": true,
+      "phase": "spec_review",
+      "status": "pending",
+      "decision_ref": "review.md"
+    }
+  },
+  "completed_phases": [],
+  "pending_human_review": {
+    "kind": "initial_spec_approval",
+    "review_ref": "review.md"
+  },
+  "artifacts": {}
+}

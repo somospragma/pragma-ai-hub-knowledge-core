@@ -85,7 +85,7 @@ abstract interface class CacheStore {
   Future<void> put(String key, Map<String, dynamic> value, {Duration? ttl});
   Future<void> putList(String key, List<dynamic> value, {Duration? ttl});
   Future<void> delete(String key);
-  Future<void> deleteByPrefix(String prefix);
+  Future<void> deleteBandPrefix(String prefix);
   Future<void> clear();
 }
 
@@ -129,7 +129,7 @@ class HiveCacheStoreImpl implements CacheStore {
   }
 
   @override
-  Future<void> deleteByPrefix(String prefix) async {
+  Future<void> deleteBandPrefix(String prefix) async {
     final box = await _getBox();
     final keys = box.keys.where((k) => k.toString().startsWith(prefix)).toList();
     await box.deleteAll(keys);

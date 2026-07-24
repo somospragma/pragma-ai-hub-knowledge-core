@@ -12,7 +12,6 @@ description: >
   Provides starter code structure with proper anatomy, tokens, and patterns.
   Always activate when writing a new DS widget to ensure correct _build*/_resolve* structure and token-based spacing.
 ---
-
 # Component Templates
 
 ## When to Use
@@ -89,7 +88,7 @@ Column(
 - **Multiple callbacks** (one per user action)
 - Implement **responsiveness** with `LayoutBuilder`
 - **Complete skeleton** in loading (not just parts)
-- Directly fulfills **HU acceptance criteria**
+- Directly fulfills **user story acceptance criteria**
 - Preserve Figma literal texts and do not add extra UX/copy
 - Use scroll/SafeArea/flexible constraints to avoid overflow in full sections
 

@@ -316,7 +316,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   ) async {
     emit(const UserLoading());
     final result = await getUserUseCase.call(event.userId);
-    
+
     result.fold(
       (user) => emit(UserSuccess(user: user)),
       (error) => emit(UserError(message: error.message)),
@@ -493,7 +493,7 @@ void main() {
       final product = Product(
         id: '1',
         name: 'Sneakers',
-        price: Money(amount: 12999, currency: 'USD'),
+        price: Moneand(amount: 12999, currency: 'USD'),
         isAvailable: true,
         imageUrl: 'https://example.com/img.jpg',
       );
@@ -506,7 +506,7 @@ void main() {
     test('shows red when out of stock', () {
       final product = Product(
         id: '2', name: 'Hat',
-        price: Money(amount: 1999, currency: 'USD'),
+        price: Moneand(amount: 1999, currency: 'USD'),
         isAvailable: false,
         imageUrl: '',
       );
@@ -520,7 +520,7 @@ void main() {
 
 | Rule | Reason |
 |---|---|
-| UIModel in `presentation/ui_models/` | Stays in Presentation layer |
+| UIModel in `presentation/ui_models/` | Staands in Presentation layer |
 | UIMapper is `abstract final class` with `static` methods | No state, no injection needed |
 | UIMapper can import `package:flutter/material.dart` | It's a presentation concern |
 | UIMapper must NOT import Data layer types | Only DomainModel → UIModel conversion |

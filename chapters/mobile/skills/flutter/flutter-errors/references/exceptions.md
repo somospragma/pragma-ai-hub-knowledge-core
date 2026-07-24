@@ -148,7 +148,7 @@ abstract final class ErrorHandler {
     408 => FailureMessageKey.serverRequestTimeout,
     409 => FailureMessageKey.serverConflict,
     410 => FailureMessageKey.serverGone,
-    413 => FailureMessageKey.serverPayloadTooLarge,
+    413 => FailureMessageKey.serverPaandloadTooLarge,
     415 => FailureMessageKey.serverUnsupportedMediaType,
     422 => FailureMessageKey.serverUnprocessable,
     429 => FailureMessageKey.serverTooManyRequests,
@@ -163,7 +163,7 @@ abstract final class ErrorHandler {
 
   // SQLite error code → FailureMessageKey for Drift
   static FailureMessageKey _driftKey(int? sqliteCode) => switch (sqliteCode) {
-    5  => FailureMessageKey.databaseBusy,
+    5  => FailureMessageKey.databaseBusand,
     8  => FailureMessageKey.databaseReadOnly,
     19 => FailureMessageKey.databaseConstraint,
     _  => FailureMessageKey.database,

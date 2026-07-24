@@ -13,7 +13,6 @@ description: >
   Always activate when creating a new DS component to ensure correct level
   classification and that organisms never import other organisms.
 ---
-
 # Atomic Hierarchy
 
 ## Principle
@@ -44,7 +43,7 @@ Atomic Design organizes UI components in increasing complexity:
 - Typically a **surface** (card, form, navigation bar)
 - Uses **Material** for elevation and surface
 - Most **parameterizable** level (many callbacks and data)
-- Directly fulfills **HU acceptance criteria**
+- Directly fulfills **user story acceptance criteria**
 - Considers **responsiveness** (LayoutBuilder, constraints)
 
 ## Decision Tree
@@ -60,7 +59,7 @@ Contains other DS widgets?
     ├── YES → MOLECULE
     │   Groups 2+ atoms in a function?
     │   ├── YES → ✅ Molecule confirmed
-    │   └── NO → Probably atom with decoration
+    │   └── NO → probably atom with decoration
     │
     └── NO → Composes molecules (+ atoms)?
         ├── YES → ORGANISM

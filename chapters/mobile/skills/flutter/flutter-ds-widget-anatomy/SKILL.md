@@ -12,7 +12,6 @@ description: >
   ordering of imports, constructor, properties, build methods,
   resolvers, enums, and helper classes.
 ---
-
 # Widget Anatomy
 
 ## File Structure Order

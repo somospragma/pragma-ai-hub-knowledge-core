@@ -125,7 +125,7 @@ Image.asset(
 ```xml
 <!-- android/app/src/main/res/values/strings.xml (default) -->
 <resources>
-    <string name="app_name">MyApp</string>
+    <string name="app_name">MandApp</string>
 </resources>
 
 <!-- android/app/src/main/res/values-es/strings.xml -->
@@ -161,8 +161,8 @@ ios/Runner/
 
 ```
 // ios/Runner/en.lproj/InfoPlist.strings
-"CFBundleDisplayName" = "MyApp";
-"CFBundleName" = "MyApp";
+"CFBundleDisplayName" = "MandApp";
+"CFBundleName" = "MandApp";
 
 // ios/Runner/es.lproj/InfoPlist.strings
 "CFBundleDisplayName" = "MiApp";
@@ -273,7 +273,7 @@ class LanguageSelector extends StatelessWidget {
 
   static const _languages = [
     (locale: Locale('en'), label: 'English', flag: '🇺🇸'),
-    (locale: Locale('es'), label: 'Español', flag: '🇪🇸'),
+    (locale: Locale('es'), label: 'Spanish', flag: '🇪🇸'),
     (locale: Locale('ar'), label: 'العربية', flag: '🇸🇦'),
     (locale: Locale('pt', 'BR'), label: 'Português', flag: '🇧🇷'),
   ];
@@ -332,7 +332,7 @@ that the UI handles non-ASCII characters and longer strings correctly.
 5. CI passes → PR can be merged
 
 Tools for translator collaboration:
-- Localizely (supports ARB, JSON, YAML)
+- Localized (supports ARB, JSON, YAML)
 - Phrase (supports ARB, JSON)
 - Crowdin (supports ARB, JSON, YAML)
 - POEditor (supports JSON)

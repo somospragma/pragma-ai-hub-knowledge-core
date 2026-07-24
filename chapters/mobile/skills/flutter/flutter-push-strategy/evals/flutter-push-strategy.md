@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-push-strategy`  
-**Scanned:** 2026-06-12 21:05:15 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-12 21:05:15 UTC
 
 ## Risk Assessment
 
@@ -24,8 +24,8 @@
 
 ### 🟡 MEDIUM: SSD-2
 
-**Location:** `references/implementation_guide.md:758–777`  
-**Confidence:** 100%  
+**Location:** `references/implementation_guide.md:758–777`
+**Confidence:** 100%
 
 **Message:** The `_handleNavigation` function implements a pattern where the application's internal routing logic is directly controlled by data received from an external, untrusted source (a push notification payload). An attacker who gains control over the notification payload (via a compromised backend, a Man-in-the-Middle attack on the provider, or a spoofed provider) can perform 'Intent Redirection.' By injecting specific keys like `route: 'profile'` and `id: 'victim_account_id'`, they can force the user's app to navigate to sensitive screens. While this is a common pattern for UX, it is dangerous because it lacks validation of the `id` or the user's current authorization state at the moment of navigation.
 

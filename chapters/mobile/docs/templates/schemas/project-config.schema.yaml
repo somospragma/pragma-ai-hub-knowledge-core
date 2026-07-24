@@ -1,0 +1,131 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://pragma.ai/schemas/mobile/project-config.schema.yaml"
+title: Mobile Project Config
+type: object
+additionalProperties: true
+required:
+  - schema_version
+  - ownership
+  - project
+  - workspace
+  - topology
+  - targets
+  - pipeline
+properties:
+  schema_version:
+    type: integer
+    minimum: 1
+  ownership:
+    type: object
+    additionalProperties: false
+    required: [file, owns, must_not_define]
+    properties:
+      file:
+        const: project.config.yaml
+      owns:
+        type: array
+        contains:
+          const: topology
+      must_not_define:
+        type: array
+        items:
+          type: string
+  project:
+    type: object
+    additionalProperties: true
+    required: [repository_local_path]
+    properties:
+      repository_local_path:
+        type: string
+      package_name:
+        type: string
+  workspace:
+    type: object
+    additionalProperties: true
+    properties:
+      roots:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required: [id, path]
+          properties:
+            id:
+              type: string
+            path:
+              type: string
+  topology:
+    type: object
+    additionalProperties: true
+    required: [repo_mode]
+    properties:
+      repo_mode:
+        type: string
+        enum: [single_repo, monorepo_melos, multi_repo]
+      feature_location_mode:
+        type: string
+      shared_core_mode:
+        type: string
+      ds_mode:
+        type: string
+  targets:
+    type: object
+    additionalProperties: true
+    required: [registry]
+    properties:
+      registry:
+        type: object
+        minProperties: 1
+        additionalProperties:
+          type: object
+          additionalProperties: true
+          required: [kind, location_strategy, root]
+          properties:
+            kind:
+              type: string
+              enum: [app, design_system, core, feature, package, docs]
+            location_strategy:
+              type: string
+              enum: [single_repo, melos_package, workspace_repo, external_repo]
+            repo_root:
+              type: string
+            package_path:
+              type: string
+            root:
+              type: string
+            package_name:
+              type: string
+  active_target_defaults:
+    type: object
+    additionalProperties:
+      type: string
+  pipeline:
+    type: object
+    additionalProperties: true
+    required: [output_dir, log_file, spec_file]
+    properties:
+      output_dir:
+        type: string
+      log_file:
+        type: string
+      spec_file:
+        type: string
+      default_execution_mode:
+        type: string
+        enum: [propose_then_apply]
+  naming:
+    type: object
+    additionalProperties: true
+  tokens:
+    type: object
+    additionalProperties: true
+  testing:
+    type: object
+    additionalProperties: true
+not:
+  anyOf:
+    - required: [layers]
+    - required: [generation_policies]
+    - required: [dependency_catalog]
+    - required: [allowed_dependency_matrix]
+    - required: [package_sources]

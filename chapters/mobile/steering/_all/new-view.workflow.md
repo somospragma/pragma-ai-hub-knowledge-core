@@ -1,235 +1,464 @@
 ---
 id: new-view
-version: 1.3.0
+version: 1.4.0
 scope: chapter
 type: steering
 chapter: mobile
+entry_agent: ds-orchestrator
+input_contract: ../docs/templates/spec-packets/overlays/new-view.yaml
+invocation_mode: explicit_agent
 description: >
-  Workflow determinista para crear una vista o pantalla Flutter desde Figma,
-  con componentes DS y capa de presentación de app. No usar para crear un
-  componente DS aislado.
+  Deterministic workflow to create a Flutter view or screen from Figma using DS components and the app presentation layer. Use when the user requests a Figma-driven app screen with view states, tests, Widgetbook, and audit gates.
 ---
+# Workflow: New View/Screen from Figma
 
-# Workflow: Nueva Vista/Pantalla desde Figma
+## Initial Invocation Is Plan-Only
 
-## Prerrequisitos
+The initial `/new-view` response may write only the Mobile Spec Packet and its
+evidence. It must complete analysis, DS/App inventory, DAG, and technical plan
+inside `spec.yaml`, then present `review.md` in Spanish and end the response.
+It must not generate Flutter code, tests, assets, routes, Widgetbook files, or
+project configuration in that response.
 
-- URL de Figma con `node-id`.
-- HU con criterios de aceptación (texto inline o referencia a archivo Markdown).
-- `.copilot/config/project.config.yaml` disponible.
-- Si falta configuración confiable de rutas/topología, ejecutar primero
-  `@ds-orchestrator /bootstrap-workspace`.
-- Contexto resuelto por orquestador:
+Only a later human turn that explicitly approves the pending packet may change
+`context.json` to `approved_for_execution` and unlock Phase 3a. Approval is
+invalid when the packet lacks the required plan or when
+`checkpoints.initial_spec.status` is not `pending`.
+
+Invoke this workflow through `@ds-orchestrator`. A bare workflow name or a
+request that lacks the controller must not authorize implementation; respond
+with the canonical invocation instead of generating code.
+
+## Prerequisites
+
+- URL from Figma with `node-id`.
+- user story with acceptance criteria (inline text or reference to a Markdown file).
+- A valid final configuration triplet in the app repository:
+  `.sopp/config/project.config.yaml`, `architecture-contract.yaml`, and
+  `dependencies-contract.yaml`.
+- This workflow never starts bootstrap automatically. If configuration is
+  missing, partial, invalid, ambiguous, or legacy-only, finish with
+  `blocked_input` and the relevant configuration code. The human must invoke
+  `@workspace-discovery /bootstrap-workspace` explicitly.
+- Context resolved by the orchestrator:
   - `PROJECT_ROOT`
-  - `TARGET_ROOT`
+  - `TARGET_REGISTRY`
+  - `ACTIVE_TARGET_ID` per phase (`design_system` for DS, `app` for the view)
+  - `ACTIVE_TARGET_ROOT`
+  - `ALLOWED_ARTIFACT_ROOTS = targets.registry.*.root`
   - `TOPOLOGY_REPO_MODE`
   - `GENERATION_SCOPE`
   - `CONTRACTS_POLICY`
   - `ARCHITECTURE_CONTRACT_PATH`
-  - `PIPELINE_SPEC_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
-  - `PIPELINE_LOG_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
+  - `PIPELINE_SPEC_PATH = {targets.registry[app].root}/{pipeline.output_dir}/{pipeline.spec_file}`
+  - `PIPELINE_LOG_PATH = {targets.registry[app].root}/{pipeline.output_dir}/{pipeline.log_file}`
+  - `SPEC_PACKET_PATH = {targets.registry[app].root}/{pipeline.output_dir}/specs/{view_slug}`
 
-## Gates obligatorios
+## Gates required
 
-### Gate 0 — Topología
+### Gate 0 - Canonical Configuration
 
-1. Validar `TOPOLOGY_REPO_MODE`.
-2. Validar roots (`PROJECT_ROOT`, `TARGET_ROOT`).
-3. En `monorepo_melos`, validar `melos.yaml`, scope y package target.
+Before any packet, log, Figma request, or code generation:
 
-### Gate 0.5 — Ownership del Repo App
+1. Resolve `PROJECT_ROOT` from optional `project_root`, then the IDE workspace
+   root, then the current repository root.
+2. Inspect only `<candidate>/.sopp/config/` for the three final configuration
+   files.
+3. Require one valid configuration triplet whose
+   `project.repository_local_path` matches the resolved app repository.
+4. Ignore `.copilot/config/` and `.kiro/config/`; they are not project runtime
+   state.
+5. If the triplet is missing, partial, invalid, or ambiguous, finish with
+   `blocked_input`. Do not create a bootstrap proposal or write any YAML.
 
-1. `project.config.yaml` debe ser el canónico del repo app:
-   `{PROJECT_ROOT}/.copilot/config/project.config.yaml`.
-2. `PROJECT_ROOT` no puede ser una librería DS/shared/core.
-3. Señales mínimas de app:
-   - `single_repo | multi_repo`: existe `lib/main.dart` o `lib/main_*.dart`
-     o carpeta `android/` o `ios/`.
-   - `monorepo_melos`: existe `melos.yaml`, package target válido y package
-     objetivo no clasifica como DS/shared/core.
-4. Si falla, bloquear con:
+### Gate 0.1 - Topology
+
+1. Validate `TOPOLOGY_REPO_MODE`.
+2. Validate roots (`PROJECT_ROOT`, target `app` and target `design_system` if
+   DS components will be created).
+3. In targets `location_strategy=melos_package`, validate `repo_root/melos.yaml`
+   and `repo_root/package_path`.
+
+### Gate 0.5 — Ownership of the Repo App
+
+1. `project.config.yaml` must be the canonical config for the app repo:
+   `{PROJECT_ROOT}/.sopp/config/project.config.yaml`.
+2. `PROJECT_ROOT` cannot be a library DS/shared/core.
+3. Minimum app signals:
+   - `single_repo | multi_repo`: exists `lib/main.dart` or `lib/main_*.dart`
+     or folder `android/` or `ios/`.
+   - `monorepo_melos`: exists `melos.yaml`, package target valid and package
+     target is not classified as DS/shared/core.
+4. If it fails, block with:
    - `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`
    - `CONFIG_PROJECT_ROOT_POINTS_TO_LIBRARY`
    - `CONFIG_APP_EXECUTABLE_SIGNAL_MISSING`
 
-### Gate 1 — Arquitectura
+### Gate 1 — Architecture
 
-1. Si `architecture.require_contract_for_new_view=true`, exigir
+1. If `architecture_contract.generation_policies.view_generation.require_architecture_contract=true`, require
    `ARCHITECTURE_CONTRACT_PATH`.
-2. `ARCHITECTURE.md` es opcional como soporte visual.
+2. `architecture.md` is optional visual support.
 
-### Gate 2 — Política de contratos
+### Gate 2 — Policy of contracts
 
-1. `optional`: continuar.
-2. `generate`: generar contratos mínimos en `§4.C` antes de Fase 3b.
-3. `required`: bloquear si faltan contratos domain/data referenciados.
+1. `optional`: continue.
+2. `generate`: generate contracts minimum in
+   `spec.yaml.contracts.minimal_domain_data` before Phase 3b.
+3. `required`: block if referenced domain/data contracts are missing.
 
-Si falla un gate, terminar con `blocked_input`.
+If it fails a gate, finish with `blocked_input`.
 
-## Inputs del Usuario
+### Gate 3 — Figma MCP
+
+Before PHASE 1, `@ds-orchestrator` must delegate Figma MCP preflight to
+`@figma-analyzer`. The analyzer verifies that Figma MCP is configured and has
+permissions for the file/screen.
+
+Minimum checklist:
+
+1. URL parseable with `fileKey` and `nodeId`.
+2. Figma MCP is available in the active tool.
+3. `get_design_context(fileKey, nodeId)` responds.
+4. `get_screenshot(...)` responds for the main frame.
+5. Access is confirmed for required components, styles, variables and assets.
+
+If it fails, update `spec.yaml.external_access.figma_mcp.status=blocked_input`,
+persist `evidence/figma-mcp-preflight.md` and finish with `blocked_input`.
+
+## User Inputs
 
 ```text
 @ds-orchestrator /new-view
-URL Figma: https://www.figma.com/file/xxx/Screen?node-id=456
-HU: [Referencia a la HU o texto de criterios de aceptación]
-HU_PATH: [Opcional, ruta Markdown; ej: docs/hus/HU-123.md]
+view_name: product_catalog_view
+figma_url: https://www.figma.com/file/xxx/Screen?node-id=456
+user_story: [User story or acceptance criteria]
+user_story_path: [Optional Markdown path; e.g. docs/user-stories/story-123.md]
+route_name: [Optional route name or path]
+target_id: [Optional app target id]
+project_root: [Optional absolute app repository root when the IDE opens a multi-root workspace]
 ```
 
-## Secuencia Canónica
+## Canonical Sequence
 
-### FASE 1 — Análisis de Pantalla
+### PHASE 0 — Mobile Spec Packet (`standard`)
 
-**Agente**: `@figma-analyzer`
+**Agent**: `@ds-orchestrator`
+**Skill**: `mobile-sdd-spec-validation`
+
+Create `SPEC_PACKET_PATH` with:
+
+1. `spec.yaml` (`schema_ref: ../docs/templates/schemas/mobile-spec.schema.yaml`,
+   `spec_level: standard`, `execution_mode: propose_then_apply`)
+2. `context.json`
+3. `review.md` in Spanish
+4. `evidence/validation-report.md`
+
+The initial spec records inputs, Figma URL, user story, contracts policy,
+architecture required, success criteria for DS + view and checkpoints
+required. Must include `external_access.figma_mcp.required=true` and
+`agent_permissions` per agent. Do not generate code in this phase.
+
+---
+
+### PHASE 1 — Analysis of Screen
+
+**Agent**: `@figma-analyzer`
 **Prompt**: `figma-analysis.prompt.md`
 
-Output obligatorio:
-- `§1` en `PIPELINE_SPEC_PATH` (incluye `§1.1b` textos literales,
-  `§1.1c` constraints/overflow, `§1.4b`, `§1.3b` y `§1.3c` si existen
-  anotaciones Development/vectores).
-- Registro de fase en `PIPELINE_LOG_PATH`.
+Update in `spec.yaml` only `design_source`, `literal_texts`,
+`layout_constraints`, `view_states`, `navigation` and `assets`.
+Persist evidence in `evidence/figma-analysis.md` and record phase in
+`PIPELINE_LOG_PATH`.
 
 ---
 
-### FASE 2 — Inventario + DAG Extendido
+### PHASE 2 — Extended Inventory + DAG
 
-**Agente**: `@component-planner`
+**Agent**: `@component-planner`
 **Prompt**: `atomic-inventory.prompt.md`
 
-Output obligatorio:
-- `§2` y `§3` en `PIPELINE_SPEC_PATH`.
-- Separación explícita DS vs App.
+Update in `spec.yaml` only `canonical_spec`, `inventory`, `dag`,
+`artifact_plan.planned[group=ds_components]` and `artifact_plan.planned[group=app_view]`.
+The DS vs App separation must remain explicit in `inventory` and `artifact_plan`.
 
 ---
 
-### FASE 2.5 — Arquitectura Técnica
+### PHASE 2.5 — Architecture Technical
 
-**Agente**: `@component-architect`
+**Agent**: `@component-architect`
 
-Output obligatorio:
-- `§4` en `PIPELINE_SPEC_PATH` con arquitectura de vista y `§4.B` de textos
-  literales/overflow.
-
----
-
-### FASE 2.6 — Contratos Mínimos (solo `CONTRACTS_POLICY=generate`)
-
-**Agente**: `@component-architect`
-
-Output obligatorio:
-- `§4.C` en `PIPELINE_SPEC_PATH` con contratos mínimos domain/data para
-  consumo de presentación (sin implementación).
+Update in `spec.yaml` only `technical_plan`, `artifact_plan`,
+`contracts.text_overflow`, `success_criteria`, `handoffs` and `checkpoints`.
 
 ---
 
-### CHECKPOINT HUMANO (si aplica)
+### PHASE 2.6 — Contracts Minimum (only `CONTRACTS_POLICY=generate`)
 
-Condición: `pipeline.human_checkpoint: true`.
+**Agent**: `@component-architect`
 
-El orquestador presenta `§1`, `§2-§3`, `§4` y espera aprobación explícita.
-
----
-
-### FASE 3a — Codegen de Componentes DS
-
-**Agente**: `@widget-developer`
-
-Orden obligatorio: átomos → moléculas → organismos.
+Update in `spec.yaml` only `contracts.minimal_domain_data`.
 
 ---
 
-### FASE 3a.5 — Auditoría de Componentes DS
+### PHASE 2.7 — Validation + Human Review
 
-**Agente**: `@code-auditor`
+**Skill**: `mobile-sdd-spec-validation`
 
-Loop con `@widget-developer` hasta `pipeline.max_audit_retries`.
+The orchestrator validates the `/new-view` plan gate in
+`mobile-sdd-spec-validation`, presents `review.md` and waits for explicit
+approval.
+
+Present:
+
+1. visual analysis, texts, constraints and states view.
+2. inventory + DAG with DS/App separation.
+3. technical plan.
+4. success criteria of DS, view, tests, goldens and Widgetbook.
+
+If the human requests adjustments, update only `spec.yaml`, `review.md` and the
+affected sections. Do not generate code until `context.json` marks the spec as
+approved.
+
+The response that presents this review must end here. Code generation begins
+only in a later human turn with explicit approval of this pending packet.
 
 ---
 
-### FASE 3b — Codegen de Vista App
+### PHASE 3a — Codegen of Components DS
 
-**Agente**: `@widget-developer`
+**Agent**: `@widget-developer`
+
+Required order: atoms → molecules → organisms.
+Required compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: ds_codegen
+read_sections:
+  - technical_plan
+  - artifact_plan.planned[group=ds_components]
+  - literal_texts
+  - layout_constraints
+  - contracts.text_overflow
+  - contracts.technical_vectors
+  - success_criteria
+```
+
+---
+
+### PHASE 3a.5 — Audit of Components DS
+
+**Agent**: `@code-auditor`
+
+Loop with `@widget-developer` up to `pipeline.max_audit_retries`.
+
+---
+
+### PHASE 3a.7 — Checkpoint Human of Layer DS
+
+**Agent**: `@ds-orchestrator`
+
+Present a compact review in Spanish before generating the app view:
+
+1. DS components created/modified
+2. audit result DS
+3. covered visual criteria
+4. risks or fallbacks pending
+
+Wait for explicit approval. If the human requests adjustments, return to
+PHASE 3a or PHASE 3a.5 as applicable. Do not continue to PHASE 3b until
+`context.json.checkpoints.ds_layer.status=approved` and
+`context.json.status=approved_for_execution`.
+
+---
+
+### PHASE 3b — Codegen of View App
+
+**Agent**: `@widget-developer`
 **Prompt**: `codegen-view.prompt.md`
+Required compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: app_view_codegen
+read_sections:
+  - technical_plan.view
+  - artifact_plan.planned[group=app_view]
+  - contracts
+  - view_states
+  - navigation
+  - literal_texts
+  - layout_constraints
+  - contracts.text_overflow
+  - contracts.technical_vectors
+  - success_criteria
+```
 
 Output:
-- Vista en `structure.views_path`.
-- Widgets privados en `structure.view_widgets_path`.
+- View in `targets.registry[app].structure.views_path`.
+- Private widgets in `targets.registry[app].structure.view_widgets_path`.
 
 ---
 
-### FASE 4a — Tests de Componentes DS
+### PHASE 4a — Tests of Components DS
 
-**Agente**: `@test-engineer`
+**Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
+Required compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: ds_widget_tests
+read_sections:
+  - artifact_plan.planned[group=ds_components]
+  - technical_plan
+  - contracts.text_overflow
+  - success_criteria
+```
 
 ---
 
-### FASE 4b — Golden de Componentes DS
+### PHASE 4b — Golden of Components DS
 
-**Agente**: `@golden-test-engineer`
+**Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
+Required compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: ds_golden_tests
+read_sections:
+  - artifact_plan.planned[group=ds_components]
+  - technical_plan
+  - layout_constraints
+  - contracts.text_overflow
+  - success_criteria
+```
 
 ---
 
-### FASE 4c — Widgetbook de Componentes DS
+### PHASE 4c — Widgetbook of Components DS
 
-**Agente**: `@widgetbook-developer`
+**Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGETBOOK`)
+Required compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: ds_widgetbook
+read_sections:
+  - artifact_plan.planned[group=ds_components]
+  - technical_plan
+  - literal_texts
+  - contracts.text_overflow
+  - success_criteria
+```
 
 ---
 
-### FASE 4d — Tests de Vista
+### PHASE 4d — Tests of View
 
-**Agente**: `@test-engineer`
+**Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=VIEW_WIDGET_TESTS`)
+Required compact handoff:
 
-Cobertura mínima:
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: view_widget_tests
+read_sections:
+  - artifact_plan.planned[group=app_view]
+  - technical_plan.view
+  - view_states
+  - navigation
+  - contracts.text_overflow
+  - success_criteria
+```
+
+Minimum coverage:
 1. `loading`
 2. `empty`
 3. `error`
 4. `populated`
-5. navegación crítica
-6. textos literales y mitigación de overflow cuando aplique
+5. critical navigation
+6. literal text and mitigation of overflow when applicable
 
 ---
 
-### FASE 4e — Golden Tests de Vista Completa
+### PHASE 4e — Golden Tests of Complete View
 
-**Agente**: `@golden-test-engineer`
+**Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=VIEW_GOLDEN_TESTS`)
+Required compact handoff:
 
-Cobertura mínima:
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: view_golden_tests
+read_sections:
+  - artifact_plan.planned[group=app_view]
+  - technical_plan.view
+  - view_states
+  - layout_constraints
+  - contracts.text_overflow
+  - success_criteria
+```
+
+Minimum coverage:
 1. `loading`
 2. `empty`
 3. `error`
 4. `populated`
 5. `light/dark`
-6. viewport compacto si existe riesgo de overflow
+6. compact viewport if overflow risk exists
 
 ---
 
-### FASE 4f — Widgetbook de Pantalla App
+### PHASE 4f — Widgetbook of Screen App
 
-**Agente**: `@widgetbook-developer`
+**Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`)
+Required compact handoff:
 
-Cobertura mínima:
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: app_widgetbook
+read_sections:
+  - artifact_plan.planned[group=app_view]
+  - technical_plan.view
+  - view_states
+  - literal_texts
+  - contracts.text_overflow
+  - success_criteria
+```
+
+Minimum coverage:
 1. `Default`
 2. `Loading`
-3. `Empty` (si aplica)
-4. `Error` (si aplica)
+3. `Empty` (if applicable)
+4. `Error` (if applicable)
 5. `Populated`
 
 ---
 
-### FASE 5 — Entrega
+### PHASE 5 — Delivery
 
-**Agente**: `@delivery-manager`
+**Agent**: `@delivery-manager`
 **Prompt**: `delivery-review.prompt.md`
 
-Debe:
-1. validar estructura DS/App en `TARGET_ROOT`
-2. actualizar barrel DS solo para componentes DS
-3. usar branch prefix:
-   - `naming.view_branch_prefix` si existe
+Must:
+1. validate the DS/App structure against `targets.registry` and
+   `artifact_plan.planned[].target_id`
+2. update the DS barrel only for components DS
+3. use branch prefix:
+   - `naming.view_branch_prefix` if it exists
    - fallback `naming.branch_prefix`
-4. generar `§7` en `PIPELINE_SPEC_PATH`
+4. generate `evidence/delivery-report.md` and a summary in the human report
+5. validate that the delivery satisfies `SPEC_PACKET_PATH/spec.yaml`

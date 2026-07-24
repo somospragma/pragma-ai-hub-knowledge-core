@@ -1,0 +1,157 @@
+schema_version: 1
+schema_ref: ../../../../docs/templates/schemas/mobile-spec.schema.yaml
+workflow: new-view
+spec_level: standard
+execution_mode: propose_then_apply
+status: proposed
+language:
+  review_documents: es
+inputs:
+  view_name: transaction_detail
+  figma_url: https://figma.com/file/example?node-id=30-40
+  user_story: View transaction details and their states.
+external_access:
+  figma_mcp:
+    required: true
+    status: verified
+    checks:
+      - get_design_context
+      - get_screenshot
+    evidence: evidence/figma-mcp-preflight.md
+agent_permissions:
+  ds-orchestrator:
+    can_read: [read_sections, context.json, review.md]
+    can_write:
+      context_sections: [context.json.checkpoints]
+      evidence: [evidence/ds-layer-checkpoint.md]
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required: [evidence/ds-layer-checkpoint.md]
+  figma-analyzer:
+    can_read: [inputs.figma_url, read_sections]
+    can_write:
+      spec_sections: [design_source, literal_texts, layout_constraints, assets, view_states, navigation]
+      evidence: [evidence/figma-analysis.md]
+    can_create_files: false
+    can_modify_files: false
+    can_delete_files: false
+    can_call_external_tools: [figma_mcp]
+    evidence_required: [evidence/figma-analysis.md]
+  widget-developer:
+    can_read: [read_sections]
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets: [design_system, app]
+      context_sections: [context.json.artifacts]
+      evidence: [evidence/codegen-report.md]
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required: [evidence/codegen-report.md]
+human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+  last_decision: pending
+design_source:
+  type: figma
+  file_key: example
+  node_id: "30:40"
+literal_texts:
+  - id: title_detail
+    text: Transaction detail
+    source: figma
+    editable_by_agent: false
+layout_constraints:
+  - element: transaction_summary_row
+    risk: horizontal_overflow
+    mitigation: Expanded around dynamic amount text
+assets:
+  - id: receipt_icon
+    strategy: DS_ICON
+view_states:
+  loading:
+    source: standard_fallback
+  empty:
+    source: standard_fallback
+  error:
+    source: standard_fallback
+  populated:
+    source: figma
+canonical_spec:
+  view_class: TransactionDetailView
+  ds_components:
+    - DSStatusBadge
+    - DSTransactionSummaryCard
+inventory:
+  ds_components:
+    missing:
+      - DSTransactionSummaryCard
+    existing:
+      - DSStatusBadge
+dag:
+  order:
+    - DSTransactionSummaryCard
+    - TransactionDetailView
+contracts:
+  minimal_domain_data:
+    entity: TransactionDetail
+    fields:
+      - id
+      - status
+      - amount
+      - createdAt
+  text_overflow:
+    transaction_summary_row: Use Expanded for dynamic amount text.
+  technical_vectors:
+    receipt_icon: DS_ICON
+constraints:
+  compatibility:
+    view_route: keep_existing_if_present
+technical_plan:
+  summary: Create the missing DS organism and app view with loading, empty, error and populated states.
+artifact_plan:
+  planned:
+    - path: lib/src/organisms/cards/ds_transaction_summary_card.dart
+      target_id: design_system
+      action: create
+      owner: widget-developer
+      group: ds_components
+    - path: lib/src/presentation/views/transaction_detail/transaction_detail_view.dart
+      target_id: app
+      action: create
+      owner: widget-developer
+      group: app_view
+success_criteria:
+  - id: SC-1
+    description: The view implements the four required states.
+    evidence:
+      - evidence/view-widget-tests.md
+  - id: SC-2
+    description: The DS layer is approved before generating the app view.
+    evidence:
+      - evidence/context-checkpoints.md
+handoffs:
+  - phase: ds_codegen
+    agent: widget-developer
+    read_sections:
+      - canonical_spec
+      - inventory
+      - dag
+      - technical_plan
+      - artifact_plan
+      - contracts.text_overflow
+      - contracts.technical_vectors
+      - success_criteria
+  - phase: view_codegen
+    agent: widget-developer
+    read_sections:
+      - view_states
+      - contracts.minimal_domain_data
+      - technical_plan
+      - artifact_plan
+      - contracts.text_overflow
+      - success_criteria

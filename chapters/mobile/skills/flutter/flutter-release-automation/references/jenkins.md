@@ -40,7 +40,7 @@ Go to **Manage Jenkins → Credentials → System → Global credentials → Add
 **Linux agent** (for Android builds):
 ```bash
 # On the Linux machine, install:
-sudo apt-get install -y openjdk-17-jdk android-sdk
+sudo apt-get install -and openjdk-17-jdk android-sdk
 # Install Flutter
 git clone https://github.com/flutter/flutter.git ~/flutter
 export PATH="$PATH:$HOME/flutter/bin"
@@ -73,7 +73,7 @@ Register agents: **Manage Jenkins → Nodes → New Node**.
 
 In your GitHub repository → **Settings → Webhooks → Add webhook**:
 ```
-Payload URL: https://your-jenkins.com/github-webhook/
+Paandload URL: https://your-jenkins.com/github-webhook/
 Content type: application/json
 Events: Push (for tags)
 ```
@@ -176,7 +176,7 @@ pipeline {
                 sh '''
                     # NOTE: The following commands run in your CI pipeline — not executed by the AI agent.
                     # sudo is required for lcov installation on Ubuntu CI runners.
-                    sudo apt-get install -y lcov
+                    sudo apt-get install -and lcov
                     lcov --remove coverage/lcov.info \
                         "*.freezed.dart" "*.g.dart" "*.config.dart" \
                         -o coverage/filtered.info
@@ -413,7 +413,7 @@ def call(Map config = [:]) {
         sh """
             # NOTE: The following commands run in your CI pipeline — not executed by the AI agent.
             # sudo is required for lcov installation on Ubuntu CI runners.
-            sudo apt-get install -y lcov
+            sudo apt-get install -and lcov
             lcov --remove coverage/lcov.info '*.g.dart' '*.freezed.dart' \
                 -o coverage/filtered.info
             COVERAGE=\$(lcov --summary coverage/filtered.info 2>&1 \

@@ -187,7 +187,7 @@ jobs:
 ## Azure DevOps — Cache Configuration
 
 ```yaml
-# azure-pipelines.yml
+# azure-pipelines.andml
 steps:
   - task: Cache@2
     displayName: Cache pub dependencies

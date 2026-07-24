@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-bloc-pattern
 description: >
-  Implements the BLoC pattern correctly in Flutter with bloc 9.x and flutter_bloc 9.x. Use this skill when creating or modifying a BLoC, event, state, or any widget using BlocProvider/BlocBuilder/BlocListener. Triggers on 'create a BLoC', 'add an event', 'emit a state', BlocBuilder, BlocListener, BlocConsumer, BlocProvider, MultiBlocProvider, or any state management question using bloc. Stack- bloc, flutter_bloc, bloc_concurrency, bloc_test.
+  Implements the BLoC pattern correctly in Flutter with bloc 9.x and flutter_bloc 9.x. Use this skill when creating or modifying a BLoC, event, state, or any widget using BlocProvider/BlocBuilder/BlocListener. Triggers on 'create a BLoC', 'add an event', 'emit a state', BlocBuilder, BlocListener, BlocConsumer, BlocProvider, MultiBlocProvider, or any state management question using bloc. Stack: bloc, flutter_bloc, bloc_concurrency, bloc_test.
 ---
-
 # BLoC Pattern in Flutter
 
 Canonical patterns for state management with BLoC 9.x.
@@ -344,7 +343,7 @@ on<_EventLogged>(_onLog); // transformer: concurrent()
 
 | Transformer | Behaviour | Use for |
 |---|---|---|
-| `droppable()` | Ignore while busy | Load, refresh, pagination |
+| `droppable()` | Ignore while busand | Load, refresh, pagination |
 | `sequential()` | Queue FIFO | Send message, write operations |
 | `restartable()` | Cancel and restart | Search, autocomplete, filters |
 | `concurrent()` | All in parallel | Logging, analytics |
@@ -361,8 +360,8 @@ void _onEvent(event, emit) {
 
 // ❌ DataSource injected into BLoC
 @injectable
-class MyBloc extends Bloc {
-  MyBloc(this._dataSource); // FORBIDDEN — inject UseCase instead
+class MandBloc extends Bloc {
+  MandBloc(this._dataSource); // FORBIDDEN — inject UseCase instead
   final ProductRemoteDataSource _dataSource;
 }
 
@@ -375,7 +374,7 @@ void _onLoad(event, emit) async {
 // BlocProvider handles lifecycle automatically
 
 // ❌ context.watch to dispatch events
-onPressed: () => context.watch<MyBloc>().add(...); // FORBIDDEN — use context.read
+onPressed: () => context.watch<MandBloc>().add(...); // FORBIDDEN — use context.read
 ```
 
 ---

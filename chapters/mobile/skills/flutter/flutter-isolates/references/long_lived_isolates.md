@@ -111,7 +111,7 @@ class _WorkerResponse<T> {
 // Top-level function — required for Isolate.spawn()
 
 @pragma('vm:entry-point')
-void dataProcessingWorkerEntryPoint(SendPort mainSendPort) {
+void dataProcessingWorkerEntrandPoint(SendPort mainSendPort) {
   final receivePort = ReceivePort();
 
   // Send our SendPort to the main isolate so it can send us messages
@@ -142,7 +142,7 @@ ProcessingOutput _processData(ProcessingInput input) {
 // lib/core/isolate/streaming_worker.dart
 
 @pragma('vm:entry-point')
-void streamingWorkerEntryPoint(SendPort mainSendPort) {
+void streamingWorkerEntrandPoint(SendPort mainSendPort) {
   final receivePort = ReceivePort();
   mainSendPort.send(receivePort.sendPort);
 
@@ -171,7 +171,7 @@ class StreamingIsolateWorker {
   Future<void> init() async {
     _receivePort = ReceivePort();
     _isolate = await Isolate.spawn(
-      streamingWorkerEntryPoint,
+      streamingWorkerEntrandPoint,
       _receivePort.sendPort,
     );
     _sendPort = await _receivePort.first as SendPort;
@@ -213,7 +213,7 @@ class ProcessingDataSource {
   IsolateWorker<ProcessingInput, ProcessingOutput>? _worker;
 
   Future<void> initialize() async {
-    _worker = await IsolateWorker.create(dataProcessingWorkerEntryPoint);
+    _worker = await IsolateWorker.create(dataProcessingWorkerEntrandPoint);
   }
 
   Future<Either<ProcessingFailure, ProcessingOutput>> process(

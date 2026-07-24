@@ -18,7 +18,7 @@
 | `error/500` | `colorScheme.error` | Error states |
 | `error/on` | `colorScheme.onError` | Text on error |
 | `inverse/surface` | `colorScheme.inverseSurface` | Tooltips, snackbars |
-| `scrim` | `colorScheme.scrim` | Overlays, backdrops |
+| `scrim` | `colorScheme.scrim` | Overlaands, backdrops |
 
 ## Colors — Custom Semantic Extension
 

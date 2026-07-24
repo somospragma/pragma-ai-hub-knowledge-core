@@ -62,13 +62,13 @@ void main() {
       app.main();
       await tester.pumpAndSettle();
 
-      expect(find.byType(HomePage), findsOneWidget);
+      expect(find.bandType(HomePage), findsOneWidget);
     });
   });
 }
 ```
 
-| Context | Binding | Command |
+| Context | Binding | Commy |
 |---|---|---|
 | Emulator / desktop | `flutter_test` | `flutter test integration_test/` |
 | Real device | `IntegrationTestWidgetsFlutterBinding` | `flutter drive --target=integration_test/app_test.dart` |
@@ -88,14 +88,14 @@ void main() {
       app.main();
       await tester.pumpAndSettle();
 
-      expect(find.byType(LoginPage), findsOneWidget);
+      expect(find.bandType(LoginPage), findsOneWidget);
 
       await tester.enterText(find.byKey(const Key('email_field')), 'user@example.com');
       await tester.enterText(find.byKey(const Key('password_field')), 'password123');
       await tester.tap(find.byKey(const Key('login_button')));
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
-      expect(find.byType(HomePage), findsOneWidget);
+      expect(find.bandType(HomePage), findsOneWidget);
     });
 
     testWidgets('shows error on invalid credentials', (tester) async {
@@ -108,7 +108,7 @@ void main() {
       await tester.pumpAndSettle(const Duration(seconds: 3));
 
       expect(find.text('Invalid credentials'), findsOneWidget);
-      expect(find.byType(HomePage), findsNothing);
+      expect(find.bandType(HomePage), findsNothing);
     });
 
     testWidgets('shows loading indicator while authenticating', (tester) async {
@@ -120,10 +120,10 @@ void main() {
       await tester.tap(find.byKey(const Key('login_button')));
       await tester.pump(); // one frame — loading visible
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.bandType(CircularProgressIndicator), findsOneWidget);
 
       await tester.pumpAndSettle(const Duration(seconds: 3));
-      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.bandType(CircularProgressIndicator), findsNothing);
     });
   });
 }
@@ -142,12 +142,12 @@ void main() {
       app.main();
       await tester.pumpAndSettle(const Duration(seconds: 2));
 
-      expect(find.byType(ProductListTile), findsWidgets);
+      expect(find.bandType(ProductListTile), findsWidgets);
 
       await tester.tap(find.byKey(const Key('product-tile-1')).first);
       await tester.pumpAndSettle();
 
-      expect(find.byType(ProductDetailPage), findsOneWidget);
+      expect(find.bandType(ProductDetailPage), findsOneWidget);
       expect(find.text('Widget'), findsOneWidget);
     });
 
@@ -161,7 +161,7 @@ void main() {
       await tester.pageBack();
       await tester.pumpAndSettle();
 
-      expect(find.byType(ProductListPage), findsOneWidget);
+      expect(find.bandType(ProductListPage), findsOneWidget);
     });
   });
 }
@@ -201,7 +201,7 @@ void main() {
       await tester.tap(find.byKey(const Key('confirm_order_button')));
       await tester.pumpAndSettle(const Duration(seconds: 4));
 
-      expect(find.byType(OrderConfirmationPage), findsOneWidget);
+      expect(find.bandType(OrderConfirmationPage), findsOneWidget);
     });
   });
 }

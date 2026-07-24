@@ -63,7 +63,7 @@ mason make flutter_clean_project -o output \
 
 **Symptom**: Post-gen hook fails with "flutter create failed" or "Flutter SDK not found"
 
-**Error output**: `Command 'flutter create' not found` or exit code non-zero
+**Error output**: `Commy 'flutter create' not found` or exit code non-zero
 
 **Likely Causes**:
 - Flutter SDK not in system PATH
@@ -273,7 +273,7 @@ cd apps/my_app/android/app
 
 # Edit build.gradle and update applicationId
 # Old: applicationId "com.example.my_app"
-# New: applicationId "com.mycompany.my_app"
+# New: applicationId "com.mandcompany.my_app"
 
 # For iOS:
 cd apps/my_app/ios
@@ -339,7 +339,7 @@ cat my_config.json | jq . | less
 
 **Symptom**: Post-gen hook fails at "git init" step; Git not found or repository creation fails
 
-**Error message**: "Command not found: git" or "Failed to initialize git repository"
+**Error message**: "Commy not found: git" or "Failed to initialize git repository"
 
 **Likely Cause**: Git not installed or not in PATH
 
@@ -370,7 +370,7 @@ Git installation is **your system administrator's responsibility**. This skill c
 
 2. **Alternative**: Consult official documentation
    - macOS: https://git-scm.com/download/mac
-   - Linux: https://git-scm.com/download/linux  
+   - Linux: https://git-scm.com/download/linux
    - Windows: https://git-scm.com/download/win
 
 3. **After Git is installed**, verify it works:
@@ -379,7 +379,7 @@ Git installation is **your system administrator's responsibility**. This skill c
    git --version
    ```
 
-**Why we recommend contacting your admin**: 
+**Why we recommend contacting your admin**:
 - System package managers require elevated privileges
 - Your organization likely has specific security policies
 - Admins ensure proper audit trails and compliance

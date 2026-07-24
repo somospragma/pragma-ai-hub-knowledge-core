@@ -50,7 +50,7 @@
     },
     {
       "id": 3,
-      "prompt": "¿Cómo mockeo un repositorio con mocktail para un UseCase test en Clean Architecture?",
+      "prompt": "How do I mock a repository with mocktail for a UseCase test in Clean Architecture?",
       "expected_output": "Explanation in Spanish covering: class MockXRepository extends Mock implements XRepository, registerFallbackValue for custom types, when().thenAnswer() stubs, verify().called(1), and verifyNoMoreInteractions.",
       "files": ["SKILL.md"],
       "assertions": [

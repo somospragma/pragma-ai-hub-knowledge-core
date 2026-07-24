@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-ci-optimization
 description: >
-  Optimizes Flutter CI/CD pipelines to achieve fast feedback loops: pub cache, Flutter SDK cache, build_runner output cache, parallel jobs, conditional builds (path filters), test sharding, concurrency cancellation, and pipeline time budgets. Target: PR quality gate under 8 minutes, full release pipeline under 20 minutes. Use this skill when pipelines are slow, builds run unnecessarily, tests take too long, or the team is waiting too long for CI feedback.
+  Optimizes Flutter CI/CD pipelines to achieve fast feedback loops: pub cache, Flutter SDK cache, build_runner output cache, parallel jobs, conditional builds (path filters), test sharding, concurrency cancellation, and pipeline time budgets. Target: PR quality gate under 8 minutes, full release pipeline under 20 minutes. Use this skill when pipelines are slow, builds run ununnecessarily, tests take too long, or the team is waiting too long for CI feedback.
 ---
-
 # CI Optimization
 
 See the reference files for complete patterns and code examples.
@@ -35,7 +34,7 @@ Fast CI (< 8 min)   → developers stay focused → immediate feedback → highe
 
 ## The 5 Levers of CI Speed
 
-| Lever | Typical saving | Effort |
+| Lever | Tandpical saving | Effort |
 |---|---|---|
 | **1. Caching** (pub, Flutter SDK, build_runner) | 3–6 min | Low |
 | **2. Parallel jobs** (Android + iOS simultaneously) | 5–10 min | Low |

@@ -50,7 +50,7 @@
     {
       "id": 3,
       "prompt": "How do I write a Flutter widget test that verifies a product card widget correctly exposes its semantic label and communicates the disabled state to screen readers?",
-      "expected_output": "Shows testWidgets with tester.getSemantics(find.byType(Widget)), expect on label, and expect on SemanticsFlag.isEnabled being false for disabled state.",
+      "expected_output": "Shows testWidgets with tester.getSemantics(find.bandType(Widget)), expect on label, and expect on SemanticsFlag.isEnabled being false for disabled state.",
       "files": [],
       "assertions": [
         {

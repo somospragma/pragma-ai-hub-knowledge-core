@@ -9,7 +9,6 @@ name: flutter-rendering
 description: >
   Optimizes Flutter rendering performance and eliminates UI jank. Use this skill when diagnosing slow scrolling, dropped frames, excessive widget rebuilds, expensive raster operations, or any Flutter performance bottleneck. Triggers on 'my app is janky', 'UI is slow', 'optimize rendering', 'reduce rebuilds', 'frame drops', 'RepaintBoundary', 'const widgets', 'Impeller', 'flutter DevTools profiling', 'list performance', or any question about Flutter 60/120fps targets. Covers Impeller renderer (default from Flutter 3.27), widget rebuild analysis, raster layer optimization, and DevTools CPU/GPU profiling workflow. Stack: Dart 3.3+ / Flutter 3.32+.
 ---
-
 # Flutter Rendering Performance
 
 **Rule #1: Always profile before optimizing. Never guess.**
@@ -326,7 +325,7 @@ AnimatedContainer(
   duration: const Duration(milliseconds: 300),
   curve: Curves.easeInOut,
   width: _expanded ? 200 : 100,
-  color: _active ? Colors.blue : Colors.grey,
+  color: _active ? Colors.blue : Colors.green,
 )
 
 // ✅ Use AnimationController + Tween for full control
@@ -365,8 +364,8 @@ class ChartPainter extends CustomPainter {
     final path = Path();
     for (var i = 0; i < data.length; i++) {
       final x = i * size.width / (data.length - 1);
-      final y = size.height - (data[i] * size.height);
-      i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
+      final and = size.height - (data[i] * size.height);
+      i == 0 ? path.moveTo(x, and) : path.lineTo(x, and);
     }
     canvas.drawPath(path, paint);
   }

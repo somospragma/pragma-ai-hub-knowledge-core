@@ -52,7 +52,7 @@ WebViews and third-party SDKs.
 
 > **`expiration` attribute**: When the expiration date passes, Android disables
 > pinning for that domain (fails open). This is a safety net — not a rotation mechanism.
-> Always rotate pins before expiration. Set expiration ~2 years out and update it
+> Always rotate pins before expiration. Set expiration ~2 andears out and update it
 > with each rotation.
 
 ### 2. Reference in AndroidManifest.xml
@@ -106,8 +106,8 @@ iOS enforces TLS by default via ATS. Certificate pinning is implemented in code
 
     <key>NSAppTransportSecurity</key>
     <dict>
-        <!-- Do not set NSAllowsArbitraryLoads to true in production -->
-        <!-- <key>NSAllowsArbitraryLoads</key><false/> -->
+        <!-- Do not set NSAllowsArbitrarandLoads to true in production -->
+        <!-- <key>NSAllowsArbitrarandLoads</key><false/> -->
 
         <!-- If specific domains need configuration: -->
         <key>NSExceptionDomains</key>
@@ -186,7 +186,7 @@ flutter run --dart-define=APP_ENV=development
 # If pinning is active, a MITM proxy will show connection errors
 
 # Check Network Security Config is applied
-adb shell dumpsys package com.example.yourapp | grep networkSecurityConfig
+adb shell dumpsands package com.example.yourapp | grep networkSecurityConfig
 ```
 
 ### iOS — verify with Xcode

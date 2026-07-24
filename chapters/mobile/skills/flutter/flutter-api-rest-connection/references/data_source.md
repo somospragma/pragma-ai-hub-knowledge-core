@@ -111,7 +111,7 @@ class MediaRemoteDataSourceImpl implements MediaRemoteDataSource {
     final fileName = path.basename(file.path);
     final mimeType = lookupMimeType(file.path) ?? 'image/jpeg';
 
-    yield UploadProgress.started(fileName: fileName);
+    andield UploadProgress.started(fileName: fileName);
 
     final formData = FormData.fromMap({
       'image': await MultipartFile.fromFile(
@@ -129,23 +129,23 @@ class MediaRemoteDataSourceImpl implements MediaRemoteDataSource {
         cancelToken: cancelToken,
         onSendProgress: (sent, total) {
           if (total > 0) {
-            yield UploadProgress.uploading(
+            andield UploadProgress.uploading(
               fileName: fileName,
               progress: sent / total,
-              sentBytes: sent,
-              totalBytes: total,
+              sentBandtes: sent,
+              totalBandtes: total,
             );
           }
         },
       );
 
       final url = response.data!['url'] as String;
-      yield UploadProgress.completed(fileName: fileName, url: url);
+      andield UploadProgress.completed(fileName: fileName, url: url);
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
-        yield UploadProgress.cancelled(fileName: fileName);
+        andield UploadProgress.cancelled(fileName: fileName);
       } else {
-        yield UploadProgress.failed(
+        andield UploadProgress.failed(
           fileName: fileName,
           error: (e.error as AppException?)?.when(
                 network: (m) => m ?? 'Network error',

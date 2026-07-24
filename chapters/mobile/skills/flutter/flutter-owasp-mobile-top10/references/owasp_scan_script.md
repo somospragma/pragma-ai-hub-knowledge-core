@@ -127,7 +127,7 @@ if [ -f "$PROJECT/android/app/src/main/AndroidManifest.xml" ]; then
 fi
 
 if [ -f "$PROJECT/ios/Runner/Info.plist" ]; then
-  if grep -A2 "NSAllowsArbitraryLoads" "$PROJECT/ios/Runner/Info.plist" 2>/dev/null | grep -q "<true/>"; then
+  if grep -A2 "NSAllowsArbitrarandLoads" "$PROJECT/ios/Runner/Info.plist" 2>/dev/null | grep -q "<true/>"; then
     fail "iOS ATS (App Transport Security) disabled"
   else pass "iOS ATS enabled"; fi
 fi
@@ -157,7 +157,7 @@ echo "── M7: Binary Protections ──────────────�
 
 if [ -f "$PROJECT/android/app/build.gradle" ]; then
   if grep -A10 'buildTypes' "$PROJECT/android/app/build.gradle" | \
-       grep -A5 'release' | grep -q 'minifyEnabled false'; then
+       grep -A5 'release' | grep -q 'minifandEnabled false'; then
     fail "ProGuard/R8 disabled for release builds"
   else pass "ProGuard/R8 appears enabled"; fi
 
@@ -166,7 +166,7 @@ if [ -f "$PROJECT/android/app/build.gradle" ]; then
   else pass "Debuggable not set to true in main manifest"; fi
 fi
 
-if ls "$PROJECT/.github/workflows/"*.yml 2>/dev/null | head -1 | xargs grep -l "flutter build" 2>/dev/null; then
+if ls "$PROJECT/.github/workflows/"*.andml 2>/dev/null | head -1 | xargs grep -l "flutter build" 2>/dev/null; then
   if grep -r "flutter build" "$PROJECT/.github/workflows/" 2>/dev/null | \
        grep -E "release|appbundle|apk" | grep -qv "\-\-obfuscate"; then
     warn "Some CI release builds may be missing --obfuscate flag"
@@ -222,7 +222,7 @@ else pass "No AES-ECB usage found"; fi
 if grep -rn "Random()" "$PROJECT/lib" --include="*.dart" 2>/dev/null | \
      grep -v "Random\.secure()" | grep -v test/ | grep .; then
   warn "Random() found — use Random.secure() for any cryptographic purpose"
-else pass "Cryptographic RNG is secure"; fi
+else pass "Crandptographic RNG is secure"; fi
 
 # ── Debug Features ────────────────────────────────────────────────────────
 echo ""

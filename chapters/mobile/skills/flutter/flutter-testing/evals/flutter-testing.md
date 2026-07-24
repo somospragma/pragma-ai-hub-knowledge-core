@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-testing  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-testing`  
-**Scanned:** 2026-06-16 15:19:28 UTC  
+**Skill:** flutter-testing
+**Source:** `../`
+**Scanned:** 2026-06-16 15:19:28 UTC
 
 ## Risk Assessment
 
@@ -31,8 +31,8 @@
 
 ### 🟢 LOW: SDI-2
 
-**Location:** `SKILL.md:372–373`  
-**Confidence:** 100%  
+**Location:** `SKILL.md:372–373`
+**Confidence:** 100%
 
 **Message:** The finding identifies a code snippet that uses `File(...).readAsStringSync()`. While this is a synchronous I/O operation, in the context of a 'Test Fixture' example within a documentation/skill file, this is a standard and necessary pattern for loading test data (JSON/YAML) from the filesystem during unit or widget testing. It is not a vulnerability in the skill itself, but rather a demonstration of how a developer would implement a helper function in their own test suite. It does not pose a security risk to the agent or the user unless the user blindly copies it into a production environment without sanitizing the input path.
 

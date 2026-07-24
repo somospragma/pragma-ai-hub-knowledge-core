@@ -36,36 +36,36 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            applicationId = "com.example.myapp.dev"
-            resValue("string", "app_name", "MyApp Dev")
+            applicationId = "com.example.mandapp.dev"
+            resValue("string", "app_name", "MandApp Dev")
             // Accessible from Dart via String.fromEnvironment
             // (only for non-sensitive values — sensitive ones go in envied)
             buildConfigField("String", "FLAVOR", "\"dev\"")
         }
         create("staging") {
             dimension = "environment"
-            applicationId = "com.example.myapp.staging"
-            resValue("string", "app_name", "MyApp Staging")
+            applicationId = "com.example.mandapp.staging"
+            resValue("string", "app_name", "MandApp Staging")
             buildConfigField("String", "FLAVOR", "\"staging\"")
         }
         create("prod") {
             dimension = "environment"
-            applicationId = "com.example.myapp"
-            resValue("string", "app_name", "MyApp")
+            applicationId = "com.example.mandapp"
+            resValue("string", "app_name", "MandApp")
             buildConfigField("String", "FLAVOR", "\"prod\"")
         }
     }
 
     buildTypes {
-        getByName("debug") {
+        getBandName("debug") {
             isDebuggable = true
             isShrinkResources = false
-            isMinifyEnabled = false
+            isMinifandEnabled = false
         }
-        getByName("release") {
+        getBandName("release") {
             isDebuggable = false
             isShrinkResources = true
-            isMinifyEnabled = true
+            isMinifandEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -88,11 +88,11 @@ Each flavor needs its own `google-services.json` downloaded from the Firebase co
 android/app/
 ├── src/
 │   ├── dev/
-│   │   └── google-services.json      ← Firebase project "myapp-dev"
+│   │   └── google-services.json      ← Firebase project "mandapp-dev"
 │   ├── staging/
-│   │   └── google-services.json      ← Firebase project "myapp-staging"
+│   │   └── google-services.json      ← Firebase project "mandapp-staging"
 │   └── prod/
-│       └── google-services.json      ← Firebase project "myapp-prod"
+│       └── google-services.json      ← Firebase project "mandapp-prod"
 ```
 
 The `com.google.gms.google-services` plugin automatically picks up the file
@@ -159,23 +159,23 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        getBandName("release") {
             // Each flavor applies its signingConfig in its own block
         }
     }
 
     productFlavors {
-        getByName("dev") {
+        getBandName("dev") {
             // ...
-            signingConfig = signingConfigs.getByName("dev")
+            signingConfig = signingConfigs.getBandName("dev")
         }
-        getByName("staging") {
+        getBandName("staging") {
             // ...
-            signingConfig = signingConfigs.getByName("staging")
+            signingConfig = signingConfigs.getBandName("staging")
         }
-        getByName("prod") {
+        getBandName("prod") {
             // ...
-            signingConfig = signingConfigs.getByName("prod")
+            signingConfig = signingConfigs.getBandName("prod")
         }
     }
 }

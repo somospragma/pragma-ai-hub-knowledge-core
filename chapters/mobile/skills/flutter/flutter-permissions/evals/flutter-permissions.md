@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-permissions`  
-**Scanned:** 2026-06-12 20:57:31 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-12 20:57:31 UTC
 
 ## Risk Assessment
 
@@ -27,8 +27,8 @@
 
 ### 🟡 MEDIUM: SDI-3
 
-**Location:** `references/platform_config.md:55–148`  
-**Confidence:** 80%  
+**Location:** `references/platform_config.md:55–148`
+**Confidence:** 80%
 
 **Message:** The skill's metadata limits its scope to specific permissions (camera, location, etc.), but the documentation provides templates for many other sensitive permissions (Bluetooth, Phone State, Calendar, etc.). While this is common in developer documentation, it creates a discrepancy where the agent might inadvertently include or suggest permissions that exceed the intended scope of the skill, potentially leading to over-privileged app manifests and subsequent store rejection or privacy concerns.
 

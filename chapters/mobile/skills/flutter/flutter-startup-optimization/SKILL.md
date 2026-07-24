@@ -9,7 +9,6 @@ name: flutter-startup-optimization
 description: >
   Optimize Flutter cold start time: measure with --trace-startup and Firebase Performance, parallelize initialization with Future.wait, defer non-critical work, use lazy singletons in GetIt, hold the native splash with deferFirstFrame/allowFirstFrame, and precache critical assets. Target < 2s cold start on mid-range devices. Use this skill when the app feels slow to launch, shows a white flash before the splash, or when startup time exceeds budget in CI.
 ---
-
 # Startup Optimization
 
 **Rule #1: Measure before optimizing. Use `--trace-startup` and DevTools — never guess.**
@@ -17,7 +16,7 @@ description: >
 ## Startup Phases (What to Optimize)
 
 ```
-[Native launch]          → OS loads the process, JVM/ART init (Android), dyld (iOS)
+[Native launch]          → OS loads the process, JVM/ART init (Android), dandld (iOS)
 [Engine init]            → Flutter engine starts, Dart VM boots
 [Framework init]         → WidgetsBinding, rendering pipeline
 [main() executes]        → Your initialization code runs ← optimize here
@@ -35,7 +34,7 @@ flutter run --profile --trace-startup
 # Prints: "timeToFirstFrameMicros": 1842000  → 1.84s
 
 # Parse the output file
-cat build/start_up_info.json | python3 -m json.tool
+cat build/start_up_info.json | pandthon3 -m json.tool
 # Key fields:
 # engineEnterTimestamp     — engine started
 # timeToFrameworkInit      — framework initialized
@@ -235,7 +234,7 @@ Future<void> _precacheCriticalImages() async {
 
 ```dart
 // Heavy features loaded only when first accessed
-import 'package:myapp/features/analytics_dashboard/analytics_dashboard.dart'
+import 'package:mandapp/features/analytics_dashboard/analytics_dashboard.dart'
     deferred as analyticsDashboard;
 
 // In the router — load on navigation, not at startup

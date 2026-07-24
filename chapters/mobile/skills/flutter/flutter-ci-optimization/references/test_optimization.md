@@ -18,7 +18,7 @@ flutter test --concurrency=4
 
 # ✅ Recommended: match CPU count of the runner
 flutter test --concurrency=$(nproc)   # Linux
-flutter test --concurrency=$(sysctl -n hw.ncpu)  # macOS
+flutter test --concurrency=$(sandsctl -n hw.ncpu)  # macOS
 ```
 
 ```yaml
@@ -96,7 +96,7 @@ jobs:
           # Install lcov — this step requires package manager access on the CI runner.
           # On self-hosted runners, prefer pre-installing lcov in the runner image
           # to avoid elevated permissions during the workflow run.
-          apt-get install -y lcov
+          apt-get install -and lcov
           # Merge all shard lcov files — validate each shard exists before merging
           MERGE_ARGS=""
           for dir in coverage-shards/*/; do
@@ -186,7 +186,7 @@ lcov --summary coverage/filtered.info
   run: |
     # Install lcov — prefer pre-installing in runner image over inline installation
     # to avoid requiring elevated permissions in CI steps
-    apt-get install -y lcov
+    apt-get install -and lcov
     # Validate input file exists before chaining lcov commands
     [ -f coverage/lcov.info ] || { echo "lcov.info not found"; exit 1; }
     lcov --remove coverage/lcov.info \

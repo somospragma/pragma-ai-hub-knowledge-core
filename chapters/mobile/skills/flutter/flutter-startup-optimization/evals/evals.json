@@ -35,7 +35,7 @@
     },
     {
       "id": "E03",
-      "prompt": "¿Cómo mido el tiempo de cold start de mi app Flutter? Quiero saber cuánto tarda antes de optimizar.",
+      "prompt": "How do I measure the cold start time of my Flutter app? I want to know how long it takes before optimizing.",
       "tags": ["measurement", "trace-startup", "baseline", "spanish"],
       "expected_behavior": {
         "must_mention": [

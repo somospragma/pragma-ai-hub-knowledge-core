@@ -34,7 +34,7 @@
     },
     {
       "id": "eval-03-ci-threshold-spanish",
-      "prompt": "¿Cómo configuro GitHub Actions para que el build falle si la cobertura baja del 80%?",
+      "prompt": "How do I configure GitHub Actions so the build fails if coverage drops below 80%?",
       "expected_behaviors": [
         "Provides the GitHub Actions YAML steps for running tests, filtering, and enforcing the threshold",
         "Shows the lcov --summary + awk pattern or equivalent to extract the coverage value",

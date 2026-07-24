@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-bloc-pattern  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-bloc-pattern`  
-**Scanned:** 2026-06-15 19:06:30 UTC  
+**Skill:** flutter-bloc-pattern
+**Source:** `../`
+**Scanned:** 2026-06-15 19:06:30 UTC
 
 ## Risk Assessment
 

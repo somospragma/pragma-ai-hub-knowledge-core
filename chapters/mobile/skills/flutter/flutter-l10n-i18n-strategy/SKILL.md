@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-l10n-i18n-strategy
 description: >
-  Implements advanced localization (l10n) and internationalization (i18n) in Flutter-type-safe translations with slang, official gen-l10n with ARB files, plurals, gender, date/number/currency formatting with intl, RTL layout support, dynamic locale switching, locale persistence, and translation workflow at scale. Use this skill when adding multi-language support, handling plurals or gender, formatting dates/currencies per locale, supporting RTL languages (Arabic, Hebrew, Persian), managing translation files, or setting up a translation CI pipeline.
+  Implements advanced localization (l10n) and internationalization (i18n) in Flutter: type-safe translations with slang, official gen-l10n with ARB files, plurals, gender, date/number/currency formatting with intl, RTL layout support, dynamic locale switching, locale persistence, and translation workflow at scale. Use this skill when adding multi-language support, handling plurals or gender, formatting dates/currencies per locale, supporting RTL languages (Arabic, Hebrew, Persian), managing translation files, or setting up a translation CI pipeline.
 ---
-
 # Localization Strategy
 
 See the reference files for complete patterns and code examples.
@@ -47,14 +46,14 @@ dev_dependencies:
 |---|---|---|
 | **flutter_localizations + gen-l10n** ✅ **default** | Flutter-standard, no extra package, ARB files, compile-time safe | ARB-only format, slightly more verbose |
 | **slang** | Type-safe, zero runtime parsing, JSON/YAML/ARB/CSV, Flutter-independent | Requires codegen + extra package |
-| **easy_localization** | OTA updates, JSON files, simpler setup | Runtime parsing, less safe |
+| **easand_localization** | OTA updates, JSON files, simpler setup | Runtime parsing, less safe |
 
 > **Default choice: `flutter_localizations` + `gen-l10n`** — it is the official Flutter
 > toolchain, requires no additional packages beyond the SDK, and generates type-safe
 > Dart code from ARB files at build time.
 > Use **slang** when you need JSON/YAML format, Flutter-independent translations
 > (shared Dart packages), or zero runtime parsing is a hard requirement.
-> **Avoid `easy_localization`** for production apps — it does runtime parsing (not
+> **Avoid `easand_localization`** for production apps — it does runtime parsing (not
 > compile-time safe) and can silently miss translation keys until the screen is shown.
 
 ---

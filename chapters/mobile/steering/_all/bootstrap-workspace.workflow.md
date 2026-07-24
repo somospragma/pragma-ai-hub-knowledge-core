@@ -1,123 +1,222 @@
 ---
 id: bootstrap-workspace
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: steering
 chapter: mobile
+entry_agent: workspace-discovery
+input_contract: ../docs/templates/spec-packets/overlays/bootstrap-workspace.yaml
+invocation_mode: explicit_agent
 description: >
-  Workflow de arranque para descubrir topología/rutas del workspace y preparar
-  `project.config.yaml` + `ARCHITECTURE-CONTRACT.yaml` +
-  `DEPENDENCIES-CONTRACT.yaml` antes de ejecutar `/new-view` o
-  `/new-component`.
+  SDD-aware workflow to discover workspace topology and paths, propose the initial configuration, and apply it only after human approval. Use when project roots or target configuration are missing, ambiguous, or multi-repo.
 ---
+# Workflow: Bootstrap Workspace
 
-# Workflow: Bootstrap de Workspace
+## When To Use It
 
-## Cuándo usarlo
+Use this workflow when:
 
-Usar este workflow cuando:
+1. the app, Design System, and/or core package live in different physical paths
+2. the workspace is a Melos monorepo or a multi-repo setup without reliable configuration
+3. the user wants to remove path ambiguity before creating a view or component
 
-1. la app, el DS y/o el core viven en rutas físicas distintas
-2. existe monorepo Melos o multi-repo y aún no hay configuración confiable
-3. el usuario quiere evitar ambigüedad antes de crear una vista/componente
+Do not use it to re-create a valid canonical `.sopp/config` triplet. Bootstrap
+reuses a valid applied configuration by default. Use `FORCE_RECONFIGURE: true`
+only for an explicit migration or repair proposal.
 
-## Prerrequisitos
+## Prerequisites
 
-- `WORKSPACE_ROOT` accesible.
-- Opcional: archivo `*.code-workspace` del VSCode workspace.
-- Opcional: hints de nombres esperados (app, DS, core).
-- Recomendado en workspaces multi-repo: `EXPECTED_APP_REPO_ROOT` para fijar
-  explícitamente el repo app donde debe crearse `.copilot/config`.
+- Accessible `WORKSPACE_ROOT`.
+- Optional `*.code-workspace` file for the IDE workspace.
+- Optional expected package names for the app, Design System, and core package.
+- Recommended for multi-repo workspaces: `EXPECTED_APP_REPO_ROOT`, so the workflow can explicitly identify where `.sopp/config` must be created.
 
-## Inputs de usuario (ejemplo)
+## User Inputs
 
 ```text
-@ds-orchestrator /bootstrap-workspace
-WORKSPACE_ROOT: /Users/usuario/dev/mobile-workspace
-WORKSPACE_FILE: /Users/usuario/dev/mobile-workspace/mobile.code-workspace
-EXPECTED_APP_REPO_ROOT: /Users/usuario/dev/mobile-workspace/my-app-monorepo
+@workspace-discovery /bootstrap-workspace
+WORKSPACE_ROOT: /Users/user/dev/mobile-workspace
+WORKSPACE_FILE: /Users/user/dev/mobile-workspace/mobile.code-workspace
+EXPECTED_APP_REPO_ROOT: /Users/user/dev/mobile-workspace/mand-app-monorepo
 EXPECTED_APP_PACKAGE: my_app
 EXPECTED_DS_PACKAGE: design_system
-APPLY_MODE: propose_only
+EXPECTED_CORE_PACKAGE: core
+EXPECTED_REPO_MODE: multi_repo
+APPLY_MODE: propose_then_apply
+FORCE_RECONFIGURE: false
 ```
 
-## Secuencia canónica
+## Canonical Sequence
 
-### FASE B1 — Discovery + Propuesta
+### PHASE B0 — Reuse Or Diagnose Canonical Configuration
 
-**Agente**: `@workspace-discovery`
+**Agent**: `@workspace-discovery`
+
+Run this gate immediately after the app repository is deterministically
+resolved. When the app root is not supplied explicitly, complete B1 discovery
+first, then return to this gate before B2 creates a proposal. Inspect only the
+final canonical files in `<APP_REPO_ROOT>/.sopp/config/`.
+
+1. If the complete triplet is valid, matches `APP_REPO_ROOT`, and resolves all
+   target roots, return `reused_existing_config` and stop. Do not create a
+   bootstrap packet, proposal, backup, or replacement configuration.
+2. If the triplet is partial, finish with
+   `blocked_input: CONFIG_BOOTSTRAP_INCOMPLETE`.
+3. If the triplet is complete but fails schema, ownership, root, or target
+   validation, finish with `blocked_input: CONFIG_BOOTSTRAP_CONFIG_INVALID`.
+4. Continue after either failure only when the human explicitly re-invokes with
+   `FORCE_RECONFIGURE: true`; record a compact diff against the prior canonical
+   configuration in the proposal.
+5. `.copilot/config/` and `.kiro/config/` are legacy tool-specific state. They
+   are never configuration inputs or write destinations. If no canonical
+   triplet exists, report `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND`.
+
+### PHASE B1 — Discovery
+
+**Agent**: `@workspace-discovery`
 **Prompt**: `workspace-discovery.prompt.md`
 
-Output obligatorio en `<APP_REPO_ROOT>/.copilot/config/bootstrap`:
+Resolve:
 
-1. `workspace_discovery_report.md`
-2. `proposed_project.config.yaml`
-3. `proposed_architecture-contract.yaml`
-4. `proposed_dependencies-contract.yaml`
-5. `bootstrap_pipeline_log.md`
+1. app, Design System, core, and Melos candidates
+2. `APP_REPO_ROOT`
+3. `TOPOLOGY_REPO_MODE`
+4. `targets.registry` with logical targets (`app`, `design_system`, `core`, `project_docs`, `feature_*`) and their resolved roots
+5. `active_target_defaults`
+6. ambiguity risks
 
----
-
-### CHECKPOINT HUMANO (obligatorio)
-
-El orquestador presenta:
-
-1. topología propuesta
-2. rutas app/ds/core propuestas
-3. diferencias clave contra configuración actual (si existe)
-4. confirmación explícita de que `APP_REPO_ROOT` no es DS/shared/core
-
-Pregunta exacta:
-
-"He generado la propuesta de configuración del workspace. ¿Apruebas aplicar los cambios con backup?"
-
-Sin aprobación explícita, finalizar en `propose_only`.
-En este modo, no se deben escribir archivos finales fuera de
-`<APP_REPO_ROOT>/.copilot/config/bootstrap`.
+If deterministic resolution fails, finish with `blocked_input`.
 
 ---
 
-### FASE B2 — Apply con backup (si aprobado)
+### PHASE B2 — Bootstrap Spec Packet + Proposal
 
-**Agente**: `@workspace-discovery`
-**Prompt**: `workspace-discovery.prompt.md` con `APPLY_MODE=apply_with_backup`
+**Agent**: `@workspace-discovery`
+**Prompt**: `workspace-discovery.prompt.md`
 
-Output obligatorio:
+Required output in `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}`:
 
-1. `<APP_REPO_ROOT>/.copilot/config/project.config.yaml`
-2. `<APP_REPO_ROOT>/.copilot/config/ARCHITECTURE-CONTRACT.yaml`
-3. `<APP_REPO_ROOT>/.copilot/config/DEPENDENCIES-CONTRACT.yaml`
-4. backups `.bak` en los 3 archivos (si existían)
+1. `bootstrap-spec.yaml`
+2. `context.json`
+3. `review.md`
+4. `proposed/project.config.yaml`
+5. `proposed/architecture-contract.yaml`
+6. `proposed/dependencies-contract.yaml`
+7. `evidence/workspace-discovery-report.md`
+8. `evidence/candidates.json`
+9. `evidence/validation-report.md`
+10. `evidence/drift-analysis.md`
+
+`bootstrap-spec.yaml` must declare `schema_ref: ../docs/templates/schemas/bootstrap-spec.schema.yaml` and is the machine-readable source for the proposal. `review.md` is the human-readable Spanish review.
+
+Generate the proposal from the canonical templates in `../docs/templates/`; do not rebuild the three configuration files from scratch when a template exists.
+
+Minimum agent permissions:
+
+- B1-B3: may read the workspace and write only inside `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}`.
+- B4: may write inside `<APP_REPO_ROOT>/.sopp/config/` only after the human checkpoint is approved and backups are created.
+- Must never delete existing configuration files.
+- Must never apply changes if the resolved root points to a Design System, shared, or core package instead of the app repository.
 
 ---
 
-### FASE B3 — Validación post-bootstrap
+### PHASE B3 — Pre-Apply Validation
 
-**Agente**: `@workspace-discovery`
+**Agent**: `@workspace-discovery`
+**Skill**: `mobile-sdd-spec-validation`
 
-Validaciones:
+Validate:
 
-1. `project.repository_local_path` existe
-2. en modo melos: `melos.yaml` + `target_scope`
-3. DS/core en `source=path` existen
-4. existe `<APP_REPO_ROOT>/.copilot/config/ARCHITECTURE-CONTRACT.yaml` final
-5. existe `<APP_REPO_ROOT>/.copilot/config/DEPENDENCIES-CONTRACT.yaml` final
-6. se puede crear `<APP_REPO_ROOT>/.copilot/flow_result`
+1. `bootstrap-spec.yaml` is parseable and has `mode=propose_then_apply`.
+2. The three files in `proposed/` exist.
+3. Each `proposed/*.yaml` file declares `schema_version`, `schema_ref`, and `ownership`.
+4. `project.repository_local_path` exists.
+5. Each `targets.registry.*.root` resolves to an existing directory.
+6. Each Dart/Flutter target declares `pubspec.yaml`.
+7. If a target uses `location_strategy=melos_package`, `repo_root/melos.yaml` and `repo_root/package_path` exist.
+8. `app` targets have executable app signals (`lib/main.dart`, `lib/main_*.dart`, `android/`, or `ios/`).
+9. `design_system` targets have Design System signals (`atoms`, `molecules`, `organisms`, or a DS barrel file).
+10. Dependencies with `source=target` reference an existing `target_id` in `project.config.yaml.targets.registry`.
+11. `APP_REPO_ROOT` does not point to a Design System, shared, or core package.
+12. No anti-drift rule is violated:
+    - physical paths and pipeline settings live only in `project.config.yaml`
+    - layer rules live only in `architecture-contract.yaml`
+    - dependency catalog and import rules live only in `dependencies-contract.yaml`
+    - `dependencies-contract.yaml` does not define physical target paths
 
-Si falla, terminar con `blocked_input` y código explícito.
+If validation fails, finish with `blocked_input`.
 
-## Resultado esperado
+---
 
-Si B1-B3 son exitosas:
+### HUMAN CHECKPOINT (Required)
 
-1. el proyecto queda listo para `/new-view` o `/new-component`
-2. la configuración deja de depender del `cwd`
-3. el pipeline principal opera con rutas deterministas
+The orchestrator presents:
 
-## Reglas
+1. topology proposal
+2. proposed app, Design System, and core paths
+3. key differences from the current configuration, if any
+4. explicit confirmation that `APP_REPO_ROOT` is not a Design System, shared, or core package
+5. summary of `review.md`
 
-- No sobreescribir archivos sin backup.
-- No inferir rutas de baja confianza sin aprobación humana.
-- Si el root resuelto apunta a una librería DS/shared/core, bloquear con código
-  explícito y no aplicar.
-- No ejecutar `/new-view` ni `/new-component` si bootstrap quedó en `blocked_input`.
+Ask exactly:
+
+"I generated the workspace configuration proposal. Do you approve applying the changes with backup?"
+
+Without explicit approval, finish with state `proposed`. Do not write final files outside `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}`.
+
+Operational note: this is not a second command. The same workflow remains paused in `proposed`; when the human approves, the orchestrator executes B4 atomically with backups.
+
+---
+
+### PHASE B4 — Apply With Backup (If Approved)
+
+**Agent**: `@workspace-discovery`
+**Prompt**: `workspace-discovery.prompt.md` with `APPLY_MODE=apply_with_backup`
+
+Required output:
+
+1. `<APP_REPO_ROOT>/.sopp/config/project.config.yaml`
+2. `<APP_REPO_ROOT>/.sopp/config/architecture-contract.yaml`
+3. `<APP_REPO_ROOT>/.sopp/config/dependencies-contract.yaml`
+4. `.bak` backups for the three files, if they existed
+5. `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}/apply-report.md`
+
+---
+
+### PHASE B5 — Post-Bootstrap Validation
+
+**Agent**: `@workspace-discovery`
+**Skill**: `mobile-sdd-spec-validation`
+
+Validate:
+
+1. `project.repository_local_path` exists.
+2. Each target in the registry resolves and keeps its expected signals.
+3. Dependencies with `source=target` point to existing targets.
+4. Final `<APP_REPO_ROOT>/.sopp/config/architecture-contract.yaml` exists.
+5. Final `<APP_REPO_ROOT>/.sopp/config/dependencies-contract.yaml` exists.
+6. `<APP_REPO_ROOT>/.sopp/flow_result` can be created.
+7. `architecture.contract_path` and `dependencies.contract_path` resolve.
+8. No anti-drift rule is violated across the three final YAML files.
+9. Future `artifact_plan.planned[].target_id` values can resolve against `targets.registry`.
+
+If validation fails, finish with `blocked_input` and an explicit code.
+
+## Expected Result
+
+If B0-B5 succeed:
+
+1. the project is ready for `/new-view` or `/new-component`
+2. the configuration no longer depends on `cwd`
+3. the main pipeline operates with deterministic paths
+
+## Rules
+
+- Do not overwrite files without backup.
+- Do not infer low-confidence paths without human approval.
+- Validate agent permissions before writing in `bootstrap/` or `config/`.
+- Default operation: `propose_then_apply`.
+- `review.md` must be in Spanish.
+- Handoffs must use references (`bootstrap-spec.yaml`, `context.json`); do not copy the full discovery into each phase.
+- If the resolved root points to a Design System, shared, or core package, block with an explicit code and do not apply changes.
+- Do not execute `/new-view` or `/new-component` if bootstrap ended in `blocked_input`.

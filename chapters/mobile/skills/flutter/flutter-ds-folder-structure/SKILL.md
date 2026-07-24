@@ -16,7 +16,6 @@ description: >
   lib/src/{level}/), or when a legacy path like lib/atoms/ is detected (register
   alert, keep new code in lib/src/).
 ---
-
 # Folder Structure
 
 ## Directory Tree
@@ -68,7 +67,7 @@ See [full tree reference](references/TREE.md) for the complete expanded structur
 │   │   ├── detail/
 │   │   │   └── detail_view.dart
 │   │   └── ...
-│   └── widgets/          ← Widgets privados de vistas
+│   └── widgets/          ← Private view widgets
 │       ├── empty_state_widget.dart
 │       └── error_retry_widget.dart
 └── test/presentation/  ← Tests de vistas
@@ -110,15 +109,15 @@ See [full tree reference](references/TREE.md) for the complete expanded structur
 12. **View widgets** shared across multiple views go to `structure.view_widgets_path` (e.g., `lib/src/presentation/widgets/`)
 13. Views **do NOT** carry the DS prefix — they belong to the app, not the DS package
 14. Views **do NOT** get exported in the DS barrel file (`lib/{{package_name}}.dart`)
-15. En flujo canónico `/new-view`, la vista completa **sí** genera:
+15. In canonical `/new-view`, the complete view **does** generate:
    - `test/presentation/views/[view]/[view]_view_golden_test.dart`
    - `{structure.widgetbook_screens_path}/features/[feature]/[view]/[view]_use_case.dart`
-16. Los widgets privados de vista (`structure.view_widgets_path`) **no** generan
-    golden/widgetbook dedicados.
+16. Private view widgets (`structure.view_widgets_path`) **do not** generate
+    dedicated golden/widgetbook files.
 
-### Artefactos de Pipeline (determinista)
-17. Nunca hardcodear rutas de pipeline en prompts/agentes
-18. Resolver siempre desde `project.config.yaml`:
+### Pipeline Artifacts (deterministic)
+17. Never hardcode pipeline paths in prompts/agents.
+18. Always resolve from `project.config.yaml`:
    - `pipeline.output_dir`
    - `pipeline.log_file`
    - `pipeline.spec_file`
@@ -127,18 +126,18 @@ See [full tree reference](references/TREE.md) for the complete expanded structur
 
 ## Path Mapping
 
-### Componentes DS
+### Components DS
 | Level | Lib | Test | Widgetbook |
 |-------|-----|------|------------|
 | Atom | `lib/src/atoms/[sub]/` | `test/atoms/[sub]/` | `{structure.widgetbook_components_path}/atoms/[sub]/` |
 | Molecule | `lib/src/molecules/[sub]/` | `test/molecules/[sub]/` | `{structure.widgetbook_components_path}/molecules/[sub]/` |
 | Organism | `lib/src/organisms/[sub]/` | `test/organisms/[sub]/` | `{structure.widgetbook_components_path}/organisms/[sub]/` |
 
-### Vistas (app-level)
-| Tipo | Path | Test | Widgetbook |
+### Views (app-level)
+| Type | Path | Test | Widgetbook |
 |------|------|------|------------|
 | View | `lib/src/presentation/views/[name]/` | `test/presentation/views/[name]/` | `{structure.widgetbook_screens_path}/features/[feature]/[name]/` |
-| View Widget | `lib/src/presentation/widgets/` | `test/presentation/widgets/` | N/A (privado) |
+| View Widget | `lib/src/presentation/widgets/` | `test/presentation/widgets/` | N/A (private) |
 
-> En flujo canónico `/new-view`, además de widget tests de vista también se genera:
+> In canonical `/new-view`, besides view widget tests, also generate:
 > `test/presentation/views/[name]/[name]_view_golden_test.dart`.

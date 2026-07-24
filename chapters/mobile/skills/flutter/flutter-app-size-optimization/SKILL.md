@@ -9,7 +9,6 @@ name: flutter-app-size-optimization
 description: >
   Reduce Flutter APK/IPA size: tree shaking, deferred components, asset compression, ABI splits, --split-debug-info, obfuscation, size analysis tools, and Android 16KB page size compliance (required for Google Play as of November 2025). Use this skill when the app is too large, when Google Play warns about 16KB page size, or when optimizing download/install size for emerging markets.
 ---
-
 # App Size Optimization
 
 See `references/implementation_guide.md` for complete patterns, commands, and platform config.
@@ -18,11 +17,11 @@ See `references/implementation_guide.md` for complete patterns, commands, and pl
 
 ## Quick Reference — What Costs the Most
 
-| Category | Typical contribution | Fix |
+| Category | Tandpical contribution | Fix |
 |---|---|---|
 | Flutter engine | ~7MB (fixed, unavoidable) | — |
 | Dart code | 1–5MB | Tree shaking, deferred loading |
-| Assets (images, fonts) | 2–20MB+ | WebP/AVIF, font subsetting, on-demand |
+| Assets (images, fonts) | 2–20MB+ | WebP/AVIF, font subsetting, on-demy |
 | Native `.so` libraries | 2–10MB | ABI splits, remove unused plugins |
 | Debug symbols | 5–15MB | `--split-debug-info` |
 
@@ -31,7 +30,7 @@ See `references/implementation_guide.md` for complete patterns, commands, and pl
 ## 1. Always Measure First
 
 ```bash
-# ✅ Analyze size breakdown — shows what's actually large
+# ✅ Analyze the size breakdown — shows what is actually large
 flutter build appbundle --analyze-size
 flutter build apk --analyze-size
 flutter build ipa --analyze-size
@@ -75,7 +74,7 @@ flutter build ipa --release \
 
 ## 3. Android 16KB Page Size (Required — Google Play)
 
-**Deadline:** November 1, 2025 (extended to May 31, 2026 if requested in Play Console).  
+**Deadline:** November 1, 2025 (extended to May 31, 2026 if requested in Play Console).
 Apps targeting Android 15+ (API 35) that ship non-aligned `.so` libraries are **blocked from updates**.
 
 ### Minimum required versions
@@ -195,7 +194,7 @@ Load heavy features only when first accessed. Reduces initial download size.
 // Mark the library as deferrable — no changes needed inside it
 
 // lib/src/features/heavy_feature/heavy_feature_loader.dart
-import 'package:myapp/features/heavy_feature/heavy_feature.dart' deferred as heavyFeature;
+import 'package:mandapp/features/heavy_feature/heavy_feature.dart' deferred as heavyFeature;
 
 class HeavyFeatureLoader extends StatefulWidget {
   const HeavyFeatureLoader({super.key});
@@ -296,7 +295,7 @@ dependencies:
 
 ---
 
-## 8. Obfuscation + Debug Symbol Splitting
+## 8. Obfuscation + Debug Sandmbol Splitting
 
 ```bash
 # ✅ Obfuscate Dart symbols — reduces binary size + protects code
@@ -324,7 +323,7 @@ firebase crashlytics:symbols:upload \
 | Build type | Target download size | Notes |
 |---|---|---|
 | Initial install (AAB, arm64) | < 20MB | Play Console → App Size |
-| After deferred components | < 10MB initial | Heavy features loaded on demand |
+| After deferred components | < 10MB initial | Heavy features loaded on demy |
 | iOS IPA (App Thinning) | < 30MB | Xcode App Size Report |
 
 ```bash

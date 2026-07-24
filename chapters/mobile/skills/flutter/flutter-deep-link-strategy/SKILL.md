@@ -9,7 +9,6 @@ name: flutter-deep-link-strategy
 description: >
   Comprehensive deep link implementation using go_router 17.2.2, fpdart functional programming, clean architecture patterns, route guards, dynamic parameters, and platform-specific configuration. Use when implementing deep links, configuring StatefulShellRoute for bottom nav, adding route guards with typed Either<DeepLinkFailure, T> error handling, or setting up Android App Links and iOS Universal Links.
 ---
-
 # Deep Link Strategy
 
 See `references/implementation_guide.md` for complete patterns and code examples.
@@ -21,7 +20,7 @@ clean architecture with modern functional programming. All code examples use:
 
 - Dart 3.5+ / Flutter 3.24+
 - go_router 17.2.2 for declarative routing and deep links
-- flutter_bloc 9.1.1 for state management  
+- flutter_bloc 9.1.1 for state management
 - GetIt 9.2.1 + Injectable 3.0.0 for dependency injection
 - Freezed 3.2.5 for immutable data classes
 - fpdart 1.2.0 for functional programming and error handling
@@ -29,20 +28,20 @@ clean architecture with modern functional programming. All code examples use:
 ## Core Features
 
 ### 1. Declarative Routing with go_router
-- `ShellRoute` — shell simple (scaffold/drawer compartido)
-- `StatefulShellRoute.indexedStack` — bottom navigation con tabs persistentes
-- Deep links activan la tab correcta dentro del shell
-- Route guards y authentication redirects
+- `ShellRoute` — simple shell (shared scaffold/drawer)
+- `StatefulShellRoute.indexedStack` — bottom navigation with persistent tabs
+- Deep links activate the correct tab inside the shell
+- Route guards and authentication redirects
 - Dynamic parameter handling (`/product/:id`)
 - Query string support (`?tab=reviews&sort=date`)
-- Error handling y fallback routes
+- Error handling and fallback routes
 
 ### 2. Clean Architecture Implementation
 ```
-Domain (Entities, UseCases, Repositories) 
+Domain (Entities, UseCases, Repositories)
   ↓
 Data (RepositoryImpl, DataSources)
-  ↓  
+  ↓
 Presentation (BLoC, Pages)
 ```
 
@@ -79,14 +78,14 @@ All dependencies injected via GetIt + Injectable. Errors returned as `Either<Dee
 
 ### Router Configuration
 ```dart
-// Caso A: ShellRoute simple (scaffold compartido)
+// Case A: Simple ShellRoute (shared scaffold)
 ShellRoute(
   builder: (context, state, child) => MainShell(child: child),
-  routes: [ /* rutas protegidas */ ],
+  routes: [ /* paths protegidas */ ],
 )
 
-// Caso B: StatefulShellRoute (bottom navigation con tabs persistentes)
-// Deep link activa la branch/tab correcta automáticamente
+// Case B: StatefulShellRoute (bottom navigation with persistent tabs)
+// Deep link activates the correct branch/tab automatically
 StatefulShellRoute.indexedStack(
   builder: (context, state, navigationShell) =>
       MainScaffold(navigationShell: navigationShell),
@@ -108,12 +107,12 @@ StatefulShellRoute.indexedStack(
 )
 ```
 
-| Escenario | Recomendación |
+| Scenario | Recommendation |
 |---|---|
-| Scaffold/AppBar compartido sin tabs | `ShellRoute` |
-| Bottom navigation con tabs persistentes | `StatefulShellRoute.indexedStack` |
-| Deep link debe activar tab específica | `StatefulShellRoute` — ruta en la branch correcta |
-| Deep link abre pantalla sobre el shell | Ruta fuera del shell (nivel raíz) |
+| Shared scaffold/AppBar without tabs | `ShellRoute` |
+| Bottom navigation with persistent tabs | `StatefulShellRoute.indexedStack` |
+| Deep link must activate a specific tab | `StatefulShellRoute` — route through the correct branch |
+| Deep link opens a screen over the shell | Route outside the shell (root level) |
 
 ### Domain Layer
 ```dart

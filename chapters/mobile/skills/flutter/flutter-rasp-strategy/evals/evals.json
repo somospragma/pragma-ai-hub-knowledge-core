@@ -58,20 +58,20 @@
     },
     {
       "id": "eval-03-debug-emulator-config-spanish",
-      "prompt": "¿Cómo configuro freeRASP para que funcione en modo debug sin bloquear el emulador de desarrollo?",
+      "prompt": "How do I configure freeRASP so it works in debug mode without blocking the development emulator?",
       "_tool_scope": "flutter-rasp-strategy",
       "assertions": [
         {
           "id": "A03-1",
           "description": "Response explains isProd: kReleaseMode (false in debug) to disable strict checks",
           "type": "contains_concept",
-          "expected": "isProd: kReleaseMode — se establece en false automáticamente en modo debug, deshabilitando verificaciones estrictas"
+          "expected": "isProd: kReleaseMode is set to false automatically in debug mode, disabling strict checks"
         },
         {
           "id": "A03-2",
           "description": "Response explains that the emulator threat should be handled conditionally — blocked in production, allowed in debug",
           "type": "contains_concept",
-          "expected": "onEmulatorDetected se puede ignorar o no bloquear cuando kReleaseMode es false"
+          "expected": "onEmulatorDetected can be ignored or not block when kReleaseMode is false"
         },
         {
           "id": "A03-3",

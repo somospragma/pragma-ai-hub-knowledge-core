@@ -11,10 +11,9 @@ description: >
   Use when creating files, classes, enums, variables, branches, commits,
   golden test outputs, or mapping Figma names to Dart identifiers.
 ---
-
 # Naming Conventions
 
-> **Scope**: Este skill cubre convenciones de nomenclatura **específicas del Design System** (prefijo DS, mapeo Figma→Dart, branches DS, goldens). Para el estándar general de código Dart/Flutter (nomenclatura general, imports, estilo, analysis_options) → ver skill `flutter-dart-coding-standard`.
+> **Scope**: This skill covers Design System-specific naming conventions (DS prefix, Figma-to-Dart mapping, DS branches, goldens). For the general Dart/Flutter code standard (general naming, imports, style, analysis_options), see `flutter-dart-coding-standard`.
 
 ## Files
 
@@ -73,7 +72,7 @@ Branches are prefixed by values from `project.config.yaml`:
 # DS component work (new components, fixes, docs)
 {naming.branch_prefix}[slug]        →  feat/ds-badge
 
-# App view / screen work  
+# App view / screen work
 {naming.view_branch_prefix}[slug]   →  feat/app-product-detail
 ```
 

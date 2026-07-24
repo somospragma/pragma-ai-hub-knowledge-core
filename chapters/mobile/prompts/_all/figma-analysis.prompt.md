@@ -4,12 +4,12 @@ version: 1.0.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt especializado para analizar componentes o pantallas de Figma y   convertirlos en especificación accionable para F
+description: >
+  Specialized prompt to analyze Figma components or screens and convert them into an actionable Flutter specification. Use when a workflow has a Figma URL and needs design extraction through Figma MCP.
 ---
+# Figma Analysis For Flutter DS
 
-# Análisis de Figma para Flutter DS
-
-## Skills de referencia
+## Reference Skills
 
 - flutter-ds-figma-mcp
 - flutter-ds-theming-tokens
@@ -17,157 +17,158 @@ description: Prompt especializado para analizar componentes o pantallas de Figma
 - flutter-ds-atomic-hierarchy
 - flutter-ds-asset-management
 
-## Instrucción
+## Instruction
 
-Dado un enlace de Figma y una HU, generar `§1` del documento de spec usando
-`PIPELINE_SPEC_PATH` como destino.
+Given a Figma link and a user story, generate the design analysis. If `spec_context` is provided, update `spec_ref` first; `PIPELINE_SPEC_PATH` remains a human report and must not become an executable or machine source.
 
-## Proceso
+## SDD Contract
 
-### 1. Acceso por MCP
+When `spec_context` exists:
 
-1. Parsear URL (`fileKey`, `nodeId`).
-2. Ejecutar `get_design_context(fileKey, nodeId)` como primer paso obligatorio.
-3. Extraer de `get_design_context`:
-   - anotaciones `Development`
-   - estados/comportamientos guiados por Figma
-   - nodos críticos para evidencia visual
-4. Ejecutar `get_screenshot(...)` para cada cambio/annotación relevante.
-5. `get_node(fileKey, nodeId)` para detectar tipo y estructura base.
-6. Extraer todos los nodos `TEXT` visibles con texto literal exacto, node id,
-   capa, scope/estado, estilo, alineación y reglas de truncamiento si existen.
-7. Extraer constraints/layout relevantes: auto-layout, HUG/FILL/FIXED, padding,
-   spacing, alignment, bounds, scroll/clip y zonas con riesgo de overflow.
-8. Detectar nodos/vector assets relevantes.
-9. Ejecutar `get_images(...)` por vector relevante (default `svg`, fallback `png`).
-10. Si pantalla: `get_node_children` para secciones.
-11. `get_styles(fileKey)` y `get_components(fileKey)` para contexto global.
+- Read `spec_ref`, `context_ref`, `phase`, and `read_sections`.
+- Write to `spec.yaml`: `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, and `acceptance_criteria`.
+- Record evidence in `{SPEC_PACKET_PATH}/evidence/figma-analysis.md`.
+- Do not use `PIPELINE_SPEC_PATH` as the machine source.
 
-### 1b. Si no hay acceso MCP o faltan datos críticos
+## Process
 
-- No solicitar input directo al usuario.
-- Escribir sección parcial con `MCP status: ❌ no disponible`.
-- Agregar `### 1.7 Bloqueos de Input` con faltantes exactos.
-- Registrar estado `blocked_input` en bitácora y devolver control al orquestador.
+### 1. MCP Access
 
-Si MCP responde pero falla `get_design_context`, bloquear también
-(`blocked_input`) para no omitir estados o comportamientos críticos.
-Si `get_design_context` responde correctamente pero no hay anotaciones
-`Development`, no bloquear: registrar `Development annotations: none` y
-continuar.
-Si falla `get_screenshot` para algún cambio guiado, bloquear también para no
-perder evidencia visual obligatoria.
-Si hay vectores críticos para la UI y falla su extracción (`get_images`) sin
-fallback válido, bloquear también para no perder fidelidad visual.
-Si faltan constraints detallados de Figma, no bloquear automáticamente: registrar
-alerta, inferir mitigación conservadora anti-overflow y continuar si el layout
-puede implementarse razonablemente.
+1. Parse the URL (`fileKey`, `nodeId`).
+2. Execute the required preflight:
+   - Figma MCP is configured in the active tool surface.
+   - File access is confirmed.
+   - Read permissions exist for the node, components, styles, variables, and assets.
+   - A screenshot is available for the main node.
+   - Evidence is written to `{SPEC_PACKET_PATH}/evidence/figma-mcp-preflight.md`.
+   - `spec.yaml.external_access.figma_mcp.status=verified`.
+3. Execute `get_design_context(fileKey, nodeId)` as the first required step.
+4. Extract from `get_design_context`:
+   - `Development` annotations
+   - Figma-guided states/behaviors
+   - nodes critical for visual evidence
+5. Execute `get_screenshot(...)` for each relevant change/annotation.
+6. Execute `get_node(fileKey, nodeId)` to detect type and base structure.
+7. Extract every visible `TEXT` node with exact literal text, node id, layer, scope/state, style, alignment, and truncation rules when available.
+8. Extract relevant constraints/layout: auto-layout, HUG/FILL/FIXED sizing, padding, spacing, alignment, bounds, scroll/clip, and overflow-risk zones.
+9. Detect relevant nodes/vector assets.
+10. Execute `get_images(...)` for each relevant vector (default `svg`, fallback `png`).
+11. If the node is a screen, use `get_node_children` for sections.
+12. Use `get_styles(fileKey)` and `get_components(fileKey)` for global context.
 
-### 2. Extracción visual y mapeo de tokens
+### 1b. Missing MCP Access Or Critical Data
 
-Para cada elemento documenta layout, visual, texto, iconos y vectores.
-Si un valor no tiene token, marcar `⚠️ ALERTA`.
+- Do not request direct input from the user.
+- Write a partial section with `MCP status: not available`.
+- Update `spec.yaml.external_access.figma_mcp.status=blocked_input`.
+- Add `### 1.7 Input Blockers` with exact missing items.
+- Record `blocked_input` in the log and return control to the orchestrator.
 
-Para textos visibles:
+If MCP responds but `get_design_context` fails, also block with `blocked_input`; do not omit critical states or behaviors.
+If `get_design_context` responds correctly but there are no `Development` annotations, do not block. Record `Development annotations: none` and continue.
+If `get_screenshot` fails for any guided change, also block to avoid losing required visual evidence.
+If vectors are critical for the UI and `get_images` extraction fails without a valid fallback, also block to avoid losing visual fidelity.
+If detailed constraints are missing from Figma, do not block automatically. Record an alert, infer conservative anti-overflow mitigation, and continue if the layout can be implemented reasonably.
 
-- Copiar `characters` exactamente como viene de Figma.
-- Preservar mayúsculas, acentos, puntuación y saltos visibles.
-- No traducir, corregir, resumir, expandir ni inventar copy.
-- Separar texto visible de nombres técnicos de capas.
+### 2. Visual Extraction And Token Mapping
 
-Adicionalmente, documenta una matriz de vectores con:
+For each element, document layout, visuals, text, icons, and vectors.
+If a value has no token, mark `ALERT`.
 
-- uso funcional en pantalla/componente
-- estrategia de consumo (`DS_ICON`, `SVG_ASSET`, `PNG_ASSET`)
-- ruta/constante propuesta
-- reglas de render (tamaño token, color token/original, semántica)
+For visible text:
 
-### 3. Variantes, estados y jerarquía
+- Copy `characters` exactly as they come from Figma.
+- Preserve uppercase/lowercase, accents, punctuation, and visible line breaks.
+- Do not translate, fix, summarize, expand, or invent copy.
+- Separate visible text from technical layer names.
 
-- Variantes Figma → enums Flutter.
-- Estados de componente: default/hover/pressed/disabled/loading/focused/error.
-- Incluir estados/comportamientos especiales definidos en anotaciones
-  `Development` (alertas, reglas condicionales, transiciones, callbacks).
-- Para vistas, registrar siempre `loading`, `empty`, `error` y `populated`.
-  Si Figma no define visual/copy para alguno, marcarlo como
-  `fallback_required` y alertar que debe resolverse con fallback estándar del
-  proyecto.
-- Descomposición atómica.
-- Si es vista completa, incluir `§1.4b` (scaffold, scroll, navegación, estados).
+Additionally, document a vector matrix with:
 
-### 4. Criterios de aceptación
+- functional use in screen/component
+- consumption strategy (`DS_ICON`, `SVG_ASSET`, `PNG_ASSET`)
+- path/constant proposal
+- rendering rules (size token, color token/original, semantics)
 
-Extraer checklist funcional desde la HU.
-Si la HU pide textos, estados o UX no presentes en Figma/metadatos, reportarlo
-como alerta de alcance y no generar copy ni UI adicional.
+### 3. Variants, States, And Hierarchy
 
-## Output obligatorio
+- Figma variants -> Flutter enums.
+- Component states: default, hover, pressed, disabled, loading, focused, error.
+- Include special states/behaviors defined in `Development` annotations (alerts, conditional rules, transitions, callbacks).
+- For views, always record `loading`, `empty`, `error`, and `populated`.
+- If Figma does not define visual/copy for any required state, mark it as `fallback_required` and flag that it must resolve through the project's standard fallback.
+- Include atomic decomposition.
+- If it is a complete view, include `view_states`, `navigation`, and screen structure in `spec.yaml`.
 
-Escribir en `PIPELINE_SPEC_PATH`:
+### 4. Acceptance Criteria
+
+Extract a functional checklist from the user story.
+If the user story requests text, states, or UX that are not present in Figma/metadata, report a scope alert and do not generate additional copy or UI.
+
+## Required Output
+
+Write first to `spec.yaml`. Optional human report format:
 
 ```markdown
-## §1 Análisis de Figma: [NombreComponente/NombreVista]
+## Analysis from Figma: [NameComponent/NameView]
 
-### 1.0 Metadatos MCP
+### 1.0 MCP Metadata
 - **File key**: [fileKey]
 - **Node ID**: [nodeId]
-- **Tipo**: [Component | Component Set | Frame/Screen]
-- **MCP status**: [✅ acceso directo | ❌ no disponible]
-- **Design context status**: [✅ obtenido | ❌ no disponible]
-- **Screenshots por cambio**: [N capturas]
+- **Type**: [Component | Component Set | Frame/Screen]
+- **MCP status**: [direct access | not available]
+- **Design context status**: [obtained | not available]
+- **Screenshots per change**: [N screenshots]
 
-### 1.1 Propiedades Visuales
-| Elemento | Propiedad | Valor Figma | Token Flutter | Status |
-|----------|-----------|-------------|---------------|--------|
+### 1.1 Visual Properties
+| Element | Property | Figma Value | Flutter Token | Status |
+|---------|----------|-------------|---------------|--------|
 
-### 1.1b Textos Literales
-| Node ID | Scope/Estado | Capa | Texto exacto Figma | Uso Flutter | Editable por agente |
-|---------|--------------|------|--------------------|-------------|---------------------|
+### 1.1b Literal Text
+| Node ID | Scope/State | Layer | Exact Figma Text | Flutter Use | Editable By Agent |
+|---------|-------------|-------|------------------|-------------|-------------------|
 
-### 1.1c Layout, Constraints y Riesgo de Overflow
-| Elemento | Node ID | Constraints Figma | Riesgo | Mitigación recomendada | Status |
-|----------|---------|-------------------|--------|--------------------------|--------|
+### 1.1c Layout, Constraints And Overflow Risk
+| Element | Node ID | Figma Constraints | Risk | Recommended Mitigation | Status |
+|---------|---------|-------------------|------|------------------------|--------|
 
-### 1.2 Variantes
-| Variante Figma | Enum Flutter | Diferencias visuales |
-|---------------|-------------|---------------------|
+### 1.2 Variants
+| Figma Variant | Flutter Enum | Visual Differences |
+|---------------|--------------|--------------------|
 
-### 1.3 Estados
-| Estado | Fuente (Figma/Fallback) | Cambios visuales | Copy | Implementación Flutter | Alerta |
-|--------|--------------------------|-----------------|------|------------------------|--------|
+### 1.3 States
+| State | Source (Figma/Fallback) | Visual Changes | Copy | Flutter Implementation | Alert |
+|-------|--------------------------|----------------|------|------------------------|-------|
 
-### 1.3b Anotaciones Development (obligatorio si existen)
-| Annotation | Nodo/Scope | Tipo (estado/comportamiento/regla) | Impacto Flutter | Requerido |
-|-----------|------------|--------------------------------------|-----------------|----------|
+### 1.3b Development Annotations (required when they exist)
+| Annotation | Node/Scope | Type (state/behavior/rule) | Flutter Impact | Required |
+|------------|------------|-----------------------------|----------------|----------|
 
-### 1.3c Vectores y Assets (obligatorio si existen)
-| Vector/Asset | Node ID | Uso UI | Estrategia (DS_ICON\|SVG_ASSET\|PNG_ASSET) | Ruta/Constante propuesta | Render (size/color/semantics) | Estado |
-|-------------|---------|--------|----------------------------------------------|--------------------------|-------------------------------|--------|
+### 1.3c Vectors And Assets (required when they exist)
+| Vector/Asset | Node ID | UI Use | Strategy (DS_ICON\|SVG_ASSET\|PNG_ASSET) | Path/Constant Proposal | Render (size/color/semantics) | State |
+|--------------|---------|--------|--------------------------------------------|------------------------|-------------------------------|-------|
 
-### 1.4 Descomposición Atómica
-[árbol propuesto]
+### 1.4 Atomic Decomposition
+[proposed tree]
 
-### 1.4b Estructura de Vista (solo si aplica)
+### 1.4b View Structure (only if applicable)
 - **Scaffold**: [...]
 - **Scroll**: [...]
-- **Organismos identificados**: [...]
-- **Navegación**: [...]
-- **Estados de vista**: [...]
+- **Identified organisms**: [...]
+- **Navigation**: [...]
+- **View states**: [...]
 
-### 1.5 Criterios de Aceptación
+### 1.5 Acceptance Criteria
 - [ ] CA-1 ...
 - [ ] CA-2 ...
 
-### 1.6 Alertas
-- ⚠️ ...
-- ⚠️ Si `get_design_context` falla, marcar bloqueo explícito.
-- ⚠️ Si no hay anotaciones `Development`, registrar `none` y continuar.
-- ⚠️ Si faltan vectores críticos para la UI objetivo, marcar bloqueo explícito.
-- ⚠️ Si faltan constraints de Figma, continuar con mitigación anti-overflow y
-  registrar el riesgo; no bloquear salvo que impida implementar.
-- ⚠️ Si la HU pide textos/UX no presentes en Figma, reportar como alcance no
-  cubierto por diseño, sin inventar copy.
+### 1.6 Alerts
+- ...
+- If `get_design_context` fails, mark an explicit block.
+- If there are no `Development` annotations, record `none` and continue.
+- If vectors critical to the target UI are missing, mark an explicit block.
+- If Figma constraints are missing, continue with anti-overflow mitigation and record the risk; do not block unless implementation is impossible.
+- If the user story requests text/UX not present in Figma, report it as not covered by design, without inventing copy.
 
-### 1.7 Bloqueos de Input (solo si aplica)
-- ❓ ...
+### 1.7 Input Blockers (only if applicable)
+- ...
 ```

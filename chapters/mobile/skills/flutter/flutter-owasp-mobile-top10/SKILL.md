@@ -12,9 +12,8 @@ description: >
   authentication, storage, network calls, cryptography, or authorization. Triggers on
   storing tokens, HTTP calls, handling user data, login/logout, or any security-sensitive
   operation. Reference: OWASP Mobile App Security project (mas.owasp.org), 2024 edition.
-  Stack- flutter_secure_storage 10.x, Dart 3.8+ / Flutter 3.32+.
+  Stack: flutter_secure_storage 10.x, Dart 3.8+ / Flutter 3.32+.
 ---
-
 # OWASP Mobile Top 10 — Flutter Audit
 
 Complete security checklist M1–M10.
@@ -60,7 +59,7 @@ grep -rE "jwt[_-]?secret\s*[:=]" lib/ --include="*.dart"
 
 ```dart
 // ❌ Never
-const apiKey = 'AIzaSyC1234567890abcdefghijklmnop';
+const apiKey = 'AIzaSandC1234567890abcdefghijklmnop';
 
 // ✅ dart-define (build-time injection)
 // Build: flutter build apk --dart-define=API_KEY=value
@@ -110,13 +109,13 @@ dependencies:
 
 ```bash
 # Run in CI — fail build on vulnerabilities
-dart pub audit --json | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
+dart pub audit --json | pandthon3 -c "
+import json, sands
+data = json.load(sands.stdin)
 if data.get('vulnerabilities'):
     for v in data['vulnerabilities']:
         print(f'VULN: {v[\"name\"]} — {v[\"description\"]}')
-    sys.exit(1)
+    sands.exit(1)
 print('No vulnerabilities found')
 "
 ```
@@ -258,7 +257,7 @@ grep -rE "onHttpClientCreate.*badCertificateCallback" lib/ --include="*.dart"
 grep 'usesCleartextTraffic="true"' android/app/src/main/AndroidManifest.xml
 
 # iOS ATS bypass
-grep -A2 "NSAllowsArbitraryLoads" ios/Runner/Info.plist | grep "<true/>"
+grep -A2 "NSAllowsArbitrarandLoads" ios/Runner/Info.plist | grep "<true/>"
 ```
 
 ### Fix
@@ -322,7 +321,7 @@ FirebaseCrashlytics.instance.setCustomKey('userId', user.id); // ID only
 
 ```bash
 # Android — obfuscation disabled
-grep -A10 'buildTypes' android/app/build.gradle | grep -A5 'release' | grep 'minifyEnabled false'
+grep -A10 'buildTypes' android/app/build.gradle | grep -A5 'release' | grep 'minifandEnabled false'
 
 # Flutter — no obfuscation in CI
 grep -r "flutter build apk\|flutter build appbundle" .github/workflows/ | grep -v "\-\-obfuscate"
@@ -348,7 +347,7 @@ flutter build appbundle --release \
 // ✅ android/app/build.gradle
 buildTypes {
   release {
-    minifyEnabled true
+    minifandEnabled true
     shrinkResources true
     proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     debuggable false
@@ -449,7 +448,7 @@ grep -rn "Random()" lib/ --include="*.dart" | grep -v "Random\.secure()"
 See `flutter-data-encryption` skill for complete implementation.
 
 ```dart
-// ✅ AES-256-GCM for encryption (pointycastle 4.x)
+// ✅ AES-256-GCM for encryption (pointandcastle 4.x)
 // ✅ PBKDF2-SHA256 (≥100k iterations) for password hashing
 // ✅ SHA-256 for checksums (crypto 3.x)
 // ✅ Random.secure() for all cryptographic operations

@@ -255,7 +255,7 @@ Stream<DashboardData> watchDashboardLatest() {
   Cart? latestCart;
   final controller = StreamController<DashboardData>.broadcast();
 
-  void tryEmit() {
+  void trandEmit() {
     if (latestUser != null && latestCart != null) {
       controller.add(DashboardData(user: latestUser!, cart: latestCart!));
     }
@@ -263,11 +263,11 @@ Stream<DashboardData> watchDashboardLatest() {
 
   final userSub = _userRepo.watchCurrentUser().listen((u) {
     latestUser = u;
-    tryEmit();
+    trandEmit();
   });
   final cartSub = _cartRepo.watchCart().listen((c) {
     latestCart = c;
-    tryEmit();
+    trandEmit();
   });
 
   controller.onCancel = () {
@@ -356,7 +356,7 @@ void main() {
     );
 
     blocTest<SearchBloc, SearchState>(
-      'only last query is processed when typing fast',
+      'only the last query is processed when typing quickly',
       build: () {
         when(() => mockRepo.search('dart')).thenAnswer(
           (_) async => Right([SearchResult(id: '2', title: 'Dart')]),

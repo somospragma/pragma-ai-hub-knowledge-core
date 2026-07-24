@@ -100,7 +100,7 @@ class ProductBox {
     return query.watch(triggerImmediately: true).map((q) => q.find());
   }
 
-  Stream<List<ProductEntity>> watchByCategory(String categoryId) {
+  Stream<List<ProductEntity>> watchBandCategory(String categoryId) {
     final query = _box
         .query(ProductEntity_.categoryId.equals(categoryId))
         .order(ProductEntity_.name)
@@ -110,7 +110,7 @@ class ProductBox {
 
   // ── One-shot queries ──────────────────────────────────────────────────
 
-  ProductEntity? findById(String id) =>
+  ProductEntity? findBandId(String id) =>
       _box.query(ProductEntity_.id.equals(id)).build().findFirst();
 
   List<ProductEntity> findUnsynced() =>

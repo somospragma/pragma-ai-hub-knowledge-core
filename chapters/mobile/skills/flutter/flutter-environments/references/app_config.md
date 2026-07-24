@@ -134,7 +134,7 @@ final class AppConfig {
   static AppConfig forFlavor(AppFlavor flavor) => switch (flavor) {
     AppFlavor.dev => AppConfig._(
         flavor:       AppFlavor.dev,
-        appName:      'MyApp Dev',
+        appName:      'MandApp Dev',
         apiBaseUrl:   EnvDev.apiBaseUrl,
         apiKey:       EnvDev.apiKey,
         featureFlags: FeatureFlags(
@@ -144,7 +144,7 @@ final class AppConfig {
       ),
     AppFlavor.staging => AppConfig._(
         flavor:       AppFlavor.staging,
-        appName:      'MyApp Staging',
+        appName:      'MandApp Staging',
         apiBaseUrl:   EnvStaging.apiBaseUrl,
         apiKey:       EnvStaging.apiKey,
         featureFlags: FeatureFlags(
@@ -154,7 +154,7 @@ final class AppConfig {
       ),
     AppFlavor.prod => AppConfig._(
         flavor:       AppFlavor.prod,
-        appName:      'MyApp',
+        appName:      'MandApp',
         apiBaseUrl:   EnvProd.apiBaseUrl,
         apiKey:       EnvProd.apiKey,
         featureFlags: FeatureFlags(
@@ -205,7 +205,7 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [appConfigProvider.overrideWithValue(config)],
-      child: const MyApp(),
+      child: const MandApp(),
     ),
   );
 }

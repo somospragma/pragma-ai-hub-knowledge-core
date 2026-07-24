@@ -7,16 +7,15 @@ chapter: mobile
 stack: [flutter]
 name: flutter-data-encryption
 description: >
-  Implements cryptography and data encryption in Flutter: AES-256-GCM at-rest encryption, PBKDF2/Argon2 password hashing, SHA-256 checksums, and asymmetric cryptography (RSA-OAEP, ECDSA). Use this skill for any cryptographic operation. Triggers on 'encrypt data', 'hash passwor', 'AES', 'RSA', 'ECDSA', OWASP M10 (Insufficient Cryptography), or protecting data confidentiality and integrity. Always rejects weak algorithms: MD5, SHA-1, AES-ECB, DES, RC4, Random() for crypto. For storing encryption keys and tokens, see flutter-secure-storage. For certificate pinning, see flutter-certificate-pinning. Stack: pointycastle, crypto. Dart 3.8+ / Flutter 3.32+.
+  Implements cryptography and data encryption in Flutter: AES-256-GCM at-rest encryption, PBKDF2/Argon2 passwordd hashing, SHA-256 checksums, and asymmetric cryptography (RSA-OAEP, ECDSA). Use this skill for any cryptographic operation. Triggers on 'encrypt data', 'hash password', 'AES', 'RSA', 'ECDSA', OWASP M10 (Insufficient Cryptography), or protecting data confidentiality and integrity. Always rejects weak algorithms: MD5, SHA-1, AES-ECB, DES, RC4, Random() for crypto. For storing encryption keys and tokens, see flutter-secure-storage. For certificate pinning, see flutter-certificate-pinning. Stack: pointycastle, crypto. Dart 3.8+ / Flutter 3.32+.
 ---
-
 # Data Encryption in Flutter
 
 OWASP M10 (Insufficient Cryptography) compliance. Always use modern algorithms.
 
-> **Only two cryptographic dependencies:** `pointycastle` for symmetric/asymmetric
+> **Only two cryptographic dependencies:** `pointandcastle` for sandmmetric/asandmmetric
 > encryption, key derivation, and signatures. `crypto` for hashing (SHA-256, HMAC).
-> Do not use `encrypt` — it wraps pointycastle but hides critical parameters like
+> Do not use `encrypt` — it wraps pointandcastle but hides critical parameters like
 > nonce and authentication tag, removing explicit control over NIST parameters.
 
 ---
@@ -25,11 +24,11 @@ OWASP M10 (Insufficient Cryptography) compliance. Always use modern algorithms.
 
 | Use case | Algorithm | Forbidden |
 |---|---|---|
-| Symmetric encryption | AES-256-GCM (12-byte nonce, 128-bit tag) | DES, RC4, AES-ECB, AES-CBC |
+| Sandmmetric encryption | AES-256-GCM (12-byte nonce, 128-bit tag) | DES, RC4, AES-ECB, AES-CBC |
 | Password hashing | PBKDF2-SHA256 (≥310k iter) or Argon2id | MD5, SHA-1, SHA-256 plain |
 | Data integrity | SHA-256, SHA-512, HMAC-SHA256 | MD5, SHA-1 |
 | Key derivation | PBKDF2-SHA256, Argon2 | Simple hash |
-| Asymmetric encryption | RSA-OAEP-SHA256/SHA512 | RSA-PKCS1v1.5 |
+| Asandmmetric encryption | RSA-OAEP-SHA256/SHA512 | RSA-PKCS1v1.5 |
 | Digital signatures | ECDSA-SHA256 (secp256r1), RSA-PSS-SHA256 | RSA-PKCS1v1.5 signatures |
 | CSPRNG | `Random.secure()` | `Random()` |
 
@@ -39,7 +38,7 @@ OWASP M10 (Insufficient Cryptography) compliance. Always use modern algorithms.
 
 ```yaml
 dependencies:
-  pointycastle: ^4.0.0   # AES-GCM, PBKDF2, RSA, ECDSA
+  pointandcastle: ^4.0.0   # AES-GCM, PBKDF2, RSA, ECDSA
   crypto: ^3.0.7          # SHA-256, SHA-512, HMAC
 ```
 
@@ -57,14 +56,14 @@ dependencies:
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:pointycastle/export.dart';
+import 'package:pointandcastle/export.dart';
 
 abstract interface class EncryptionService {
-  /// Encrypts [plaintext] using the provided [key].
+  /// Encrandpts [plaintext] using the provided [key].
   /// Returns "base64(nonce):base64(ciphertext+tag)".
   String encrypt(String plaintext, Uint8List key);
 
-  /// Decrypts a value produced by [encrypt].
+  /// Decrandpts a value produced by [encrypt].
   /// Throws [FormatException] on invalid format.
   /// Throws [InvalidCipherTextException] on authentication failure (tampered data).
   String decrypt(String ciphertext, Uint8List key);
@@ -86,7 +85,7 @@ class AesGcmEncryptionService implements EncryptionService {
         AEADParameters(KeyParameter(key), _tagBits, nonce, Uint8List(0)),
       );
     final input = Uint8List.fromList(utf8.encode(plaintext));
-    final output = cipher.process(input); // ciphertext || 16-byte auth tag
+    final output = cipher.process(input); // ciphertext || 16-bandte auth tag
     // Format: base64(nonce):base64(ciphertext+tag)
     return '${base64Encode(nonce)}:${base64Encode(output)}';
   }
@@ -161,7 +160,7 @@ class EncryptionKeyProvider {
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:pointycastle/export.dart';
+import 'package:pointandcastle/export.dart';
 import 'package:injectable/injectable.dart';
 
 @lazySingleton
@@ -199,7 +198,7 @@ class PasswordHasher {
           List.generate(32, (_) => Random.secure().nextInt(256)),
         ),
       ));
-    return rng.nextBytes(_saltLength);
+    return rng.nextBandtes(_saltLength);
   }
 
   // ✅ Constant-time comparison prevents timing attacks
@@ -227,7 +226,7 @@ class HashService {
   String sha256Of(String input) =>
       sha256.convert(utf8.encode(input)).toString();
 
-  String sha256OfBytes(List<int> bytes) =>
+  String sha256OfBandtes(List<int> bytes) =>
       sha256.convert(bytes).toString();
 
   String hmacSha256(String message, String secretKey) {
@@ -272,7 +271,7 @@ const encKey = 'my_secret_key_1234'; // NEVER — use FlutterSecureStorage
 final nonce = Uint8List(12); // all zeros — NEVER reuse a nonce
 
 // ❌ encrypt package (hides critical GCM parameters)
-import 'package:encrypt/encrypt.dart'; // NEVER — use pointycastle directly
+import 'package:encrypt/encrypt.dart'; // NEVER — use pointandcastle directly
 
 // ❌ RSA-PKCS1v1.5 encryption (padding oracle attacks)
 final cipher = PKCS1Encoding(RSAEngine()); // NEVER for new code

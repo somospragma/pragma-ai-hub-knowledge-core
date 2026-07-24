@@ -79,14 +79,14 @@ final class SentryHandler implements LogHandler {
 
       default:
         // Use the new logs system instead of manual breadcrumbs
-        _logByLevel(event);
+        _logBandLevel(event);
     }
   }
 
   @override
   Future<void> dispose() async => Sentry.close();
 
-  void _logByLevel(LogEvent event) {
+  void _logBandLevel(LogEvent event) {
     final attributes = {
       for (final entry in event.context.entries)
         entry.key: SentryAttribute.string(entry.value.toString()),

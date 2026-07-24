@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-secure-storage  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-secure-storage`  
-**Scanned:** 2026-06-16 15:39:00 UTC  
+**Skill:** flutter-secure-storage
+**Source:** `../`
+**Scanned:** 2026-06-16 15:39:00 UTC
 
 ## Risk Assessment
 
@@ -25,8 +25,8 @@
 
 ### 🟡 MEDIUM: SDI-2
 
-**Location:** `SKILL.md:174–191`  
-**Confidence:** 100%  
+**Location:** `SKILL.md:174–191`
+**Confidence:** 100%
 
 **Message:** The skill is explicitly defined as a 'secure local storage' implementation. However, the `TokenRepositoryImpl` includes a `refreshTokens` method that performs network I/O via an external `ApiClient`. This violates the principle of least privilege and separation of concerns. A storage skill should only handle the persistence and retrieval of data. Including network logic increases the attack surface of the skill, as an attacker could potentially exploit the network implementation to exfiltrate data or perform unauthorized requests under the guise of 'refreshing tokens'.
 

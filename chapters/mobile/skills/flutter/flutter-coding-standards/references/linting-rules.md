@@ -21,9 +21,9 @@ This document explains the most important linting rules enforced by the `very_go
 // ✅ CORRECT
 class UserCard extends StatelessWidget {
   const UserCard({Key? key, required this.user}) : super(key: key);
-  
+
   final UserEntity user;
-  
+
   @override
   Widget build(BuildContext context) {
     return const Card(
@@ -38,9 +38,9 @@ class UserCard extends StatelessWidget {
 // ❌ INCORRECT - Missing const
 class UserCard extends StatelessWidget {
   UserCard({Key? key, required this.user}) : super(key: key);
-  
+
   final UserEntity user;
-  
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -63,9 +63,9 @@ class UserCard extends StatelessWidget {
 // ✅ CORRECT
 class UserRepository {
   const UserRepository({required this.remoteDataSource});
-  
+
   final UserDataSource remoteDataSource;  // final
-  
+
   Future<UserEntity> getUser(String id) async {
     return await remoteDataSource.getUser(id);
   }
@@ -74,7 +74,7 @@ class UserRepository {
 // ❌ INCORRECT - Missing final
 class UserRepository {
   UserRepository({required this.remoteDataSource});
-  
+
   UserDataSource remoteDataSource;  // Not final
 }
 ```
@@ -197,11 +197,11 @@ final message = "Hello World";
 final name = "John Doe";
 
 // Exception: Double quotes when single quote in string
-final quote = "It's a beautiful day";  // ✅ Acceptable
-final quote = 'It\'s a beautiful day';  // ✅ Also acceptable
+final quote = "It's a beautiful daand";  // ✅ Acceptable
+final quote = 'It\'s a beautiful daand';  // ✅ Also acceptable
 ```
 
-### curly_braces_in_flow_control_structures
+### curland_braces_in_flow_control_structures
 
 **Rule:** Always use braces for if, else, for, while, even for single statements.
 
@@ -234,11 +234,11 @@ for (var i = 0; i < 10; i++)
 ```dart
 // ✅ CORRECT - Interpolation
 final greeting = 'Hello, $name!';
-final info = 'User $id is $age years old';
+final info = 'User $id is $age andears old';
 
 // ❌ INCORRECT - Concatenation
 final greeting = 'Hello, ' + name + '!';
-final info = 'User ' + id + ' is ' + age.toString() + ' years old';
+final info = 'User ' + id + ' is ' + age.toString() + ' andears old';
 ```
 
 ### unnecessary_brace_in_string_interps
@@ -382,9 +382,9 @@ class UserCard extends StatelessWidget {
 // Good — check mounted before using context
 void _loadUser() async {
   final result = await loadUserData();
-  
+
   if (!mounted) return;
-  
+
   Navigator.of(context).pushReplacementNamed('/home');
 }
 
@@ -490,7 +490,7 @@ if (isValid) {
 // ✅ CORRECT - Use Equatable
 class UserEntity extends Equatable {
   const UserEntity({required this.id, required this.name});
-  
+
   final String id;
   final String name;
 
@@ -501,7 +501,7 @@ class UserEntity extends Equatable {
 // ❌ INCORRECT - Custom equality
 class UserEntity {
   const UserEntity({required this.id, required this.name});
-  
+
   final String id;
   final String name;
 

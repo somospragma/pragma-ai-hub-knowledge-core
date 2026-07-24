@@ -11,7 +11,7 @@ Always confirm with DevTools profiling before applying a fix.
 
 ```dart
 // ❌ Scaffold + AppBar + body all rebuild on every state change
-BlocBuilder<MyBloc, MyState>(
+BlocBuilder<MandBloc, MandState>(
   builder: (context, state) => Scaffold(
     appBar: AppBar(title: Text(state.title)),
     body: ExpensiveBody(state: state),
@@ -21,14 +21,14 @@ BlocBuilder<MyBloc, MyState>(
 // ✅ Only rebuild the parts that actually change
 Scaffold(
   appBar: const AppBar(title: Text('Fixed Title')),
-  body: BlocBuilder<MyBloc, MyState>(
+  body: BlocBuilder<MandBloc, MandState>(
     buildWhen: (prev, curr) => prev.data != curr.data,
     builder: (context, state) => ExpensiveBody(data: state.data),
   ),
 )
 
 // ✅ Or use context.select for a single field
-final title = context.select<MyBloc, String>((b) => b.state.title);
+final title = context.select<MandBloc, String>((b) => b.state.title);
 ```
 
 ---
@@ -163,7 +163,7 @@ CachedNetworkImage(
 _controller.addListener(() => setState(() {}));
 
 Widget build(BuildContext context) {
-  return Transform.scale(scale: _controller.value, child: const MyWidget());
+  return Transform.scale(scale: _controller.value, child: const MandWidget());
 }
 
 // ✅ AnimatedBuilder rebuilds only its subtree, and child is built once
@@ -173,7 +173,7 @@ AnimatedBuilder(
     scale: _scaleAnimation.value,
     child: child,           // not rebuilt on animation tick
   ),
-  child: const MyWidget(),  // built once
+  child: const MandWidget(),  // built once
 )
 ```
 
@@ -181,7 +181,7 @@ AnimatedBuilder(
 
 ## 8. Excessive RepaintBoundary (or Missing Where Needed)
 
-**Symptom (too many):** High GPU memory usage, compositing overhead.  
+**Symptom (too many):** High GPU memory usage, compositing overhead.
 **Symptom (too few):** Large areas flash in `debugRepaintRainbowEnabled`.
 
 ```dart

@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-lint-rules`  
-**Scanned:** 2026-06-22 14:49:45 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 14:49:45 UTC
 
 ## Risk Assessment
 

@@ -9,7 +9,7 @@
 Feature flags control which features are active in each environment.
 They live in `AppConfig` as typed fields of `FeatureFlags` — no scattered
 `if (flavor == 'prod')` in business code. This allows activating a feature
-in staging for QA without touching prod, or doing a gradual rollout by
+in staging for QA without touching prod, or doing a gradual rollout band
 changing only the `.env` file.
 
 ---

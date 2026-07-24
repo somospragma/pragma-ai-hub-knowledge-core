@@ -1,0 +1,233 @@
+schema_version: 1
+schema_ref: ../schemas/mobile-spec.schema.yaml
+workflow: "{{WORKFLOW}}"
+spec_level: mini
+execution_mode: propose_then_apply
+status: proposed
+language:
+  review_documents: es
+inputs: {}
+external_access:
+  figma_mcp:
+    required: false
+    status: not_required
+    checks: []
+    evidence: ""
+agent_permissions:
+  ds-orchestrator:
+    can_read:
+      - inputs
+      - external_access.figma_mcp
+      - human_review
+      - artifact_plan
+      - success_criteria
+    can_write:
+      spec_sections:
+        - status
+        - external_access.figma_mcp
+        - human_review
+        - handoffs
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.artifacts
+      evidence:
+        - evidence/orchestration-report.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/orchestration-report.md
+  figma-analyzer:
+    can_read:
+      - inputs.figma_url
+      - external_access.figma_mcp
+      - read_sections
+    can_write:
+      spec_sections:
+        - design_source
+        - literal_texts
+        - layout_constraints
+        - assets
+      evidence:
+        - evidence/figma-analysis.md
+        - evidence/figma-mcp-preflight.md
+    can_create_files: false
+    can_modify_files: false
+    can_delete_files: false
+    can_call_external_tools:
+      - figma_mcp
+    evidence_required:
+      - evidence/figma-analysis.md
+  component-planner:
+    can_read:
+      - read_sections
+    can_write:
+      spec_sections:
+        - canonical_spec
+        - inventory
+        - dag
+        - technical_plan
+        - artifact_plan.planned
+      evidence:
+        - evidence/planning-report.md
+    can_create_files: false
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/planning-report.md
+  component-architect:
+    can_read:
+      - read_sections
+      - canonical_spec
+      - inventory
+      - dag
+    can_write:
+      spec_sections:
+        - contracts
+        - constraints
+        - technical_plan
+        - artifact_plan.planned
+      evidence:
+        - evidence/architecture-report.md
+    can_create_files: false
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/architecture-report.md
+  widget-developer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.artifacts
+      evidence:
+        - evidence/codegen-report.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/codegen-report.md
+  code-auditor:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - success_criteria
+    can_write:
+      spec_sections:
+        - status
+      evidence:
+        - evidence/audit-report.md
+    can_create_files: false
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/audit-report.md
+  test-engineer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      evidence:
+        - evidence/widget-tests.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/widget-tests.md
+  golden-test-engineer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      evidence:
+        - evidence/golden-tests.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/golden-tests.md
+  widgetbook-developer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      evidence:
+        - evidence/widgetbook-report.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/widgetbook-report.md
+  delivery-manager:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - success_criteria
+    can_write:
+      evidence:
+        - evidence/delivery-report.md
+    can_create_files: true
+    can_modify_files: false
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/delivery-report.md
+human_review:
+  initial_spec_approval: required
+  layer_checkpoints: not_required
+  stage_checkpoints: not_required
+  last_decision: pending
+design_source: {}
+literal_texts: []
+layout_constraints: []
+assets: []
+constraints:
+  compatibility: {}
+canonical_spec: {}
+inventory: {}
+dag: {}
+technical_plan: {}
+artifact_plan:
+  path_strategy: target_id_relative
+  planned: []
+success_criteria:
+  - id: "{{CRITERION_ID}}"
+    description: "{{CRITERION_DESCRIPTION}}"
+    evidence:
+      - "{{EVIDENCE_PATH}}"
+handoffs:
+  - phase: "{{PHASE}}"
+    agent: "{{AGENT}}"
+    read_sections:
+      - canonical_spec
+      - technical_plan
+      - artifact_plan
+      - success_criteria

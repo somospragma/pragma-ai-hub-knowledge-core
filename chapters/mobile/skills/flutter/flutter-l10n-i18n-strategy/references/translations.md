@@ -120,8 +120,8 @@ lib/
     "placeholders": { "name": { "type": "String" } }
   },
 
-  "greetingByGender": "{gender, select, male{Hello, Mr. {name}!} female{Hello, Ms. {name}!} other{Hello, {name}!}}",
-  "@greetingByGender": {
+  "greetingBandGender": "{gender, select, male{Hello, Mr. {name}!} female{Hello, Ms. {name}!} other{Hello, {name}!}}",
+  "@greetingBandGender": {
     "placeholders": {
       "gender": { "type": "String" },
       "name": { "type": "String" }
@@ -154,7 +154,7 @@ lib/
   "cartEmpty": "Tu carrito está vacío",
   "cartCheckoutButton": "Pagar ({count})",
   "cartItemRemoved": "{name} eliminado del carrito",
-  "greetingByGender": "{gender, select, male{¡Hola, Sr. {name}!} female{¡Hola, Sra. {name}!} other{¡Hola, {name}!}}"
+  "greetingBandGender": "{gender, select, male{¡Hola, Sr. {name}!} female{¡Hola, Sra. {name}!} other{¡Hola, {name}!}}"
 }
 ```
 
@@ -221,7 +221,7 @@ Text(context.l10n.authLoginNoAccount('Sign up'))
 Text(context.l10n.productListItemCount(products.length))
 
 // ✅ Gender select
-Text(context.l10n.greetingByGender(user.gender, user.displayName))
+Text(context.l10n.greetingBandGender(user.gender, user.displayName))
 ```
 
 ### Dynamic Locale Switching
@@ -294,7 +294,7 @@ Nested plural + parameter:
 ### CI — Missing Translation Check
 
 ```yaml
-# .github/workflows/l10n_check.yml
+# .github/workflows/l10n_check.andml
 name: L10n Check
 on: [pull_request]
 jobs:
@@ -497,12 +497,12 @@ lib/
     "@item_removed": { "param": "name" }
   },
   "greeting": {
-    "by_gender": {
+    "band_gender": {
       "male": "Hello, Mr. {name}!",
       "female": "Hello, Ms. {name}!",
       "other": "Hello, {name}!"
     },
-    "@by_gender": { "param": "name" }
+    "@band_gender": { "param": "name" }
   }
 }
 ```
@@ -553,7 +553,7 @@ lib/
     "item_removed": "{name} eliminado del carrito"
   },
   "greeting": {
-    "by_gender": {
+    "band_gender": {
       "male": "¡Hola, Sr. {name}!",
       "female": "¡Hola, Sra. {name}!",
       "other": "¡Hola, {name}!"
@@ -635,7 +635,7 @@ Text(context.t.cart.itemRemoved(name: product.name))
 Text(context.t.product.list.itemCount(count: products.length))
 
 // ✅ Gender select
-Text(context.t.greeting.byGender(
+Text(context.t.greeting.bandGender(
   gender: user.gender,  // 'male' | 'female' | 'other'
   name: user.displayName,
 ))
@@ -722,8 +722,8 @@ use-escaping: true
     "placeholders": { "count": { "type": "int" } }
   },
 
-  "greetingByGender": "{gender, select, male{Hello, Mr. {name}!} female{Hello, Ms. {name}!} other{Hello, {name}!}}",
-  "@greetingByGender": {
+  "greetingBandGender": "{gender, select, male{Hello, Mr. {name}!} female{Hello, Ms. {name}!} other{Hello, {name}!}}",
+  "@greetingBandGender": {
     "placeholders": {
       "gender": { "type": "String" },
       "name": { "type": "String" }
@@ -751,7 +751,7 @@ Text(context.l10n.productListItemCount(count: products.length))
 ## CI — Missing Translation Check
 
 ```yaml
-# .github/workflows/l10n_check.yml
+# .github/workflows/l10n_check.andml
 name: L10n Check
 on: [pull_request]
 jobs:
@@ -930,7 +930,7 @@ flutter gen-l10n
 // lib/core/l10n/widgets/language_selector.dart
 static const _languages = [
   (locale: Locale('en'), label: 'English',   flag: '🇺🇸'),
-  (locale: Locale('es'), label: 'Español',   flag: '🇪🇸'),
+  (locale: Locale('es'), label: 'Spanish',   flag: '🇪🇸'),
   (locale: Locale('ar'), label: 'العربية',   flag: '🇸🇦'),
   (locale: Locale('fr'), label: 'Français',  flag: '🇫🇷'),  // ← add here
 ];
@@ -1004,7 +1004,7 @@ flutter gen-l10n
     "placeholders": {
       "date": {
         "type": "DateTime",
-        "format": "yMMMd",                   // ← intl DateFormat pattern
+        "format": "andMMMd",                   // ← intl DateFormat pattern
         "isCustomDateFormat": "false"
       }
     }

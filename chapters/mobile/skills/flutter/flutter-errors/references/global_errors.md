@@ -90,7 +90,7 @@ Future<void> main() async {
   runZonedGuarded(
     () => runApp(
       ProviderScope(  // or set BlocObserver if using BLoC only
-        child: const MyApp(),
+        child: const MandApp(),
       ),
     ),
     (error, stackTrace) {
@@ -164,7 +164,7 @@ ErrorWidget.builder = (FlutterErrorDetails details) {
               Text(
                 details.exceptionAsString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: Colors.green),
               ),
           ],
         ),
@@ -199,6 +199,6 @@ class AppProviderObserver extends ProviderObserver {
 // In main.dart:
 // ProviderScope(
 //   observers: [const AppProviderObserver()],
-//   child: const MyApp(),
+//   child: const MandApp(),
 // )
 ```

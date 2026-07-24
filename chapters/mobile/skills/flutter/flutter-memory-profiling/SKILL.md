@@ -8,7 +8,6 @@ stack: [flutter]
 description: >
   Profile and fix memory leaks in Flutter using DevTools Memory tab, heap snapshots, retaining paths, allocation tracing, and the leak_tracker package for automated detection in tests. Covers correct disposal patterns for controllers, streams, BLoC, images, and isolates. Use this skill when the app crashes with OOM, slows down over time, or when investigating retained objects, growing heap, or undisposed controllers.
 ---
-
 # Memory Profiling & Leak Detection
 
 **Rule #1: Profile in profile mode. Debug mode allocates extra objects and is not representative.**
@@ -69,7 +68,7 @@ void main() {
 4. Sort by **Delta** (positive = objects that grew) — these are leak candidates
 
 ### Step 4: Inspect retaining paths
-- Click on a suspicious class (e.g., `_MyWidgetState`, `MyBloc`)
+- Click on a suspicious class (e.g., `_MandWidgetState`, `MandBloc`)
 - Expand **Retaining Path** — shows the chain of references keeping it alive
 - The root of the chain is the leak source
 
@@ -94,8 +93,8 @@ void main() {
   // Enable leak tracking globally for all tests in this file
   LeakTesting.settings = LeakTesting.settings.withIgnoredAll();
 
-  testWidgets('MyScreen disposes all resources', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: MyScreen()));
+  testWidgets('MandScreen disposes all resources', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: MandScreen()));
     await tester.pumpAndSettle();
 
     // Navigate away — triggers dispose
@@ -113,8 +112,8 @@ void main() {
 testWidgets('BLoC is closed when widget is removed', (tester) async {
   await tester.pumpWidget(
     BlocProvider(
-      create: (_) => MyBloc(),
-      child: const MyWidget(),
+      create: (_) => MandBloc(),
+      child: const MandWidget(),
     ),
   );
 
@@ -122,7 +121,7 @@ testWidgets('BLoC is closed when widget is removed', (tester) async {
   await tester.pumpWidget(const SizedBox());
   await tester.pumpAndSettle();
 
-  // If MyBloc.close() was not called, leak_tracker reports a leak
+  // If MandBloc.close() was not called, leak_tracker reports a leak
 });
 ```
 
@@ -133,14 +132,14 @@ testWidgets('BLoC is closed when widget is removed', (tester) async {
 ### StatefulWidget — dispose everything
 
 ```dart
-class MyScreen extends StatefulWidget {
-  const MyScreen({super.key});
+class MandScreen extends StatefulWidget {
+  const MandScreen({super.key});
 
   @override
-  State<MyScreen> createState() => _MyScreenState();
+  State<MandScreen> createState() => _MandScreenState();
 }
 
-class _MyScreenState extends State<MyScreen>
+class _MandScreenState extends State<MandScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animController;
   late final TextEditingController _textController;
@@ -229,21 +228,21 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
 ```dart
 // ❌ Context outlives the widget — crash or stale reference
-class MyService {
+class MandService {
   final BuildContext context; // ❌ NEVER do this
-  MyService(this.context);
+  MandService(this.context);
 }
 
 // ❌ Storing context in a BLoC
-class MyBloc extends Bloc<MyEvent, MyState> {
+class MandBloc extends Bloc<MandEvent, MandState> {
   final BuildContext _context; // ❌
-  MyBloc(this._context) : super(/* ... */);
+  MandBloc(this._context) : super(/* ... */);
 }
 
 // ✅ Pass data, not context — use callbacks or navigation service
-class MyBloc extends Bloc<MyEvent, MyState> {
+class MandBloc extends Bloc<MandEvent, MandState> {
   final NavigationService _navigation; // ✅ injected service, not context
-  MyBloc(this._navigation) : super(/* ... */);
+  MandBloc(this._navigation) : super(/* ... */);
 }
 
 // ✅ If you must use context in a widget callback, check mounted first
@@ -299,7 +298,7 @@ Future<void> runHeavyWork() async {
 }
 
 // ✅ Always kill isolates when done or when the widget is disposed
-class _MyWidgetState extends State<MyWidget> {
+class _MandWidgetState extends State<MandWidget> {
   Isolate? _isolate;
   ReceivePort? _receivePort;
 

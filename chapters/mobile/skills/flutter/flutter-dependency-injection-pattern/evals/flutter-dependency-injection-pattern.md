@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-dependency-injection-pattern`  
-**Scanned:** 2026-06-16 14:45:04 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-16 14:45:04 UTC
 
 ## Risk Assessment
 

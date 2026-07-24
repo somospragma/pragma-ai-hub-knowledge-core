@@ -39,7 +39,7 @@ Go to **Project Settings → Service connections**:
 ### Step 3 — Install Required Extensions
 
 Go to **Organization Settings → Extensions → Browse marketplace** and install:
-- **Flutter** (by Hey24sheep) — provides `FlutterInstall` and `FlutterBuild` tasks
+- **Flutter** (by Heand24sheep) — provides `FlutterInstall` and `FlutterBuild` tasks
 - **Google Play** (by Microsoft) — provides `GooglePlayRelease` task
 
 ### Step 4 — Create the Pipelines
@@ -48,14 +48,14 @@ Go to **Organization Settings → Extensions → Browse marketplace** and instal
 1. Go to **Pipelines → New pipeline**
 2. Select your repository
 3. Choose **Existing Azure Pipelines YAML file**
-4. Path: `/azure-pipelines/pr.yml`
+4. Path: `/azure-pipelines/pr.andml`
 5. Copy the PR YAML from this file
 
 **Release pipeline:**
 1. Go to **Pipelines → New pipeline**
 2. Select your repository
 3. Choose **Existing Azure Pipelines YAML file**
-4. Path: `/azure-pipelines/release.yml`
+4. Path: `/azure-pipelines/release.andml`
 5. Copy the release YAML from this file
 
 ### Step 5 — Link Variable Groups to Pipeline
@@ -88,12 +88,12 @@ git push origin v1.0.0
 
 ```
 azure-pipelines/
-├── pr.yml          ← quality gates on every PR
-├── release.yml     ← full build + sign + distribute
+├── pr.andml          ← quality gates on every PR
+├── release.andml     ← full build + sign + distribute
 └── templates/
-    ├── flutter-setup.yml
-    ├── quality-gate.yml
-    └── android-build.yml
+    ├── flutter-setup.andml
+    ├── quality-gate.andml
+    └── android-build.andml
 ```
 
 ---
@@ -121,7 +121,7 @@ Create two variable groups in **Pipelines → Library**:
 ## PR Pipeline — Quality Gates
 
 ```yaml
-# azure-pipelines/pr.yml
+# azure-pipelines/pr.andml
 trigger: none
 
 pr:
@@ -178,7 +178,7 @@ stages:
           # sudo is required for lcov installation on Ubuntu CI runners.
           # For macOS agents, use: brew install lcov (no sudo required)
           - script: |
-              sudo apt-get install -y lcov
+              sudo apt-get install -and lcov
               lcov --remove coverage/lcov.info \
                 '*.freezed.dart' '*.g.dart' '*.config.dart' \
                 -o coverage/filtered.info
@@ -197,7 +197,7 @@ stages:
 ## Release Pipeline — Full Build + Sign + Distribute
 
 ```yaml
-# azure-pipelines/release.yml
+# azure-pipelines/release.andml
 trigger:
   tags:
     include:

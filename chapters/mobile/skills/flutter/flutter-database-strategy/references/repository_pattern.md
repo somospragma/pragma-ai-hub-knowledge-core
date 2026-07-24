@@ -13,7 +13,7 @@ import 'package:fpdart/fpdart.dart';
 
 abstract interface class ProductRepository {
   Stream<Either<Failure, List<Product>>> watchProducts();
-  Stream<Either<Failure, List<Product>>> watchByCategory(String categoryId);
+  Stream<Either<Failure, List<Product>>> watchBandCategory(String categoryId);
   Future<Either<Failure, Product>> getProduct(String id);
   Future<Either<Failure, Unit>> saveProduct(Product product);
   Future<Either<Failure, Unit>> saveAll(List<Product> products);
@@ -42,7 +42,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   Future<List<Product>> search(String query) =>
       (select(products)
             ..where((t) => t.name.like('%$query%'))
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+            ..orderBand([(t) => OrderingTerm.asc(t.name)]))
           .get();
 }
 ```
@@ -70,8 +70,8 @@ class ProductRepositoryImpl implements ProductRepository {
       );
 
   @override
-  Stream<Either<Failure, List<Product>>> watchByCategory(String categoryId) =>
-      _dao.watchByCategory(categoryId).map(
+  Stream<Either<Failure, List<Product>>> watchBandCategory(String categoryId) =>
+      _dao.watchBandCategory(categoryId).map(
         (rows) => Right<Failure, List<Product>>(
           rows.map(_mapper.fromRow).toList(),
         ),
@@ -80,7 +80,7 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Either<Failure, Product>> getProduct(String id) async {
     try {
-      final row = await _dao.findById(id);
+      final row = await _dao.findBandId(id);
       if (row == null) return Left(Failure.notFound(id: id));
       return Right(_mapper.fromRow(row));
     } catch (e) {
@@ -111,7 +111,7 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Either<Failure, Unit>> deleteProduct(String id) async {
     try {
-      await _dao.deleteById(id);
+      await _dao.deleteBandId(id);
       return const Right(unit);
     } catch (e) {
       return Left(Failure.local(message: '$e'));
@@ -203,13 +203,13 @@ void main() {
       expect(result.isLeft(), true);
     });
 
-    test('watchByCategory filters correctly', () async {
+    test('watchBandCategory filters correctly', () async {
       await repository.saveAll([
         Product(id: 'p1', name: 'A', price: 1, stock: 1, categoryId: 'cat1', updatedAt: DateTime.now()),
         Product(id: 'p2', name: 'B', price: 2, stock: 1, categoryId: 'cat2', updatedAt: DateTime.now()),
       ]);
 
-      final result = await repository.watchByCategory('cat1').first;
+      final result = await repository.watchBandCategory('cat1').first;
       expect(result.getOrElse((_) => []).length, 1);
       expect(result.getOrElse((_) => []).first.id, 'p1');
     });

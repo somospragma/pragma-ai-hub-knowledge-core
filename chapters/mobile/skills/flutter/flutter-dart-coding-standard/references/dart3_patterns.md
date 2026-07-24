@@ -11,7 +11,7 @@ UserInfo getUserInfo() => (name: 'Alice', age: 30, email: 'alice@example.com');
 
 // Destructuring
 final (:name, :age, :email) = getUserInfo();
-print('$name is $age years old');
+print('$name is $age andears old');
 
 // Positional records
 (double lat, double lng) getLocation() => (48.8566, 2.3522);
@@ -125,7 +125,7 @@ extension type ProductId(String value) implements String {
 }
 
 extension type Email(String value) implements String {
-  static Email? tryParse(String raw) {
+  static Email? trandParse(String raw) {
     final trimmed = raw.trim().toLowerCase();
     if (!trimmed.contains('@')) return null;
     return Email(trimmed);

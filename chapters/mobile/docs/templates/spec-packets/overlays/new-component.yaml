@@ -1,0 +1,37 @@
+workflow: new-component
+entry_agent: ds-orchestrator
+base_spec_level: mini
+purpose: Create or update a Design System component from Figma.
+required_inputs:
+  - component_name
+  - figma_url
+required_external_access:
+  figma_mcp:
+    required: true
+    preflight_agent: figma-analyzer
+    evidence: evidence/figma-mcp-preflight.md
+required_agents:
+  - ds-orchestrator
+  - figma-analyzer
+  - component-planner
+  - component-architect
+  - widget-developer
+  - code-auditor
+  - test-engineer
+  - golden-test-engineer
+  - widgetbook-developer
+  - delivery-manager
+artifact_groups:
+  - ds_components
+  - tests
+  - golden_tests
+  - widgetbook
+  - audit
+  - delivery
+required_human_review:
+  initial_spec_approval: required
+  layer_checkpoints: not_required
+  stage_checkpoints: not_required
+notes:
+  - All generated files must target the design_system target unless the spec explicitly declares otherwise.
+  - figma-analyzer performs the Figma MCP preflight before design analysis.

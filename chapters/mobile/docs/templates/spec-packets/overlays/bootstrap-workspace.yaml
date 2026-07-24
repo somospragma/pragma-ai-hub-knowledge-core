@@ -1,0 +1,24 @@
+workflow: bootstrap-workspace
+entry_agent: workspace-discovery
+purpose: Discover workspace topology and propose application-owned configuration.
+required_inputs:
+  - workspace_root
+optional_inputs:
+  - workspace_file
+  - expected_app_repo_root
+  - expected_app_repo_name
+  - expected_app_package
+  - expected_ds_package
+  - expected_core_package
+  - expected_repo_mode
+  - apply_mode
+  - force_reconfigure
+execution_mode: propose_then_apply
+required_agents:
+  - workspace-discovery
+required_human_review:
+  initial_configuration_approval: required
+notes:
+  - The canonical configuration destination is the resolved application repository.
+  - Configuration is applied only after explicit approval and backup creation.
+  - Reuse an existing valid .sopp/config triplet by default; reconfiguration requires force_reconfigure=true.

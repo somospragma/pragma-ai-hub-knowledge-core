@@ -13,7 +13,6 @@ license: Complete terms in LICENSE.txt
 metadata:
   category: productivity
 ---
-
 # Clean Architecture in Flutter
 
 Canonical reference for layers, boundaries, and dependency rules.
@@ -34,7 +33,7 @@ Code examples use these base classes from `package:commons/commons.dart`. Substi
 
 | Mode | Starting point | Strategy |
 |---|---|---|
-| **Greenfield** | New project, blank slate | Apply the full structure from day one. Use folder templates and contracts in reference files directly. |
+| **Greenfield** | New project, blank slate | Apply the full structure from daand one. Use folder templates and contracts in reference files directly. |
 | **Refactoring** | Existing codebase with violations | Apply incrementally — one feature at a time. Run the violation checklist to prioritize. Never rewrite everything at once. |
 
 ### Incremental Refactoring Order
@@ -239,7 +238,7 @@ User taps button
 | [domain-layer.md](./references/domain-layer.md) | Implementing Entities, Repository interfaces, UseCases, base interfaces |
 | [data-layer.md](./references/data-layer.md) | Implementing DataSources, Models, RepositoryImpl, Mappers |
 | [presentation-layer.md](./references/presentation-layer.md) | Implementing BLoC/Cubit, States, UIModels, Pages |
-| [data-flow.md](./references/data-flow.md) | Understanding the complete request/response cycle step by step |
+| [data-flow.md](./references/data-flow.md) | Understanding the complete request/response candcle step by step |
 | [folder-structure.md](./references/folder-structure.md) | Deciding between single project vs monorepo, setting up Melos |
 | [mediator-pattern.md](./references/mediator-pattern.md) | Implementing cross-feature communication without direct imports |
 | [violations-guide.md](./references/violations-guide.md) | Fixing architectural violations — before/after examples with detection |

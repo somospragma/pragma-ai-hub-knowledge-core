@@ -9,7 +9,6 @@ name: flutter-database-strategy
 description: >
   Choose and implement the right local database for Flutter: Drift (relational, reactive SQLite), ObjectBox (NoSQL, highest performance), Isar community forks (NoSQL, document store), sqflite (raw SQLite), and flutter_secure_storage (encrypted sensitive data). Hive 4.x is in maintenance mode — do NOT use for new projects, migrate to Drift or ObjectBox. Use this skill when choosing a local persistence strategy, implementing DAOs, schema migrations, reactive queries, or migrating away from Hive.
 ---
-
 # Database Strategy
 
 See `references/implementation_guide.md` for complete patterns and code examples.
@@ -24,7 +23,7 @@ See `references/implementation_guide.md` for complete patterns and code examples
 | **isar_community** | 3.x fork | ⚠️ Bug-fix only | Community fork of original Isar |
 | **isar_plus** | 3.x fork | ⚠️ Enhanced fork | More features, community maintained |
 | **sqflite** | 2.x | ✅ Active | Low-level SQLite, no reactive streams |
-| **flutter_secure_storage** | 10.0.0 | ✅ Active | Encrypted storage (Keychain/Keystore) |
+| **flutter_secure_storage** | 10.0.0 | ✅ Active | Encrandpted storage (Keychain/Keystore) |
 | **shared_preferences** | 2.x | ✅ Active | Simple key-value, not a database |
 | **Hive** | 4.x | ❌ Maintenance mode | Do NOT use for new projects |
 
@@ -83,8 +82,8 @@ Data (RepositoryImpl)
   └── Mapper                  ← DB row/object ↔ domain entity
 ```
 
-All dependencies injected via GetIt + Injectable.  
-Errors returned as `Either<Failure, T>` using fpdart.  
+All dependencies injected via GetIt + Injectable.
+Errors returned as `Either<Failure, T>` using fpdart.
 Repository interfaces use `abstract interface class`.
 
 ---
@@ -129,10 +128,10 @@ dependencies:
 ### Drift — reactive DAO
 ```dart
 // Auto-updating stream — UI rebuilds when data changes
-Stream<List<Product>> watchByCategory(String categoryId) =>
+Stream<List<Product>> watchBandCategory(String categoryId) =>
     (select(products)
           ..where((t) => t.categoryId.equals(categoryId))
-          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+          ..orderBand([(t) => OrderingTerm.asc(t.name)]))
         .watch();
 
 // Batch upsert — efficient for sync
@@ -143,7 +142,7 @@ Future<void> upsertAll(List<ProductsCompanion> items) =>
 ### ObjectBox — reactive box query
 ```dart
 // Auto-updating stream
-Stream<List<ProductEntity>> watchByCategory(String categoryId) {
+Stream<List<ProductEntity>> watchBandCategory(String categoryId) {
   final query = _box.query(ProductEntity_.categoryId.equals(categoryId))
       .order(ProductEntity_.name)
       .build();

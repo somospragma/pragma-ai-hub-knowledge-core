@@ -4,12 +4,12 @@ version: 1.0.1
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt para generar código Flutter de un átomo del Design System. Usar cuando   el componente ya fue clasificado como át
+description: >
+  Prompt for generating Flutter code for an atom-level Design System component. Use when the component is classified as an atom and its technical plan, tokens, states, and artifact path are approved.
 ---
+# Generation of Atom Flutter
 
-# Generación de Átomo Flutter
-
-## Skills de referencia
+## Reference Skills
 
 - flutter-ds-theming-tokens
 - flutter-ds-component-template
@@ -18,72 +18,83 @@ description: Prompt para generar código Flutter de un átomo del Design System.
 - flutter-ds-widget-anatomy
 - flutter-ds-a11y-semantics
 
-## INSTRUCCIÓN
+## Instruction
 
-Genera el código Flutter completo de un componente atómico del Design System.
+Generate the complete Flutter code for an atom-level component in the Design System.
 
-## INPUTS QUE RECIBIRÁS
+## SDD Contract
 
-1. Nombre del átomo a crear
-2. Especificaciones visuales (de §1 y §2)
-3. Estados requeridos
-4. Variantes requeridas
-5. Path de destino (de §3)
-6. Interfaz diseñada (de §4)
-7. Contrato de textos y overflow (`§4.B`), obligatorio en `/new-component` y
-   `/new-view`; puede declarar "sin textos/riesgos" si no aplica al átomo
+When `spec_context` exists, read `spec_ref` and `context_ref` as machine
+sources. Use only `read_sections`, implement the artifacts declared in
+`artifact_plan`, record evidence in
+`{SPEC_PACKET_PATH}/evidence/codegen-report.md`, and treat `PIPELINE_SPEC_PATH`
+as the human report.
 
-## REGLAS ABSOLUTAS
+## Inputs You Will Receive
+
+1. Name of the atom to create
+2. Visual specifications from `design_source` and `canonical_spec`
+3. Required states
+4. Required variants
+5. Destination path from `artifact_plan`
+6. Interface designed from `technical_plan`
+7. Text and overflow contract (`contracts.text_overflow`), required in `/new-component` and
+   `/new-view`; can declare "without texts/risks" if it does not apply to the atom
+8. In SDD mode, the same inputs come from `canonical_spec`,
+   `technical_plan`, `contracts` and `artifact_plan`
+
+## Absolute Rules
 
 ### Tokens
-- TODO color → token semántico (según `project.config.yaml` → `tokens.access_method`)
-- TODA tipografía → token de texto/typography
-- TODO spacing → token de spacing (constantes estáticas)
-- TODO radius → token de radius
-- TODA elevación → token de elevation
-- **CERO valores mágicos**. Si no hay token → generar ⚠️ ALERTA
+- Every color → token semantic (according to `project.config.yaml` → `tokens.access_method`)
+- Every typography value → token of text/typography
+- Every spacing value → spacing token
+- Every radius value → radius token
+- Every elevation value → token elevation
+- **ZERO magic values**. If there is no token → generate ⚠️ ALERT
 
 ### Template
-- Usar SIEMPRE el template de Átomo del skill `flutter-ds-component-template`
-- Seguir la anatomía del skill `flutter-ds-widget-anatomy`
+- Use ALWAYS the template of Atom of the skill `flutter-ds-component-template`
+- Follow the anatomy from the `flutter-ds-widget-anatomy` skill
 
 ### Naming
-- Clase: `{{DS_PREFIX}}[Nombre]` en PascalCase
-- Archivo: `{{ds_prefix_snake}}_[nombre].dart` en snake_case
-- Enum de estado: `{{DS_PREFIX}}[Nombre]State`
-- Enum de variante: `{{DS_PREFIX}}[Nombre]Variant`
-- Enum de tamaño: `{{DS_PREFIX}}[Nombre]Size`
+- Clase: `{{DS_PREFIX}}[Name]` in PascalCase
+- File: `{{ds_prefix_snake}}_[name].dart` in snake_case
+- Enum state: `{{DS_PREFIX}}[Name]State`
+- Enum of variante: `{{DS_PREFIX}}[Name]Variant`
+- Enum of size: `{{DS_PREFIX}}[Name]Size`
 
 ### Clean Code
-- Código autoexplicativo por nombres y estructura
-- Prohibidos comentarios inline/bloque/Dartdoc por defecto
-- Solo permitir comentario fundamental cuando no sea deducible del código
-- Constructor `const` siempre que posible
-- Named parameters siempre
-- 1 widget público por archivo
-- Métodos privados `_build*` para lógica de estados
-- Métodos privados `_resolve*` para resolver tokens por variante/estado
+- Code self-explanatory through names and structure
+- Inline, block, and Dartdoc comments are prohibited by default
+- Only allow a fundamental comment when the code cannot make the reason clear
+- Constructor `const` whenever possible
+- Named parameters always
+- 1 public widget per file
+- Private `_build*` methods for state-specific UI
+- Private `_resolve*` methods to resolve tokens per variant/state
 
-### Accesibilidad
-- Consultar `flutter-ds-a11y-semantics`
-- `Semantics` labels en elementos interactivos
-- Áreas de toque mínimo 48x48
+### Accessibility
+- Consult `flutter-ds-a11y-semantics`
+- `Semantics` labels on interactive elements
+- Minimum touch targets of 48x48
 
-### Textos y Overflow
-- Usar textos visibles solo desde `§1.1b`/`§2`/`§4.B`.
-- No inventar, traducir, corregir ni reescribir labels.
-- Si el átomo renderiza texto dentro de un contenedor limitado, respetar
-  `maxLines`/`overflow` solo si Figma o `§4.B` lo indican.
-- No fijar width/height para resolver overflow salvo que Figma marque FIXED.
+### Text And Overflow
+- Use visible text only from `literal_texts`, `contracts.literal_texts` and
+  `contracts.text_overflow`.
+- Do not invent, translate, fix, or rewrite labels.
+- If the atom renders text inside a constrained container, respect
+  `maxLines`/`overflow` only if Figma or `contracts.text_overflow` indicates it.
+- Do not force width/height to resolve overflow unless Figma marks the node as FIXED.
 
-## ESTRUCTURA DEL ARCHIVO
+## File Structure
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:{{package_name}}/tokens/...';
 
-class {{DS_PREFIX}}[Nombre] extends StatelessWidget {
-  const {{DS_PREFIX}}[Nombre]({super.key, required this.param, ...});
+class {{DS_PREFIX}}[Name] extends StatelessWidget {
+  const {{DS_PREFIX}}[Name]({super.key, required this.param, ...});
 
   final Type param;
 
@@ -105,26 +116,26 @@ class {{DS_PREFIX}}[Nombre] extends StatelessWidget {
   EdgeInsets _resolvePadding() { ... }
 }
 
-enum {{DS_PREFIX}}[Nombre]State { default_, disabled, loading, focused, error }
-enum {{DS_PREFIX}}[Nombre]Variant { primary, secondary }
-enum {{DS_PREFIX}}[Nombre]Size { sm, md, lg }
+enum {{DS_PREFIX}}[Name]State { default_, disabled, loading, focused, error }
+enum {{DS_PREFIX}}[Name]Variant { primary, secondary }
+enum {{DS_PREFIX}}[Name]Size { sm, md, lg }
 ```
 
-## CHECKLIST PRE-ENTREGA
+## Pre-Delivery Checklist
 
-- [ ] ¿Usa SOLO tokens del DS para valores visuales?
-- [ ] ¿Sin comentarios inline/bloque/Dartdoc salvo excepción fundamental?
-- [ ] ¿Constructor es `const`?
-- [ ] ¿Todos los parámetros son named?
-- [ ] ¿Implementa TODOS los estados requeridos?
-- [ ] ¿Implementa TODAS las variantes requeridas?
-- [ ] ¿`build()` delega a métodos privados?
-- [ ] ¿Disabled usa `Opacity` + `IgnorePointer`?
-- [ ] ¿Loading muestra skeleton/shimmer con tokens?
-- [ ] ¿Callbacks son null-safe?
-- [ ] ¿Compila (imports correctos, tipos correctos)?
-- [ ] ¿Accesibilidad: Semantics labels?
-- [ ] ¿1 widget público por archivo?
-- [ ] ¿Package imports (no relativos)?
-- [ ] ¿Textos visibles son literales del contrato Figma?
-- [ ] ¿Overflow mitigado sin alterar copy ni layout base?
+- [ ] Uses only DS tokens for visual values?
+- [ ] Contains no inline, block, or Dartdoc comments unless there is a fundamental exception?
+- [ ] Constructor is `const`?
+- [ ] All parameters are named?
+- [ ] Implements all required states?
+- [ ] Implements all required variants?
+- [ ] `build()` delegates to private methods?
+- [ ] Disabled uses `Opacity` + `IgnorePointer`?
+- [ ] Loading shows skeleton/shimmer with tokens?
+- [ ] Callbacks are null-safe?
+- [ ] Compiles with correct imports and types?
+- [ ] Accessibility: Semantics labels?
+- [ ] 1 public widget per file?
+- [ ] Package imports (no relativos)?
+- [ ] Is visible text literal from the Figma contract?
+- [ ] Overflow is mitigated without changing copy or the base layout?

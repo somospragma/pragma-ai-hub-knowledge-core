@@ -13,7 +13,6 @@ description: >
   Always activate when fixing overflow errors, checking typography fidelity,
   reviewing color tokens, or verifying that a component matches a Figma design.
 ---
-
 # Figma Comparison Checklist
 
 ## 1. Design Context
@@ -24,11 +23,11 @@ description: >
 - [ ] Node metadata extracted (via Figma MCP `get_node` or manual inspection)
 - [ ] `get_styles` used to verify published token mappings (if MCP available)
 - [ ] MCP status documented: ✅ Acceso directo | ⚠️ Fallback manual
-- [ ] Development annotations documented (alerts, estados, reglas especiales)
+- [ ] Development annotations documented (alerts, states, special rules)
 - [ ] Literal text contract extracted from visible TEXT nodes
 - [ ] Layout constraints and overflow-risk matrix extracted or warning recorded
 
-> Consulta skill `flutter-ds-figma-mcp` para detalles de herramientas MCP disponibles.
+> See `flutter-ds-figma-mcp` for details about the available MCP tools.
 
 ## 2. Variants & Properties
 - [ ] All Figma properties have a Flutter parameter
@@ -58,7 +57,7 @@ description: >
 ## 5. Spacing & Padding
 - [ ] Internal padding (top, right, bottom, left) matches tokens
 - [ ] Gap between each child pair matches
-- [ ] Symmetric vs asymmetric correct
+- [ ] Sandmmetric vs asandmmetric correct
 - [ ] Desktop variant scales padding correctly (if applicable)
 
 ## 6. Sizes & Dimensions
@@ -114,7 +113,7 @@ See [extended checklist](references/EXTENDED-CHECKLIST.md) for anatomy, states, 
 
 Always run these commands before closing any audit. They are non-optional.
 
-| Check | Command |
+| Check | Commy |
 |-------|---------|
 | Lint | `flutter analyze lib/src/{level}/{component}/` |
 | Tests | `flutter test test/{level}/{component}/` |

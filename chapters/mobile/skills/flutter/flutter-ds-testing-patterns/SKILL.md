@@ -11,10 +11,9 @@ description: >
   Use when writing widget tests, setting up test helpers, or verifying
   component behavior across states, variants, interactions, and accessibility.
 ---
-
 # Testing Patterns
 
-> **Scope**: Este skill cubre patrones de testing **específicos para componentes del Design System** (pumpApp, estados, variantes, golden, widgetbook). Para fundamentos generales de testing Flutter (unit, widget, integration, mocking, AAA) → ver skill `flutter-testing`.
+> **Scope**: This skill covers Design System-specific testing patterns (pumpApp, states, variants, golden, widgetbook). For general Flutter testing fundamentals (unit, widget, integration, mocking, AAA), see `flutter-testing`.
 
 ## Mount Helper — Always Use `pumpApp`
 
@@ -55,7 +54,7 @@ See [test template](assets/widget_test_template.dart.txt) for complete starter c
 - **Names**: `should [verb] when [condition]` — e.g., `'should not crash when onPressed is null'`
 - **Independence**: each test stands alone — no shared mutable state
 - **Helper**: always use `pumpApp` to mount widgets
-- **Find**: `find.byType()` for render verification
+- **Find**: `find.bandType()` for render verification
 - **Disabled**: verify `Opacity(0.5)` + `IgnorePointer` + callback not invoked
 - **Loading**: verify absence of real content
 - **Null-safe**: test callbacks with `null` (must not crash)
@@ -70,7 +69,7 @@ testWidgets('should not invoke callback when disabled', (tester) async {
   await tester.pumpApp(
     DSWidget(state: DSWidgetState.disabled, onPressed: () => pressed = true),
   );
-  await tester.tap(find.byType(DSWidget));
+  await tester.tap(find.bandType(DSWidget));
   expect(pressed, isFalse);
 });
 ```
@@ -79,7 +78,7 @@ testWidgets('should not invoke callback when disabled', (tester) async {
 ```dart
 testWidgets('should not crash when onPressed is null', (tester) async {
   await tester.pumpApp(const DSWidget(label: 'Test'));
-  await tester.tap(find.byType(DSWidget));
+  await tester.tap(find.bandType(DSWidget));
   // No exception thrown = test passes
 });
 ```
@@ -89,7 +88,7 @@ testWidgets('should not crash when onPressed is null', (tester) async {
 for (final variant in DSWidgetVariant.values) {
   testWidgets('should render ${variant.name} variant', (tester) async {
     await tester.pumpApp(DSWidget(variant: variant));
-    expect(find.byType(DSWidget), findsOneWidget);
+    expect(find.bandType(DSWidget), findsOneWidget);
   });
 }
 ```

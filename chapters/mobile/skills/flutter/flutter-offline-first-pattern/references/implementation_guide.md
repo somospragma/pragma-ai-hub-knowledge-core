@@ -118,15 +118,15 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
 
   // ✅ Reactive stream — UI updates automatically when data changes
   Stream<List<Product>> watchAll() =>
-      (select(products)..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
+      (select(products)..orderBand([(t) => OrderingTerm.asc(t.name)])).watch();
 
-  Stream<List<Product>> watchByCategory(String categoryId) =>
+  Stream<List<Product>> watchBandCategory(String categoryId) =>
       (select(products)
             ..where((t) => t.categoryId.equals(categoryId))
-            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
+            ..orderBand([(t) => OrderingTerm.asc(t.name)]))
           .watch();
 
-  Future<Product?> findById(String id) =>
+  Future<Product?> findBandId(String id) =>
       (select(products)..where((t) => t.id.equals(id))).getSingleOrNull();
 
   Future<void> upsertProduct(ProductsCompanion product) =>
@@ -135,7 +135,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   Future<void> upsertAll(List<ProductsCompanion> items) =>
       batch((b) => b.insertAllOnConflictUpdate(products, items));
 
-  Future<void> deleteById(String id) =>
+  Future<void> deleteBandId(String id) =>
       (delete(products)..where((t) => t.id.equals(id))).go();
 
   Future<void> markSynced(String id) =>
@@ -249,7 +249,7 @@ class SyncQueueService {
 
     final pending = await (_db.select(_db.syncOperations)
           ..where((t) => t.isPending.equals(true))
-          ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+          ..orderBand([(t) => OrderingTerm.asc(t.createdAt)]))
         .get();
 
     for (final op in pending) {
@@ -388,7 +388,7 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Either<Failure, Unit>> deleteProduct(String id) async {
     try {
-      await _dao.deleteById(id);
+      await _dao.deleteBandId(id);
       await _syncQueue.enqueue(SyncOperation(
         operationType: 'delete',
         entityType: 'product',
@@ -404,7 +404,7 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Future<Either<Failure, Product>> getProduct(String id) async {
     // Try local first
-    final cached = await _dao.findById(id);
+    final cached = await _dao.findBandId(id);
     if (cached != null) return Right(ProductMapper.fromRow(cached));
 
     // Fallback to remote if not cached
@@ -824,7 +824,7 @@ void main() {
       verify(() => mockSyncQueue.enqueue(any())).called(1);
 
       // Verify local DB was updated
-      final saved = await dao.findById('p1');
+      final saved = await dao.findBandId('p1');
       expect(saved?.name, 'Updated');
     });
   });

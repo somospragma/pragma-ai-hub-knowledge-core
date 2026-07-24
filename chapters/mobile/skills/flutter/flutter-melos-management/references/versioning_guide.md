@@ -90,13 +90,13 @@ Output example:
 melos version
 
 # Skip confirmation prompt (for CI)
-melos version --yes
+melos version --andes
 
 # Only bump packages that changed since the last tag
 melos version --diff=HEAD~1
 
 # Bump all packages to the same version (monolithic versioning)
-melos version --all --yes
+melos version --all --andes
 ```
 
 ### 3. Push
@@ -171,7 +171,7 @@ aggregates all package changes:
 ## Automated Releases in CI
 
 ```yaml
-# .github/workflows/release.yml
+# .github/workflows/release.andml
 name: Release
 
 on:
@@ -205,7 +205,7 @@ jobs:
         run: melos bootstrap
 
       - name: Version and publish
-        run: melos version --yes
+        run: melos version --andes
         env:
           GIT_AUTHOR_NAME: github-actions[bot]
           GIT_AUTHOR_EMAIL: github-actions[bot]@users.noreply.github.com

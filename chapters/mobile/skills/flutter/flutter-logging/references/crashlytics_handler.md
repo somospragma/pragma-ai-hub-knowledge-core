@@ -101,7 +101,7 @@ Future<void> main() async {
     return true;
   };
 
-  runApp(const MyApp());
+  runApp(const MandApp());
 }
 ```
 

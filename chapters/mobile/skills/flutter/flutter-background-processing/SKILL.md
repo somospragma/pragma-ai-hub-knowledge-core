@@ -9,7 +9,6 @@ name: flutter-background-processing
 description: >
   Implements background tasks with WorkManager 0.5.x and push message background handling using a Strategy pattern to support multiple providers (FCM, OneSignal, custom), clean architecture, fpdart, and modern Flutter patterns.
 ---
-
 # Background Processing
 
 See `references/implementation_guide.md` for complete patterns and code examples.
@@ -62,7 +61,7 @@ Presentation (NotificationBloc — provider-agnostic)
 Background (top-level entry points — provider-specific, thin wrappers)
 ```
 
-All dependencies injected via GetIt + Injectable.  
+All dependencies injected via GetIt + Injectable.
 Errors returned as `Either<PushFailure, T>` / `Either<BackgroundFailure, T>` using fpdart.
 
 ## Key Constraints

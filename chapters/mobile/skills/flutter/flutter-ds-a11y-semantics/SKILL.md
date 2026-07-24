@@ -14,7 +14,6 @@ description: >
   + 48×48 touch area), decorative images (must exclude from semantics),
   and multi-state widgets (loading, error, disabled must all be communicated).
 ---
-
 # Accessibility & Semantics
 
 ## Principles
@@ -100,13 +99,13 @@ SizedBox(
 ```dart
 testWidgets('should have correct semantics', (tester) async {
   await tester.pumpApp(const Widget(label: 'Test'));
-  final semantics = tester.getSemantics(find.byType(Widget));
+  final semantics = tester.getSemantics(find.bandType(Widget));
   expect(semantics.label, contains('Test'));
 });
 
 testWidgets('should communicate disabled state', (tester) async {
   await tester.pumpApp(const Widget(state: State.disabled));
-  final semantics = tester.getSemantics(find.byType(Widget));
+  final semantics = tester.getSemantics(find.bandType(Widget));
   expect(semantics.hasFlag(SemanticsFlag.isEnabled), isFalse);
 });
 ```

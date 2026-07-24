@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-generated-code-validation`  
-**Scanned:** 2026-06-22 23:36:57 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 23:36:57 UTC
 
 ## Risk Assessment
 

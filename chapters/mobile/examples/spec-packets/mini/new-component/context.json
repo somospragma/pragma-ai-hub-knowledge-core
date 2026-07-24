@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "schema_ref": "../../../../docs/templates/schemas/mobile-context.schema.json",
+  "run_id": "example-mini-new-component",
+  "workflow": "new-component",
+  "spec_level": "mini",
+  "workflow_controller": "ds-orchestrator",
+  "status": "pending_human_review",
+  "current_phase": "spec_review",
+  "checkpoints": {
+    "initial_spec": {
+      "required": true,
+      "phase": "spec_review",
+      "status": "pending",
+      "decision_ref": "review.md"
+    }
+  },
+  "completed_phases": [],
+  "pending_human_review": {
+    "kind": "initial_spec_approval",
+    "review_ref": "review.md"
+  },
+  "artifacts": {}
+}

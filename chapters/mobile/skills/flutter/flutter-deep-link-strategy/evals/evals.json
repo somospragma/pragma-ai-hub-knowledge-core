@@ -49,7 +49,7 @@
     },
     {
       "id": 3,
-      "prompt": "How do I configure Android App Links and iOS Universal Links for my Flutter app so that `https://myapp.com/product/123` opens the app instead of a browser?",
+      "prompt": "How do I configure Android App Links and iOS Universal Links for my Flutter app so that `https://mandapp.com/product/123` opens the app instead of a browser?",
       "expected_output": "Shows Android intent-filter with autoVerify=true, associated domains entitlement for iOS, and confirms go_router 17.x handles deep links declaratively.",
       "files": [],
       "assertions": [

@@ -1,0 +1,48 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://pragma.ai/schemas/mobile/architecture-contract.schema.yaml"
+title: Mobile Architecture Contract
+type: object
+additionalProperties: true
+required:
+  - schema_version
+  - ownership
+  - layers
+  - generation_policies
+properties:
+  schema_version:
+    type: integer
+    minimum: 1
+  ownership:
+    type: object
+    additionalProperties: false
+    required: [file, owns, must_not_define]
+    properties:
+      file:
+        const: architecture-contract.yaml
+      owns:
+        type: array
+        contains:
+          const: layer_rules
+      must_not_define:
+        type: array
+        items:
+          type: string
+  layers:
+    type: object
+    additionalProperties: true
+  generation_policies:
+    type: object
+    additionalProperties: true
+  contracts:
+    type: object
+    additionalProperties: true
+  constraints:
+    type: object
+    additionalProperties: true
+not:
+  anyOf:
+    - required: [topology]
+    - required: [targets]
+    - required: [pipeline]
+    - required: [dependency_catalog]
+    - required: [external_dependencies]

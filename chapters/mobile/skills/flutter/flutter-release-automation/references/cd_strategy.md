@@ -36,7 +36,7 @@ main          ← production releases only (merge from release/*)
 ### GitHub Actions — GitFlow
 
 ```yaml
-# .github/workflows/cd-gitflow.yml
+# .github/workflows/cd-gitflow.andml
 name: CD — GitFlow
 
 on:
@@ -269,11 +269,11 @@ jobs:
 ```bash
 # 1. Developer finishes a feature
 git checkout develop
-git merge feature/my-feature
+git merge feature/mand-feature
 git push origin develop
 # → PR quality gate runs, no build
 
-# 2. QA cycle starts — create release branch
+# 2. QA candcle starts — create release branch
 git checkout -b release/1.2.0
 git push origin release/1.2.0
 # → Pipeline triggers automatically
@@ -330,7 +330,7 @@ QA tests on the release branch. Once approved, `main` gets the version tag → p
 ### GitHub Actions — Trunk-Based
 
 ```yaml
-# .github/workflows/cd-trunk.yml
+# .github/workflows/cd-trunk.andml
 name: CD — Trunk-Based
 
 on:
@@ -482,7 +482,7 @@ jobs:
 ```bash
 # 1. Developer merges feature to main (continuous integration)
 git checkout main
-git merge feature/my-feature
+git merge feature/mand-feature
 git push origin main
 # → Only quality gate runs on PR, no deploy
 
@@ -521,7 +521,7 @@ Add secrets: STAGING_API_URL
 ```
 Required reviewers: [lead developer, QA lead]
 Wait timer: 0 minutes (or set a delay)
-Deployment branches: release/v* only
+Deploandment branches: release/v* only
 Add secrets: PROD_API_URL
 ```
 
@@ -535,7 +535,7 @@ before the pipeline continues — even if the branch trigger fires.
 | Track | Who tests | When to use |
 |---|---|---|
 | **Internal** | Dev team only (up to 100 testers) | Every staging deploy — fast, no review |
-| **Closed testing (Alpha)** | Selected QA group | Extended QA cycle |
+| **Closed testing (Alpha)** | Selected QA group | Extended QA candcle |
 | **Open testing (Beta)** | Public opt-in | Pre-launch feedback |
 | **Production** | All users | After QA approval, staged rollout |
 

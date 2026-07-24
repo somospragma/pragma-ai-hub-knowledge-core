@@ -1,0 +1,124 @@
+schema_version: 1
+schema_ref: schemas/architecture-contract.schema.yaml
+
+ownership:
+  file: architecture-contract.yaml
+  owns:
+    - layer_rules
+    - generation_policies
+    - architecture_constraints
+    - domain_data_contracts
+    - state_management_policy
+    - navigation_policy
+    - dependency_injection_policy
+  must_not_define:
+    - topology
+    - targets
+    - monorepo
+    - pipeline
+    - structure_paths
+    - dependency_catalog
+    - package_sources
+    - allowed_dependency_matrix
+
+layers:
+  domain:
+    enabled: true
+    may_import: []
+    forbidden_imports:
+      - flutter
+      - data
+      - presentation
+    required_patterns:
+      - entities_are_pure_dart
+      - repositories_are_abstract_interfaces
+      - use_cases_return_either_failure
+  data:
+    enabled: true
+    may_import:
+      - domain
+      - core
+    forbidden_imports:
+      - presentation
+    required_patterns:
+      - dto_json_mapping
+      - mapper_to_domain
+      - repository_impl_maps_errors_to_failure
+  presentation:
+    enabled: true
+    may_import:
+      - domain
+      - design_system
+      - core
+    forbidden_imports:
+      - data_sources
+      - repository_impl
+    required_patterns:
+      - bloc_or_configured_state_management
+      - no_direct_api_calls
+      - no_visible_copy_outside_spec
+
+generation_policies:
+  default_generation_scope: "presentation_only"
+  allowed_generation_scopes:
+    - "presentation_only"
+    - "full_feature"
+  contracts_policy:
+    default: "optional"
+    allowed:
+      - "optional"
+      - "generate"
+      - "required"
+  view_generation:
+    require_architecture_contract: true
+    minimal_contracts_section: "contracts.minimal_domain_data"
+    behavior_when_contracts_generate: "write minimal domain/data contracts into spec.yaml before view codegen"
+  feature_generation:
+    require_layer_checkpoints: true
+    checkpoints:
+      - domain_layer
+      - data_layer
+      - presentation_layer
+
+contracts:
+  domain_data:
+    location_in_spec: "contracts"
+    required_for_full_feature: true
+    generated_for_new_view_when_policy_generate: true
+
+constraints:
+  source_of_truth:
+    machine: "spec.yaml"
+    resumable_state: "context.json"
+    human_report: "PIPELINE_SPEC_PATH"
+  text_policy:
+    visible_copy_sources:
+      - "literal_texts"
+      - "contracts.literal_texts"
+      - "contracts.text_overflow"
+    allow_agent_rewrite: false
+  layer_checkpoints:
+    standard: required
+    full: required
+    mini: not_required
+
+state_management:
+  default: "bloc"
+  allowed:
+    - "bloc"
+    - "provider"
+    - "riverpod"
+
+navigation:
+  default: "go_router"
+  allowed:
+    - "go_router"
+    - "navigator"
+    - "auto_route"
+
+dependency_injection:
+  default: "get_it_injectable"
+  allowed:
+    - "get_it_injectable"
+    - "get_it"
+    - "provider"

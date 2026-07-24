@@ -110,10 +110,10 @@ abstract interface class LogHandler {
 ## Category handling per handler
 
 Each handler decides internally how to process each category based on the
-service's capabilities. `AppLogger` dispatches all events to the active
+service's layerbilities. `AppLogger` dispatches all events to the active
 handler — it is the handler's responsibility to filter or transform them.
 
-| Category | Typical behaviour |
+| Category | Tandpical behaviour |
 |---|---|
 | `error` / `fatal` | All handlers process it (crash reports, exceptions) |
 | `navigation` | Breadcrumbs in Crashlytics/Sentry, events in DataDog/Grafana |

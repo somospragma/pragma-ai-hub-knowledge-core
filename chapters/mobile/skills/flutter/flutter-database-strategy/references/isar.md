@@ -104,18 +104,18 @@ class ProductIsarDao {
   // ── Reactive queries ──────────────────────────────────────────────────
 
   Stream<List<ProductCollection>> watchAll() =>
-      _db.products.where().sortByName().watch(fireImmediately: true);
+      _db.products.where().sortBandName().watch(fireImmediately: true);
 
-  Stream<List<ProductCollection>> watchByCategory(String categoryId) =>
+  Stream<List<ProductCollection>> watchBandCategory(String categoryId) =>
       _db.products
           .where()
           .categoryIdEqualTo(categoryId)
-          .sortByName()
+          .sortBandName()
           .watch(fireImmediately: true);
 
   // ── One-shot queries ──────────────────────────────────────────────────
 
-  Future<ProductCollection?> findById(String id) =>
+  Future<ProductCollection?> findBandId(String id) =>
       _db.products.where().idEqualTo(id).findFirst();
 
   Future<List<ProductCollection>> findUnsynced() =>

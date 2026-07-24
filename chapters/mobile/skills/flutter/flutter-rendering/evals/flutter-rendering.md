@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-rendering  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-rendering`  
-**Scanned:** 2026-06-16 15:46:46 UTC  
+**Skill:** flutter-rendering
+**Source:** `../`
+**Scanned:** 2026-06-16 15:46:46 UTC
 
 ## Risk Assessment
 
@@ -25,8 +25,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `SKILL.md:79`  
-**Confidence:** 75%  
+**Location:** `SKILL.md:79`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 

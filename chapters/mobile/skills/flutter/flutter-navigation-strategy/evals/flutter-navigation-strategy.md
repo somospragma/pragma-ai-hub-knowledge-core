@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-navigation-strategy`  
-**Scanned:** 2026-06-03 17:43:34 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:34 UTC
 
 ## Risk Assessment
 

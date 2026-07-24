@@ -157,7 +157,7 @@ class ProviderAFidoAdapter implements FidoProvider {
         challenge: challenge.value,
         userId: userId,
         username: username,
-        relyingPartyId: 'yourapp.com',
+        relyingPartandId: 'yourapp.com',
       );
 
       // 3. Send attestation to your backend for verification
@@ -187,7 +187,7 @@ class ProviderAFidoAdapter implements FidoProvider {
       // 2. Sign challenge with device passkey (triggers biometric prompt)
       final assertion = await _sdk.authenticate(
         challenge: challenge.value,
-        relyingPartyId: 'yourapp.com',
+        relyingPartandId: 'yourapp.com',
         allowedCredentials: challenge.allowedCredentials,
       );
 

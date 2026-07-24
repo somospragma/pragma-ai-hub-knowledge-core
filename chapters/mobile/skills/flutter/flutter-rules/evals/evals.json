@@ -3,59 +3,59 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Evalúa mi proyecto Flutter. Es un proyecto single-app estándar con carpetas lib/, android/ e ios/. Quiero saber si cumple con las buenas prácticas de Pragma.",
-      "expected_output": "El agente detecta que es un proyecto single-app, evalúa el repositorio en los 5 dominios (Mantenibilidad, Trazabilidad, Performance, Seguridad, Documentación) cargando cada archivo de referencia, y genera reports/flutter_rules_report.md con tabla ✔️/❌/⚠️/N/A, resumen ejecutivo y pasos sugeridos.",
+      "prompt": "Evaluate my Flutter project. It is a standard single-app project with lib/, android/ and ios/ folders. I want to know whether it complies with Pragma best practices.",
+      "expected_output": "The agent detects that it is a single-app project, evaluates the repository across the 5 domains (Maintainability, Traceability, Performance, Security, Documentation) by loading each reference file, and generates reports/flutter_rules_report.md with a ✔️/❌/⚠️/N/A table, executive summary and suggested steps.",
       "files": [],
       "expectations": [
-        "El agente detecta correctamente que es un proyecto single-app antes de evaluar",
-        "El agente carga al menos un archivo de references/ (mantenibilidad.md, trazabilidad.md, performance.md, seguridad.md o documentacion.md) durante la evaluación",
-        "El reporte se genera en reports/flutter_rules_report.md",
-        "El reporte contiene una tabla de Resumen Ejecutivo con conteo de ✔️, ❌, ⚠️ y N/A",
-        "El reporte tiene secciones separadas para los 5 dominios con tabla de criterios",
-        "El reporte incluye sección de Pasos Sugeridos con al menos una acción concreta"
+        "The agent correctly detects that it is a single-app project before evaluating",
+        "The agent loads at least one references/ file (maintainability.md, traceability.md, performance.md, security.md or documentation.md) during the evaluation",
+        "The report is generated at reports/flutter_rules_report.md",
+        "The report contains an Executive Summary table with counts for ✔️, ❌, ⚠️ and N/A",
+        "The report has separate sections for the 5 domains with criteria tables",
+        "The report includes a Suggested Steps section with at least one concrete action"
       ]
     },
     {
       "id": 2,
-      "prompt": "Tengo un monorepo Flutter con carpetas apps/app_cliente, apps/app_admin y packages/shared_auth. ¿Cumple con las reglas de Pragma? Evalúa todo.",
-      "expected_output": "El agente detecta el monorepo, lee references/monorepo.md para la lógica de evaluación, clasifica los proyectos (2 apps + 1 package), evalúa cada uno con su scope de paths correcto, verifica impacto cruzado de shared_auth en ambas apps, y produce reports/flutter_rules_report.md con resumen consolidado, tabla de impacto cruzado y secciones por proyecto.",
+      "prompt": "I have a Flutter monorepo with folders apps/app_client, apps/app_admin, and packages/shared_auth. Does it comply with Pragma rules? Evaluate everything.",
+      "expected_output": "The agent detects the monorepo, reads references/monorepo.md for evaluation logic, classifies the projects (2 apps + 1 package), evaluates each one with the correct path scope, verifies shared_auth cross-impact on both apps, and produces reports/flutter_rules_report.md with a consolidated summary, cross-impact table, and sections per project.",
       "files": [],
       "expectations": [
-        "El agente lee references/monorepo.md para obtener el algoritmo de evaluación de monorepo",
-        "El agente clasifica app_cliente y app_admin como tipo App, y shared_auth como tipo Package",
-        "El agente usa paths diferenciados: apps/app_cliente/lib/ para app_cliente, packages/shared_auth/lib/ para shared_auth",
-        "El reporte tiene una sección de Resumen Consolidado con tabla de proyectos y su nivel de deuda",
-        "El reporte tiene una sección de Hallazgos de Impacto Cruzado cuando encuentra problemas en shared_auth",
-        "Los criterios de Android/iOS están marcados como N/A en la sección de shared_auth",
-        "El reporte se genera en reports/flutter_rules_report.md"
+        "The agent reads references/monorepo.md to obtain the monorepo evaluation algorithm",
+        "The agent classifies app_client and app_admin as App projects, and shared_auth as a Package",
+        "The agent uses different paths: apps/app_client/lib/ for app_client, packages/shared_auth/lib/ for shared_auth",
+        "The report has a Consolidated Summary section with a table of projects and their debt level",
+        "The report has a Cross-Impact Findings section when it finds problems in shared_auth",
+        "Android/iOS criteria are marked as N/A in the shared_auth section",
+        "The report is generated at reports/flutter_rules_report.md"
       ]
     },
     {
       "id": 3,
-      "prompt": "Solo quiero revisar el dominio de Seguridad de mi app Flutter. Tenemos un release mañana y el equipo de seguridad me pidió un checklist rápido.",
-      "expected_output": "El agente entiende que se pide solo el dominio Seguridad, carga únicamente references/seguridad.md, evalúa el proyecto contra las reglas de ese dominio y genera un reporte parcial con solo la sección de Seguridad, sin evaluar los otros 4 dominios.",
+      "prompt": "I only want to review the Security domain of my Flutter app. We have a release tomorrow and the security team asked me for a quick checklist.",
+      "expected_output": "The agent understands that only the Security domain is requested, loads only references/security.md, evaluates the project against that domain, and generates a partial report with only the Security section without evaluating the other 4 domains.",
       "files": [],
       "expectations": [
-        "El agente carga references/seguridad.md para obtener las reglas del dominio Seguridad",
-        "El agente evalúa búsqueda de http:// (sin TLS), print( en producción y posibles credenciales hardcodeadas",
-        "El reporte contiene la sección de Seguridad con tabla de criterios ✔️/❌/⚠️/N/A",
-        "El reporte se genera en reports/flutter_rules_report.md",
-        "El agente NO evalúa dominios no solicitados (Mantenibilidad, Trazabilidad, Performance, Documentación) o los marca como fuera de alcance"
+        "The agent loads references/security.md to obtain Security domain rules",
+        "The agent evaluates http:// usage without TLS, print( in production, and possible hardcoded credentials",
+        "The report contains the Security section with a criteria table",
+        "The report is generated at reports/flutter_rules_report.md",
+        "The agent does NOT evaluate unrequested domains (Maintainability, Traceability, Performance, Documentation) or marks them as out of scope"
       ]
     },
     {
       "id": 4,
-      "prompt": "Evalúa mi monorepo Flutter con Melos. La estructura es: melos.yaml en la raíz, apps/app_movil/, features/auth_feature/, features/checkout_feature/ y shared/design_system/. Quiero saber el estado general y qué packages tienen más deuda técnica.",
-      "expected_output": "El agente detecta melos.yaml, lee references/monorepo.md, clasifica los proyectos (1 app + 2 features + 1 shared), usa melos.yaml como fuente de verdad para el listado de packages, evalúa cada uno con scope correcto (features y shared sin criterios Android/iOS), reporta impacto cruzado de shared/design_system en las features y la app, y produce reporte con resumen consolidado indicando el proyecto con mayor deuda.",
+      "prompt": "Evaluate my Flutter monorepo with Melos. The structure is: melos.yaml at the root, apps/mobile_app/, features/auth_feature/, features/checkout_feature/, and shared/design_system/. I want to know the overall status and which packages have the most technical debt.",
+      "expected_output": "The agent detects melos.yaml, reads references/monorepo.md, classifies the projects (1 app + 2 features + 1 shared), uses melos.yaml as the source of truth for the package list, evaluates each one with the correct scope (features and shared without Android/iOS criteria), reports shared/design_system cross-impact on the features and app, and produces a consolidated summary showing the project with the highest debt.",
       "files": [],
       "expectations": [
-        "El agente detecta melos.yaml y lo usa como fuente de verdad para listar los proyectos del workspace",
-        "El agente lee references/monorepo.md para obtener la lógica de clasificación y scoping",
-        "app_movil se evalúa con criterios de App (incluye Android/iOS); features y shared sin criterios de plataformas nativas (N/A)",
-        "El agente verifica qué features y apps consumen shared/design_system leyendo los pubspec.yaml de cada proyecto",
-        "El reporte incluye un Resumen Consolidado con tabla que muestra todos los proyectos y su nivel de deuda",
-        "El reporte identifica el proyecto con mayor deuda técnica en el Resumen Consolidado",
-        "La sección de Hallazgos de Impacto Cruzado muestra qué proyectos son afectados por problemas en shared/design_system"
+        "The agent detects melos.yaml and uses it as the source of truth to list workspace projects",
+        "The agent reads references/monorepo.md to obtain classification and scoping logic",
+        "mobile_app is evaluated with App criteria including Android/iOS; features and shared have native platform criteria marked as N/A",
+        "The agent verifies which features and apps consume shared/design_system by reading each project pubspec.yaml",
+        "The report includes a Consolidated Summary table showing all projects and their debt level",
+        "The report identifies the project with the highest technical debt in the Consolidated Summary",
+        "The Cross-Impact Findings section shows which projects are affected by problems in shared/design_system"
       ]
     }
   ]

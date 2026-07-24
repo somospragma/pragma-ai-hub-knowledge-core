@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-l10n-i18n-strategy  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-l10n-i18n-strategy`  
-**Scanned:** 2026-06-23 00:18:01 UTC  
+**Skill:** flutter-l10n-i18n-strategy
+**Source:** `../`
+**Scanned:** 2026-06-23 00:18:01 UTC
 
 ## Risk Assessment
 

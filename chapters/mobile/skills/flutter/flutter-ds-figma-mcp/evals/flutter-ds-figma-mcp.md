@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-figma-mcp`  
-**Scanned:** 2026-06-16 15:04:30 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-16 15:04:30 UTC
 
 ## Risk Assessment
 

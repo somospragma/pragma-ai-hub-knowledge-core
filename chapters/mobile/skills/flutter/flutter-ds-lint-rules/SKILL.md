@@ -11,10 +11,9 @@ description: >
   Use when writing code, auditing code quality, configuring analysis_options,
   or verifying compliance with Pragma coding standards.
 ---
-
 # Lint Rules
 
-> **Scope**: Este skill cubre reglas de linting **específicas del Design System** (tokens hardcodeados, prefijo DS, estructura de widgets). Para el estándar general de código Dart/Flutter (analysis_options, flutter_lints, orden de imports) → ver skill `flutter-dart-coding-standard`.
+> **Scope**: This skill covers Design System-specific linting rules (hardcoded tokens, DS prefix, widget structure). For the general Dart/Flutter code standard (analysis_options, flutter_lints, import order), see `flutter-dart-coding-standard`.
 
 ## DS-Specific Rules
 

@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-firebase-analytics`  
-**Scanned:** 2026-06-22 20:18:07 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 20:18:07 UTC
 
 ## Risk Assessment
 
@@ -26,12 +26,12 @@
 
 ### 🟢 LOW: SQP-2
 
-**Location:** `SKILL.md:113–123`  
-**Confidence:** 85%  
+**Location:** `SKILL.md:113–123`
+**Confidence:** 85%
 
 **Message:** The finding correctly identifies a lack of guidance regarding PII (Personally Identifiable Information) and data privacy. While the skill provides a mechanism for setting User IDs and properties, it fails to warn developers against passing sensitive data (e.g., email addresses, real names, or precise GPS coordinates) into these methods. In a production environment, sending PII to third-party providers like Firebase or Mixpanel can lead to violations of GDPR, CCPA, and other privacy regulations, and increases the risk of data breaches if the third-party provider is compromised.
 
-**Remediation:** Update the documentation to include a 'Privacy & Data Security' section. Explicitly instruct developers to: 1) Never pass PII (emails, names, phone numbers) as User IDs or User Properties. 2) Use anonymized internal UUIDs for `setUserId`. 3) Sanitize all event parameters to ensure no sensitive data is leaked in the `parameters` map. 4) Implement a data scrubbing layer within the `AnalyticsProviderAdapter` to strip prohibited keys.
+**Remediation:** Update the documentation to include a 'Privacy & Data Security' section. Explicitly instruct developers to: 1) Never pass PII (emails, names, phone numbers) as User IDs or User Properties. 2) Use anonandmized internal UUIDs for `setUserId`. 3) Sanitize all event parameters to ensure no sensitive data is leaked in the `parameters` map. 4) Implement a data scrubbing layer within the `AnalyticsProviderAdapter` to strip prohibited keys.
 
 ---
 

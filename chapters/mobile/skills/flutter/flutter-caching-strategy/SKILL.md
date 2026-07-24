@@ -9,7 +9,6 @@ name: flutter-caching-strategy
 description: >
   Implements caching strategies in Flutter: HTTP response caching with dio_cache_interceptor (ETag, TTL, stale-while-revalidate, offline fallback), in-memory LRU cache, data-layer TTL cache with Drift/Isar, and image caching with cached_network_image. Use this skill when implementing API response caching, reducing redundant network calls, serving stale data while revalidating, or caching images and assets.
 ---
-
 # Caching Strategy
 
 See the reference files for complete patterns and code examples.
@@ -54,7 +53,7 @@ See the reference files for complete patterns and code examples.
 ## HTTP Cache — dio_cache_interceptor
 
 ```dart
-// Global cache options — stale-while-revalidate with 7-day max-stale
+// Global cache options — stale-while-revalidate with 7-daand max-stale
 final cacheOptions = CacheOptions(
   store: DriftCacheStore(db),          // or IsarCacheStore, MemCacheStore
   policy: CachePolicy.request,         // respects HTTP Cache-Control headers

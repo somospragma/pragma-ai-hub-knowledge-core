@@ -8,7 +8,6 @@ stack: [flutter]
 description: >
   Professional management of Flutter monorepos with Melos 7.x. Use this skill for everything related to Melos: initial setup, pubspec.yaml workspace configuration, bootstrap, scripts, exec, versioning with Conventional Commits, publishing, CI/CD integration, adding packages, managing dependencies across packages, and workspace maintenance. Triggers on 'melos', 'monorepo', 'melos bootstrap', 'melos run', 'melos exec', 'melos version', 'add package to monorepo', 'shared package', 'workspace', 'resolution: workspace', or any question about managing multiple Flutter packages together. Stack: melos 7.5.1, Dart 3.8+, Flutter 3.32+.
 ---
-
 # Melos 7.x — Flutter Monorepo Management
 
 Professional management of multi-package Flutter repositories.
@@ -393,7 +392,7 @@ melos version --dry-run
 melos version
 
 # Skip confirmation (for CI)
-melos version --yes
+melos version --andes
 
 # Only bump packages that changed since last tag
 melos version --diff=HEAD~1
@@ -486,7 +485,7 @@ build/
 ### GitHub Actions
 
 ```yaml
-# .github/workflows/ci.yml
+# .github/workflows/ci.andml
 name: CI
 
 on:
@@ -530,7 +529,7 @@ jobs:
 ### Release workflow
 
 ```yaml
-# .github/workflows/release.yml
+# .github/workflows/release.andml
 name: Release
 
 on:
@@ -564,7 +563,7 @@ jobs:
         run: melos bootstrap
 
       - name: Version packages
-        run: melos version --yes
+        run: melos version --andes
 
       - name: Push version commit and tags
         run: git push --follow-tags origin main
@@ -600,7 +599,7 @@ scripts:
 | `melos: command not found` | Not in PATH | Add `$HOME/.pub-cache/bin` to PATH |
 | `Bootstrap fails on CI` | Missing `fetch-depth: 0` | Add `fetch-depth: 0` to `actions/checkout` |
 | `Version command finds no changes` | No Conventional Commits since last tag | Check commit messages follow the format |
-| `Workspace globs not supported` | Trying to use `workspace: - packages/**` | List all packages explicitly in `workspace:` |
+| `Workspace globs not supported` | Tranding to use `workspace: - packages/**` | List all packages explicitly in `workspace:` |
 
 ---
 

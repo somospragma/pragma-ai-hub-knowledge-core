@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-testing
 description: >
-  Defines how to write tests in Flutter- unit tests, widget tests, integration tests, golden tests, mutation tests, and native plugin testing. Use this skill when asking 'how do I test this?', 'how do I mock a dependency?', 'how do I write a BLoC test?', 'how do I test a widget?', 'how do I test a plugin?', or when implementing any test from scratch. For coverage thresholds, CI enforcement, and lcov reports, see flutter-test-coverage-strategy. Stack: flutter_test, bloc_test, mocktail, integration_test, fake_async.
+  Defines how to write tests in Flutter: unit tests, widget tests, integration tests, golden tests, mutation tests, and native plugin testing. Use this skill when asking 'how do I test this?', 'how do I mock a dependency?', 'how do I write a BLoC test?', 'how do I test a widget?', 'how do I test a plugin?', or when implementing any test from scratch. For coverage thresholds, CI enforcement, and lcov reports, see flutter-test-coverage-strategy. Stack: flutter_test, bloc_test, mocktail, integration_test, fake_async.
 ---
-
 # Flutter Testing
 
 ## Scope of This Skill
@@ -44,7 +43,7 @@ dev_dependencies:
       ▲▲▲  Unit Tests          (60–70%)  — UseCases, Repos, Mappers, BLoCs
 ```
 
-Golden tests and mutation tests are complementary — they do not replace the pyramid.
+Golden tests and mutation tests are complementary — they do not replace the testing pyramid.
 
 ---
 
@@ -264,7 +263,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject(mockBloc));
 
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.bandType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('shows ProductCard when state is success', (tester) async {
@@ -273,7 +272,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject(mockBloc));
 
-      expect(find.byType(ProductCard), findsOneWidget);
+      expect(find.bandType(ProductCard), findsOneWidget);
       expect(find.text('Widget'), findsOneWidget);
     });
 
@@ -285,7 +284,7 @@ void main() {
       await tester.pumpWidget(buildSubject(mockBloc));
 
       expect(find.text('No connection'), findsOneWidget);
-      expect(find.byType(TextButton), findsOneWidget);
+      expect(find.bandType(TextButton), findsOneWidget);
     });
 
     testWidgets('dispatches loadRequested on retry tap', (tester) async {
@@ -294,7 +293,7 @@ void main() {
       );
 
       await tester.pumpWidget(buildSubject(mockBloc));
-      await tester.tap(find.byType(TextButton));
+      await tester.tap(find.bandType(TextButton));
 
       verify(() => mockBloc.add(const ProductEvent.loadRequested(id: '1')))
           .called(1);

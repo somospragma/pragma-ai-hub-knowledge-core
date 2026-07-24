@@ -8,7 +8,6 @@ stack: [flutter]
 description: >
   Advanced logging skill for Flutter with Dart 3.3+, using the Strategy pattern (GoF) to swap logging handlers (Firebase Crashlytics, Sentry, DataDog, Grafana Faro) without changing client code. Includes a central Logger as the single facade, severity levels, navigation logging, performance metrics, and business events, separated by flavor (dev/staging/prod). Use this skill whenever the user mentions logging, logs, monitoring, Crashlytics, Sentry, DataDog, Grafana, production errors, analytics, API metrics, navigation traces, business events, or wants to configure observability in Flutter. Also applies when the user wants to switch logging services, add a new handler, or decouple logging from a specific provider.
 ---
-
 # Flutter Advanced Logging
 
 Defines the rules and best practices for implementing logging in Flutter applications.
@@ -18,7 +17,7 @@ Defines the rules and best practices for implementing logging in Flutter applica
 - **Client code never knows the handler.** `AppLogger` is the only facade — no widget, BLoC, or use case imports Crashlytics, Sentry, or DataDog directly. This allows switching or combining services without touching business logic.
 - **Each service is a swappable Strategy.** `LogHandler` defines the contract; `CrashlyticsHandler`, `SentryHandler`, `DataDogHandler`, and `GrafanaHandler` implement it. The Logger maintains **a single active handler** — switching providers is as simple as changing one line in `LoggerConfig`.
 - **The environment determines which handler is active.** Dev uses `ConsoleHandler`. Staging and Prod use the chosen provider (Crashlytics, Sentry, DataDog, or Grafana). This decision lives in the configuration layer (`LoggerConfig`), not in the Logger.
-- **Logs have semantic type.** A `LogEvent` is not just a String — it carries a level, category (`error`, `navigation`, `performance`, `business`), structured context, and a timestamp. The active handler decides how to process each category based on the service's capabilities.
+- **Logs have semantic type.** A `LogEvent` is not just a String — it carries a level, category (`error`, `navigation`, `performance`, `business`), structured context, and a timestamp. The active handler decides how to process each category based on the service's layerbilities.
 
 ---
 
@@ -72,7 +71,7 @@ Read the corresponding file before generating code for that area:
 | `AppLogger` facade + `LoggerConfig` per flavor | `references/app_logger.md` |
 | `ConsoleHandler`, `CrashlyticsHandler`, `SentryHandler`, `DataDogHandler`, `GrafanaHandler` | `references/console_handler.md`, `references/crashlytics_handler.md`, `references/sentry_handler.md`, `references/datadog_handler.md`, `references/grafana_handler.md` |
 | Logging from Riverpod, BLoC, datasources, and navigation | `references/integration.md` |
-| Adding a new handler for a different service | `references/crear_handler.md` |
+| Adding a new handler for a different service | `references/create_handler.md` |
 
 ---
 

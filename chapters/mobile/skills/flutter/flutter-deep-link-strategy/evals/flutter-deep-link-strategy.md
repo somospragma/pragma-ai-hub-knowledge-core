@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-deep-link-strategy`  
-**Scanned:** 2026-06-15 20:26:19 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-15 20:26:19 UTC
 
 ## Risk Assessment
 

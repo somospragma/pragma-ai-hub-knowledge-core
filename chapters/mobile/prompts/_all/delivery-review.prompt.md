@@ -4,21 +4,20 @@ version: 1.0.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt para la fase final de entrega. Usar cuando implementación y testing   ya terminaron y toca preparar documentación
+description: Prompt for the final delivery phase. Use when implementation and testing are complete and delivery documentation must be prepared.
 ---
+# Delivery And Final Review
 
-# Entrega y Revisión Final
-
-## Skills de referencia
+## Reference Skills
 
 - flutter-ds-folder-structure
 - flutter-ds-naming-conventions
 - flutter-ds-markdown-docs
 - flutter-ds-lint-rules
-- flutter-commit-conventions
-- flutter-changelog-management
+- commit-conventions
+- changelog-management
 
-## Contexto mínimo obligatorio
+## Minimum Required Context
 
 1. `workflow`.
 2. `project_root`.
@@ -27,79 +26,88 @@ description: Prompt para la fase final de entrega. Usar cuando implementación y
 5. `execution_context`.
 6. `PIPELINE_SPEC_PATH`.
 7. `PIPELINE_LOG_PATH`.
+8. `spec_context` when the workflow uses Mobile Spec Packet.
 
-Si falta contexto, devolver `blocked_input`.
+If context is missing, return `blocked_input`.
 
-## INSTRUCCIÓN
+## Instruction
 
-Tras completar testing, preparar la entrega final del componente o vista.
+After testing is complete, prepare the final delivery for the component or view.
 
-## PROCESO
+## SDD Contract
 
-### 1. Revisión de estructura
+When `spec_context` exists, validate `spec_ref`, verify that delivered
+artifacts are declared in `artifact_plan` or approved in `context_ref`, record
+`{SPEC_PACKET_PATH}/evidence/delivery-report.md`, and use `PIPELINE_SPEC_PATH`
+only as the human report.
 
-- Verificar ubicación de archivos contra `flutter-ds-folder-structure`.
-- Confirmar que el código productivo nuevo/modificado vive bajo `lib/src`,
-  excepto entrypoints `lib/main*.dart` y barrels públicos `lib/<package>.dart`.
-- Validar naming conventions.
-- Validar barrel files.
-- Validar que consumidores externos usan barrels públicos y no
+## Process
+
+### 1. Structure Review
+
+- Verify file location against `flutter-ds-folder-structure`.
+- Confirm that new/modified production code lives under `lib/src`, except
+  `lib/main*.dart` entrypoints and public `lib/<package>.dart` barrels.
+- Validate naming conventions.
+- Validate barrel files.
+- Validate that external consumers use public barrels and not
   `package:<package>/src/...`.
-- En `/new-view`, no exportar vistas en barrel DS.
+- In `/new-view`, do not export app views in the DS barrel.
 
-### 2. Validación de scope
+### 2. Scope Validation
 
-- Confirmar que cambios pertenecen al `target.target_root`.
-- En `monorepo_melos`, confirmar que no se modifican paquetes fuera de
-  `target.package_path`.
+- Confirm that changes belong to `target.target_root`.
+- In `monorepo_melos`, confirm that no packages outside `target.package_path`
+  were modified.
 
-### 3. Documentación
+### 3. Documentation
 
-- Verificar política de comentarios en código:
-  - sin comentarios inline/bloque/Dartdoc por defecto
-  - excepciones solo si son fundamentales y justificadas
-- Generar README cuando aplique.
+- Verify the code comment policy:
+  - no inline, block, or Dartdoc comments by default
+  - exceptions only when they are fundamental and justified
+- Generate README when applicable.
 
-### 4. Branch y commits
+### 4. Branch And Commits
 
-- Branch DS: `naming.branch_prefix`.
-- Branch vista: `naming.view_branch_prefix` (fallback `naming.branch_prefix`).
-- Commits con Conventional Commits.
+- DS branch: `naming.branch_prefix`.
+- View branch: `naming.view_branch_prefix` (fallback `naming.branch_prefix`).
+- Commits follow Conventional Commits.
 
 ### 5. PR
 
-Incluir:
-- HU
-- Figma
-- inventario de archivos
-- resumen de tests
-- checklist DoD
+Include:
 
-### 6. Reporte §7
+- user story
+- Figma reference
+- inventory file
+- test summary
+- DoD checklist
+
+### 6. Final Report
 
 ```markdown
-## §7 Reporte de Entrega
+## Delivery Report
 
-### Contexto de Ejecución
+### Execution Context
 - **Repo mode**: ...
 - **Target package**: ...
 - **Target root**: ...
 - **Melos scope**: ...
 
-### Resumen
+### Summary
 - **Branch**: ...
 - **PR**: ...
-- **Archivos creados/modificados**: ...
+- **Created/modified files**: ...
 - **Tests**: ...
-- **Auditoría**: ...
+- **Audit**: ...
 
-### Criterios de Aceptación
+### Acceptance Criteria
 - [x] ...
 ```
 
-## Verificación final (topology-aware)
+## Final Verification (topology-aware)
 
-### `single_repo` o `multi_repo`
+### `single_repo` or `multi_repo`
 
 ```bash
 flutter analyze

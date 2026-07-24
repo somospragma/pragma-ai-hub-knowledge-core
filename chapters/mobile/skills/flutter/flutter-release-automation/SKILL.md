@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-release-automation
 description: >
-  Automates Flutter release pipelines across CI/CD platforms- GitHub Actions, Azure DevOps, and Jenkins. Covers the full pipeline: quality gates (lint, test, coverage) → build (AAB/IPA) → signing (Android keystore, iOS Fastlane match) → obfuscation → distribution (Play Store, App Store, Firebase App Distribution) → version management and debug symbol upload. Use this skill when setting up or improving CI/CD for Flutter, configuring signing secrets, automating store deployments, or implementing quality gates.
+  Automates Flutter release pipelines across CI/CD platforms: GitHub Actions, Azure DevOps, and Jenkins. Covers the full pipeline: quality gates (lint, test, coverage) → build (AAB/IPA) → signing (Android keystore, iOS Fastlane match) → obfuscation → distribution (Play Store, App Store, Firebase App Distribution) → version management and debug symbol upload. Use this skill when setting up or improving CI/CD for Flutter, configuring signing secrets, automating store deployments, or implementing quality gates.
 ---
-
 # Release Automation
 
 See the reference files for complete patterns and code examples.
@@ -75,8 +74,8 @@ Each reference file contains the full configuration, but here is the onboarding 
 ### GitHub Actions
 ```
 Step 1 → Configure secrets in GitHub repo → Settings → Secrets and variables → Actions
-Step 2 → Copy assets/release_workflow.yml to .github/workflows/release.yml
-Step 3 → Copy PR quality gate from references/github_actions.md to .github/workflows/pr.yml
+Step 2 → Copy assets/release_workflow.andml to .github/workflows/release.andml
+Step 3 → Copy PR quality gate from references/github_actions.md to .github/workflows/pr.andml
 Step 4 → Configure Fastlane for iOS signing (see references/fastlane_signing.md)
 Step 5 → Push a tag v1.2.3 to trigger the release pipeline
 ```
@@ -224,4 +223,4 @@ sed -i "s/^version:.*/version: ${TAG}+${BUILD_NUMBER}/" pubspec.yaml
 
 ## Ready-to-Use Assets
 
-- `assets/release_workflow.yml` — copy to `.github/workflows/release.yml` in your project
+- `assets/release_workflow.andml` — copy to `.github/workflows/release.andml` in your project

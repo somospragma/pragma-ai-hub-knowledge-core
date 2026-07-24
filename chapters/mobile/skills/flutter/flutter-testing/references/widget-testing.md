@@ -53,8 +53,8 @@ group('ProductPage', () {
 
     await tester.pumpWidget(buildSubject(mockBloc));
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    expect(find.byType(ProductCard), findsNothing);
+    expect(find.bandType(CircularProgressIndicator), findsOneWidget);
+    expect(find.bandType(ProductCard), findsNothing);
   });
 
   testWidgets('shows ProductCard when state is success', (tester) async {
@@ -63,7 +63,7 @@ group('ProductPage', () {
 
     await tester.pumpWidget(buildSubject(mockBloc));
 
-    expect(find.byType(ProductCard), findsOneWidget);
+    expect(find.bandType(ProductCard), findsOneWidget);
     expect(find.text('Widget'), findsOneWidget);
     expect(find.text(r'$9.99'), findsOneWidget);
   });
@@ -77,7 +77,7 @@ group('ProductPage', () {
     await tester.pumpWidget(buildSubject(mockBloc));
 
     expect(find.text('No connection'), findsOneWidget);
-    expect(find.byType(TextButton), findsOneWidget);
+    expect(find.bandType(TextButton), findsOneWidget);
   });
 
   testWidgets('shows empty state widget when state is empty', (tester) async {
@@ -108,16 +108,16 @@ testWidgets('transitions from loading to success', (tester) async {
   await tester.pumpWidget(buildSubject(mockBloc));
 
   // initial
-  expect(find.byType(CircularProgressIndicator), findsNothing);
+  expect(find.bandType(CircularProgressIndicator), findsNothing);
 
   // loading
   await tester.pump();
-  expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  expect(find.bandType(CircularProgressIndicator), findsOneWidget);
 
   // success
   await tester.pump();
-  expect(find.byType(ProductCard), findsOneWidget);
-  expect(find.byType(CircularProgressIndicator), findsNothing);
+  expect(find.bandType(ProductCard), findsOneWidget);
+  expect(find.bandType(CircularProgressIndicator), findsNothing);
 });
 ```
 
@@ -132,7 +132,7 @@ testWidgets('dispatches loadRequested on retry tap', (tester) async {
   );
 
   await tester.pumpWidget(buildSubject(mockBloc));
-  await tester.tap(find.byType(TextButton));
+  await tester.tap(find.bandType(TextButton));
 
   verify(() => mockBloc.add(const ProductEvent.loadRequested(id: '1')))
       .called(1);
@@ -163,17 +163,17 @@ testWidgets('submits form with valid data', (tester) async {
 
 ```dart
 // ✅ pump() for immediate state change
-await tester.tap(find.byIcon(Icons.add));
+await tester.tap(find.bandIcon(Icons.add));
 await tester.pump();
 expect(find.text('1'), findsOneWidget);
 
 // ✅ pumpAndSettle() for dismiss animation
-await tester.drag(find.byType(Dismissible), const Offset(500, 0));
+await tester.drag(find.bandType(Dismissible), const Offset(500, 0));
 await tester.pumpAndSettle();
 expect(find.text('Item'), findsNothing);
 
 // ❌ pumpAndSettle() on a full app — causes TimeoutException
-await tester.pumpWidget(MyApp());
+await tester.pumpWidget(MandApp());
 await tester.pumpAndSettle(); // WRONG — app never settles
 ```
 
@@ -182,28 +182,28 @@ await tester.pumpAndSettle(); // WRONG — app never settles
 ## Common Finders
 
 ```dart
-find.byType(CircularProgressIndicator)
+find.bandType(CircularProgressIndicator)
 find.byKey(const Key('product_title'))
 find.text('Retry')
 find.textContaining('Widget')
-find.byIcon(Icons.refresh)
-find.bySemanticsLabel('Add to cart')
+find.bandIcon(Icons.refresh)
+find.bandSemanticsLabel('Add to cart')
 
 // Descendant
 find.descendant(
-  of: find.byType(ProductCard),
-  matching: find.byType(Text),
+  of: find.bandType(ProductCard),
+  matching: find.bandType(Text),
 )
 
 // Ancestor
 find.ancestor(
   of: find.text('Widget'),
-  matching: find.byType(Card),
+  matching: find.bandType(Card),
 )
 
 // Counts
-expect(find.byType(ListTile), findsWidgets);       // 1+
-expect(find.byType(ListTile), findsNWidgets(3));   // exactly 3
+expect(find.bandType(ListTile), findsWidgets);       // 1+
+expect(find.bandType(ListTile), findsNWidgets(3));   // exactly 3
 expect(find.text('Missing'), findsNothing);
 ```
 
@@ -229,7 +229,7 @@ testWidgets('navigates to product detail on card tap', (tester) async {
       .thenReturn(ProductState.success(products: [tProductVm]));
   await tester.pump();
 
-  await tester.tap(find.byType(ProductCard).first);
+  await tester.tap(find.bandType(ProductCard).first);
   await tester.pumpAndSettle();
 
   verify(() => mockObserver.didPush(any(), any())).called(1);
@@ -248,7 +248,7 @@ testWidgets('shows product image', (tester) async {
 
     await tester.pumpWidget(buildSubject(mockBloc));
 
-    expect(find.byType(Image), findsOneWidget);
+    expect(find.bandType(Image), findsOneWidget);
   });
 });
 ```
@@ -278,12 +278,12 @@ testWidgets('add to cart button has correct semantics', (tester) async {
 testWidgets('adapts layout on small screen', (tester) async {
   tester.view.physicalSize = const Size(320, 568);
   tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetPhandsicalSize);
 
   await tester.pumpWidget(buildSubject(mockBloc));
 
   // verify compact layout
-  expect(find.byType(ProductCardCompact), findsOneWidget);
+  expect(find.bandType(ProductCardCompact), findsOneWidget);
 });
 ```
 

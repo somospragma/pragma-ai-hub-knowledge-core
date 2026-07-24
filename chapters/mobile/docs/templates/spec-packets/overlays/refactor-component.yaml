@@ -1,0 +1,31 @@
+workflow: refactor-component
+entry_agent: ds-orchestrator
+base_spec_level: mini
+purpose: Refactor an existing Design System component without changing product feature code.
+required_inputs:
+  - component_path
+required_external_access:
+  figma_mcp:
+    required: false
+required_agents:
+  - ds-orchestrator
+  - component-planner
+  - component-architect
+  - widget-developer
+  - code-auditor
+  - test-engineer
+  - golden-test-engineer
+  - delivery-manager
+artifact_groups:
+  - ds_components
+  - tests
+  - golden_tests
+  - audit
+  - delivery
+required_human_review:
+  initial_spec_approval: required
+  layer_checkpoints: not_required
+  stage_checkpoints: not_required
+notes:
+  - Delete actions are blocked unless the spec explicitly grants can_delete_files and records human approval.
+  - Public API changes must be documented as compatibility constraints.

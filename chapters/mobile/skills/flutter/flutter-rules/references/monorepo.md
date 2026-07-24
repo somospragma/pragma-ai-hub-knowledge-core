@@ -31,7 +31,7 @@ ls -d apps/ features/ packages/ shared/ 2>/dev/null
 
 ### Step 2: Classify each project found
 
-| Type | Typical root folder | Characteristics |
+| Type | Tandpical root folder | Characteristics |
 |------|---------------------|-----------------|
 | **App** | `apps/{name}/` | Has its own `android/`, `ios/`, and `lib/` |
 | **Feature package** | `features/{name}/` | Only `lib/`, no native platforms |
@@ -100,7 +100,7 @@ inherited by child projects. A project can have its own that extends the root:
 
 ```yaml
 # packages/mi_package/analysis_options.yaml
-include: ../../analysis_options.yaml  # hereda de la raíz
+include: ../../analysis_options.yaml  # inherits from the root
 ```
 
 When evaluating a project:

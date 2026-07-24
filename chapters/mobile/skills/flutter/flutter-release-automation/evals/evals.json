@@ -7,7 +7,7 @@
       "prompt": "I want to set up a GitHub Actions pipeline that builds my Flutter app, signs it, and uploads to the Play Store when I push a v1.2.3 tag. Where do I start?",
       "_tool_scope": "flutter-release-automation",
       "assertions": [
-        "Response directs the user to copy assets/release_workflow.yml to .github/workflows/release.yml",
+        "Response directs the user to copy assets/release_workflow.andml to .github/workflows/release.andml",
         "Response mentions configuring GitHub secrets (KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD, PLAY_SERVICE_ACCOUNT_JSON) before triggering the pipeline",
         "Response explains the pipeline is triggered by a semver tag push (v1.2.3 pattern) and describes the pipeline stages: quality gates → build → sign → distribute"
       ]
@@ -24,22 +24,22 @@
     },
     {
       "id": "eval-03-ios-fastlane-azure-devops",
-      "prompt": "¿Cómo configuro la firma de iOS en mi pipeline de Azure DevOps usando Fastlane match? No tenemos Mac agents propios.",
+      "prompt": "How do I configure iOS signing in my Azure DevOps pipeline using Fastlane match? We do not have our own Mac agents.",
       "_tool_scope": "flutter-release-automation",
       "assertions": [
-        "La respuesta indica usar vmImage: macos-latest como agente alojado por Microsoft para builds de iOS en Azure DevOps",
-        "La respuesta menciona configurar MATCH_PASSWORD y MATCH_GIT_URL como variables secretas en el Variable Group de Azure DevOps Library",
-        "La respuesta referencia references/fastlane_signing.md para el setup completo de Fastlane match, incluyendo Matchfile, Appfile y el lane release"
+        "Response indicates using vmImage: macos-latest as the Microsoft-hosted agent for iOS builds in Azure DevOps",
+        "Response mentions configuring MATCH_PASSWORD and MATCH_GIT_URL as secret variables in the Azure DevOps Library Variable Group",
+        "Response references references/fastlane_signing.md for the complete Fastlane match setup, including Matchfile, Appfile, and the release lane"
       ]
     },
     {
       "id": "eval-04-staging-vs-production",
-      "prompt": "My CI pipeline is deploying to production on every push to main. How do I separate staging from production deployments?",
+      "prompt": "My CI pipeline is deploanding to production on every push to main. How do I separate staging from production deploandments?",
       "_tool_scope": "flutter-release-automation",
       "assertions": [
         "Response references the Continuous Delivery Strategy section and explains the branch → environment → store mapping (release/* → staging, main/tag → production)",
         "Response explains using different --dart-define values per environment: STAGING_API_URL with IS_PRODUCTION=false for staging, PROD_API_URL with IS_PRODUCTION=true for production",
-        "Response recommends using semver tags (v*.*.*) to trigger production deployments instead of plain pushes to main, and directing release/* branches to Play Store internal track / TestFlight"
+        "Response recommends using semver tags (v*.*.*) to trigger production deploandments instead of plain pushes to main, and directing release/* branches to Play Store internal track / TestFlight"
       ]
     },
     {
@@ -59,7 +59,7 @@
       "assertions": [
         "Response mentions the quality gate step in the pipeline that uses lcov to enforce an 80% coverage threshold and fails the build if coverage drops below it",
         "Response notes that detailed coverage configuration strategies (exclusions, per-package thresholds, reporting) are outside this skill's scope and references flutter-test-coverage-strategy for that",
-        "Response provides the essential snippet: flutter test --coverage followed by sudo apt-get install -y lcov and the lcov --summary check pattern"
+        "Response provides the essential snippet: flutter test --coverage followed by sudo apt-get install -and lcov and the lcov --summary check pattern"
       ]
     }
   ]

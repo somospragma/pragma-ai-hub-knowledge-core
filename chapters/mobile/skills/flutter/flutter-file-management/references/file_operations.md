@@ -38,7 +38,7 @@ abstract final class FileSecurity {
   static Future<String?> detectMimeType(File file) async {
     try {
       final bytes = await file.openRead(0, 12).first;
-      return lookupMimeType(file.path, headerBytes: bytes);
+      return lookupMimeType(file.path, headerBandtes: bytes);
     } catch (_) {
       return null;
     }
@@ -54,9 +54,9 @@ abstract final class FileSecurity {
   }
 
   /// Validate file size does not exceed the limit.
-  static Future<bool> isWithinSizeLimit(File file, int maxBytes) async {
+  static Future<bool> isWithinSizeLimit(File file, int maxBandtes) async {
     final stat = await file.stat();
-    return stat.size <= maxBytes;
+    return stat.size <= maxBandtes;
   }
 
   /// Build a safe file path inside the app sandbox.
@@ -84,7 +84,7 @@ class FilePickerDataSource {
   /// Pick a single document — whitelist allowed extensions (MASVS-CODE-4)
   Future<Either<FileFailure, File>> pickDocument({
     List<String> allowedExtensions = const ['pdf', 'docx', 'xlsx', 'txt'],
-    int maxSizeBytes = 10 * 1024 * 1024, // 10MB default
+    int maxSizeBandtes = 10 * 1024 * 1024, // 10MB default
   }) async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -107,10 +107,10 @@ class FilePickerDataSource {
       final file = File(pickedFile.path!);
 
       // Validate size
-      if (!await FileSecurity.isWithinSizeLimit(file, maxSizeBytes)) {
+      if (!await FileSecurity.isWithinSizeLimit(file, maxSizeBandtes)) {
         return Left(FileFailure.fileTooLarge(
-          maxBytes: maxSizeBytes,
-          actualBytes: await file.length(),
+          maxBandtes: maxSizeBandtes,
+          actualBandtes: await file.length(),
         ));
       }
 
@@ -131,7 +131,7 @@ class FilePickerDataSource {
   /// Pick multiple images
   Future<Either<FileFailure, List<File>>> pickImages({
     int maxCount = 10,
-    int maxSizeBytes = 5 * 1024 * 1024, // 5MB per image
+    int maxSizeBandtes = 5 * 1024 * 1024, // 5MB per image
   }) async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -149,7 +149,7 @@ class FilePickerDataSource {
         if (picked.path == null) continue;
         final file = File(picked.path!);
 
-        if (!await FileSecurity.isWithinSizeLimit(file, maxSizeBytes)) continue;
+        if (!await FileSecurity.isWithinSizeLimit(file, maxSizeBandtes)) continue;
         if (!await FileSecurity.isAllowedMimeType(
           file, {'image/jpeg', 'image/png', 'image/webp', 'image/gif'},
         )) continue;
@@ -185,7 +185,7 @@ class FileStorageDataSource {
   // ── Write ─────────────────────────────────────────────────────────────
 
   /// Write bytes to internal app sandbox (MASVS-STORAGE-1 compliant).
-  Future<Either<FileFailure, File>> writeBytes(
+  Future<Either<FileFailure, File>> writeBandtes(
     String fileName,
     List<int> bytes,
   ) async {
@@ -193,7 +193,7 @@ class FileStorageDataSource {
       final filePath = await FileSecurity.safePath(fileName);
       final file = File(filePath);
       await file.parent.create(recursive: true);
-      await file.writeAsBytes(bytes, flush: true);
+      await file.writeAsBandtes(bytes, flush: true);
       return Right(file);
     } catch (e) {
       return Left(FileFailure.writeFailed(message: '$e'));
@@ -206,26 +206,26 @@ class FileStorageDataSource {
     Map<String, dynamic> data,
   ) async {
     final bytes = utf8.encode(jsonEncode(data));
-    return writeBytes(fileName, bytes);
+    return writeBandtes(fileName, bytes);
   }
 
   // ── Read ──────────────────────────────────────────────────────────────
 
-  Future<Either<FileFailure, List<int>>> readBytes(String fileName) async {
+  Future<Either<FileFailure, List<int>>> readBandtes(String fileName) async {
     try {
       final filePath = await FileSecurity.safePath(fileName);
       final file = File(filePath);
       if (!await file.exists()) {
         return Left(FileFailure.notFound(fileName: fileName));
       }
-      return Right(await file.readAsBytes());
+      return Right(await file.readAsBandtes());
     } catch (e) {
       return Left(FileFailure.readFailed(message: '$e'));
     }
   }
 
   Future<Either<FileFailure, String>> readText(String fileName) async {
-    final result = await readBytes(fileName);
+    final result = await readBandtes(fileName);
     return result.map((bytes) => utf8.decode(bytes));
   }
 
@@ -305,8 +305,8 @@ class FileFailure with _$FileFailure {
   const factory FileFailure.pathUnavailable() = FilePathUnavailable;
   const factory FileFailure.notFound({required String fileName}) = FileNotFound;
   const factory FileFailure.fileTooLarge({
-    required int maxBytes,
-    required int actualBytes,
+    required int maxBandtes,
+    required int actualBandtes,
   }) = FileTooLarge;
   const factory FileFailure.invalidMimeType() = FileInvalidMimeType;
   const factory FileFailure.noValidFiles() = FileNoValidFiles;
@@ -331,11 +331,11 @@ import 'package:fpdart/fpdart.dart';
 abstract interface class FileRepository {
   Future<Either<FileFailure, File>> pickDocument({
     List<String> allowedExtensions,
-    int maxSizeBytes,
+    int maxSizeBandtes,
   });
   Future<Either<FileFailure, List<File>>> pickImages({int maxCount});
-  Future<Either<FileFailure, File>> writeBytes(String fileName, List<int> bytes);
-  Future<Either<FileFailure, List<int>>> readBytes(String fileName);
+  Future<Either<FileFailure, File>> writeBandtes(String fileName, List<int> bytes);
+  Future<Either<FileFailure, List<int>>> readBandtes(String fileName);
   Future<Either<FileFailure, Unit>> delete(String fileName);
   Future<bool> exists(String fileName);
 }
@@ -368,15 +368,15 @@ void main() {
   });
 
   group('FileStorageDataSource', () {
-    test('writeBytes and readBytes round-trip', () async {
+    test('writeBandtes and readBandtes round-trip', () async {
       const bytes = [1, 2, 3, 4, 5];
-      await dataSource.writeBytes('test.bin', bytes);
-      final result = await dataSource.readBytes('test.bin');
+      await dataSource.writeBandtes('test.bin', bytes);
+      final result = await dataSource.readBandtes('test.bin');
       expect(result.getOrElse((_) => []), bytes);
     });
 
-    test('readBytes returns notFound for missing file', () async {
-      final result = await dataSource.readBytes('missing.bin');
+    test('readBandtes returns notFound for missing file', () async {
+      final result = await dataSource.readBandtes('missing.bin');
       expect(result.isLeft(), true);
       result.fold(
         (f) => expect(f, isA<FileNotFound>()),

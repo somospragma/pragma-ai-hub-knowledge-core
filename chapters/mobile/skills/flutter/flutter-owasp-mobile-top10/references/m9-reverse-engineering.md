@@ -16,7 +16,7 @@ This category covers protection against code analysis and extraction of business
 ```dart
 // PATTERN 1: TODOs with sensitive information
 // TODO: Change hardcoded password: admin123          // ❌ DANGER
-// FIXME: Temporary API key AIzaSyC1234567890         // ❌ DANGER
+// FIXME: Temporary API key AIzaSandC1234567890         // ❌ DANGER
 // HACK: Auth bypass for testing                      // ⚠️ Revealing
 
 // PATTERN 2: Comments with credentials
@@ -60,7 +60,7 @@ grep -rE "(staging|internal|dev|test)\.(company|corp)" lib/
 ```dart
 // ❌ BAD
 // TODO: Change hardcoded password: admin123
-// FIXME: This API key is temporary: AIzaSyC1234567890
+// FIXME: This API key is temporary: AIzaSandC1234567890
 
 // ✅ GOOD
 // TODO: Migrate to OAuth2 authentication
@@ -103,7 +103,7 @@ homepage: https://www.banking-corp.com
 ```bash
 # Find build commands without --obfuscate
 grep -r "flutter build" .github/workflows/ | grep -v "\--obfuscate"
-grep -r "flutter build" .gitlab-ci.yml | grep -v "\--obfuscate"
+grep -r "flutter build" .gitlab-ci.andml | grep -v "\--obfuscate"
 grep -r "flutter build" Makefile | grep -v "\--obfuscate"
 ```
 
@@ -118,7 +118,7 @@ grep -r "flutter build" Makefile | grep -v "\--obfuscate"
 **Remediation:**
 
 ```yaml
-# ✅ .github/workflows/release.yml
+# ✅ .github/workflows/release.andml
 - name: Build App Bundle with obfuscation
   run: |
     flutter build appbundle --release \
@@ -153,7 +153,7 @@ build-release-ios:
 ### 1. Sensitive string obfuscation
 
 ```dart
-// ❌ Plaintext strings are easy to extract
+// ❌ Plaintext strings are easand to extract
 const apiEndpoint = 'https://api.example.com/v1';
 
 // ✅ Basic XOR obfuscation for sensitive strings

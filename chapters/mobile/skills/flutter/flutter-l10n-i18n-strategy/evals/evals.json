@@ -5,7 +5,7 @@
       "id": 1,
       "eval_name": "package-selection-default",
       "prompt": "I want to add multi-language support to my Flutter app. Which localization package should I use and why?",
-      "expected_output": "Default recommendation: flutter_localizations + gen-l10n (official Flutter SDK, no extra package, ARB files, compile-time safe). slang as alternative when JSON/YAML format needed or Flutter-independent. NOT easy_localization as default (runtime parsing, less safe). Explains the tradeoffs.",
+      "expected_output": "Default recommendation: flutter_localizations + gen-l10n (official Flutter SDK, no extra package, ARB files, compile-time safe). slang as alternative when JSON/YAML format needed or Flutter-independent. NOT easand_localization as default (runtime parsing, less safe). Explains the tradeoffs.",
       "files": [],
       "assertions": [
         {
@@ -20,7 +20,7 @@
         },
         {
           "id": "a3",
-          "text": "Response does NOT recommend easy_localization as the default (it has runtime parsing and is less type-safe)",
+          "text": "Response does NOT recommend easand_localization as the default (it has runtime parsing and is less type-safe)",
           "type": "llm_judge"
         }
       ]

@@ -1,12 +1,15 @@
 ---
 id: new-feature
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: workflow
 chapter: mobile
-description: Workflow for building a complete feature following Clean Architecture   (domain → data → presentation) with optional DS
+entry_agent: feature-builder
+input_contract: ../docs/templates/spec-packets/overlays/new-feature.yaml
+invocation_mode: explicit_agent
+description: >
+  Workflow for building a complete Clean Architecture feature with domain, data, and presentation layers. Use when the user requests a new feature, module, flow, or Melos feature package, optionally coordinating missing DS components.
 ---
-
 # Workflow: New Feature (Full Clean Architecture)
 
 ## When to Use
@@ -31,28 +34,28 @@ Do NOT use for:
 - Feature name and description provided by the user
 - API contract **or** manual entity_name + fields provided:
   - If `api_contract` is given → `entity_name` is inferred from the schema (the primary schema referenced by the endpoints, or the user can hint which schema to use)
-  - If no contract → `entity_name` and `fields` are required manually
-- `.copilot/config/project.config.yaml` valid (or run `/bootstrap-workspace` first)
+  - Without an `api_contract` → `entity_name` and `fields` are required
+- `.sopp/config/project.config.yaml` valid (or run `/bootstrap-workspace` first)
 - Context resolved:
   - `PROJECT_ROOT`
-  - `TARGET_ROOT`
+  - `TARGET_REGISTRY`
+  - `ACTIVE_TARGET_ID` (`app` or the feature target specified by the input)
+  - `ACTIVE_TARGET_ROOT = targets.registry[ACTIVE_TARGET_ID].root`
+  - `ALLOWED_ARTIFACT_ROOTS = targets.registry.*.root`
   - `TOPOLOGY_REPO_MODE`
-  - `PIPELINE_SPEC_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
-  - `PIPELINE_LOG_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
+  - `PIPELINE_SPEC_PATH = {ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
+  - `PIPELINE_LOG_PATH = {ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
+  - `SPEC_PACKET_PATH = {ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/specs/{feature_name}`
 
 ---
 
 ## Gate — Topology (mandatory)
 
 1. Validate `TOPOLOGY_REPO_MODE` (`single_repo | monorepo_melos | multi_repo`).
-2. Validate `PROJECT_ROOT` and `TARGET_ROOT` are accessible.
-3. If `monorepo_melos`:
-   - `melos_enabled = true`
-   - `melos.yaml` exists at workspace root
-   - `target_scope` is not empty
-   - `target_package_path` exists
-4. If `target_location = melos_package`:
-   - Validate `package_name` and `workspace_root` are provided
+2. Validate `PROJECT_ROOT` and `ACTIVE_TARGET_ROOT` are accessible.
+3. Validate `ACTIVE_TARGET_ID` exists in `targets.registry`.
+4. If `location_strategy = melos_package`, validate `repo_root/melos.yaml` and
+   `repo_root/package_path`.
 
 If any validation fails, terminate with `blocked_input`.
 
@@ -65,7 +68,7 @@ If any validation fails, terminate with `blocked_input`.
 feature_name: product_catalog
 description: Browse and search products by category with detail view
 api_contract: <see below — accepts any format>
-user_story: docs/hus/HU-045.md  (optional — contains acceptance criteria + DoD)
+user_story: docs/hus/user story-045.md  (optional — contains acceptance criteria + DoD)
 figma_url: https://www.figma.com/file/xxx/ProductList?node-id=123  (optional)
 target_location: app_folder | melos_package
 sequence_diagram: docs/diagrams/product_catalog_flow.mmd  (optional)
@@ -141,21 +144,70 @@ api_contract: |
 
 ## Execution Sequence
 
+### PHASE S0 — Mobile Spec Packet (`full`)
+
+**Agent:** `@feature-builder`
+**Skill:** `mobile-sdd-spec-validation`
+
+Create `SPEC_PACKET_PATH` with:
+
+1. `spec.yaml` (`schema_ref: ../docs/templates/schemas/mobile-spec.schema.yaml`,
+   `spec_level: full`, `execution_mode: propose_then_apply`)
+2. `context.json`
+3. `review.md` in Spanish
+4. `evidence/validation-report.md`
+
+The agent drafts the spec from `feature_name`, description, API contract,
+optional user story, Figma URL and sequence diagram. The developer reviews `review.md`
+instead of writing YAML manually.
+
+The full spec must include:
+
+- requirements and success criteria
+- API/entity/domain analysis inputs
+- layer plan: domain, data, presentation, wiring, documentation
+- expected artifacts per layer
+- documentation artifacts under `artifact_plan.planned[group=docs]` using
+  `target_id=project_docs` or the configured docs target
+- required layer checkpoints
+- `stage_checkpoints: required`
+- `agent_permissions` for feature, DS, audit, test and delivery agents
+- `external_access.figma_mcp.required=true` only when `figma_url` is provided
+  and `agent_permissions.figma-analyzer.can_call_external_tools` includes
+  `figma_mcp`
+- commands and evidence expected
+
+Validate the spec and wait for explicit approval before scaffold or code
+generation.
+
+---
+
 ### PHASE 0 — UI Component Inventory (conditional)
 
 **Condition:** `figma_url` or `ui_components` is provided.
-**Agent:** `@feature-builder` (internal) + delegation to `@ds-orchestrator`
+**Agent:** `@feature-builder`
 
 Steps:
-1. Identify required DS components from Figma or description
-2. Search the repository for each component
-3. Classify: ✅ exists | ⚠️ partial | 🆕 missing
-4. For each 🆕 or ⚠️ component:
+1. If `figma_url` is provided, `@feature-builder` delegates Figma MCP preflight
+   and screen analysis to `@figma-analyzer`:
+   - parse `fileKey` and `nodeId`
+   - verify Figma MCP is configured in the active tool
+   - verify `get_design_context(fileKey, nodeId)` succeeds
+   - verify a screenshot can be obtained for the target node
+   - persist `evidence/figma-mcp-preflight.md`
+   - if any required check fails, set
+     `spec.yaml.external_access.figma_mcp.status=blocked_input` and stop
+2. Identify required DS components from Figma or description
+3. Search the repository for each component
+4. Classify: ✅ exists | ⚠️ partial | 🆕 missing
+5. For each 🆕 or ⚠️ component:
    - Delegate to `@ds-orchestrator /new-component` or `/refactor-component`
    - Wait for DS pipeline completion
-5. If DS pipeline returns `blocked_input`, present options to user
+6. If DS pipeline returns `blocked_input`, present options to user
 
-Output: Phase 0 inventory table in `PIPELINE_SPEC_PATH`.
+Output: `evidence/ui-component-inventory.md`.
+Update `spec.yaml` sections `ui_inventory`, `artifact_plan.planned[group=ds_components]` and
+`dependencies.ds_pipeline`.
 
 **Skip condition:** No `figma_url` and no `ui_components` provided.
 
@@ -164,6 +216,18 @@ Output: Phase 0 inventory table in `PIPELINE_SPEC_PATH`.
 ### PHASE 1 — Scaffold
 
 **Agent:** `@feature-builder`
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: scaffold
+read_sections:
+  - topology
+  - artifact_plan.planned[group=scaffold]
+  - technical_plan.layers
+  - architecture_contract_refs
+```
 
 Steps:
 1. Determine target location (app folder vs Melos package)
@@ -175,6 +239,7 @@ Steps:
 3. Create all directories per the architecture map
 
 Output: Directory structure created, registered in `PIPELINE_LOG_PATH`.
+Persist scaffold evidence under `SPEC_PACKET_PATH/evidence/`.
 
 ---
 
@@ -200,7 +265,9 @@ Steps:
    - Data source method signatures (one per endpoint)
    - Use case list (inferred from endpoints: GET list → GetAll, GET by id → GetById, POST → Create, etc.)
 
-Output: API analysis section in `PIPELINE_SPEC_PATH`.
+Output: `evidence/api-contract-analysis.md`.
+Update `spec.yaml` sections `contracts.api`, `domain_model_plan`,
+`data_model_plan` and `use_case_plan`.
 
 **Skip condition:** No `api_contract` provided and no inline cURL — use `fields` and `api_endpoints` directly.
 
@@ -209,19 +276,54 @@ Output: API analysis section in `PIPELINE_SPEC_PATH`.
 ### PHASE 2 — Domain Layer
 
 **Agent:** `@feature-builder`
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: domain_layer
+read_sections:
+  - requirements
+  - domain_model_plan
+  - use_case_plan
+  - success_criteria.domain
+```
 
 Generate:
 1. Domain model (`@freezed abstract class`, no JSON, with business logic getters)
 2. Repository interface (`abstract interface class`, `Either<Failure, T>` returns)
 3. Use case(s) (`@injectable`, implements `UseCase<T, Params>`)
 
-Output: Domain files in `PIPELINE_SPEC_PATH` file list.
+Output: `context.json.artifacts.domain` and `evidence/domain-checkpoint.md`.
+
+#### REQUIRED CHECKPOINT — Domain Layer
+
+Present a compact Spanish review:
+
+1. files created/modified
+2. entities/use cases/repositories produced
+3. criteria covered
+4. self-verification result
+
+Wait for explicit approval before PHASE 3.
 
 ---
 
 ### PHASE 3 — Data Layer
 
 **Agent:** `@feature-builder`
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: data_layer
+read_sections:
+  - contracts.api
+  - data_model_plan
+  - artifact_plan.planned[group=data]
+  - success_criteria.data
+```
 
 Generate:
 1. DTO (`@freezed abstract class` + `fromJson`, `@JsonKey` for API field names)
@@ -230,13 +332,36 @@ Generate:
 4. Local data source (interface only — implementation noted as optional)
 5. Repository implementation (`@LazySingleton(as:)`, cache-first, error mapping)
 
-Output: Data files in `PIPELINE_SPEC_PATH` file list.
+Output: `context.json.artifacts.data` and `evidence/data-checkpoint.md`.
+
+#### REQUIRED CHECKPOINT — Data Layer
+
+Present a compact Spanish review:
+
+1. DTOs, mappers, data sources and repository implementation
+2. API mappings and error handling
+3. criteria covered
+4. self-verification result
+
+Wait for explicit approval before PHASE 4.
 
 ---
 
 ### PHASE 4 — Presentation Layer
 
 **Agent:** `@feature-builder`
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: presentation_layer
+read_sections:
+  - requirements
+  - artifact_plan.planned[group=presentation]
+  - navigation
+  - success_criteria.presentation
+```
 
 Generate:
 1. Event (`@freezed sealed class`, one factory per user action)
@@ -245,7 +370,19 @@ Generate:
 4. UIModel (`@freezed abstract class` + `fromDomain` factory)
 5. Page (`BlocProvider` + `getIt<Bloc>()` + `BlocBuilder` with exhaustive switch)
 
-Output: Presentation files in `PIPELINE_SPEC_PATH` file list.
+Output: `context.json.artifacts.presentation` and
+`evidence/presentation-checkpoint.md`.
+
+#### REQUIRED CHECKPOINT — Presentation Layer
+
+Present a compact Spanish review:
+
+1. events/states/BLoC/UIModel/page
+2. state coverage and navigation status
+3. criteria covered
+4. self-verification result
+
+Wait for explicit approval before PHASE 5.
 
 ---
 
@@ -261,7 +398,8 @@ Steps:
    - If not accessible, note as manual step
 4. If Melos package: register `ExternalModule` in app's injection container
 
-Output: Wiring verification in `PIPELINE_SPEC_PATH`.
+Output: `evidence/wiring-validation.md`.
+Persist build_runner, DI and route evidence under `SPEC_PACKET_PATH/evidence/`.
 
 ---
 
@@ -277,24 +415,23 @@ Steps:
    - Naming conventions
    - DI correctness (no DataSource in BLoC, no domain importing Flutter)
 2. If issues found:
-   - Report in `§5`
+   - Report in `evidence/audit-report.md`
    - Return to `@feature-builder` for corrections
    - Max retries: `pipeline.max_audit_retries` (default: 3)
 3. If approved: mark complete
 
-Output: `§5` audit report in `PIPELINE_SPEC_PATH`.
+Output: `evidence/audit-report.md` and a summary in the human report.
 
 ---
 
-### CHECKPOINT HUMANO (optional)
-
-**Condition:** `pipeline.human_checkpoint: true`
+### HUMAN CHECKPOINT — Final Build Review (required)
 
 Present to the developer:
 1. Feature build report (all files created)
 2. DI registration status
 3. Route registration status
 4. Any manual steps needed
+5. spec criteria covered and evidence paths
 
 Wait for explicit approval.
 
@@ -305,24 +442,29 @@ Wait for explicit approval.
 **Agent:** `@delivery-manager`
 
 Steps:
-1. Validate all files are within `TARGET_ROOT` scope
+1. Validate all files resolve within
+   `targets.registry[artifact_plan.planned[].target_id].root`
 2. Validate topology constraints (monorepo: no changes outside `target_scope`)
-3. Generate branch name using `naming.branch_prefix` + feature name
-4. Commits with Conventional Commits (`feat({feature}): implement {feature} feature`)
-5. PR description with:
+3. Propose branch name using `naming.branch_prefix` + feature name
+4. Propose Conventional Commit messages
+   (`feat({feature}): implement {feature} feature`)
+5. Draft PR description with:
    - Feature description
    - Files created (by layer)
    - DI registration status
    - Route registration status
    - Next steps (tests, Widgetbook)
 
-Output: `§7` delivery report in `PIPELINE_SPEC_PATH`.
+Output: `evidence/delivery-report.md` and a summary in the human report.
+
+The delivery manager does not run `git`, create branches or open PRs unless the
+user explicitly asks for it and the spec grants external tool permissions.
 
 ---
 
 ### PHASE 8 — Documentation (mandatory)
 
-**Agent:** `@feature-builder` (via `flutter-generate-documentation` skill)
+**Agent:** `@feature-builder` using shared skill `documentation-projects`
 
 **Condition:** Always executes — NEVER skip.
 
@@ -331,11 +473,18 @@ Steps:
    - If `docs/` exists at `PROJECT_ROOT` → use it
    - If `documentation/` or similar exists → use the existing one
    - Otherwise → create `docs/` at `PROJECT_ROOT`
-2. Check which of the 7 documents exist:
+2. Before invoking the shared skill, update `spec.yaml.artifact_plan.planned`
+   with every document that may be created or modified:
+   - `target_id: project_docs` or the configured docs target
+   - `path: docs/<document>.md` relative to that target
+   - `action: create | modify`
+   - `owner: feature-builder`
+   - `group: docs`
+3. Check which of the 7 documents exist:
    - `index.md`, `project-overview.md`, `requirements.md`, `project-structure.md`,
      `tech-stack.md`, `features.md`, `implementation.md`, `user-flow.md`
-3. For **missing documents** → generate from templates (`flutter-generate-documentation` skill)
-4. For **existing documents** → update with the new feature information:
+4. For **missing documents** → generate from templates using shared skill `documentation-projects`
+5. For **existing documents** → update with the new feature information:
    - `features.md` → add feature entry (name, description, status, layer files)
    - `project-structure.md` → update folder tree if new directories were created
    - `implementation.md` → update if new patterns, DI modules, or routes were added
@@ -343,11 +492,16 @@ Steps:
    - `user-flow.md` → add user flow if the feature introduces a new user journey
    - `requirements.md` → add functional requirements if `acceptance_criteria` or `functional_requirements` were provided as input
    - `project-overview.md` → update current state table if feature changes project scope
-5. Commit documentation changes: `docs({feature}): update project documentation`
+6. Propose documentation commit message:
+   `docs({feature}): update project documentation`
 
 Output: List of created/updated documents in `PIPELINE_LOG_PATH`.
 
-**Skill invocation:** `@generate-docs action=update target={docs_path} documents=all`
+**Skill invocation:** `documentation-projects action=update target={docs_path} documents=all`
+
+The shared skill internally orchestrates `doc-auditor`, `doc-interviewer`,
+`doc-generator` and `doc-validator`; the mobile workflow must not reference
+legacy generate-docs aliases.
 
 ---
 
@@ -403,13 +557,22 @@ After all phases:
 ## Rules
 
 - NEVER skip domain or data layers — always generate the full stack
+- NEVER proceed to scaffold/code generation before `review.md` is approved
 - NEVER proceed to Phase 1 if Phase 0 has unresolved `blocked_input`
-- NEVER generate files outside `TARGET_ROOT`
+- NEVER generate files outside the root resolved by
+  `artifact_plan.planned[].target_id`
+- NEVER call Figma MCP directly outside the Figma MCP preflight or delegated DS
+  workflow
 - NEVER generate tests (that is a separate workflow/agent responsibility)
 - NEVER skip Phase 8 (Documentation) — it is mandatory after every feature build
 - ALWAYS run topology gate before any file generation
 - ALWAYS run `build_runner` in Phase 5 before audit
 - ALWAYS delegate DS component creation to `@ds-orchestrator` (never build DS components directly)
+- ALWAYS enforce `agent_permissions` from `spec.yaml` before file creation,
+  modification, command execution or external tool access
 - ALWAYS register each phase in `PIPELINE_LOG_PATH`
-- ALWAYS generate/update project documentation in Phase 8 using `flutter-generate-documentation` skill
+- ALWAYS update `SPEC_PACKET_PATH/context.json` after every layer checkpoint
+- ALWAYS use compact handoffs by `spec_ref`, `context_ref`, `phase` and
+  `read_sections`
+- ALWAYS generate/update project documentation in Phase 8 using shared skill `documentation-projects`
 - If a phase fails or returns `blocked_input`, stop and report to user

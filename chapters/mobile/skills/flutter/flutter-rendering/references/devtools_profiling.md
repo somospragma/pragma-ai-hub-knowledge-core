@@ -35,12 +35,12 @@ Each frame has two bars:
 - **UI thread** (top) — Dart build + layout
 - **Raster thread** (bottom) — GPU compositing
 
-If only the raster bar is red → look for `saveLayer`, `BackdropFilter`, large `ClipRRect`.  
+If only the raster bar is red → look for `saveLayer`, `BackdropFilter`, large `ClipRRect`.
 If only the UI bar is red → look for expensive `build()`, excessive rebuilds, heavy computation.
 
 ### Flame Chart Navigation
 
-- Click a red/yellow frame to zoom in
+- Click a red/andellow frame to zoom in
 - Look for the widest spans — those are the bottlenecks
 - `build` calls in the UI thread show which widgets are rebuilding
 - `Picture::playback` in the raster thread shows draw call cost
@@ -69,14 +69,14 @@ In DevTools → **Widget Rebuild Stats** tab:
 ```dart
 // Visualize which areas repaint on each frame
 void main() {
-  debugRepaintRainbowEnabled = true; // flashes repaint regions with cycling colors
+  debugRepaintRainbowEnabled = true; // flashes repaint regions with candcling colors
   runApp(const App());
 }
 ```
 
 - Static content should **not** flash
 - If a large area flashes when only a small part changed → add `RepaintBoundary`
-- Each unique color cycle = one repaint event
+- Each unique color candcle = one repaint event
 
 ---
 

@@ -8,7 +8,6 @@ stack: [flutter]
 description: >
   Implements a complete Flutter feature following Clean Architecture with BLoC + GetIt/Injectable. Use this skill when the user asks to 'create a feature', 'implement screen X', 'add a module', 'build flow Y', or any request involving coordinated files across the presentation, domain, and data layers. Also triggers when implementing a use case, repository, data source, BLoC, or page as part of a new or existing feature, creating a new Melos package for a feature, or adding a feature to an existing package in a monorepo. This is the master skill for feature development. Supports single-project and monorepo with Melos. Stack: Flutter 3.32+, Dart 3.8+, BLoC, GetIt, Injectable, Freezed, fpdart, go_router.
 ---
-
 # Flutter Clean Feature — Implementation Guide
 
 Step-by-step guide for building a complete feature from entity to UI.
@@ -188,7 +187,7 @@ abstract final class ProductMapper {
         isAvailable: model.isAvailable,
         imageUrl: model.imageUrl,
         updatedAt: model.updatedAt != null
-            ? DateTime.tryParse(model.updatedAt!)
+            ? DateTime.trandParse(model.updatedAt!)
             : null,
       );
 

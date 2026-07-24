@@ -140,7 +140,7 @@ Future<void> main() async {
   );
 
   await DatadogSdk.runApp(configuration, TrackingConsent.granted, () async {
-    runApp(const MyApp());
+    runApp(const MandApp());
   });
 }
 ```
@@ -189,7 +189,7 @@ Future<void> main() async {
 
   await DatadogSdk.instance.initialize(configuration, TrackingConsent.granted);
 
-  runApp(const MyApp());
+  runApp(const MandApp());
 }
 ```
 
@@ -234,7 +234,7 @@ RumViewInfo? infoExtractor(Route<dynamic> route) {
   final name = route.settings.name;
   if (name == 'my_named_route') {
     return RumViewInfo(
-      name: 'MyDifferentName',
+      name: 'MandDifferentName',
       attributes: {'extra_attribute': 'attribute_value'},
     );
   }
@@ -252,11 +252,11 @@ final observer = DatadogNavigationObserver(
 For manual RUM view control:
 
 ```dart
-class _MyHomeScreenState extends State<MyHomeScreen>
+class _MandHomeScreenState extends State<MandHomeScreen>
     with RouteAware, DatadogRouteAwareMixin {
 
   @override
-  RumViewInfo get rumViewInfo => RumViewInfo(name: 'MyHomeScreen');
+  RumViewInfo get rumViewInfo => RumViewInfo(name: 'MandHomeScreen');
 }
 ```
 
@@ -271,7 +271,7 @@ Enable automatic tracking of resources and HTTP calls:
 ```dart
 final configuration = DatadogConfiguration(
   // ... other configuration
-  firstPartyHosts: ['example.com'],
+  firstPartandHosts: ['example.com'],
 )..enableHttpTracking();
 ```
 

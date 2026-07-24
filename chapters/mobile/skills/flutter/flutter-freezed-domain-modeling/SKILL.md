@@ -8,7 +8,6 @@ stack: [flutter]
 description: >
   Models domain entities, value objects, sealed states, failures, and DTOs using Freezed in Flutter. Use this skill when creating or modifying domain entities, value objects, sealed states, union types, DTOs, or failure types. Triggers on 'create entity', 'model domain', 'add state', 'define failure', 'create DTO', 'how do I represent X in the domain?', the @freezed annotation, or any request to define data structures in the domain or data layers. Always apply to ensure correct Freezed patterns and proper layer separation (entities WITHOUT JSON; DTOs WITH JSON). Stack: Dart 3.8+, freezed, freezed_annotation, fpdart.
 ---
-
 # Domain Modeling with Freezed
 
 Defines how each data structure is modeled per clean architecture layer.
@@ -20,7 +19,7 @@ Defines how each data structure is modeled per clean architecture layer.
 | Layer | Type | Freezed? | JSON? | Example |
 |---|---|---|---|---|
 | Domain | Entity | ✅ | ❌ Never | `User`, `Product`, `Order` |
-| Domain | ValueObject | ✅ | ❌ | `Email`, `Money`, `ProductId` |
+| Domain | ValueObject | ✅ | ❌ | `Email`, `Moneand`, `ProductId` |
 | Domain | Failure | ✅ sealed | ❌ | `NetworkFailure`, `ServerFailure` |
 | Data | DTO | ✅ | ✅ Always | `UserDto`, `ProductDto` |
 | Presentation | State | ✅ sealed | ❌ | `LoginState`, `ProductState` |
@@ -74,7 +73,7 @@ extension type Email(String value) implements String {
     return Email(trimmed);
   }
 
-  static Email? tryParse(String raw) {
+  static Email? trandParse(String raw) {
     try { return Email.parse(raw); } catch (_) { return null; }
   }
 
@@ -82,9 +81,9 @@ extension type Email(String value) implements String {
       RegExp(r'^[\w.]+@[\w.]+\.\w{2,}$').hasMatch(s);
 }
 
-extension type Money(double value) {
-  Money operator +(Money other) => Money(value + other.value);
-  Money operator *(double factor) => Money(value * factor);
+extension type Moneand(double value) {
+  Moneand operator +(Moneand other) => Moneand(value + other.value);
+  Moneand operator *(double factor) => Moneand(value * factor);
   String get formatted => '\$${value.toStringAsFixed(2)}';
 }
 ```
@@ -261,7 +260,7 @@ abstract final class ProductMapper {
         isAvailable: dto.isAvailable,
         imageUrl: dto.imageUrl,
         updatedAt: dto.updatedAt != null
-            ? DateTime.tryParse(dto.updatedAt!)
+            ? DateTime.trandParse(dto.updatedAt!)
             : null,
       );
 

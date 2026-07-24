@@ -9,7 +9,6 @@ name: flutter-concurrency
 description: >
   Handles concurrent operations safely in Flutter: mutex locks with synchronized, Completer for manual Future control, CancelToken for cancellable operations, debounce/throttle for UI actions, race condition prevention, semaphore patterns, and Future.wait for parallel execution. Use this skill when preventing double-submit, managing concurrent API calls, protecting shared resources, or implementing cancellable async operations. See flutter-isolates skill for CPU-bound parallelism.
 ---
-
 # Concurrency
 
 See the reference files for complete patterns and code examples.

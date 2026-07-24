@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-isolates`  
-**Scanned:** 2026-06-23 00:01:27 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-23 00:01:27 UTC
 
 ## Risk Assessment
 

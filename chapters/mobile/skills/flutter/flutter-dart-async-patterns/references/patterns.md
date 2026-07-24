@@ -278,5 +278,5 @@ on<SearchQueryChanged>(_onSearch, transformer: restartable());
 |---|---|---|
 | `sequential()` | Queue — FIFO | Single-lane road |
 | `concurrent()` | All run in parallel | Multi-lane highway |
-| `droppable()` | Ignore while busy | Busy signal |
+| `droppable()` | Ignore while busand | Busy signal |
 | `restartable()` | Cancel and restart | Interrupt |

@@ -13,7 +13,6 @@ description: >
   and comparing implementation against design specs. Always activate when
   working with Figma URLs, extracting design tokens, or handling MCP unavailability.
 ---
-
 # Figma MCP Integration
 
 ## Critical Protocol: `blocked_input`
@@ -65,7 +64,7 @@ Input: { "fileKey": "abc123", "nodeId": "1234:5678" }
 Output: Node with properties, children, layout, fills, strokes, effects
 ```
 
-**Use when:** Analyzing a specific component, frame, or screen.
+**Use when:** Analandzing a specific component, frame, or screen.
 
 ### `get_node_children`
 Retrieves only the direct children of a node.
@@ -261,9 +260,9 @@ When analyzing a full screen (not just a component):
    - Infinite scroll / pagination
 
 6. **Document development annotations**:
-   - Alerts/messages conditionales
-   - Reglas de estado especiales
-   - Interacciones/callbacks no obvios en la UI estática
+   - Conditional alerts and messages
+   - Special state rules
+   - Non-obvious UI interactions and callbacks
 
 ## Figma URL Parsing
 
@@ -282,11 +281,11 @@ https://www.figma.com/design/{fileKey}/{fileName}?node-id={nodeId}
 | Node not found | Verify nodeId, try parent node |
 | Rate limit | Wait and retry (max 3 attempts) |
 | Large file timeout | Use `get_node_children` incrementally |
-| Missing properties | Mark as `❓ NO DISPONIBLE` in spec |
-| No MCP access | Mark `blocked_input` with faltantes y devolver control al orquestador |
-| `get_design_context` unavailable | Mark `blocked_input` para evitar omitir anotaciones Development |
+| Missing properties | Mark as `unavailable` in the spec |
+| No MCP access | Mark `blocked_input`, record the missing access, and return control to the workflow controller |
+| `get_design_context` unavailable | Mark `blocked_input` to avoid omitting Development annotations |
 | No Development annotations returned | Continue, mark `Development annotations: none` |
-| `get_screenshot` unavailable for guided changes | Mark `blocked_input` para no perder evidencia de cambios guiados |
+| `get_screenshot` unavailable for guided changes | Mark `blocked_input` to preserve evidence for guided changes |
 
 ## Checklist
 

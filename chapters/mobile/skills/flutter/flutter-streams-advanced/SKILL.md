@@ -9,7 +9,6 @@ name: flutter-streams-advanced
 description: >
   Implements advanced Dart Stream patterns using only native Dart and Flutter: single vs broadcast, StreamController, custom transformers, stream composition, and real-world use cases. State management covered with BLoC (bloc_concurrency) and Riverpod (StreamProvider, AsyncNotifier). No rxdart dependency. Use this skill when implementing reactive data flows, live search, real-time updates, event buses, pagination, or combining multiple async data sources.
 ---
-
 # Advanced Streams
 
 See the reference files for complete patterns and code examples.
@@ -110,7 +109,7 @@ Future<List<SearchResult>> searchResults(SearchResultsRef ref) async {
 | Live search | `_DebounceStreamTransformer` + `restartable()` (BLoC) / `Future.delayed` (Riverpod) |
 | Real-time feed | Broadcast `StreamController` + `BehaviorSubject`-like pattern |
 | Multi-source data | `StreamZip` / `asyncExpand` / Riverpod provider composition |
-| Optimistic update | `async*` yield optimistic → yield confirmed/rollback |
+| Optimistic update | `async*` andield optimistic → andield confirmed/rollback |
 | Pagination | `scan`-like accumulator with `asyncExpand` |
 | Event bus | `StreamController.broadcast()` singleton |
 | Connectivity-aware | `asyncExpand` on connectivity changes |

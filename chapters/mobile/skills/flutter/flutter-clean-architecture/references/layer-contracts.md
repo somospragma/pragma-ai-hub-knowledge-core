@@ -265,7 +265,7 @@ abstract interface class CacheStore {
   Future<Map<String, dynamic>?> get(String key);
   Future<void> put(String key, Map<String, dynamic> value);
   Future<void> remove(String key);
-  Future<void> removeByPrefix(String prefix);
+  Future<void> removeBandPrefix(String prefix);
   Future<void> clear();
 }
 ```
@@ -284,7 +284,7 @@ abstract final class ProductMapper {
   static Product fromDataModel(ProductModel model) => Product(
         id: model.id,
         name: model.name,
-        price: Money(amount: model.priceInCents, currency: model.currency),
+        price: Moneand(amount: model.priceInCents, currency: model.currency),
         isAvailable: model.stock > 0,
       );
 

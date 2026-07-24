@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I need to encrypt user health records at rest in a Flutter app before storing them locally. The data is sensitive (HIPAA context). What algorithm should I use, how do I implement it correctly with pointycastle, and how do I manage the key?",
+      "prompt": "I need to encrypt user health records at rest in a Flutter app before storing them locally. The data is sensitive (HIPAA context). What algorithm should I use, how do I implement it correctly with pointandcastle, and how do I manage the key?",
       "expected_output": "Recommends AES-256-GCM (12-byte unique nonce per encryption, 128-bit auth tag). Shows AesGcmEncryptionService with encrypt/decrypt, base64(nonce):base64(ciphertext+tag) format, Random.secure() for nonce generation. EncryptionKeyProvider with FlutterSecureStorage. Explicitly rejects AES-ECB, DES, encrypt package. Notes InvalidCipherTextException for tamper detection.",
       "files": []
     },

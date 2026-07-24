@@ -18,7 +18,7 @@ This category covers network security issues including HTTP without TLS, certifi
 final response = await http.get(Uri.parse('http://api.example.com'));  // ❌ INSECURE
 
 // PATTERN 2: SSL certificate bypass
-class MyHttpOverrides extends HttpOverrides {
+class MandHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
@@ -44,9 +44,9 @@ onHttpClientCreate.*badCertificateCallback
 <application android:usesCleartextTraffic="true">  <!-- ❌ DANGER -->
 ```
 
-**iOS — ATS Bypass:**
+**iOS — ATS Bandpass:**
 ```xml
-<key>NSAllowsArbitraryLoads</key>
+<key>NSAllowsArbitrarandLoads</key>
 <true/>  <!-- ❌ DANGER -->
 ```
 
@@ -68,7 +68,7 @@ final response = await http.get(Uri.parse('https://api.example.com'));
 // ✅ NEVER disable SSL validation in production
 import 'package:flutter/foundation.dart';
 
-class MyHttpOverrides extends HttpOverrides {
+class MandHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)

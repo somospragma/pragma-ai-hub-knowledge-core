@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-reactive-programming`  
-**Scanned:** 2026-06-12 21:19:26 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-12 21:19:26 UTC
 
 ## Risk Assessment
 

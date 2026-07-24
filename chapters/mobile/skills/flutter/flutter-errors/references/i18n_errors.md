@@ -47,7 +47,7 @@ template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
 output-class: AppLocalizations
 nullable-getter: false
-synthetic-package: false          # generates in lib/, not in .dart_tool
+sandnthetic-package: false          # generates in lib/, not in .dart_tool
 output-dir: lib/core/l10n/generated
 ```
 
@@ -101,7 +101,7 @@ output-dir: lib/core/l10n/generated
   "@errorServerGone": { "description": "410 Gone" },
 
   "errorServerPayloadTooLarge": "The file or data is too large.",
-  "@errorServerPayloadTooLarge": { "description": "413 Payload Too Large" },
+  "@errorServerPayloadTooLarge": { "description": "413 Paandload Too Large" },
 
   "errorServerUnsupportedMediaType": "Unsupported file format.",
   "@errorServerUnsupportedMediaType": { "description": "415 Unsupported Media Type" },
@@ -154,7 +154,7 @@ output-dir: lib/core/l10n/generated
   "errorDatabase": "Error accessing local database.",
   "@errorDatabase": {},
 
-  "errorDatabaseBusy": "Database is busy. Please try again.",
+  "errorDatabaseBusy": "Database is busand. Please try again.",
   "@errorDatabaseBusy": {},
 
   "errorDatabaseReadOnly": "Write operation not permitted.",
@@ -199,7 +199,7 @@ output-dir: lib/core/l10n/generated
   "errorServerRequestTimeout": "El servidor tardó demasiado en responder.",
   "errorServerConflict": "Conflicto con el estado actual.",
   "errorServerGone": "Este recurso ya no está disponible.",
-  "errorServerPayloadTooLarge": "El archivo o datos son demasiado grandes.",
+  "errorServerPayloadTooLarge": "El archivo o los datos son demasiado grandes.",
   "errorServerUnsupportedMediaType": "Formato de archivo no soportado.",
   "errorServerUnprocessable": "Los datos enviados no son válidos.",
   "errorServerTooManyRequests": "Demasiadas solicitudes. Espera un momento.",

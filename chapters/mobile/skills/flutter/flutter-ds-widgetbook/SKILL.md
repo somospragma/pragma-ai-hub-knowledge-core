@@ -12,7 +12,6 @@ description: >
   use cases, knobs, code preview, and build_runner generation with deterministic
   scope selection.
 ---
-
 # Widgetbook Patterns (Deterministic Scope)
 
 ## Step 0 — Define the scope first
@@ -62,7 +61,7 @@ For screen use cases, always use wrappers/mocks. Never use real navigation — r
 | `enum` | `context.knobs.list()` | **Always** include `labelBuilder` |
 | `double` | `context.knobs.double.slider()` | Set reasonable min/max |
 | `int` | `context.knobs.int.slider()` | Set reasonable min/max |
-| `Color` | ❌ no knob | Colors come from theme/tokens only |
+| Theme and color tokens | ❌ not a knob | Come from the configured theme and token system |
 | `VoidCallback?` | boolean + ternary | `enabled ? () => developer.log('...') : null` |
 
 Import `developer` explicitly: `import 'dart:developer' as developer;`
@@ -89,7 +88,7 @@ dart run build_runner build --delete-conflicting-outputs
 ## Critical rules
 
 - `labelBuilder` is **mandatory** on every `knobs.list()` / enum knob
-- **Never** add a knob for `Color` — colors come from the theme
+- **Never** add knobs for theme or color tokens; they come from the configured theme
 - **Never** use `print` in callbacks — use `developer.log(...)`
 - **Never** add `part '*.g.dart'` inside `*.use_case.dart` files — this breaks code generation
 - For `APP_SCREENS`: always use test mocks/providers, never real navigation
@@ -101,8 +100,8 @@ dart run build_runner build --delete-conflicting-outputs
 - [ ] Required use cases covered for the scope
 - [ ] `context.setCodePreview(...)` present in every use case
 - [ ] `labelBuilder` on all enum/list knobs
-- [ ] No `print` — uses `developer.log`
-- [ ] No `part '*.g.dart'` in use case files
+- [ ] Not `print` — uses `developer.log`
+- [ ] Not `part '*.g.dart'` in use case files
 - [ ] `dart analyze` ran clean
 - [ ] `dart run build_runner build --delete-conflicting-outputs` ran
 

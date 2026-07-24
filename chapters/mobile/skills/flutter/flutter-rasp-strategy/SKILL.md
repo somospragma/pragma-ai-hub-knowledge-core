@@ -6,10 +6,9 @@ type: skill
 chapter: mobile
 stack: [flutter]
 name: flutter-rasp-strategy
-description: > 
+description: >
   Implements Runtime Application Self-Protection (RASP) in Flutter using freeRASP (Talsec) as the primary provider: root/jailbreak detection, emulator detection, hook/Frida detection, tamper detection, and untrusted installation detection. Uses a Strategy + Adapter pattern so the RASP provider can be swapped without touching domain or presentation layers. Covers OWASP MASVS-RESILIENCE requirements (R category).
 ---
-
 # RASP Strategy
 
 See the reference files for complete patterns and code examples.

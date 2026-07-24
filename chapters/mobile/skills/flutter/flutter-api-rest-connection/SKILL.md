@@ -8,7 +8,6 @@ stack: [flutter]
 description: >
   Configures and implements REST API connections in Flutter using Dio: complete Dio client setup with environment-based URLs, interceptor stack (auth with 401 token refresh + mutex lock, safe logging without PII exposure, exponential backoff retry, error mapping), multipart file upload, request cancellation, and Clean Architecture integration. USE THIS SKILL when: setting up HTTP communication with a backend, implementing 401 token refresh with race condition prevention, adding secure logging without exposing tokens/passwords/PII, implementing resilient retry logic for transient network failures, mapping HTTP errors to domain Failures, handling multipart file uploads, or integrating HTTP client with DataSource/Repository layers.
 ---
-
 # REST API Connection in Flutter
 
 **The HTTP layer lives entirely in the Data layer.** Domain never knows about Dio, HTTP status codes, or JSON responses.

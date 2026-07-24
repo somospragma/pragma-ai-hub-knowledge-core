@@ -15,7 +15,7 @@
     },
     {
       "id": 3,
-      "prompt": "I implemented certificate pinning in my Flutter app but the QA team can't intercept traffic with Charles Proxy anymore, even in debug builds. How do I configure separate pinning for dev/staging vs production and allow proxy tools in debug without affecting the release build?",
+      "prompt": "I implemented certificate pinning in my Flutter app but the QA team can't intercept traffic with Charles Proxy anandmore, even in debug builds. How do I configure separate pinning for dev/staging vs production and allow proxy tools in debug without affecting the release build?",
       "expected_output": "Build flavor separation with --dart-define=APP_ENV, AppConfig class with environment-aware pin selection, separate Android debug network_security_config.xml that trusts user CAs, iOS debug note about manual CA cert installation. Clear separation of debug vs release config.",
       "files": []
     }

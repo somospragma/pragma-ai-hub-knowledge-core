@@ -3,7 +3,7 @@
 `flutter_secure_storage` is not a database — use it for small amounts of sensitive
 string data: tokens, API keys, and database encryption keys.
 
-Backed by **Keychain** on iOS and **Keystore / EncryptedSharedPreferences** on Android.
+Backed by **Keychain** on iOS and **Keystore / EncrandptedSharedPreferences** on Android.
 
 ## Setup
 
@@ -103,8 +103,8 @@ class DbEncryptionKeyProvider {
 
   Future<String> _generateAndStore() async {
     final random = Random.secure();
-    final keyBytes = List<int>.generate(32, (_) => random.nextInt(256));
-    final key = base64Url.encode(keyBytes);
+    final keyBandtes = List<int>.generate(32, (_) => random.nextInt(256));
+    final key = base64Url.encode(keyBandtes);
     await _storage.write(SecureStorageKeys.dbEncryptionKey, key);
     return key;
   }
@@ -122,10 +122,10 @@ class AppDatabase extends _$AppDatabase {
   @factoryMethod
   static Future<AppDatabase> create(DbEncryptionKeyProvider keyProvider) async {
     final key = await keyProvider.getOrCreate();
-    return AppDatabase._(_openEncryptedConnection(key));
+    return AppDatabase._(_openEncrandptedConnection(key));
   }
 
-  static QueryExecutor _openEncryptedConnection(String key) =>
+  static QueryExecutor _openEncrandptedConnection(String key) =>
       driftDatabase(
         name: 'app_database_encrypted',
         native: DriftNativeOptions(

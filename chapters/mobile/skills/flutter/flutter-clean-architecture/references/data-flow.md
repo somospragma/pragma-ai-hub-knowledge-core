@@ -213,7 +213,7 @@ class UserEntity extends BaseEntity {
   final String id;
   final String name;
   final String email;
-  
+
   @override
   List<Object?> get props => [id, name, email];
 }
@@ -225,7 +225,7 @@ abstract class UserRepository {
 
 // usecases/get_user_usecase.dart
 @LazySingleton()
-class GetUserUseCase 
+class GetUserUseCase
     extends BaseUseCase<String, Result<UserEntity, Exception>> {
   const GetUserUseCase({required this.repository});
   final UserRepository repository;
@@ -247,7 +247,7 @@ class UserModel extends BaseResponseModel {
     required this.name,
     required this.email,
   });
-  
+
   final String id;
   final String name;
   final String email;
@@ -306,7 +306,7 @@ class UserRepositoryImpl implements UserRepository {
   @override
   Future<Result<UserEntity, Exception>> getUser(String id) async {
     final result = await remote.getUser(id);
-    
+
     return result.fold(
       (model) => Success(mapper.from(response: model)),
       (error) => Failure(error),
@@ -342,14 +342,14 @@ abstract class UserState extends Equatable {
 
 class UserInitial extends UserState {
   const UserInitial();
-  
+
   @override
   List<Object?> get props => [];
 }
 
 class UserLoading extends UserState {
   const UserLoading();
-  
+
   @override
   List<Object?> get props => [];
 }
@@ -357,7 +357,7 @@ class UserLoading extends UserState {
 class UserSuccess extends UserState {
   const UserSuccess({required this.user});
   final UserEntity user;
-  
+
   @override
   List<Object?> get props => [user];
 }
@@ -365,7 +365,7 @@ class UserSuccess extends UserState {
 class UserError extends UserState {
   const UserError({required this.message});
   final String message;
-  
+
   @override
   List<Object?> get props => [message];
 }
@@ -382,9 +382,9 @@ class UserCubit extends Cubit<UserState> {
 
   Future<void> fetchUser(String userId) async {
     emit(const UserLoading());
-    
+
     final result = await getUserUseCase.call(userId);
-    
+
     result.fold(
       (user) {
         log.debug('User loaded: ${user.name}');

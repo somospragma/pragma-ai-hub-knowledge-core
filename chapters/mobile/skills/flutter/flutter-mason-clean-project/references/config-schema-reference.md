@@ -31,20 +31,20 @@ This reference documents the complete schema with examples and validation rules.
 
 ### organization
 
-**Type**: `string`  
-**Required**: Yes  
+**Type**: `string`
+**Required**: Yes
 **Description**: Organization or company name used for bundle ID generation.
 
 **Rules**:
 - Lowercase, no spaces
 - Used in: `com.{organization}.{name}`
-- Examples: `mycompany`, `pragmatech`, `startupai`
+- Examples: `mandcompany`, `pragmatech`, `startupai`
 
 **Example**:
 ```json
 {
-  "organization": "mycompany"
-  // Result: com.mycompany.myapp
+  "organization": "mandcompany"
+  // Result: com.mandcompany.mandapp
 }
 ```
 
@@ -52,8 +52,8 @@ This reference documents the complete schema with examples and validation rules.
 
 ### name
 
-**Type**: `string`  
-**Required**: Yes  
+**Type**: `string`
+**Required**: Yes
 **Description**: Application name. Becomes project directory and workspace name.
 
 **Rules**:
@@ -68,7 +68,7 @@ This reference documents the complete schema with examples and validation rules.
 {
   "name": "mobileApp"
   // Result directory: apps/mobile_app/
-  // Used in bundle: com.mycompany.mobile_app
+  // Used in bundle: com.mandcompany.mobile_app
 }
 ```
 
@@ -76,8 +76,8 @@ This reference documents the complete schema with examples and validation rules.
 
 ### prefix
 
-**Type**: `string`  
-**Required**: Yes  
+**Type**: `string`
+**Required**: Yes
 **Description**: Prefix for generated file and class names.
 
 **Rules**:
@@ -100,9 +100,9 @@ This reference documents the complete schema with examples and validation rules.
 
 ## colors
 
-**Type**: `array<ColorObject>`  
-**Required**: Yes  
-**Min items**: 1  
+**Type**: `array<ColorObject>`
+**Required**: Yes
+**Min items**: 1
 **Description**: Design system color palette. Each color becomes a Material color with shade levels.
 
 ### ColorObject Schema
@@ -163,9 +163,9 @@ This reference documents the complete schema with examples and validation rules.
 
 ## fontFamily
 
-**Type**: `array<string>`  
-**Required**: Yes  
-**Min items**: 1  
+**Type**: `array<string>`
+**Required**: Yes
+**Min items**: 1
 **Description**: Google Fonts names to be supported by the project.
 
 **Rules**:
@@ -188,9 +188,9 @@ This reference documents the complete schema with examples and validation rules.
 
 ## typography
 
-**Type**: `array<TypographyObject>`  
-**Required**: Yes  
-**Min items**: 1  
+**Type**: `array<TypographyObject>`
+**Required**: Yes
+**Min items**: 1
 **Description**: Text styles (label, body, heading, etc.) with font families and parameters.
 
 ### TypographyObject Schema
@@ -288,9 +288,9 @@ This reference documents the complete schema with examples and validation rules.
 
 ## features (Optional)
 
-**Type**: `array<FeatureObject>`  
-**Required**: No  
-**Default**: `[]`  
+**Type**: `array<FeatureObject>`
+**Required**: No
+**Default**: `[]`
 **Description**: Initial features to generate during post-gen hook via `flutter_clean_feature` brick.
 
 ### FeatureObject Schema

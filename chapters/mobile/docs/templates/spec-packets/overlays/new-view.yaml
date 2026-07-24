@@ -1,0 +1,44 @@
+workflow: new-view
+entry_agent: ds-orchestrator
+base_spec_level: standard
+purpose: Generate a Flutter app view from Figma with required DS/App split.
+required_inputs:
+  - view_name
+  - figma_url
+  - user_story
+optional_inputs:
+  - project_root
+  - user_story_path
+  - route_name
+  - target_id
+required_external_access:
+  figma_mcp:
+    required: true
+    preflight_agent: figma-analyzer
+    evidence: evidence/figma-mcp-preflight.md
+required_agents:
+  - ds-orchestrator
+  - figma-analyzer
+  - component-planner
+  - component-architect
+  - widget-developer
+  - code-auditor
+  - test-engineer
+  - golden-test-engineer
+  - widgetbook-developer
+  - delivery-manager
+artifact_groups:
+  - ds_components
+  - app_view
+  - tests
+  - golden_tests
+  - widgetbook
+  - audit
+  - delivery
+required_human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+notes:
+  - DS artifacts target design_system; app view artifacts target app.
+  - The DS checkpoint must be approved before app view generation starts.

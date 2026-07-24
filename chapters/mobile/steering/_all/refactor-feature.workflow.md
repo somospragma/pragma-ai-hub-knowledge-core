@@ -1,17 +1,15 @@
 ---
 id: refactor-feature
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: steering
 chapter: mobile
+entry_agent: refactoring-advisor
+input_contract: ../docs/templates/spec-packets/overlays/refactor-feature.yaml
+invocation_mode: explicit_agent
 description: >
-  Workflow for refactoring an existing feature that already follows Clean
-  Architecture (or close to it). Analyzes code smells, architectural
-  violations, and complexity — then executes incremental improvements that
-  keep the app compiling at every stage. Not for DS components (use
-  /refactor-component) or legacy rewrites from scratch.
+  Workflow for refactoring an existing feature that follows, or should migrate toward, Clean Architecture. Use to analyze code, plan incremental changes, apply domain/data/presentation refactors, add tests, and produce refactoring documentation.
 ---
-
 # Workflow: Refactor Feature (Evolutionary Improvement)
 
 ## When to Use
@@ -37,27 +35,28 @@ Do NOT use for:
 ## Prerequisites
 
 - Feature path provided by the user (must exist and contain code)
-- `.copilot/config/project.config.yaml` valid (or run `/bootstrap-workspace` first)
+- `.sopp/config/project.config.yaml` valid (or run `/bootstrap-workspace` first)
 - Context resolved:
   - `PROJECT_ROOT`
-  - `TARGET_ROOT`
+  - `TARGET_REGISTRY`
+  - `ACTIVE_TARGET_ID` (`app` or feature target)
+  - `ACTIVE_TARGET_ROOT = targets.registry[ACTIVE_TARGET_ID].root`
+  - `ALLOWED_ARTIFACT_ROOTS = targets.registry.*.root`
   - `TOPOLOGY_REPO_MODE`
   - `PIPELINE_SPEC_PATH`
   - `PIPELINE_LOG_PATH`
+  - `SPEC_PACKET_PATH = {ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/specs/{feature_name}-refactor`
 
 ---
 
 ## Gate — Topology (mandatory)
 
 1. Validate `TOPOLOGY_REPO_MODE` (`single_repo | monorepo_melos | multi_repo`).
-2. Validate `PROJECT_ROOT` and `TARGET_ROOT` are accessible.
+2. Validate `PROJECT_ROOT` and `ACTIVE_TARGET_ROOT` are accessible.
 3. Validate `feature_path` exists and contains Dart files.
-4. If `target_location = melos_package`:
-   - Validate `package_name` and `workspace_root` are provided
-   - Validate workspace root `pubspec.yaml` has `workspace:` key
-5. If `monorepo_melos`:
-   - `melos_enabled = true`
-   - `target_scope` is not empty
+4. Validate each affected file maps to an allowed `target_id`.
+5. If `location_strategy=melos_package`, validate `repo_root/melos.yaml` and
+   `repo_root/package_path`.
 
 If any validation fails, terminate with `blocked_input`.
 
@@ -67,10 +66,11 @@ If any validation fails, terminate with `blocked_input`.
 
 ```text
 @refactoring-advisor /refactor-feature
+feature_name: checkout
 feature_path: lib/src/features/checkout/
-intent: Split the CheckoutBloc into CartBloc and PaymentBloc, extract coupon validation to a use case
+refactor_goal: Split the CheckoutBloc into CartBloc and PaymentBloc, extract coupon validation to a use case
 constraints: Don't change the API contract, keep route paths the same
-user_story: docs/hus/HU-078.md  (optional — contains acceptance criteria + DoD)
+user_story: docs/hus/user story-078.md  (optional — contains acceptance criteria + DoD)
 target_location: same | melos_package
 sequence_diagram: docs/diagrams/checkout_flow.mmd  (optional)
 ```
@@ -80,25 +80,29 @@ sequence_diagram: docs/diagrams/checkout_flow.mmd  (optional)
 ```text
 # Simple refactor (most common)
 @refactoring-advisor /refactor-feature
+feature_name: checkout
 feature_path: lib/src/features/checkout/
-intent: The BLoC is too large, needs splitting
+refactor_goal: The BLoC is too large, needs splitting
 
 # Package extraction
 @refactoring-advisor /refactor-feature
+feature_name: payments
 feature_path: lib/src/features/payments/
-intent: Extract to a standalone Melos package
+refactor_goal: Extract to a standalone Melos package
 target_location: melos_package
 package_name: payments
 
 # Pattern update
 @refactoring-advisor /refactor-feature
+feature_name: auth
 feature_path: lib/src/features/auth/
-intent: Replace dartz with fpdart, update Freezed to 3.x syntax
+refactor_goal: Replace dartz with fpdart, update Freezed to 3.x syntax
 
 # Add endpoint to existing feature
 @refactoring-advisor /refactor-feature
+feature_name: products
 feature_path: lib/src/features/products/
-intent: Add DELETE /products/:id endpoint to existing feature
+refactor_goal: Add DELETE /products/:id endpoint to existing feature
 api_contract: |
   DELETE /products/:id -> void (204)
 ```
@@ -106,6 +110,25 @@ api_contract: |
 ---
 
 ## Execution Sequence
+
+### PHASE S0 — Mobile Spec Packet (`full`)
+
+**Agent:** `@refactoring-advisor`
+**Skill:** `mobile-sdd-spec-validation`
+
+Create `SPEC_PACKET_PATH` with:
+
+1. `spec.yaml` (`schema_ref: ../docs/templates/schemas/mobile-spec.schema.yaml`,
+   `spec_level: full`, `execution_mode: propose_then_apply`)
+2. `context.json`
+3. `review.md` in Spanish
+4. `evidence/validation-report.md`
+
+The initial spec records feature name, feature path, refactor goal, constraints, risk policy,
+expected checkpoints, `agent_permissions` and success criteria. It is enriched
+by PHASE 1-3 before execution approval.
+
+---
 
 ### PHASE 1 — Analysis
 
@@ -130,11 +153,13 @@ Steps:
 4. Count existing tests and map coverage
 5. Map internal dependency graph (who imports whom)
 
-Output: Analysis section in `PIPELINE_SPEC_PATH`.
+Output: `evidence/refactoring-analysis.md`.
+Update `spec.yaml` sections `current_state`, `issues`, `test_inventory` and
+`dependency_graph`.
 
 ---
 
-### PHASE 2 — Impact Assessment
+### PHASE 2 — Impact Analysis
 
 **Agent:** `@refactoring-advisor`
 
@@ -148,7 +173,8 @@ Steps:
 4. Identify tests that will need updates vs tests that should still pass
 5. Rate overall risk: `low` | `medium` | `high`
 
-Output: Impact assessment section in `PIPELINE_SPEC_PATH`.
+Output: update `spec.yaml` sections `impact_analysis`, `risk`,
+`breaking_changes` and `affected_artifacts`.
 
 ---
 
@@ -159,7 +185,7 @@ Output: Impact assessment section in `PIPELINE_SPEC_PATH`.
 Steps:
 1. Decompose the refactoring into atomic steps
 2. Each step MUST leave the app in a compilable state
-3. Order by:
+3. Order band:
    - Dependencies (prerequisites first)
    - Risk (lowest first)
    - Type (additive → structural → destructive)
@@ -170,7 +196,20 @@ Steps:
    - Reversibility (✅ / ⚠️)
    - Verification command
 
-Output: Refactoring plan section in `PIPELINE_SPEC_PATH`.
+Output: update `spec.yaml` sections `refactoring_plan`, `execution_steps`,
+`success_criteria` and `handoffs`.
+
+The plan must also update `spec.yaml.artifact_plan.planned` with every created,
+modified, moved or deleted file. Mandatory documentation outputs must be
+included with `group: docs`, including:
+
+- `docs/refactoring/{feature_name}-refactoring-{YYYY-MM-DD}.md`
+- every project documentation file that Phase 9 may create or modify
+
+If any planned artifact has `action: delete`, the spec must explicitly set
+`agent_permissions.refactoring-advisor.can_delete_files=true` and record the
+human approval that enabled the destructive action. Without that elevation,
+delete actions remain blocked.
 
 ---
 
@@ -180,8 +219,9 @@ Output: Refactoring plan section in `PIPELINE_SPEC_PATH`.
 
 Present to the user:
 1. Analysis summary (current state + issues found)
-2. Impact assessment (files affected, breaking changes, risk)
+2. Impact analysis (files affected, breaking changes, risk)
 3. Refactoring plan (ordered steps with risk ratings)
+4. `review.md` in Spanish with criteria, checkpoints and evidence expected
 
 Question:
 "I've analyzed the feature and prepared a refactoring plan with {N} atomic steps (risk: {level}). Want me to proceed with execution?"
@@ -195,6 +235,20 @@ If the user requests changes to the plan, adjust and re-present.
 ### PHASE 5 — Execution (iterative)
 
 **Agent:** `@refactoring-advisor`
+Mandatory compact handoff per step:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: refactor_execution
+step: <step_id>
+read_sections:
+  - refactoring_plan
+  - execution_steps.<step_id>
+  - success_criteria
+  - impact_analysis
+  - risk
+```
 
 For each step in the approved plan:
 
@@ -211,12 +265,19 @@ For each step in the approved plan:
    - Expected failures (structural change) → queue for Phase 6
    - Unexpected failures (regression) → revert step, reassess plan
 6. **Log** step completion
+7. **Update context** in `SPEC_PACKET_PATH/context.json`
 
 If a step fails compilation:
 - Fix immediately (do not move to next step)
 - If fix requires plan adjustment, re-present to user
 
 Output: Execution log per step in `PIPELINE_LOG_PATH`.
+
+#### REQUIRED CHECKPOINT — After Each Architectural Step
+
+If a step changes public API, DI, route behavior, layer boundaries, package
+location or data contracts, present a compact Spanish review and wait for
+approval before continuing.
 
 > **IMPORTANT: After completing ALL refactoring steps, you are NOT done.**
 > You MUST continue to Phase 6 (tests), Phase 7 (audit), and Phase 8 (documentation).
@@ -256,7 +317,9 @@ Steps:
    - ALL success AND failure paths covered
 7. Run all tests and verify they pass
 
-Output: Test files created + coverage summary in `PIPELINE_SPEC_PATH`.
+Output: test files, `spec.yaml.success_criteria.tests` and
+`evidence/test-validation.md`.
+Persist test evidence under `SPEC_PACKET_PATH/evidence/`.
 
 ---
 
@@ -281,7 +344,8 @@ Steps:
    - Max retries: `pipeline.max_audit_retries` (default: 3)
 4. If approved: mark complete
 
-Output: `§5` audit report in `PIPELINE_SPEC_PATH`.
+Output: `evidence/audit-report.md` and a summary in the human report.
+Audit must explicitly verify modified code against `SPEC_PACKET_PATH/spec.yaml`.
 
 ---
 
@@ -322,7 +386,7 @@ Generate two outputs:
 - [ ] Verify navigation from other features still works
 ```
 
-Output: Report in `PIPELINE_SPEC_PATH`.
+Output: human report summary.
 
 #### 8b. Refactoring documentation file (mandatory — FILE CREATION action)
 
@@ -332,6 +396,10 @@ Output: Report in `PIPELINE_SPEC_PATH`.
 
 **Action:** Create a NEW file at this EXACT path:
 `{PROJECT_ROOT}/docs/refactoring/{feature_name}-refactoring-{YYYY-MM-DD}.md`
+
+This file must already be declared in `artifact_plan.planned[]` with
+`target_id=project_docs` or the configured docs target, `owner:
+refactoring-advisor` and `group: docs`.
 
 **Steps:**
 1. If `docs/refactoring/` directory does not exist → CREATE IT
@@ -346,7 +414,7 @@ Output: Documentation file created at `docs/refactoring/`.
 
 ### PHASE 9 — Project Documentation Update (mandatory)
 
-**Agent:** `@refactoring-advisor` (via `flutter-generate-documentation` skill)
+**Agent:** `@refactoring-advisor` using shared skill `documentation-projects`
 
 **Condition:** Always executes — NEVER skip.
 
@@ -355,28 +423,40 @@ Steps:
    - If `docs/` exists at `PROJECT_ROOT` → use it
    - If `documentation/` or similar exists → use the existing one
    - Otherwise → create `docs/` at `PROJECT_ROOT`
-2. Check which of the 7 project documents exist:
+2. Before invoking the shared skill, update `spec.yaml.artifact_plan.planned`
+   with every document that may be created or modified:
+   - `target_id: project_docs` or the configured docs target
+   - `path: docs/<document>.md` relative to that target
+   - `action: create | modify`
+   - `owner: refactoring-advisor`
+   - `group: docs`
+3. Check which of the 7 project documents exist:
    - `index.md`, `project-overview.md`, `requirements.md`, `project-structure.md`,
      `tech-stack.md`, `features.md`, `implementation.md`, `user-flow.md`
-3. For **missing documents** → generate from templates (`flutter-generate-documentation` skill)
-4. For **existing documents** → update with the refactoring changes:
+4. For **missing documents** → generate from templates using shared skill `documentation-projects`
+5. For **existing documents** → update with the refactoring changes:
    - `project-structure.md` → update if folder structure changed (extracted classes, new packages)
    - `features.md` → update feature entry if public API or behavior changed
    - `implementation.md` → update if new patterns, DI modules, or architectural decisions were introduced
    - `tech-stack.md` → update if dependencies were added or removed
    - `user-flow.md` → update if user journeys were affected
-5. Commit documentation changes: `docs({feature}): update project documentation after refactoring`
+6. Propose documentation commit message:
+   `docs({feature}): update project documentation after refactoring`
 
 Output: List of created/updated documents in `PIPELINE_LOG_PATH`.
 
-**Skill invocation:** `@generate-docs action=update target={docs_path} documents=all`
+**Skill invocation:** `documentation-projects action=update target={docs_path} documents=all`
+
+The shared skill internally orchestrates `doc-auditor`, `doc-interviewer`,
+`doc-generator` and `doc-validator`; the mobile workflow must not reference
+legacy generate-docs aliases.
 
 ---
 
 ## Mandatory Post-Execution Checklist
 
 > **The agent MUST complete ALL items below before reporting to the user.
-> If any item is missing, the refactoring is INCOMPLETE.**
+> If any item missing, the refactoring is INCOMPLETE.**
 
 | # | Action | Verification |
 |---|---|---|
@@ -414,12 +494,13 @@ After all phases:
 - [ ] Coverage targets met (domain 95%, data 85%, BLoC 85%, pages 70%)
 - [ ] `@code-auditor` approved
 - [ ] Documentation file EXISTS at `docs/refactoring/{feature_name}-refactoring-{date}.md`
-- [ ] Project documentation (7 documents) updated via `flutter-generate-documentation` skill
+- [ ] Project documentation (7 documents) updated via shared skill `documentation-projects`
 
 ### Prohibitions
 - NEVER skip the analysis phase — always understand before changing
 - NEVER make a change that leaves the app in a non-compilable state
 - NEVER proceed past Phase 4 without explicit user approval
+- NEVER execute a refactor step before `review.md` is approved
 - NEVER delete tests without updating them to match new structure
 - NEVER change behavior during refactoring (unless explicitly requested as part of intent)
 - NEVER refactor DS components — delegate to `@ds-orchestrator /refactor-component`
@@ -434,9 +515,14 @@ After all phases:
 - ALWAYS generate missing tests to meet coverage targets
 - ALWAYS use mocktail for mocking and bloc_test for BLoC tests
 - ALWAYS delegate to `@code-auditor` for final quality review
+- ALWAYS enforce `agent_permissions` from `spec.yaml` before file creation,
+  modification, command execution or external tool access
 - ALWAYS register each phase in `PIPELINE_LOG_PATH`
+- ALWAYS update `SPEC_PACKET_PATH/context.json` after each approved checkpoint
+- ALWAYS use compact handoffs by `spec_ref`, `context_ref`, `phase` and
+  `read_sections`
 - ALWAYS create `docs/refactoring/` directory if it doesn't exist
 - ALWAYS create the documentation .md file as the LAST action before reporting completion
 - ALWAYS verify the documentation file exists on disk after creating it
-- ALWAYS update project documentation (7 documents) in Phase 9 using `flutter-generate-documentation` skill
+- ALWAYS update project documentation (7 documents) in Phase 9 using shared skill `documentation-projects`
 - If a step causes unexpected test failures, REVERT and reassess before continuing

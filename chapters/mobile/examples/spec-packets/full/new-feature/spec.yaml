@@ -1,0 +1,149 @@
+schema_version: 1
+schema_ref: ../../../../docs/templates/schemas/mobile-spec.schema.yaml
+workflow: new-feature
+spec_level: full
+execution_mode: propose_then_apply
+status: proposed
+language:
+  review_documents: es
+inputs:
+  feature_name: payment_methods
+  description: View and manage payment methods.
+  api_contract: docs/api/payment-methods.yaml
+  user_story: As a user, I want to see my payment methods so I can choose one during checkout.
+external_access:
+  figma_mcp:
+    required: false
+    status: not_required
+    checks: []
+    evidence: ""
+agent_permissions:
+  feature-builder:
+    can_read: [read_sections, architecture_contract_refs, dependencies_contract_refs]
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets: [app, project_docs]
+      context_sections: [context.json.artifacts]
+      evidence: [evidence/]
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/domain-checkpoint.md
+      - evidence/data-checkpoint.md
+      - evidence/presentation-checkpoint.md
+  code-auditor:
+    can_read: [read_sections, artifact_plan.planned, success_criteria]
+    can_write:
+      spec_sections: [status]
+      evidence: [evidence/audit-report.md]
+    can_create_files: false
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required: [evidence/audit-report.md]
+  delivery-manager:
+    can_read: [read_sections, artifact_plan.planned, success_criteria]
+    can_write:
+      evidence: [evidence/delivery-report.md]
+    can_create_files: true
+    can_modify_files: false
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required: [evidence/delivery-report.md]
+human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+  last_decision: pending
+contracts:
+  api:
+    endpoints:
+      - method: GET
+        path: /payment-methods
+        response: List<PaymentMethod>
+  domain:
+    entities:
+      - PaymentMethod
+  dto_mappings:
+    PaymentMethodModel: PaymentMethod
+artifact_plan:
+  planned:
+    - path: lib/src/features/payment_methods/domain/domain_models/payment_method.dart
+      target_id: app
+      action: create
+      owner: feature-builder
+      group: domain
+    - path: lib/src/features/payment_methods/domain/repositories/payment_methods_repository.dart
+      target_id: app
+      action: create
+      owner: feature-builder
+      group: domain
+    - path: lib/src/features/payment_methods/data/data_models/payment_method_model.dart
+      target_id: app
+      action: create
+      owner: feature-builder
+      group: data
+    - path: lib/src/features/payment_methods/presentation/bloc/payment_methods_bloc.dart
+      target_id: app
+      action: create
+      owner: feature-builder
+      group: presentation
+    - path: docs/features/payment_methods.md
+      target_id: project_docs
+      action: create
+      owner: feature-builder
+      group: docs
+technical_plan:
+  layers:
+    domain: Generate entity, repository contract and get use case.
+    data: Generate DTO, mapper, remote data source and repository impl.
+    presentation: Generate BLoC, UI model and page.
+success_criteria:
+  - id: SC-1
+    description: Domain does not import Flutter or data.
+    evidence:
+      - evidence/domain-checkpoint.md
+  - id: SC-2
+    description: Data maps DTOs to entities and errors to Failure.
+    evidence:
+      - evidence/data-checkpoint.md
+  - id: SC-3
+    description: Presentation uses BLoC and Either.match.
+    evidence:
+      - evidence/presentation-checkpoint.md
+handoffs:
+  - phase: domain_layer
+    agent: feature-builder
+    read_sections:
+      - contracts.domain
+      - artifact_plan
+      - success_criteria
+  - phase: data_layer
+    agent: feature-builder
+    read_sections:
+      - contracts.api
+      - contracts.dto_mappings
+      - artifact_plan
+      - success_criteria
+  - phase: presentation_layer
+    agent: feature-builder
+    read_sections:
+      - technical_plan.layers.presentation
+      - artifact_plan
+      - success_criteria
+  - phase: audit
+    agent: code-auditor
+    read_sections:
+      - artifact_plan
+      - success_criteria
+      - evidence/domain-checkpoint.md
+      - evidence/data-checkpoint.md
+      - evidence/presentation-checkpoint.md
+  - phase: delivery
+    agent: delivery-manager
+    read_sections:
+      - artifact_plan
+      - success_criteria
+      - evidence/audit-report.md

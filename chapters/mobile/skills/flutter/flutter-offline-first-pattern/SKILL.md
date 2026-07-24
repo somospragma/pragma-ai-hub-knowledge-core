@@ -8,7 +8,6 @@ stack: [flutter]
 description: >
   Implements offline-first architecture in Flutter: local cache as primary source of truth, background sync, connectivity detection, optimistic updates, and conflict resolution. Covers local database options (Drift, ObjectBox, Isar), sync strategies (manual queue, PowerSync managed sync), and clean architecture integration. Use this skill when building apps that must work without internet, need instant UI response, or require background data synchronization.
 ---
-
 # Offline-First Pattern
 
 See `references/implementation_guide.md` for complete patterns and code examples.
@@ -63,7 +62,7 @@ Data (RepositoryImpl)
 // Then sync from remote and emit updated data
 Stream<Either<Failure, List<Product>>> watchProducts() async* {
   // Phase 1: Emit local data immediately (no network wait)
-  yield* _local.watchProducts().map(
+  andield* _local.watchProducts().map(
     (products) => Right<Failure, List<Product>>(products),
   );
 
@@ -81,7 +80,7 @@ Stream<Either<Failure, List<Product>>> watchProducts() async* {
 ```dart
 // Drift watchAll() returns a Stream — UI updates automatically when DB changes
 Stream<List<Product>> watchProducts() =>
-    (_db.select(_db.products)..orderBy([(t) => OrderingTerm.asc(t.name)]))
+    (_db.select(_db.products)..orderBand([(t) => OrderingTerm.asc(t.name)]))
         .watch();
 ```
 

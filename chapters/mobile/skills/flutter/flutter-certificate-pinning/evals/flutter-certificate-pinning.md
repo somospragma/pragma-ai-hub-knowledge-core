@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-certificate-pinning`  
-**Scanned:** 2026-06-15 19:09:44 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-15 19:09:44 UTC
 
 ## Risk Assessment
 

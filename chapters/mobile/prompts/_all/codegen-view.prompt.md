@@ -4,12 +4,12 @@ version: 1.0.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt para generar una vista o pantalla Flutter completa en la capa de   presentación de la app, componiendo componente
+description: >
+  Prompt for generating a complete Flutter view or screen in the app presentation layer. Use when a /new-view workflow needs a screen that composes DS organisms, view states, navigation hooks, and overflow-safe layout.
 ---
+# Flutter View/Screen Generation (Deterministic)
 
-# Generación de Vista/Pantalla Flutter (Determinista)
-
-## Skills de referencia
+## Reference Skills
 
 - flutter-ds-theming-tokens
 - flutter-ds-folder-structure
@@ -22,14 +22,31 @@ description: Prompt para generar una vista o pantalla Flutter completa en la cap
 - flutter-navigation-strategy
 - flutter-errors
 
-## INSTRUCCIÓN
+## Instruction
 
-Genera el código Flutter de una vista/pantalla que compone organismos,
-moléculas y átomos del Design System existentes.
+Generate the Flutter code for a view/screen that composes existing Design
+System organisms, molecules, and atoms.
 
-## Handoff mínimo obligatorio
+## SDD Contract
 
-Antes de implementar, validar que recibes:
+`/new-view` codegen is forbidden unless `spec_context` supplies both `spec_ref`
+and `context_ref`, the context status is `approved_for_execution`, and
+`checkpoints.initial_spec.status=approved`. The current phase must be
+`app_view_codegen` and its artifacts must be declared in `artifact_plan`.
+
+If any prerequisite is missing, return
+`blocked_input: CONFIG_SPEC_NOT_APPROVED` without creating or modifying files.
+Do not infer an implementation from the user request or Figma URL.
+
+After this gate passes, read `spec_ref` and `context_ref` as machine sources.
+Use only `read_sections`, implement the artifacts declared in `artifact_plan`,
+validate against `view_states`, `contracts`, and `success_criteria`, record
+evidence in `{SPEC_PACKET_PATH}/evidence/view-codegen-report.md`, and treat
+`PIPELINE_SPEC_PATH` as the human report.
+
+## Minimum Required Handoff
+
+Before implementation, validate that the handoff includes:
 
 1. `workflow`, `phase_id`, `mode`.
 2. `project_root`.
@@ -37,92 +54,95 @@ Antes de implementar, validar que recibes:
 4. `target` (`package_name`, `package_path`, `target_root`, `feature_root`).
 5. `execution_context` (`melos_enabled`, `melos_root`, `target_scope`).
 6. `contracts_context` (`generation_scope`, `contracts_policy`).
-7. `architecture_refs` (`contract_path`, `mermaid_path` opcional).
-8. `input_refs` y `output_paths`.
+7. `architecture_refs` (`contract_path`, optional `mermaid_path`).
+8. `input_refs` and `output_paths`.
+9. `spec_context` when the workflow uses Mobile Spec Packet.
 
-Si falta cualquiera de estos campos, devolver `blocked_input`.
+If any of these fields are missing, return `blocked_input`.
 
-## Regla de fuente de verdad (MCP)
+## Source Of Truth Rule (MCP)
 
-- Este prompt NO consulta Figma MCP.
-- Debe implementar usando únicamente `§1`, `§2`, `§3`, `§4` y contratos de
-  arquitectura/dependencias entregados por fases previas.
-- Si la spec no contiene información suficiente para implementación determinista,
-  devolver `blocked_input`.
-- Textos visibles, labels, placeholders, títulos, CTAs y mensajes deben salir
-  literalmente de `§1.1b`, `§2` o `§4.B`; no crear copy adicional.
-- `loading`, `empty`, `error` y `populated` siempre deben existir. Si Figma no
-  define alguno, usar el fallback estándar definido en `§4`/`§4.B` y registrar
-  alerta para el desarrollador.
-- Constraints incompletos de Figma no bloquean por sí solos: aplicar mitigación
-  anti-overflow conservadora y registrar alerta.
+- This prompt does NOT query Figma MCP.
+- Implement only from `spec.yaml`, `context.json`, and the architecture/dependency
+  contracts delivered by previous phases.
+- If the spec does not contain enough information for deterministic implementation,
+  return `blocked_input`.
+- Visible text, labels, placeholders, titles, CTAs, and messages must come
+  literally from `literal_texts`, `contracts.literal_texts`, or
+  `contracts.text_overflow`; do not create additional copy.
+- `loading`, `empty`, `error`, and `populated` must always exist. If Figma does
+  not define a state, use the standard fallback defined in `view_states` or
+  `contracts.text_overflow` and record an alert for the developer.
+- Incomplete Figma constraints do not block by themselves: apply conservative
+  anti-overflow mitigation and record an alert.
 
-## INPUTS FUNCIONALES
+## Functional Inputs
 
-1. Nombre de vista/pantalla.
-2. `§1` completo (incluye `§1.4b`, `§1.3b` y `§1.3c` si existen vectores/anotaciones Development).
-3. `§2`, `§3`, `§4` (incluye `§4.A` si hay contrato de vectores).
-   También debe incluir `§4.B` para textos y overflow.
-4. HU y criterios de aceptación.
-5. Estados requeridos: `loading`, `empty`, `error`, `populated`.
-6. Reglas de navegación.
-7. Contrato de arquitectura.
+1. View/screen name.
+2. `design_source`, `literal_texts`, `layout_constraints`, `assets`, and
+   `view_states`.
+3. `canonical_spec`, `inventory`, `dag`, `technical_plan`, and `contracts`.
+4. User story and acceptance criteria.
+5. Required states: `loading`, `empty`, `error`, `populated`.
+6. Navigation rules.
+7. Architecture contract.
 
-## Fuente de verdad de arquitectura
+## Architecture Source Of Truth
 
-1. Usar primero `.copilot/config/ARCHITECTURE-CONTRACT.yaml`.
-2. Usar `.copilot/config/ARCHITECTURE.md` solo como soporte visual.
-3. Si hay conflicto, prevalece el YAML.
+1. Use `.sopp/config/architecture-contract.yaml` first.
+2. Use `.sopp/config/architecture.md` only as visual support.
+3. If there is a conflict, the YAML contract prevails.
 
-## Reglas por política de generación
+## Generation Scope Rules
 
 ### `generation_scope = presentation_only`
 
-- Solo crear código de presentación.
-- Prohibido crear implementaciones de domain/data.
-- Permitido usar callbacks y modelos de entrada adaptadores de UI.
+- Only create presentation code.
+- Do not create domain/data implementations.
+- Callbacks and UI adapter input models are allowed.
 
 ### `generation_scope = full_feature`
 
-- Este prompt sigue siendo de presentación.
-- Si se necesitan domain/data, dejarlos como dependencia declarada en contratos,
-  no implementarlos aquí.
+- This prompt remains presentation-only.
+- If domain/data are needed, leave them as declared dependencies in contracts;
+  do not implement them here.
 
-## Reglas por `contracts_policy`
+## `contracts_policy` Rules
 
 ### `optional`
 
-- Continuar aunque no existan contratos de domain/data.
-- Resolver con callbacks y estados de vista.
+- Continue even if domain/data contracts do not exist.
+- Resolve behavior with callbacks and view states.
 
 ### `generate`
 
-- Exigir referencia a `§4.C` (contratos mínimos generados por arquitecto).
-- Consumir esos contratos en la vista sin crear implementación real.
-- Si `§4.C` no existe, devolver `blocked_input`.
+- Require a reference to `contracts.minimal_domain_data`, the minimal contracts
+  generated by the architect.
+- Consume those contracts in the view without creating real implementations.
+- If `contracts.minimal_domain_data` does not exist, return `blocked_input`.
 
 ### `required`
 
-- Exigir contratos domain/data existentes y referenciados en spec.
-- Si faltan referencias, devolver `blocked_input`.
+- Require existing domain/data contracts referenced in the spec.
+- If references are missing, return `blocked_input`.
 
-## Diferencias vs componente DS
+## Differences From A DS Component
 
-- La vista no es componente DS.
-- No lleva prefijo `{{DS_PREFIX}}`.
-- No se exporta en barrel DS.
-- Vive en `structure.views_path` (default `lib/src/presentation/views`).
-- Widgets privados de vista en `structure.view_widgets_path` (default
+- The view is not a DS component.
+- It does not use the `{{DS_PREFIX}}` prefix.
+- It is not exported in the DS barrel.
+- It lives in `targets.registry[app].structure.views_path` (default `lib/src/presentation/views`).
+- Private view widgets live in `targets.registry[app].structure.view_widgets_path` (default
   `lib/src/presentation/widgets`).
 
-## Estructura esperada
+## Expected Structure
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:{{package_name}}/{{package_name}}.dart';
 
-class [NombreView] extends StatelessWidget {
-  const [NombreView]({super.key});
+class [NameView] extends StatelessWidget {
+  const [NameView]({super.key});
 
   static const routeName = '/[route-name]';
 
@@ -145,61 +165,62 @@ class [NombreView] extends StatelessWidget {
 }
 ```
 
-## Estados obligatorios
+## Required States
 
-- `loading`: skeletons de organismos DS.
-- `empty`: diseño/copy Figma si existe; si no, fallback estándar alertado.
-- `error`: diseño/copy Figma si existe; si no, fallback estándar alertado.
-- `populated`: composición final.
-- Estados especiales derivados de anotaciones `Development` (si aplican).
+- `loading`: DS organism skeletons.
+- `empty`: Figma design/copy if it exists; otherwise a flagged standard fallback.
+- `error`: Figma design/copy if it exists; otherwise a flagged standard fallback.
+- `populated`: final composition.
+- Special states derived from `Development` annotations, if applicable.
 
-## Reglas de implementación
+## Implementation Rules
 
-1. Reutilizar componentes DS existentes; no duplicar widgets.
-2. Seguir patrón de estado/navegación/DI del contrato.
-3. Sin lógica de negocio en la vista.
-4. Si la vista >300 líneas, fragmentar en widgets privados.
-5. No escribir fuera de `target.target_root`.
-6. Implementar reglas/alertas/comportamientos especiales definidos en `§1.3b`.
-7. Prohibidos comentarios inline/bloque/Dartdoc por defecto; solo permitir
-   comentario fundamental no deducible del código.
-8. Preservar los textos literales del contrato; no traducir, corregir ni
-   reemplazar copy con valores "más realistas".
-9. No agregar UI o UX adicional que no venga de Figma/metadatos/anotaciones.
+1. Reuse existing DS components; do not duplicate widgets.
+2. Follow the state/navigation/DI pattern from the contract.
+3. Do not place business logic in the view.
+4. If the view exceeds 300 lines, split it into private widgets.
+5. Do not write outside `target.target_root`.
+6. Implement special rules, alerts, and behaviors from `design_source.annotations`.
+7. Inline, block, and Dartdoc comments are prohibited by default; only allow a
+   fundamental comment when the code cannot make the reason clear.
+8. Preserve literal text from the contract; do not translate, fix, or replace
+   copy with values that seem more realistic.
+9. Do not add UI or UX that does not come from Figma, metadata, or annotations.
 
-## Reglas anti-overflow en vista
+## Anti-Overflow Rules For Views
 
-1. Aplicar `SafeArea` en la pantalla completa salvo contraindicación en Figma.
-2. Elegir el patrón de scroll definido en `§4.V`; si no está completo, usar una
-   opción conservadora que evite overflow vertical y registrar alerta.
-3. En filas con texto + iconos/botones/badges, envolver el texto con
-   `Flexible`/`Expanded` según composición.
-4. Usar `Wrap` para chips, acciones secundarias o grupos horizontales que puedan
-   saltar línea sin romper el diseño.
-5. No usar `maxLines`/`ellipsis` salvo que Figma o `§4.B` indiquen truncamiento.
-6. No introducir anchos fijos para "hacer calzar" el diseño; usar constraints
-   flexibles y tokens.
+1. Apply `SafeArea` to the full screen unless Figma explicitly contraindicates it.
+2. Choose the scroll pattern defined in `technical_plan.view`; if it is incomplete,
+   use a conservative option that avoids vertical overflow and record an alert.
+3. In rows with text plus icons/buttons/badges, wrap text with `Flexible` or
+   `Expanded` according to the composition.
+4. Use `Wrap` for chips, secondary actions, or horizontal groups that can wrap
+   without breaking the design.
+5. Do not use `maxLines`/`ellipsis` unless Figma or `contracts.text_overflow`
+   indicates truncation.
+6. Do not introduce fixed widths to make the design fit; use flexible constraints
+   and tokens.
 
-## Reglas de vectores en vista (cuando aplique)
+## Vector Rules For Views
 
-1. Consumir `§1.3c` + `§4.A` como fuente de verdad para vectores.
-2. Respetar estrategia por elemento:
-   - `DS_ICON` -> ícono/componente DS
-   - `SVG_ASSET` -> renderer vectorial + constante de recurso
-   - `PNG_ASSET` -> fallback raster definido en contrato
-3. No hardcodear rutas de asset en la vista.
-4. Mantener tamaño/color/semántica según contrato.
-5. Si falta contrato para un vector crítico, devolver `blocked_input`.
+1. Consume `assets` and `contracts.technical_vectors` as the source of truth.
+2. Respect the strategy per element:
+   - `DS_ICON` -> DS icon/component.
+   - `SVG_ASSET` -> vector renderer plus resource constant.
+   - `PNG_ASSET` -> raster fallback defined in the contract.
+3. Do not hardcode asset paths in the view.
+4. Keep size, color, and semantics according to the contract.
+5. If the contract is missing for a critical vector, return `blocked_input`.
 
-## Checklist pre-entrega
+## Pre-Delivery Checklist
 
-- [ ] Scaffold y estructura de pantalla correctas.
-- [ ] Estados `loading/empty/error/populated` implementados.
-- [ ] Fallbacks de estado sin Figma están alertados.
-- [ ] Navegación crítica implementada.
-- [ ] Sin prefijo DS.
-- [ ] Criterios HU cubiertos.
-- [ ] Reglas de contratos/política respetadas.
-- [ ] Vectores críticos implementados según `§1.3c`/`§4.A`.
-- [ ] Textos visibles coinciden literalmente con `§1.1b`/`§4.B`.
-- [ ] Riesgos de overflow de `§1.1c`/`§4.B` mitigados o alertados.
+- [ ] Scaffold and screen structure are correct.
+- [ ] States `loading/empty/error/populated` are implemented.
+- [ ] State fallbacks missing from Figma are flagged.
+- [ ] Critical navigation is implemented.
+- [ ] No DS prefix is used.
+- [ ] User-story criteria are covered.
+- [ ] Contract and policy rules are respected.
+- [ ] Critical vectors are implemented according to `assets`/`contracts.technical_vectors`.
+- [ ] Visible text matches Figma literally through `literal_texts`/`contracts.text_overflow`.
+- [ ] Overflow risks from `layout_constraints`/`contracts.text_overflow` are mitigated or flagged.

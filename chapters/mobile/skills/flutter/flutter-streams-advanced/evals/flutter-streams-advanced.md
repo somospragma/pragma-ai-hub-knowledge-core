@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-streams-advanced  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-streams-advanced`  
-**Scanned:** 2026-06-16 15:26:25 UTC  
+**Skill:** flutter-streams-advanced
+**Source:** `../`
+**Scanned:** 2026-06-16 15:26:25 UTC
 
 ## Risk Assessment
 

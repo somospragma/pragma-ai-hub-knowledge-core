@@ -12,7 +12,6 @@ description: >
   writing tests that need theme setup, or auditing hardcoded values.
   Covers colors, spacing, radius, elevation, typography, and icon sizes.
 ---
-
 # Theming Tokens
 
 ## Rule: Zero Hardcode

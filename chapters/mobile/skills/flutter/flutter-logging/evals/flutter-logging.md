@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-logging`  
-**Scanned:** 2026-06-03 17:43:23 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:23 UTC
 
 ## Risk Assessment
 
@@ -22,7 +22,7 @@
 | `references/console_handler.md` | markdown | 41 | No |
 | `references/core_models.md` | markdown | 125 | No |
 | `references/crashlytics_handler.md` | markdown | 113 | No |
-| `references/crear_handler.md` | markdown | 67 | No |
+| `references/create_handler.md` | markdown | 67 | No |
 | `references/datadog_handler.md` | markdown | 301 | No |
 | `references/grafana_handler.md` | markdown | 240 | No |
 | `references/integration.md` | markdown | 238 | No |
@@ -32,8 +32,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/crashlytics_handler.md:19`  
-**Confidence:** 75%  
+**Location:** `references/crashlytics_handler.md:19`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 

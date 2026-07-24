@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-caching-strategy  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-caching-strategy`  
-**Scanned:** 2026-06-15 19:07:59 UTC  
+**Skill:** flutter-caching-strategy
+**Source:** `../`
+**Scanned:** 2026-06-15 19:07:59 UTC
 
 ## Risk Assessment
 

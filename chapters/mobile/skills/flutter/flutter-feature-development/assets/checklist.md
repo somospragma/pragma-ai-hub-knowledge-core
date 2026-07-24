@@ -215,9 +215,9 @@ Use this checklist when developing a new feature to ensure all requirements are 
 
 ---
 
-**Feature Name:** ________________________  
-**Date Started:** ________________________  
-**Date Completed:** ________________________  
-**Reviewer:** ________________________  
+**Feature Name:** ________________________
+**Date Started:** ________________________
+**Date Completed:** ________________________
+**Reviewer:** ________________________
 **Notes:**
 

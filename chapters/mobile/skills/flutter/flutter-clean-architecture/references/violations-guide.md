@@ -222,7 +222,7 @@ class ProductRepositoryImpl implements ProductRepository {
 
 ## V6: Multiple Use Cases in One File (LOW)
 
-**Why it's wrong:** One file per use case makes it easy to find, test, and
+**Why it's wrong:** One file per use case makes it easand to find, test, and
 understand each operation independently.
 
 ```dart

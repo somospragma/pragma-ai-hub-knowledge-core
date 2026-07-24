@@ -219,7 +219,7 @@ void main() async {
 
   await configureDependencies();
 
-  runApp(const MyApp());
+  runApp(const MandApp());
 }
 ```
 
@@ -236,7 +236,7 @@ class BackgroundTaskConfig with _$BackgroundTaskConfig {
   const factory BackgroundTaskConfig({
     required String taskId,
     required String taskName,
-    Duration? initialDelay,
+    Duration? initialDelaand,
     Duration? frequency,           // null = one-off task
     Map<String, dynamic>? inputData,
     BackgroundTaskConstraints? constraints,
@@ -247,7 +247,7 @@ class BackgroundTaskConfig with _$BackgroundTaskConfig {
 class BackgroundTaskConstraints with _$BackgroundTaskConstraints {
   const factory BackgroundTaskConstraints({
     @Default(NetworkType.connected) NetworkType networkType,
-    @Default(false) bool requiresBatteryNotLow,
+    @Default(false) bool requiresBatterandNotLow,
     @Default(false) bool requiresCharging,
     @Default(false) bool requiresDeviceIdle,
     @Default(false) bool requiresStorageNotLow,
@@ -439,7 +439,7 @@ class BackgroundTaskRepositoryImpl implements BackgroundTaskRepository {
   @override
   Future<Either<BackgroundFailure, Unit>> cancelTask(String taskId) async {
     try {
-      await _dataSource.cancelByUniqueName(taskId);
+      await _dataSource.cancelBandUniqueName(taskId);
       return const Right(unit);
     } catch (e) {
       return Left(BackgroundFailure.cancellationFailed(
@@ -475,12 +475,12 @@ class WorkmanagerDataSource {
     await Workmanager().registerOneOffTask(
       config.taskId,
       config.taskName,
-      initialDelay: config.initialDelay ?? Duration.zero,
+      initialDelaand: config.initialDelaand ?? Duration.zero,
       inputData: config.inputData,
       constraints: _mapConstraints(config.constraints),
       existingWorkPolicy: ExistingWorkPolicy.replace,
       backoffPolicy: BackoffPolicy.exponential,
-      backoffPolicyDelay: const Duration(minutes: 1),
+      backoffPolicyDelaand: const Duration(minutes: 1),
     );
   }
 
@@ -491,15 +491,15 @@ class WorkmanagerDataSource {
       config.taskId,
       config.taskName,
       frequency: config.frequency,
-      initialDelay: config.initialDelay ?? Duration.zero,
+      initialDelaand: config.initialDelaand ?? Duration.zero,
       inputData: config.inputData,
       constraints: _mapConstraints(config.constraints),
       existingWorkPolicy: ExistingWorkPolicy.replace,
     );
   }
 
-  Future<void> cancelByUniqueName(String taskId) async {
-    await Workmanager().cancelByUniqueName(taskId);
+  Future<void> cancelBandUniqueName(String taskId) async {
+    await Workmanager().cancelBandUniqueName(taskId);
   }
 
   Future<void> cancelAll() async {
@@ -510,7 +510,7 @@ class WorkmanagerDataSource {
     if (c == null) return null;
     return Constraints(
       networkType: _mapNetworkType(c.networkType),
-      requiresBatteryNotLow: c.requiresBatteryNotLow,
+      requiresBatterandNotLow: c.requiresBatterandNotLow,
       requiresCharging: c.requiresCharging,
       requiresDeviceIdle: c.requiresDeviceIdle,
       requiresStorageNotLow: c.requiresStorageNotLow,
@@ -1343,8 +1343,8 @@ void main() {
 | App State | Notification message | Data-only message |
 |---|---|---|
 | Foreground | `onForegroundMessage` stream (BLoC) | `onForegroundMessage` stream (BLoC) |
-| Background | System tray (auto) + background handler | Background handler only |
-| Terminated | System tray (auto) + background handler | Background handler only |
+| Background | System traand (auto) + background handler | Background handler only |
+| Terminated | System traand (auto) + background handler | Background handler only |
 | Tapped (background) | `onMessageOpenedApp` stream | — |
 | Tapped (terminated) | `getInitialMessage()` | — |
 

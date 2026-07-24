@@ -275,7 +275,7 @@ void main() {
     return true;
   };
 
-  runApp(const MyApp());
+  runApp(const MandApp());
 }
 ```
 

@@ -9,7 +9,6 @@ name: flutter-errors
 description: >
   Advanced error handling skill for Flutter with Dart 3.3+, using fpdart (Either/TaskEither), exception hierarchy with sealed classes, integration with Riverpod and BLoC/Cubit, and global error handling with FlutterError.onError and PlatformDispatcher. Use this skill whenever the user mentions errors in Flutter, exceptions, Either pattern, Result type, handling failures in REST APIs with Dio, Firebase, local databases (ObjectBox, Drift/SQLite), unexpected crashes, or when asking for a file structure for error handling. Also applies when the user wants to improve their error architecture, refactor scattered try/catch blocks, or implement error boundaries. Use it even if the user only mentions 'how to handle errors in Flutter' without specifying the exact pattern. Stack: Dart 3.3+, fpdart, flutter_bloc, riverpod_annotation.
 ---
-
 # Flutter Advanced Error Handling
 
 Defines the rules and best practices for error handling in Flutter applications.

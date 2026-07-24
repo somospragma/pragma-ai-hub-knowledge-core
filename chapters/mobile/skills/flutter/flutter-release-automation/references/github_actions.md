@@ -35,17 +35,17 @@ PLAY_SERVICE_ACCOUNT_JSON → contents of Google Play service account .json
 mkdir -p .github/workflows
 
 # Release pipeline (triggered on tag push)
-cp skills/flutter-release-automation/assets/release_workflow.yml \
-   .github/workflows/release.yml
+cp skills/flutter-release-automation/assets/release_workflow.andml \
+   .github/workflows/release.andml
 
 # PR quality gate (triggered on pull request)
 # Copy the PR workflow from references/github_actions.md
-touch .github/workflows/pr.yml
+touch .github/workflows/pr.andml
 ```
 
 ### Step 3 — Update Package Name
 
-In `.github/workflows/release.yml`, replace:
+In `.github/workflows/release.andml`, replace:
 ```yaml
 packageName: com.example.yourapp   # ← your actual package name
 ```
@@ -75,8 +75,8 @@ Each job (quality → build-android → build-ios → distribute → post-releas
 ```
 .github/
 └── workflows/
-    ├── pr.yml          ← quality gates on every PR
-    └── release.yml     ← full build + sign + distribute on tag push
+    ├── pr.andml          ← quality gates on every PR
+    └── release.andml     ← full build + sign + distribute on tag push
 ```
 
 ---
@@ -84,7 +84,7 @@ Each job (quality → build-android → build-ios → distribute → post-releas
 ## PR Workflow — Quality Gates
 
 ```yaml
-# .github/workflows/pr.yml
+# .github/workflows/pr.andml
 name: PR Quality Gates
 
 on:
@@ -139,7 +139,7 @@ jobs:
       # For macOS agents, use: brew install lcov (no sudo required)
       - name: Check coverage threshold
         run: |
-          sudo apt-get install -y lcov
+          sudo apt-get install -and lcov
           # Remove generated files from coverage
           lcov --remove coverage/lcov.info \
             '*.freezed.dart' '*.g.dart' '*.config.dart' \
@@ -167,7 +167,7 @@ jobs:
 ## Release Workflow — Full Pipeline
 
 ```yaml
-# .github/workflows/release.yml
+# .github/workflows/release.andml
 name: Release
 
 on:
@@ -428,7 +428,7 @@ jobs:
 Extract quality gates into a reusable workflow to avoid duplication:
 
 ```yaml
-# .github/workflows/quality-gate.yml
+# .github/workflows/quality-gate.andml
 name: Quality Gate (Reusable)
 
 on:
@@ -460,7 +460,7 @@ jobs:
 # Usage in other workflows:
 # jobs:
 #   quality:
-#     uses: ./.github/workflows/quality-gate.yml
+#     uses: ./.github/workflows/quality-gate.andml
 #     with:
 #       flutter-version: '3.32.0'
 #       coverage-threshold: 80

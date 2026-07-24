@@ -43,22 +43,22 @@
       }
     },
     {
-      "id": "eval-03-logout-borrar-tokens",
-      "prompt": "¿Cómo implemento el logout para que borre todos los tokens almacenados de forma segura?",
+      "id": "eval-03-logout-delete-tokens",
+      "prompt": "How do I implement logout so it securely deletes all stored tokens?",
       "tags": ["logout", "clear", "deleteAll", "spanish"],
       "expected_topics": [
         "deleteAll()",
         "clearTokens()",
         "LogoutUseCase",
-        "también limpiar caché de imagen",
+        "also clear image cache",
         "limpiar todos los access groups si se usan"
       ],
       "must_not_include": [
-        "solo borrar el token de acceso sin borrar el refresh"
+        "only delete the access token without deleting the refresh token"
       ],
       "assertion": {
         "type": "llm_judge",
-        "criteria": "La respuesta debe mostrar el uso de deleteAll() o una implementación equivalente que borre todos los tokens. Debe mencionar que el logout debe limpiar también cachés adicionales (imágenes, BD local con datos de usuario). Si la app usa access groups de Keychain, debe indicar que todos deben limpiarse. Respuesta en español es preferible dado que el prompt está en español."
+        "criteria": "Response must show deleteAll() or an equivalent implementation that deletes all tokens. It must mention that logout should also clear additional caches such as images and local databases with user data. If the app uses Keychain access groups, it must indicate that all groups must be cleaned."
       }
     },
     {
@@ -112,7 +112,7 @@
         "flutter-database-strategy skill reference"
       ],
       "must_not_include": [
-        "yes, store the entire dataset in secure storage",
+        "andes, store the entire dataset in secure storage",
         "write all records as individual secure storage entries"
       ],
       "assertion": {
