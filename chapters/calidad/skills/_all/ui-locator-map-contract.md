@@ -1,6 +1,6 @@
 ---
 id: calidad-ui-locator-map-contract
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -21,7 +21,7 @@ Cuando las pruebas de front (Playwright) o mobile (Appium) se construyen **antes
 
 ## El contrato
 
-Un archivo `locator-map.json` versionado en el proyecto de tests (y referenciado desde el repo del frontend/app), acordado en sesión conjunta QA + dev + diseño a partir del Figma:
+Un archivo `locator-map.json` versionado en el proyecto de tests (y referenciado desde el repo del frontend/app), acordado en sesión conjunta QA + dev + diseño a partir del Figma (consumido vía `[[calidad-figma-mcp-integration]]` — los nombres de capas/componentes del diseño son la semilla de los identificadores):
 
 ```json
 {
@@ -63,6 +63,14 @@ Antes de correr la suite contra la app real por primera vez (paso 4 del checklis
 1. **Web**: navegar las rutas del mapa y verificar que cada `web` id existe en el DOM (`page.getByTestId(id).count() > 0`). Emitir reporte `.evidence/locator-map-drift-{ISO}.json` con `expected / found / missing`.
 2. **Mobile**: volcar la jerarquía (Appium `getPageSource` o `[[calidad-appium-apk-auto-discovery]]`) y diffear contra los `mobile` ids del mapa.
 3. **Drift detectado** → el fallo se reporta como **incumplimiento de contrato de identificadores** al equipo de desarrollo (con la lista exacta de faltantes), NO como N tests rojos a auto-corregir. La auto-corrección de selectores (`[[calidad-test-self-healing]]`) aplica después de que el drift de contrato esté resuelto o formalmente aceptado (y entonces el mapa se actualiza primero).
+
+## Enforcement ante ausencia del mapa
+
+Preguntar por el mapa **no es un trámite**: la respuesta cambia el flujo. Si `execution_target != real` y el mapa no existe:
+
+1. **Default: DETENER.** No se generan page objects, tasks ni tests de UI. Blocker `locator_map_missing`, status `partial`. Se ofrece al usuario la plantilla del mapa y la sesión de acuerdo con desarrollo como siguiente paso.
+2. **Override explícito (única excepción):** si el usuario, informado del riesgo, decide continuar sin mapa, debe confirmarlo con frase explícita. El flujo continúa con selectores inferidos y registra en el delivery gate `locator_map: waived` + el riesgo aceptado ("suite puede fallar íntegramente por drift de identificadores al llegar el desarrollo") en `blockers` o `next_steps`. El mensaje de cierre lo repite.
+3. **PROHIBIDO el camino intermedio observado en pruebas**: preguntar, no recibir mapa, y continuar en silencio generando reporte completo como si nada faltara. Eso invalida la entrega.
 
 ## Restricciones
 

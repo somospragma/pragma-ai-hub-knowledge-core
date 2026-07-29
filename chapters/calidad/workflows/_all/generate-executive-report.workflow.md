@@ -1,6 +1,6 @@
 ---
 id: calidad-generate-executive-report
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: workflow
 chapter: calidad
@@ -58,6 +58,7 @@ Mostrar al usuario:
 - Resumen del estado global (verde / amarillo / rojo) con una frase de justificación.
 - Conteo de hallazgos por clasificación (`SUT_BUG`, `THRESHOLD_TOO_STRICT`, `ENVIRONMENT_BLOCKED`, `TEST_DESIGN_ISSUE`, `DATA_ISSUE`, `UNKNOWN`).
 - Recordatorio de registrar el path en `delivery_gate.evidence_persisted.executive_report`.
+- **Si `execution_target: mock | hybrid`**: el reporte DEBE llevar un banner visible en la portada/encabezado — *"Ejecutado contra mock ({tool}): valida la construcción de la suite, no certifica el SUT. Certificación pendiente de integraciones reales."* — y el mensaje al usuario lo repite. Sin este banner el reporte puede leerse como certificación, que es exactamente lo que la regla maestra de `[[calidad-sut-readiness-gate]]` prohíbe.
 
 ## Criterios de finalización (DoD)
 
@@ -67,6 +68,7 @@ Mostrar al usuario:
 - [ ] Sección "Recomendaciones por rol" presente con al menos una acción por rol con hallazgos asociados, o nota "sin acciones para <rol>".
 - [ ] Path del reporte registrado en `delivery_gate.evidence_persisted.executive_report`.
 - [ ] Si `modo` es `scaffold-only` o `dry-run`, este workflow se omite y `delivery_gate.evidence_persisted.executive_report = null` con `blocker: "execution_skipped"`.
+- [ ] Si `execution_target: mock | hybrid`: banner de "no certifica el SUT" presente en el reporte y repetido en el mensaje de cierre.
 
 ## Cross-links
 

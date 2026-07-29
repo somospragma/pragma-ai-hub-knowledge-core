@@ -1,6 +1,6 @@
 ---
 id: calidad-post-generation-execution-prompt
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -34,10 +34,12 @@ El agente puede acompañar el prompt con una sugerencia explícita según el sta
 
 | Stack       | Default sugerido | Razonamiento                                                                 |
 |-------------|------------------|------------------------------------------------------------------------------|
-| Karate      | (a)              | Suite full es barata (HTTP, sin bootstrap pesado). Vale la cobertura completa. |
-| Playwright  | (a) si la URL del SUT es accesible; (c) si scaffold-only o sin BASE_URL | El costo de levantar browser es razonable cuando hay app viva. Sin URL, no tiene sentido ejecutar. |
-| K6          | (b) o (c)        | La suite completa (Carga + Estrés) puede tardar minutos y consumir recursos del SUT. El smoke 1:1 suele ser suficiente como gate inicial; el resto se ejecuta a demanda. |
+| Karate      | (a)              | Suite full es barata (HTTP, sin bootstrap pesado). Vale la cobertura completa. Aplica igual con `execution_target: mock` (el mock levantado es la URL accesible). |
+| Playwright  | (a) si la URL del SUT es accesible (incluye front local contra mock); (c) solo si no hay front alguno donde ejecutar | El costo de levantar browser es razonable cuando hay app viva o front local contra mock. Sin front, no tiene sentido ejecutar. |
+| K6          | (b) o (c); con `execution_target: mock` siempre (b) | La suite completa (Carga + Estrés) puede tardar minutos y consumir recursos del SUT. Contra mock, SOLO smoke 1:1 (métricas de carga contra mock son inválidas). |
 | Appium      | (a)              | El smoke valida que el emulador/dispositivo y Appium server estén OK; la suite completa es corta y crítica para validar locators. |
+
+**Regla con mock** (`[[calidad-sut-readiness-gate]]`): la ausencia de ambiente real NO empuja el default a (c). Si el gate resolvió `execution_target: mock` y el mock está levantado, la sugerencia default es (a) — o (b) en K6 — contra el mock. Sugerir (c) de entrada y luego redirigir a mocks es el anti-patrón detectado en pruebas.
 
 ## Reglas duras
 

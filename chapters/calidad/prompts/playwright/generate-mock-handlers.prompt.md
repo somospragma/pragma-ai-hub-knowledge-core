@@ -1,6 +1,6 @@
 ---
 id: calidad-playwright-generate-mock-handlers-prompt
-version: 2.0.0
+version: 2.1.0
 scope: stack
 type: prompt
 chapter: calidad
@@ -43,6 +43,8 @@ Genera UN solo archivo `mocks/api-handlers.ts` siguiendo estrictamente [[calidad
 ## Recordatorio sobre el riesgo de mockear
 
 Los tests `@mocked` validan que el frontend habla con el contrato del mock, no con el backend real. Pueden pasar verde aunque la API esté caída. La estrategia recomendada es: smoke suite siempre `@live`; mocks solo para aislamiento UI puntual, contract regression del mock o desarrollo offline. Ver [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md`).
+
+**Propósito de estos mocks**: habilitar la interacción y navegación del front que depende del backend — NO probar los servicios. Los tests que consuman estos handlers asertan UI (navegación, estados visibles, mensajes); NUNCA generes tests que validen status code, schema o campos del response mockeado como si fueran pruebas de contrato — eso pertenece a Karate.
 
 ## Snippet de salida esperado
 

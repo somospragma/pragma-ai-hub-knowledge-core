@@ -1,6 +1,6 @@
 ---
 id: calidad-sut-readiness-gate
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -10,8 +10,8 @@ enforcement: mandatory
 verification:
   - check: "execution_target (real/mock/hybrid), data_strategy (real/synthetic) y, para front/mobile, locator_map resueltos explícitamente con el usuario antes de validar spec o generar código"
     failure_message: "Bloqueado: no se resolvió la disponibilidad del SUT, de los datos de prueba y del mapeo de locators. Sin este gate no se puede garantizar que los tests sean ejecutables ni deterministas."
-  - check: "si execution_target es mock o hybrid, los inputs que la matriz por stack marca como obligatorios están presentes (spec con response schemas para API, locator map + fuente UI para front/mobile)"
-    failure_message: "Bloqueado: el modo pre-desarrollo exige insumos adicionales que no fueron entregados. Consultar la matriz de obligatoriedad por stack."
+  - check: "si execution_target es mock o hybrid, los inputs que la matriz por stack marca como obligatorios están presentes (spec con response schemas para API, locator map + fuente UI para front/mobile); ante locator_map ausente NO se generó código de UI salvo override explícito registrado como waived"
+    failure_message: "Bloqueado: el modo pre-desarrollo exige insumos adicionales que no fueron entregados. Sin locator map no se generan page objects salvo waiver explícito del usuario. Consultar la matriz de obligatoriedad por stack."
   - check: "si execution_target es mock o hybrid, el delivery gate declara certification: pending_real_integration"
     failure_message: "Bloqueado: resultados contra mock no pueden presentarse como certificación del SUT."
 ---
@@ -41,9 +41,10 @@ Preguntar explícitamente al usuario; nunca asumir:
 2. **¿Existen datos de prueba en ese ambiente (o un catálogo de datasets del cliente)?**
    - `sí` → `data_strategy: real` (respetando anonimización, ver `[[calidad-test-data-management]]`)
    - `no` → `data_strategy: synthetic` — datos generados con Faker + seed fijo; si hay mock de servicios, los mismos datos alimentan sus data buckets para coherencia end-to-end.
+   - **Precedencia de fuentes de datos** (esta pregunta se hace PRIMERO, no al final): (1) data real/catálogo del cliente, (2) `examples` del spec y valores de la firma, (3) sintética Faker + seed determinista. **NUNCA inventar datos ad-hoc "con criterio del agente"**: un dato sin seed no es reproducible y rompe el determinismo de la suite.
 3. **(Solo Playwright/Appium) ¿Existe un mapeo acordado de identificadores/localizadores de los elementos UI?**
    - `sí` → `locator_map: provided` — los selectores del proyecto salen del mapa, no se inventan.
-   - `no` → `locator_map: missing` — si `execution_target != real`, es un insumo obligatorio: sin él los tests fallarán cuando llegue el desarrollo por drift de identificadores. Ver `[[calidad-ui-locator-map-contract]]`.
+   - `no` → `locator_map: missing` — si `execution_target != real`, es un insumo obligatorio: sin él los tests fallarán cuando llegue el desarrollo por drift de identificadores. **La pregunta no es decorativa: sin mapa NO se generan page objects ni se declara la corrida completa** — el flujo se detiene con blocker `locator_map_missing`. El usuario puede optar por continuar sin mapa SOLO con confirmación explícita, que se registra como `locator_map: waived` (riesgo aceptado) en el delivery gate. Ver `[[calidad-ui-locator-map-contract]]`.
 
 Las tres respuestas se registran en el `STRATEGY.md` (`[[calidad-pre-design-strategy-document]]`, sección "Execution target y plan de switchover") y en el bloque final `[[calidad-delivery-gate-contract]]`.
 
@@ -55,14 +56,14 @@ Cuando `execution_target` es `mock` o `hybrid`, estos insumos **pasan de opciona
 |---|---|---|---|
 | Karate | Sí — mock Mockoon como SUT | `spec` OpenAPI/Swagger/WSDL con **response schemas completos y examples** (sin schemas de respuesta el mock no es fiel → STOP) | Suite completa + smoke gate |
 | K6 | Sí, **solo para validar construcción** | `spec` con response schemas + RNF/SLAs para thresholds | Solo smoke 1:1. Métricas de `load/stress/spike/soak` contra mock son inválidas — ver restricción abajo |
-| Playwright | Sí, si existe build del frontend (backend mockeado). Sin frontend: solo construcción con ejecución diferida | Fuente UI (Figma u otra de `ui-source-priority`) + **locator map** (`[[calidad-ui-locator-map-contract]]`); sin ambos → STOP | Con frontend: suite `@mocked`/`@hybrid` + smoke. Sin frontend: ninguna (scaffold + locator map, ejecución diferida) |
+| Playwright | Sí — depende del camino front/back (ver `references/execution-modes-live-mocked-hybrid.md` de [[calidad-playwright-greenfield]]): con front (desplegado o levantable desde su repo local) el back se mockea; sin front ni back, camino oficial = construcción completa con ejecución diferida | Fuente UI (Figma u otra de `ui-source-priority`) + **locator map** (`[[calidad-ui-locator-map-contract]]`); sin ambos → STOP (continuar solo con override explícito `locator_map: waived`) | Con front: suite `@mocked`/`@hybrid` + smoke. Sin front: ninguna por el camino oficial; existe la opción opt-in de prototipo de front (solo a elección explícita del usuario, ver la reference de caminos) |
 | Appium | Parcial — sin APK no hay runtime: scaffold + deferred locators | **Locator map** con accessibility ids acordados desde diseño (alimenta los placeholders de `deferred-locators-strategy`); `user_story`/`test_cases` | Backend mock solo si el APK existe y permite override de base URL. Sin APK: health-check estático, ejecución vía `[[calidad-complete-deferred-locators]]` |
 
 En **brownfield** (cualquier stack), el gate aplica solo a los tests nuevos de la corrida: los mocks jamás justifican modificar tests preexistentes ni la infraestructura existente (regla anti-cheating maestra del chapter).
 
 ## Qué activa cada resultado
 
-- `execution_target: mock` → generar/levantar el mock con `[[calidad-service-virtualization-mockoon]]` antes del smoke gate; los tests apuntan al mock **solo vía configuración** (env/profile). Prompt de generación: `[[calidad-generate-mockoon-environment-prompt]]`.
+- `execution_target: mock` → generar/levantar el mock con `[[calidad-service-virtualization-mockoon]]` antes del smoke gate; los tests apuntan al mock **solo vía configuración** (env/profile). Prompt de generación: `[[calidad-generate-mockoon-environment-prompt]]`. **El mock levantado cuenta como SUT alcanzable: el modo de operación default sigue siendo `full` (contra mock)** — NO degradar a `scaffold-only` por "falta de ambiente real"; `scaffold-only` queda solo para cuando ni el mock es viable (spec sin response schemas, Playwright sin front alguno, Appium sin APK).
 - `execution_target: hybrid` → mock en proxy mode: rutas no listas se mockean, el resto pasa al backend real (partial mocking). Documentar qué rutas están mockeadas en el STRATEGY.md.
 - `data_strategy: synthetic` → Faker con locale de la jurisdicción y `FAKER_SEED` fijo (`[[calidad-test-data-management]]`, `references/synthetic-data-faker.md`); el mismo seed alimenta los data buckets del mock (`--faker-seed` de Mockoon) para que test y mock generen datos coherentes.
 - `locator_map: provided` → Playwright genera selectores `getByTestId` desde el mapa; Appium genera `Target` desde los accessibility ids del mapa. Al llegar el desarrollo, validar drift mapa vs DOM real **antes** de correr la suite (`[[calidad-ui-locator-map-contract]]`).

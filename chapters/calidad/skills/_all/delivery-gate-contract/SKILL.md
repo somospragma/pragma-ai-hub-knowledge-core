@@ -1,6 +1,6 @@
 ---
 id: calidad-delivery-gate-contract
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -111,6 +111,7 @@ delivery_gate:
 - `transversal_capabilities` debe estar presente: si no aplica ninguna capa, declarar `detected: []` y justificar en `omitted`. Una capa con `confirmed_by_user: false` no debe haberse tejido en la suite.
 - Si `execution_target: mock | hybrid` → `certification: pending_real_integration` es obligatorio, `mock_evidence` completo, y `next_steps` DEBE incluir la re-ejecución contra integraciones reales (switchover). `certification: certified` con `execution_target != real` es contradicción → entrega inválida.
 - Resultados contra mock JAMÁS se presentan como certificación de integración, performance o seguridad del SUT (regla maestra de `[[calidad-sut-readiness-gate]]`).
+- **Advertencia de cierre obligatoria**: si `execution_target: mock | hybrid`, el mensaje final al usuario (el que sigue al bloque YAML) DEBE repetir en su primera línea: *"Resultados obtenidos contra mock: validan la construcción de la suite, NO certifican el SUT. Certificación pendiente de re-ejecución contra integraciones reales (ver plan de switchover)."* Decirlo solo al inicio del flujo no basta — el usuario que lee el cierre debe verla ahí (hallazgo de pruebas de campo).
 
 ## Verification
 
@@ -128,6 +129,8 @@ verification:
     failure_message: "Bloqueado: faltó evaluar/registrar las capacidades transversales complementarias (accesibilidad, SEO, seguridad, visual, contract, performance)."
   - check: "execution_target declarado; si es mock o hybrid, certification: pending_real_integration + mock_evidence completo + switchover en next_steps"
     failure_message: "Bloqueado: la corrida contra mock no declara la certificación pendiente o carece de evidencia del mock y plan de switchover."
+  - check: "si execution_target es mock o hybrid, el mensaje de cierre posterior al bloque YAML repite la advertencia de certificación pendiente"
+    failure_message: "Bloqueado: el cierre no advierte que los resultados contra mock no certifican el SUT. La advertencia al inicio del flujo no sustituye la del cierre."
 ```
 
 ## Cross-links

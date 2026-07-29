@@ -1,6 +1,6 @@
 ---
 id: calidad-generate-playwright-greenfield
-version: 2.0.0
+version: 2.1.0
 scope: stack
 type: workflow
 chapter: calidad
@@ -58,10 +58,11 @@ NUNCA generar código sin STRATEGY.md aprobado explícitamente.
 
 3. **Validar UI source** — Verifica que `ui_source` describa UI real según `ui_source_type`:
    - `live-url`: URL accesible y autenticable si aplica.
-   - `figma`: link público o screenshots con jerarquía de páginas.
+   - `figma`: consumir vía MCP según `[[calidad-figma-mcp-integration]]` — un link de Figma NO es accesible sin conexión autenticada (MCP oficial con OAuth o Framelink con PAT). Si el MCP no está configurado, guiar el setup con ese skill y luego continuar; no reportar "no puedo acceder" como callejón sin salida.
    - `user-story`: historia con flujos UI explícitos (no solo reglas backend).
    - `storybook`: URL del Storybook publicada.
    - Si no hay `ui_source` (aunque venga un `spec` o una colección Postman), **detente**: el insumo principal debe describir UI. Solicita una fuente UI según [[calidad-playwright-greenfield]] (consultar `references/ui-source-priority.md`). Si la intención del usuario es validar el contrato backend o medir performance, deriva a `[[calidad-karate-greenfield]]` o `[[calidad-k6-greenfield]]`.
+   - **Enforcement del locator map (pre-desarrollo)**: si `execution_target != real` y no hay `locator_map`, **detente aquí** con blocker `locator_map_missing` — no continúes a detección de páginas ni generación. Única excepción: override explícito del usuario, registrado como `locator_map: waived` en el delivery gate con el riesgo aceptado. Ver `[[calidad-ui-locator-map-contract]]` (sección Enforcement).
 4. **Detectar páginas** — Invoca `[[calidad-playwright-detect-pages-from-ui-source-prompt]]` con `ui_source_type`, `ui_source_content = ui_source`, `user_story` y `priority_assignments`. Output: lista de páginas con `route` (frontend), `form_fields`, `navigation`, `selectors_hint`, `page_type` y `priority`.
 5. **Resolver prioridades faltantes** — Para cada página con `priority: UNKNOWN`, pregunta al usuario/PO antes de continuar. Nunca infieras prioridad desde el nombre.
 6. **Detectar flujos de usuario** — Clasifica navegación, formularios, auth, listados/paginación a partir de la UI detectada. Cada flujo mapeará a uno o más `.spec.ts`.
@@ -70,7 +71,7 @@ NUNCA generar código sin STRATEGY.md aprobado explícitamente.
    - `full` → genera mocks y suite `@mocked` además de `@live`.
    - `partial` → genera mocks dirigidos para `mock_endpoints` y suite `@hybrid`.
 8. **Planificar tests** — Para cada página: 5-8 escenarios funcionales con tag `@live` por defecto. Marcar visual + a11y en páginas `CRITICAL` y `HIGH`. Aplicar `[[calidad-route-test-generation]]` para mapear flujo UI → test.
-9. **Generar Page Objects** — Por cada página, invoca `[[calidad-playwright-generate-page-object-prompt]]` siguiendo [[calidad-playwright-greenfield]] (consultar `references/page-object-model.md`) + [[calidad-playwright-greenfield]] (consultar `references/selector-priority.md`). `navigate()` usa la `route` frontend detectada (anti-patrón rutas inventadas). Si hay `locator_map` (pre-desarrollo), TODOS los selectores salen del mapa vía `getByTestId` (`[[calidad-ui-locator-map-contract]]`); nada inferido fuera del mapa.
+9. **Generar Page Objects** — Por cada página, invoca `[[calidad-playwright-generate-page-object-prompt]]` siguiendo [[calidad-playwright-greenfield]] (consultar `references/page-object-model.md`) + [[calidad-playwright-greenfield]] (consultar `references/selector-priority.md`). `navigate()` usa la `route` frontend detectada (anti-patrón rutas inventadas). Si hay `locator_map` (pre-desarrollo), TODOS los selectores salen del mapa vía `getByTestId` (`[[calidad-ui-locator-map-contract]]`); nada inferido fuera del mapa. Sin mapa y sin waiver explícito, este paso NO se ejecuta (bloqueado desde el paso 3).
 10. **Generar mocks (opt-in)** — SOLO si `mock_mode != off`, invoca `[[calidad-playwright-generate-mock-handlers-prompt]]` con `endpoints = mock_endpoints` (o derivados del `spec` si se aportó) y `mock_mode`. Sigue [[calidad-playwright-greenfield]] (consultar `references/mocks-page-route.md`). Si `mock_mode = off`, **no se crea** la carpeta `mocks/` ni el fixture `mockApi`.
 11. **Generar tests** — Emite primero los `tests/*.spec.ts` con tag `@live` por defecto (`[[calidad-playwright-greenfield]]` paso 6). Tests que ejerciten error states con mocks llevan `@mocked` o `@hybrid` y declaran `mockApi` en la firma. Para suites de accesibilidad invoca `[[calidad-playwright-generate-a11y-prompt]]`; para visual aplica [[calidad-playwright-greenfield]] (consultar `references/visual-regression.md`).
 12. **Emitir infraestructura** — `playwright.config.ts`, `tsconfig.json`, `package.json`, `.gitignore`, `README.md` según [[calidad-playwright-greenfield]] (consultar `references/playwright-config-strict-ts.md`) y [[calidad-playwright-greenfield]] (consultar `references/project-structure.md`). Incluir `BASE_URL`, `BACKEND_URL` y projects filtrados por tag (`@live`, `@mocked`, `@hybrid`). Si la UI tiene login real, además `fixtures/auth.setup.ts` y projects con `dependencies: ['setup']` según [[calidad-playwright-greenfield]] (consultar `references/auth-storage-state.md`).
@@ -115,3 +116,5 @@ Invocar `[[calidad-generate-executive-report]]` con `results_path`, `strategy_md
 - [ ] Si hubo correcciones aplicadas (selector repair, healing visual, fixture ajustada): audit log persistido con anti-cheating guardrails verificados.
 - [ ] Si el modo es `dry-run` o `scaffold-only`: scaffold + comandos `npx playwright test ...` + diffs propuestos entregados; ninguna corrección aplicada sin aprobación humana.
 - [ ] Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@a11y` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra). Aserciones WCAG y reglas axe quedan intocables.
+- [ ] Si `execution_target != real`: `locator_map` presente y usado como fuente única de selectores, O waiver explícito del usuario registrado (`locator_map: waived`) en el delivery gate. Continuar sin mapa y sin waiver invalida la entrega.
+- [ ] Los tests con mocks validan UI (navegación, estados visibles, interacción), NO el contrato de los servicios mockeados (eso pertenece a Karate). Ver [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md`).

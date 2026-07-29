@@ -1,6 +1,24 @@
 
 # Modos de ejecución — `@live`, `@mocked`, `@hybrid`
 
+## Qué valida un test Playwright con mocks (y qué NO)
+
+**El objetivo de mockear servicios en Playwright es habilitar la interacción del front y la navegación que depende de ese backend** — que el flujo de UI pueda recorrerse cuando el servicio real no está. Las aserciones del test validan lo que el usuario ve y hace: navegación, estados visibles, mensajes, habilitación de controles, redirecciones.
+
+**NO se validan los servicios ni sus respuestas.** Asertar el status code, el schema o los campos del response de un endpoint mockeado es (a) probar el mock contra sí mismo y (b) invadir el terreno de las pruebas de servicios — eso pertenece a `[[calidad-karate-greenfield]]`. Regla práctica: si una aserción desaparecería al reemplazar el mock por el backend real sin que la UI cambie, sobra.
+
+## Caminos según disponibilidad de front y back
+
+Resuelto en `[[calidad-sut-readiness-gate]]`; los tres caminos posibles:
+
+| Camino | Front | Back | Qué se hace |
+|---|---|---|---|
+| 1 | No | No | **Oficial**: si existe el código del front (repo/build local aunque no esté desplegado), levantarlo localmente contra el mock del back y ejecutar. Si no existe ni el código: construcción completa (tests + locator map + mocks listos) con **ejecución diferida** — no hay SUT de UI que recorrer. |
+| 2 | Sí | No | Front real (desplegado o local) + back mockeado: `@mocked` con `page.route()` full, o Mockoon backend-level vía `BACKEND_URL`. |
+| 3 | Sí | Sí | Live con **mock dirigido** de servicios puntuales que hay que controlar (ej. forzar el response del login, un tercero inestable, un estado difícil de reproducir): `@hybrid` con `page.route()` parcial o Mockoon en proxy mode. |
+
+**Opción opt-in del camino 1 — prototipo de front ("mock del front")**: el agente PUEDE generar un front descartable a partir del diseño (Figma + locator map) para ejecutar los tests antes de que exista el front real. Se ofrece SOLO a elección explícita del usuario, NUNCA por defecto, con esta advertencia obligatoria: el prototipo no es fiel al diseño real — los tests que pasen contra él validan la mecánica de la suite, no el front del producto, y traen riesgo de retrabajo cuando llegue el desarrollo. Reglas si el usuario lo acepta: los selectores salen del locator map (el prototipo implementa exactamente esos `data-testid`), el prototipo vive fuera del árbol de tests (ej. `mocks/front-prototype/`, descartable), el delivery gate registra `front_prototype: true` dentro de `mock_evidence` y la corrida cierra igual con `certification: pending_real_integration`.
+
 Cada test Playwright declara su modo de ejecución mediante un tag en el título o en su `describe`. Esto evita el bug de "toda la suite es contrato del mock" y permite filtrar por pipeline.
 
 ## Tags

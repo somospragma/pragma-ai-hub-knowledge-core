@@ -37,6 +37,7 @@ chapters/calidad/
 │   │   ├── business-driven-prioritization.md
 │   │   ├── environment-blocker-evidence.md
 │   │   ├── execution-metadata-schema.md
+│   │   ├── figma-mcp-integration.md
 │   │   ├── intent-detection.md
 │   │   ├── mandatory-inputs-protocol.md
 │   │   ├── post-generation-execution-prompt.md
@@ -247,7 +248,8 @@ chapters/calidad/
 | `sut-types-and-adaptations/SKILL.md`   | Adaptaciones por tipo de SUT (REST, GraphQL, gRPC, eventos, ML inference, serverless, SOAP/EJB, batch).      |
 | `test-data-management/SKILL.md`        | Builder/Factory/ObjectMother, datasets versionados, anonimización PII, data para perf, sintética. Ante ausencia de datos reales, sintéticos deterministas (Faker + seed) coherentes con los data buckets del mock. |
 | `service-virtualization-mockoon/SKILL.md` | Service virtualization con Mockoon para construir/validar pruebas sin backend desplegado: environment JSON versionable, mock desde OpenAPI, CRUD stateful con data buckets, SOAP/XML, proxy hybrid, CLI/Docker en CI y switchover mock → real solo-configuración. Bundle con 7 references. |
-| `ui-locator-map-contract.md`           | Contrato QA+dev de identificadores UI (`data-testid` / accessibility ids) versionado en `locator-map.json`, para que las pruebas front/mobile construidas antes del desarrollo no fallen por drift de selectores; incluye validación de drift al llegar la app real. |
+| `ui-locator-map-contract.md`           | Contrato QA+dev de identificadores UI (`data-testid` / accessibility ids) versionado en `locator-map.json`, para que las pruebas front/mobile construidas antes del desarrollo no fallen por drift de selectores; incluye validación de drift al llegar la app real y enforcement explícito (sin mapa no se generan page objects salvo waiver del usuario). |
+| `figma-mcp-integration.md`             | Consumo de Figma como fuente UI vía MCP (server oficial remoto con OAuth o Framelink con PAT) con setup guiado por IDE y fallback REST API; un link público de Figma no es consumible sin conexión autenticada. |
 
 #### Capacidades transversales complementarias (accesibilidad, SEO, visual)
 
@@ -377,7 +379,7 @@ Cada IDE soporta un subset de los tipos de asset. Esta es la matriz para el chap
 | Asset del Chapter | Cantidad | Kiro | Claude Code | GitHub Copilot | Amazon Q (IDE) | Amazon Q (CLI) |
 |---|---|---|---|---|---|---|
 | `steering`     | 3   | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `skill`        | 44  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `skill`        | 45  | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `workflow`     | 13  | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `prompt`       | 15  | ✓ | — | ✓ | ✓ | — |
 

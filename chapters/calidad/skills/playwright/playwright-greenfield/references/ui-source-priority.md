@@ -40,7 +40,7 @@ Cuando la fuente es Figma o user story porque la app **aún no existe** (`execut
 ## Herramientas recomendadas por fuente
 
 - **URL viva** → `npx playwright codegen URL`, MCP browser tools (`browser_navigate`, `browser_snapshot`), o crawlers headless. Skill: `[[calidad-playwright-from-live-app]]`.
-- **Figma** → plugin oficial de Figma para exportar specs; OCR sobre screenshots si solo hay imagen.
+- **Figma** → conexión vía MCP (server oficial remoto o Framelink con PAT) según `[[calidad-figma-mcp-integration]]`. **Un link "público" de Figma NO es consumible sin esa conexión autenticada** — si el usuario entrega solo el link, guiar el setup del MCP (el skill incluye el flujo y los snippets por IDE) y luego continuar. Export estático (imágenes/PDF) solo como último recurso.
 - **User story** → leer en voz alta el flujo y mapearlo a páginas; pedir al PO los flujos faltantes.
 - **Storybook** → `npm run storybook` y crawlear `iframe.html?id=...` con Playwright.
 

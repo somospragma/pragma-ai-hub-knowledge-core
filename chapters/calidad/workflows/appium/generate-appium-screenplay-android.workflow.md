@@ -35,6 +35,8 @@ Cuando `[[calidad-intent-detection]]` identifica un escenario greenfield para Ap
 
 Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`, incluido el SUT readiness gate (`[[calidad-sut-readiness-gate]]`). Sin APK no hay runtime: pre-desarrollo el alcance es scaffold + deferred locators desde el `locator_map`, modo `scaffold-only`. Mock de backend (`[[calidad-service-virtualization-mockoon]]`) aplica solo si el APK existe y permite override de base URL.
 
+**Enforcement del locator map (pre-desarrollo)**: si `execution_target != real` y no hay `locator_map`, detenerse con blocker `locator_map_missing` antes de generar la capa Screenplay; continuar solo con waiver explícito del usuario registrado en el delivery gate (`locator_map: waived`). Ver `[[calidad-ui-locator-map-contract]]` (sección Enforcement).
+
 ## Pasos
 
 ### 1. Pre-flight check del stack (OBLIGATORIO)

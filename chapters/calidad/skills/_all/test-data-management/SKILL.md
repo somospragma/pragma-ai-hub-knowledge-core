@@ -1,6 +1,6 @@
 ---
 id: calidad-test-data-management
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -33,7 +33,14 @@ Activa este skill en paralelo con `[[calidad-karate-greenfield]]`, `[[calidad-ka
 
 ## Instrucción
 
-0. **Confirmar disponibilidad de datos** — Pregunta del `[[calidad-sut-readiness-gate]]`: ¿existen datos de prueba en el ambiente (o catálogo de datasets del cliente)? Si NO (`data_strategy: synthetic`), la ausencia de datos NO detiene la construcción de la suite: se generan sintéticos deterministas (pasos 2-4) y, si hay mock de servicios (`[[calidad-service-virtualization-mockoon]]`), el mismo seed y locale alimentan sus data buckets para que test y mock sean coherentes end-to-end. El switchover a datos reales es parte del plan de certificación, no un cambio de código.
+0. **Confirmar disponibilidad de datos PRIMERO y respetar la precedencia de fuentes** — La pregunta del `[[calidad-sut-readiness-gate]]` (¿existen datos de prueba o catálogo del cliente?) se hace AL INICIO, no como último recurso. Precedencia estricta:
+   1. **Data real / catálogo del cliente** (con anonimización cuando aplique).
+   2. **`examples` del spec y valores de la firma** — son parte del contrato; se usan tal cual.
+   3. **Sintética determinista** (Faker + seed fijo, pasos 2-4) para todo lo que 1 y 2 no cubran.
+
+   **PROHIBIDO el camino observado en pruebas de campo**: "inventar" datos con criterio del agente cuando el spec no trae examples. Un dato improvisado sin seed no es reproducible entre corridas — rompe el determinismo que es el objetivo de toda esta capacidad. Si falta un dato y ninguna fuente lo provee, se genera con Faker + seed (reproducible) o se pregunta; nunca se improvisa.
+
+   Si NO hay datos (`data_strategy: synthetic`), la ausencia NO detiene la construcción de la suite: si hay mock de servicios (`[[calidad-service-virtualization-mockoon]]`), el mismo seed y locale alimentan sus data buckets para que test y mock sean coherentes end-to-end. El switchover a datos reales es parte del plan de certificación, no un cambio de código.
 1. **Definir alcance** — ¿el dato es para unit, integration, e2e o performance? La estrategia cambia drásticamente. Matriz en `references/test-data-strategies.md`.
 2. **Elegir estrategia** — `synthetic` (generado on-the-fly, default) vs `anonymized prod-like` (snapshot prod pasado por pipeline de anonimización, sólo cuando volumen/realismo lo exija). Anonimización detallada en `references/anonymization-pii.md`.
 3. **Diseñar el patrón de construcción** — Object Mother, Test Data Builder o Factory según contexto. Snippets canónicos por lenguaje en `references/builder-factory-objectmother-patterns.md`.
