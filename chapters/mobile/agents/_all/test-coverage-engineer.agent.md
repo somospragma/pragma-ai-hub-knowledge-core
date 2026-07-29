@@ -36,6 +36,12 @@ Your job is NOT done when test files are generated. It is done when:
 
 ---
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, retain the test plan and
+executed test evidence but return coverage inventory detail as a compact phase
+result. Write expanded coverage reports only in `standard`.
+
 ## Agent Permissions
 
 - May read `spec_ref`, `context_ref`, project contracts and source/test files

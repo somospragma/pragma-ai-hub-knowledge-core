@@ -12,6 +12,15 @@ description: >
 ---
 # Workflow: New Component from Figma
 
+## Evidence Mode
+
+Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
+as `spec.yaml.evidence_mode` before validation. In `minimal`, retain gate
+evidence and record every other phase as a compact
+`context.json.phase_results` entry. `standard` additionally writes detailed
+phase reports. Neither mode may omit a gate, approval, test result, blocker or
+delivery result.
+
 ## Prerequisites
 
 - URL for the component in Figma with `node-id`.
@@ -83,6 +92,8 @@ figma_url: https://www.figma.com/file/xxx/Component?node-id=123
 user_story: [Optional acceptance context]
 user_story_path: [Optional Markdown path; e.g. docs/user-stories/story-123.md]
 atomic_hint: [Optional atom|molecule|organism]
+golden_tests: false  [Optional; default false]
+evidence_mode: minimal  [Optional; default minimal]
 ```
 
 ## Execution Sequence
@@ -101,9 +112,12 @@ Create `SPEC_PACKET_PATH` with:
 4. `evidence/validation-report.md`
 
 The initial spec records inputs, acceptance criteria, Figma URL, user story,
-expected success criteria (`widget_tests`, `goldens`, `widgetbook`,
+expected success criteria (`widget_tests`, optional `goldens`, `widgetbook`,
 `audit`), `external_access.figma_mcp.required=true`, permissions per agent and
-sections that each agent must read.
+sections that each agent must read. Normalize an omitted `golden_tests` input to
+`false` and persist the resolved boolean in `spec.yaml.inputs` before
+validation. Plan golden artifacts and golden success criteria only when it is
+`true`.
 
 Minimum packet permissions:
 
@@ -225,8 +239,9 @@ read_sections:
 
 ---
 
-### PHASE 4b — Golden Tests DS
+### PHASE 4b — Golden Tests DS (conditional)
 
+**Condition**: `golden_tests=true`.
 **Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
 Required compact handoff:
@@ -242,6 +257,11 @@ read_sections:
   - contracts.text_overflow
   - success_criteria
 ```
+
+When `golden_tests=false`, do not invoke `@golden-test-engineer` or create
+golden artifacts. Record `golden_tests: skipped_by_input` with
+`reason: golden_tests=false` in `context.json`, `spec.yaml` and
+`PIPELINE_LOG_PATH`.
 
 ---
 
@@ -272,6 +292,10 @@ read_sections:
 
 Required output: `evidence/delivery-report.md` and a summary in the human report.
 
+Delivery requires passing `evidence/widget-tests.md` and exactly one golden
+outcome: passing `evidence/golden-tests.md` when `golden_tests=true`, or the
+recorded `golden_tests: skipped_by_input` outcome when false.
+
 ## Rules
 
 - Do not generate code before approving `review.md`.
@@ -280,6 +304,7 @@ Required output: `evidence/delivery-report.md` and a summary in the human report
 - Handoffs by reference; do not copy full human reports between agents.
 - Do not generate artifacts outside the resolved root for
   `artifact_plan.planned[].target_id`.
-- No skip phases required.
+- Widget tests are required. Golden tests are conditional and must be recorded
+  as executed or `skipped_by_input`.
 - Record each phase in `PIPELINE_LOG_PATH`.
 - If a phase does not apply, use `skipped` with an explicit reason.

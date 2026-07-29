@@ -39,6 +39,24 @@ Canonical chapter schemas:
 - `../../docs/templates/schemas/architecture-contract.schema.yaml`
 - `../../docs/templates/schemas/dependencies-contract.schema.yaml`
 
+## Evidence Mode
+
+Every packet declares `evidence_mode: minimal | standard`; normalize an omitted
+invocation value to `minimal` before packet validation. This setting controls
+only additional narrative files, never a gate or decision.
+
+In `minimal`, persist the required packet files, validation, Figma preflight
+when applicable, human decisions, audit, executed test results, enabled
+optional-stage results and delivery. For every other phase, the controller
+writes a compact `context.json.phase_results.<phase>` object with `status`, a
+summary of at most 280 characters and references. A success criterion may point
+to that context entry instead of a verbose evidence file.
+
+In `standard`, retain those guarantees and also write detailed analysis,
+inventory, planning, code-generation, Widgetbook and checkpoint reports. The
+`agent_permissions.*.evidence_required` list authorizes gate evidence; it does
+not force standard-only reports in `minimal`.
+
 ## Bootstrap Spec Packet
 
 Expected files:
@@ -78,7 +96,9 @@ Minimum checks:
    and `repo_root/package_path` exist.
 9. Every local dependency uses `source=target` and its `target_id` exists in
    `project.config.yaml.targets.registry`.
-10. `validation-report.md` and `drift-analysis.md` exist.
+10. `validation-report.md` and `drift-analysis.md` exist. Detailed discovery
+    and candidates files exist only in `standard`; `minimal` records their
+    compact result in `context.json.phase_results`.
 11. The three proposed files declare `ownership.file`, `ownership.owns` and
     `ownership.must_not_define`.
 12. If `bootstrap-spec.yaml.status=applied`, all critical flags under
@@ -91,7 +111,7 @@ Minimum checks:
 Expected files for functional workflows:
 
 ```text
-{ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/specs/{workflow_slug}/
+{SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}/specs/{workflow_slug}/
 ├── spec.yaml
 ├── context.json
 ├── review.md
@@ -101,12 +121,13 @@ Expected files for functional workflows:
 Minimum checks:
 
 1. `spec.yaml` declares `workflow`, `spec_level`, `execution_mode` and
-   `success_criteria`.
+   `evidence_mode` and `success_criteria`.
    - Allowed `spec_level`: `mini | standard | full`.
    - If `schema_ref` exists, it points to `mobile-spec.schema.yaml`.
 2. `execution_mode` defaults to `propose_then_apply`.
 3. `context.json` declares `schema_ref` for `mobile-context.schema.json`, a
-   `workflow_controller`, a global status and a `checkpoints` object.
+   `workflow_controller`, `packet_owner_target_id`, `packet_root`, a global
+   status and a `checkpoints` object.
    The controller must match the workflow `entry_agent`.
 4. The initial checkpoint is required and execution continues only when
    `context.json.status=approved_for_execution` and
@@ -139,6 +160,8 @@ Minimum checks:
 16. Every phase states which spec sections it reads to reduce token usage.
 17. `PIPELINE_SPEC_PATH`, if present, is treated only as a human report; it must
     not contradict `spec.yaml`.
+18. `context.json.phase_results` exists. Every completed, failed, blocked or
+    skipped phase has a compact result with a status, summary and references.
 
 ### `/new-view` Plan Gate
 
@@ -154,6 +177,10 @@ packet is a real executable plan, not an empty template. Require:
 5. Non-placeholder success criteria with evidence paths.
 6. `context.json.status=pending_human_review` and
    `checkpoints.initial_spec.status=pending`.
+7. `packet_owner_target_id` resolves to the requested app target or the
+   configured app default, its target kind is `app`, and `packet_root` is under
+   that target root. The packet owner must not be the Design System target,
+   even while DS artifacts are planned or generated.
 
 If any condition fails, use `CONFIG_SPEC_PACKET_INVALID`; do not present an
 approval request and do not delegate to a code-producing agent.
@@ -162,6 +189,44 @@ Before any code-producing phase, require the same packet plus
 `context.json.status=approved_for_execution` and
 `checkpoints.initial_spec.status=approved`. Otherwise return
 `CONFIG_SPEC_NOT_APPROVED` without modifying project files.
+
+### `/new-feature` Test And Optional-Stage Gate
+
+Before the initial review, require planned artifacts and success criteria for
+`unit_tests`, `widget_tests` and `integration_tests`. Their owners must be
+`test-engineer`, and the packet must grant that agent sufficient read, write,
+target and evidence permissions.
+
+Before audit and delivery, require passed evidence at:
+
+1. `evidence/unit-tests.md`
+2. `evidence/widget-tests.md`
+3. `evidence/integration-tests.md`
+
+When `inputs.golden_tests=true`, also require planned `golden_tests` artifacts,
+`golden-test-engineer` permissions and a passing `evidence/golden-tests.md`.
+When false, require the recorded `skipped_by_input` outcome instead.
+
+When `inputs.documentation=true`, require planned `docs` artifacts and
+`evidence/documentation-report.md`. When false, require the recorded
+`skipped_by_input` outcome instead. Never accept a missing optional-stage
+outcome as an implicit skip.
+
+If an integration environment is unavailable, return `blocked_input`; it does
+not satisfy the required integration-test evidence.
+
+### `/new-component` And `/new-view` Golden Gate
+
+Normalize an omitted `inputs.golden_tests` to `false` before the initial
+review. When it is true, require planned `golden_tests` artifacts,
+`golden-test-engineer` permissions and passing `evidence/golden-tests.md`
+before delivery. When false, require a single recorded
+`golden_tests: skipped_by_input` outcome with its reason; do not plan golden
+artifacts or invoke the golden-test agent.
+
+Widget tests remain mandatory: `/new-component` requires
+`evidence/widget-tests.md`; `/new-view` additionally requires
+`evidence/view-widget-tests.md`.
 
 ## Agent Permission Validation
 
@@ -189,6 +254,9 @@ For every handoff:
    `can_call_external_tools`, treat it only as human-facing delivery text, not
    as an executed action.
 9. Require at least one path in `evidence_required`.
+
+In `minimal`, do not require a standard-only report merely because its path is
+authorized. Require its compact controller-owned phase result instead.
 
 If validation fails, block with `SPEC_AGENT_PERMISSION_MISSING`.
 

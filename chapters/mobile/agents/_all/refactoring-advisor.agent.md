@@ -39,6 +39,12 @@ Your job is NOT done when the code changes compile. It is done when:
 
 ---
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, record compact phase
+results in `context.json.phase_results` and omit standard-only analysis and
+step reports. Preserve approvals, audit, required tests and delivery evidence.
+
 ## Agent Permissions
 
 - May read `spec_ref`, `context_ref`, project contracts and files under the

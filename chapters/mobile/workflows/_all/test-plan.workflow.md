@@ -12,6 +12,15 @@ description: >
 ---
 # Workflow: Test Plan (Full Coverage for Existing Feature)
 
+## Evidence Mode
+
+Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
+as `spec.yaml.evidence_mode` before validation. In `minimal`, retain gate
+evidence and record every other phase as a compact
+`context.json.phase_results` entry. `standard` additionally writes detailed
+phase reports. Neither mode may omit a gate, approval, test result, blocker or
+delivery result.
+
 ## When to Use
 
 Use this workflow when:
@@ -50,6 +59,7 @@ Do NOT use for:
 @test-coverage-engineer /test-plan
 feature_name: product_catalog
 feature_path: lib/src/features/product_catalog/
+evidence_mode: minimal
 ```
 
 ### Input variations

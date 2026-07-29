@@ -81,10 +81,11 @@ The agent must:
 <APP_REPO_ROOT>/.sopp/config/dependencies-contract.yaml
 ```
 
-Functional workflows write their spec packet under the active target:
+Functional workflows resolve a packet owner before Phase 0. The owner is
+immutable for the run and can differ from the active artifact target:
 
 ```text
-{ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/specs/{workflow_slug}/
+{SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}/specs/{workflow_slug}/
 ├── spec.yaml
 ├── context.json
 ├── review.md
@@ -93,6 +94,10 @@ Functional workflows write their spec packet under the active target:
 
 `spec.yaml` and `context.json` are the executable source of truth.
 `PIPELINE_SPEC_PATH` is only a cumulative human report.
+
+For `/new-view`, resolve the owner from `target_id` or the configured app
+default. It must have `kind: app`; a DS phase may change `ACTIVE_TARGET_ID` for
+its generated components but never the packet root, evidence or reports.
 
 ## Critical Fields
 

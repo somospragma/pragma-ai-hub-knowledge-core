@@ -11,6 +11,13 @@ optional_inputs:
   - user_story_path
   - route_name
   - target_id
+  - golden_tests
+  - evidence_mode
+spec_packet_owner:
+  target_resolution: input.target_id_or_active_target_defaults.app_target_id
+  fallback_key: active_target_defaults.app
+  required_kind: app
+  immutable_across_phases: true
 required_external_access:
   figma_mcp:
     required: true
@@ -24,9 +31,11 @@ required_agents:
   - widget-developer
   - code-auditor
   - test-engineer
-  - golden-test-engineer
   - widgetbook-developer
   - delivery-manager
+conditional_agents:
+  golden_tests:
+    - golden-test-engineer
 artifact_groups:
   - ds_components
   - app_view
@@ -40,5 +49,9 @@ required_human_review:
   layer_checkpoints: required
   stage_checkpoints: required
 notes:
-  - DS artifacts target design_system; app view artifacts target app.
+  - The Spec Packet is owned by the resolved app target for the whole run.
+  - DS artifacts target design_system; app view artifacts target the resolved app target.
   - The DS checkpoint must be approved before app view generation starts.
+  - DS and view widget tests remain mandatory; both golden stages run only when golden_tests=true.
+  - When golden_tests=false, record golden_tests as skipped_by_input.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

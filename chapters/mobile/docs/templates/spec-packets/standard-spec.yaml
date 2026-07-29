@@ -3,6 +3,7 @@ schema_ref: ../schemas/mobile-spec.schema.yaml
 workflow: "{{WORKFLOW}}"
 spec_level: standard
 execution_mode: propose_then_apply
+evidence_mode: minimal
 status: proposed
 language:
   review_documents: es
@@ -33,6 +34,7 @@ agent_permissions:
         - context.json.current_phase
         - context.json.checkpoints
         - context.json.completed_phases
+        - context.json.phase_results
         - context.json.artifacts
       evidence:
         - evidence/ds-layer-checkpoint.md
@@ -64,7 +66,7 @@ agent_permissions:
     can_call_external_tools:
       - figma_mcp
     evidence_required:
-      - evidence/figma-analysis.md
+      - evidence/figma-mcp-preflight.md
   component-planner:
     can_read:
       - read_sections
@@ -151,6 +153,12 @@ agent_permissions:
       generated_files_source: artifact_plan.planned
       artifact_targets:
         - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.artifacts
       evidence:
         - evidence/widget-tests.md
     can_create_files: true
@@ -168,6 +176,12 @@ agent_permissions:
       generated_files_source: artifact_plan.planned
       artifact_targets:
         - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.artifacts
       evidence:
         - evidence/golden-tests.md
     can_create_files: true

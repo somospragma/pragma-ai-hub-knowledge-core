@@ -21,6 +21,13 @@ mobile KB pipeline can run without ambiguity.
 
 - mobile-sdd-spec-validation
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the invocation. In `minimal`, retain the proposal,
+validation and drift evidence, then record discovery detail in
+`context.json.phase_results`. Write discovery and candidates files only in
+`standard`.
+
 ## Agent Permissions
 
 - In discovery mode, can read `WORKSPACE_ROOT`, `WORKSPACE_FILE`, and
@@ -54,6 +61,8 @@ mobile KB pipeline can run without ambiguity.
 - `FORCE_RECONFIGURE`: `false` by default. Set `true` only when the human
   explicitly wants to repair or replace an existing invalid/outdated canonical
   `.sopp/config` triplet.
+- `EVIDENCE_MODE`: `minimal` by default; use `standard` for detailed discovery
+  and candidate files.
 
 ## Outputs
 
@@ -66,10 +75,15 @@ When B0 requires a new proposal, generate in
 4. `proposed/project.config.yaml`
 5. `proposed/architecture-contract.yaml`
 6. `proposed/dependencies-contract.yaml`
-7. `evidence/workspace-discovery-report.md`
-8. `evidence/candidates.json`
-9. `evidence/validation-report.md`
-10. `evidence/drift-analysis.md`
+7. `evidence/validation-report.md`
+8. `evidence/drift-analysis.md`
+9. `evidence/workspace-discovery-report.md` only when
+   `evidence_mode=standard`
+10. `evidence/candidates.json` only when `evidence_mode=standard`
+
+In `minimal`, record the discovery outcome, rejected candidates and references
+as compact `context.json.phase_results` entries. Do not omit validation, drift
+analysis, the human decision or the proposed configuration files.
 
 When B0 reuses a valid configuration, return only the compact state
 `reused_existing_config`, canonical app root, and validated config paths. Do

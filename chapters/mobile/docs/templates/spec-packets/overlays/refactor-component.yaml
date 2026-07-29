@@ -4,6 +4,8 @@ base_spec_level: mini
 purpose: Refactor an existing Design System component without changing product feature code.
 required_inputs:
   - component_path
+optional_inputs:
+  - evidence_mode
 required_external_access:
   figma_mcp:
     required: false
@@ -29,3 +31,4 @@ required_human_review:
 notes:
   - Delete actions are blocked unless the spec explicitly grants can_delete_files and records human approval.
   - Public API changes must be documented as compatibility constraints.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

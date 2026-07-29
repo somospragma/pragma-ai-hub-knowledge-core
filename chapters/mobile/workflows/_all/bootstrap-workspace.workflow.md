@@ -12,6 +12,15 @@ description: >
 ---
 # Workflow: Bootstrap Workspace
 
+## Evidence Mode
+
+Accept `EVIDENCE_MODE: minimal | standard`; default to `minimal` and persist it
+as `bootstrap-spec.yaml.evidence_mode` before validation. In `minimal`, retain
+the proposal, validation, drift analysis, human decision and apply result; use
+compact `context.json.phase_results` for other phases. `standard` additionally
+writes detailed discovery reports and candidates. Neither mode may omit a
+topology, ownership or schema gate.
+
 ## When To Use It
 
 Use this workflow when:
@@ -44,6 +53,7 @@ EXPECTED_CORE_PACKAGE: core
 EXPECTED_REPO_MODE: multi_repo
 APPLY_MODE: propose_then_apply
 FORCE_RECONFIGURE: false
+EVIDENCE_MODE: minimal
 ```
 
 ## Canonical Sequence
@@ -102,10 +112,13 @@ Required output in `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}`:
 4. `proposed/project.config.yaml`
 5. `proposed/architecture-contract.yaml`
 6. `proposed/dependencies-contract.yaml`
-7. `evidence/workspace-discovery-report.md`
-8. `evidence/candidates.json`
-9. `evidence/validation-report.md`
-10. `evidence/drift-analysis.md`
+7. `evidence/validation-report.md` (required in both modes)
+8. `evidence/drift-analysis.md` (required in both modes)
+9. `evidence/workspace-discovery-report.md` (only `evidence_mode=standard`)
+10. `evidence/candidates.json` (only `evidence_mode=standard`)
+
+In `minimal`, persist discovery selections, rejected candidates and references
+as compact `context.json.phase_results` entries instead of files 9-10.
 
 `bootstrap-spec.yaml` must declare `schema_ref: ../docs/templates/schemas/bootstrap-spec.schema.yaml` and is the machine-readable source for the proposal. `review.md` is the human-readable Spanish review.
 

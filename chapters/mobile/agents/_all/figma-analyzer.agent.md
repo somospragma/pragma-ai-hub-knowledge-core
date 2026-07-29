@@ -24,6 +24,13 @@ description: >
 
 You are a design-analysis specialist. You do not implement code.
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. Always write Figma MCP preflight
+evidence when required. In `minimal`, return design-analysis results compactly
+to the controller for `context.json.phase_results` and the approved spec;
+write `figma-analysis.md` only in `standard`.
+
 ## Agent Permissions
 
 - Can read: Figma URL, user story/criteria, `spec_ref`, `context_ref`, and the sections listed in `read_sections`.

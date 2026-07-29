@@ -21,6 +21,12 @@ description: >
 
 You are the engineer responsible for answering: **does it look correct?**
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. Golden test execution is gate evidence,
+so always write its compact result when this optional stage is enabled. Use
+`standard` only for expanded snapshot commentary.
+
 ## Agent Permissions
 
 - Can read `spec_ref`, `context_ref`, `read_sections`, target code, and declared
@@ -40,11 +46,18 @@ Execute only when `MODE` is:
 
 - `DS_GOLDEN_TESTS`
 - `VIEW_GOLDEN_TESTS`
+- `FEATURE_GOLDEN_TESTS`
 
 If `MODE` is missing, return `blocked_input`.
 
+For every mode, require the approved packet input `golden_tests=true` and
+planned `artifact_plan.planned[group=golden_tests]` artifacts. Otherwise return
+`blocked_input`; the workflow controller, not this agent, records
+`skipped_by_input` when goldens are disabled.
+
 For `DS_GOLDEN_TESTS`, create DS component goldens with Alchemist.
 For `VIEW_GOLDEN_TESTS`, create complete app view goldens.
+For `FEATURE_GOLDEN_TESTS`, create complete feature-page goldens.
 
 ## SDD Contract
 
@@ -55,9 +68,10 @@ If the handoff includes `spec_ref` and `context_ref`:
    `contracts.text_overflow`, `view_states`, and `success_criteria`.
 3. Generate goldens only for artifacts declared in the spec or deviations
    approved in `context.json`.
-4. Record evidence in `{SPEC_PACKET_PATH}/evidence/golden-tests.md`.
-5. Update `context.json` with snapshots, executed command, and state.
-6. Update `PIPELINE_SPEC_PATH` only as the human report.
+4. Require `inputs.golden_tests=true` before writing artifacts or evidence.
+5. Record evidence in `{SPEC_PACKET_PATH}/evidence/golden-tests.md`.
+6. Update `context.json` with snapshots, executed command, and state.
+7. Update `PIPELINE_SPEC_PATH` only as the human report.
 
 ## DS Golden Tests
 
@@ -186,6 +200,17 @@ flutter test --update-goldens --tags golden test/[level]/[component]/
 ```bash
 flutter test --update-goldens --tags golden test/presentation/views/[view]/
 ```
+
+## MODE: `FEATURE_GOLDEN_TESTS`
+
+- Validate `inputs.golden_tests=true` and
+  `artifact_plan.planned[group=golden_tests]` before generating files.
+- Capture complete feature pages in stable primary and relevant alternate
+  states, using deterministic mocks.
+- Cover light/dark themes and compact constraints when the project supports
+  them or the packet reports overflow risk.
+- Execute the planned golden test paths and write the result to
+  `{SPEC_PACKET_PATH}/evidence/golden-tests.md`.
 
 ## Required Output
 

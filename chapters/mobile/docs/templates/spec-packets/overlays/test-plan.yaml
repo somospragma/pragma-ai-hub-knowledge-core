@@ -5,6 +5,8 @@ purpose: Generate or improve test coverage for an existing feature.
 required_inputs:
   - feature_name
   - feature_path
+optional_inputs:
+  - evidence_mode
 required_external_access:
   figma_mcp:
     required: false
@@ -20,3 +22,4 @@ required_human_review:
 notes:
   - The testing report must be represented as artifact_plan.planned[group=docs].
   - Integration tests may be generated as pending manual validation when execution is outside agent scope.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

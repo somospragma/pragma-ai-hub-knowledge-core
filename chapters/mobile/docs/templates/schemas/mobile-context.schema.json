@@ -11,10 +11,13 @@
     "workflow",
     "spec_level",
     "workflow_controller",
+    "packet_owner_target_id",
+    "packet_root",
     "status",
     "current_phase",
     "checkpoints",
     "completed_phases",
+    "phase_results",
     "artifacts"
   ],
   "properties": {
@@ -35,6 +38,8 @@
     },
     "spec_level": { "type": "string", "enum": ["mini", "standard", "full"] },
     "workflow_controller": { "type": "string", "minLength": 1 },
+    "packet_owner_target_id": { "type": "string", "minLength": 1 },
+    "packet_root": { "type": "string", "minLength": 1 },
     "status": {
       "type": "string",
       "enum": [
@@ -61,6 +66,10 @@
       }
     },
     "completed_phases": { "type": "array", "items": { "type": "string" } },
+    "phase_results": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/phase_result" }
+    },
     "artifacts": { "type": "object" }
   },
   "$defs": {
@@ -73,6 +82,23 @@
         "phase": { "type": "string", "minLength": 1 },
         "status": { "type": "string", "enum": ["pending", "approved", "changes_requested", "skipped"] },
         "decision_ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "phase_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary", "refs"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["completed", "skipped_by_input", "blocked_input", "failed"]
+        },
+        "summary": { "type": "string", "maxLength": 280 },
+        "refs": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "type": "string" }
+        }
       }
     }
   },

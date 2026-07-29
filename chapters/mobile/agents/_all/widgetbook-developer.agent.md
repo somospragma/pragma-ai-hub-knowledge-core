@@ -21,6 +21,12 @@ description: >
 
 You are the developer responsible for answering: **can it be explored interactively?**
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, return Widgetbook paths
+and status as a compact phase result for the controller; write a detailed
+Widgetbook report only in `standard`.
+
 ## Agent Permissions
 
 - Can read `spec_ref`, `context_ref`, `read_sections`, target code, and existing
@@ -49,9 +55,9 @@ Resolve `WIDGETBOOK_SCOPE`:
 
 Resolve configuration paths:
 
-- `WIDGETBOOK_COMPONENTS_ROOT = targets.registry[design_system].structure.widgetbook_components_path`
+- `WIDGETBOOK_COMPONENTS_ROOT = targets.registry[DESIGN_SYSTEM_TARGET_ID].structure.widgetbook_components_path`
   (fallback `widgetbook`)
-- `WIDGETBOOK_SCREENS_ROOT = targets.registry[app].structure.widgetbook_screens_path`
+- `WIDGETBOOK_SCREENS_ROOT = targets.registry[APP_TARGET_ID].structure.widgetbook_screens_path`
   (fallback `widgetbook`)
 
 For `DS_WIDGETBOOK`, create DS component stories.

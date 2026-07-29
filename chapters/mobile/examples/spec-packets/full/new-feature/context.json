@@ -5,6 +5,8 @@
   "workflow": "new-feature",
   "spec_level": "full",
   "workflow_controller": "feature-builder",
+  "packet_owner_target_id": "app",
+  "packet_root": "/workspace/app/.sopp/flow_result/specs/new-feature-product-catalog",
   "status": "pending_human_review",
   "current_phase": "spec_review",
   "checkpoints": {
@@ -38,5 +40,6 @@
     "review_ref": "review.md"
   },
   "completed_phases": [],
+  "phase_results": {},
   "artifacts": {}
 }

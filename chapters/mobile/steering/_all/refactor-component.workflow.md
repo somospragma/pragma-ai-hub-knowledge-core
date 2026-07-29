@@ -12,6 +12,15 @@ description: >
 ---
 # Workflow: Refactor Component
 
+## Evidence Mode
+
+Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
+as `spec.yaml.evidence_mode` before validation. In `minimal`, retain gate
+evidence and record every other phase as a compact
+`context.json.phase_results` entry. `standard` additionally writes detailed
+phase reports. Neither mode may omit a gate, approval, test result, blocker or
+delivery result.
+
 ## Prerequisites
 
 - Path for the component to refactor.
@@ -46,6 +55,7 @@ If it fails, finish with `blocked_input`.
 component_path: lib/src/organisms/cards/product_card.dart
 refactor_goal: Extract the header into a separate molecule and add support for the compact variant.
 compatibility_policy: no_public_api_change
+evidence_mode: minimal
 ```
 
 ## Execution Sequence

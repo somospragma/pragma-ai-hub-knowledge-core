@@ -1,7 +1,7 @@
 workflow: new-feature
 entry_agent: feature-builder
 base_spec_level: full
-purpose: Generate a complete feature across domain, data, presentation, wiring and documentation.
+purpose: Generate a complete feature across domain, data, presentation, wiring, mandatory automated tests and optional documentation.
 required_inputs:
   - feature_name
   - description
@@ -12,6 +12,14 @@ optional_inputs:
   - fields
   - api_endpoints
   - user_story
+  - ui_components
+  - sequence_diagram
+  - target_location
+  - package_name
+  - workspace_root
+  - golden_tests
+  - documentation
+  - evidence_mode
 required_external_access:
   figma_mcp:
     required_when_input_exists: figma_url
@@ -21,10 +29,13 @@ required_agents:
   - feature-builder
   - ds-orchestrator
   - code-auditor
+  - test-engineer
   - delivery-manager
 conditional_agents:
   figma_url:
     - figma-analyzer
+  golden_tests:
+    - golden-test-engineer
 artifact_groups:
   - ds_components
   - scaffold
@@ -32,6 +43,10 @@ artifact_groups:
   - data
   - presentation
   - wiring
+  - unit_tests
+  - widget_tests
+  - integration_tests
+  - golden_tests
   - docs
   - audit
   - delivery
@@ -40,6 +55,10 @@ required_human_review:
   layer_checkpoints: required
   stage_checkpoints: required
 notes:
-  - Project documentation must be represented as artifact_plan.planned[group=docs].
+  - Unit, widget and integration tests are mandatory and must pass before audit and delivery.
+  - Golden tests run only when golden_tests=true; otherwise their skipped_by_input state must be recorded.
+  - Documentation runs only when documentation=true; otherwise its skipped_by_input state must be recorded.
+  - When documentation=true, project documentation must be represented as artifact_plan.planned[group=docs].
   - feature-builder delegates Figma preflight and analysis to figma-analyzer when figma_url is provided.
   - Delivery proposes branch, commit and PR text unless explicit git or gh permissions are granted.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

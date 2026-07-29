@@ -18,6 +18,14 @@ description: >
 - flutter-ds-responsive-layout
 - mobile-sdd-spec-validation
 
+## Evidence Mode
+
+Resolve `EVIDENCE_MODE` from the invocation, defaulting to `minimal`, and
+persist it in the packet before validation. Include the scalar in every compact
+handoff. In `minimal`, write `context.json.phase_results` after each delegated
+phase instead of requesting standard-only reports; never omit a gate, approval,
+preflight, audit, test result, optional-stage result or delivery evidence.
+
 ## Non-Negotiable `/new-view` Start Gate
 
 The first `/new-view` invocation is plan-only. Its response may create or
@@ -28,12 +36,20 @@ configuration.
 Before delegating any code-producing phase, complete these actions in order:
 
 1. resolve and validate canonical `.sopp/config`
-2. create `spec.yaml`, `context.json`, `review.md`, and validation evidence
-3. delegate Figma analysis, inventory/DAG, and technical planning into the packet
-4. validate the completed packet
-5. set `context.json.status=pending_human_review` and
+2. resolve the app target from `target_id` or the configured app default; set
+   it as the immutable `SPEC_PACKET_OWNER_TARGET_ID` for `/new-view`
+3. create `spec.yaml`, `context.json`, `review.md`, and validation evidence
+   only under `SPEC_PACKET_OWNER_ROOT`
+4. delegate Figma analysis, inventory/DAG, and technical planning into the packet
+5. validate the completed packet
+6. set `context.json.status=pending_human_review` and
    `checkpoints.initial_spec.status=pending`
-6. present the compact Spanish `review.md` and end the response
+7. present the compact Spanish `review.md` and end the response
+
+For `/new-view`, `ACTIVE_TARGET_ID` may become the Design System target during
+DS phases, but it must never change the packet owner, packet path, pipeline
+log or human report. A packet root outside the resolved app target is
+`blocked_input: CONFIG_SPEC_PACKET_ROOT_MISMATCH`.
 
 The approval is valid only in a later human turn that explicitly approves the
 pending packet. Before that turn, do not delegate to `@widget-developer`,
@@ -163,20 +179,29 @@ Resolve these constants:
 - `TOPOLOGY_SHARED_CORE_MODE = topology.shared_core_mode` (fallback `none`)
 - `TOPOLOGY_DS_MODE = topology.ds_mode` (fallback `external_ds_package`)
 - `TARGET_REGISTRY = targets.registry`
+- `APP_TARGET_ID = inputs.target_id` when it is valid for `/new-view`, otherwise
+  `active_target_defaults.app_target_id` (fallback `active_target_defaults.app`)
+- `DESIGN_SYSTEM_TARGET_ID = active_target_defaults.design_system_target_id`
+  (fallback `active_target_defaults.design_system`)
+- `SPEC_PACKET_OWNER_TARGET_ID` resolved before Phase 0:
+  - `/new-view` -> `APP_TARGET_ID`
+  - other DS workflows -> their Phase 0 target unless the workflow declares
+    another packet owner
+- `SPEC_PACKET_OWNER_ROOT = targets.registry[SPEC_PACKET_OWNER_TARGET_ID].root`
 - `ACTIVE_TARGET_ID` per workflow/phase:
-  - `/new-component`, `/refactor-component` -> `active_target_defaults.design_system`
-  - `/new-view` DS phases -> `active_target_defaults.design_system`
-  - `/new-view` app phases -> `active_target_defaults.app`
+  - `/new-component`, `/refactor-component` -> `DESIGN_SYSTEM_TARGET_ID`
+  - `/new-view` DS phases -> `DESIGN_SYSTEM_TARGET_ID`
+  - `/new-view` app phases -> `APP_TARGET_ID`
   - `/fix-pr-comments` -> target indicated by the input or
     `active_target_defaults.design_system`
 - `ACTIVE_TARGET_ROOT = targets.registry[ACTIVE_TARGET_ID].root`
 - `ALLOWED_ARTIFACT_ROOTS = targets.registry.*.root`
-- `PIPELINE_ROOT = {ACTIVE_TARGET_ROOT}/{pipeline.output_dir}`
+- `PIPELINE_ROOT = {SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}`
 - `PIPELINE_LOG_PATH = {PIPELINE_ROOT}/{pipeline.log_file}`
 - `PIPELINE_SPEC_PATH = {PIPELINE_ROOT}/{pipeline.spec_file}`
 - `SPEC_PACKET_ROOT = {PIPELINE_ROOT}/specs`
-- `WIDGETBOOK_COMPONENTS_ROOT = targets.registry[design_system].structure.widgetbook_components_path` (fallback `widgetbook`)
-- `WIDGETBOOK_SCREENS_ROOT = targets.registry[app].structure.widgetbook_screens_path` (fallback `widgetbook`)
+- `WIDGETBOOK_COMPONENTS_ROOT = targets.registry[DESIGN_SYSTEM_TARGET_ID].structure.widgetbook_components_path` (fallback `widgetbook`)
+- `WIDGETBOOK_SCREENS_ROOT = targets.registry[APP_TARGET_ID].structure.widgetbook_screens_path` (fallback `widgetbook`)
 - `ARCHITECTURE_MERMAID_PATH = {PROJECT_ROOT}/{architecture.mermaid_doc_path}`
 - `ARCHITECTURE_CONTRACT_PATH = {PROJECT_ROOT}/{architecture.contract_path}`
 - `DEPENDENCIES_CONTRACT_PATH = {PROJECT_ROOT}/{dependencies.contract_path}` (fallback `.sopp/config/dependencies-contract.yaml`)
@@ -196,6 +221,10 @@ Applies to every workflow controlled by this agent.
 Before any codegen, refactor or correction, create a package in:
 
 `SPEC_PACKET_PATH = {SPEC_PACKET_ROOT}/{workflow_slug}`
+
+`ACTIVE_TARGET_ID` may change as phases generate artifacts in different
+targets. It must never change the packet owner, `SPEC_PACKET_PATH`,
+`PIPELINE_LOG_PATH` or `PIPELINE_SPEC_PATH`.
 
 Must contain:
 
@@ -348,7 +377,8 @@ Outside those cases, do not ask intermediate confirmations.
 6. Phase 3 `@widget-developer` → requires spec approved; generates code DS bottom-up.
 7. Phase 3.5 `@code-auditor` → requires outputs of Phase 3 and writes evidence.
 8. Phase 4a `@test-engineer` with `MODE=DS_WIDGET_TESTS`.
-9. Phase 4b `@golden-test-engineer` with `MODE=DS_GOLDEN_TESTS`.
+9. Phase 4b `@golden-test-engineer` with `MODE=DS_GOLDEN_TESTS` only when
+   `golden_tests=true`; otherwise record `skipped_by_input`.
 10. Phase 4c `@widgetbook-developer` with `MODE=DS_WIDGETBOOK`.
 11. Phase 5 `@delivery-manager` → writes final evidence and the human report.
 
@@ -372,10 +402,12 @@ Outside those cases, do not ask intermediate confirmations.
 10. Phase 3a.5 `@code-auditor` → audits DS against `spec_ref`.
 11. Phase 3b `@widget-developer` → creates view app with `codegen-view`.
 12. Phase 4a `@test-engineer` with `MODE=DS_WIDGET_TESTS`.
-13. Phase 4b `@golden-test-engineer` with `MODE=DS_GOLDEN_TESTS`.
+13. Phase 4b `@golden-test-engineer` with `MODE=DS_GOLDEN_TESTS` only when
+    `golden_tests=true`; otherwise record `skipped_by_input`.
 14. Phase 4c `@widgetbook-developer` with `MODE=DS_WIDGETBOOK`.
 15. Phase 4d `@test-engineer` with `MODE=VIEW_WIDGET_TESTS`.
-16. Phase 4e `@golden-test-engineer` with `MODE=VIEW_GOLDEN_TESTS`.
+16. Phase 4e `@golden-test-engineer` with `MODE=VIEW_GOLDEN_TESTS` only when
+    `golden_tests=true`; otherwise reuse the recorded `skipped_by_input` outcome.
 17. Phase 4f `@widgetbook-developer` with `MODE=APP_WIDGETBOOK_SCREENS`
     and `WIDGETBOOK_SCOPE=APP_SCREENS`.
 18. Phase 5 `@delivery-manager` → final evidence and human report.

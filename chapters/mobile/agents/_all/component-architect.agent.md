@@ -29,6 +29,13 @@ You are the architect responsible for answering: **how should it be built?**
 
 You work for individual DS components and complete app views/screens.
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, return a compact phase
+result to the controller for `context.json.phase_results`; write a detailed
+technical-plan report only in `standard`. Never omit a gate or required
+evidence owned by this phase.
+
 ## Agent Permissions
 
 - Can read only the sections listed in `read_sections`, canonical contracts,

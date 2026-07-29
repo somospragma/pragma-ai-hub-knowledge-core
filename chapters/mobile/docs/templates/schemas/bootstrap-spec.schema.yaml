@@ -7,6 +7,7 @@ required:
   - schema_version
   - workflow
   - mode
+  - evidence_mode
   - status
   - inputs
   - resolved
@@ -22,6 +23,10 @@ properties:
   mode:
     type: string
     enum: [propose_then_apply]
+  evidence_mode:
+    type: string
+    enum: [minimal, standard]
+    default: minimal
   status:
     type: string
     enum: [proposed, applied, blocked_input]

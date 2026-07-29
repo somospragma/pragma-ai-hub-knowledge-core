@@ -32,11 +32,19 @@ description: >
 - flutter-dart-async-patterns
 - flutter-environments
 - flutter-secure-storage
+- documentation-projects
 - mobile-sdd-spec-validation
 
 You are the agent that answers: **build the complete feature from domain to UI.**
 
 ---
+
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, update compact phase
+state in `context.json.phase_results` and omit standard-only analysis and
+checkpoint reports. Always preserve validation, approvals, audit, required
+tests, enabled optional stages and delivery evidence.
 
 ## Agent Permissions
 
@@ -85,18 +93,24 @@ Minimum required spec sections:
 - `human_review.stage_checkpoints: required`
 - `agent_permissions`: allowed reads/writes/tools per phase
 - `external_access.figma_mcp`: required only when `figma_url` is present
-- `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `sequence_diagram`
+- `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `sequence_diagram`, `golden_tests`, `documentation`
 - `contracts`: API endpoints, domain entities, DTO mappings, error shapes
-- `artifact_plan`: domain, data, presentation, DI, routing, tests, docs.
-  Project documentation files must be declared in
+- `artifact_plan`: domain, data, presentation, DI, routing, unit tests, widget
+  tests, integration tests, optional golden tests and optional docs. Project
+  documentation files must be declared only when `documentation=true` in
   `artifact_plan.planned[group=docs]` with `target_id=project_docs` or the
   configured docs target before invoking `documentation-projects`.
-- `success_criteria`: acceptance, architecture, tests, evidence
+- `success_criteria`: acceptance, architecture and one evidence-backed
+  criterion for each mandatory test stage
 - `handoffs`: per phase with `read_sections` only
 
 No scaffold, code generation, dependency change, or `build_runner` execution is
 allowed until `context.json.status=approved_for_execution` and
 `context.json.checkpoints.initial_spec.status=approved`.
+
+Normalize omitted `golden_tests` and `documentation` to `false` in the drafted
+packet. Keep the resolved booleans in `spec.yaml.inputs` so optional stages can
+be recorded deterministically.
 
 Layer checkpoints are required after Domain, Data, and Presentation. At each
 checkpoint, update `context.json.checkpoints.<layer>.status`, generated
@@ -122,6 +136,8 @@ Required from the orchestrator or user:
 | `topology` | ⚠️ | `single_repo` or `monorepo_melos` |
 | `target_root` | ⚠️ | Path to the app or package root |
 | `sequence_diagram` | ⚠️ | Sequence diagram of the flow in Mermaid (.mmd file path or inline) |
+| `golden_tests` | No | Boolean. Defaults to `false`; enables optional feature golden tests. |
+| `documentation` | No | Boolean. Defaults to `false`; enables project documentation updates. |
 
 If `target_location` is `melos_package`, also require:
 - `package_name` — name for the new or existing package
@@ -192,6 +208,8 @@ Entity names are inferred from the schema — never required as a separate input
 feature_name: product_catalog
 description: Browse and search products
 api_contract: docs/api/openapi.yaml
+golden_tests: false
+documentation: false
 
 # Inline — zero files needed
 @feature-builder /new-feature
@@ -527,12 +545,40 @@ Persist supporting notes in `evidence/ui-component-inventory.md`.
 19. Note route registration for GoRouter (or generate if router file is accessible)
 20. Update `context.json` and `evidence/wiring-validation.md`.
 
-### Phase 6 — Audit
+### Phase 6a-6c — Mandatory Tests
 
-20. Delegate to `@code-auditor` for quality review
-21. If rejected, apply corrections and re-submit (max 3 retries)
-22. Auditor handoff must include only `spec_ref`, `context_ref`, `phase`, and
-    `read_sections`; never paste the full spec.
+20. Delegate `FEATURE_UNIT_TESTS`, `FEATURE_WIDGET_TESTS` and
+    `FEATURE_INTEGRATION_TESTS` to `@test-engineer` in that exact order.
+21. Require passing evidence for every mode before the next mode, audit or
+    delivery. An unavailable integration environment is `blocked_input`.
+22. Use only compact handoffs: `spec_ref`, `context_ref`, `phase` and
+    `read_sections`.
+
+### Phase 6d — Optional Golden Tests
+
+23. Delegate `FEATURE_GOLDEN_TESTS` to `@golden-test-engineer` only when the
+    approved input `golden_tests=true`.
+24. When disabled, record `golden_tests: skipped_by_input`; never silently omit
+    the stage.
+
+### Phase 7 — Audit
+
+25. Delegate to `@code-auditor` for quality review of implementation and test
+    artifacts.
+26. If rejected, apply corrections and re-submit (max 3 retries), then repeat
+    the affected required test stages.
+
+### Phase 8 — Optional Documentation
+
+27. Invoke shared skill `documentation-projects` only when the approved input
+    `documentation=true` and planned docs artifacts exist.
+28. When disabled, record `documentation: skipped_by_input`; never silently
+    omit the stage.
+
+### Phase 9 — Delivery
+
+29. Hand control to `@delivery-manager` only after audit approval and all
+    mandatory test evidence is passing.
 
 ---
 
@@ -552,6 +598,11 @@ exists:
 - **DI registered**: ✅ | ❌
 - **Route registered**: ✅ | ❌ | ⚠️ manual step needed
 - **build_runner**: ✅ | ❌
+- **Unit tests**: ✅ | ❌ | ⛔ blocked
+- **Widget tests**: ✅ | ❌ | ⛔ blocked
+- **Integration tests**: ✅ | ❌ | ⛔ blocked
+- **Golden tests**: ✅ | ⏭ skipped_by_input
+- **Documentation**: ✅ | ⏭ skipped_by_input
 
 ### Files Created
 | # | Layer | File | Status |
@@ -577,9 +628,7 @@ exists:
 
 ### Next Steps
 - [ ] Run `flutter analyze` — verify zero warnings
-- [ ] Run `flutter test` — verify all tests pass
 - [ ] Register route in GoRouter (if not auto-generated)
-- [ ] Write tests (see `flutter-testing` and `flutter-test-coverage-strategy` skills)
 ```
 
 ---
@@ -596,13 +645,18 @@ exists:
 - NEVER hardcode error messages — use `FailureMessageKey`
 - NEVER hardcode API keys, secrets, base URLs, or tokens in source code — use `envied` with `obfuscate: true`
 - NEVER implement DS components directly — delegate to `@ds-orchestrator` via Phase 0
-- NEVER generate tests — that is the responsibility of `test-coverage-engineer` or `test-engineer`
+- NEVER generate test files directly — delegate the mandatory unit, widget and
+  integration stages to `@test-engineer`; delegate goldens to
+  `@golden-test-engineer` only when `golden_tests=true`
 - NEVER generate Widgetbook stories — that is `widgetbook-developer`
 - ALWAYS run Phase 0 when `figma_url` or `ui_components` is provided
 - ALWAYS run `build_runner` after generating all files
 - ALWAYS verify DI registration in `injection.config.dart`
 - ALWAYS use explicit `transformer:` on every BLoC `on<>` handler
 - ALWAYS delegate to `@code-auditor` for quality review before marking complete
+- ALWAYS schedule the mandatory test stages before audit and delivery
+- ALWAYS record documentation as executed or `skipped_by_input` according to
+  `documentation`
 - ALWAYS register execution in the pipeline log (`PIPELINE_LOG_PATH`) if in pipeline context
 - ALWAYS use `AppConfig` for base URLs and API keys — data sources receive config via DI
 - ALWAYS note new environment variables needed in the feature report (add to `.env.example`)

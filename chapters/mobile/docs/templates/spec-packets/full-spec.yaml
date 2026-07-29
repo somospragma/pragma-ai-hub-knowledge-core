@@ -3,6 +3,7 @@ schema_ref: ../schemas/mobile-spec.schema.yaml
 workflow: "{{WORKFLOW}}"
 spec_level: full
 execution_mode: propose_then_apply
+evidence_mode: minimal
 status: proposed
 language:
   review_documents: es
@@ -31,6 +32,7 @@ agent_permissions:
         - context.json.current_phase
         - context.json.checkpoints
         - context.json.completed_phases
+        - context.json.phase_results
         - context.json.artifacts
       evidence:
         - evidence/scaffold-report.md
@@ -63,6 +65,7 @@ agent_permissions:
         - context.json.current_phase
         - context.json.checkpoints
         - context.json.completed_phases
+        - context.json.phase_results
         - context.json.artifacts
       evidence:
         - evidence/refactoring-plan.md
@@ -92,6 +95,7 @@ agent_permissions:
         - context.json.current_phase
         - context.json.checkpoints
         - context.json.completed_phases
+        - context.json.phase_results
         - context.json.artifacts
       evidence:
         - evidence/test-plan.md
@@ -104,6 +108,60 @@ agent_permissions:
     evidence_required:
       - evidence/test-plan.md
       - evidence/test-generation-report.md
+  test-engineer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - technical_plan
+      - contracts
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.artifacts
+      evidence:
+        - evidence/unit-tests.md
+        - evidence/widget-tests.md
+        - evidence/integration-tests.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/unit-tests.md
+      - evidence/widget-tests.md
+      - evidence/integration-tests.md
+  golden-test-engineer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - technical_plan
+      - contracts
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.artifacts
+      evidence:
+        - evidence/golden-tests.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/golden-tests.md
   ds-orchestrator:
     can_read:
       - inputs.figma_url
@@ -142,7 +200,7 @@ agent_permissions:
     can_call_external_tools:
       - figma_mcp
     evidence_required:
-      - evidence/figma-analysis.md
+      - evidence/figma-mcp-preflight.md
   code-auditor:
     can_read:
       - read_sections

@@ -58,6 +58,8 @@ If any item is missing, stop with `blocked_input`.
 - Execute commands in `target.target_root`.
 - Commands:
   - `flutter test`
+  - `flutter test {declared_test_path}`
+  - `flutter test {declared_integration_test_path}`
   - `flutter test --update-goldens --tags golden`
   - `dart run build_runner build --delete-conflicting-outputs`
 
@@ -68,6 +70,8 @@ If any item is missing, stop with `blocked_input`.
 - Require non-empty `execution_context.target_scope`.
 - Commands:
   - `melos exec --scope={target_scope} -- flutter test`
+  - `melos exec --scope={target_scope} -- flutter test {declared_test_path}`
+  - `melos exec --scope={target_scope} -- flutter test {declared_integration_test_path}`
   - `melos exec --scope={target_scope} -- flutter test --update-goldens --tags golden`
   - `melos exec --scope={target_scope} -- dart run build_runner build --delete-conflicting-outputs`
 
@@ -134,6 +138,72 @@ If any item is missing, stop with `blocked_input`.
 1. `test/presentation/views/[view]/[view]_view_test.dart`.
 2. Evidence of the executed mode.
 
+## MODE: `FEATURE_UNIT_TESTS` (only `@test-engineer`)
+
+### Minimum Coverage
+
+1. Domain entities, value behavior and use cases.
+2. Repository implementation success and mapped failure paths.
+3. DTO and mapper conversions, including nullable and malformed API values.
+4. Data-source success and failure mapping with mocks or fakes.
+5. BLoC events, emitted states and use-case interaction where the feature has a BLoC.
+
+### Rules
+
+- Generate only tests planned under `artifact_plan.planned[group=unit_tests]`.
+- Keep production code unchanged. Return implementation defects to the feature
+  builder and stop the phase until they are corrected.
+- Execute the declared test paths, or the feature unit-test directory when the
+  packet declares it, and persist the exact command and result.
+
+### Output
+
+1. Planned `test/...` unit-test files for the feature.
+2. `evidence/unit-tests.md` with files, command, passed/failed totals and result.
+
+## MODE: `FEATURE_WIDGET_TESTS` (only `@test-engineer`)
+
+### Minimum Coverage
+
+1. Page rendering in loading, empty, error and populated states when applicable.
+2. Primary user actions and callback dispatch.
+3. Critical navigation from and back to the feature flow.
+4. Visible literal text and compact constraints when overflow risk is declared.
+
+### Rules
+
+- Generate only tests planned under `artifact_plan.planned[group=widget_tests]`.
+- Use deterministic dependencies, state fixtures and routing fakes.
+- Execute the declared feature widget-test paths and persist the exact command
+  and result.
+
+### Output
+
+1. Planned feature widget-test files.
+2. `evidence/widget-tests.md` with files, command, passed/failed totals and result.
+
+## MODE: `FEATURE_INTEGRATION_TESTS` (only `@test-engineer`)
+
+### Minimum Coverage
+
+1. One end-to-end primary journey through the app entry point.
+2. A relevant empty or failure outcome when the feature exposes one.
+3. Navigation into and out of the feature when it belongs to an app flow.
+
+### Rules
+
+- Generate only tests planned under `artifact_plan.planned[group=integration_tests]`.
+- Use the configured integration-test harness and stable fake or test backend
+  where the project provides one.
+- Execute the declared integration-test path. If the required device, emulator
+  or harness is unavailable, return `blocked_input`; never record this mode as
+  skipped.
+
+### Output
+
+1. Planned `integration_test/...` feature journey file(s).
+2. `evidence/integration-tests.md` with files, command, environment and result.
+
 ## MODE: `DS_GOLDEN_TESTS` (only `@golden-test-engineer`)
 
 ### Required Goldens
@@ -174,6 +244,27 @@ If any item is missing, stop with `blocked_input`.
 
 1. `test/presentation/views/[view]/[view]_view_golden_test.dart`.
 2. Evidence with command and result.
+
+## MODE: `FEATURE_GOLDEN_TESTS` (only `@golden-test-engineer`)
+
+### Required Complete Feature Goldens
+
+1. Stable primary page state.
+2. Relevant loading, empty or error state when implemented.
+3. Light and dark theme when the application supports both.
+4. Compact viewport when `contracts.text_overflow` reports overflow risk.
+
+### Rules
+
+- Execute this mode only when the approved input `golden_tests=true` and the
+  packet plans `artifact_plan.planned[group=golden_tests]`.
+- Capture complete feature pages, not isolated private widgets.
+- Use deterministic state wrappers and mocks.
+
+### Output
+
+1. Planned feature golden test files and snapshots.
+2. `evidence/golden-tests.md` with the command and result.
 
 ## MODE: `DS_WIDGETBOOK` (only `@widgetbook-developer`)
 

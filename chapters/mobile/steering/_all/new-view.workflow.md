@@ -12,6 +12,15 @@ description: >
 ---
 # Workflow: New View/Screen from Figma
 
+## Evidence Mode
+
+Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
+as `spec.yaml.evidence_mode` before validation. In `minimal`, retain gate
+evidence and record every other phase as a compact
+`context.json.phase_results` entry. `standard` additionally writes detailed
+phase reports. Neither mode may omit a gate, approval, test result, blocker or
+delivery result.
+
 ## Initial Invocation Is Plan-Only
 
 The initial `/new-view` response may write only the Mobile Spec Packet and its
@@ -43,16 +52,24 @@ with the canonical invocation instead of generating code.
 - Context resolved by the orchestrator:
   - `PROJECT_ROOT`
   - `TARGET_REGISTRY`
-  - `ACTIVE_TARGET_ID` per phase (`design_system` for DS, `app` for the view)
+  - `APP_TARGET_ID = target_id` when supplied; otherwise
+    `active_target_defaults.app_target_id`, falling back to
+    `active_target_defaults.app`
+  - `DESIGN_SYSTEM_TARGET_ID = active_target_defaults.design_system_target_id`,
+    falling back to `active_target_defaults.design_system`
+  - `SPEC_PACKET_OWNER_TARGET_ID = APP_TARGET_ID` (immutable for the run)
+  - `SPEC_PACKET_OWNER_ROOT = targets.registry[SPEC_PACKET_OWNER_TARGET_ID].root`
+  - `ACTIVE_TARGET_ID` per implementation phase (`DESIGN_SYSTEM_TARGET_ID` for
+    DS, `APP_TARGET_ID` for the view)
   - `ACTIVE_TARGET_ROOT`
   - `ALLOWED_ARTIFACT_ROOTS = targets.registry.*.root`
   - `TOPOLOGY_REPO_MODE`
   - `GENERATION_SCOPE`
   - `CONTRACTS_POLICY`
   - `ARCHITECTURE_CONTRACT_PATH`
-  - `PIPELINE_SPEC_PATH = {targets.registry[app].root}/{pipeline.output_dir}/{pipeline.spec_file}`
-  - `PIPELINE_LOG_PATH = {targets.registry[app].root}/{pipeline.output_dir}/{pipeline.log_file}`
-  - `SPEC_PACKET_PATH = {targets.registry[app].root}/{pipeline.output_dir}/specs/{view_slug}`
+  - `PIPELINE_SPEC_PATH = {SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
+  - `PIPELINE_LOG_PATH = {SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
+  - `SPEC_PACKET_PATH = {SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}/specs/{view_slug}`
 
 ## Gates required
 
@@ -74,10 +91,26 @@ Before any packet, log, Figma request, or code generation:
 ### Gate 0.1 - Topology
 
 1. Validate `TOPOLOGY_REPO_MODE`.
-2. Validate roots (`PROJECT_ROOT`, target `app` and target `design_system` if
-   DS components will be created).
+2. Validate roots (`PROJECT_ROOT`, `APP_TARGET_ID` and
+   `DESIGN_SYSTEM_TARGET_ID` if DS components will be created).
 3. In targets `location_strategy=melos_package`, validate `repo_root/melos.yaml`
    and `repo_root/package_path`.
+
+### Gate 0.2 - Spec Packet Ownership
+
+Before writing any packet, log, report or Figma evidence:
+
+1. Resolve `APP_TARGET_ID` from `target_id` or the app default. It must exist
+   in `targets.registry` and have `kind: app`.
+2. Set `SPEC_PACKET_OWNER_TARGET_ID = APP_TARGET_ID` and
+   `SPEC_PACKET_OWNER_ROOT = targets.registry[APP_TARGET_ID].root`.
+3. Compute every packet-state path from `SPEC_PACKET_OWNER_ROOT` only.
+   `ACTIVE_TARGET_ID` may change for DS and app implementation phases, but it
+   must never change `SPEC_PACKET_PATH`, `PIPELINE_LOG_PATH` or
+   `PIPELINE_SPEC_PATH`.
+4. If the resolved packet root differs from `SPEC_PACKET_OWNER_ROOT`, stop with
+   `CONFIG_SPEC_PACKET_ROOT_MISMATCH`. If the target is missing or is not an
+   app, stop with `CONFIG_SPEC_PACKET_OWNER_INVALID`.
 
 ### Gate 0.5 — Ownership of the Repo App
 
@@ -137,6 +170,8 @@ user_story_path: [Optional Markdown path; e.g. docs/user-stories/story-123.md]
 route_name: [Optional route name or path]
 target_id: [Optional app target id]
 project_root: [Optional absolute app repository root when the IDE opens a multi-root workspace]
+golden_tests: false  [Optional; default false]
+evidence_mode: minimal  [Optional; default minimal]
 ```
 
 ## Canonical Sequence
@@ -154,10 +189,19 @@ Create `SPEC_PACKET_PATH` with:
 3. `review.md` in Spanish
 4. `evidence/validation-report.md`
 
+Record `packet_owner_target_id: APP_TARGET_ID` and
+`packet_root: SPEC_PACKET_PATH` in `context.json`. Verify that the packet path
+is inside `SPEC_PACKET_OWNER_ROOT` before the first write. DS phases may write
+only their planned artifacts under `DESIGN_SYSTEM_TARGET_ID`; they must keep
+all packet state and evidence under this app-owned packet.
+
 The initial spec records inputs, Figma URL, user story, contracts policy,
 architecture required, success criteria for DS + view and checkpoints
 required. Must include `external_access.figma_mcp.required=true` and
-`agent_permissions` per agent. Do not generate code in this phase.
+`agent_permissions` per agent. Normalize an omitted `golden_tests` input to
+`false` and persist the resolved boolean in `spec.yaml.inputs`. Plan golden
+artifacts and golden success criteria only when it is `true`. Do not generate
+code in this phase.
 
 ---
 
@@ -298,8 +342,8 @@ read_sections:
 ```
 
 Output:
-- View in `targets.registry[app].structure.views_path`.
-- Private widgets in `targets.registry[app].structure.view_widgets_path`.
+- View in `targets.registry[APP_TARGET_ID].structure.views_path`.
+- Private widgets in `targets.registry[APP_TARGET_ID].structure.view_widgets_path`.
 
 ---
 
@@ -322,8 +366,9 @@ read_sections:
 
 ---
 
-### PHASE 4b — Golden of Components DS
+### PHASE 4b — Golden of Components DS (conditional)
 
+**Condition**: `golden_tests=true`.
 **Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
 Required compact handoff:
@@ -339,6 +384,11 @@ read_sections:
   - contracts.text_overflow
   - success_criteria
 ```
+
+When `golden_tests=false`, do not invoke `@golden-test-engineer` or create DS
+golden artifacts. Record the single run outcome `golden_tests: skipped_by_input`
+with `reason: golden_tests=false` in `context.json`, `spec.yaml` and
+`PIPELINE_LOG_PATH`.
 
 ---
 
@@ -391,8 +441,9 @@ Minimum coverage:
 
 ---
 
-### PHASE 4e — Golden Tests of Complete View
+### PHASE 4e — Golden Tests of Complete View (conditional)
 
+**Condition**: `golden_tests=true`.
 **Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=VIEW_GOLDEN_TESTS`)
 Required compact handoff:
@@ -409,6 +460,10 @@ read_sections:
   - contracts.text_overflow
   - success_criteria
 ```
+
+When `golden_tests=false`, this phase is already represented by the single
+`golden_tests: skipped_by_input` outcome recorded in Phase 4b. Do not invoke
+the agent or create view golden artifacts.
 
 Minimum coverage:
 1. `loading`
@@ -462,3 +517,7 @@ Must:
    - fallback `naming.branch_prefix`
 4. generate `evidence/delivery-report.md` and a summary in the human report
 5. validate that the delivery satisfies `SPEC_PACKET_PATH/spec.yaml`
+6. require passing `evidence/widget-tests.md` and
+   `evidence/view-widget-tests.md`
+7. require passing `evidence/golden-tests.md` when `golden_tests=true`, or the
+   recorded `golden_tests: skipped_by_input` outcome when false

@@ -32,14 +32,24 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
    - `TOPOLOGY_SHARED_CORE_MODE = topology.shared_core_mode` (fallback `none`)
    - `TOPOLOGY_DS_MODE = topology.ds_mode` (fallback `external_ds_package`)
    - `TARGET_REGISTRY = targets.registry`
-   - `ACTIVE_TARGET_ID` per workflow/phase
+   - `APP_TARGET_ID = workflow-resolved app target` (for `/new-view`, use
+     `inputs.target_id` when present, otherwise
+     `active_target_defaults.app_target_id`, falling back to
+     `active_target_defaults.app`)
+   - `DESIGN_SYSTEM_TARGET_ID = active_target_defaults.design_system_target_id`
+     (fallback `active_target_defaults.design_system`)
+   - `SPEC_PACKET_OWNER_TARGET_ID = workflow-resolved target before Phase 0`.
+     It is immutable for the run and is not the same concept as
+     `ACTIVE_TARGET_ID`.
+   - `SPEC_PACKET_OWNER_ROOT = targets.registry[SPEC_PACKET_OWNER_TARGET_ID].root`
+   - `ACTIVE_TARGET_ID` per implementation phase
    - `ACTIVE_TARGET_ROOT = targets.registry[ACTIVE_TARGET_ID].root`
    - `ALLOWED_ARTIFACT_ROOTS = targets.registry.*.root`
-   - `PIPELINE_ROOT = {ACTIVE_TARGET_ROOT}/{pipeline.output_dir}`
+   - `PIPELINE_ROOT = {SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}`
    - `PIPELINE_LOG_PATH = {PIPELINE_ROOT}/{pipeline.log_file}`
    - `PIPELINE_SPEC_PATH = {PIPELINE_ROOT}/{pipeline.spec_file}`
-   - `WIDGETBOOK_COMPONENTS_ROOT = targets.registry[design_system].structure.widgetbook_components_path` (fallback `widgetbook`)
-   - `WIDGETBOOK_SCREENS_ROOT = targets.registry[app].structure.widgetbook_screens_path` (fallback `widgetbook`)
+   - `WIDGETBOOK_COMPONENTS_ROOT = targets.registry[DESIGN_SYSTEM_TARGET_ID].structure.widgetbook_components_path` (fallback `widgetbook`)
+   - `WIDGETBOOK_SCREENS_ROOT = targets.registry[APP_TARGET_ID].structure.widgetbook_screens_path` (fallback `widgetbook`)
    - `ARCHITECTURE_MERMAID_PATH = {PROJECT_ROOT}/{architecture.mermaid_doc_path}`
    - `ARCHITECTURE_CONTRACT_PATH = {PROJECT_ROOT}/{architecture.contract_path}`
    - `DEPENDENCIES_CONTRACT_PATH = {PROJECT_ROOT}/{dependencies.contract_path}` (fallback `.sopp/config/dependencies-contract.yaml`)
@@ -52,11 +62,17 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
    - `DETERMINISTIC_MODE = pipeline.deterministic_mode`
    - `ENFORCE_PHASE_CONTRACTS = pipeline.enforce_phase_contracts`
    - `STOP_ON_MISSING_ARTIFACTS = pipeline.stop_on_missing_artifacts`
-4. Create `PIPELINE_LOG_PATH` and `PIPELINE_SPEC_PATH` only after the
-   canonical configuration gate succeeds.
+   - `EVIDENCE_MODE = invocation.evidence_mode` (default `minimal`; allowed
+     `minimal | standard`)
+4. Resolve `SPEC_PACKET_OWNER_TARGET_ID` before creating any packet, log or
+   report. The target must exist in `TARGET_REGISTRY` and its root must be
+   accessible. Create `PIPELINE_LOG_PATH` and `PIPELINE_SPEC_PATH` only after
+   the canonical configuration gate succeeds.
 5. Apply Gate 0 - Topology Gate:
    - Validate `TOPOLOGY_REPO_MODE` in `single_repo | monorepo_melos | multi_repo`.
-   - Require `PROJECT_ROOT`, `ACTIVE_TARGET_ID` and `ACTIVE_TARGET_ROOT` accessible.
+   - Require `PROJECT_ROOT`, `SPEC_PACKET_OWNER_TARGET_ID`,
+     `SPEC_PACKET_OWNER_ROOT`, `ACTIVE_TARGET_ID` and `ACTIVE_TARGET_ROOT`
+     accessible.
    - If `monorepo_melos`: require `MELOS_ENABLED=true`, `MELOS_ROOT/melos.yaml`,
      `MELOS_TARGET_SCOPE` and `TARGET_PACKAGE_PATH` valid.
    - If `TOPOLOGY_SHARED_CORE_MODE=external_core_package`: require
@@ -92,8 +108,13 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
    - `spec.yaml` must validate against
      `../docs/templates/schemas/mobile-spec.schema.yaml`.
    - `execution_mode=propose_then_apply`.
+   - `evidence_mode=EVIDENCE_MODE`.
    - `review.md` always in Spanish.
    - validate with `mobile-sdd-spec-validation`.
+   - Do not derive `SPEC_PACKET_ROOT`, `SPEC_PACKET_PATH`,
+     `PIPELINE_LOG_PATH` or `PIPELINE_SPEC_PATH` from `ACTIVE_TARGET_ROOT`.
+     Changing the active target for an implementation phase must never move
+     packet state or evidence.
 12. Assign `spec_level` per workflow:
    - `mini`: `/new-component`, `/refactor-component`, `/fix-pr-comments`
    - `standard`: `/new-view`
@@ -154,6 +175,8 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 - `CONFIG_PROJECT_ROOT_POINTS_TO_LIBRARY`
 - `CONFIG_APP_EXECUTABLE_SIGNAL_MISSING`
 - `CONFIG_SPEC_PACKET_INVALID`
+- `CONFIG_SPEC_PACKET_OWNER_INVALID`
+- `CONFIG_SPEC_PACKET_ROOT_MISMATCH`
 - `CONFIG_SPEC_NOT_APPROVED`
 
 ## Orchestration Contract
@@ -161,11 +184,24 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 - Do not advance to the next phase without validating the required output of the previous phase.
 - If a phase returns `blocked_input`, stop the pipeline immediately.
 - Record each phase in `PIPELINE_LOG_PATH`.
+- Keep `SPEC_PACKET_OWNER_TARGET_ID`, `SPEC_PACKET_OWNER_ROOT`,
+  `SPEC_PACKET_PATH`, `PIPELINE_LOG_PATH` and `PIPELINE_SPEC_PATH` immutable
+  for the run. Only `ACTIVE_TARGET_ID` and `ACTIVE_TARGET_ROOT` may change by
+  phase.
 - Update `context.json` and `spec.yaml` after each functional phase.
 - Update `PIPELINE_SPEC_PATH` only as the cumulative human report.
 - Update `context.json` of the Mobile Spec Packet after each functional phase.
+- Record every phase in `context.json.phase_results` with a compact status,
+  summary and references. This state is mandatory in both evidence modes.
 - If a phase is conditional (`if applicable`), record `skipped` with reason.
 - Keep handoffs silent, complete and reference-based.
+- Include the resolved `evidence_mode` scalar in every handoff.
+- `minimal` writes only gate evidence: validation, required Figma preflight,
+  required human decisions, audit, executed tests, enabled optional stages and
+  delivery. Record all other completed phases in `context.json.phase_results`
+  instead of creating narrative evidence files.
+- `standard` additionally writes phase analysis, inventory, planning, codegen,
+  Widgetbook and detailed checkpoint reports.
 - Do not use `PIPELINE_SPEC_PATH` as the machine source when there is
   `spec_context`.
 
@@ -181,7 +217,8 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 6. Phase 3 → `@widget-developer` (`codegen-atom/molecule/organism`) with a compact handoff.
 7. Phase 3.5 → `@code-auditor` → audits against `spec_ref` (loop up to `pipeline.max_audit_retries`).
 8. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
-9. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`).
+9. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) only when
+   `golden_tests=true`; otherwise record `skipped_by_input`.
 10. Phase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
 11. Phase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → final evidence and human report.
 
@@ -199,10 +236,12 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 10. A human checkpoint is required after the DS layer.
 11. Phase 3b → `@widget-developer` (`codegen-view.prompt.md`) → view app with handoff compact.
 12. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
-13. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`).
+13. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) only when
+    `golden_tests=true`; otherwise record `skipped_by_input`.
 14. Phase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
 15. Phase 4d → `@test-engineer` (`MODE=VIEW_WIDGET_TESTS`).
-16. Phase 4e → `@golden-test-engineer` (`MODE=VIEW_GOLDEN_TESTS`).
+16. Phase 4e → `@golden-test-engineer` (`MODE=VIEW_GOLDEN_TESTS`) only when
+    `golden_tests=true`; otherwise reuse the recorded `skipped_by_input` outcome.
 17. Phase 4f → `@widgetbook-developer` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`).
 18. Phase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → final evidence and human report.
 
@@ -239,7 +278,17 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 6. Phase 3 → Data; human checkpoint required.
 7. Phase 4 → Presentation; human checkpoint required.
 8. Phase 5 → wiring and validation.
-9. Phase 6 → audit against `spec_ref`.
+9. Phase 6a → `@test-engineer` (`MODE=FEATURE_UNIT_TESTS`); required.
+10. Phase 6b → `@test-engineer` (`MODE=FEATURE_WIDGET_TESTS`); required.
+11. Phase 6c → `@test-engineer` (`MODE=FEATURE_INTEGRATION_TESTS`); required.
+12. Phase 6d → `@golden-test-engineer` (`MODE=FEATURE_GOLDEN_TESTS`) only
+    when `golden_tests=true`; otherwise record `skipped_by_input`.
+13. Phase 7 → `@code-auditor` audits implementation and required test evidence.
+14. Human checkpoint → final build review; required.
+15. Phase 8 → project documentation only when `documentation=true`; otherwise
+    record `skipped_by_input`.
+16. Phase 9 → `@delivery-manager` validates all required evidence and emits the
+    final delivery report.
 
 ### `/refactor-feature`
 

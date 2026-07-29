@@ -32,11 +32,24 @@ command. For example, use `@ds-orchestrator /new-view`, not both agents.
 | `/bootstrap-workspace` | `@workspace-discovery` | bootstrap | Discover workspace topology and create `.sopp/config` files. | No |
 | `/new-component` | `@ds-orchestrator` | mini | Create or update a reusable Design System component from Figma. | Required |
 | `/new-view` | `@ds-orchestrator` | standard | Build an app screen that composes DS components. | Required |
-| `/new-feature` | `@feature-builder` | full | Build domain, data, presentation, wiring and docs. | Optional |
+| `/new-feature` | `@feature-builder` | full | Build domain, data, presentation, wiring and mandatory tests. | Optional when Figma is supplied. |
 | `/refactor-component` | `@ds-orchestrator` | mini | Refactor an existing DS component. | No |
 | `/refactor-feature` | `@refactoring-advisor` | full | Refactor an existing feature across layers. | No |
 | `/test-plan` | `@test-coverage-engineer` | full | Generate or improve tests for an existing feature. | No |
 | `/fix-pr-comments` | `@ds-orchestrator` | mini | Resolve accessible PR review comments. | No |
+
+## Evidence Mode
+
+Every workflow accepts `evidence_mode: <minimal|standard>` as an optional
+parameter. It defaults to `minimal`, which preserves all gates and stores
+compact phase results in the packet. Use `standard` only when detailed phase
+reports are needed for investigation, audit or handoff outside the pipeline.
+`/bootstrap-workspace` follows its existing uppercase input convention:
+`EVIDENCE_MODE: <minimal|standard>`.
+
+```text
+evidence_mode: <minimal|standard>  # optional, default minimal
+```
 
 ## `/bootstrap-workspace`
 
@@ -106,6 +119,7 @@ from Figma.
 | `user_story` | No | Inline acceptance context or short user need. |
 | `user_story_path` | No | Markdown file with acceptance criteria or DoD. |
 | `atomic_hint` | No | `atom`, `molecule` or `organism` when the level is already known. |
+| `golden_tests` | No | Boolean, default `false`. Runs DS golden tests only when `true`. |
 
 ```text
 @ds-orchestrator /new-component
@@ -114,6 +128,7 @@ figma_url: <https://www.figma.com/file/...?...node-id=...>  # required
 user_story: <short acceptance context>                      # optional
 user_story_path: <docs/user-stories/story-123.md>           # optional
 atomic_hint: <atom|molecule|organism>                       # optional
+golden_tests: <true|false>                                  # optional, default false
 ```
 
 Expected result: DS source files, tests, optional goldens, Widgetbook use case,
@@ -130,8 +145,9 @@ Purpose: generate an app screen/view from Figma, including DS/App separation.
 | `user_story` | Yes | Inline user story or acceptance criteria. |
 | `user_story_path` | No | Markdown file with acceptance criteria or DoD. |
 | `route_name` | No | Existing or proposed route name/path. |
-| `target_id` | No | App target id when not the default `app`. |
+| `target_id` | No | App target id. Defaults to `active_target_defaults.app_target_id`, then `active_target_defaults.app`. |
 | `project_root` | No | Absolute app repository root when the IDE opens a multi-root workspace. |
+| `golden_tests` | No | Boolean, default `false`. Runs DS and complete-view goldens only when `true`. |
 
 ```text
 @ds-orchestrator /new-view
@@ -140,13 +156,19 @@ figma_url: <https://www.figma.com/file/...?...node-id=...>  # required
 user_story: <user story or acceptance criteria>             # required
 user_story_path: <docs/user-stories/story-123.md>           # optional
 route_name: <route name or path>                            # optional
-target_id: <app_target_id>                                  # optional, default app
+target_id: <app_target_id>                                  # optional; must resolve to kind app
 project_root: <absolute/path/to/app-repo>                    # optional; needed only for multi-root ambiguity
+golden_tests: <true|false>                                  # optional, default false
 ```
 
 Expected result: app view code, DS component inventory, DS artifacts when
-needed, tests/goldens when applicable, Widgetbook screen use case when
-configured, audit evidence and delivery summary.
+needed, mandatory widget tests, optional goldens, Widgetbook screen use case
+when configured, audit evidence and delivery summary. When goldens are
+disabled, the packet records `golden_tests: skipped_by_input`.
+
+The Spec Packet, evidence and pipeline reports are always created under the
+resolved app target. DS phases may write planned DS artifacts in a separate
+target, but they must not move packet state away from the app.
 
 Before creating a packet, `/new-view` resolves and validates exactly one
 canonical `.sopp/config` triplet. It never runs bootstrap automatically. A
@@ -164,7 +186,8 @@ Use the explicit `@ds-orchestrator /new-view` form shown above. A bare
 ## `/new-feature`
 
 Purpose: generate a complete feature across domain, data, presentation, wiring
-and documentation.
+and mandatory automated tests. Golden tests and project documentation are
+opt-in to control AI token consumption.
 
 You must provide `feature_name` and `description`, plus one of these input
 strategies:
@@ -187,6 +210,8 @@ strategies:
 | `target_location` | No | `app_folder` or `melos_package`. |
 | `package_name` | Conditional | Required when `target_location: melos_package` creates or targets a package. |
 | `workspace_root` | Conditional | Required when `target_location: melos_package` and the workspace is ambiguous. |
+| `golden_tests` | No | Boolean, default `false`. Runs feature golden tests only when `true`. |
+| `documentation` | No | Boolean, default `false`. Updates project documentation only when `true`. |
 
 With API contract:
 
@@ -202,6 +227,8 @@ sequence_diagram: <docs/diagrams/feature_flow.mmd>          # optional
 target_location: <app_folder|melos_package>                 # optional, default app_folder
 package_name: <package_name>                                # conditional
 workspace_root: <absolute/path/to/workspace>                # conditional
+golden_tests: <true|false>                                  # optional, default false
+documentation: <true|false>                                # optional, default false
 ```
 
 Without API contract:
@@ -221,12 +248,17 @@ user_story: <story text or docs/user-stories/story-123.md>  # optional
 figma_url: <https://www.figma.com/file/...?...node-id=...>  # optional
 ui_components: <DSComponentA, DSComponentB>                 # optional
 sequence_diagram: <docs/diagrams/feature_flow.mmd>          # optional
+golden_tests: <true|false>                                  # optional, default false
+documentation: <true|false>                                # optional, default false
 ```
 
 Expected result: domain entities, use cases, repository contracts, DTOs, data
 sources, repository implementation, presentation state, page/UI model,
-DI/routing notes, tests or test plan, docs artifact, audit evidence and final
-delivery summary.
+DI/routing notes, passed unit/widget/integration tests, audit evidence and a
+final delivery summary. When requested, it also includes passed golden tests
+and updated project documentation. A missing or failed mandatory test blocks
+audit completion and delivery; optional stages are recorded as
+`skipped_by_input` when disabled.
 
 ## `/refactor-component`
 

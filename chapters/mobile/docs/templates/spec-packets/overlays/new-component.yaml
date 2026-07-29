@@ -5,6 +5,12 @@ purpose: Create or update a Design System component from Figma.
 required_inputs:
   - component_name
   - figma_url
+optional_inputs:
+  - user_story
+  - user_story_path
+  - atomic_hint
+  - golden_tests
+  - evidence_mode
 required_external_access:
   figma_mcp:
     required: true
@@ -18,9 +24,11 @@ required_agents:
   - widget-developer
   - code-auditor
   - test-engineer
-  - golden-test-engineer
   - widgetbook-developer
   - delivery-manager
+conditional_agents:
+  golden_tests:
+    - golden-test-engineer
 artifact_groups:
   - ds_components
   - tests
@@ -35,3 +43,6 @@ required_human_review:
 notes:
   - All generated files must target the design_system target unless the spec explicitly declares otherwise.
   - figma-analyzer performs the Figma MCP preflight before design analysis.
+  - Widget tests remain mandatory; golden tests run only when golden_tests=true.
+  - When golden_tests=false, record golden_tests as skipped_by_input.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

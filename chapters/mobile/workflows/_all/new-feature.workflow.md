@@ -12,6 +12,15 @@ description: >
 ---
 # Workflow: New Feature (Full Clean Architecture)
 
+## Evidence Mode
+
+Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
+as `spec.yaml.evidence_mode` before validation. In `minimal`, retain gate
+evidence and record every other phase as a compact
+`context.json.phase_results` entry. `standard` additionally writes detailed
+phase reports. Neither mode may omit a gate, approval, test result, blocker or
+delivery result.
+
 ## When to Use
 
 Use this workflow when:
@@ -72,6 +81,9 @@ user_story: docs/hus/user story-045.md  (optional — contains acceptance criter
 figma_url: https://www.figma.com/file/xxx/ProductList?node-id=123  (optional)
 target_location: app_folder | melos_package
 sequence_diagram: docs/diagrams/product_catalog_flow.mmd  (optional)
+golden_tests: false  (optional; default false)
+documentation: false  (optional; default false)
+evidence_mode: minimal  (optional; default minimal)
 ```
 
 ### `api_contract` — Single field, any format
@@ -161,17 +173,29 @@ The agent drafts the spec from `feature_name`, description, API contract,
 optional user story, Figma URL and sequence diagram. The developer reviews `review.md`
 instead of writing YAML manually.
 
+Normalize omitted `golden_tests` and `documentation` inputs to `false` and
+persist both resolved booleans in `spec.yaml.inputs` before validation. An
+omitted option must never be interpreted as an unrecorded skip later.
+
 The full spec must include:
 
 - requirements and success criteria
 - API/entity/domain analysis inputs
-- layer plan: domain, data, presentation, wiring, documentation
+- layer plan: domain, data, presentation, wiring and mandatory tests
 - expected artifacts per layer
+- mandatory artifacts under `artifact_plan.planned[group=unit_tests]`,
+  `artifact_plan.planned[group=widget_tests]` and
+  `artifact_plan.planned[group=integration_tests]`
+- success criteria with evidence for each mandatory test stage
+- golden artifacts under `artifact_plan.planned[group=golden_tests]` only when
+  `golden_tests=true`; otherwise record `skipped_by_input`
 - documentation artifacts under `artifact_plan.planned[group=docs]` using
-  `target_id=project_docs` or the configured docs target
+  `target_id=project_docs` or the configured docs target only when
+  `documentation=true`; otherwise record `skipped_by_input`
 - required layer checkpoints
 - `stage_checkpoints: required`
-- `agent_permissions` for feature, DS, audit, test and delivery agents
+- `agent_permissions` for feature, DS, audit, test and delivery agents; include
+  `golden-test-engineer` only when `golden_tests=true`
 - `external_access.figma_mcp.required=true` only when `figma_url` is provided
   and `agent_permissions.figma-analyzer.can_call_external_tools` includes
   `figma_mcp`
@@ -403,12 +427,107 @@ Persist build_runner, DI and route evidence under `SPEC_PACKET_PATH/evidence/`.
 
 ---
 
-### PHASE 6 — Audit
+### PHASE 6a — Unit Tests (required)
+
+**Agent:** `@test-engineer`
+**Mode:** `FEATURE_UNIT_TESTS`
+
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: feature_unit_tests
+read_sections:
+  - artifact_plan.planned[group=domain]
+  - artifact_plan.planned[group=data]
+  - artifact_plan.planned[group=unit_tests]
+  - contracts
+  - success_criteria
+```
+
+Generate and run unit tests for domain models, use cases, repositories, mappers,
+data sources and BLoC behavior where applicable. Persist
+`evidence/unit-tests.md`, test paths, command and result in `context.json`.
+This phase is complete only when its declared tests pass. If tests cannot run or
+fail, record `blocked_input` or `failed` with command output and stop.
+
+---
+
+### PHASE 6b — Widget Tests (required)
+
+**Agent:** `@test-engineer`
+**Mode:** `FEATURE_WIDGET_TESTS`
+
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: feature_widget_tests
+read_sections:
+  - artifact_plan.planned[group=presentation]
+  - artifact_plan.planned[group=widget_tests]
+  - contracts.literal_texts
+  - success_criteria
+```
+
+Generate and run widget tests for the feature page and interactive states,
+including loading, empty, error, populated, critical actions and navigation.
+Persist `evidence/widget-tests.md`, test paths, command and result in
+`context.json`. A missing or failing result stops the pipeline.
+
+---
+
+### PHASE 6c — Integration Tests (required)
+
+**Agent:** `@test-engineer`
+**Mode:** `FEATURE_INTEGRATION_TESTS`
+
+Mandatory compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: feature_integration_tests
+read_sections:
+  - requirements
+  - navigation
+  - artifact_plan.planned[group=integration_tests]
+  - success_criteria
+```
+
+Generate and run at least one feature journey through the app entry point using
+the configured integration-test harness. Cover the primary success path and a
+relevant failure or empty state when the feature exposes one. Persist
+`evidence/integration-tests.md`, test path, command and result in
+`context.json`.
+
+An unavailable integration environment is `blocked_input`, not a skipped test.
+Do not audit or deliver a feature without passed integration-test evidence.
+
+---
+
+### PHASE 6d — Golden Tests (conditional)
+
+**Condition:** `golden_tests=true`.
+**Agent:** `@golden-test-engineer`
+**Mode:** `FEATURE_GOLDEN_TESTS`
+
+When enabled, create and run complete feature-view goldens for relevant stable
+states and persist `evidence/golden-tests.md`. When disabled, record
+`golden_tests: skipped_by_input` with `reason: golden_tests=false` in
+`context.json`, `spec.yaml` and `PIPELINE_LOG_PATH`; do not create golden files
+or invoke `@golden-test-engineer`.
+
+---
+
+### PHASE 7 — Audit
 
 **Agent:** `@code-auditor`
 
 Steps:
-1. Review all generated files against:
+1. Review all generated implementation and test files against:
    - SOLID principles
    - Clean Architecture dependency rules
    - Dart coding standard
@@ -437,36 +556,11 @@ Wait for explicit approval.
 
 ---
 
-### PHASE 7 — Delivery
-
-**Agent:** `@delivery-manager`
-
-Steps:
-1. Validate all files resolve within
-   `targets.registry[artifact_plan.planned[].target_id].root`
-2. Validate topology constraints (monorepo: no changes outside `target_scope`)
-3. Propose branch name using `naming.branch_prefix` + feature name
-4. Propose Conventional Commit messages
-   (`feat({feature}): implement {feature} feature`)
-5. Draft PR description with:
-   - Feature description
-   - Files created (by layer)
-   - DI registration status
-   - Route registration status
-   - Next steps (tests, Widgetbook)
-
-Output: `evidence/delivery-report.md` and a summary in the human report.
-
-The delivery manager does not run `git`, create branches or open PRs unless the
-user explicitly asks for it and the spec grants external tool permissions.
-
----
-
-### PHASE 8 — Documentation (mandatory)
+### PHASE 8 — Documentation (conditional)
 
 **Agent:** `@feature-builder` using shared skill `documentation-projects`
 
-**Condition:** Always executes — NEVER skip.
+**Condition:** `documentation=true`.
 
 Steps:
 1. Resolve documentation directory:
@@ -495,13 +589,49 @@ Steps:
 6. Propose documentation commit message:
    `docs({feature}): update project documentation`
 
-Output: List of created/updated documents in `PIPELINE_LOG_PATH`.
+Output: `evidence/documentation-report.md` and a list of created/updated
+documents in `PIPELINE_LOG_PATH`.
 
 **Skill invocation:** `documentation-projects action=update target={docs_path} documents=all`
 
 The shared skill internally orchestrates `doc-auditor`, `doc-interviewer`,
 `doc-generator` and `doc-validator`; the mobile workflow must not reference
 legacy generate-docs aliases.
+
+When `documentation=false`, record `documentation: skipped_by_input` with
+`reason: documentation=false` in `context.json`, `spec.yaml` and
+`PIPELINE_LOG_PATH`. Do not modify project documentation or invoke the shared
+skill.
+
+---
+
+### PHASE 9 — Delivery
+
+**Agent:** `@delivery-manager`
+
+Steps:
+1. Validate all files resolve within
+   `targets.registry[artifact_plan.planned[].target_id].root`.
+2. Validate topology constraints (monorepo: no changes outside `target_scope`).
+3. Require passing evidence for `unit-tests.md`, `widget-tests.md` and
+   `integration-tests.md`; reject delivery when any is absent, failed or
+   blocked.
+4. Require exactly one recorded optional outcome:
+   - `golden-tests.md` passed when `golden_tests=true`, or
+     `golden_tests: skipped_by_input` when false.
+   - `documentation-report.md` passed when `documentation=true`, or
+     `documentation: skipped_by_input` when false.
+5. Validate `spec.yaml` parses and validates against its schema before marking
+   completion.
+6. Propose a branch name and Conventional Commit messages
+   (`feat({feature}): implement {feature} feature`).
+7. Draft a PR description with the feature, test evidence, optional-stage
+   outcomes, DI and route status.
+
+Output: `evidence/delivery-report.md` and a summary in the human report.
+
+The delivery manager does not run `git`, create branches or open PRs unless the
+user explicitly asks for it and the spec grants external tool permissions.
 
 ---
 
@@ -513,11 +643,13 @@ After all phases:
   ```bash
   flutter analyze --fatal-infos
   dart run build_runner build --delete-conflicting-outputs
+  flutter test
   ```
 - `monorepo_melos`:
   ```bash
   melos exec --scope={target_scope} -- "flutter analyze --fatal-infos"
   melos exec --scope={target_scope} -- "dart run build_runner build --delete-conflicting-outputs"
+  melos exec --scope={target_scope} -- "flutter test"
   ```
 
 ---
@@ -536,7 +668,11 @@ After all phases:
 - **Route registered**: ✅ | ❌ | ⚠️ manual
 - **build_runner**: ✅ | ❌
 - **Audit**: ✅ approved | ❌ rejected (attempt {N})
-- **Documentation**: ✅ updated | 🆕 created
+- **Unit tests**: ✅ passed | ❌ failed | ⛔ blocked
+- **Widget tests**: ✅ passed | ❌ failed | ⛔ blocked
+- **Integration tests**: ✅ passed | ❌ failed | ⛔ blocked
+- **Golden tests**: ✅ passed | ⏭ skipped_by_input
+- **Documentation**: ✅ updated | 🆕 created | ⏭ skipped_by_input
 
 ### Phase 0 — DS Components (if applicable)
 | Component | Status | Action |
@@ -546,10 +682,8 @@ After all phases:
 | # | Layer | File | Status |
 |---|---|---|---|
 
-### Next Steps
-- [ ] Write tests (use `flutter-testing` / `flutter-test-coverage-strategy`)
-- [ ] Register route in GoRouter (if manual step)
-- [ ] Run `flutter test`
+### Manual Follow-up
+- [ ] Register route in GoRouter (only if explicitly reported as manual)
 ```
 
 ---
@@ -563,8 +697,12 @@ After all phases:
   `artifact_plan.planned[].target_id`
 - NEVER call Figma MCP directly outside the Figma MCP preflight or delegated DS
   workflow
-- NEVER generate tests (that is a separate workflow/agent responsibility)
-- NEVER skip Phase 8 (Documentation) — it is mandatory after every feature build
+- NEVER generate test files directly; delegate all mandatory test stages to
+  `@test-engineer`
+- NEVER mark the feature complete without passing unit, widget and integration
+  evidence
+- NEVER invoke `@golden-test-engineer` unless `golden_tests=true`
+- NEVER invoke `documentation-projects` unless `documentation=true`
 - ALWAYS run topology gate before any file generation
 - ALWAYS run `build_runner` in Phase 5 before audit
 - ALWAYS delegate DS component creation to `@ds-orchestrator` (never build DS components directly)
@@ -574,5 +712,5 @@ After all phases:
 - ALWAYS update `SPEC_PACKET_PATH/context.json` after every layer checkpoint
 - ALWAYS use compact handoffs by `spec_ref`, `context_ref`, `phase` and
   `read_sections`
-- ALWAYS generate/update project documentation in Phase 8 using shared skill `documentation-projects`
+- ALWAYS record golden and documentation stages as executed or `skipped_by_input`
 - If a phase fails or returns `blocked_input`, stop and report to user

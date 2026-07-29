@@ -2,6 +2,7 @@ schema_version: 1
 schema_ref: ../schemas/bootstrap-spec.schema.yaml
 workflow: bootstrap-workspace
 mode: propose_then_apply
+evidence_mode: minimal
 status: proposed
 
 inputs:

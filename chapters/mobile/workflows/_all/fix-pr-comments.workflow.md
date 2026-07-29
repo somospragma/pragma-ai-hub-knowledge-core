@@ -11,6 +11,15 @@ description: Deterministic workflow to fix Pull Request comments in a traceable 
 ---
 # Workflow: Fix PR Comments
 
+## Evidence Mode
+
+Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
+as `spec.yaml.evidence_mode` before validation. In `minimal`, retain gate
+evidence and record every other phase as a compact
+`context.json.phase_results` entry. `standard` additionally writes detailed
+phase reports. Neither mode may omit a gate, approval, test result, blocker or
+delivery result.
+
 ## Prerequisites
 
 - URL of the PR.
@@ -43,6 +52,7 @@ pr_id: <123>                         # optional
 target_branch: <branch_name>         # optional
 allow_git_commands: false            # optional, default false
 allow_gh_commands: false             # optional, default false
+evidence_mode: minimal                # optional, default minimal
 ```
 
 ## Topology Gate

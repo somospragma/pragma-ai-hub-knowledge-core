@@ -4,6 +4,8 @@ base_spec_level: mini
 purpose: Resolve PR comments with traceable comment-to-action mapping.
 required_inputs:
   - pr_comments_source
+optional_inputs:
+  - evidence_mode
 required_external_access:
   figma_mcp:
     required: false
@@ -29,3 +31,4 @@ required_human_review:
 notes:
   - Delivery proposes commit messages only unless explicit git or gh permissions are granted.
   - Each planned artifact should link back to one or more PR comments.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

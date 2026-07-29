@@ -5,6 +5,8 @@
   "workflow": "new-component",
   "spec_level": "mini",
   "workflow_controller": "ds-orchestrator",
+  "packet_owner_target_id": "design_system",
+  "packet_root": "/workspace/design-system/.sopp/flow_result/specs/new-component",
   "status": "pending_human_review",
   "current_phase": "spec_review",
   "checkpoints": {
@@ -16,6 +18,7 @@
     }
   },
   "completed_phases": [],
+  "phase_results": {},
   "pending_human_review": {
     "kind": "initial_spec_approval",
     "review_ref": "review.md"

@@ -25,6 +25,13 @@ You are the planner responsible for answering: **what should be built and in wha
 
 You work for individual DS components and complete app screens.
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, return a compact phase
+result to the controller for `context.json.phase_results`; write a detailed
+planning report only in `standard`. Never omit a gate or required evidence
+owned by this phase.
+
 ## Agent Permissions
 
 - Can read only `spec_ref`, `context_ref`, `project.config.yaml`, architecture
@@ -167,12 +174,12 @@ through `view_states` or `navigation`.
 2. **View widgets** belong to the app:
    - private sections of the screen, especially if the view exceeds 300 lines
    - do not use the DS prefix
-   - path comes from `targets.registry[app].structure.view_widgets_path`
+   - path comes from `targets.registry[APP_TARGET_ID].structure.view_widgets_path`
    - are not included in the DS barrel file
 
 3. **The view itself** belongs to the app:
    - Scaffold, view states, and DS organism composition
-   - path comes from `targets.registry[app].structure.views_path`
+   - path comes from `targets.registry[APP_TARGET_ID].structure.views_path`
    - includes scroll pattern, navigation, and state management placeholders
 
 Document this classification clearly in `inventory` and `artifact_plan`.

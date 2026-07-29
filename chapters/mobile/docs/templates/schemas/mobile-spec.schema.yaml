@@ -8,6 +8,7 @@ required:
   - workflow
   - spec_level
   - execution_mode
+  - evidence_mode
   - status
   - inputs
   - external_access
@@ -36,6 +37,10 @@ properties:
   execution_mode:
     type: string
     enum: [propose_then_apply]
+  evidence_mode:
+    type: string
+    enum: [minimal, standard]
+    default: minimal
   status:
     type: string
     enum:
@@ -58,6 +63,12 @@ properties:
     properties:
       figma_url:
         type: string
+      golden_tests:
+        type: boolean
+        default: false
+      documentation:
+        type: boolean
+        default: false
       pr_comments_source:
         type: object
         additionalProperties: true
@@ -244,6 +255,9 @@ properties:
                 - presentation
                 - wiring
                 - tests
+                - unit_tests
+                - widget_tests
+                - integration_tests
                 - golden_tests
                 - widgetbook
                 - docs

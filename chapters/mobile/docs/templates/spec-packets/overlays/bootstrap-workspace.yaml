@@ -13,6 +13,7 @@ optional_inputs:
   - expected_repo_mode
   - apply_mode
   - force_reconfigure
+  - evidence_mode
 execution_mode: propose_then_apply
 required_agents:
   - workspace-discovery
@@ -22,3 +23,4 @@ notes:
   - The canonical configuration destination is the resolved application repository.
   - Configuration is applied only after explicit approval and backup creation.
   - Reuse an existing valid .sopp/config triplet by default; reconfiguration requires force_reconfigure=true.
+  - evidence_mode defaults to minimal; standard retains detailed discovery evidence.

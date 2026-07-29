@@ -6,10 +6,12 @@ from scratch.
 
 ## Functional Packet Location
 
-Functional workflows create packets under the active target:
+Functional workflows resolve a packet owner before Phase 0. The owner stays
+immutable for the run; it is distinct from the active target used to create a
+particular artifact.
 
 ```text
-{ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/specs/{workflow_slug}/
+{SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}/specs/{workflow_slug}/
 ├── spec.yaml
 ├── context.json
 ├── review.md
@@ -22,6 +24,12 @@ With the default config this resolves under:
 ```text
 .sopp/flow_result/specs/{workflow_slug}/
 ```
+
+For `/new-view`, the owner is the resolved app target: use `target_id` when it
+is supplied, otherwise `active_target_defaults.app_target_id`, falling back to
+`active_target_defaults.app`. DS phases may set `ACTIVE_TARGET_ID` to the
+Design System target for their artifacts, but they must not move packet state,
+evidence or pipeline reports out of the app-owned root.
 
 ## Initial Files
 
@@ -36,6 +44,8 @@ With the default config this resolves under:
 `workflow_controller` is the workflow `entry_agent`, not the optional
 `mobile-orchestrator` router. The controller is the only agent that may request
 human approval; specialized agents return a compact handoff instead.
+`packet_owner_target_id` and `packet_root` make the packet location explicit
+without conflating it with the active artifact target.
 
 The approval state is intentionally singular:
 
@@ -55,7 +65,29 @@ controller resume a specific gate without rereading the complete conversation.
 |---|---|---|
 | `mini` | `/new-component`, `/refactor-component`, `/fix-pr-comments` | Initial approval; later checkpoints only when required by the workflow. |
 | `standard` | `/new-view` | Initial approval plus DS/app phase checkpoints. |
-| `full` | `/new-feature`, `/refactor-feature`, `/test-plan` | Initial approval and required layer/stage checkpoints. |
+| `full` | `/new-feature`, `/refactor-feature`, `/test-plan` | Initial approval and required layer/stage checkpoints. For `/new-feature`, unit, widget and integration evidence is mandatory; golden tests and documentation are explicit opt-ins. |
+
+## Optional Golden Tests
+
+`/new-component`, `/new-view` and `/new-feature` accept
+`golden_tests: true|false`. The default is `false`, which avoids generating
+golden files and snapshots. The controller normalizes an omitted value to
+`false` in `spec.yaml.inputs` and records `golden_tests: skipped_by_input` in
+the packet. When enabled, every applicable golden stage must pass and persist
+`evidence/golden-tests.md` before delivery. Widget tests remain mandatory.
+
+## Evidence Modes
+
+Every packet declares `evidence_mode: minimal | standard`. The default is
+`minimal`, and users can override it in a workflow invocation with
+`evidence_mode: standard`.
+
+`minimal` keeps the evidence that controls deterministic execution: validation,
+Figma preflight when required, human decisions, audit, executed tests, enabled
+optional stages and delivery. Other phase outcomes are compact structured
+entries in `context.json.phase_results`, so later agents can resume without
+re-reading prose reports. `standard` additionally writes detailed analysis,
+inventory, planning, code-generation, Widgetbook and checkpoint reports.
 
 ## Required `spec.yaml` Concepts
 
@@ -66,6 +98,7 @@ Every generated spec must include:
 - `spec_level`
 - `execution_mode`
 - `inputs`
+- `evidence_mode`
 - `human_review`
 - `agent_permissions`
 - `external_access`

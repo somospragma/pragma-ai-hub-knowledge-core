@@ -12,6 +12,15 @@ description: >
 ---
 # Workflow: Refactor Feature (Evolutionary Improvement)
 
+## Evidence Mode
+
+Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
+as `spec.yaml.evidence_mode` before validation. In `minimal`, retain gate
+evidence and record every other phase as a compact
+`context.json.phase_results` entry. `standard` additionally writes detailed
+phase reports. Neither mode may omit a gate, approval, test result, blocker or
+delivery result.
+
 ## When to Use
 
 Use this workflow when:
@@ -73,6 +82,7 @@ constraints: Don't change the API contract, keep route paths the same
 user_story: docs/hus/user story-078.md  (optional — contains acceptance criteria + DoD)
 target_location: same | melos_package
 sequence_diagram: docs/diagrams/checkout_flow.mmd  (optional)
+evidence_mode: minimal  (optional; default minimal)
 ```
 
 ### Input variations

@@ -29,6 +29,12 @@ description: >
 
 You are the developer who **builds** Flutter widgets.
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, return generated artifact
+paths and validation status as a compact phase result for the controller;
+write a detailed code-generation report only in `standard`.
+
 ## Agent Permissions
 
 - Can read only the sections listed in `read_sections` and the existing files needed inside the target resolved by `target_id`.

@@ -3,6 +3,7 @@ schema_ref: ../../../../docs/templates/schemas/mobile-spec.schema.yaml
 workflow: new-feature
 spec_level: full
 execution_mode: propose_then_apply
+evidence_mode: minimal
 status: proposed
 language:
   review_documents: es
@@ -11,6 +12,8 @@ inputs:
   description: View and manage payment methods.
   api_contract: docs/api/payment-methods.yaml
   user_story: As a user, I want to see my payment methods so I can choose one during checkout.
+  golden_tests: false
+  documentation: false
 external_access:
   figma_mcp:
     required: false
@@ -52,6 +55,18 @@ agent_permissions:
     can_delete_files: false
     can_call_external_tools: []
     evidence_required: [evidence/delivery-report.md]
+  test-engineer:
+    can_read: [read_sections, artifact_plan.planned, technical_plan, contracts, success_criteria]
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets: [app]
+      context_sections: [context.json.status, context.json.current_phase, context.json.checkpoints, context.json.completed_phases, context.json.artifacts]
+      evidence: [evidence/unit-tests.md, evidence/widget-tests.md, evidence/integration-tests.md]
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required: [evidence/unit-tests.md, evidence/widget-tests.md, evidence/integration-tests.md]
 human_review:
   initial_spec_approval: required
   layer_checkpoints: required
@@ -90,11 +105,21 @@ artifact_plan:
       action: create
       owner: feature-builder
       group: presentation
-    - path: docs/features/payment_methods.md
-      target_id: project_docs
+    - path: test/features/payment_methods/domain/payment_methods_use_case_test.dart
+      target_id: app
       action: create
-      owner: feature-builder
-      group: docs
+      owner: test-engineer
+      group: unit_tests
+    - path: test/features/payment_methods/presentation/payment_methods_page_test.dart
+      target_id: app
+      action: create
+      owner: test-engineer
+      group: widget_tests
+    - path: integration_test/payment_methods/payment_methods_flow_test.dart
+      target_id: app
+      action: create
+      owner: test-engineer
+      group: integration_tests
 technical_plan:
   layers:
     domain: Generate entity, repository contract and get use case.
@@ -113,6 +138,18 @@ success_criteria:
     description: Presentation uses BLoC and Either.match.
     evidence:
       - evidence/presentation-checkpoint.md
+  - id: SC-4
+    description: Mandatory unit tests pass for domain, data and BLoC behavior.
+    evidence:
+      - evidence/unit-tests.md
+  - id: SC-5
+    description: Mandatory widget tests pass for feature states and navigation.
+    evidence:
+      - evidence/widget-tests.md
+  - id: SC-6
+    description: Mandatory integration tests pass for the feature journey.
+    evidence:
+      - evidence/integration-tests.md
 handoffs:
   - phase: domain_layer
     agent: feature-builder
@@ -141,6 +178,9 @@ handoffs:
       - evidence/domain-checkpoint.md
       - evidence/data-checkpoint.md
       - evidence/presentation-checkpoint.md
+      - evidence/unit-tests.md
+      - evidence/widget-tests.md
+      - evidence/integration-tests.md
   - phase: delivery
     agent: delivery-manager
     read_sections:

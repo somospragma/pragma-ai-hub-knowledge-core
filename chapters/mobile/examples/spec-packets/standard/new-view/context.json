@@ -5,6 +5,8 @@
   "workflow": "new-view",
   "spec_level": "standard",
   "workflow_controller": "ds-orchestrator",
+  "packet_owner_target_id": "app",
+  "packet_root": "/workspace/app/.sopp/flow_result/specs/new-view-product-detail",
   "status": "pending_human_review",
   "current_phase": "spec_review",
   "checkpoints": {
@@ -32,5 +34,6 @@
     "review_ref": "review.md"
   },
   "completed_phases": [],
+  "phase_results": {},
   "artifacts": {}
 }

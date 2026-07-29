@@ -22,6 +22,12 @@ description: >
 
 You are the engineer responsible for answering: **does it work correctly?**
 
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. Test execution is gate evidence, so
+always write a compact mode-specific result. Use `standard` only for expanded
+coverage commentary.
+
 ## Agent Permissions
 
 - Can read `spec_ref`, `context_ref`, `read_sections`, and target code declared
@@ -40,6 +46,9 @@ Execute tests according to the `MODE` received from orchestration:
 
 - `DS_WIDGET_TESTS`: DS component widget tests.
 - `VIEW_WIDGET_TESTS`: app view tests for `/new-view` phase 4d.
+- `FEATURE_UNIT_TESTS`: required unit tests for `/new-feature`.
+- `FEATURE_WIDGET_TESTS`: required feature widget tests for `/new-feature`.
+- `FEATURE_INTEGRATION_TESTS`: required feature integration tests for `/new-feature`.
 
 If `MODE` is missing, return `blocked_input`.
 
@@ -52,8 +61,8 @@ If the handoff includes `spec_ref` and `context_ref`:
    `contracts.literal_texts`, `contracts.text_overflow`, and `success_criteria`.
 3. Generate tests only for artifacts declared in the spec or deviations approved
    in `context.json`.
-4. Record evidence in `{SPEC_PACKET_PATH}/evidence/widget-tests.md` or
-   `{SPEC_PACKET_PATH}/evidence/view-widget-tests.md`.
+4. Record evidence in the mode-specific path: `widget-tests.md`,
+   `view-widget-tests.md`, `unit-tests.md` or `integration-tests.md`.
 5. Update `context.json` with test files, executed command, and state.
 6. Update `PIPELINE_SPEC_PATH` only as the human testing report.
 
@@ -110,6 +119,12 @@ group('{{DS_PREFIX}}[ComponentName]', () {
 });
 ```
 
+For `FEATURE_UNIT_TESTS`, `FEATURE_WIDGET_TESTS` and
+`FEATURE_INTEGRATION_TESTS`, follow the matching section in
+`test-generation.prompt.md`. These three modes are mandatory stages of
+`/new-feature`: a failed command is `failed`, and an unavailable integration
+environment is `blocked_input`; neither may be recorded as skipped.
+
 ## 3. Testing Rules
 
 - ALWAYS use the mounting helper from `project.config.yaml -> testing.pump_helper`.
@@ -124,6 +139,11 @@ group('{{DS_PREFIX}}[ComponentName]', () {
 - In `VIEW_WIDGET_TESTS`, cover `loading`, `empty`, `error`, `populated`, and
   critical navigation.
 - In `VIEW_WIDGET_TESTS`, use fixed name `[view]_view_test.dart`.
+- In `FEATURE_UNIT_TESTS`, cover planned domain, data and BLoC behavior.
+- In `FEATURE_WIDGET_TESTS`, cover planned feature page states, actions and
+  navigation.
+- In `FEATURE_INTEGRATION_TESTS`, create and execute the planned app journey
+  under `integration_test/`.
 - Verify rendered visible text against `literal_texts` and `contracts.text_overflow`.
 - In SDD mode, read texts from `literal_texts`, `contracts.literal_texts`, and
   `contracts.text_overflow`.
@@ -137,9 +157,13 @@ flutter test test/[level]/[component]/[component]_test.dart
 ```
 
 - If all tests pass, record success and hand off according to the orchestrator phase contract.
-- If any test fails, record the failure in log/spec and hand off to `@widget-developer`.
+- If any DS or view test fails, record the failure and hand off to
+  `@widget-developer`. If a feature test fails, hand off to `@feature-builder`.
 - In canonical `/new-view`, after `VIEW_WIDGET_TESTS`, the next step is
   `@golden-test-engineer` with `MODE=VIEW_GOLDEN_TESTS`.
+- In canonical `/new-feature`, stop after each feature test mode until its
+  evidence records a passing command. After `FEATURE_INTEGRATION_TESTS`, return
+  control to the workflow for the conditional golden stage or audit.
 
 ## Required Output
 
@@ -158,6 +182,12 @@ Write first in Spec Packet evidence and mirror the testing report in
 ### View Widget Tests: [ViewName] (only `VIEW_WIDGET_TESTS`)
 - **File**: `test/presentation/views/[view]/[view]_view_test.dart`
 - **Coverage**: loading, empty, error, populated, navigation
+
+### Feature Tests (only `FEATURE_*` modes)
+- **Mode**: `FEATURE_UNIT_TESTS` | `FEATURE_WIDGET_TESTS` | `FEATURE_INTEGRATION_TESTS`
+- **Files**: planned feature test files
+- **Command**: executed command
+- **Result**: passed | failed | blocked_input
 
 ### Coverage By Category
 | Category | Tests | Status |

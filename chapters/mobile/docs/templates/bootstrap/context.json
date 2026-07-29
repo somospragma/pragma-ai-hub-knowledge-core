@@ -21,5 +21,6 @@
     "discovery",
     "proposal",
     "validation"
-  ]
+  ],
+  "phase_results": {}
 }

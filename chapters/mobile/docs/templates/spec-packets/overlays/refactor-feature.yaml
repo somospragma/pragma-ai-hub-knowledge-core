@@ -6,6 +6,8 @@ required_inputs:
   - feature_name
   - feature_path
   - refactor_goal
+optional_inputs:
+  - evidence_mode
 required_external_access:
   figma_mcp:
     required: false
@@ -32,3 +34,4 @@ delete_elevation:
 notes:
   - Refactoring reports must be represented as artifact_plan.planned[group=docs].
   - Delete actions remain blocked until the spec explicitly grants delete permission.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

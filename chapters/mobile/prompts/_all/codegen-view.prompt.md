@@ -39,7 +39,8 @@ If any prerequisite is missing, return
 Do not infer an implementation from the user request or Figma URL.
 
 After this gate passes, read `spec_ref` and `context_ref` as machine sources.
-Use only `read_sections`, implement the artifacts declared in `artifact_plan`,
+The controller must provide `APP_TARGET_ID`, resolved from the requested app
+target or the configured app default. Use only `read_sections`, implement the artifacts declared in `artifact_plan`,
 validate against `view_states`, `contracts`, and `success_criteria`, record
 evidence in `{SPEC_PACKET_PATH}/evidence/view-codegen-report.md`, and treat
 `PIPELINE_SPEC_PATH` as the human report.
@@ -131,8 +132,8 @@ If any of these fields are missing, return `blocked_input`.
 - The view is not a DS component.
 - It does not use the `{{DS_PREFIX}}` prefix.
 - It is not exported in the DS barrel.
-- It lives in `targets.registry[app].structure.views_path` (default `lib/src/presentation/views`).
-- Private view widgets live in `targets.registry[app].structure.view_widgets_path` (default
+- It lives in `targets.registry[APP_TARGET_ID].structure.views_path` (default `lib/src/presentation/views`).
+- Private view widgets live in `targets.registry[APP_TARGET_ID].structure.view_widgets_path` (default
   `lib/src/presentation/widgets`).
 
 ## Expected Structure

@@ -3,6 +3,7 @@ schema_ref: ../../../../docs/templates/schemas/mobile-spec.schema.yaml
 workflow: new-component
 spec_level: mini
 execution_mode: propose_then_apply
+evidence_mode: minimal
 status: proposed
 language:
   review_documents: es
@@ -10,6 +11,7 @@ inputs:
   component_name: ds_status_badge
   figma_url: https://figma.com/file/example?node-id=10-20
   user_story: Show a transaction status in a list.
+  golden_tests: false
 external_access:
   figma_mcp:
     required: true
