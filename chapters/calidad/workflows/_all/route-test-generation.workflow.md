@@ -51,9 +51,26 @@ Aplica `[[calidad-sut-readiness-gate]]` inmediatamente después de los inputs ba
 
 Aplica `[[calidad-intent-detection]]`:
 
-- Determina si la solicitud es Karate, K6, Playwright o Appium.
+- Determina si la solicitud es Karate, K6, Playwright, Appium — o **funcional** (análisis/refinamiento de HUs, diseño de casos de alto nivel, estrategia o plan de pruebas). Ver la desambiguación de "pruebas funcionales" en el skill.
 - Si el intent es ambiguo, **pregunta**; no asumas Playwright por defecto.
 - Si el usuario pide mobile iOS greenfield, no abortes: el scaffolder V2 no lo genera automáticamente, pero el chapter sí soporta iOS via scaffold manual (apuntar a `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`). Si es mobile iOS brownfield, enrutar a `[[calidad-appium-brownfield]]`.
+
+### Ruta funcional (bifurcación temprana desde el paso 2)
+
+Si el intent es **funcional**, el router bifurca aquí y delega directo — los pasos 2.5 a 7 y los gates de ejecución (smoke, modo de operación, mock) NO aplican a entregables documentales:
+
+| Intent funcional | Workflow destino |
+|---|---|
+| Analizar / refinar HUs | `[[calidad-analyze-and-refine-stories]]` |
+| Diseñar casos de prueba de alto nivel (y publicarlos al ALM) | `[[calidad-design-test-cases]]` |
+| Estrategia y/o plan de pruebas | `[[calidad-build-test-strategy-and-plan]]` |
+
+Reglas de la ruta:
+
+- Los inputs los define cada workflow funcional (`stories_source`, `output_path`, etc.); no aplican `spec` ni el gate de mocks. Los insumos pueden venir de Azure DevOps / Jira vía `[[calidad-alm-mcp-integration]]`.
+- El **delivery gate contract se emite igual** (`framework: funcional`, `execution.*: null`, cobertura documental) — la ruta funcional no exime del cierre.
+- Los gates humanos de la ruta son propios: aprobación del PO en refinamiento, aprobación de estrategia/plan, confirmación de lotes antes de escribir al ALM.
+- Conexión con la automatización: los casos diseñados en funcional son el insumo de los stacks — si el usuario continúa hacia automatización, se re-entra al router con el nuevo intent (los pasos 1.5, 3, 4 aplican entonces con normalidad).
 
 ### Paso 2.5 — Detectar capacidades transversales complementarias
 
@@ -132,7 +149,8 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 
 Este workflow se considera completo **solo cuando**:
 
-- [ ] El framework destino y el modo (greenfield / brownfield) fueron resueltos correctamente para los **4 frameworks soportados** (Karate, Playwright, K6, Appium) en cualquiera de sus dos modos.
+- [ ] El framework destino y el modo (greenfield / brownfield) fueron resueltos correctamente para los **4 frameworks soportados** (Karate, Playwright, K6, Appium) en cualquiera de sus dos modos — o la solicitud se bifurcó a la **ruta funcional** con su workflow correcto.
+- [ ] Si la ruta fue funcional: el workflow delegado cerró con su delivery gate documental y sus gates humanos cumplidos (nada escrito al ALM sin aprobación/confirmación).
 - [ ] El **SUT readiness gate** (paso 1.5) fue resuelto explícitamente: `execution_target`, `data_strategy` y (front/mobile) `locator_map` registrados en STRATEGY.md y delivery gate. Si `execution_target != real`, el delivery gate declara `certification: pending_real_integration` y `next_steps` incluye el switchover a integraciones reales.
 - [ ] Las **capacidades transversales complementarias** (accesibilidad, SEO, seguridad, regresión visual, contract, performance) fueron evaluadas con `[[calidad-transversal-capabilities]]`, propuestas al usuario y registradas (aplicadas u omitidas con motivo) en el bloque `transversal_capabilities` del delivery-gate.
 - [ ] Todos los archivos de prueba esperados están escritos en `output_path` y son consistentes con el spec/firma.

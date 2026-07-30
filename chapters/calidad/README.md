@@ -4,12 +4,13 @@
 
 El Chapter Calidad de Pragma agrupa el conocimiento accionable para **QA automation para cualquier sistema bajo prueba — APIs, web, mobile, performance — sin presunción de sector o región**. Capacidades específicas (compliance, anonimización, mobile clouds) se activan según el contexto del cliente, no por defecto. Los assets de este chapter están diseñados para alimentar agentes que generan, extienden y operan suites de pruebas reales en producción.
 
-Cubre cuatro frameworks de automatización:
+Cubre cuatro frameworks de automatización y un stack funcional:
 
 - **Karate** — API testing (REST/SOAP) sobre OpenAPI/Swagger/WSDL.
 - **Playwright** — E2E web testing y accesibilidad.
 - **K6** — Performance testing.
 - **Appium** — Mobile testing (Android V2 con Screenplay + Serenity + Cucumber).
+- **Funcional** — el trabajo funcional del proceso de pruebas: análisis y refinamiento de historias de usuario (INVEST, criterios de aceptación, ambigüedades), diseño de casos de alto nivel con técnicas formales, estrategias y planes de prueba (ISO/IEC/IEEE 29119-3), con integración a Azure DevOps y Jira vía MCP para traer insumos y llevar resultados. Sus entregables son documentos y artefactos ALM, no código; sus casos diseñados alimentan a los stacks de automatización.
 
 Y cinco ejes cross-cutting que aplican a los cuatro frameworks:
 
@@ -33,6 +34,7 @@ chapters/calidad/
 │
 ├── skills/
 │   ├── _all/
+│   │   ├── alm-mcp-integration.md
 │   │   ├── brownfield-vs-greenfield.md
 │   │   ├── business-driven-prioritization.md
 │   │   ├── environment-blocker-evidence.md
@@ -98,6 +100,23 @@ chapters/calidad/
 │   │       ├── SKILL.md
 │   │       └── references/{commercial-vs-oss-healing-tools, healing-aware-page-object, healing-strategies-by-framework, llm-driven-selector-repair, multi-locator-fallback-pattern, over-healing-guardrails, visual-ai-healing}.md
 │   │
+│   ├── funcional/
+│   │   ├── funcional-story-analysis/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{acceptance-criteria-quality, ambiguity-taxonomy, analysis-report-format, invest-scoring}.md
+│   │   ├── funcional-story-refinement/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{example-mapping-three-amigos, refinement-proposal-format, story-splitting-patterns}.md
+│   │   ├── funcional-test-design/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{bdd-atdd-alignment, combinatorial-pairwise, decision-tables-state-transition, equivalence-partitioning-bva, exploratory-charters-error-guessing, technique-selection-guide, test-case-format}.md
+│   │   ├── funcional-test-strategy/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{automation-stack-mapping, levels-types-quadrants, risk-based-approach}.md
+│   │   └── funcional-test-plan/
+│   │       ├── SKILL.md
+│   │       └── references/{entry-exit-criteria, progress-and-closure-reports, risk-analysis-matrix, test-plan-structure, traceability-rtm}.md
+│   │
 │   ├── appium/
 │   │   ├── appium-run-and-tags.md
 │   │   ├── appium-apk-auto-discovery/
@@ -145,6 +164,10 @@ chapters/calidad/
 │   │   ├── route-test-generation.workflow.md
 │   │   ├── seo-audit.workflow.md
 │   │   └── test-self-correction-loop.workflow.md
+│   ├── funcional/
+│   │   ├── analyze-and-refine-stories.workflow.md
+│   │   ├── build-test-strategy-and-plan.workflow.md
+│   │   └── design-test-cases.workflow.md
 │   ├── appium/
 │   │   ├── complete-deferred-locators.workflow.md
 │   │   ├── extend-appium-brownfield.workflow.md
@@ -163,6 +186,10 @@ chapters/calidad/
 └── prompts/
     ├── _all/
     │   └── generate-mockoon-environment.prompt.md
+    ├── funcional/
+    │   ├── analyze-user-story.prompt.md
+    │   ├── generate-high-level-test-cases.prompt.md
+    │   └── generate-test-plan-document.prompt.md
     ├── appium/
     │   ├── generate-cucumber-feature-android.prompt.md
     │   ├── generate-screenplay-task.prompt.md
@@ -250,6 +277,7 @@ chapters/calidad/
 | `service-virtualization-mockoon/SKILL.md` | Service virtualization con Mockoon para construir/validar pruebas sin backend desplegado: environment JSON versionable, mock desde OpenAPI, CRUD stateful con data buckets, SOAP/XML, proxy hybrid, CLI/Docker en CI y switchover mock → real solo-configuración. Bundle con 7 references. |
 | `ui-locator-map-contract.md`           | Contrato QA+dev de identificadores UI (`data-testid` / accessibility ids) versionado en `locator-map.json`, para que las pruebas front/mobile construidas antes del desarrollo no fallen por drift de selectores; incluye validación de drift al llegar la app real y enforcement explícito (sin mapa no se generan page objects salvo waiver del usuario). |
 | `figma-mcp-integration.md`             | Consumo de Figma como fuente UI vía MCP (server oficial remoto con OAuth o Framelink con PAT) con setup guiado por IDE y fallback REST API; un link público de Figma no es consumible sin conexión autenticada. |
+| `alm-mcp-integration.md`               | Integración con Azure DevOps (`@azure-devops/mcp`) y Jira (Atlassian Remote MCP) vía MCP: traer HUs/work items/test plans y llevar test cases, estados, defectos y documentos, con setup guiado, gates de escritura, idempotencia y trazabilidad. Puerta ALM de todo el chapter. |
 
 #### Capacidades transversales complementarias (accesibilidad, SEO, visual)
 
@@ -261,6 +289,18 @@ chapters/calidad/
 | `visual-regression.md`                 | Política transversal de regresión visual (web/móvil): baselines, dinamismo, match levels, anti-patrones.    |
 
 ### Skills per-framework
+
+#### Funcional (`skills/funcional/`)
+
+| Asset | Capacidad |
+|---|---|
+| `funcional-story-analysis/SKILL.md` | Análisis de HUs: scoring INVEST con evidencia, calidad de criterios de aceptación, taxonomía de ambigüedades/vacíos como preguntas al PO, veredicto Definition of Ready. |
+| `funcional-story-refinement/SKILL.md` | Refinamiento propuesto (nunca impuesto): reescritura antes/después, splitting SPIDR, Example Mapping / Tres Amigos; aplica al ALM solo lo aprobado por el PO. |
+| `funcional-test-design/SKILL.md` | Casos de alto nivel con técnicas ISTQB declaradas (particiones, BVA, tablas de decisión, estados, pairwise, error guessing, exploratorio), Gherkin español data-driven, trazabilidad CA→caso al 100%. |
+| `funcional-test-strategy/SKILL.md` | Estrategia: niveles/cuadrantes, enfoque risk-based, frontera con lo unitario, mapeo a los stacks de automatización y al camino shift-left (mocks, locator map). |
+| `funcional-test-plan/SKILL.md` | Plan ISO/IEC/IEEE 29119-3 (equivalencia IEEE 829): riesgos con análisis, criterios entrada/salida/suspensión medibles, RTM, informes de avance y reporte de cierre. |
+
+El stack funcional produce documentos y artefactos ALM (no código): sus casos alimentan a los stacks de automatización, y sus insumos/resultados viajan a Azure DevOps / Jira vía `[[calidad-alm-mcp-integration]]`.
 
 #### Karate (`skills/karate/`)
 
@@ -320,12 +360,16 @@ Incluye references para capas Screenplay, locators diferidos vs auto-discovery (
 | Appium greenfield                      | `workflows/appium/generate-appium-screenplay-android.workflow.md`                      |
 | Appium brownfield                      | `workflows/appium/extend-appium-brownfield.workflow.md`                                |
 | Appium locators                        | `workflows/appium/complete-deferred-locators.workflow.md`                              |
+| Funcional — análisis/refinamiento      | `workflows/funcional/analyze-and-refine-stories.workflow.md`                           |
+| Funcional — diseño de casos + ALM      | `workflows/funcional/design-test-cases.workflow.md`                                    |
+| Funcional — estrategia y plan          | `workflows/funcional/build-test-strategy-and-plan.workflow.md`                         |
 
 ### Prompts (`prompts/`)
 
 | Framework  | Prompts disponibles                                                                                                        |
 |------------|----------------------------------------------------------------------------------------------------------------------------|
 | Transversal (`_all`) | `generate-mockoon-environment` (data file Mockoon desde spec; opt-in cuando `execution_target` es mock/hybrid)   |
+| Funcional  | `analyze-user-story`, `generate-high-level-test-cases`, `generate-test-plan-document`                                      |
 | Karate     | `analyze-openapi-for-karate`, `generate-karate-feature`, `generate-karate-match-schema`                                    |
 | Playwright | `detect-pages-from-ui-source`, `generate-page-object`, `generate-accessibility-suite`, `generate-mock-handlers`            |
 | K6         | `extract-config-from-openapi`, `generate-k6-script`, `generate-utils-and-payloads`                                         |
@@ -346,6 +390,7 @@ pragma-ai init --ide kiro --chapter calidad --stack karate     # API testing
 pragma-ai init --ide kiro --chapter calidad --stack playwright # E2E web
 pragma-ai init --ide kiro --chapter calidad --stack k6         # performance
 pragma-ai init --ide kiro --chapter calidad --stack appium     # mobile Android
+pragma-ai init --ide kiro --chapter calidad --stack funcional  # análisis HUs, casos, estrategia, planes, ALM
 
 # 3. Verificar instalación
 pragma-ai status
@@ -357,7 +402,7 @@ pragma-ai update              # aplicar
 
 `init` crea `pragma.yaml` en la raíz del proyecto, descarga los assets del chapter Calidad para el stack indicado (más todos los skills cross-cutting de `_all/`) en el path nativo del IDE, agrega `.pragma/` al `.gitignore` e instala los hooks para telemetría. Detalle completo de la CLI en el manual de `pragma-ai`.
 
-**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium`. Cada uno corresponde a un framework de automatización; un proyecto típico usa un solo stack. Si la suite combina varios frameworks (ej. APIs + UI + perf en el mismo repo), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos del stack se suman sin conflicto.
+**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium`, `funcional`. Los cuatro primeros corresponden a frameworks de automatización; `funcional` cubre el trabajo documental del proceso (análisis/refinamiento de HUs, diseño de casos, estrategia, planes) con integración ALM. Un proyecto típico usa un solo stack de automatización; `funcional` suele convivir con cualquiera de ellos. Si la suite combina varios frameworks (ej. APIs + UI + perf en el mismo repo), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos del stack se suman sin conflicto.
 
 **Multi-IDE** en el mismo proyecto: repetir `--ide`:
 
@@ -379,9 +424,9 @@ Cada IDE soporta un subset de los tipos de asset. Esta es la matriz para el chap
 | Asset del Chapter | Cantidad | Kiro | Claude Code | GitHub Copilot | Amazon Q (IDE) | Amazon Q (CLI) |
 |---|---|---|---|---|---|---|
 | `steering`     | 3   | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `skill`        | 45  | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `workflow`     | 13  | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `prompt`       | 15  | ✓ | — | ✓ | ✓ | — |
+| `skill`        | 51  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `workflow`     | 16  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `prompt`       | 18  | ✓ | — | ✓ | ✓ | — |
 
 Implicaciones operativas:
 
@@ -411,7 +456,7 @@ Ese workflow se encarga de:
 
 1. Recolectar inputs obligatorios (`[[calidad-mandatory-inputs-protocol]]`).
 2. **SUT readiness gate** (`[[calidad-sut-readiness-gate]]`, paso 1.5): ¿el desarrollo está desplegado, o las pruebas deben ser ejecutables antes del desarrollo? Resuelve `execution_target` (real/mock/hybrid), `data_strategy` (real/synthetic) y, para front/mobile, la existencia del `locator_map` (`[[calidad-ui-locator-map-contract]]`). En modo pre-desarrollo endurece los inputs (spec con response schemas para API; Figma + locator map para Playwright; locator map para Appium) y activa `[[calidad-service-virtualization-mockoon]]`.
-3. Identificar framework (`[[calidad-intent-detection]]`).
+3. Identificar framework (`[[calidad-intent-detection]]`) — incluida la **ruta funcional**: los intents de análisis/refinamiento de HUs, diseño de casos, estrategia y plan bifurcan aquí directo a los workflows del stack `funcional` (`[[calidad-analyze-and-refine-stories]]`, `[[calidad-design-test-cases]]`, `[[calidad-build-test-strategy-and-plan]]`), sin spec-validation ni gates de ejecución, con delivery gate documental y gates humanos propios (aprobación del PO, confirmación antes de escribir al ALM).
 4. Validar el spec si aplica (`[[calidad-spec-validation]]`).
 5. Decidir greenfield vs brownfield (`[[calidad-brownfield-vs-greenfield]]`).
 6. **Pre-diseño**: redactar `STRATEGY.md` y esperar aprobación humana (`[[calidad-pre-design-strategy-document]]`). Incluye la sección "Execution target y plan de switchover" cuando se prueba antes del desarrollo. En greenfield es obligatorio; en brownfield grande se simplifica a un delta-strategy.

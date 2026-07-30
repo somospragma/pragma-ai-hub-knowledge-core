@@ -1,6 +1,6 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -62,6 +62,12 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 5. Para proyectos con convenciones cliente-específicas detectadas (ver `[[calidad-karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
 6. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
 ```
+
+### Inputs para la ruta funcional
+
+Los intents funcionales (análisis/refinamiento de HUs, diseño de casos, estrategia/plan) NO usan la tabla de arriba: su contrato de entrada lo define cada workflow funcional (`[[calidad-analyze-and-refine-stories]]`, `[[calidad-design-test-cases]]`, `[[calidad-build-test-strategy-and-plan]]`). Común a los tres: `stories_source`/`contexto_fuente` (IDs o queries del ALM vía `[[calidad-alm-mcp-integration]]`, o el contenido pegado) y `output_path`. `spec`, `sut_available` y `locator_map` no aplican salvo que el flujo derive en automatización (re-entrada al router).
+
+Cruce con la `user_story` de esta tabla: si la HU entregada como input de automatización está visiblemente rota (sin CA, ambigua), ofrecer el análisis funcional (`[[calidad-funcional-story-analysis]]`) ANTES de generar código — mejora el insumo en vez de generar sobre él.
 
 ### K6-specific inputs
 

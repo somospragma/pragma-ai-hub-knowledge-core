@@ -1,11 +1,11 @@
 ---
 id: calidad-intent-detection
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: Decide qué framework de automatización (Karate, K6, Playwright, Appium) aplicar a partir del intent del usuario.
-tags: [intent, routing, karate, k6, playwright, appium]
+description: Decide qué stack aplicar a partir del intent del usuario — los 4 frameworks de automatización (Karate, K6, Playwright, Appium) o el stack funcional (análisis/refinamiento de HUs, diseño de casos, estrategia y planes).
+tags: [intent, routing, karate, k6, playwright, appium, funcional]
 ---
 
 # Intent Detection — Selección de Framework de Automatización
@@ -34,10 +34,14 @@ Esta skill decide **con qué framework** se generan las pruebas. La decisión de
 | K6         | "performance", "carga", "load", "stress", "spike", "soak", "K6", "VUs", "latencia", "throughput", "p95", "p99"          | (no se trata brownfield)                                          | `[[calidad-k6-greenfield]]`                                                     |
 | Playwright | "web", "browser", "E2E", "UI", "frontend", "Playwright", "page object", "visual", "accessibility", "regresión visual" | "proyecto existente", "actualizar selectores", "ya hay tests web" | greenfield → `[[calidad-playwright-greenfield]]` · brownfield → `[[calidad-playwright-brownfield]]` |
 | Appium     | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity"                        | (no se trata brownfield)                                          | `[[calidad-appium-screenplay-android]]`                                         |
+| Funcional  | "analizar historia", "HU", "INVEST", "criterios de aceptación", "refinamiento", "refinar", "casos de prueba" (diseño, no código), "test cases", "test plan", "plan de pruebas", "estrategia de pruebas", "matriz de trazabilidad", "Azure DevOps"/"Jira" como fuente de HUs | (no aplica greenfield/brownfield)                                 | análisis/refinamiento → `[[calidad-analyze-and-refine-stories]]` · diseño de casos → `[[calidad-design-test-cases]]` · estrategia/plan → `[[calidad-build-test-strategy-and-plan]]` |
+
+**Desambiguación "pruebas funcionales"**: si el intent pide *generar/automatizar* pruebas funcionales de una API (hay spec, endpoints, "automatiza") → Karate. Si pide *diseñar, documentar o gestionar* — analizar HUs, escribir casos de alto nivel, plan, estrategia — → stack funcional. Ante la duda, la pregunta es: "¿el entregable es código de pruebas ejecutable, o documentos/casos en el ALM?". El camino natural completo es funcional primero (diseño) y automatización después (los casos diseñados alimentan a los stacks).
 
 ## Restricciones
 
 - Si el intent no es claro o cae entre dos frameworks, **pregunta explícitamente**; nunca asumas Playwright por defecto.
+- Los intents funcionales NO pasan por spec-validation ni brownfield-vs-greenfield: el router los bifurca directo al workflow funcional (ver la ruta funcional en `[[calidad-route-test-generation]]`).
 - **Appium requiere señales explícitas de Android** (APK, `app_package`, `app_activity`, "mobile Android"). La versión actual del Chapter (Appium V2) **no soporta iOS**: si el usuario pide mobile iOS, repórtalo como fuera de alcance y detente.
 - K6 y Playwright/Karate pueden coexistir en un mismo programa de pruebas, pero **no en una sola solicitud de generación**: cada framework se genera por separado, en su propio `output_path`.
 - Una vez decidido el framework, transfiere el control al workflow específico; no mezcles instrucciones de generación de distintos frameworks.
