@@ -115,6 +115,8 @@ Expected files for functional workflows:
 ├── spec.yaml
 ├── context.json
 ├── review.md
+├── source-assets/
+│   └── figma/                 # required only for Figma-driven packets
 └── evidence/
 ```
 
@@ -145,6 +147,9 @@ Minimum checks:
    Before analysis there must be preflight evidence at
    `evidence/figma-mcp-preflight.md`, and the preflight agent must include
    `figma_mcp` in `can_call_external_tools`.
+   The analyzer must also have `can_create_files=true`,
+   `can_modify_files=true`, and `can_write.packet_paths` including
+   `source-assets/figma`.
 11. `review.md` exists and is written in Spanish.
 12. Every success criterion has at least one expected evidence path.
 13. Every planned artifact declares `target_id`, and `target_id` exists in
@@ -174,10 +179,27 @@ packet is a real executable plan, not an empty template. Require:
 3. Non-empty `canonical_spec`, `inventory`, `dag`, and `technical_plan`.
 4. A non-empty `artifact_plan.planned` that separates DS and app-view
    artifacts and assigns every artifact a `target_id`.
-5. Non-placeholder success criteria with evidence paths.
-6. `context.json.status=pending_human_review` and
+5. A complete `visual_manifest`: a captured main-node Figma screenshot,
+   reconciled visible elements with no unresolved ids, asset render strategies,
+   a downloaded `figma_mcp` source archive record for every visible asset and
+   icon, exact icon mappings or archived Figma SVGs, exact-project-font
+   typography mappings, and a resolved bottom-navigation ownership.
+6. For every asset with `crop.required=true`, require
+   `render_strategy=explicit_clip_transform`; frame exports do not satisfy the
+   contract. For every icon, permit `ds_icon_exact` only with a named exact DS
+   catalog match; otherwise require `figma_svg_asset`.
+7. Every `visual_manifest.assets[].asset_id` and
+   `visual_manifest.icons[].asset_id` resolves to `assets[].id`, whose
+   `figma_export.status=downloaded`, archive path exists under
+   `source-assets/figma/`, and SHA-256 matches the archived file. Every
+   typography entry has `figma_source.source=figma_mcp` and
+   `font_resolution=exact_project_font`.
+8. `visual_manifest.reconciliation.visual_verification_required=true` when the
+   packet includes a crop, exported Figma icon, or visible bottom navigation.
+9. Non-placeholder success criteria with evidence paths.
+10. `context.json.status=pending_human_review` and
    `checkpoints.initial_spec.status=pending`.
-7. `packet_owner_target_id` resolves to the requested app target or the
+11. `packet_owner_target_id` resolves to the requested app target or the
    configured app default, its target kind is `app`, and `packet_root` is under
    that target root. The packet owner must not be the Design System target,
    even while DS artifacts are planned or generated.
@@ -228,6 +250,11 @@ Widget tests remain mandatory: `/new-component` requires
 `evidence/widget-tests.md`; `/new-view` additionally requires
 `evidence/view-widget-tests.md`.
 
+For `/new-view`, also require a completed `visual_manifest` reconciliation
+before audit and delivery. When its visual-verification flag is true, require
+`evidence/visual-verification.md` with both the canonical Figma screenshot and
+the Flutter rendering reference, plus an approved `app_view_layer` checkpoint.
+
 ## Agent Permission Validation
 
 For every handoff:
@@ -265,11 +292,37 @@ If validation fails, block with `SPEC_AGENT_PERMISSION_MISSING`.
 For `/new-component`, `/new-view` and `/new-feature` with `figma_url`:
 
 1. `external_access.figma_mcp.required=true`.
-2. `figma-analyzer` performs the preflight and is the only agent that calls
-   Figma MCP. It records status `verified` before design analysis continues.
+2. `figma-analyzer` performs the preflight by default. For `/new-feature` only,
+   when `execution_capabilities.subagent_delegation=unavailable`,
+   `feature-builder` may execute the same role contract if its packet
+   permission explicitly grants `figma_mcp`. It records status `verified`
+   before design analysis continues.
 3. If it is not verified, block with `FIGMA_MCP_ACCESS_NOT_VERIFIED`.
 4. If MCP lacks permissions for the file, node or assets, block with
    `FIGMA_MCP_PERMISSION_DENIED`.
+5. For every visible icon, image, illustration, logo, or image-fill source,
+   require a matching `assets[]` entry with `figma_export.source=figma_mcp`, a
+   downloaded archive file under `source-assets/figma/`, and a matching
+   SHA-256. An image URL, screenshot, local replacement, or visually similar
+   icon cannot satisfy this check. Otherwise block with
+   `FIGMA_ASSET_DOWNLOAD_UNAVAILABLE`.
+6. For every visible text node in `/new-view`, require Figma source metadata
+   and `font_resolution=exact_project_font`. A close family or weight must
+   block with `FIGMA_TYPOGRAPHY_UNAVAILABLE`, not silently fall back.
+
+## Portable Role Execution
+
+For `/new-feature`, validate `execution_capabilities` before any specialized
+phase. `fallback_policy` must be `delegate_or_controller_executes`.
+
+- If native delegation is available, a specialist agent may execute its phase.
+- If it is unavailable, `feature-builder` is the execution owner and must
+  execute the named specialist role contract itself when its packet permissions
+  cover the files, commands, evidence, target, and external tools needed.
+- Mandatory unit, widget, and integration phases can never be `skipped` due to
+  unavailable delegation. Missing permissions or a missing runtime capability
+  are `blocked_input: PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`, not
+  success.
 
 ## Anti-Drift Validation
 

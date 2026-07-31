@@ -59,6 +59,9 @@ notes:
   - Golden tests run only when golden_tests=true; otherwise their skipped_by_input state must be recorded.
   - Documentation runs only when documentation=true; otherwise its skipped_by_input state must be recorded.
   - When documentation=true, project documentation must be represented as artifact_plan.planned[group=docs].
-  - feature-builder delegates Figma preflight and analysis to figma-analyzer when figma_url is provided.
+  - feature-builder prefers Figma preflight and analysis through figma-analyzer when figma_url is provided.
+  - When figma_url is provided, every visible icon, image, illustration, logo, and image-fill source must be downloaded into source-assets/figma with node id, format and SHA-256 before code generation.
+  - Native delegation is optional: feature-builder owns every mandatory phase and executes a specialist role contract when execution_capabilities.subagent_delegation=unavailable.
+  - Unit, widget, and integration tests are never skipped because a test-engineer subagent is unavailable.
   - Delivery proposes branch, commit and PR text unless explicit git or gh permissions are granted.
   - evidence_mode defaults to minimal; standard retains detailed phase reports.

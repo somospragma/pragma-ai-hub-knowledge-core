@@ -52,6 +52,10 @@ notes:
   - The Spec Packet is owned by the resolved app target for the whole run.
   - DS artifacts target design_system; app view artifacts target the resolved app target.
   - The DS checkpoint must be approved before app view generation starts.
+  - Every visible icon, image, illustration, logo, and image-fill source must be downloaded from Figma into source-assets/figma with its node id, format and SHA-256 before approval.
+  - The initial plan must reconcile the visual manifest: cropped assets use source SVGs with explicit transforms, DS icons require an exact match and an archived Figma export, and typography must map to exact tokens and registered project fonts.
+  - Visible bottom navigation must resolve to existing_app_shell, view_scaffold, or not_present before approval.
+  - Cropped assets, exported Figma icons, and visible bottom navigation require a human visual-verification checkpoint with Figma and Flutter rendering references.
   - DS and view widget tests remain mandatory; both golden stages run only when golden_tests=true.
   - When golden_tests=false, record golden_tests as skipped_by_input.
   - evidence_mode defaults to minimal; standard retains detailed phase reports.

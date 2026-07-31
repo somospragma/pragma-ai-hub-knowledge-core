@@ -22,7 +22,7 @@ description: >
 - [ ] `get_screenshot` captured for each guided change
 - [ ] Node metadata extracted (via Figma MCP `get_node` or manual inspection)
 - [ ] `get_styles` used to verify published token mappings (if MCP available)
-- [ ] MCP status documented: ✅ Acceso directo | ⚠️ Fallback manual
+- [ ] MCP status documented: direct access | manual fallback
 - [ ] Development annotations documented (alerts, states, special rules)
 - [ ] Literal text contract extracted from visible TEXT nodes
 - [ ] Layout constraints and overflow-risk matrix extracted or warning recorded
@@ -46,6 +46,8 @@ description: >
 
 ## 4. Typography
 - [ ] Each text uses correct typography token
+- [ ] Family and weight match the Figma style source and an exact registered
+      project font; no close-font fallback
 - [ ] Font size matches
 - [ ] Font weight matches (Regular=400, Medium=500, Bold=700)
 - [ ] `textAlign` matches
@@ -68,6 +70,24 @@ description: >
 - [ ] Horizontal text layouts use `Flexible`/`Expanded` where needed
 - [ ] Scroll/SafeArea strategy prevents full-view overflow
 - [ ] Missing Figma constraints are warnings when mitigated, not blockers
+
+## 6a. Rendered Assets And Icons
+- [ ] Each visible asset maps its source node to its visible container
+- [ ] Every visible icon, image, illustration, logo, and image-fill source was
+      downloaded from Figma into `source-assets/figma/` with format and SHA-256
+- [ ] Cropped/masked/scaled assets use the source file plus explicit clip,
+      transform, and alignment; no enclosing-frame export is used as a shortcut
+- [ ] A DS icon is used only when its exact catalog match is declared and its
+      Figma source export remains archived
+- [ ] Otherwise, the archived Figma SVG is registered and rendered
+- [ ] Final runtime assets have the same checksum as their archived Figma source
+- [ ] The runtime result preserves source bounds versus visible bounds
+
+## 6c. Screen Chrome
+- [ ] Visible bottom navigation is classified as shared app shell, view-owned
+      scaffold, or not present
+- [ ] A shared shell is integrated without duplication
+- [ ] A view-owned navigation bar is rendered and covered by a widget test
 
 ## 6b. Overflow Safety
 

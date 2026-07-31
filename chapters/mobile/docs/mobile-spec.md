@@ -16,6 +16,8 @@ particular artifact.
 ├── context.json
 ├── review.md
 ├── evidence/
+├── source-assets/
+│   └── figma/
 └── snapshots/
 ```
 
@@ -39,6 +41,7 @@ evidence or pipeline reports out of the app-owned root.
 | `context.json` | Resume state: run id, current phase, approvals, completed phases, blockers and evidence references. | Agents |
 | `review.md` | Compact Spanish review for human approval. | Human |
 | `evidence/` | Validation reports, preflight results, audits, command summaries and checkpoint decisions. | Human and agents |
+| `source-assets/figma/` | Immutable Figma exports for each visible icon, image, illustration and logo. | Agents and audit |
 
 `context.json` is validated by `mobile-context.schema.json`. Its
 `workflow_controller` is the workflow `entry_agent`, not the optional
@@ -76,6 +79,57 @@ golden files and snapshots. The controller normalizes an omitted value to
 the packet. When enabled, every applicable golden stage must pass and persist
 `evidence/golden-tests.md` before delivery. Widget tests remain mandatory.
 
+## `/new-view` Visual Fidelity Contract
+
+`/new-view` adds `visual_manifest` to the standard packet. It is a compact,
+machine-readable reconciliation of visible Figma elements, not a verbose
+handoff. The initial plan cannot be approved until it contains:
+
+- `reference_screenshot`: the Figma MCP screenshot reference for the requested
+  main node;
+- `assets`: an immutable Figma MCP export for every visible icon, image,
+  illustration and logo, identified by source node, format, packet archive path
+  and SHA-256; rendered non-icon assets also record their visible container,
+  clip/mask chain, bounds, scale, translation, alignment and strategy;
+- `icons`: an archived Figma export plus either a declared exact DS catalog
+  match (`ds_icon_exact`) or that archived Figma SVG (`figma_svg_asset`);
+- `typography`: family, size, weight, line height, alignment, Figma style id
+  (or `inline:<node-id>`), exact project-font resolution and the resolved
+  typography token for every visible text node;
+- `screen_chrome.bottom_navigation`: whether it is visible in Figma and whether
+  the result is owned by `existing_app_shell`, `view_scaffold`, or
+  `not_present`; and
+- `reconciliation`: counts, unresolved ids, completion status, and whether a
+  visual-verification checkpoint is required.
+
+For cropped, masked, or transformed assets, the reusable source asset is
+exported and Flutter recreates the visible crop with
+`explicit_clip_transform`. Exporting an enclosing Figma frame is not allowed:
+it loses reuse and makes the result dependent on a single screen context.
+
+The archive is mandatory for every Figma-driven `/new-component`, `/new-view`,
+or `/new-feature` with `figma_url`: `get_images(...)` must download the source
+file into `source-assets/figma/` before the initial review. An image URL,
+screenshot, existing local asset, or visually similar system/DS icon is not
+evidence of provenance. The code-generation phase copies image, illustration,
+logo and Figma-SVG sources without modifying them; an exact declared DS icon
+may use its catalog entry while retaining the Figma export as proof. The audit
+verifies the final file checksum or exact DS identity. If an asset cannot be
+exported or downloaded, the workflow stops with
+`FIGMA_ASSET_DOWNLOAD_UNAVAILABLE`.
+
+Typography has a distinct constraint: Figma supplies the design metadata but
+normally not a redistributable font file. The analyzer records the exact Figma
+family, weight and style reference, then verifies an exact registered project
+font. It must block with `FIGMA_TYPOGRAPHY_UNAVAILABLE` rather than substitute
+a close family or weight.
+
+The controller requires visual verification when the manifest has an explicit
+crop, an exported Figma icon, or visible bottom navigation. The app-view
+checkpoint then compares the canonical Figma screenshot reference with a
+deterministic Flutter rendering reference. This is a human approval gate, not
+a replacement for optional golden regression tests.
+
 ## Evidence Modes
 
 Every packet declares `evidence_mode: minimal | standard`. The default is
@@ -88,6 +142,23 @@ optional stages and delivery. Other phase outcomes are compact structured
 entries in `context.json.phase_results`, so later agents can resume without
 re-reading prose reports. `standard` additionally writes detailed analysis,
 inventory, planning, code-generation, Widgetbook and checkpoint reports.
+
+## Portable Role Execution
+
+`/new-feature` packets require `execution_capabilities`:
+
+```yaml
+execution_capabilities:
+  subagent_delegation: available | unavailable
+  fallback_policy: delegate_or_controller_executes
+```
+
+The entry controller owns every required result. A named agent such as
+`test-engineer` is the preferred specialist role, not a reason to omit work on
+tool surfaces that cannot delegate. When delegation is unavailable,
+`feature-builder` executes the role contract itself using the same planned
+artifacts, commands, evidence and blockers. This is mandatory for unit, widget
+and integration tests; unavailable delegation is never `skipped_by_input`.
 
 ## Required `spec.yaml` Concepts
 

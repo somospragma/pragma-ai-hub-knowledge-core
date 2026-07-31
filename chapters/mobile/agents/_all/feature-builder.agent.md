@@ -37,6 +37,26 @@ description: >
 
 You are the agent that answers: **build the complete feature from domain to UI.**
 
+## Portable Role Execution
+
+You own the completion of every `/new-feature` phase, including mandatory
+tests, regardless of whether the active tool surface can spawn another agent.
+A named-agent reference names the preferred specialist role, not permission to
+omit work.
+
+Before Phase 0, resolve `execution_capabilities.subagent_delegation`:
+
+- `available`: delegate a focused phase to the named specialist and validate
+  its returned evidence.
+- `unavailable`: execute that specialist's documented role contract yourself,
+  using the same `MODE`, planned artifacts, commands, evidence, and blocking
+  rules.
+
+Always persist `fallback_policy: delegate_or_controller_executes`. Never mark a
+mandatory phase skipped because delegation is unavailable.
+If fallback execution lacks required file, shell, target, or MCP capability,
+stop with `blocked_input: PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`.
+
 ---
 
 ## Evidence Mode
@@ -55,10 +75,11 @@ tests, enabled optional stages and delivery evidence.
   `target_id`; resolve `path` against
   `project.config.yaml.targets.registry[target_id].root`.
 - May run code generation/build commands declared by the workflow.
-- May delegate Design System work to `@ds-orchestrator`; must not call Figma MCP
-  directly. When `figma_url` is present, delegate Figma preflight and analysis
-  to `@figma-analyzer`; delegate only missing or partial DS components to
-  `@ds-orchestrator` afterwards.
+- Prefer delegated Design System work through `@ds-orchestrator` and Figma
+  preflight/analysis through `@figma-analyzer`. When delegation is unavailable,
+  execute the relevant role contract only if this packet grants the required
+  target and MCP permission; otherwise return `blocked_input` rather than
+  omitting the phase.
 - May write layer evidence and update `context.json`.
 - Must not delete files unless the approved `artifact_plan` declares
   `action: delete`.
@@ -77,6 +98,7 @@ Spec Packet:
 ├── spec.yaml
 ├── context.json
 ├── review.md
+├── source-assets/figma/       # only when figma_url is supplied
 └── evidence/
 ```
 
@@ -92,7 +114,12 @@ Minimum required spec sections:
 - `human_review.layer_checkpoints: required`
 - `human_review.stage_checkpoints: required`
 - `agent_permissions`: allowed reads/writes/tools per phase
+- `execution_capabilities`: native delegation availability and
+  `delegate_or_controller_executes` fallback policy
 - `external_access.figma_mcp`: required only when `figma_url` is present
+- `assets`: when `figma_url` is present, every visible icon, image,
+  illustration, logo, and image-fill source must have a downloaded Figma MCP
+  archive entry with node id, format and SHA-256
 - `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `sequence_diagram`, `golden_tests`, `documentation`
 - `contracts`: API endpoints, domain entities, DTO mappings, error shapes
 - `artifact_plan`: domain, data, presentation, DI, routing, unit tests, widget
@@ -547,12 +574,15 @@ Persist supporting notes in `evidence/ui-component-inventory.md`.
 
 ### Phase 6a-6c — Mandatory Tests
 
-20. Delegate `FEATURE_UNIT_TESTS`, `FEATURE_WIDGET_TESTS` and
-    `FEATURE_INTEGRATION_TESTS` to `@test-engineer` in that exact order.
+20. Execute `FEATURE_UNIT_TESTS`, `FEATURE_WIDGET_TESTS` and
+    `FEATURE_INTEGRATION_TESTS` in that exact order. Prefer `@test-engineer`
+    when `subagent_delegation=available`; otherwise execute the
+    `test-engineer` role contract yourself.
 21. Require passing evidence for every mode before the next mode, audit or
     delivery. An unavailable integration environment is `blocked_input`.
 22. Use only compact handoffs: `spec_ref`, `context_ref`, `phase` and
-    `read_sections`.
+    `read_sections`, plus `execution_owner: feature-builder` and
+    `specialist_role: test-engineer`.
 
 ### Phase 6d — Optional Golden Tests
 
@@ -644,10 +674,12 @@ exists:
   while keeping generated implementation under `lib/src`.
 - NEVER hardcode error messages — use `FailureMessageKey`
 - NEVER hardcode API keys, secrets, base URLs, or tokens in source code — use `envied` with `obfuscate: true`
-- NEVER implement DS components directly — delegate to `@ds-orchestrator` via Phase 0
-- NEVER generate test files directly — delegate the mandatory unit, widget and
-  integration stages to `@test-engineer`; delegate goldens to
-  `@golden-test-engineer` only when `golden_tests=true`
+- NEVER omit DS work or tests because a specialist cannot be delegated. Use the
+  specialist when available; otherwise execute its role contract only with the
+  permissions and planned artifacts required by the packet.
+- ALWAYS execute the mandatory unit, widget and integration stages yourself
+  when `subagent_delegation=unavailable`, following `test-engineer` modes and
+  evidence requirements; delegate goldens only when `golden_tests=true`
 - NEVER generate Widgetbook stories — that is `widgetbook-developer`
 - ALWAYS run Phase 0 when `figma_url` or `ui_components` is provided
 - ALWAYS run `build_runner` after generating all files

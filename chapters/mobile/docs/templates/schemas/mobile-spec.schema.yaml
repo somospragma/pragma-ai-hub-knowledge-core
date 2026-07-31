@@ -120,6 +120,17 @@ properties:
               type: string
           evidence:
             type: string
+  execution_capabilities:
+    type: object
+    additionalProperties: false
+    required: [subagent_delegation, fallback_policy]
+    properties:
+      subagent_delegation:
+        type: string
+        enum: [pending, available, unavailable]
+      fallback_policy:
+        type: string
+        enum: [delegate_or_controller_executes]
   agent_permissions:
     type: object
     minProperties: 1
@@ -204,6 +215,208 @@ properties:
     items:
       type: object
       additionalProperties: true
+      required:
+        - id
+        - figma_node_id
+        - kind
+        - figma_export
+        - status
+      properties:
+        id:
+          type: string
+        figma_node_id:
+          type: string
+        kind:
+          type: string
+          enum: [icon, image, illustration, logo]
+        figma_export:
+          type: object
+          additionalProperties: false
+          required: [source, format, archive_path, sha256, status]
+          properties:
+            source:
+              type: string
+              const: figma_mcp
+            format:
+              type: string
+              enum: [svg, png, jpg, webp]
+            archive_path:
+              type: string
+              pattern: "^source-assets/figma/"
+            sha256:
+              type: string
+              pattern: "^sha256:[a-f0-9]{64}$"
+            status:
+              type: string
+              enum: [downloaded, blocked_input]
+        status:
+          type: string
+          enum: [resolved, blocked_input]
+  visual_manifest:
+    type: object
+    additionalProperties: false
+    required:
+      - reference_screenshot
+      - assets
+      - icons
+      - typography
+      - screen_chrome
+      - reconciliation
+    properties:
+      reference_screenshot:
+        type: object
+        additionalProperties: false
+        required: [node_id, status, reference]
+        properties:
+          node_id:
+            type: string
+          status:
+            type: string
+            enum: [captured, blocked_input]
+          reference:
+            type: string
+      assets:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required:
+            - id
+            - asset_id
+            - source_node_id
+            - visible_container_node_id
+            - render_strategy
+            - crop
+            - status
+          properties:
+            id:
+              type: string
+            asset_id:
+              type: string
+            source_node_id:
+              type: string
+            visible_container_node_id:
+              type: string
+            render_strategy:
+              type: string
+              enum: [direct_asset, explicit_clip_transform]
+            crop:
+              type: object
+              additionalProperties: true
+              required: [required]
+              properties:
+                required:
+                  type: boolean
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      icons:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required: [id, asset_id, figma_node_id, strategy, status]
+          properties:
+            id:
+              type: string
+            asset_id:
+              type: string
+            figma_node_id:
+              type: string
+            strategy:
+              type: string
+              enum: [ds_icon_exact, figma_svg_asset]
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      typography:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required:
+            - text_node_id
+            - font_family
+            - font_size
+            - font_weight
+            - line_height
+            - text_align
+            - token
+            - figma_source
+            - status
+          properties:
+            text_node_id:
+              type: string
+            font_family:
+              type: string
+            font_size:
+              type: [number, string]
+            font_weight:
+              type: [number, string]
+            line_height:
+              type: [number, string]
+            text_align:
+              type: string
+            token:
+              type: string
+            figma_source:
+              type: object
+              additionalProperties: false
+              required: [source, style_id, font_resolution]
+              properties:
+                source:
+                  type: string
+                  const: figma_mcp
+                style_id:
+                  type: string
+                font_resolution:
+                  type: string
+                  enum: [exact_project_font, blocked_input]
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      screen_chrome:
+        type: object
+        additionalProperties: false
+        required: [bottom_navigation]
+        properties:
+          bottom_navigation:
+            type: object
+            additionalProperties: true
+            required: [figma_visible, ownership, verification]
+            properties:
+              figma_visible:
+                type: boolean
+              ownership:
+                type: string
+                enum: [existing_app_shell, view_scaffold, not_present, blocked_input]
+              verification:
+                type: string
+      reconciliation:
+        type: object
+        additionalProperties: false
+        required:
+          - visible_element_count
+          - resolved_element_count
+          - unresolved_ids
+          - status
+          - visual_verification_required
+        properties:
+          visible_element_count:
+            type: integer
+            minimum: 0
+          resolved_element_count:
+            type: integer
+            minimum: 0
+          unresolved_ids:
+            type: array
+            items:
+              type: string
+          status:
+            type: string
+            enum: [pending, complete, blocked_input]
+          visual_verification_required:
+            type: boolean
   canonical_spec:
     type: object
     additionalProperties: true
@@ -263,6 +476,22 @@ properties:
                 - docs
                 - audit
                 - delivery
+            source_asset:
+              type: object
+              additionalProperties: false
+              required: [asset_id, archive_path, sha256, copy_mode]
+              properties:
+                asset_id:
+                  type: string
+                archive_path:
+                  type: string
+                  pattern: "^source-assets/figma/"
+                sha256:
+                  type: string
+                  pattern: "^sha256:[a-f0-9]{64}$"
+                copy_mode:
+                  type: string
+                  enum: [byte_identical]
   success_criteria:
     type: array
     minItems: 1
@@ -346,6 +575,7 @@ allOf:
         workflow:
           const: new-view
     then:
+      required: [visual_manifest]
       properties:
         inputs:
           required: [view_name, figma_url, user_story]
@@ -370,6 +600,7 @@ allOf:
         workflow:
           const: new-feature
     then:
+      required: [execution_capabilities]
       properties:
         inputs:
           required: [feature_name, description]

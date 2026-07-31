@@ -185,4 +185,6 @@ If it exists Mobile Spec Packet, record final evidence in
 - Do not modify widget implementation.
 - Do not create PR without validating structure, scope and tests.
 - Do not complete `/new-feature` delivery without its mandatory test evidence.
+- The same delivery contract applies when `feature-builder` executes the role
+  because native subagent delegation is unavailable.
 - Keep structured output and without conversational text.

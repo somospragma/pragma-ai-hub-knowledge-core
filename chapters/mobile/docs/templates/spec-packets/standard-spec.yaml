@@ -23,6 +23,7 @@ agent_permissions:
       - artifact_plan
       - success_criteria
       - evidence
+      - visual_manifest
     can_write:
       spec_sections:
         - status
@@ -55,13 +56,16 @@ agent_permissions:
         - literal_texts
         - layout_constraints
         - assets
+        - visual_manifest
         - view_states
         - navigation
+      packet_paths:
+        - source-assets/figma
       evidence:
         - evidence/figma-analysis.md
         - evidence/figma-mcp-preflight.md
-    can_create_files: false
-    can_modify_files: false
+    can_create_files: true
+    can_modify_files: true
     can_delete_files: false
     can_call_external_tools:
       - figma_mcp
@@ -74,6 +78,8 @@ agent_permissions:
       - literal_texts
       - layout_constraints
       - assets
+      - source-assets/figma
+      - visual_manifest
     can_write:
       spec_sections:
         - canonical_spec
@@ -95,12 +101,19 @@ agent_permissions:
       - canonical_spec
       - inventory
       - dag
+      - design_source
+      - literal_texts
+      - layout_constraints
+      - assets
+      - source-assets/figma
+      - visual_manifest
     can_write:
       spec_sections:
         - contracts
         - constraints
         - technical_plan
         - artifact_plan.planned
+        - visual_manifest
       evidence:
         - evidence/architecture-report.md
     can_create_files: false
@@ -113,6 +126,8 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - source-assets/figma
+      - visual_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -122,6 +137,7 @@ agent_permissions:
         - context.json.artifacts
       evidence:
         - evidence/codegen-report.md
+        - evidence/visual-verification.md
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
@@ -132,6 +148,9 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - assets
+      - source-assets/figma
+      - visual_manifest
       - success_criteria
     can_write:
       spec_sections:
@@ -148,6 +167,7 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - visual_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -171,6 +191,7 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - visual_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -194,6 +215,7 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - visual_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -211,6 +233,7 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - visual_manifest
       - success_criteria
     can_write:
       evidence:
@@ -230,6 +253,25 @@ design_source: {}
 literal_texts: []
 layout_constraints: []
 assets: []
+visual_manifest:
+  reference_screenshot:
+    node_id: "{{FIGMA_NODE_ID}}"
+    status: blocked_input
+    reference: ""
+  assets: []
+  icons: []
+  typography: []
+  screen_chrome:
+    bottom_navigation:
+      figma_visible: false
+      ownership: not_present
+      verification: pending_analysis
+  reconciliation:
+    visible_element_count: 0
+    resolved_element_count: 0
+    unresolved_ids: []
+    status: pending
+    visual_verification_required: false
 view_states:
   loading: {}
   empty: {}
@@ -242,6 +284,10 @@ contracts:
   minimal_domain_data: {}
   text_overflow: {}
   technical_vectors: {}
+  asset_rendering: {}
+  icon_mapping: {}
+  typography_mapping: {}
+  screen_chrome: {}
 constraints:
   compatibility: {}
 technical_plan: {}
@@ -264,6 +310,7 @@ handoffs:
       - artifact_plan
       - contracts.text_overflow
       - contracts.technical_vectors
+      - visual_manifest
       - success_criteria
   - phase: app_view_codegen
     agent: widget-developer
@@ -272,6 +319,7 @@ handoffs:
       - contracts.minimal_domain_data
       - contracts.text_overflow
       - contracts.technical_vectors
+      - visual_manifest
       - technical_plan
       - artifact_plan
       - success_criteria

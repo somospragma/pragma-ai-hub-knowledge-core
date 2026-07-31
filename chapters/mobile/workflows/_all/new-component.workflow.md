@@ -79,6 +79,10 @@ Minimum checklist:
 3. `get_design_context(fileKey, nodeId)` returns context for the node.
 4. `get_screenshot(...)` returns a screenshot for the main node.
 5. Sufficient permissions to read components, styles, variables and assets.
+6. The active agent can write the packet-only Figma source archive at
+   `{SPEC_PACKET_PATH}/source-assets/figma/`.
+7. `get_images(...)` exports can be persisted by the active tool surface; a
+   screenshot or temporary URL alone does not satisfy source-asset access.
 
 If it fails, update `spec.yaml.external_access.figma_mcp.status=blocked_input`,
 persist `evidence/figma-mcp-preflight.md` and finish with `blocked_input`.
@@ -140,6 +144,10 @@ Minimum packet permissions:
 
 Required output: update in `spec.yaml` only `design_source`,
 `literal_texts`, `layout_constraints`, `assets` and `success_criteria.visual`.
+Download every visible Figma icon, image, illustration, logo, and image-fill
+source into `{SPEC_PACKET_PATH}/source-assets/figma/`, recording node id,
+format, archive path and SHA-256 in `assets`. A screenshot, temporary export
+URL, existing local asset, or similar icon is not a substitute.
 Persist evidence in `evidence/figma-analysis.md`.
 
 ---
@@ -170,7 +178,7 @@ Update in `spec.yaml` only `technical_plan`, `artifact_plan`,
 Validate `spec.yaml` and present `review.md`.
 
 Present to the developer:
-1. visual analysis and literal text.
+1. visual analysis, literal text, and the Figma source archive for every visible asset.
 2. inventory, DAG and planned artifacts.
 3. technical plan.
 4. success criteria from `review.md`.
@@ -199,6 +207,8 @@ read_sections:
   - artifact_plan.planned[group=ds_components]
   - literal_texts
   - layout_constraints
+  - assets
+  - source-assets/figma
   - contracts.text_overflow
   - contracts.technical_vectors
   - success_criteria
@@ -216,6 +226,8 @@ Output: files `.dart` bajo
 Loop with `@widget-developer` up to `pipeline.max_audit_retries`.
 
 Required output: `evidence/audit-report.md` and a summary in the human report.
+The audit must block a missing Figma source archive, a checksum mismatch for a
+runtime asset, an undeclared DS exact-icon mapping, or a substituted font.
 
 ---
 

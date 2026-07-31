@@ -133,11 +133,20 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
      `spec.yaml.agent_permissions.<agent>` must allow it.
    - if the permission does not exist or does not cover the action, stop with
      `blocked_input` and record the missing.
+   - Native subagent delegation is an optimization. When
+     `execution_capabilities.subagent_delegation=unavailable`, the workflow
+     controller executes the documented specialist role contract itself; it
+     must not skip a mandatory phase. Use
+     `fallback_policy=delegate_or_controller_executes`.
 14. Require Figma MCP preflight for Figma-driven workflows:
    - `/new-component`
    - `/new-view`
    - `/new-feature` only if it has `figma_url`
    - block if `external_access.figma_mcp.status` is not `verified`.
+   - require every visible icon, image, illustration, logo, and image-fill
+     source to be downloaded into `{SPEC_PACKET_PATH}/source-assets/figma/`
+     with node id, format and SHA-256. Do not accept a screenshot, URL, or
+     similar local/DS resource as a replacement.
 15. Define workflow:
    - `/bootstrap-workspace`
    - `/new-component`
@@ -226,7 +235,7 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 
 1. Gate architecture and contracts policy.
 2. Phase 0 → create Mobile Spec Packet `standard`.
-3. Phase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → update spec with visual analysis, states, texts, constraints and assets.
+3. Phase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → update spec with visual analysis, states, texts, constraints, assets and `visual_manifest`.
 4. Phase 2 → `@component-planner` (`atomic-inventory.prompt.md`) → update inventory DS vs App, DAG and artifacts.
 5. Phase 2.5 → `@component-architect` → update architecture view and technical plan.
 6. Phase 2.6 (only `CONTRACTS_POLICY=generate`) → add minimal contracts to the spec.
@@ -235,15 +244,19 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 9. Phase 3a.5 → `@code-auditor` → audits DS against `spec_ref`.
 10. A human checkpoint is required after the DS layer.
 11. Phase 3b → `@widget-developer` (`codegen-view.prompt.md`) → view app with handoff compact.
-12. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
-13. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) only when
+12. Phase 3b.5 → `@code-auditor` → reconciles the generated app view against
+    `visual_manifest`, including crop, exact icons, typography and screen chrome.
+13. A human checkpoint is required after the app view. When visual verification
+    is required, present Figma and Flutter rendering references before tests.
+14. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
+15. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) only when
     `golden_tests=true`; otherwise record `skipped_by_input`.
-14. Phase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
-15. Phase 4d → `@test-engineer` (`MODE=VIEW_WIDGET_TESTS`).
-16. Phase 4e → `@golden-test-engineer` (`MODE=VIEW_GOLDEN_TESTS`) only when
+16. Phase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
+17. Phase 4d → `@test-engineer` (`MODE=VIEW_WIDGET_TESTS`).
+18. Phase 4e → `@golden-test-engineer` (`MODE=VIEW_GOLDEN_TESTS`) only when
     `golden_tests=true`; otherwise reuse the recorded `skipped_by_input` outcome.
-17. Phase 4f → `@widgetbook-developer` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`).
-18. Phase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → final evidence and human report.
+19. Phase 4f → `@widgetbook-developer` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`).
+20. Phase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → final evidence and human report.
 
 ### `/refactor-component`
 
@@ -271,16 +284,20 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 ### `/new-feature`
 
 1. Phase S0 → `@feature-builder` creates Mobile Spec Packet `full`.
-2. Phase 0 → conditional UI/DS inventory; delegate missing components to `@ds-orchestrator`.
+2. Phase 0 → conditional UI/DS inventory; prefer the specialist role and use
+   controller fallback only with the required target/MCP permissions.
 3. Phase 1 → scaffold with handoff compact and evidence.
 4. Phase 1.5 → API contract analysis; update `spec.yaml.contracts`.
 5. Phase 2 → Domain; human checkpoint required.
 6. Phase 3 → Data; human checkpoint required.
 7. Phase 4 → Presentation; human checkpoint required.
 8. Phase 5 → wiring and validation.
-9. Phase 6a → `@test-engineer` (`MODE=FEATURE_UNIT_TESTS`); required.
-10. Phase 6b → `@test-engineer` (`MODE=FEATURE_WIDGET_TESTS`); required.
-11. Phase 6c → `@test-engineer` (`MODE=FEATURE_INTEGRATION_TESTS`); required.
+9. Phase 6a → `test-engineer` role (`MODE=FEATURE_UNIT_TESTS`); required and
+   owned by `@feature-builder` if delegation is unavailable.
+10. Phase 6b → `test-engineer` role (`MODE=FEATURE_WIDGET_TESTS`); required
+    and owned by `@feature-builder` if delegation is unavailable.
+11. Phase 6c → `test-engineer` role (`MODE=FEATURE_INTEGRATION_TESTS`); required
+    and owned by `@feature-builder` if delegation is unavailable.
 12. Phase 6d → `@golden-test-engineer` (`MODE=FEATURE_GOLDEN_TESTS`) only
     when `golden_tests=true`; otherwise record `skipped_by_input`.
 13. Phase 7 → `@code-auditor` audits implementation and required test evidence.
@@ -322,7 +339,8 @@ this checkpoint enables implementation.
 For `standard` and `full`, in addition to the initial checkpoint, request
 layer/stage checkpoints according to the workflow:
 
-- `/new-view`: after DS and before the app view.
+- `/new-view`: after DS and after the app view, before its tests. The latter
+  includes visual verification when required by `visual_manifest`.
 - `/new-feature`: after Domain, Data and Presentation.
 - `/refactor-feature`: after architectural or contract steps.
 - `/test-plan`: before generation of tests.

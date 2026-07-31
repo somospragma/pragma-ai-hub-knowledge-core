@@ -195,6 +195,8 @@ Output: Screenshot URL/reference for visual verification
 | `effects[type=DROP_SHADOW]` | `node.effects` | `elevation` → ElevationToken |
 | `opacity` | `node.opacity` | `Opacity` widget |
 | `clipsContent` | `node.clipsContent` | `clipBehavior: Clip.antiAlias` |
+| `relativeTransform` / bounds | node transform + bounds | `Transform` + `Align` inside clip |
+| mask / clipping ancestor chain | parent traversal | `ClipRect`/`ClipPath` render contract |
 
 ### Text Properties
 | Figma Property | MCP Path | Flutter Mapping |
@@ -206,6 +208,40 @@ Output: Screenshot URL/reference for visual verification
 | `style.lineHeightPx` | `node.style.lineHeightPx` | `height` in TextStyle |
 | `style.textAlignHorizontal` | `node.style.textAlignHorizontal` | `TextAlign.*` |
 
+### Rendered Asset Fidelity
+
+When an SVG/image source is shown through a frame, mask, or non-default scale,
+the source file and its visible result are different things. Record both:
+
+1. the reusable source node and exported source asset;
+2. the first visible container, its clip/mask ancestor chain, source and
+   visible bounds, scale, translation, and alignment.
+
+Use the source asset directly only when all of it is visible. Otherwise the
+Flutter contract must use an explicit clip and transform. Do not export the
+enclosing Figma frame merely to preserve a crop: it flattens a reusable asset
+into one context-specific image.
+
+For icons, a Design System replacement is allowed only when it is an exact
+catalog match in geometry and intended visual treatment. Download and archive
+the Figma export for every visible icon, even when that exact DS icon is used;
+exported source provenance is required. Export the Figma SVG for runtime use
+when no exact match exists.
+
+### Source Asset Archive
+
+For every visible icon, image, illustration, logo, or image-fill source:
+
+1. call `get_images` on the source node, never the enclosing presentation frame;
+2. download the Figma result to `{SPEC_PACKET_PATH}/source-assets/figma/`;
+3. record source node id, format, archive path and SHA-256 in `spec.yaml.assets`;
+4. copy that archived file byte-for-byte to the planned runtime asset path after
+   approval.
+
+Do not treat a screenshot, a temporary export URL, a local look-alike, or a
+platform icon as an asset source. If any visible source cannot be downloaded,
+return `blocked_input: FIGMA_ASSET_DOWNLOAD_UNAVAILABLE`.
+
 ### Text Fidelity Rules
 
 - Use `characters` exactly as Figma returns it for visible UI text.
@@ -215,6 +251,9 @@ Output: Screenshot URL/reference for visual verification
 - Layer names are not copy unless metadata/anotations explicitly say so.
 - If a required state has no visible text in Figma, report a gap instead of
   inventing final copy.
+- Record Figma style id (or `inline:<node-id>`) for every visible text node and
+  verify the exact family and weight are registered by the project. Do not
+  substitute a close font; return `blocked_input: FIGMA_TYPOGRAPHY_UNAVAILABLE`.
 
 ### Overflow Risk Extraction
 
@@ -240,6 +279,10 @@ When analyzing a full screen (not just a component):
    - Body content (scrollable or fixed)
    - Bottom navigation / FAB
    - Drawers / sidebars
+
+   For bottom navigation, record the Figma node and visible selected state.
+   Ownership is resolved later against the application route shell: shared
+   shell, view scaffold, or not present.
 
 2. **Map each section to organisms**:
    - Each major section = 1 organism

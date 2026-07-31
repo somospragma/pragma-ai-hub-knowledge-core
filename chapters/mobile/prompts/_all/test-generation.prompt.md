@@ -32,6 +32,12 @@ Before execution, the orchestrator must define `MODE` and the agent must honor i
 
 If `MODE` is not defined or does not match the current agent, stop with `blocked_input`.
 
+For `FEATURE_*` modes, `@feature-builder` may be the execution owner when
+`execution_capabilities.subagent_delegation=unavailable`. It adopts the
+`test-engineer` role contract without changing test scope, execution order,
+planned artifacts, commands, or evidence requirements. Its fallback policy is
+`delegate_or_controller_executes`.
+
 ## SDD Contract
 
 When `spec_context` exists, read `spec_ref` and `context_ref` as machine
@@ -124,7 +130,7 @@ If any item is missing, stop with `blocked_input`.
 2. `empty`
 3. `error`
 4. `populated`
-5. critical navigation
+5. critical navigation, including the declared bottom-navigation ownership
 6. absence of overflow in main and compact constraints when applicable
 
 ### Rules

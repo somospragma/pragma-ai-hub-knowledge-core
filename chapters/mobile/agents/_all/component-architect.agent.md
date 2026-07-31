@@ -41,9 +41,11 @@ evidence owned by this phase.
 - Can read only the sections listed in `read_sections`, canonical contracts,
   and existing files needed to design interfaces.
 - Can write in `spec.yaml`: `technical_plan`, `artifact_plan`,
-  `contracts.technical_vectors`, `contracts.text_overflow`,
-  `contracts.minimal_domain_data`, `success_criteria`, `handoffs`, and
-  `checkpoints`.
+  `contracts.technical_vectors`, `contracts.asset_rendering`,
+  `contracts.icon_mapping`, `contracts.typography_mapping`,
+  `contracts.screen_chrome`, `contracts.text_overflow`,
+  `contracts.minimal_domain_data`, `success_criteria`, `handoffs`,
+  `checkpoints`, and the ownership resolution in `visual_manifest`.
 - Can write evidence in `{SPEC_PACKET_PATH}/evidence/technical-plan.md`.
 - Cannot call Figma MCP.
 - Cannot create, modify, or delete Dart files, tests, or final assets.
@@ -53,7 +55,8 @@ evidence owned by this phase.
 
 - This phase does NOT query Figma MCP directly.
 - Design from `spec_ref` when it exists, reading `canonical_spec`, `inventory`,
-  `dag`, `contracts`, `artifact_plan`, and `success_criteria`.
+  `dag`, `assets`, `visual_manifest`, `contracts`, `artifact_plan`, and
+  `success_criteria`.
 - The human report may exist, but it is not the primary source.
 - If critical information is missing for interfaces or contracts, record
   `blocked_input` and return control to the orchestrator.
@@ -69,7 +72,9 @@ If the handoff includes `spec_ref` and `context_ref`:
 1. Validate the Mobile Spec Packet with `mobile-sdd-spec-validation`.
 2. Read only `read_sections`.
 3. Update `spec.yaml.technical_plan`, `artifact_plan`,
-   `contracts.technical_vectors`, `contracts.text_overflow`, and, for views,
+   `contracts.technical_vectors`, `contracts.asset_rendering`,
+   `contracts.icon_mapping`, `contracts.typography_mapping`,
+   `contracts.screen_chrome`, `contracts.text_overflow`, and, for views,
    `contracts.minimal_domain_data`.
 4. Record evidence in `{SPEC_PACKET_PATH}/evidence/technical-plan.md`.
 5. Update the human report only as a readable summary, if it exists.
@@ -134,6 +139,30 @@ Consume `assets` and `contracts.assets` for each relevant vector:
 - resource path/constant
 - render rule: size token, color token/original color, semantics
 - defined fallback, if applicable
+
+For `/new-view`, consume every `visual_manifest.assets` entry. A crop must
+remain `explicit_clip_transform` with its source bounds, visible bounds,
+clip/mask chain, scale, translation, and alignment. Never replace it with a
+frame export. For every icon, preserve `ds_icon_exact` only when the manifest
+names the exact catalog entry; otherwise use the exported Figma SVG.
+
+### 4.5b Define Typography And Screen Chrome Contracts
+
+- Resolve every `visual_manifest.typography` entry to the exact typography
+  token. A missing family, weight, size, line height, alignment, or token is
+  `blocked_input`; do not approximate it with a nearby style.
+- For every Figma source asset, plan a runtime artifact with
+  `source_asset.asset_id`, archive path, SHA-256 and `copy_mode: byte_identical`.
+  The only exception is `ds_icon_exact`, which keeps the source archive as proof
+  and records its exact catalog id instead of copying a duplicate runtime file.
+- Require `figma_source.font_resolution=exact_project_font` for every visible
+  text entry. A missing licensed project font is
+  `blocked_input: FIGMA_TYPOGRAPHY_UNAVAILABLE`, not permission to substitute.
+- Resolve bottom-navigation ownership by inspecting the app route tree:
+  `existing_app_shell` when a shared shell renders it, `view_scaffold` only
+  when this view owns it, and `not_present` when it is absent in Figma.
+- Record the route integration, selected state where applicable, and the
+  corresponding widget-test assertion in `contracts.screen_chrome`.
 
 ### 4.6 Define Text And Safe Layout Contract
 
@@ -213,6 +242,10 @@ technical_plan:
     navigation: {}
 contracts:
   technical_vectors: []
+  asset_rendering: []
+  icon_mapping: []
+  typography_mapping: []
+  screen_chrome: {}
   text_overflow: []
 ```
 

@@ -14,6 +14,9 @@ external_access:
     status: not_required
     checks: []
     evidence: ""
+execution_capabilities:
+  subagent_delegation: pending
+  fallback_policy: delegate_or_controller_executes
 agent_permissions:
   feature-builder:
     can_read:
@@ -21,11 +24,16 @@ agent_permissions:
       - architecture_contract_refs
       - dependencies_contract_refs
       - artifact_plan.planned
+      - technical_plan
+      - contracts
+      - assets
+      - source-assets/figma
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
       artifact_targets:
         - "{{ACTIVE_TARGET_ID}}"
+        - "{{DESIGN_SYSTEM_TARGET_ID}}"
         - "{{DOCS_TARGET_ID_OR_PROJECT_DOCS}}"
       context_sections:
         - context.json.status
@@ -34,16 +42,24 @@ agent_permissions:
         - context.json.completed_phases
         - context.json.phase_results
         - context.json.artifacts
+      packet_paths:
+        - source-assets/figma
       evidence:
         - evidence/scaffold-report.md
         - evidence/domain-checkpoint.md
         - evidence/data-checkpoint.md
         - evidence/presentation-checkpoint.md
+        - evidence/unit-tests.md
+        - evidence/widget-tests.md
+        - evidence/integration-tests.md
+        - evidence/audit-report.md
+        - evidence/delivery-report.md
         - evidence/documentation-report.md
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
-    can_call_external_tools: []
+    can_call_external_tools:
+      - figma_mcp
     evidence_required:
       - evidence/domain-checkpoint.md
       - evidence/data-checkpoint.md
@@ -191,11 +207,13 @@ agent_permissions:
         - literal_texts
         - layout_constraints
         - assets
+      packet_paths:
+        - source-assets/figma
       evidence:
         - evidence/figma-analysis.md
         - evidence/figma-mcp-preflight.md
-    can_create_files: false
-    can_modify_files: false
+    can_create_files: true
+    can_modify_files: true
     can_delete_files: false
     can_call_external_tools:
       - figma_mcp
@@ -205,6 +223,8 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - assets
+      - source-assets/figma
       - success_criteria
     can_write:
       spec_sections:

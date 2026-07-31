@@ -123,6 +123,29 @@ complete spec content.
 - [ ] Without hardcoded asset paths in widgets
 - [ ] Use of constants/central resource registry
 - [ ] Size/color/semantics of vectors coincide with spec
+- [ ] Every `visual_manifest.icons` entry uses either its exact declared DS
+      icon or its exported Figma SVG; similar icon substitution is a BLOCKER
+- [ ] Every `visual_manifest.assets` crop uses its declared
+      `explicit_clip_transform` source asset, visible container, clip/mask,
+      transform and alignment; frame-export substitution is a BLOCKER
+- [ ] Every visible icon/image/illustration/logo resolves to a downloaded
+      `assets[].figma_export` archive entry; each runtime asset checksum matches
+      that source archive, except `ds_icon_exact`, which must prove its declared
+      exact catalog id. Missing download or any replacement is a BLOCKER
+
+### 9b. Typography And Screen Chrome
+- [ ] Every `visual_manifest.typography` entry resolves to its declared token,
+      including family, size, weight, line height and alignment
+- [ ] Every typography entry has `figma_source.source=figma_mcp` and
+      `font_resolution=exact_project_font`; a close family or weight is
+      `blocked_input: FIGMA_TYPOGRAPHY_UNAVAILABLE`
+- [ ] Bottom navigation matches `visual_manifest.screen_chrome` and
+      `contracts.screen_chrome`: shared shell integration is not duplicated,
+      view-owned navigation is rendered and tested
+- [ ] `visual_manifest.reconciliation.status=complete` and has no unresolved ids
+- [ ] When `visual_verification_required=true`,
+      `evidence/visual-verification.md` references both Figma and Flutter
+      renderings; otherwise the packet records why it is not required
 
 ### 10. Layout and Overflow
 - [ ] Each risk in `layout_constraints`/`contracts.text_overflow` is mitigated or flagged

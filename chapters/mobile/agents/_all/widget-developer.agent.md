@@ -156,6 +156,35 @@ Widget build(BuildContext context) {
   - size from token
   - tokenized color when applicable
   - multicolor assets without forced tinting
+
+For `/new-view`, treat `visual_manifest` and `contracts.asset_rendering` as
+mandatory implementation contracts:
+
+- `direct_asset` renders the whole declared source asset.
+- `explicit_clip_transform` reuses the source SVG/image and recreates the
+  visible Figma result with the declared clip/mask bounds, scale, translation,
+  and alignment. Do not export or substitute the enclosing Figma frame.
+- `ds_icon_exact` may use only the named exact DS catalog icon. A
+  `figma_svg_asset` must use the archived Figma SVG; do not replace it with a
+  similar platform or DS icon. Every runtime image, illustration, logo, and
+  `figma_svg_asset` icon must be a byte-identical copy of its
+  `source-assets/figma` archive entry; do not redraw, optimize, or replace it
+  during code generation. An exact DS icon may use its declared catalog id,
+  but its downloaded Figma archive remains mandatory proof.
+- Apply the declared typography token for every visible text node, including
+  family, weight, size, line height, and alignment. `figma_source.font_resolution`
+  must be `exact_project_font`; otherwise return
+  `blocked_input: FIGMA_TYPOGRAPHY_UNAVAILABLE`, never substitute a close font.
+- Respect `screen_chrome.bottom_navigation.ownership`: integrate under the
+  existing app shell, render it in this view's scaffold, or omit it only when
+  the contract says `not_present`.
+
+When `visual_manifest.reconciliation.visual_verification_required=true`,
+capture a deterministic Flutter rendering with the project-supported test or
+preview tooling and record its reference beside the canonical Figma screenshot
+in `evidence/visual-verification.md`. If the project cannot capture it,
+return `blocked_input: FIGMA_VISUAL_VERIFICATION_UNAVAILABLE`; never invent a
+visual-comparison result.
 - Semantics:
   - decorative -> exclude from semantics
   - informative/interactive -> explicit semantic label

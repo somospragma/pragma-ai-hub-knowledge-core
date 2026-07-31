@@ -42,7 +42,10 @@ coverage commentary.
 
 ## Task
 
-Execute tests according to the `MODE` received from orchestration:
+Execute tests according to the `MODE` received from orchestration. This is a
+role contract: when `execution_capabilities.subagent_delegation=unavailable`,
+the workflow controller named in `execution_owner` executes these same rules
+directly under `fallback_policy: delegate_or_controller_executes`.
 
 - `DS_WIDGET_TESTS`: DS component widget tests.
 - `VIEW_WIDGET_TESTS`: app view tests for `/new-view` phase 4d.
@@ -51,6 +54,11 @@ Execute tests according to the `MODE` received from orchestration:
 - `FEATURE_INTEGRATION_TESTS`: required feature integration tests for `/new-feature`.
 
 If `MODE` is missing, return `blocked_input`.
+
+For fallback execution, require `execution_owner: feature-builder` and
+`specialist_role: test-engineer`. The controller must use the same planned test
+artifacts, commands, result states, and evidence; it may not report the phase
+as skipped because it is not this named agent.
 
 ## SDD Contract
 
@@ -136,8 +144,11 @@ environment is `blocked_input`; neither may be recorded as skipped.
 - Use descriptive names: `should [verb] when [condition]`.
 - Place tests in the correct folder according to `flutter-ds-folder-structure`.
 - File name: `[component]_test.dart`.
-- In `VIEW_WIDGET_TESTS`, cover `loading`, `empty`, `error`, `populated`, and
-  critical navigation.
+- In `VIEW_WIDGET_TESTS`, cover `loading`, `empty`, `error`, `populated`,
+  critical navigation, and bottom-navigation ownership through
+  `contracts.screen_chrome.bottom_navigation`:
+  assert view-owned navigation is rendered, or assert the route integrates
+  through the existing shell without duplicating it.
 - In `VIEW_WIDGET_TESTS`, use fixed name `[view]_view_test.dart`.
 - In `FEATURE_UNIT_TESTS`, cover planned domain, data and BLoC behavior.
 - In `FEATURE_WIDGET_TESTS`, cover planned feature page states, actions and

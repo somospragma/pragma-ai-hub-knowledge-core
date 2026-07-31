@@ -80,6 +80,29 @@ into Flutter Design System widgets and complete app views.
   views. If Figma does not define one, use the fallback standard for the project and
   alert the developer that that state does not come from Figma.
 
+### Rendered Asset And Screen Chrome Fidelity
+
+For `/new-view`, require a complete `visual_manifest` before the initial
+approval. It is a compact reconciliation of what is visible in Figma, not a
+duplicate prose handoff. The controller must not approve a packet when:
+
+- a cropped or transformed asset lacks its source node, visible container,
+  explicit clip/transform contract, or resolved status;
+- a visible icon, image, illustration, logo, or image-fill source lacks a
+  downloaded Figma archive record with node id, format and SHA-256;
+- an icon maps to a similar rather than exact DS icon, or lacks an archived
+  Figma SVG fallback;
+- a text node lacks the resolved family, weight, size, line height, alignment,
+  typography token, Figma style source, or exact registered project font;
+- visible bottom navigation lacks an ownership decision between the shared app
+  shell and this view's scaffold; or
+- reconciliation has unresolved elements.
+
+When the manifest requires visual verification, the app-view checkpoint must
+present both the canonical Figma screenshot reference and a deterministic
+Flutter rendering reference. Do not substitute an enclosing Figma frame for a
+reusable cropped source asset.
+
 ### Anti-Overflow Policy
 
 - The pipeline must prevent overflow in views and components using constraints,

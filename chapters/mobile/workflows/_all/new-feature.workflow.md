@@ -200,6 +200,8 @@ The full spec must include:
   and `agent_permissions.figma-analyzer.can_call_external_tools` includes
   `figma_mcp`
 - commands and evidence expected
+- `execution_capabilities.subagent_delegation` and
+  `fallback_policy=delegate_or_controller_executes`
 
 Validate the spec and wait for explicit approval before scaffold or code
 generation.
@@ -212,14 +214,19 @@ generation.
 **Agent:** `@feature-builder`
 
 Steps:
-1. If `figma_url` is provided, `@feature-builder` delegates Figma MCP preflight
-   and screen analysis to `@figma-analyzer`:
+1. If `figma_url` is provided, `@feature-builder` prefers Figma MCP preflight
+   and screen analysis through `@figma-analyzer`. When native subagent
+   delegation is unavailable, it executes the `figma-analyzer` role contract
+   itself only if the packet grants `figma_mcp`; otherwise it blocks:
    - parse `fileKey` and `nodeId`
    - verify Figma MCP is configured in the active tool
    - verify `get_design_context(fileKey, nodeId)` succeeds
    - verify a screenshot can be obtained for the target node
+   - download every visible Figma icon, image, illustration, logo, and
+     image-fill source into `{SPEC_PACKET_PATH}/source-assets/figma/`, with
+     node id, format and SHA-256 recorded in `spec.yaml.assets`
    - persist `evidence/figma-mcp-preflight.md`
-   - if any required check fails, set
+   - if any required check or source download fails, set
      `spec.yaml.external_access.figma_mcp.status=blocked_input` and stop
 2. Identify required DS components from Figma or description
 3. Search the repository for each component
@@ -429,8 +436,13 @@ Persist build_runner, DI and route evidence under `SPEC_PACKET_PATH/evidence/`.
 
 ### PHASE 6a — Unit Tests (required)
 
-**Agent:** `@test-engineer`
+**Preferred specialist role:** `@test-engineer`
 **Mode:** `FEATURE_UNIT_TESTS`
+
+**Execution owner:** `@feature-builder`. Delegate only when
+`execution_capabilities.subagent_delegation=available`; otherwise the controller
+executes the `test-engineer` contract and writes the same planned artifacts and
+evidence.
 
 Mandatory compact handoff:
 
@@ -456,8 +468,11 @@ fail, record `blocked_input` or `failed` with command output and stop.
 
 ### PHASE 6b — Widget Tests (required)
 
-**Agent:** `@test-engineer`
+**Preferred specialist role:** `@test-engineer`
 **Mode:** `FEATURE_WIDGET_TESTS`
+
+**Execution owner:** `@feature-builder`; use the same delegate-or-controller
+rule as Phase 6a.
 
 Mandatory compact handoff:
 
@@ -481,8 +496,11 @@ Persist `evidence/widget-tests.md`, test paths, command and result in
 
 ### PHASE 6c — Integration Tests (required)
 
-**Agent:** `@test-engineer`
+**Preferred specialist role:** `@test-engineer`
 **Mode:** `FEATURE_INTEGRATION_TESTS`
+
+**Execution owner:** `@feature-builder`; use the same delegate-or-controller
+rule as Phase 6a.
 
 Mandatory compact handoff:
 
@@ -607,7 +625,11 @@ skill.
 
 ### PHASE 9 — Delivery
 
-**Agent:** `@delivery-manager`
+**Preferred specialist role:** `@delivery-manager`
+
+**Execution owner:** `@feature-builder`. When native delegation is unavailable,
+the controller executes the delivery-manager validation contract and writes the
+same delivery evidence.
 
 Steps:
 1. Validate all files resolve within
@@ -695,10 +717,14 @@ After all phases:
 - NEVER proceed to Phase 1 if Phase 0 has unresolved `blocked_input`
 - NEVER generate files outside the root resolved by
   `artifact_plan.planned[].target_id`
-- NEVER call Figma MCP directly outside the Figma MCP preflight or delegated DS
-  workflow
-- NEVER generate test files directly; delegate all mandatory test stages to
-  `@test-engineer`
+- NEVER call Figma MCP outside the Figma preflight role contract and its
+  explicit packet permission.
+- NEVER replace a visible Figma asset with a similar local, platform, or DS
+  resource. The Figma source archive is mandatory; only a declared
+  `ds_icon_exact` may reuse its exact catalog id while retaining the archive.
+- NEVER skip or downgrade a mandatory phase because a specialist cannot be
+  delegated. `@feature-builder` owns required unit, widget and integration
+  tests and executes the `test-engineer` role contract when needed.
 - NEVER mark the feature complete without passing unit, widget and integration
   evidence
 - NEVER invoke `@golden-test-engineer` unless `golden_tests=true`

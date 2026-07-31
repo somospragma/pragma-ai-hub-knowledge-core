@@ -80,8 +80,8 @@ If any of these fields are missing, return `blocked_input`.
 ## Functional Inputs
 
 1. View/screen name.
-2. `design_source`, `literal_texts`, `layout_constraints`, `assets`, and
-   `view_states`.
+2. `design_source`, `literal_texts`, `layout_constraints`, `assets`,
+   `visual_manifest`, and `view_states`.
 3. `canonical_spec`, `inventory`, `dag`, `technical_plan`, and `contracts`.
 4. User story and acceptance criteria.
 5. Required states: `loading`, `empty`, `error`, `populated`.
@@ -213,6 +213,29 @@ class [NameView] extends StatelessWidget {
 4. Keep size, color, and semantics according to the contract.
 5. If the contract is missing for a critical vector, return `blocked_input`.
 
+## Rendered Asset, Typography, And Screen Chrome Rules
+
+1. `visual_manifest.reconciliation.status` must be `complete` with no
+   unresolved ids before implementation. Otherwise return `blocked_input:
+   FIGMA_VISUAL_MANIFEST_INCOMPLETE`.
+2. Recreate `explicit_clip_transform` assets with the source asset plus the
+   declared clip/mask bounds, scale, translation, and alignment. Never render
+   the whole asset when Figma shows a crop, and never export the parent frame
+   as a shortcut.
+3. A DS icon is valid only for `ds_icon_exact` with the exact declared catalog
+   id and a downloaded Figma source archive. `figma_svg_asset` requires the
+   archived Figma SVG and its registered resource constant. Copy each runtime
+   image, illustration, logo, and `figma_svg_asset` byte-for-byte from
+   `source-assets/figma/`; do not redraw, optimize, or replace it. An exact DS
+   icon may use its declared catalog id, while retaining the Figma archive proof.
+4. Every visible text must use the resolved typography token from
+   `contracts.typography_mapping` and `figma_source.font_resolution` must be
+   `exact_project_font`; do not approximate its family, weight, or style.
+5. Follow `contracts.screen_chrome.bottom_navigation` exactly. An
+   `existing_app_shell` means route integration without duplicate navigation;
+   `view_scaffold` means render and test it in the view; `not_present` means do
+   not add it.
+
 ## Pre-Delivery Checklist
 
 - [ ] Scaffold and screen structure are correct.
@@ -225,3 +248,5 @@ class [NameView] extends StatelessWidget {
 - [ ] Critical vectors are implemented according to `assets`/`contracts.technical_vectors`.
 - [ ] Visible text matches Figma literally through `literal_texts`/`contracts.text_overflow`.
 - [ ] Overflow risks from `layout_constraints`/`contracts.text_overflow` are mitigated or flagged.
+- [ ] Each visual-manifest entry is implemented with its exact icon, crop,
+  typography, and screen-chrome contract.

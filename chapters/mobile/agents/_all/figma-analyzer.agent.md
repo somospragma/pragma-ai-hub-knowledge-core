@@ -35,9 +35,9 @@ write `figma-analysis.md` only in `standard`.
 
 - Can read: Figma URL, user story/criteria, `spec_ref`, `context_ref`, and the sections listed in `read_sections`.
 - Can call external tools: only Figma MCP.
-- Can write in `spec.yaml`: `external_access.figma_mcp`, `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `view_states`, `navigation`, and `acceptance_criteria`.
+- Can write in `spec.yaml`: `external_access.figma_mcp`, `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, `view_states`, `navigation`, and `acceptance_criteria`.
 - Can write evidence: `{SPEC_PACKET_PATH}/evidence/figma-mcp-preflight.md` and `{SPEC_PACKET_PATH}/evidence/figma-analysis.md`.
-- Cannot create, modify, or delete Dart files, tests, final assets, or project configuration.
+- Can create and modify only `{SPEC_PACKET_PATH}/source-assets/figma/` to archive downloaded Figma source assets. It cannot create, modify, or delete Dart files, tests, final target assets, or project configuration.
 - If `agent_permissions.figma-analyzer` exists in `spec.yaml`, it must be satisfied before any MCP call or write operation.
 
 ## Input/Output Contract
@@ -51,7 +51,7 @@ Minimum input:
 
 Required output:
 
-- Update `spec_ref` as the machine source with `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `view_states`, and `acceptance_criteria`.
+- Update `spec_ref` as the machine source with `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, `view_states`, and `acceptance_criteria`.
 - Write a human-readable summary to `PIPELINE_SPEC_PATH` only as a report, if the pipeline report exists.
 - Persist evidence in `{SPEC_PACKET_PATH}/evidence/figma-analysis.md`.
 - Record the phase in `PIPELINE_LOG_PATH`.
@@ -82,7 +82,7 @@ If the handoff includes `spec_ref` and `context_ref`:
    - `Development` annotations
    - Figma-guided changes/behaviors
    - nodes relevant for visual capture
-5. Execute `get_screenshot(...)` for each relevant change/annotation detected by Figma in step 4.
+5. Execute `get_screenshot(...)` for the requested main node and for each relevant change/annotation detected by Figma in step 4. Record the main-node reference in `visual_manifest.reference_screenshot`; it is required even when there are no annotations.
 6. Execute `get_node(fileKey, nodeId)` to determine node type and complete structure.
 7. Extract all visible `TEXT` nodes:
    - exact literal text (`characters`) without translating, summarizing, or fixing
@@ -92,12 +92,15 @@ If the handoff includes `spec_ref` and `context_ref`:
    - `layoutMode`, sizing HUG/FILL/FIXED, padding, spacing, alignment
    - bounds, min/max when available, scroll/clip/auto-layout
    - zones with overflow risk due to long text, horizontal rows, fixed content, safe areas, or lists
-9. Detect relevant nodes/vector assets:
+9. Enumerate visible visual leaves and their ancestor chain before selecting assets. Detect every visible icon, image, illustration, logo, image-fill source, and vector asset:
    - `VECTOR`, `BOOLEAN_OPERATION`, `LINE`, `ELLIPSE`, `POLYGON`, `STAR`
    - layers with visual use as iconography or illustration
-10. For each relevant vector, execute `get_images(...)`:
-    - default format: `svg`
-    - fallback: `png` when the vector is not viable as runtime SVG
+10. For each detected visible asset, execute `get_images(...)` and download the returned Figma export into `{SPEC_PACKET_PATH}/source-assets/figma/`:
+- use `svg` for vector assets; use `png`, `jpg`, or `webp` only when the Figma source or runtime renderer requires raster output
+- archive the downloaded file with a deterministic name and SHA-256 checksum
+- record `figma_node_id`, format, archive path, checksum, and `status: downloaded` in `spec.yaml.assets`
+- export the source asset node, never its enclosing frame merely to preserve a crop
+- downloading only a screenshot, retaining an expiring URL, or planning a similar local asset does not satisfy this step
 11. If the node is a `COMPONENT_SET`, extract variants.
 12. If the node is a `FRAME/SECTION`, use `get_node_children` for sections.
 13. Use `get_styles(fileKey)` and `get_components(fileKey)` for global context.
@@ -118,7 +121,7 @@ If MCP fails or critical information is missing:
 If MCP is available but `get_design_context` fails, block with `blocked_input`; do not ignore critical states/behaviors.
 If `get_design_context` succeeds but there are no `Development` annotations, do not block. Record `Development annotations: none` and continue.
 If `get_screenshot` fails for any Figma-guided change, also block with `blocked_input` to avoid missing critical visual evidence.
-If the screen/component requires visible vectors and extraction with `get_images` fails without a valid fallback strategy, also block with `blocked_input`.
+If any visible icon, image, illustration, logo, or image-fill source cannot be exported and downloaded from Figma, block with `blocked_input: FIGMA_ASSET_DOWNLOAD_UNAVAILABLE`. A screenshot, a similar local asset, or a platform icon is not a fallback.
 If Figma does not expose enough constraints for an area, do not block for that alone: record an alert, infer conservative anti-overflow mitigation, and continue when the layout can be implemented reasonably.
 
 ### 1) Complete Visual Extraction
@@ -147,6 +150,36 @@ For each relevant detected vector/asset:
    - size by token
    - color (semantic token or original color if multicolor)
    - semantics (`decorative` vs `informative`)
+
+### 1c) Rendered Visual Manifest (required for `/new-view`)
+
+Build a compact `visual_manifest` from the visible screen tree. The unit of
+fidelity is the rendered result inside Figma, not the raw SVG or image source.
+
+1. Store the main Figma screenshot reference with the requested node id.
+2. For every visible image/vector that is not iconography, record its source
+   node, first visible container node, ancestor clip/mask chain, source bounds,
+   visible bounds, scale, translation, alignment, and `crop.required`.
+3. Use `direct_asset` only when the full source asset is visible without a
+   crop, mask, or non-default transform. Otherwise use
+   `explicit_clip_transform`; the implementation must reuse the source asset
+   and recreate the crop with a Flutter clip and transform. Never use a frame
+   export as a substitute for a reusable asset.
+4. For every visible icon, archive its Figma export first. Use `ds_icon_exact`
+   only after proving an exact DS catalog match in geometry and intended visual
+   treatment; retain the archived Figma export as the proof. Otherwise use the
+   archived Figma SVG as `figma_svg_asset`. Similarity is not sufficient.
+5. For every visible `TEXT` node, record family, size, weight, line height,
+   alignment, Figma style id (or `inline:<node-id>`), resolved typography token,
+   and resolution status in `visual_manifest.typography`. Resolve only an
+   exact project font family and weight; do not substitute a close font. Figma
+   supplies typography metadata, not a license to distribute font files.
+6. Detect bottom navigation from the root screen tree. Record only whether it
+   is visible in Figma and its node id. Its ownership is resolved later by the
+   architect after inspecting the app shell.
+7. Count visible elements covered by the manifest and leave any unresolved ids
+   explicit. Set `visual_verification_required=true` when there is an explicit
+   crop, a Figma-exported icon, or visible bottom navigation.
 
 ### 2) Variants And States
 
@@ -203,9 +236,17 @@ For each relevant detected vector/asset:
 | Annotation | Node/Scope | Type (state/behavior/rule) | Flutter Impact | Required |
 |-----------|------------|-----------------------------|----------------|----------|
 
-### 1.3c Vectors And Assets (required when they exist)
-| Vector/Asset | Node ID | UI Use | Strategy (DS_ICON\|SVG_ASSET\|PNG_ASSET) | Path/Constant Proposal | Render (size/color/semantics) | State |
-|-------------|---------|--------|--------------------------------------------|------------------------|-------------------------------|-------|
+### 1.3c Figma Source Assets (required when they exist)
+| Asset | Node ID | Kind | Export Format | Archive Path | SHA-256 | Strategy | Runtime Path/Constant | State |
+|-------|---------|------|---------------|--------------|---------|----------|-----------------------|-------|
+
+### 1.3d Visual Manifest (required for `/new-view`)
+| Element | Source Node | Visible Container | Crop/Transform | Exact Strategy | Resolution |
+|---------|-------------|-------------------|----------------|----------------|------------|
+
+### 1.3e Typography Manifest (required for `/new-view`)
+| Text Node | Figma Style ID | Family | Size | Weight | Line Height | Align | Token | Exact Project Font Resolution |
+|-----------|----------------|--------|------|--------|-------------|-------|-------|-------------------------------|
 
 ### 1.4 Atomic Decomposition
 [proposed tree]
@@ -239,6 +280,8 @@ For each relevant detected vector/asset:
 - NEVER invent, translate, correct, or rewrite visible text.
 - NEVER ignore `Development` annotations detected by Figma.
 - NEVER ignore vectors that are relevant to the final UI.
+- NEVER replace a Figma icon with a merely similar DS icon.
+- NEVER export an enclosing frame to hide an asset crop; record and preserve the source asset transform instead.
 - ALWAYS try the recommended MCP flow: `get_design_context` -> `get_screenshot`.
 - ALWAYS extract and record the vector strategy with `get_images` when applicable.
 - ALWAYS record literal text plus constraints/overflow risks in `spec.yaml`.

@@ -12,7 +12,29 @@ optional lines that do not apply.
 
 Invoke the entry agent shown for a known workflow. That agent is the workflow
 controller: it creates and resumes the packet, asks for required human
-checkpoints, delegates specialized work and records the final state.
+checkpoints, owns each required outcome, and records the final state.
+
+## Portable Role Execution
+
+Specialist agents such as `@test-engineer` describe role contracts. Native
+agent-to-agent delegation is optional. At runtime, the controller records
+`execution_capabilities.subagent_delegation`:
+
+- `available`: it may delegate a focused phase and validates the returned
+  evidence.
+- `unavailable`: the invoked controller executes the specialist role contract
+  itself, with the same planned artifacts, commands, permissions, blockers and
+  evidence, under `fallback_policy: delegate_or_controller_executes`.
+
+This makes the workflows portable across Copilot and Kiro. A missing subagent
+capability never permits a mandatory phase to be skipped. If the controller
+lacks a needed permission or tool, it records `blocked_input` instead.
+
+For Kiro fallback execution, the active entry-agent profile needs `read`,
+`write`, and `shell` access. Add `subagent` only when native delegation is
+desired; it is not required for correctness. A Figma-driven fallback also
+needs the configured Figma MCP tool. Missing runtime access is
+`blocked_input: PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`.
 
 Use `@mobile-orchestrator` only when the request is ambiguous or the user does
 not know which workflow applies. It classifies intent and delegates once; it
@@ -148,6 +170,7 @@ Purpose: generate an app screen/view from Figma, including DS/App separation.
 | `target_id` | No | App target id. Defaults to `active_target_defaults.app_target_id`, then `active_target_defaults.app`. |
 | `project_root` | No | Absolute app repository root when the IDE opens a multi-root workspace. |
 | `golden_tests` | No | Boolean, default `false`. Runs DS and complete-view goldens only when `true`. |
+| `evidence_mode` | No | `minimal` by default; `standard` keeps detailed phase reports. |
 
 ```text
 @ds-orchestrator /new-view
@@ -159,6 +182,7 @@ route_name: <route name or path>                            # optional
 target_id: <app_target_id>                                  # optional; must resolve to kind app
 project_root: <absolute/path/to/app-repo>                    # optional; needed only for multi-root ambiguity
 golden_tests: <true|false>                                  # optional, default false
+evidence_mode: <minimal|standard>                            # optional, default minimal
 ```
 
 Expected result: app view code, DS component inventory, DS artifacts when
@@ -179,6 +203,25 @@ The initial invocation is plan-only: it creates and completes the Spec Packet,
 then presents `review.md` in Spanish and stops. No Flutter code or tests may be
 generated in that response. Approve the named pending packet in a later turn
 to allow Phase 3 and later phases to resume.
+
+Before that approval, the plan must reconcile every visible Figma asset, icon,
+text style, and screen-chrome decision in `visual_manifest`. Every visible
+icon, image, illustration and logo is downloaded from Figma MCP into the
+packet `source-assets/figma/` archive with its node id, format and SHA-256;
+the implementation copies that source without replacement. Cropped SVG/image
+sources are retained as reusable assets and rendered with an
+`explicit_clip_transform`; the workflow must not export a containing frame as
+a flattened substitute. A DS icon is permitted only when it is an exact
+declared match and its Figma source export remains archived. Otherwise the
+archived Figma SVG is used. Typography must resolve the exact Figma family and
+weight to a registered project font; a close fallback blocks the run. When Figma displays
+bottom navigation, the plan determines whether an existing app shell provides
+it, this view owns it, or it is not part of the target view.
+
+After app-view code generation, `/new-view` performs an app-view audit and a
+required human checkpoint. Crops, exported Figma icons, or visible bottom
+navigation require a compact visual-verification record with the canonical
+Figma screenshot reference and a deterministic Flutter rendering reference.
 
 Use the explicit `@ds-orchestrator /new-view` form shown above. A bare
 `/new-view` is not the canonical invocation and must not start implementation.
@@ -259,6 +302,11 @@ final delivery summary. When requested, it also includes passed golden tests
 and updated project documentation. A missing or failed mandatory test blocks
 audit completion and delivery; optional stages are recorded as
 `skipped_by_input` when disabled.
+
+The `feature-builder` always owns the required unit, widget and integration
+test outcomes. It uses `@test-engineer` when the active tool surface can
+delegate; otherwise it executes that role contract directly. The three stages
+keep their order and evidence requirements in either mode.
 
 ## `/refactor-component`
 

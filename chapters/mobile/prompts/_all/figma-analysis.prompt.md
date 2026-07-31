@@ -26,7 +26,7 @@ Given a Figma link and a user story, generate the design analysis. If `spec_cont
 When `spec_context` exists:
 
 - Read `spec_ref`, `context_ref`, `phase`, and `read_sections`.
-- Write to `spec.yaml`: `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, and `acceptance_criteria`.
+- Write to `spec.yaml`: `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, and `acceptance_criteria`.
 - Record evidence in `{SPEC_PACKET_PATH}/evidence/figma-analysis.md`.
 - Do not use `PIPELINE_SPEC_PATH` as the machine source.
 
@@ -47,12 +47,12 @@ When `spec_context` exists:
    - `Development` annotations
    - Figma-guided states/behaviors
    - nodes critical for visual evidence
-5. Execute `get_screenshot(...)` for each relevant change/annotation.
+5. Execute `get_screenshot(...)` for the requested main node and each relevant change/annotation. Record the main screenshot reference in `visual_manifest.reference_screenshot`.
 6. Execute `get_node(fileKey, nodeId)` to detect type and base structure.
 7. Extract every visible `TEXT` node with exact literal text, node id, layer, scope/state, style, alignment, and truncation rules when available.
 8. Extract relevant constraints/layout: auto-layout, HUG/FILL/FIXED sizing, padding, spacing, alignment, bounds, scroll/clip, and overflow-risk zones.
-9. Detect relevant nodes/vector assets.
-10. Execute `get_images(...)` for each relevant vector (default `svg`, fallback `png`).
+9. Detect every visible icon, image, illustration, logo, image-fill source, and vector asset.
+10. Execute `get_images(...)` for every detected source asset, download the returned Figma export into `{SPEC_PACKET_PATH}/source-assets/figma/`, and record its format, archive path, and SHA-256 in `spec.yaml.assets`. Prefer `svg` for vectors and use raster output only when required. Do not export an enclosing frame to simulate a crop.
 11. If the node is a screen, use `get_node_children` for sections.
 12. Use `get_styles(fileKey)` and `get_components(fileKey)` for global context.
 
@@ -67,7 +67,7 @@ When `spec_context` exists:
 If MCP responds but `get_design_context` fails, also block with `blocked_input`; do not omit critical states or behaviors.
 If `get_design_context` responds correctly but there are no `Development` annotations, do not block. Record `Development annotations: none` and continue.
 If `get_screenshot` fails for any guided change, also block to avoid losing required visual evidence.
-If vectors are critical for the UI and `get_images` extraction fails without a valid fallback, also block to avoid losing visual fidelity.
+If any visible icon, image, illustration, logo, or image-fill source cannot be exported and downloaded from Figma, block with `FIGMA_ASSET_DOWNLOAD_UNAVAILABLE`. A screenshot, an expiring export URL, a similar local resource, or a platform icon is not a fallback.
 If detailed constraints are missing from Figma, do not block automatically. Record an alert, infer conservative anti-overflow mitigation, and continue if the layout can be implemented reasonably.
 
 ### 2. Visual Extraction And Token Mapping
@@ -86,6 +86,19 @@ Additionally, document a vector matrix with:
 
 - functional use in screen/component
 - consumption strategy (`DS_ICON`, `SVG_ASSET`, `PNG_ASSET`)
+
+For `/new-view`, also build `visual_manifest`:
+
+- every visible non-icon asset maps source node to visible container, clip/mask
+  chain, bounds, transform and `direct_asset` or `explicit_clip_transform`;
+- `explicit_clip_transform` is mandatory for an image shown through a crop,
+  mask, or non-default scale; reuse the source asset rather than exporting the
+  frame;
+- every icon has an archived Figma export and maps either to a proven exact DS icon or to that exported Figma SVG;
+- every text node maps Figma style id (or `inline:<node-id>`), family, size, weight, line height, alignment, token, and exact project-font resolution; do not approximate a font;
+- screen chrome records whether bottom navigation is visible in Figma;
+- reconciliation records all unresolved visible elements and requires visual
+  verification for crops, exported icons, or visible bottom navigation.
 - path/constant proposal
 - rendering rules (size token, color token/original, semantics)
 
@@ -166,6 +179,7 @@ Write first to `spec.yaml`. Optional human report format:
 - If `get_design_context` fails, mark an explicit block.
 - If there are no `Development` annotations, record `none` and continue.
 - If vectors critical to the target UI are missing, mark an explicit block.
+- If a visible icon lacks an exact DS mapping or exported Figma SVG, mark an explicit block.
 - If Figma constraints are missing, continue with anti-overflow mitigation and record the risk; do not block unless implementation is impossible.
 - If the user story requests text/UX not present in Figma, report it as not covered by design, without inventing copy.
 

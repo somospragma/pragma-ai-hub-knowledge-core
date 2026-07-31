@@ -20,6 +20,9 @@ external_access:
     status: not_required
     checks: []
     evidence: ""
+execution_capabilities:
+  subagent_delegation: unavailable
+  fallback_policy: delegate_or_controller_executes
 agent_permissions:
   feature-builder:
     can_read: [read_sections, architecture_contract_refs, dependencies_contract_refs]
@@ -27,11 +30,12 @@ agent_permissions:
       generated_files_source: artifact_plan.planned
       artifact_targets: [app, project_docs]
       context_sections: [context.json.artifacts]
-      evidence: [evidence/]
+      packet_paths: [source-assets/figma]
+      evidence: [evidence/domain-checkpoint.md, evidence/data-checkpoint.md, evidence/presentation-checkpoint.md, evidence/unit-tests.md, evidence/widget-tests.md, evidence/integration-tests.md, evidence/audit-report.md, evidence/delivery-report.md]
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
-    can_call_external_tools: []
+    can_call_external_tools: [figma_mcp]
     evidence_required:
       - evidence/domain-checkpoint.md
       - evidence/data-checkpoint.md
@@ -108,17 +112,20 @@ artifact_plan:
     - path: test/features/payment_methods/domain/payment_methods_use_case_test.dart
       target_id: app
       action: create
-      owner: test-engineer
+      owner: feature-builder
+      specialist_role: test-engineer
       group: unit_tests
     - path: test/features/payment_methods/presentation/payment_methods_page_test.dart
       target_id: app
       action: create
-      owner: test-engineer
+      owner: feature-builder
+      specialist_role: test-engineer
       group: widget_tests
     - path: integration_test/payment_methods/payment_methods_flow_test.dart
       target_id: app
       action: create
-      owner: test-engineer
+      owner: feature-builder
+      specialist_role: test-engineer
       group: integration_tests
 technical_plan:
   layers:
@@ -181,6 +188,13 @@ handoffs:
       - evidence/unit-tests.md
       - evidence/widget-tests.md
       - evidence/integration-tests.md
+  - phase: feature_unit_tests
+    agent: feature-builder
+    specialist_role: test-engineer
+    read_sections:
+      - artifact_plan.planned[group=unit_tests]
+      - contracts
+      - success_criteria
   - phase: delivery
     agent: delivery-manager
     read_sections:

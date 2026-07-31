@@ -43,6 +43,8 @@ required_human_review:
 notes:
   - All generated files must target the design_system target unless the spec explicitly declares otherwise.
   - figma-analyzer performs the Figma MCP preflight before design analysis.
+  - Every visible icon, image, illustration, logo, and image-fill source must be downloaded from Figma into source-assets/figma with its node id, format and SHA-256 before approval.
+  - A similar local or platform asset is not a valid source replacement; missing Figma downloads block the run.
   - Widget tests remain mandatory; golden tests run only when golden_tests=true.
   - When golden_tests=false, record golden_tests as skipped_by_input.
   - evidence_mode defaults to minimal; standard retains detailed phase reports.

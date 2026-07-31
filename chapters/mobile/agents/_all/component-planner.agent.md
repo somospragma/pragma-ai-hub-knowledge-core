@@ -48,8 +48,8 @@ owned by this phase.
 
 - This phase does NOT query Figma MCP directly.
 - The source of truth is `spec_ref` when it exists; read `design_source`,
-  `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, and
-  `acceptance_criteria`.
+  `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`,
+  `visual_manifest`, and `acceptance_criteria`.
 - The human report may exist, but it is not the primary source.
 - If `design_source`, `literal_texts`, or `assets` are incomplete for planning
   critical annotations, states, or vectors, record `blocked_input` and return
@@ -75,7 +75,7 @@ If the handoff includes `spec_ref` and `context_ref`:
 ## Phase A: Canonical Specification
 
 From `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`,
-and `assets`:
+`assets`, and `visual_manifest`:
 
 1. Normalize raw Figma values to project tokens.
    - Consult `flutter-ds-theming-tokens` and the project catalog (`CATALOG.md`).
@@ -88,7 +88,8 @@ and `assets`:
    - State, variant, and size enums.
    - Typed callbacks.
    - Special behaviors from `design_source.annotations`.
-   - Vector contract from `assets`.
+   - Vector, crop, icon, typography, and screen-chrome contracts from
+     `assets` and `visual_manifest`.
    - Literal text contract from `literal_texts`.
    - Risks and anti-overflow mitigations from `layout_constraints`.
 
@@ -131,15 +132,31 @@ For each sub-component identified in the atomic decomposition:
 
 ## Phase C.1: Vector And Asset Plan
 
-From `assets`:
+From `assets` and `visual_manifest`:
 
-1. Define which vectors resolve through DS reuse (`DS_ICON`).
+1. Define which icons resolve through DS reuse only when the manifest proves
+   `ds_icon_exact` and the Figma source archive has been downloaded; a similar
+   icon is not reusable.
 2. Define which vectors require assets (`SVG_ASSET` / `PNG_ASSET`).
 3. Propose:
    - final asset path
    - resource constant
    - implementation owner (`DS` or `APP`)
-4. Block only if a critical vector lacks a deterministic strategy.
+4. For every `explicit_clip_transform`, propagate the source asset, visible
+   container, clip/mask chain, bounds, scale, translation, alignment and
+   Flutter implementation owner without flattening it into a frame export.
+5. Block if any critical vector, icon, image, crop, or typography record lacks
+   a downloaded Figma source archive, exact font resolution, deterministic
+   strategy, or resolved reconciliation status.
+
+## Phase C.1b: Screen Chrome Plan (only `/new-view`)
+
+1. Read `visual_manifest.screen_chrome.bottom_navigation` and inspect the
+   existing route/shell implementation.
+2. Resolve ownership as exactly one of `existing_app_shell`, `view_scaffold`,
+   or `not_present`; do not copy a shared shell into the view.
+3. Record the route/shell integration and the test assertion needed to verify
+   the decision in `contracts.screen_chrome` and `technical_plan.view`.
 
 ## Phase C.2: Text And Overflow Plan
 
@@ -158,6 +175,9 @@ From `literal_texts` and `layout_constraints`:
    - `SafeArea` when the frame represents a complete screen
    - `maxLines`/`TextOverflow.ellipsis` only if Figma/metadata indicate truncation
 5. Record any inferred constraint as an alert when metadata is missing.
+6. Propagate every `visual_manifest.typography` entry to the canonical plan;
+   unresolved family, weight, size, line height, alignment, or token blocks
+   the initial review instead of being silently approximated.
 
 ## Phase D: DS Component vs App View Classification
 

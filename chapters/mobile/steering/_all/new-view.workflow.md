@@ -155,6 +155,10 @@ Minimum checklist:
 3. `get_design_context(fileKey, nodeId)` responds.
 4. `get_screenshot(...)` responds for the main frame.
 5. Access is confirmed for required components, styles, variables and assets.
+6. The active agent can write the packet-only Figma source archive at
+   `{SPEC_PACKET_PATH}/source-assets/figma/`.
+7. `get_images(...)` exports can be persisted by the active tool surface; a
+   screenshot or temporary URL alone does not satisfy source-asset access.
 
 If it fails, update `spec.yaml.external_access.figma_mcp.status=blocked_input`,
 persist `evidence/figma-mcp-preflight.md` and finish with `blocked_input`.
@@ -211,7 +215,11 @@ code in this phase.
 **Prompt**: `figma-analysis.prompt.md`
 
 Update in `spec.yaml` only `design_source`, `literal_texts`,
-`layout_constraints`, `view_states`, `navigation` and `assets`.
+`layout_constraints`, `view_states`, `navigation`, `assets`, and
+`visual_manifest`. Download every visible Figma icon, image, illustration,
+logo, and image-fill source into `{SPEC_PACKET_PATH}/source-assets/figma/` and
+record its node id, format, archive path and SHA-256 in `assets`. Do not accept
+a screenshot, URL, existing local asset, or similar icon as a substitute.
 Persist evidence in `evidence/figma-analysis.md` and record phase in
 `PIPELINE_LOG_PATH`.
 
@@ -233,7 +241,10 @@ The DS vs App separation must remain explicit in `inventory` and `artifact_plan`
 **Agent**: `@component-architect`
 
 Update in `spec.yaml` only `technical_plan`, `artifact_plan`,
-`contracts.text_overflow`, `success_criteria`, `handoffs` and `checkpoints`.
+`contracts.text_overflow`, `contracts.asset_rendering`,
+`contracts.icon_mapping`, `contracts.typography_mapping`,
+`contracts.screen_chrome`, `visual_manifest`, `success_criteria`, `handoffs`
+and `checkpoints`.
 
 ---
 
@@ -256,9 +267,11 @@ approval.
 Present:
 
 1. visual analysis, texts, constraints and states view.
-2. inventory + DAG with DS/App separation.
-3. technical plan.
-4. success criteria of DS, view, tests, goldens and Widgetbook.
+2. visual manifest reconciliation: cropped assets, exact icon mappings,
+   typography mappings, and bottom-navigation ownership.
+3. inventory + DAG with DS/App separation.
+4. technical plan.
+5. success criteria of DS, view, tests, goldens and Widgetbook.
 
 If the human requests adjustments, update only `spec.yaml`, `review.md` and the
 affected sections. Do not generate code until `context.json` marks the spec as
@@ -285,8 +298,14 @@ read_sections:
   - artifact_plan.planned[group=ds_components]
   - literal_texts
   - layout_constraints
+  - assets
+  - source-assets/figma
   - contracts.text_overflow
   - contracts.technical_vectors
+  - contracts.asset_rendering
+  - contracts.icon_mapping
+  - contracts.typography_mapping
+  - visual_manifest
   - success_criteria
 ```
 
@@ -297,6 +316,23 @@ read_sections:
 **Agent**: `@code-auditor`
 
 Loop with `@widget-developer` up to `pipeline.max_audit_retries`.
+
+Required compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: ds_component_audit
+read_sections:
+  - artifact_plan.planned[group=ds_components]
+  - technical_plan
+  - contracts.technical_vectors
+  - contracts.asset_rendering
+  - contracts.icon_mapping
+  - contracts.typography_mapping
+  - visual_manifest
+  - success_criteria
+```
 
 ---
 
@@ -338,12 +374,67 @@ read_sections:
   - layout_constraints
   - contracts.text_overflow
   - contracts.technical_vectors
+  - contracts.asset_rendering
+  - contracts.icon_mapping
+  - contracts.typography_mapping
+  - contracts.screen_chrome
+  - source-assets/figma
+  - visual_manifest
   - success_criteria
 ```
 
 Output:
 - View in `targets.registry[APP_TARGET_ID].structure.views_path`.
 - Private widgets in `targets.registry[APP_TARGET_ID].structure.view_widgets_path`.
+
+---
+
+### PHASE 3b.5 — Audit of App View
+
+**Agent**: `@code-auditor`
+
+Loop with `@widget-developer` up to `pipeline.max_audit_retries`.
+The audit must reconcile every `visual_manifest` entry. A missing downloaded
+Figma source archive, checksum mismatch, missing exact icon, unrecreated
+`explicit_clip_transform` crop, unresolved typography, or incorrect
+bottom-navigation ownership is a blocker.
+
+Required compact handoff:
+
+```yaml
+spec_ref: {SPEC_PACKET_PATH}/spec.yaml
+context_ref: {SPEC_PACKET_PATH}/context.json
+phase: app_view_audit
+read_sections:
+  - artifact_plan.planned[group=app_view]
+  - technical_plan.view
+  - literal_texts
+  - assets
+  - source-assets/figma
+  - visual_manifest
+  - contracts.asset_rendering
+  - contracts.icon_mapping
+  - contracts.typography_mapping
+  - contracts.screen_chrome
+  - success_criteria
+```
+
+---
+
+### PHASE 3b.7 — Human Checkpoint of App View
+
+**Agent**: `@ds-orchestrator`
+
+Present the app-view audit and wait for explicit approval before tests. Include
+the resolved bottom-navigation ownership, every Figma source archive result,
+and any crop/icon/typography mapping.
+When `visual_manifest.reconciliation.visual_verification_required=true`, the
+review must include the canonical Figma screenshot reference and the Flutter
+rendering reference from `evidence/visual-verification.md`. If a rendering
+cannot be captured, stop with `FIGMA_VISUAL_VERIFICATION_UNAVAILABLE`.
+
+Do not continue until `context.json.checkpoints.app_view_layer.status=approved`
+and `context.json.status=approved_for_execution`.
 
 ---
 
@@ -427,7 +518,9 @@ read_sections:
   - technical_plan.view
   - view_states
   - navigation
+  - visual_manifest
   - contracts.text_overflow
+  - contracts.screen_chrome
   - success_criteria
 ```
 
@@ -437,7 +530,8 @@ Minimum coverage:
 3. `error`
 4. `populated`
 5. critical navigation
-6. literal text and mitigation of overflow when applicable
+6. bottom-navigation ownership when applicable
+7. literal text and mitigation of overflow when applicable
 
 ---
 
@@ -457,6 +551,13 @@ read_sections:
   - technical_plan.view
   - view_states
   - layout_constraints
+  - assets
+  - source-assets/figma
+  - visual_manifest
+  - contracts.asset_rendering
+  - contracts.icon_mapping
+  - contracts.typography_mapping
+  - contracts.screen_chrome
   - contracts.text_overflow
   - success_criteria
 ```
@@ -490,6 +591,8 @@ read_sections:
   - technical_plan.view
   - view_states
   - literal_texts
+  - visual_manifest
+  - contracts.screen_chrome
   - contracts.text_overflow
   - success_criteria
 ```
@@ -521,3 +624,6 @@ Must:
    `evidence/view-widget-tests.md`
 7. require passing `evidence/golden-tests.md` when `golden_tests=true`, or the
    recorded `golden_tests: skipped_by_input` outcome when false
+8. require completed visual-manifest reconciliation and, when required, a
+   passing human visual-verification checkpoint with Figma and Flutter
+   rendering references
