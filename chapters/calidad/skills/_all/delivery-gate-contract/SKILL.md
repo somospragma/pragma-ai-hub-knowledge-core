@@ -1,6 +1,6 @@
 ---
 id: calidad-delivery-gate-contract
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -33,6 +33,8 @@ delivery_gate:
     data_file: "mocks/mockoon/environment.json"
     faker_seed: 12345
     locator_map: "locator-map.json" | null  # solo front/mobile pre-desarrollo
+    front_prototype: true | false           # opt-in: prototipo HTML del front (mocks/front-prototype/)
+    app_prototype: true | false             # opt-in: prototipo Flutter de la app (mocks/app-prototype/)
     switchover_plan: "STRATEGY.md#6"        # dónde quedó documentado el plan mock -> real
   preflight:
     tool_version: "11.0.21"           # Java/Node/k6/Gradle según stack

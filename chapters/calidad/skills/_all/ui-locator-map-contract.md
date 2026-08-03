@@ -1,6 +1,6 @@
 ---
 id: calidad-ui-locator-map-contract
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -28,7 +28,7 @@ Un archivo `locator-map.json` versionado en el proyecto de tests (y referenciado
   "version": "1.0.0",
   "source": "figma:https://figma.com/file/XXXX (page: Checkout v3)",
   "agreed_with": "equipo frontend, 2026-07-20",
-  "convention": { "web": "data-testid", "mobile": "android:contentDescription (accessibilityId)" },
+  "convention": { "web": "data-testid", "mobile": "semantics_identifier | semantics_label | resource-id | accessibilityId (declarar cuál)" },
   "screens": [
     {
       "screen": "login",
@@ -45,7 +45,8 @@ Un archivo `locator-map.json` versionado en el proyecto de tests (y referenciado
 
 Reglas del formato:
 
-1. `name` es el identificador lógico que usan Page Objects y Tasks; `web`/`mobile` son los valores literales que desarrollo se compromete a implementar (`data-testid` en web, `contentDescription`/resource-id en Android según convención acordada).
+1. `name` es el identificador lógico que usan Page Objects y Tasks; `web`/`mobile` son los valores literales que desarrollo se compromete a implementar (`data-testid` en web; en Android nativo `resource-id`/`contentDescription` según convención acordada).
+1b. **Apps Flutter**: la convención `mobile` preferida es `semantics_identifier` — el equipo dev se compromete a envolver cada elemento del mapa en `Semantics(identifier: '<valor>')`, que se expone como `resource-id` en Android (Flutter 3.19+) y `accessibilityIdentifier` en iOS → `AppiumBy.id` con el stack estándar. `semantics_label` (→ `content-desc`) es secundario: es texto de accesibilidad real y cambia con i18n. Detalle en [[calidad-appium-screenplay-android]] (consultar `references/flutter-apps-and-prototype.md` en su subfolder).
 2. Naming kebab-case (web) / snake_case (mobile), prefijado por pantalla, sin valores derivados de texto visible (el texto cambia con i18n; el testid no).
 3. `role` opcional documenta el rol ARIA esperado — habilita fallback `getByRole` y validación de accesibilidad.
 4. Todo elemento con el que el robot interactúe o aserte DEBE estar en el mapa. Elementos decorativos no.
@@ -55,6 +56,7 @@ Reglas del formato:
 - **Desarrollo** implementa exactamente los identificadores del mapa (es un criterio de aceptación de sus HUs — idealmente verificado en su propio CI).
 - **QA** genera los selectores SOLO desde el mapa: Playwright `getByTestId('login-username')` (consistente con `selector-priority` de [[calidad-playwright-greenfield]]); Appium `AppiumBy.accessibilityId("login_username")` — los placeholders de `deferred-locators-strategy` de [[calidad-appium-screenplay-android]] salen del mapa, no se inventan.
 - **Cambios** al mapa (renombrar, agregar pantalla) se hacen por PR sobre el archivo, con ambos equipos como reviewers. El mapa es la fuente de verdad; ni el test ni el DOM la redefinen unilateralmente.
+- **Los prototipos como especificación ejecutable**: cuando existe front prototype (web) o app prototype (Flutter), estos implementan exactamente los identificadores del mapa — el equipo dev tiene el ejemplo corriendo de lo que se comprometió a implementar. Recetas: [[calidad-playwright-greenfield]] (consultar `references/front-prototype-recipe.md`) y [[calidad-appium-screenplay-android]] (consultar `references/flutter-apps-and-prototype.md`).
 
 ## Validación de drift cuando llega el desarrollo
 

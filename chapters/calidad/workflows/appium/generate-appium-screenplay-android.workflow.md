@@ -1,6 +1,6 @@
 ---
 id: calidad-generate-appium-screenplay-android
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: workflow
 chapter: calidad
@@ -33,7 +33,12 @@ Cuando `[[calidad-intent-detection]]` identifica un escenario greenfield para Ap
 | `locator_map` | Condicional | **Obligatorio si las pruebas se construyen antes del desarrollo** (`execution_target != real`): accessibility ids acordados con dev según `[[calidad-ui-locator-map-contract]]`; alimenta los deferred locators. |
 | `firma` | No | Documento técnico complementario. |
 
-Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`, incluido el SUT readiness gate (`[[calidad-sut-readiness-gate]]`). Sin APK no hay runtime: pre-desarrollo el alcance es scaffold + deferred locators desde el `locator_map`, modo `scaffold-only`. Mock de backend (`[[calidad-service-virtualization-mockoon]]`) aplica solo si el APK existe y permite override de base URL.
+Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`, incluido el SUT readiness gate (`[[calidad-sut-readiness-gate]]`). Sin APK real, dos caminos:
+
+- **Oficial**: scaffold + deferred locators desde el `locator_map`, modo `scaffold-only`, ejecución diferida a `[[calidad-complete-deferred-locators]]`.
+- **Opt-in — app prototype**: ANTES de ofrecerlo, **preguntar con qué tecnología se construirá la app real** (Flutter / nativa Android / React Native / sin definir) — el prototipo se construye con la MISMA tecnología declarada; una distinta valida en falso, y sin definición no hay prototipo fiel posible (camino oficial). Con tecnología declarada, ofrecer (nunca ejecutar por defecto) generar la app descartable desde Figma + locator map y correr la suite en emulador contra ella. Requiere elección explícita del usuario, el SDK correspondiente (verificar en el preflight del paso 1 cuando esta opción esté en juego) y `locator_map` con la convención de esa tecnología. Advertencia obligatoria al ofrecer: valida la mecánica de la suite, no la app del producto. El caso Flutter (receta completa, `semantics_identifier` → `AppiumBy.id`) en [[calidad-appium-screenplay-android]] (consultar `references/flutter-apps-and-prototype.md` en su subfolder); si la app real será Flutter, el mapa y los Targets usan `semantics_identifier` desde el diseño, haya o no prototipo.
+
+Mock de backend (`[[calidad-service-virtualization-mockoon]]`): con APK real que permite override de base URL, o embebido en el prototipo vía `--dart-define=BASE_URL=http://10.0.2.2:3010/api`.
 
 **Enforcement del locator map (pre-desarrollo)**: si `execution_target != real` y no hay `locator_map`, detenerse con blocker `locator_map_missing` antes de generar la capa Screenplay; continuar solo con waiver explícito del usuario registrado en el delivery gate (`locator_map: waived`). Ver `[[calidad-ui-locator-map-contract]]` (sección Enforcement).
 
@@ -110,6 +115,8 @@ Entregar archivos con `[[calidad-streaming-files-protocol]]` solo si `generation
 ### Fase final obligatoria — Ejecutar, triar y auto-corregir
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.** Esta fase **extiende el health-check estático del paso 7** (14 stages + pipeline Gradle) con verificación de **runtime** real: instalar APK, levantar Appium server, correr los 2 escenarios `@android @smoke` y aplicar el loop de triage + auto-corrección. El health-check estático garantiza que el scaffold compila; este loop garantiza que arranca contra el binario real.
+
+**Si el usuario eligió el app prototype** (sin APK real; tecnología de la app real ya declarada — caso Flutter): antes del smoke gate — (a) generar el prototipo en `mocks/app-prototype/` con los `Semantics(identifier:)` exactos del mapa, (b) levantar el Mockoon, (c) `flutter build apk --debug --dart-define=BASE_URL=http://10.0.2.2:3010/api`, (d) bootstrap del emulador (`[[calidad-appium-apk-auto-discovery]]`, `adb-and-emulator-bootstrap.md`) + `adb install`, (e) los Targets usan los identifiers del mapa (NO deferred: el prototipo los implementa). El smoke y la suite corren contra el prototipo; el delivery gate registra `app_prototype: true` y `certification: pending_real_integration`.
 
 0. **Smoke gate 1:1 (obligatorio en modo full)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con 1 escenario `@android @smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[calidad-appium-screenplay-android]] (consultar `references/smoke-gate-gradle.md`). Comando: `./gradlew test -Dcucumber.filter.tags=@smoke`. Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_appium"` y escalar al usuario; NO continuar a ejecución de `@proposed` ni a auto-corrección.
 

@@ -1,6 +1,6 @@
 ---
 id: calidad-generate-playwright-greenfield
-version: 2.1.0
+version: 2.2.0
 scope: stack
 type: workflow
 chapter: calidad
@@ -81,7 +81,10 @@ NUNCA generar código sin STRATEGY.md aprobado explícitamente.
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.**
 
-**Si `execution_target: mock | hybrid`**: con frontend build disponible, el smoke corre contra el frontend con backend mockeado (project `mocked-*`/`hybrid-*`, o `BACKEND_URL` al mock Mockoon) y el delivery gate registra `certification: pending_real_integration`; el smoke `@live` de certificación queda para el switchover. Sin frontend build, no hay ejecución posible: modo `scaffold-only`, status `partial`, con locator map validable al llegar el desarrollo (`[[calidad-ui-locator-map-contract]]`).
+**Si `execution_target: mock | hybrid`**: con frontend build disponible (desplegado o levantable desde su repo local), el smoke corre contra el frontend con backend mockeado (project `mocked-*`/`hybrid-*`, o `BACKEND_URL` al mock Mockoon) y el delivery gate registra `certification: pending_real_integration`; el smoke `@live` de certificación queda para el switchover. Sin frontend alguno, dos caminos:
+
+- **Oficial**: `scaffold-only`, status `partial`, con locator map validable al llegar el desarrollo (`[[calidad-ui-locator-map-contract]]`).
+- **Opt-in — front prototype**: ofrecer (nunca por defecto) el prototipo HTML descartable. Si el usuario lo elige: (a) generarlo en `mocks/front-prototype/` con los `data-testid` exactos del mapa y `fetch` reales al mock, (b) levantar Mockoon + servidor estático, (c) correr smoke y suite con `BASE_URL` al prototipo. Receta completa en [[calidad-playwright-greenfield]] (consultar `references/front-prototype-recipe.md`). Delivery gate: `front_prototype: true` en `mock_evidence`, `certification: pending_real_integration`.
 
 0. **Smoke gate 1:1 (obligatorio)** — Antes de ejecutar la suite completa, validar que el scaffold corre end-to-end con un solo escenario `@smoke`. Aplicar [[calidad-smoke-gate-policy]] y [[calidad-playwright-greenfield]] (consultar `references/smoke-gate-playwright.md`). Comando: `npx playwright test --grep @smoke --project=chromium-live --workers=1 --max-failures=1` (project `mocked-*` cuando `execution_target: mock`). Si falla con exit ≠ 0 → status `partial` con `blocker: "smoke_gate_failed_playwright"` y escalar al usuario; NO continuar a ejecución completa de la suite.
 

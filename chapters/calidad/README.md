@@ -18,7 +18,7 @@ Y cinco ejes cross-cutting que aplican a los cuatro frameworks:
 - **Datos de prueba** y trazabilidad requisito → test → resultado.
 - **CI/CD** (Azure DevOps, GitHub Actions, GitLab CI).
 - **Contract testing** y validación de specs.
-- **Shift-left y mocking**: construir y validar pruebas antes de que el desarrollo exista — service virtualization con Mockoon, datos sintéticos deterministas y contrato de mapeo de locators UI. Los mocks validan la construcción del test; la certificación formal siempre corre contra integraciones reales vía switchover solo-configuración.
+- **Shift-left y mocking**: construir y validar pruebas antes de que el desarrollo exista — service virtualization con Mockoon, datos sintéticos deterministas, contrato de mapeo de locators UI, y prototipos opt-in de front (HTML) y de app mobile (en la misma tecnología de la app real, ej. Flutter con Semantics identifiers) para ejecutar la suite en browser/emulador pre-desarrollo. Los mocks validan la construcción del test; la certificación formal siempre corre contra integraciones reales vía switchover solo-configuración.
 
 ## Mapa de assets
 
@@ -127,7 +127,7 @@ chapters/calidad/
 │   │   │   └── references/{convention-detection, selector-update-strategy}.md
 │   │   └── appium-screenplay-android/
 │   │       ├── SKILL.md
-│   │       └── references/{android-only-scope-rationale, contractual-questions, deferred-locators-strategy, gherkin-syntax-rules, gradle-version-matrix, health-check-pipeline, mandatory-inputs-validation, metadata-emitter-appium, mobile-accessibility, mobile-visual-regression, no-aggregate-collision, preflight, project-structure, screenplay-layers, smoke-gate-gradle, smoke-vs-proposed-scenarios, step-isolation-appium, templates}.md
+│   │       └── references/{android-only-scope-rationale, contractual-questions, deferred-locators-strategy, flutter-apps-and-prototype, gherkin-syntax-rules, gradle-version-matrix, health-check-pipeline, mandatory-inputs-validation, metadata-emitter-appium, mobile-accessibility, mobile-visual-regression, no-aggregate-collision, preflight, project-structure, screenplay-layers, smoke-gate-gradle, smoke-vs-proposed-scenarios, step-isolation-appium, templates}.md
 │   │
 │   ├── k6/
 │   │   ├── k6-run-and-suite.md
@@ -156,7 +156,7 @@ chapters/calidad/
 │       │   └── SKILL.md
 │       └── playwright-greenfield/
 │           ├── SKILL.md
-│           └── references/{accessibility-axe-wcag, auth-detection-rules, auth-storage-state, coherence-checks, contractual-checks-from-ui, coverage-formula, execution-modes-live-mocked-hybrid, fixtures-composition, metadata-emitter-playwright, mocks-page-route, page-object-model, playwright-config-strict-ts, playwright-native-tags-v142, preflight, project-structure, selector-priority, smoke-gate-playwright, step-isolation-playwright, templates, ui-source-priority, visual-regression, waits-policy}.md
+│           └── references/{accessibility-axe-wcag, auth-detection-rules, auth-storage-state, coherence-checks, contractual-checks-from-ui, coverage-formula, execution-modes-live-mocked-hybrid, fixtures-composition, front-prototype-recipe, metadata-emitter-playwright, mocks-page-route, page-object-model, playwright-config-strict-ts, playwright-native-tags-v142, preflight, project-structure, selector-priority, smoke-gate-playwright, step-isolation-playwright, templates, ui-source-priority, visual-regression, waits-policy}.md
 │
 ├── workflows/
 │   ├── _all/
