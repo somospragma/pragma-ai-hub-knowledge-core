@@ -63,6 +63,9 @@ properties:
     properties:
       figma_url:
         type: string
+      figma_scope:
+        type: string
+        enum: [view, component_inventory]
       golden_tests:
         type: boolean
         default: false
@@ -417,6 +420,125 @@ properties:
             enum: [pending, complete, blocked_input]
           visual_verification_required:
             type: boolean
+  layout_manifest:
+    type: object
+    additionalProperties: false
+    required: [root_node_id, viewport, nodes, reconciliation, tolerances]
+    properties:
+      root_node_id:
+        type: string
+      viewport:
+        type: object
+        additionalProperties: false
+        required: [width, height, device_pixel_ratio]
+        properties:
+          width:
+            type: number
+            exclusiveMinimum: 0
+          height:
+            type: number
+            exclusiveMinimum: 0
+          device_pixel_ratio:
+            type: number
+            exclusiveMinimum: 0
+      nodes:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required:
+            - figma_node_id
+            - parent_node_id
+            - child_index
+            - kind
+            - bounds
+            - layout
+            - shape
+            - status
+          properties:
+            figma_node_id:
+              type: string
+            parent_node_id:
+              type: string
+            child_index:
+              type: integer
+              minimum: 0
+            kind:
+              type: string
+              enum: [frame, group, component, instance, text, image, icon, vector, shape, navigation]
+            bounds:
+              type: object
+              additionalProperties: false
+              required: [x, y, width, height]
+              properties:
+                x: { type: number }
+                y: { type: number }
+                width: { type: number, exclusiveMinimum: 0 }
+                height: { type: number, exclusiveMinimum: 0 }
+            layout:
+              type: object
+              additionalProperties: true
+              required: [direction, alignment, padding, item_gap, clip]
+              properties:
+                direction:
+                  type: string
+                  enum: [horizontal, vertical, stack, none]
+                alignment:
+                  type: string
+                padding:
+                  type: object
+                  additionalProperties: false
+                  required: [top, right, bottom, left]
+                  properties:
+                    top: { type: number }
+                    right: { type: number }
+                    bottom: { type: number }
+                    left: { type: number }
+                item_gap:
+                  type: number
+                clip:
+                  type: boolean
+            shape:
+              type: object
+              additionalProperties: true
+              required: [top_left, top_right, bottom_right, bottom_left, border_width]
+              properties:
+                top_left: { type: number, minimum: 0 }
+                top_right: { type: number, minimum: 0 }
+                bottom_right: { type: number, minimum: 0 }
+                bottom_left: { type: number, minimum: 0 }
+                border_width: { type: number, minimum: 0 }
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      reconciliation:
+        type: object
+        additionalProperties: false
+        required: [visible_node_count, resolved_node_count, unresolved_ids, order_verified, status]
+        properties:
+          visible_node_count: { type: integer, minimum: 0 }
+          resolved_node_count: { type: integer, minimum: 0 }
+          unresolved_ids:
+            type: array
+            items: { type: string }
+          order_verified: { type: boolean }
+          status:
+            type: string
+            enum: [pending, complete, blocked_input]
+      tolerances:
+        type: object
+        additionalProperties: false
+        required: [geometry_dp, global_pixel_diff_percent, regional_pixel_diff_percent]
+        properties:
+          geometry_dp:
+            type: number
+            const: 1
+          global_pixel_diff_percent:
+            type: number
+            const: 2
+          regional_pixel_diff_percent:
+            type: number
+            const: 4
   canonical_spec:
     type: object
     additionalProperties: true
@@ -575,7 +697,7 @@ allOf:
         workflow:
           const: new-view
     then:
-      required: [visual_manifest]
+      required: [visual_manifest, layout_manifest]
       properties:
         inputs:
           required: [view_name, figma_url, user_story]
@@ -595,6 +717,19 @@ allOf:
                   const: true
                 status:
                   enum: [pending, verified, blocked_input]
+        inputs:
+          required: [figma_scope]
+  - if:
+      properties:
+        workflow:
+          const: new-feature
+        inputs:
+          properties:
+            figma_scope:
+              const: view
+          required: [figma_scope]
+    then:
+      required: [visual_manifest, layout_manifest]
   - if:
       properties:
         workflow:

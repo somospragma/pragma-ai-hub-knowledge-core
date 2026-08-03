@@ -24,10 +24,19 @@ agent_permissions:
       - success_criteria
       - evidence
       - visual_manifest
+      - layout_manifest
     can_write:
       spec_sections:
         - status
         - external_access.figma_mcp
+        - design_source
+        - literal_texts
+        - layout_constraints
+        - assets
+        - visual_manifest
+        - layout_manifest
+        - view_states
+        - navigation
         - human_review
         - handoffs
       context_sections:
@@ -39,10 +48,15 @@ agent_permissions:
         - context.json.artifacts
       evidence:
         - evidence/ds-layer-checkpoint.md
+        - evidence/figma-analysis.md
+        - evidence/figma-mcp-preflight.md
+      packet_paths:
+        - source-assets/figma
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
-    can_call_external_tools: []
+    can_call_external_tools:
+      - figma_mcp
     evidence_required:
       - evidence/ds-layer-checkpoint.md
   figma-analyzer:
@@ -57,6 +71,7 @@ agent_permissions:
         - layout_constraints
         - assets
         - visual_manifest
+        - layout_manifest
         - view_states
         - navigation
       packet_paths:
@@ -80,6 +95,7 @@ agent_permissions:
       - assets
       - source-assets/figma
       - visual_manifest
+      - layout_manifest
     can_write:
       spec_sections:
         - canonical_spec
@@ -107,6 +123,7 @@ agent_permissions:
       - assets
       - source-assets/figma
       - visual_manifest
+      - layout_manifest
     can_write:
       spec_sections:
         - contracts
@@ -114,6 +131,7 @@ agent_permissions:
         - technical_plan
         - artifact_plan.planned
         - visual_manifest
+        - layout_manifest
       evidence:
         - evidence/architecture-report.md
     can_create_files: false
@@ -128,6 +146,7 @@ agent_permissions:
       - artifact_plan.planned
       - source-assets/figma
       - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -138,6 +157,7 @@ agent_permissions:
       evidence:
         - evidence/codegen-report.md
         - evidence/visual-verification.md
+        - evidence/figma-fidelity-report.json
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
@@ -151,13 +171,15 @@ agent_permissions:
       - assets
       - source-assets/figma
       - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       spec_sections:
         - status
       evidence:
         - evidence/audit-report.md
-    can_create_files: false
+        - evidence/figma-fidelity-report.json
+    can_create_files: true
     can_modify_files: true
     can_delete_files: false
     can_call_external_tools: []
@@ -168,6 +190,7 @@ agent_permissions:
       - read_sections
       - artifact_plan.planned
       - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -192,6 +215,7 @@ agent_permissions:
       - read_sections
       - artifact_plan.planned
       - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -216,6 +240,7 @@ agent_permissions:
       - read_sections
       - artifact_plan.planned
       - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -234,6 +259,7 @@ agent_permissions:
       - read_sections
       - artifact_plan.planned
       - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       evidence:
@@ -272,6 +298,23 @@ visual_manifest:
     unresolved_ids: []
     status: pending
     visual_verification_required: false
+layout_manifest:
+  root_node_id: "{{FIGMA_NODE_ID}}"
+  viewport:
+    width: 0
+    height: 0
+    device_pixel_ratio: 1
+  nodes: []
+  reconciliation:
+    visible_node_count: 0
+    resolved_node_count: 0
+    unresolved_ids: []
+    order_verified: false
+    status: pending
+  tolerances:
+    geometry_dp: 1
+    global_pixel_diff_percent: 2
+    regional_pixel_diff_percent: 4
 view_states:
   loading: {}
   empty: {}
@@ -311,6 +354,7 @@ handoffs:
       - contracts.text_overflow
       - contracts.technical_vectors
       - visual_manifest
+      - layout_manifest
       - success_criteria
   - phase: app_view_codegen
     agent: widget-developer
@@ -320,6 +364,7 @@ handoffs:
       - contracts.text_overflow
       - contracts.technical_vectors
       - visual_manifest
+      - layout_manifest
       - technical_plan
       - artifact_plan
       - success_criteria

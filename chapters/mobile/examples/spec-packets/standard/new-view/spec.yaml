@@ -22,33 +22,35 @@ external_access:
     evidence: evidence/figma-mcp-preflight.md
 agent_permissions:
   ds-orchestrator:
-    can_read: [read_sections, context.json, review.md]
+    can_read: [read_sections, context.json, review.md, visual_manifest, layout_manifest]
     can_write:
+      spec_sections: [external_access.figma_mcp, design_source, literal_texts, layout_constraints, assets, visual_manifest, layout_manifest, view_states, navigation]
       context_sections: [context.json.checkpoints]
-      evidence: [evidence/ds-layer-checkpoint.md]
+      packet_paths: [source-assets/figma]
+      evidence: [evidence/ds-layer-checkpoint.md, evidence/figma-analysis.md, evidence/figma-mcp-preflight.md]
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
-    can_call_external_tools: []
+    can_call_external_tools: [figma_mcp]
     evidence_required: [evidence/ds-layer-checkpoint.md]
   figma-analyzer:
     can_read: [inputs.figma_url, read_sections]
     can_write:
-      spec_sections: [design_source, literal_texts, layout_constraints, assets, view_states, navigation]
+      spec_sections: [design_source, literal_texts, layout_constraints, assets, visual_manifest, layout_manifest, view_states, navigation]
       packet_paths: [source-assets/figma]
-      evidence: [evidence/figma-analysis.md]
+      evidence: [evidence/figma-analysis.md, evidence/figma-mcp-preflight.md]
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
     can_call_external_tools: [figma_mcp]
     evidence_required: [evidence/figma-analysis.md]
   widget-developer:
-    can_read: [read_sections, source-assets/figma]
+    can_read: [read_sections, source-assets/figma, visual_manifest, layout_manifest]
     can_write:
       generated_files_source: artifact_plan.planned
       artifact_targets: [design_system, app]
       context_sections: [context.json.artifacts]
-      evidence: [evidence/codegen-report.md]
+      evidence: [evidence/codegen-report.md, evidence/figma-fidelity-report.json]
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
@@ -120,7 +122,50 @@ visual_manifest:
     resolved_element_count: 2
     unresolved_ids: []
     status: complete
-    visual_verification_required: false
+    visual_verification_required: true
+layout_manifest:
+  root_node_id: "30:40"
+  viewport:
+    width: 390
+    height: 844
+    device_pixel_ratio: 1
+  nodes:
+    - figma_node_id: "30:40"
+      parent_node_id: ""
+      child_index: 0
+      kind: frame
+      bounds: {x: 0, y: 0, width: 390, height: 844}
+      layout:
+        direction: vertical
+        alignment: MIN
+        padding: {top: 24, right: 16, bottom: 24, left: 16}
+        item_gap: 16
+        clip: true
+      shape: {top_left: 0, top_right: 0, bottom_right: 0, bottom_left: 0, border_width: 0}
+      status: resolved
+    - figma_node_id: "30:44"
+      parent_node_id: "30:40"
+      child_index: 0
+      kind: text
+      bounds: {x: 16, y: 24, width: 180, height: 24}
+      layout:
+        direction: none
+        alignment: LEFT
+        padding: {top: 0, right: 0, bottom: 0, left: 0}
+        item_gap: 0
+        clip: false
+      shape: {top_left: 0, top_right: 0, bottom_right: 0, bottom_left: 0, border_width: 0}
+      status: resolved
+  reconciliation:
+    visible_node_count: 2
+    resolved_node_count: 2
+    unresolved_ids: []
+    order_verified: true
+    status: complete
+  tolerances:
+    geometry_dp: 1
+    global_pixel_diff_percent: 2
+    regional_pixel_diff_percent: 4
 view_states:
   loading:
     source: standard_fallback

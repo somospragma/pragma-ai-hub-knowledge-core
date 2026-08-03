@@ -28,8 +28,20 @@ agent_permissions:
       - contracts
       - assets
       - source-assets/figma
+      - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
+      spec_sections:
+        - external_access.figma_mcp
+        - design_source
+        - literal_texts
+        - layout_constraints
+        - assets
+        - visual_manifest
+        - layout_manifest
+        - view_states
+        - navigation
       generated_files_source: artifact_plan.planned
       artifact_targets:
         - "{{ACTIVE_TARGET_ID}}"
@@ -55,6 +67,7 @@ agent_permissions:
         - evidence/audit-report.md
         - evidence/delivery-report.md
         - evidence/documentation-report.md
+        - evidence/figma-fidelity-report.json
     can_create_files: true
     can_modify_files: true
     can_delete_files: false
@@ -130,6 +143,8 @@ agent_permissions:
       - artifact_plan.planned
       - technical_plan
       - contracts
+      - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       generated_files_source: artifact_plan.planned
@@ -207,6 +222,8 @@ agent_permissions:
         - literal_texts
         - layout_constraints
         - assets
+        - visual_manifest
+        - layout_manifest
       packet_paths:
         - source-assets/figma
       evidence:
@@ -225,13 +242,16 @@ agent_permissions:
       - artifact_plan.planned
       - assets
       - source-assets/figma
+      - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       spec_sections:
         - status
       evidence:
         - evidence/audit-report.md
-    can_create_files: false
+        - evidence/figma-fidelity-report.json
+    can_create_files: true
     can_modify_files: true
     can_delete_files: false
     can_call_external_tools: []
@@ -241,6 +261,8 @@ agent_permissions:
     can_read:
       - read_sections
       - artifact_plan.planned
+      - visual_manifest
+      - layout_manifest
       - success_criteria
     can_write:
       evidence:
@@ -260,6 +282,8 @@ contracts: {}
 constraints:
   compatibility: {}
 technical_plan: {}
+visual_manifest: {}
+layout_manifest: {}
 artifact_plan:
   path_strategy: target_id_relative
   planned: []
@@ -287,4 +311,6 @@ handoffs:
     read_sections:
       - technical_plan
       - artifact_plan
+      - visual_manifest
+      - layout_manifest
       - success_criteria

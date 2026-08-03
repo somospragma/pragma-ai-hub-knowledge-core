@@ -144,9 +144,12 @@ If it fails a gate, finish with `blocked_input`.
 
 ### Gate 3 — Figma MCP
 
-Before PHASE 1, `@ds-orchestrator` must delegate Figma MCP preflight to
-`@figma-analyzer`. The analyzer verifies that Figma MCP is configured and has
-permissions for the file/screen.
+Before PHASE 1, `@ds-orchestrator` prefers `@figma-analyzer` for Figma MCP
+preflight. When the active surface cannot delegate natively, it executes the
+figma-analyzer role contract itself only when the packet grants Figma MCP,
+packet-write and source-archive permissions. The preflight verifies that Figma
+MCP is configured and has permissions for the file/screen; otherwise stop with
+`PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`.
 
 Minimum checklist:
 
@@ -211,12 +214,14 @@ code in this phase.
 
 ### PHASE 1 — Analysis of Screen
 
-**Agent**: `@figma-analyzer`
+**Preferred specialist role**: `@figma-analyzer`
+**Execution owner**: `@ds-orchestrator` when native delegation is unavailable
+and the approved packet grants the figma-analyzer role permissions.
 **Prompt**: `figma-analysis.prompt.md`
 
 Update in `spec.yaml` only `design_source`, `literal_texts`,
 `layout_constraints`, `view_states`, `navigation`, `assets`, and
-`visual_manifest`. Download every visible Figma icon, image, illustration,
+`visual_manifest`, and `layout_manifest`. Download every visible Figma icon, image, illustration,
 logo, and image-fill source into `{SPEC_PACKET_PATH}/source-assets/figma/` and
 record its node id, format, archive path and SHA-256 in `assets`. Do not accept
 a screenshot, URL, existing local asset, or similar icon as a substitute.
@@ -269,9 +274,12 @@ Present:
 1. visual analysis, texts, constraints and states view.
 2. visual manifest reconciliation: cropped assets, exact icon mappings,
    typography mappings, and bottom-navigation ownership.
-3. inventory + DAG with DS/App separation.
-4. technical plan.
-5. success criteria of DS, view, tests, goldens and Widgetbook.
+3. layout manifest reconciliation: viewport, parent-child order, bounds,
+   direction, padding, gap, clipping, four-corner radii, border width, and
+   fixed fidelity tolerances.
+4. inventory + DAG with DS/App separation.
+5. technical plan.
+6. success criteria of DS, view, tests, goldens and Widgetbook.
 
 If the human requests adjustments, update only `spec.yaml`, `review.md` and the
 affected sections. Do not generate code until `context.json` marks the spec as
@@ -306,6 +314,7 @@ read_sections:
   - contracts.icon_mapping
   - contracts.typography_mapping
   - visual_manifest
+  - layout_manifest
   - success_criteria
 ```
 
@@ -331,6 +340,7 @@ read_sections:
   - contracts.icon_mapping
   - contracts.typography_mapping
   - visual_manifest
+  - layout_manifest
   - success_criteria
 ```
 
@@ -380,6 +390,7 @@ read_sections:
   - contracts.screen_chrome
   - source-assets/figma
   - visual_manifest
+  - layout_manifest
   - success_criteria
 ```
 
@@ -398,6 +409,9 @@ The audit must reconcile every `visual_manifest` entry. A missing downloaded
 Figma source archive, checksum mismatch, missing exact icon, unrecreated
 `explicit_clip_transform` crop, unresolved typography, or incorrect
 bottom-navigation ownership is a blocker.
+It must also reject a missing/changed `layout_manifest` child order, geometry
+outside `1 dp`, incorrect corner radii or border width, or a fidelity report
+over `2%` global / `4%` regional pixel difference.
 
 Required compact handoff:
 
@@ -412,6 +426,7 @@ read_sections:
   - assets
   - source-assets/figma
   - visual_manifest
+  - layout_manifest
   - contracts.asset_rendering
   - contracts.icon_mapping
   - contracts.typography_mapping
@@ -427,11 +442,12 @@ read_sections:
 
 Present the app-view audit and wait for explicit approval before tests. Include
 the resolved bottom-navigation ownership, every Figma source archive result,
-and any crop/icon/typography mapping.
-When `visual_manifest.reconciliation.visual_verification_required=true`, the
-review must include the canonical Figma screenshot reference and the Flutter
-rendering reference from `evidence/visual-verification.md`. If a rendering
-cannot be captured, stop with `FIGMA_VISUAL_VERIFICATION_UNAVAILABLE`.
+any crop/icon/typography mapping, and `evidence/figma-fidelity-report.json`.
+The fidelity report is required for every view and compares the canonical Figma
+screenshot with Flutter at `layout_manifest.viewport`. It must pass `1 dp`
+geometry, `2%` global pixel difference, and `4%` regional pixel difference. If
+capture or comparison cannot be completed, stop with
+`FIGMA_FIDELITY_COMPARISON_UNAVAILABLE`.
 
 Do not continue until `context.json.checkpoints.app_view_layer.status=approved`
 and `context.json.status=approved_for_execution`.
@@ -519,6 +535,7 @@ read_sections:
   - view_states
   - navigation
   - visual_manifest
+  - layout_manifest
   - contracts.text_overflow
   - contracts.screen_chrome
   - success_criteria
@@ -554,6 +571,7 @@ read_sections:
   - assets
   - source-assets/figma
   - visual_manifest
+  - layout_manifest
   - contracts.asset_rendering
   - contracts.icon_mapping
   - contracts.typography_mapping
@@ -592,6 +610,7 @@ read_sections:
   - view_states
   - literal_texts
   - visual_manifest
+  - layout_manifest
   - contracts.screen_chrome
   - contracts.text_overflow
   - success_criteria
@@ -624,6 +643,8 @@ Must:
    `evidence/view-widget-tests.md`
 7. require passing `evidence/golden-tests.md` when `golden_tests=true`, or the
    recorded `golden_tests: skipped_by_input` outcome when false
-8. require completed visual-manifest reconciliation and, when required, a
-   passing human visual-verification checkpoint with Figma and Flutter
-   rendering references
+8. require completed visual-manifest and layout-manifest reconciliation plus a
+   passing `evidence/figma-fidelity-report.json` at the manifest viewport:
+   exact text/hierarchy/assets/typography/shape values, at most `1 dp`
+   geometry delta, `2%` global pixel difference and `4%` regional pixel
+   difference

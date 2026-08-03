@@ -512,9 +512,24 @@ def validate_semantics(findings, cleared)
 
   %w[mini standard full].each do |level|
     ds_tools = templates[level].dig("agent_permissions", "ds-orchestrator", "can_call_external_tools") || []
-    if ds_tools.include?("figma_mcp")
-      add(findings, "HIGH", "FIGMA_CONTROLLER_PERMISSION_DRIFT", "#{level}-spec grants figma_mcp to ds-orchestrator; only figma-analyzer may call Figma MCP")
+    next unless ds_tools.include?("figma_mcp")
+
+    # `/new-view` may run on surfaces that cannot delegate. Its standard packet
+    # grants a bounded controller fallback for the figma-analyzer role; other
+    # packet levels must keep Figma MCP exclusive to the specialist role.
+    if level != "standard"
+      add(findings, "HIGH", "FIGMA_CONTROLLER_PERMISSION_DRIFT", "#{level}-spec grants figma_mcp to ds-orchestrator outside the bounded new-view fallback")
     end
+  end
+
+  feature_packet_paths = templates["full"].dig("agent_permissions", "feature-builder", "can_write", "packet_paths") || []
+  unless feature_packet_paths.include?("source-assets/figma")
+    add(
+      findings,
+      "CRITICAL",
+      "FIGMA_SOURCE_ARCHIVE_FALLBACK_PERMISSION_MISSING",
+      "full-spec must authorize feature-builder to archive Figma sources when it executes the analyzer role"
+    )
   end
 
   controller_context_sections = %w[
@@ -561,6 +576,57 @@ def validate_semantics(findings, cleared)
     unless property["type"] == "boolean" && property["default"] == false
       add(findings, "CRITICAL", "NEW_FEATURE_OPTION_SCHEMA_DRIFT", "mobile-spec schema must define #{input} as boolean default false")
     end
+  end
+
+  execution_capability = schema.dig("properties", "execution_capabilities") || {}
+  unless execution_capability.dig("properties", "subagent_delegation", "enum") == %w[pending available unavailable] &&
+         execution_capability.dig("properties", "fallback_policy", "enum") == ["delegate_or_controller_executes"]
+    add(findings, "CRITICAL", "PORTABLE_ROLE_SCHEMA_DRIFT", "mobile-spec schema must define portable role execution capabilities")
+  end
+  new_feature_schema_rules = (schema["allOf"] || []).select do |rule|
+    rule.dig("if", "properties", "workflow", "const") == "new-feature"
+  end
+  unless new_feature_schema_rules.any? { |rule| rule.dig("then", "required")&.include?("execution_capabilities") }
+    add(findings, "CRITICAL", "NEW_FEATURE_EXECUTION_CAPABILITY_MISSING", "new-feature packets must require execution_capabilities")
+  end
+
+  feature_permissions = full_spec.dig("agent_permissions", "feature-builder") || {}
+  feature_evidence = feature_permissions.dig("can_write", "evidence") || []
+  required_fallback_evidence = %w[
+    evidence/unit-tests.md evidence/widget-tests.md evidence/integration-tests.md
+    evidence/audit-report.md evidence/delivery-report.md
+  ]
+  missing_fallback_evidence = required_fallback_evidence - feature_evidence
+  unless missing_fallback_evidence.empty? &&
+         (feature_permissions["can_call_external_tools"] || []).include?("figma_mcp") &&
+         (full_spec.dig("execution_capabilities", "fallback_policy") == "delegate_or_controller_executes")
+    add(
+      findings,
+      "CRITICAL",
+      "NEW_FEATURE_CONTROLLER_FALLBACK_PERMISSION_MISSING",
+      "feature-builder must be able to execute portable mandatory phases",
+      missing_fallback_evidence.join(", ")
+    )
+  end
+
+  feature_builder = File.read("chapters/mobile/agents/_all/feature-builder.agent.md")
+  portable_role_resources = {
+    "new-feature-workflow" => new_feature_workflow,
+    "feature-builder" => feature_builder,
+    "test-engineer" => test_engineer,
+    "test-generation" => test_generation,
+    "master-orchestration" => master_orchestration,
+    "workflow-docs" => File.read("chapters/mobile/docs/workflows.md")
+  }
+  portable_role_resources.each do |source, text|
+    unless text.include?("subagent_delegation") &&
+           text.include?("delegate_or_controller_executes")
+      add(findings, "HIGH", "PORTABLE_ROLE_CONTRACT_MISSING", "#{source} must define delegate-or-controller execution")
+    end
+  end
+  if feature_builder.include?("NEVER generate test files directly") ||
+     new_feature_workflow.include?("NEVER generate test files directly")
+    add(findings, "CRITICAL", "NEW_FEATURE_DELEGATION_ONLY_DRIFT", "new-feature must not prohibit controller-owned mandatory tests")
   end
 
   %w[unit_tests widget_tests integration_tests].each do |group|
@@ -690,6 +756,7 @@ def validate_semantics(findings, cleared)
   workspace_agent = File.read("chapters/mobile/agents/_all/workspace-discovery.agent.md")
   workspace_prompt = File.read("chapters/mobile/prompts/_all/workspace-discovery.prompt.md")
   ds_orchestrator = File.read("chapters/mobile/agents/_all/ds-orchestrator.agent.md")
+  new_component_workflow = File.read("chapters/mobile/workflows/_all/new-component.workflow.md")
   new_view_workflow = File.read("chapters/mobile/workflows/_all/new-view.workflow.md")
   new_view_overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/new-view.yaml")
   bootstrap_overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/bootstrap-workspace.yaml")
@@ -785,16 +852,320 @@ def validate_semantics(findings, cleared)
     add(findings, "HIGH", "MASTER_PLAN_ONLY_GATE_MISSING", "master orchestration must preserve the plan-only first invocation")
   end
 
+  unless master_orchestration.include?("Phase 3b.5") &&
+         master_orchestration.include?("visual_manifest") &&
+         master_orchestration.include?("after the app view")
+    add(findings, "HIGH", "MASTER_NEW_VIEW_VISUAL_FLOW_DRIFT", "master orchestration must preserve the app-view audit and checkpoint")
+  end
+
   unless master_orchestration.include?("SPEC_PACKET_OWNER_TARGET_ID") &&
          master_orchestration.include?("must never move\n     packet state or evidence") &&
          master_orchestration.include?("Do not derive `SPEC_PACKET_ROOT`")
     add(findings, "CRITICAL", "MASTER_PACKET_OWNER_GATE_MISSING", "master orchestration must separate immutable packet ownership from active phase targets")
   end
 
+  visual_manifest_schema = schema.dig("properties", "visual_manifest") || {}
+  expected_visual_manifest_fields = %w[
+    reference_screenshot assets icons typography screen_chrome reconciliation
+  ]
+  missing_visual_schema_fields = expected_visual_manifest_fields - (visual_manifest_schema["required"] || [])
+  unless missing_visual_schema_fields.empty? &&
+         schema.to_s.include?("explicit_clip_transform") &&
+         schema.to_s.include?("ds_icon_exact") &&
+         schema.to_s.include?("figma_svg_asset") &&
+         schema.to_s.include?("existing_app_shell") &&
+         schema.to_s.include?("view_scaffold")
+    add(
+      findings,
+      "CRITICAL",
+      "NEW_VIEW_VISUAL_MANIFEST_SCHEMA_DRIFT",
+      "mobile spec schema must model the new-view visual manifest contract",
+      missing_visual_schema_fields.join(", ")
+    )
+  end
+
+  standard_visual_manifest = templates["standard"]["visual_manifest"] || {}
+  missing_visual_template_fields = expected_visual_manifest_fields.reject do |field|
+    standard_visual_manifest.key?(field)
+  end
+  unless missing_visual_template_fields.empty?
+    add(
+      findings,
+      "CRITICAL",
+      "NEW_VIEW_VISUAL_MANIFEST_TEMPLATE_DRIFT",
+      "standard-spec must initialize every visual manifest section",
+      missing_visual_template_fields.join(", ")
+    )
+  end
+
+  layout_manifest_schema = schema.dig("properties", "layout_manifest") || {}
+  expected_layout_manifest_fields = %w[root_node_id viewport nodes reconciliation tolerances]
+  missing_layout_schema_fields = expected_layout_manifest_fields - (layout_manifest_schema["required"] || [])
+  unless missing_layout_schema_fields.empty? &&
+         schema.to_s.include?("child_index") &&
+         schema.to_s.include?("top_left") &&
+         layout_manifest_schema.dig("properties", "tolerances", "properties", "geometry_dp", "const") == 1 &&
+         layout_manifest_schema.dig("properties", "tolerances", "properties", "global_pixel_diff_percent", "const") == 2 &&
+         layout_manifest_schema.dig("properties", "tolerances", "properties", "regional_pixel_diff_percent", "const") == 4
+    add(
+      findings,
+      "CRITICAL",
+      "FIGMA_LAYOUT_MANIFEST_SCHEMA_DRIFT",
+      "mobile spec schema must model the deterministic Figma layout manifest",
+      missing_layout_schema_fields.join(", ")
+    )
+  end
+
+  standard_layout_manifest = templates["standard"]["layout_manifest"] || {}
+  missing_layout_template_fields = expected_layout_manifest_fields.reject do |field|
+    standard_layout_manifest.key?(field)
+  end
+  unless missing_layout_template_fields.empty?
+    add(
+      findings,
+      "CRITICAL",
+      "FIGMA_LAYOUT_MANIFEST_TEMPLATE_DRIFT",
+      "standard-spec must initialize every layout manifest section",
+      missing_layout_template_fields.join(", ")
+    )
+  end
+
+  layout_permission_contract = {
+    "ds-orchestrator" => { read: ["layout_manifest"], write: [] },
+    "figma-analyzer" => { read: [], write: ["layout_manifest"] },
+    "component-planner" => { read: ["layout_manifest"], write: [] },
+    "component-architect" => { read: ["layout_manifest"], write: ["layout_manifest"] },
+    "widget-developer" => { read: ["layout_manifest"], write: [] },
+    "code-auditor" => { read: ["layout_manifest"], write: [] },
+    "test-engineer" => { read: ["layout_manifest"], write: [] },
+    "golden-test-engineer" => { read: ["layout_manifest"], write: [] },
+    "widgetbook-developer" => { read: ["layout_manifest"], write: [] },
+    "delivery-manager" => { read: ["layout_manifest"], write: [] }
+  }
+  layout_permission_contract.each do |agent, contract|
+    permission = templates["standard"].dig("agent_permissions", agent) || {}
+    readable = permission["can_read"] || []
+    writable = permission.dig("can_write", "spec_sections") || []
+    missing_read = contract[:read] - readable
+    missing_write = contract[:write] - writable
+    next if missing_read.empty? && missing_write.empty?
+
+    add(
+      findings,
+      "CRITICAL",
+      "FIGMA_LAYOUT_MANIFEST_PERMISSION_DRIFT",
+      "#{agent} lacks the layout-manifest permissions required by new-view",
+      "read=#{missing_read.join(", ")}; write=#{missing_write.join(", ")}"
+    )
+  end
+
+  fidelity_report_schema_path = "chapters/mobile/docs/templates/schemas/figma-fidelity-report.schema.json"
+  fidelity_report_schema = JSON.parse(File.read(fidelity_report_schema_path))
+  expected_fidelity_report_fields = %w[schema_ref status viewport references node_reconciliation exact_invariants measurements tolerances]
+  missing_fidelity_report_fields = expected_fidelity_report_fields - (fidelity_report_schema["required"] || [])
+  unless missing_fidelity_report_fields.empty? &&
+         fidelity_report_schema.dig("properties", "tolerances", "properties", "geometry_dp", "const") == 1 &&
+         fidelity_report_schema.dig("properties", "tolerances", "properties", "global_pixel_diff_percent", "const") == 2 &&
+         fidelity_report_schema.dig("properties", "tolerances", "properties", "regional_pixel_diff_percent", "const") == 4
+    add(
+      findings,
+      "CRITICAL",
+      "FIGMA_FIDELITY_REPORT_SCHEMA_DRIFT",
+      "the Figma fidelity report schema must preserve the compact deterministic contract",
+      missing_fidelity_report_fields.join(", ")
+    )
+  end
+
+  visual_permission_contract = {
+    "ds-orchestrator" => { read: ["visual_manifest"], write: [] },
+    "figma-analyzer" => { read: [], write: ["visual_manifest"] },
+    "component-planner" => { read: ["visual_manifest"], write: [] },
+    "component-architect" => { read: ["assets", "visual_manifest"], write: ["visual_manifest"] },
+    "widget-developer" => { read: ["visual_manifest"], write: [] },
+    "code-auditor" => { read: ["visual_manifest"], write: [] },
+    "test-engineer" => { read: ["visual_manifest"], write: [] },
+    "golden-test-engineer" => { read: ["visual_manifest"], write: [] },
+    "widgetbook-developer" => { read: ["visual_manifest"], write: [] },
+    "delivery-manager" => { read: ["visual_manifest"], write: [] }
+  }
+  visual_permission_contract.each do |agent, contract|
+    permission = templates["standard"].dig("agent_permissions", agent) || {}
+    readable = permission["can_read"] || []
+    writable = permission.dig("can_write", "spec_sections") || []
+    missing_read = contract[:read] - readable
+    missing_write = contract[:write] - writable
+    next if missing_read.empty? && missing_write.empty?
+
+    add(
+      findings,
+      "CRITICAL",
+      "NEW_VIEW_VISUAL_MANIFEST_PERMISSION_DRIFT",
+      "#{agent} lacks the visual-manifest permissions required by new-view",
+      "read=#{missing_read.join(", ")}; write=#{missing_write.join(", ")}"
+    )
+  end
+
+  component_architect = File.read("chapters/mobile/agents/_all/component-architect.agent.md")
+  code_auditor = File.read("chapters/mobile/agents/_all/code-auditor.agent.md")
+  figma_analyzer = File.read("chapters/mobile/agents/_all/figma-analyzer.agent.md")
+  test_engineer = File.read("chapters/mobile/agents/_all/test-engineer.agent.md")
+  mobile_spec_docs = File.read("chapters/mobile/docs/mobile-spec.md")
+  workflow_docs = File.read("chapters/mobile/docs/workflows.md")
+  visual_contract_resources = {
+    "new-view-workflow" => [new_view_workflow, %w[visual_manifest explicit_clip_transform FIGMA_FIDELITY_COMPARISON_UNAVAILABLE]],
+    "ds-orchestrator" => [ds_orchestrator, %w[visual_manifest exact visual verification]],
+    "codegen-view" => [codegen_view, %w[visual_manifest explicit_clip_transform FIGMA_LAYOUT_MANIFEST_INCOMPLETE]],
+    "component-architect" => [component_architect, %w[visual_manifest explicit_clip_transform existing_app_shell]],
+    "code-auditor" => [code_auditor, %w[visual_manifest explicit_clip_transform similar icon substitution]],
+    "figma-analyzer" => [figma_analyzer, %w[visual_manifest explicit_clip_transform Similarity]]
+  }
+  visual_contract_resources.each do |source, (text, phrases)|
+    phrases.each do |phrase|
+      next if text.include?(phrase)
+
+      add(findings, "HIGH", "NEW_VIEW_VISUAL_CONTRACT_MISSING", "#{source} must document the visual fidelity contract", phrase)
+    end
+  end
+
+  layout_contract_resources = {
+    "new-view-workflow" => [new_view_workflow, %w[layout_manifest FIGMA_FIDELITY_COMPARISON_UNAVAILABLE 4%]],
+    "new-feature-workflow" => [new_feature_workflow, %w[figma_scope=view layout_manifest FIGMA_FIDELITY_TOLERANCE_EXCEEDED]],
+    "master-orchestration" => [master_orchestration, %w[layout_manifest figma_scope=view]],
+    "widget-developer" => [widget_developer, %w[layout_manifest figma-fidelity-report.schema.json four corner]],
+    "code-auditor" => [code_auditor, %w[layout_manifest figma-fidelity-report.schema.json tolerances]],
+    "test-engineer" => [test_engineer, %w[layout_manifest child order geometry]],
+    "figma-analyzer" => [figma_analyzer, %w[get_metadata download_assets FIGMA_LAYOUT_MANIFEST_INCOMPLETE]],
+    "spec-validation" => [spec_validation_skill, %w[Shared Figma UI Fidelity Gate FIGMA_LAYOUT_MANIFEST_INCOMPLETE]],
+    "mobile-spec-docs" => [mobile_spec_docs, %w[layout_manifest 2% 4%]],
+    "workflows-docs" => [workflow_docs, %w[figma_scope layout_manifest]]
+  }
+  layout_contract_resources.each do |source, (text, phrases)|
+    phrases.each do |phrase|
+      next if text.include?(phrase)
+
+      add(findings, "HIGH", "FIGMA_LAYOUT_FIDELITY_CONTRACT_MISSING", "#{source} must document the shared deterministic Figma layout contract", phrase)
+    end
+  end
+
+  full_feature_permissions = templates["full"].fetch("agent_permissions", {})
+  full_feature_contract = {
+    "feature-builder" => ["visual_manifest", "layout_manifest"],
+    "test-engineer" => ["visual_manifest", "layout_manifest"],
+    "code-auditor" => ["visual_manifest", "layout_manifest"],
+    "delivery-manager" => ["visual_manifest", "layout_manifest"]
+  }
+  full_feature_contract.each do |agent, sections|
+    permission = full_feature_permissions[agent] || {}
+    readable = permission["can_read"] || []
+    missing = sections - readable
+    next if missing.empty?
+
+    add(findings, "CRITICAL", "NEW_FEATURE_FIGMA_FIDELITY_PERMISSION_DRIFT", "#{agent} lacks required Figma view fidelity reads in full-spec", missing.join(", "))
+  end
+
+  feature_builder_writes = full_feature_permissions.dig("feature-builder", "can_write", "spec_sections") || []
+  missing_feature_builder_fallback_writes = %w[external_access.figma_mcp design_source literal_texts assets visual_manifest layout_manifest] - feature_builder_writes
+  unless missing_feature_builder_fallback_writes.empty? ||
+         !new_feature_workflow.include?("delegate_or_controller_executes")
+    add(
+      findings,
+      "CRITICAL",
+      "NEW_FEATURE_FIGMA_FALLBACK_PERMISSION_DRIFT",
+      "feature-builder must be able to execute the permitted Figma analysis fallback",
+      missing_feature_builder_fallback_writes.join(", ")
+    )
+  end
+
+  ds_fallback_permission = templates["standard"].dig("agent_permissions", "ds-orchestrator") || {}
+  ds_fallback_writes = ds_fallback_permission.dig("can_write", "spec_sections") || []
+  ds_fallback_archive_paths = ds_fallback_permission.dig("can_write", "packet_paths") || []
+  unless ds_fallback_permission.fetch("can_call_external_tools", []).include?("figma_mcp") &&
+         ds_fallback_archive_paths.include?("source-assets/figma") &&
+         %w[external_access.figma_mcp visual_manifest layout_manifest].all? { |section| ds_fallback_writes.include?(section) }
+    add(
+      findings,
+      "CRITICAL",
+      "NEW_VIEW_FIGMA_FALLBACK_PERMISSION_DRIFT",
+      "ds-orchestrator must be able to execute the bounded Figma planning fallback",
+      "missing Figma tool, archive path, or manifest write permission"
+    )
+  end
+  [mobile_spec_docs, workflow_docs].each_with_index do |text, index|
+    source = %w[mobile-spec-docs workflows-docs][index]
+    %w[visual_manifest explicit_clip_transform].each do |phrase|
+      next if text.include?(phrase)
+
+      add(findings, "HIGH", "NEW_VIEW_VISUAL_DOCS_MISSING", "#{source} must explain the visual fidelity contract", phrase)
+    end
+  end
+  unless new_view_workflow.include?("PHASE 3b.5 — Audit of App View") &&
+         new_view_workflow.include?("PHASE 3b.7 — Human Checkpoint of App View") &&
+         new_view_workflow.include?("contracts.screen_chrome") &&
+         new_view_workflow.include?("visual_manifest")
+    add(findings, "CRITICAL", "NEW_VIEW_APP_VISUAL_CHECKPOINT_MISSING", "new-view must audit and require approval for the generated app view")
+  end
+  unless test_engineer.include?("bottom-navigation ownership") &&
+         code_auditor.include?("similar icon substitution is a BLOCKER") &&
+         figma_analyzer.include?("Similarity is not sufficient")
+    add(findings, "CRITICAL", "NEW_VIEW_VISUAL_RECONCILIATION_MISSING", "new-view agents must enforce exact icons and screen-chrome tests")
+  end
+
   unless spec_validation_skill.include?("`/new-view` Plan Gate") &&
          spec_validation_skill.include?("Non-empty `canonical_spec`") &&
-         spec_validation_skill.include?("packet_owner_target_id")
+         spec_validation_skill.include?("packet_owner_target_id") &&
+         spec_validation_skill.include?("visual_manifest")
     add(findings, "HIGH", "NEW_VIEW_PLAN_VALIDATION_MISSING", "spec validation skill must require a complete new-view plan before approval")
+  end
+
+  source_asset_schema = schema.dig("properties", "assets", "items") || {}
+  source_export_schema = source_asset_schema.dig("properties", "figma_export") || {}
+  expected_source_asset_fields = %w[id figma_node_id kind figma_export status]
+  missing_source_asset_fields = expected_source_asset_fields - (source_asset_schema["required"] || [])
+  unless missing_source_asset_fields.empty? &&
+         source_export_schema.dig("properties", "source", "const") == "figma_mcp" &&
+         source_export_schema.dig("properties", "archive_path", "pattern") == "^source-assets/figma/" &&
+         source_export_schema.dig("properties", "sha256", "pattern") == "^sha256:[a-f0-9]{64}$"
+    add(
+      findings,
+      "CRITICAL",
+      "FIGMA_SOURCE_ASSET_SCHEMA_DRIFT",
+      "mobile spec schema must require Figma source-asset provenance",
+      missing_source_asset_fields.join(", ")
+    )
+  end
+
+  %w[mini standard full].each do |level|
+    permission = templates[level].dig("agent_permissions", "figma-analyzer") || {}
+    packet_paths = permission.dig("can_write", "packet_paths") || []
+    unless permission["can_create_files"] == true &&
+           permission["can_modify_files"] == true &&
+           packet_paths.include?("source-assets/figma")
+      add(
+        findings,
+        "CRITICAL",
+        "FIGMA_SOURCE_ARCHIVE_PERMISSION_MISSING",
+        "#{level}-spec must authorize figma-analyzer to write the Figma source archive"
+      )
+    end
+  end
+
+  source_asset_resources = {
+    "new-component-workflow" => [new_component_workflow, %w[source-assets/figma SHA-256]],
+    "new-view-workflow" => [new_view_workflow, %w[source-assets/figma SHA-256]],
+    "new-feature-workflow" => [new_feature_workflow, %w[source-assets/figma SHA-256]],
+    "figma-analyzer" => [figma_analyzer, %w[source-assets/figma FIGMA_ASSET_DOWNLOAD_UNAVAILABLE SHA-256]],
+    "widget-developer" => [widget_developer, %w[source-assets/figma byte-identical FIGMA_TYPOGRAPHY_UNAVAILABLE]],
+    "code-auditor" => [code_auditor, %w[figma_export checksum FIGMA_TYPOGRAPHY_UNAVAILABLE]],
+    "spec-validation" => [spec_validation_skill, %w[source-assets/figma FIGMA_ASSET_DOWNLOAD_UNAVAILABLE FIGMA_TYPOGRAPHY_UNAVAILABLE]],
+    "mobile-spec-docs" => [mobile_spec_docs, %w[source-assets/figma FIGMA_ASSET_DOWNLOAD_UNAVAILABLE FIGMA_TYPOGRAPHY_UNAVAILABLE]],
+    "workflows-docs" => [workflow_docs, %w[source-assets/figma SHA-256]]
+  }
+  source_asset_resources.each do |source, (text, phrases)|
+    phrases.each do |phrase|
+      next if text.include?(phrase)
+
+      add(findings, "HIGH", "FIGMA_SOURCE_ASSET_CONTRACT_MISSING", "#{source} must document strict Figma source-asset fidelity", phrase)
+    end
   end
 
   cleared << "Semantic workflow/template/schema checks passed" unless findings.any?

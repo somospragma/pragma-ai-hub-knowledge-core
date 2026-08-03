@@ -250,10 +250,26 @@ Widget tests remain mandatory: `/new-component` requires
 `evidence/widget-tests.md`; `/new-view` additionally requires
 `evidence/view-widget-tests.md`.
 
-For `/new-view`, also require a completed `visual_manifest` reconciliation
-before audit and delivery. When its visual-verification flag is true, require
-`evidence/visual-verification.md` with both the canonical Figma screenshot and
-the Flutter rendering reference, plus an approved `app_view_layer` checkpoint.
+## Shared Figma UI Fidelity Gate
+
+For `/new-view` and `/new-feature` with `inputs.figma_scope=view`, require a
+completed `visual_manifest` and `layout_manifest` before audit and delivery.
+The layout reconciliation must cover every visible structural node and leaf,
+with no unresolved ids and verified parent-child order. It records bounds,
+layout, clipping, four corner radii and border width.
+
+Require `evidence/figma-fidelity-report.json` validated against
+`docs/templates/schemas/figma-fidelity-report.schema.json`. Its exact
+invariants are literal text, hierarchy/order, asset identity, typography and
+declared shape values. Its measured tolerances are at most `1 dp` geometry,
+`2%` global pixel difference and `4%` regional pixel difference. Capture and
+comparison failures block with `FIGMA_FIDELITY_COMPARISON_UNAVAILABLE`; an
+incomplete manifest blocks with `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`; a measured
+failure blocks with `FIGMA_FIDELITY_TOLERANCE_EXCEEDED`.
+
+`figma_scope=component_inventory` is intentionally exempt from the screen
+layout and pixel-comparison gate, while retaining Figma preflight and asset
+provenance rules that apply to its planned components.
 
 ## Agent Permission Validation
 

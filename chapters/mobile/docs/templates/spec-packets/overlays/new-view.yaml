@@ -53,9 +53,9 @@ notes:
   - DS artifacts target design_system; app view artifacts target the resolved app target.
   - The DS checkpoint must be approved before app view generation starts.
   - Every visible icon, image, illustration, logo, and image-fill source must be downloaded from Figma into source-assets/figma with its node id, format and SHA-256 before approval.
-  - The initial plan must reconcile the visual manifest: cropped assets use source SVGs with explicit transforms, DS icons require an exact match and an archived Figma export, and typography must map to exact tokens and registered project fonts.
+  - The initial plan must reconcile visual_manifest and layout_manifest: cropped assets use source SVGs with explicit transforms, DS icons require an exact match and an archived Figma export, typography must map to exact tokens and registered project fonts, and every visible node must retain its parent-child order, bounds, layout, four-corner radii and border width.
   - Visible bottom navigation must resolve to existing_app_shell, view_scaffold, or not_present before approval.
-  - Cropped assets, exported Figma icons, and visible bottom navigation require a human visual-verification checkpoint with Figma and Flutter rendering references.
+  - The app-view checkpoint requires evidence/figma-fidelity-report.json. Geometry allows at most 1 dp delta, global pixel difference at most 2%, and regional pixel difference at most 4%; text, hierarchy/order, asset identity and declared shape values are exact invariants.
   - DS and view widget tests remain mandatory; both golden stages run only when golden_tests=true.
   - When golden_tests=false, record golden_tests as skipped_by_input.
   - evidence_mode defaults to minimal; standard retains detailed phase reports.

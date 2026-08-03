@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pragma.ai/schemas/mobile/figma-fidelity-report.schema.json",
+  "title": "Figma Fidelity Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_ref",
+    "status",
+    "viewport",
+    "references",
+    "node_reconciliation",
+    "exact_invariants",
+    "measurements",
+    "tolerances"
+  ],
+  "properties": {
+    "schema_ref": {
+      "const": "../templates/schemas/figma-fidelity-report.schema.json"
+    },
+    "status": {
+      "enum": ["passed", "failed", "blocked_input"]
+    },
+    "viewport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "device_pixel_ratio"],
+      "properties": {
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "height": { "type": "number", "exclusiveMinimum": 0 },
+        "device_pixel_ratio": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["figma_screenshot", "flutter_capture"],
+      "properties": {
+        "figma_screenshot": { "type": "string", "minLength": 1 },
+        "flutter_capture": { "type": "string", "minLength": 1 }
+      }
+    },
+    "node_reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visible_node_count", "resolved_node_count", "unresolved_ids", "order_verified"],
+      "properties": {
+        "visible_node_count": { "type": "integer", "minimum": 0 },
+        "resolved_node_count": { "type": "integer", "minimum": 0 },
+        "unresolved_ids": { "type": "array", "items": { "type": "string" } },
+        "order_verified": { "type": "boolean" }
+      }
+    },
+    "exact_invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["literal_text", "hierarchy_order", "asset_identity", "typography", "shape_values"],
+      "properties": {
+        "literal_text": { "type": "boolean" },
+        "hierarchy_order": { "type": "boolean" },
+        "asset_identity": { "type": "boolean" },
+        "typography": { "type": "boolean" },
+        "shape_values": { "type": "boolean" }
+      }
+    },
+    "measurements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_geometry_delta_dp", "global_pixel_diff_percent", "max_regional_pixel_diff_percent"],
+      "properties": {
+        "max_geometry_delta_dp": { "type": "number", "minimum": 0 },
+        "global_pixel_diff_percent": { "type": "number", "minimum": 0 },
+        "max_regional_pixel_diff_percent": { "type": "number", "minimum": 0 }
+      }
+    },
+    "tolerances": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["geometry_dp", "global_pixel_diff_percent", "regional_pixel_diff_percent"],
+      "properties": {
+        "geometry_dp": { "const": 1 },
+        "global_pixel_diff_percent": { "const": 2 },
+        "regional_pixel_diff_percent": { "const": 4 }
+      }
+    }
+  }
+}

@@ -35,7 +35,7 @@ write `figma-analysis.md` only in `standard`.
 
 - Can read: Figma URL, user story/criteria, `spec_ref`, `context_ref`, and the sections listed in `read_sections`.
 - Can call external tools: only Figma MCP.
-- Can write in `spec.yaml`: `external_access.figma_mcp`, `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, `view_states`, `navigation`, and `acceptance_criteria`.
+- Can write in `spec.yaml`: `external_access.figma_mcp`, `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, `layout_manifest`, `view_states`, `navigation`, and `acceptance_criteria`.
 - Can write evidence: `{SPEC_PACKET_PATH}/evidence/figma-mcp-preflight.md` and `{SPEC_PACKET_PATH}/evidence/figma-analysis.md`.
 - Can create and modify only `{SPEC_PACKET_PATH}/source-assets/figma/` to archive downloaded Figma source assets. It cannot create, modify, or delete Dart files, tests, final target assets, or project configuration.
 - If `agent_permissions.figma-analyzer` exists in `spec.yaml`, it must be satisfied before any MCP call or write operation.
@@ -51,7 +51,7 @@ Minimum input:
 
 Required output:
 
-- Update `spec_ref` as the machine source with `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, `view_states`, and `acceptance_criteria`.
+- Update `spec_ref` as the machine source with `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, `layout_manifest`, `view_states`, and `acceptance_criteria`.
 - Write a human-readable summary to `PIPELINE_SPEC_PATH` only as a report, if the pipeline report exists.
 - Persist evidence in `{SPEC_PACKET_PATH}/evidence/figma-analysis.md`.
 - Record the phase in `PIPELINE_LOG_PATH`.
@@ -77,33 +77,42 @@ If the handoff includes `spec_ref` and `context_ref`:
    - confirm read permissions for the node, components, styles, variables, and assets
    - persist the result in `{SPEC_PACKET_PATH}/evidence/figma-mcp-preflight.md`
    - update `spec.yaml.external_access.figma_mcp.status`
-3. Execute `get_design_context(fileKey, nodeId)` as the first required analysis step.
-4. Extract from `get_design_context`:
+3. Discover the active Figma MCP capabilities. Prefer `get_metadata` for the
+   sparse hierarchy, `get_design_context` for styling, `get_variable_defs` for
+   radius/spacing/typography tokens, and `download_assets` for source files.
+   A legacy `get_node`/`get_images` adapter is allowed only when the preferred
+   capability is unavailable and returns equivalent structured data.
+4. Execute `get_metadata(fileKey, nodeId)` and retain the complete visible
+   parent-child order, ids, positions, and sizes before requesting deep context.
+5. Execute `get_design_context(fileKey, nodeId)` as the first required styling step.
+6. Extract from `get_design_context`:
    - `Development` annotations
    - Figma-guided changes/behaviors
    - nodes relevant for visual capture
-5. Execute `get_screenshot(...)` for the requested main node and for each relevant change/annotation detected by Figma in step 4. Record the main-node reference in `visual_manifest.reference_screenshot`; it is required even when there are no annotations.
-6. Execute `get_node(fileKey, nodeId)` to determine node type and complete structure.
-7. Extract all visible `TEXT` nodes:
+7. Execute `get_screenshot(...)` for the requested main node and for each relevant change/annotation detected by Figma in step 6. Record the main-node reference in `visual_manifest.reference_screenshot`; it is required even when there are no annotations.
+8. Execute the deep-node adapter only for subtrees whose metadata requires
+   additional detail.
+9. Execute `get_variable_defs(...)` for the requested node to resolve radius,
+   spacing, typography, and color variables before token mapping.
+10. Extract all visible `TEXT` nodes:
    - exact literal text (`characters`) without translating, summarizing, or fixing
    - node id, layer name, scope/screen/state, visibility
    - typographic style, alignment, `maxLines`/truncation when available
-8. Extract relevant constraints/layout:
+11. Extract relevant constraints/layout:
    - `layoutMode`, sizing HUG/FILL/FIXED, padding, spacing, alignment
    - bounds, min/max when available, scroll/clip/auto-layout
    - zones with overflow risk due to long text, horizontal rows, fixed content, safe areas, or lists
-9. Enumerate visible visual leaves and their ancestor chain before selecting assets. Detect every visible icon, image, illustration, logo, image-fill source, and vector asset:
+12. Enumerate visible visual leaves and their ancestor chain before selecting assets. Detect every visible icon, image, illustration, logo, image-fill source, and vector asset:
    - `VECTOR`, `BOOLEAN_OPERATION`, `LINE`, `ELLIPSE`, `POLYGON`, `STAR`
    - layers with visual use as iconography or illustration
-10. For each detected visible asset, execute `get_images(...)` and download the returned Figma export into `{SPEC_PACKET_PATH}/source-assets/figma/`:
+13. For each detected visible asset, execute `download_assets(...)` and download the returned Figma export into `{SPEC_PACKET_PATH}/source-assets/figma/`. Use a legacy `get_images(...)` adapter only when `download_assets` is unavailable:
 - use `svg` for vector assets; use `png`, `jpg`, or `webp` only when the Figma source or runtime renderer requires raster output
 - archive the downloaded file with a deterministic name and SHA-256 checksum
 - record `figma_node_id`, format, archive path, checksum, and `status: downloaded` in `spec.yaml.assets`
 - export the source asset node, never its enclosing frame merely to preserve a crop
 - downloading only a screenshot, retaining an expiring URL, or planning a similar local asset does not satisfy this step
-11. If the node is a `COMPONENT_SET`, extract variants.
-12. If the node is a `FRAME/SECTION`, use `get_node_children` for sections.
-13. Use `get_styles(fileKey)` and `get_components(fileKey)` for global context.
+14. If the node is a `COMPONENT_SET`, extract variants.
+15. Use metadata/deep-node adapters only for sections that need more detail.
 
 ### 0b) Blocked Input Handling
 
@@ -151,7 +160,7 @@ For each relevant detected vector/asset:
    - color (semantic token or original color if multicolor)
    - semantics (`decorative` vs `informative`)
 
-### 1c) Rendered Visual Manifest (required for `/new-view`)
+### 1c) Rendered Visual Manifest (required for `/new-view` and `/new-feature` with `figma_scope=view`)
 
 Build a compact `visual_manifest` from the visible screen tree. The unit of
 fidelity is the rendered result inside Figma, not the raw SVG or image source.
@@ -180,6 +189,21 @@ fidelity is the rendered result inside Figma, not the raw SVG or image source.
 7. Count visible elements covered by the manifest and leave any unresolved ids
    explicit. Set `visual_verification_required=true` when there is an explicit
    crop, a Figma-exported icon, or visible bottom navigation.
+
+### 1d) Layout Manifest (required for every `figma_scope=view`)
+
+Build `layout_manifest` from the metadata tree before code generation. For every
+visible structural node and visible leaf, record its Figma id, parent id,
+`child_index`, kind, bounds relative to the root viewport, direction,
+alignment, four padding values, gap, clip behavior, four corner radii, and
+border width. Link text nodes to their literal-text ids when applicable.
+
+The root viewport uses the exact Figma frame width, height, and DPR expected by
+the Flutter capture. Preserve child order exactly as Figma returns it; a visual
+match with reordered children is invalid. Set tolerances to `1 dp` geometry,
+`2%` global pixel difference, and `4%` regional pixel difference. Any missing
+visible node, unresolved radius, or unverified child order is `blocked_input:
+FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
 
 ### 2) Variants And States
 

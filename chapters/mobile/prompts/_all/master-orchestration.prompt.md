@@ -235,7 +235,7 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 
 1. Gate architecture and contracts policy.
 2. Phase 0 → create Mobile Spec Packet `standard`.
-3. Phase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → update spec with visual analysis, states, texts, constraints, assets and `visual_manifest`.
+3. Phase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → update spec with visual analysis, states, texts, constraints, assets, `visual_manifest` and `layout_manifest`.
 4. Phase 2 → `@component-planner` (`atomic-inventory.prompt.md`) → update inventory DS vs App, DAG and artifacts.
 5. Phase 2.5 → `@component-architect` → update architecture view and technical plan.
 6. Phase 2.6 (only `CONTRACTS_POLICY=generate`) → add minimal contracts to the spec.
@@ -245,7 +245,8 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 10. A human checkpoint is required after the DS layer.
 11. Phase 3b → `@widget-developer` (`codegen-view.prompt.md`) → view app with handoff compact.
 12. Phase 3b.5 → `@code-auditor` → reconciles the generated app view against
-    `visual_manifest`, including crop, exact icons, typography and screen chrome.
+    `visual_manifest` and `layout_manifest`, including crop, exact icons,
+    typography, screen chrome, hierarchy/order, geometry and shape values.
 13. A human checkpoint is required after the app view. When visual verification
     is required, present Figma and Flutter rendering references before tests.
 14. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
@@ -340,7 +341,9 @@ For `standard` and `full`, in addition to the initial checkpoint, request
 layer/stage checkpoints according to the workflow:
 
 - `/new-view`: after DS and after the app view, before its tests. The latter
-  includes visual verification when required by `visual_manifest`.
+  includes the required layout and Figma fidelity report.
+- `/new-feature` with `figma_scope=view`: its Presentation checkpoint includes
+  the same required layout and Figma fidelity report before wiring or tests.
 - `/new-feature`: after Domain, Data and Presentation.
 - `/refactor-feature`: after architectural or contract steps.
 - `/test-plan`: before generation of tests.

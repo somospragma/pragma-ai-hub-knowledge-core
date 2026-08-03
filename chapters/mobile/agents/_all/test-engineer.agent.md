@@ -149,6 +149,11 @@ environment is `blocked_input`; neither may be recorded as skipped.
   `contracts.screen_chrome.bottom_navigation`:
   assert view-owned navigation is rendered, or assert the route integrates
   through the existing shell without duplicating it.
+- In `VIEW_WIDGET_TESTS` and `FEATURE_WIDGET_TESTS` when `figma_scope=view`,
+  use stable keys derived from `layout_manifest.figma_node_id` to assert exact
+  visible text, parent-child order, and relative geometry within `1 dp`.
+  Verify every declared rounded node uses its four declared corner radii and
+  border width through its exposed decoration or captured fidelity result.
 - In `VIEW_WIDGET_TESTS`, use fixed name `[view]_view_test.dart`.
 - In `FEATURE_UNIT_TESTS`, cover planned domain, data and BLoC behavior.
 - In `FEATURE_WIDGET_TESTS`, cover planned feature page states, actions and
@@ -156,6 +161,8 @@ environment is `blocked_input`; neither may be recorded as skipped.
 - In `FEATURE_INTEGRATION_TESTS`, create and execute the planned app journey
   under `integration_test/`.
 - Verify rendered visible text against `literal_texts` and `contracts.text_overflow`.
+- For `figma_scope=view`, read `layout_manifest` and fail on a missing visible
+  node, changed top-to-bottom child order, or geometry outside tolerance.
 - In SDD mode, read texts from `literal_texts`, `contracts.literal_texts`, and
   `contracts.text_overflow`.
 - If `contracts.text_overflow` reports overflow risk, add a compact-constraints

@@ -79,11 +79,12 @@ golden files and snapshots. The controller normalizes an omitted value to
 the packet. When enabled, every applicable golden stage must pass and persist
 `evidence/golden-tests.md` before delivery. Widget tests remain mandatory.
 
-## `/new-view` Visual Fidelity Contract
+## Shared Figma UI Fidelity Contract
 
-`/new-view` adds `visual_manifest` to the standard packet. It is a compact,
-machine-readable reconciliation of visible Figma elements, not a verbose
-handoff. The initial plan cannot be approved until it contains:
+`/new-view` and `/new-feature` with `figma_scope: view` add
+`visual_manifest` and `layout_manifest` to the packet. They are compact,
+machine-readable reconciliations of visible Figma content, not verbose
+handoffs. The initial plan cannot be approved until it contains:
 
 - `reference_screenshot`: the Figma MCP screenshot reference for the requested
   main node;
@@ -102,14 +103,23 @@ handoff. The initial plan cannot be approved until it contains:
 - `reconciliation`: counts, unresolved ids, completion status, and whether a
   visual-verification checkpoint is required.
 
+`layout_manifest` is the structural counterpart. It records the requested
+Figma root and capture viewport, then every visible structural node and leaf
+with its parent id, child index, bounds, layout direction/alignment/padding/gap,
+clip behavior, four independent corner radii and border width. This makes the
+top-to-bottom/left-to-right order and rounded shapes auditable rather than
+implicit in generated widget code.
+
 For cropped, masked, or transformed assets, the reusable source asset is
 exported and Flutter recreates the visible crop with
 `explicit_clip_transform`. Exporting an enclosing Figma frame is not allowed:
 it loses reuse and makes the result dependent on a single screen context.
 
 The archive is mandatory for every Figma-driven `/new-component`, `/new-view`,
-or `/new-feature` with `figma_url`: `get_images(...)` must download the source
-file into `source-assets/figma/` before the initial review. An image URL,
+or `/new-feature` with `figma_url`: `download_assets(...)` must download the
+source file into `source-assets/figma/` before the initial review. A legacy
+`get_images(...)` adapter is acceptable only when the active MCP exposes no
+equivalent current capability. An image URL,
 screenshot, existing local asset, or visually similar system/DS icon is not
 evidence of provenance. The code-generation phase copies image, illustration,
 logo and Figma-SVG sources without modifying them; an exact declared DS icon
@@ -124,11 +134,22 @@ family, weight and style reference, then verifies an exact registered project
 font. It must block with `FIGMA_TYPOGRAPHY_UNAVAILABLE` rather than substitute
 a close family or weight.
 
-The controller requires visual verification when the manifest has an explicit
-crop, an exported Figma icon, or visible bottom navigation. The app-view
-checkpoint then compares the canonical Figma screenshot reference with a
-deterministic Flutter rendering reference. This is a human approval gate, not
-a replacement for optional golden regression tests.
+The controller always requires the screen-level fidelity gate for this scope.
+It compares the canonical Figma screenshot reference with a deterministic
+Flutter capture at `layout_manifest.viewport` and writes
+`evidence/figma-fidelity-report.json`. Hierarchy/child order, literal text,
+asset identity, typography resolution, and declared radii/border values are
+exact invariants. Measured differences allow at most `1 dp` per geometry value,
+`2%` global pixel difference, and `4%` regional pixel difference. A missing
+comparison or a result above those limits blocks the pipeline; the human
+checkpoint reviews the compact report and render references. This fidelity gate
+does not replace optional golden regression tests.
+
+`/new-feature` uses `figma_scope: view` by default when `figma_url` is set.
+Set `figma_scope: component_inventory` only when the link supplies a DS
+inventory rather than a screen the feature must reproduce. That lighter scope
+still verifies Figma access and component provenance, but deliberately skips
+the screen layout manifest and pixel-comparison gate.
 
 ## Evidence Modes
 

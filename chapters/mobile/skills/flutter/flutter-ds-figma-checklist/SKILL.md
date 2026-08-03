@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-figma-checklist
-version: 1.3.0
+version: 1.4.0
 scope: stack
 type: skill
 chapter: mobile
@@ -20,8 +20,8 @@ description: >
 - [ ] `get_design_context` executed before deep analysis
 - [ ] Screenshot(s) for visual reference
 - [ ] `get_screenshot` captured for each guided change
-- [ ] Node metadata extracted (via Figma MCP `get_node` or manual inspection)
-- [ ] `get_styles` used to verify published token mappings (if MCP available)
+- [ ] Node metadata extracted with `get_metadata` (or an equivalent legacy adapter)
+- [ ] `get_variable_defs` used to verify published token mappings (if available)
 - [ ] MCP status documented: direct access | manual fallback
 - [ ] Development annotations documented (alerts, states, special rules)
 - [ ] Literal text contract extracted from visible TEXT nodes
@@ -59,7 +59,7 @@ description: >
 ## 5. Spacing & Padding
 - [ ] Internal padding (top, right, bottom, left) matches tokens
 - [ ] Gap between each child pair matches
-- [ ] Sandmmetric vs asandmmetric correct
+- [ ] Symmetric versus asymmetric spacing is correct
 - [ ] Desktop variant scales padding correctly (if applicable)
 
 ## 6. Sizes & Dimensions
@@ -115,9 +115,16 @@ Row(
 // Text(productTitle, overflow: TextOverflow.ellipsis, maxLines: 1)
 ```
 
-## 7. Border Radius
-- [ ] Main container radius matches token
-- [ ] Internal elements' radius (chips, badges) correct
+## 7. Structure And Shape Fidelity
+- [ ] `layout_manifest` covers every visible structural node and leaf
+- [ ] Parent-child and sibling order match the Figma hierarchy exactly
+- [ ] Bounds, direction, alignment, padding, gap and clipping match the manifest
+- [ ] Main container radius matches each declared corner value
+- [ ] Internal elements' radii (chips, badges, cards, navigation) match each declared corner value
+- [ ] Border widths match; asymmetric radii are not simplified to a uniform value
+- [ ] Literal text, asset identity, typography and declared shape values are exact invariants
+- [ ] Capture comparison uses `layout_manifest.viewport`
+- [ ] Geometry delta is at most `1 dp`, global pixel difference at most `2%`, and regional pixel difference at most `4%`
 
 ## 8. Desktop vs Mobile
 - [ ] Widget accepts platform parameter (if applicable)

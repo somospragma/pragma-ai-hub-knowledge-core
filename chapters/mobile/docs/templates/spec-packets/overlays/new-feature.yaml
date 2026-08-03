@@ -7,6 +7,7 @@ required_inputs:
   - description
 optional_inputs:
   - figma_url
+  - figma_scope
   - api_contract
   - entity_name
   - fields
@@ -60,7 +61,9 @@ notes:
   - Documentation runs only when documentation=true; otherwise its skipped_by_input state must be recorded.
   - When documentation=true, project documentation must be represented as artifact_plan.planned[group=docs].
   - feature-builder prefers Figma preflight and analysis through figma-analyzer when figma_url is provided.
-  - When figma_url is provided, every visible icon, image, illustration, logo, and image-fill source must be downloaded into source-assets/figma with node id, format and SHA-256 before code generation.
+  - When figma_url is provided, figma_scope defaults to view. Use component_inventory only when the linked Figma content is intentionally not a screen this feature implements.
+  - When figma_scope=view, every visible icon, image, illustration, logo, and image-fill source must be downloaded into source-assets/figma with node id, format and SHA-256 before approval. visual_manifest and layout_manifest must resolve exact text, hierarchy/order, bounds, layout, four-corner radii and border width; the required fidelity report allows at most 1 dp geometry delta, 2% global pixel difference and 4% regional pixel difference.
+  - When figma_scope=component_inventory, Figma analysis remains limited to the DS inventory and does not require a screen-level layout manifest or pixel comparison.
   - Native delegation is optional: feature-builder owns every mandatory phase and executes a specialist role contract when execution_capabilities.subagent_delegation=unavailable.
   - Unit, widget, and integration tests are never skipped because a test-engineer subagent is unavailable.
   - Delivery proposes branch, commit and PR text unless explicit git or gh permissions are granted.

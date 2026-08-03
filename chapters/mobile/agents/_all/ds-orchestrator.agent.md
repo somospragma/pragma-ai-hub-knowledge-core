@@ -16,6 +16,9 @@ description: >
 - flutter-ds-folder-structure
 - flutter-ds-naming-conventions
 - flutter-ds-responsive-layout
+- flutter-ds-figma-mcp
+- flutter-ds-figma-checklist
+- flutter-ds-asset-management
 - mobile-sdd-spec-validation
 
 ## Evidence Mode
@@ -40,7 +43,10 @@ Before delegating any code-producing phase, complete these actions in order:
    it as the immutable `SPEC_PACKET_OWNER_TARGET_ID` for `/new-view`
 3. create `spec.yaml`, `context.json`, `review.md`, and validation evidence
    only under `SPEC_PACKET_OWNER_ROOT`
-4. delegate Figma analysis, inventory/DAG, and technical planning into the packet
+4. delegate Figma analysis, inventory/DAG, and technical planning into the packet;
+   when native delegation is unavailable, execute the figma-analyzer role
+   contract only if the packet grants its Figma MCP, packet-write and
+   source-archive permissions
 5. validate the completed packet
 6. set `context.json.status=pending_human_review` and
    `checkpoints.initial_spec.status=pending`
@@ -82,9 +88,10 @@ into Flutter Design System widgets and complete app views.
 
 ### Rendered Asset And Screen Chrome Fidelity
 
-For `/new-view`, require a complete `visual_manifest` before the initial
-approval. It is a compact reconciliation of what is visible in Figma, not a
-duplicate prose handoff. The controller must not approve a packet when:
+For `/new-view`, require complete `visual_manifest` and `layout_manifest`
+before the initial approval. They reconcile the rendered result and its exact
+structure without duplicating prose handoff. The controller must not approve a
+packet when:
 
 - a cropped or transformed asset lacks its source node, visible container,
   explicit clip/transform contract, or resolved status;
@@ -97,6 +104,14 @@ duplicate prose handoff. The controller must not approve a packet when:
 - visible bottom navigation lacks an ownership decision between the shared app
   shell and this view's scaffold; or
 - reconciliation has unresolved elements.
+
+The layout manifest must cover every visible structural node and leaf with
+parent-child order, bounds, layout/padding/gap, clip behavior, four corner
+radii and border width. At app-view audit, literal text, hierarchy/order,
+asset identity, typography and declared shape values are exact invariants.
+Geometry may differ by at most `1 dp`, global pixels by `2%`, and regional
+pixels by `4%`. The required `evidence/figma-fidelity-report.json` records the
+comparison at the manifest viewport; a missing or failed report blocks delivery.
 
 When the manifest requires visual verification, the app-view checkpoint must
 present both the canonical Figma screenshot reference and a deterministic
@@ -271,8 +286,12 @@ Rules:
 - `agent_permissions` must exist in the packet when a phase can create,
   modify, or delete files, execute commands, or call external tools.
 - For Figma-driven workflows, require
-  `external_access.figma_mcp.required=true`. Delegate both Figma preflight and
-  analysis to `@figma-analyzer`; this controller never calls Figma MCP itself.
+  `external_access.figma_mcp.required=true`. Prefer both Figma preflight and
+  analysis through `@figma-analyzer`. If the active surface cannot delegate,
+  execute that role contract only when `agent_permissions.ds-orchestrator`
+  grants `figma_mcp`, the required spec sections, evidence paths and
+  `source-assets/figma`; otherwise return
+  `blocked_input: PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`.
 - `mobile-sdd-spec-validation` must validate the spec before presenting
   `review.md` and before applying changes.
 - The handoffs between agents use `spec_ref`, `context_ref`, `phase` and
@@ -413,8 +432,9 @@ Outside those cases, do not ask intermediate confirmations.
    - `CONTRACTS_POLICY=generate` -> generate contracts minimum before codegen.
    - `CONTRACTS_POLICY=optional` -> continue without block.
 3. Phase 0 → create Mobile Spec Packet `standard`.
-4. Phase 1 `@figma-analyzer` → update visual analysis, texts, constraints,
-   assets and states view.
+4. Phase 1 `@figma-analyzer` (or this controller under the explicit
+   non-delegating fallback) → update visual analysis, texts, constraints,
+   assets, visual/layout manifests and view states.
 5. Phase 2 `@component-planner` → update inventory DS/App and DAG.
 6. Phase 2.5 `@component-architect` → update architecture view,
    contracts technicals.
@@ -511,8 +531,10 @@ No continue without explicit approval.
 ## Critical Rules
 
 - NEVER code or audit files directly; delegate.
-- NEVER execute Figma MCP directly in orchestration.
-- ALWAYS delegate any Figma access to `@figma-analyzer` (Phase 1).
+- NEVER execute Figma MCP directly when native delegation is available.
+- ALWAYS prefer `@figma-analyzer` for Figma access (Phase 1). When delegation
+  is unavailable, execute only its bounded analysis role contract and only with
+  the explicit packet permissions listed above.
 - ALWAYS respect phase order of phases and gates.
 - ALWAYS record log per phase.
 - If audit fails, loop with `@widget-developer` up to `MAX_AUDIT_RETRIES`.

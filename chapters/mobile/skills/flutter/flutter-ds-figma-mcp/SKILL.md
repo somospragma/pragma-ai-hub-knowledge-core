@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-figma-mcp
-version: 1.3.0
+version: 1.4.0
 scope: stack
 type: skill
 chapter: mobile
@@ -44,6 +44,37 @@ descriptions or screenshots.
 
 ## Available MCP Tools
 
+### Preferred Capability Adapter
+
+Figma MCP tool names vary by client and server version. Discover the available
+capabilities first. Prefer the current focused tools below; use a legacy tool
+only when it returns equivalent structured data. Never silently omit a required
+fact because a legacy name is unavailable.
+
+### `get_metadata`
+Retrieves a sparse hierarchy with node ids, order, positions and sizes.
+
+**Use when:** Establishing the complete visible tree for a component or screen
+without loading unnecessary deep context.
+
+### `get_variable_defs`
+Retrieves variable and token definitions relevant to a target node.
+
+**Use when:** Resolving radius, spacing, typography and color variables before
+mapping values to project tokens.
+
+### `download_assets`
+Downloads source asset exports for selected nodes.
+
+**Use when:** Archiving visible icons, images, illustrations, logos and
+image-fills in the Spec Packet. Prefer it to expiring export URLs.
+
+### Legacy Equivalents
+
+`get_file`, `get_node`, `get_node_children`, `get_styles`, `get_components`,
+and `get_images` may be used only when the active server exposes them instead
+of an equivalent preferred capability.
+
 ### `get_file`
 Retrieves the full Figma file structure (pages, frames, components).
 
@@ -64,7 +95,7 @@ Input: { "fileKey": "abc123", "nodeId": "1234:5678" }
 Output: Node with properties, children, layout, fills, strokes, effects
 ```
 
-**Use when:** Analandzing a specific component, frame, or screen.
+**Use when:** Analyzing a specific component, frame, or screen.
 
 ### `get_node_children`
 Retrieves only the direct children of a node.
@@ -138,23 +169,23 @@ Output: Screenshot URL/reference for visual verification
 
 ### For a Single Component
 ```
-1. get_design_context(fileKey, nodeId) → guided changes + development annotations
-2. For each guided change: get_screenshot(change/node)
-3. get_node(nodeId) → full component tree
-4. Parse children recursively → build layer hierarchy
-5. For each child: extract type, properties, fills, strokes, effects, text, constraints
+1. get_metadata(fileKey, nodeId) → complete visible tree, ids, order and bounds
+2. get_design_context(fileKey, nodeId) → guided changes + development annotations
+3. get_variable_defs(fileKey, nodeId) → radius, spacing, typography and color variables
+4. For each guided change: get_screenshot(change/node)
+5. Deep-node adapter only for nodes that need missing detail
 6. Register literal visible text from TEXT nodes without rewriting
-7. Register layout constraints and overflow risks
-8. Map each property → DS token
+7. Build visual_manifest and layout_manifest
+8. Map each property → DS token and download each visible source asset
 ```
 
 ### For a Full Screen/Page
 ```
-1. get_file(fileKey) → discover pages
+1. get_metadata(fileKey, pageNodeId) → complete visible hierarchy, order and bounds
 2. get_design_context(fileKey, pageNodeId) → development annotations + guided changes
-3. For each guided change: get_screenshot(change/node)
-4. get_node(pageNodeId) → get screen frame
-5. get_node_children(frameId) → top-level sections
+3. get_variable_defs(fileKey, pageNodeId) → design values
+4. For each guided change: get_screenshot(change/node)
+5. Deep-node adapter only for top-level sections that require missing detail
 6. For each section:
    a. Classify: header, body, footer, navigation, etc.
    b. get_node(sectionId) → full section tree
@@ -232,7 +263,7 @@ when no exact match exists.
 
 For every visible icon, image, illustration, logo, or image-fill source:
 
-1. call `get_images` on the source node, never the enclosing presentation frame;
+1. call `download_assets` on the source node, never the enclosing presentation frame; use `get_images` only as a legacy equivalent;
 2. download the Figma result to `{SPEC_PACKET_PATH}/source-assets/figma/`;
 3. record source node id, format, archive path and SHA-256 in `spec.yaml.assets`;
 4. copy that archived file byte-for-byte to the planned runtime asset path after
@@ -248,7 +279,7 @@ return `blocked_input: FIGMA_ASSET_DOWNLOAD_UNAVAILABLE`.
 - Preserve casing, accents, punctuation, line breaks that are visible in design,
   and intentional spacing.
 - Do not translate, correct, summarize, expand, or invent copy.
-- Layer names are not copy unless metadata/anotations explicitly say so.
+- Layer names are not copy unless metadata/annotations explicitly say so.
 - If a required state has no visible text in Figma, report a gap instead of
   inventing final copy.
 - Record Figma style id (or `inline:<node-id>`) for every visible text node and

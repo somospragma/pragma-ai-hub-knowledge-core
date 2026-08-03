@@ -107,6 +107,9 @@ complete spec content.
 - [ ] Without unresolved TODOs
 
 ### 8. Design Fidelity
+- [ ] For `/new-view` and `/new-feature` with `figma_scope=view`, enforce the
+      shared visual and layout fidelity gate; `component_inventory` is not a
+      substitute for a screen-level comparison
 - [ ] Consult skill `flutter-ds-figma-checklist`
 - [ ] Implemented variants match Figma
 - [ ] States implemented match with Figma
@@ -146,6 +149,15 @@ complete spec content.
 - [ ] When `visual_verification_required=true`,
       `evidence/visual-verification.md` references both Figma and Flutter
       renderings; otherwise the packet records why it is not required
+- [ ] `layout_manifest` covers every visible structural node and leaf, with no
+      unresolved ids and `order_verified=true`
+- [ ] Parent-child order, direction, bounds, padding, gap, clipping, four
+      corner radii, and border width match the declared layout node; changed
+      order or a rounded component rendered with a smaller/symmetric radius is
+      a BLOCKER
+- [ ] `evidence/figma-fidelity-report.json` passes `1 dp` geometry, `2%`
+      global pixel-difference, and `4%` regional pixel-difference tolerances
+      and conforms to `docs/templates/schemas/figma-fidelity-report.schema.json`
 
 ### 10. Layout and Overflow
 - [ ] Each risk in `layout_constraints`/`contracts.text_overflow` is mitigated or flagged

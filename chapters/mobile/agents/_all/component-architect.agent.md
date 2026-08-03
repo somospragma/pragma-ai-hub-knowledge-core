@@ -158,6 +158,11 @@ names the exact catalog entry; otherwise use the exported Figma SVG.
 - Require `figma_source.font_resolution=exact_project_font` for every visible
   text entry. A missing licensed project font is
   `blocked_input: FIGMA_TYPOGRAPHY_UNAVAILABLE`, not permission to substitute.
+- For every `layout_manifest` node, propagate parent-child order, relative
+  bounds, direction, padding, gap, clipping, four corner radii, and border
+  width into the technical plan. A radius must resolve to an exact token or
+  numeric value; nearby rounding is `blocked_input:
+  FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
 - Resolve bottom-navigation ownership by inspecting the app route tree:
   `existing_app_shell` when a shared shell renders it, `view_scaffold` only
   when this view owns it, and `not_present` when it is absent in Figma.

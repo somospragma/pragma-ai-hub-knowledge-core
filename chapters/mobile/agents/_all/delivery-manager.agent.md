@@ -120,6 +120,10 @@ until all of the following are true:
    If false, the packet records `documentation: skipped_by_input` and its
    reason.
 5. `spec_ref` parses and validates against its declared Mobile Spec schema.
+6. When `inputs.figma_scope=view`, `evidence/figma-fidelity-report.json`
+   exists, conforms to `docs/templates/schemas/figma-fidelity-report.schema.json`,
+   has complete node/order reconciliation, exact invariant results, and a
+   passing `1 dp` / `2%` / `4%` comparison.
 
 Report the exact evidence paths and each optional-stage outcome. Do not replace
 these checks with a future-work note or a generic `flutter test` summary.
@@ -132,6 +136,12 @@ For `/new-component`, require passing `evidence/widget-tests.md`. For
 outcome: a passing `evidence/golden-tests.md` when `inputs.golden_tests=true`,
 or `golden_tests: skipped_by_input` with its reason when false. Missing golden
 state is not an implicit skip and blocks delivery.
+
+For `/new-view`, also require a passing
+`evidence/figma-fidelity-report.json` with the completed visual/layout manifest
+reconciliation. The same rule applies to `/new-feature` only when
+`inputs.figma_scope=view`; `component_inventory` does not claim screen-level
+pixel fidelity.
 
 ### 6. Branch and commits (deterministic)
 

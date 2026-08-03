@@ -215,9 +215,10 @@ class [NameView] extends StatelessWidget {
 
 ## Rendered Asset, Typography, And Screen Chrome Rules
 
-1. `visual_manifest.reconciliation.status` must be `complete` with no
+1. `visual_manifest.reconciliation.status` and
+   `layout_manifest.reconciliation.status` must be `complete`, with no
    unresolved ids before implementation. Otherwise return `blocked_input:
-   FIGMA_VISUAL_MANIFEST_INCOMPLETE`.
+   FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
 2. Recreate `explicit_clip_transform` assets with the source asset plus the
    declared clip/mask bounds, scale, translation, and alignment. Never render
    the whole asset when Figma shows a crop, and never export the parent frame
@@ -235,6 +236,17 @@ class [NameView] extends StatelessWidget {
    `existing_app_shell` means route integration without duplicate navigation;
    `view_scaffold` means render and test it in the view; `not_present` means do
    not add it.
+6. Preserve the `layout_manifest` tree exactly: render child nodes in declared
+   `child_index` order, respect direction and relative bounds, and use all four
+   declared radii plus border width. Do not collapse asymmetric radii to
+   `BorderRadius.circular`.
+7. Capture the final view at `layout_manifest.viewport` and write
+   `evidence/figma-fidelity-report.json` using
+   `docs/templates/schemas/figma-fidelity-report.schema.json`. It must contain
+   source/capture references, node reconciliation, exact-invariant results,
+   measured deltas, and fixed tolerances. It must pass `1 dp` geometry, `2%`
+   global pixel difference, and `4%` regional pixel difference; otherwise
+   return `blocked_input: FIGMA_FIDELITY_TOLERANCE_EXCEEDED`.
 
 ## Pre-Delivery Checklist
 

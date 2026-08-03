@@ -79,6 +79,7 @@ description: Browse and search products by category with detail view
 api_contract: <see below — accepts any format>
 user_story: docs/hus/user story-045.md  (optional — contains acceptance criteria + DoD)
 figma_url: https://www.figma.com/file/xxx/ProductList?node-id=123  (optional)
+figma_scope: view | component_inventory  (optional; default view when figma_url is supplied)
 target_location: app_folder | melos_package
 sequence_diagram: docs/diagrams/product_catalog_flow.mmd  (optional)
 golden_tests: false  (optional; default false)
@@ -176,6 +177,9 @@ instead of writing YAML manually.
 Normalize omitted `golden_tests` and `documentation` inputs to `false` and
 persist both resolved booleans in `spec.yaml.inputs` before validation. An
 omitted option must never be interpreted as an unrecorded skip later.
+When `figma_url` is supplied, normalize an omitted `figma_scope` to `view`.
+Use `component_inventory` only when the Figma link is intentionally not a
+screen the feature will implement.
 
 The full spec must include:
 
@@ -199,12 +203,33 @@ The full spec must include:
 - `external_access.figma_mcp.required=true` only when `figma_url` is provided
   and `agent_permissions.figma-analyzer.can_call_external_tools` includes
   `figma_mcp`
+- `visual_manifest`, `layout_manifest`, a Figma fidelity report artifact, and
+  presentation/widget-test criteria when `figma_scope=view`
 - commands and evidence expected
 - `execution_capabilities.subagent_delegation` and
   `fallback_policy=delegate_or_controller_executes`
 
-Validate the spec and wait for explicit approval before scaffold or code
-generation.
+When `figma_scope=view`, execute PHASE S0.5 before validating the initial
+review. Validate the completed spec and wait for explicit approval before
+scaffold or code generation.
+
+---
+
+### PHASE S0.5 — Shared Figma UI Fidelity Planning (conditional)
+
+**Condition:** `figma_url` is supplied and `figma_scope=view`.
+**Preferred specialist role:** `@figma-analyzer`.
+**Execution owner:** `@feature-builder` when native delegation is unavailable
+and the packet grants Figma MCP plus packet-write permissions.
+
+Before the initial review, execute the same Figma analysis contract as
+`/new-view`: capture metadata hierarchy, design context, variables, screenshot,
+assets, `visual_manifest`, and `layout_manifest`. The plan must resolve every
+visible node's parent-child order, bounds, layout, corner radii, border width,
+literal text and fixed tolerances (`1 dp`, `2%` global, `4%` regional). Missing
+or unresolved geometry blocks with `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
+
+---
 
 ---
 
@@ -214,7 +239,9 @@ generation.
 **Agent:** `@feature-builder`
 
 Steps:
-1. If `figma_url` is provided, `@feature-builder` prefers Figma MCP preflight
+1. If `figma_url` is provided, reuse PHASE S0.5 analysis when
+   `figma_scope=view`; do not re-query or reinterpret Figma. For
+   `component_inventory`, `@feature-builder` prefers Figma MCP preflight
    and screen analysis through `@figma-analyzer`. When native subagent
    delegation is unavailable, it executes the `figma-analyzer` role contract
    itself only if the packet grants `figma_mcp`; otherwise it blocks:
@@ -391,6 +418,9 @@ read_sections:
   - requirements
   - artifact_plan.planned[group=presentation]
   - navigation
+  - literal_texts
+  - visual_manifest
+  - layout_manifest
   - success_criteria.presentation
 ```
 
@@ -400,9 +430,17 @@ Generate:
 3. BLoC (`@injectable`, explicit `transformer:` on every `on<>`, `result.match()`)
 4. UIModel (`@freezed abstract class` + `fromDomain` factory)
 5. Page (`BlocProvider` + `getIt<Bloc>()` + `BlocBuilder` with exhaustive switch)
+6. When `figma_scope=view`, apply the shared `codegen-view` fidelity contract:
+   exact literal text, hierarchy/order, geometry, four-corner radii, borders,
+   assets, and capture plan at `layout_manifest.viewport`.
 
 Output: `context.json.artifacts.presentation` and
 `evidence/presentation-checkpoint.md`.
+
+When `figma_scope=view`, run the shared app-view audit before the Presentation
+checkpoint. Persist `evidence/figma-fidelity-report.json`; it must pass `1 dp`
+geometry, `2%` global pixel difference, and `4%` regional pixel difference.
+Otherwise stop with `FIGMA_FIDELITY_TOLERANCE_EXCEEDED`.
 
 #### REQUIRED CHECKPOINT — Presentation Layer
 
@@ -410,8 +448,9 @@ Present a compact Spanish review:
 
 1. events/states/BLoC/UIModel/page
 2. state coverage and navigation status
-3. criteria covered
-4. self-verification result
+3. Figma fidelity report and any blocked visual criteria when applicable
+4. criteria covered
+5. self-verification result
 
 Wait for explicit approval before PHASE 5.
 
@@ -484,6 +523,8 @@ read_sections:
   - artifact_plan.planned[group=presentation]
   - artifact_plan.planned[group=widget_tests]
   - contracts.literal_texts
+  - visual_manifest
+  - layout_manifest
   - success_criteria
 ```
 
@@ -551,11 +592,20 @@ Steps:
    - Dart coding standard
    - Naming conventions
    - DI correctness (no DataSource in BLoC, no domain importing Flutter)
+   - When `figma_scope=view`: `visual_manifest` and `layout_manifest`, including
+     exact literal text, hierarchy/child order, geometry, four-corner radii,
+     borders, source assets, typography and screen-chrome ownership. Require
+     `evidence/figma-fidelity-report.json` to pass `1 dp` geometry, `2%`
+     global pixel difference and `4%` regional pixel difference.
 2. If issues found:
    - Report in `evidence/audit-report.md`
    - Return to `@feature-builder` for corrections
    - Max retries: `pipeline.max_audit_retries` (default: 3)
 3. If approved: mark complete
+
+For `figma_scope=view`, a missing, unresolved or failed layout/fidelity result
+is a blocker (`FIGMA_LAYOUT_MANIFEST_INCOMPLETE` or
+`FIGMA_FIDELITY_TOLERANCE_EXCEEDED`), not an audit warning.
 
 Output: `evidence/audit-report.md` and a summary in the human report.
 
@@ -638,16 +688,20 @@ Steps:
 3. Require passing evidence for `unit-tests.md`, `widget-tests.md` and
    `integration-tests.md`; reject delivery when any is absent, failed or
    blocked.
-4. Require exactly one recorded optional outcome:
+4. When `figma_scope=view`, require a passing
+   `evidence/figma-fidelity-report.json` with the manifest viewport, complete
+   node/order reconciliation, and the declared `1 dp` / `2%` / `4%` results.
+   Reject delivery when it is absent, unresolved or failed.
+5. Require exactly one recorded optional outcome:
    - `golden-tests.md` passed when `golden_tests=true`, or
      `golden_tests: skipped_by_input` when false.
    - `documentation-report.md` passed when `documentation=true`, or
      `documentation: skipped_by_input` when false.
-5. Validate `spec.yaml` parses and validates against its schema before marking
+6. Validate `spec.yaml` parses and validates against its schema before marking
    completion.
-6. Propose a branch name and Conventional Commit messages
+7. Propose a branch name and Conventional Commit messages
    (`feat({feature}): implement {feature} feature`).
-7. Draft a PR description with the feature, test evidence, optional-stage
+8. Draft a PR description with the feature, test evidence, optional-stage
    outcomes, DI and route status.
 
 Output: `evidence/delivery-report.md` and a summary in the human report.
@@ -722,6 +776,9 @@ After all phases:
 - NEVER replace a visible Figma asset with a similar local, platform, or DS
   resource. The Figma source archive is mandatory; only a declared
   `ds_icon_exact` may reuse its exact catalog id while retaining the archive.
+- NEVER generate a Figma-backed feature view without a complete
+  `layout_manifest`, exact literal text/order checks, and a passing Figma
+  fidelity report. `figma_scope=component_inventory` is the only exception.
 - NEVER skip or downgrade a mandatory phase because a specialist cannot be
   delegated. `@feature-builder` owns required unit, widget and integration
   tests and executes the `test-engineer` role contract when needed.

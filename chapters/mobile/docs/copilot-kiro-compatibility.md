@@ -50,10 +50,14 @@ bootstrap or forced migration; it must not select a renderer-specific fallback.
    `read_sections`.
 2. Persist approvals, blockers and evidence on disk, not only in chat memory.
 3. Keep Figma MCP checks explicit before workflows that depend on Figma.
-4. For Figma-driven work, grant the analyzer `write` access to the Spec Packet
-   and Figma MCP asset-export capability. It must persist exports under
+4. For Figma-driven work, grant the preferred analyzer role and the entry
+   controller fallback `write` access to the Spec Packet and Figma MCP
+   asset-export capability. The fallback applies only when native delegation is
+   unavailable and must otherwise stop with
+   `PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`.
+5. The active executor must persist exports under
    `source-assets/figma/`; a screenshot or temporary URL is insufficient.
-4. Avoid mandatory Kiro hooks or Copilot-only commands.
+6. Avoid mandatory Kiro hooks or Copilot-only commands.
 5. Keep human-facing review content in Spanish by default.
 
 ## Handoff Example

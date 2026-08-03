@@ -26,7 +26,7 @@ Given a Figma link and a user story, generate the design analysis. If `spec_cont
 When `spec_context` exists:
 
 - Read `spec_ref`, `context_ref`, `phase`, and `read_sections`.
-- Write to `spec.yaml`: `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, and `acceptance_criteria`.
+- Write to `spec.yaml`: `design_source`, `visual_analysis`, `literal_texts`, `layout_constraints`, `assets`, `visual_manifest`, `layout_manifest`, and `acceptance_criteria`.
 - Record evidence in `{SPEC_PACKET_PATH}/evidence/figma-analysis.md`.
 - Do not use `PIPELINE_SPEC_PATH` as the machine source.
 
@@ -42,17 +42,22 @@ When `spec_context` exists:
    - A screenshot is available for the main node.
    - Evidence is written to `{SPEC_PACKET_PATH}/evidence/figma-mcp-preflight.md`.
    - `spec.yaml.external_access.figma_mcp.status=verified`.
-3. Execute `get_design_context(fileKey, nodeId)` as the first required step.
-4. Extract from `get_design_context`:
+3. Discover capabilities and prefer `get_metadata`, `get_design_context`,
+   `get_variable_defs`, and `download_assets`. Use legacy tool names only when
+   they provide equivalent output.
+4. Execute `get_metadata(fileKey, nodeId)` to capture ids, hierarchy, order,
+   positions, and sizes for all visible nodes.
+5. Execute `get_design_context(fileKey, nodeId)` as the first styling step.
+6. Extract from `get_design_context`:
    - `Development` annotations
    - Figma-guided states/behaviors
    - nodes critical for visual evidence
-5. Execute `get_screenshot(...)` for the requested main node and each relevant change/annotation. Record the main screenshot reference in `visual_manifest.reference_screenshot`.
-6. Execute `get_node(fileKey, nodeId)` to detect type and base structure.
-7. Extract every visible `TEXT` node with exact literal text, node id, layer, scope/state, style, alignment, and truncation rules when available.
+7. Execute `get_screenshot(...)` for the requested main node and each relevant change/annotation. Record the main screenshot reference in `visual_manifest.reference_screenshot`.
+8. Execute `get_variable_defs(...)` to resolve radius, spacing, and typography variables.
+9. Extract every visible `TEXT` node with exact literal text, node id, parent id, child index, layer, scope/state, style, alignment, and truncation rules when available.
 8. Extract relevant constraints/layout: auto-layout, HUG/FILL/FIXED sizing, padding, spacing, alignment, bounds, scroll/clip, and overflow-risk zones.
-9. Detect every visible icon, image, illustration, logo, image-fill source, and vector asset.
-10. Execute `get_images(...)` for every detected source asset, download the returned Figma export into `{SPEC_PACKET_PATH}/source-assets/figma/`, and record its format, archive path, and SHA-256 in `spec.yaml.assets`. Prefer `svg` for vectors and use raster output only when required. Do not export an enclosing frame to simulate a crop.
+10. Detect every visible icon, image, illustration, logo, image-fill source, and vector asset.
+11. Execute `download_assets(...)` for every detected source asset, download the returned Figma export into `{SPEC_PACKET_PATH}/source-assets/figma/`, and record its format, archive path, and SHA-256 in `spec.yaml.assets`. Use `get_images(...)` only as a compatible fallback. Prefer `svg` for vectors and use raster output only when required. Do not export an enclosing frame to simulate a crop.
 11. If the node is a screen, use `get_node_children` for sections.
 12. Use `get_styles(fileKey)` and `get_components(fileKey)` for global context.
 
@@ -101,6 +106,14 @@ For `/new-view`, also build `visual_manifest`:
   verification for crops, exported icons, or visible bottom navigation.
 - path/constant proposal
 - rendering rules (size token, color token/original, semantics)
+
+For `/new-view` and `/new-feature` with `figma_scope=view`, also build a
+complete `layout_manifest`: exact root viewport, visible-node hierarchy,
+parent-child index, bounds, direction, alignment, padding, gap, clip, four
+corner radii, border width, and reconciliation. Use fixed tolerances of `1 dp`
+for geometry, `2%` global pixel difference, and `4%` regional pixel difference.
+Missing structural nodes, a changed child order, or unresolved shape geometry
+must block with `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
 
 ### 3. Variants, States, And Hierarchy
 

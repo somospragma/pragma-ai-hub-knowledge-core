@@ -132,6 +132,8 @@ If any item is missing, stop with `blocked_input`.
 4. `populated`
 5. critical navigation, including the declared bottom-navigation ownership
 6. absence of overflow in main and compact constraints when applicable
+7. when `figma_scope=view`, exact literal text, layout-manifest child order,
+   visible-node coverage, and geometry within `1 dp`
 
 ### Rules
 
@@ -175,6 +177,8 @@ If any item is missing, stop with `blocked_input`.
 2. Primary user actions and callback dispatch.
 3. Critical navigation from and back to the feature flow.
 4. Visible literal text and compact constraints when overflow risk is declared.
+5. When `figma_scope=view`, exact layout-manifest structure, child order and
+   geometry tolerance results.
 
 ### Rules
 

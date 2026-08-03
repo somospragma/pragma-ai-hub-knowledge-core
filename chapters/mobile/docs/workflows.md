@@ -188,7 +188,10 @@ evidence_mode: <minimal|standard>                            # optional, default
 Expected result: app view code, DS component inventory, DS artifacts when
 needed, mandatory widget tests, optional goldens, Widgetbook screen use case
 when configured, audit evidence and delivery summary. When goldens are
-disabled, the packet records `golden_tests: skipped_by_input`.
+disabled, the packet records `golden_tests: skipped_by_input`. The app-view
+checkpoint also requires `evidence/figma-fidelity-report.json` with exact
+text/hierarchy/assets/typography/shape checks and the `1 dp` / `2%` / `4%`
+tolerances.
 
 The Spec Packet, evidence and pipeline reports are always created under the
 resolved app target. DS phases may write planned DS artifacts in a separate
@@ -205,7 +208,8 @@ generated in that response. Approve the named pending packet in a later turn
 to allow Phase 3 and later phases to resume.
 
 Before that approval, the plan must reconcile every visible Figma asset, icon,
-text style, and screen-chrome decision in `visual_manifest`. Every visible
+text style, screen-chrome decision, hierarchy/order and geometry in
+`visual_manifest` plus `layout_manifest`. Every visible
 icon, image, illustration and logo is downloaded from Figma MCP into the
 packet `source-assets/figma/` archive with its node id, format and SHA-256;
 the implementation copies that source without replacement. Cropped SVG/image
@@ -219,9 +223,11 @@ bottom navigation, the plan determines whether an existing app shell provides
 it, this view owns it, or it is not part of the target view.
 
 After app-view code generation, `/new-view` performs an app-view audit and a
-required human checkpoint. Crops, exported Figma icons, or visible bottom
-navigation require a compact visual-verification record with the canonical
-Figma screenshot reference and a deterministic Flutter rendering reference.
+required human checkpoint. It always writes
+`evidence/figma-fidelity-report.json` from the canonical Figma screenshot and
+a deterministic Flutter rendering at the manifest viewport. Text, hierarchy,
+assets, typography and declared shape values must match exactly; geometry may
+differ by at most `1 dp`, global pixels by `2%`, and regional pixels by `4%`.
 
 Use the explicit `@ds-orchestrator /new-view` form shown above. A bare
 `/new-view` is not the canonical invocation and must not start implementation.
@@ -248,6 +254,7 @@ strategies:
 | `api_endpoints` | No | Manual endpoints when there is no formal API contract. |
 | `user_story` | No | Inline user story, acceptance criteria or path to a Markdown file. |
 | `figma_url` | No | Figma URL; triggers Figma MCP preflight and DS inventory. |
+| `figma_scope` | No | `view` (default when `figma_url` is present) runs the shared screen-fidelity gate; `component_inventory` performs only the DS inventory. |
 | `ui_components` | No | Existing or expected DS components when there is no Figma URL. |
 | `sequence_diagram` | No | Mermaid file path or inline Mermaid sequence diagram. |
 | `target_location` | No | `app_folder` or `melos_package`. |
@@ -255,6 +262,13 @@ strategies:
 | `workspace_root` | Conditional | Required when `target_location: melos_package` and the workspace is ambiguous. |
 | `golden_tests` | No | Boolean, default `false`. Runs feature golden tests only when `true`. |
 | `documentation` | No | Boolean, default `false`. Updates project documentation only when `true`. |
+
+When `figma_url` is present, `figma_scope` defaults to `view`. This runs the
+same screen-fidelity planning and Presentation checkpoint used by `/new-view`:
+Figma assets, `visual_manifest`, `layout_manifest`, exact text/order and the
+compact fidelity report. Select `component_inventory` only when the Figma link
+is not a screen that the feature must render; it avoids the screen comparison
+and retains only the DS-inventory analysis.
 
 With API contract:
 
@@ -265,6 +279,7 @@ description: <short feature description>                    # required
 api_contract: <path|url|inline contract>                    # required for this strategy
 user_story: <story text or docs/user-stories/story-123.md>  # optional
 figma_url: <https://www.figma.com/file/...?...node-id=...>  # optional
+figma_scope: <view|component_inventory>                     # optional; default view with figma_url
 ui_components: <DSComponentA, DSComponentB>                 # optional
 sequence_diagram: <docs/diagrams/feature_flow.mmd>          # optional
 target_location: <app_folder|melos_package>                 # optional, default app_folder
@@ -289,6 +304,7 @@ api_endpoints:                                              # optional
   - GET /<resource>/{id} -> <DomainEntityName>
 user_story: <story text or docs/user-stories/story-123.md>  # optional
 figma_url: <https://www.figma.com/file/...?...node-id=...>  # optional
+figma_scope: <view|component_inventory>                     # optional; default view with figma_url
 ui_components: <DSComponentA, DSComponentB>                 # optional
 sequence_diagram: <docs/diagrams/feature_flow.mmd>          # optional
 golden_tests: <true|false>                                  # optional, default false

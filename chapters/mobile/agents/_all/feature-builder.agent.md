@@ -120,7 +120,7 @@ Minimum required spec sections:
 - `assets`: when `figma_url` is present, every visible icon, image,
   illustration, logo, and image-fill source must have a downloaded Figma MCP
   archive entry with node id, format and SHA-256
-- `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `sequence_diagram`, `golden_tests`, `documentation`
+- `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `figma_scope`, `sequence_diagram`, `golden_tests`, `documentation`
 - `contracts`: API endpoints, domain entities, DTO mappings, error shapes
 - `artifact_plan`: domain, data, presentation, DI, routing, unit tests, widget
   tests, integration tests, optional golden tests and optional docs. Project
@@ -157,7 +157,8 @@ Required from the orchestrator or user:
 | `fields` | ⚠️ | Required only when `api_contract` is not provided |
 | `api_endpoints` | ⚠️ | Optional manual endpoint list when `api_contract` is not provided |
 | `user_story` | ⚠️ | Refined User Story (file path or inline) — contains acceptance criteria, DoD, functional/non-functional requirements |
-| `figma_url` | ⚠️ | Figma URL for the screen/component (triggers Phase 0) |
+| `figma_url` | ⚠️ | Figma URL for the screen/component (triggers Figma planning) |
+| `figma_scope` | ⚠️ | `view` (default with `figma_url`) requires screen fidelity; `component_inventory` limits Figma work to DS inventory |
 | `ui_components` | ⚠️ | List of DS components the page will use (alternative to Figma) |
 | `target_location` | ⚠️ | `app_folder` (default) or `melos_package` |
 | `topology` | ⚠️ | `single_repo` or `monorepo_melos` |
@@ -171,6 +172,13 @@ If `target_location` is `melos_package`, also require:
 - `workspace_root` — path to the monorepo root
 
 If `figma_url` or `ui_components` is provided, Phase 0 (UI Component Inventory) is triggered.
+When `figma_url` is supplied and `figma_scope=view`, complete shared Figma UI
+fidelity planning before the initial approval: `visual_manifest`,
+`layout_manifest`, literal text/order, archived source assets, and the capture
+plan. The Presentation checkpoint requires a passing
+`evidence/figma-fidelity-report.json` (`1 dp` geometry, `2%` global pixels,
+`4%` regional pixels); text, hierarchy/order, asset identity, typography and
+declared shape values are exact invariants.
 If neither is provided, Phase 0 is skipped and the agent assumes all UI components exist.
 
 Require either:
@@ -560,7 +568,13 @@ Persist supporting notes in `evidence/ui-component-inventory.md`.
 14. Generate BLoC with explicit transformers and `result.match()`
 15. Generate UIModel with `fromDomain` factory
 16. Generate page with `BlocProvider` + `BlocBuilder` exhaustive switch
-17. Validate generated presentation artifacts against `spec.yaml.success_criteria`
+17. When `figma_scope=view`, implement `layout_manifest` exactly: source
+    assets, literal text, hierarchy/order, bounds, layout, clipping, four-corner
+    radii, borders and screen-chrome ownership.
+18. Capture and compare the feature view at `layout_manifest.viewport`, write
+    `evidence/figma-fidelity-report.json`, and block on missing evidence or a
+    failed `1 dp` / `2%` / `4%` result.
+19. Validate generated presentation artifacts against `spec.yaml.success_criteria`
     and stop at required Presentation checkpoint before wiring.
 
 ### Phase 5 — Wiring
@@ -594,7 +608,8 @@ Persist supporting notes in `evidence/ui-component-inventory.md`.
 ### Phase 7 — Audit
 
 25. Delegate to `@code-auditor` for quality review of implementation and test
-    artifacts.
+    artifacts. For `figma_scope=view`, it must also validate the layout manifest
+    and passing fidelity report before approval.
 26. If rejected, apply corrections and re-submit (max 3 retries), then repeat
     the affected required test stages.
 

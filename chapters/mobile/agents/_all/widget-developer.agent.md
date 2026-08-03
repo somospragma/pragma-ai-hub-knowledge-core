@@ -157,7 +157,8 @@ Widget build(BuildContext context) {
   - tokenized color when applicable
   - multicolor assets without forced tinting
 
-For `/new-view`, treat `visual_manifest` and `contracts.asset_rendering` as
+For `/new-view` and `/new-feature` with `figma_scope=view`, treat
+`visual_manifest`, `layout_manifest`, and `contracts.asset_rendering` as
 mandatory implementation contracts:
 
 - `direct_asset` renders the whole declared source asset.
@@ -178,6 +179,10 @@ mandatory implementation contracts:
 - Respect `screen_chrome.bottom_navigation.ownership`: integrate under the
   existing app shell, render it in this view's scaffold, or omit it only when
   the contract says `not_present`.
+- Preserve `layout_manifest` parent-child order exactly. Implement each node's
+  declared direction, bounds relationship, padding, gap, alignment, clipping,
+  four corner radii, and border width. Do not simplify an asymmetric radius to
+  a single circular value or replace it with a nearby token.
 
 When `visual_manifest.reconciliation.visual_verification_required=true`,
 capture a deterministic Flutter rendering with the project-supported test or
@@ -185,6 +190,15 @@ preview tooling and record its reference beside the canonical Figma screenshot
 in `evidence/visual-verification.md`. If the project cannot capture it,
 return `blocked_input: FIGMA_VISUAL_VERIFICATION_UNAVAILABLE`; never invent a
 visual-comparison result.
+
+For every `figma_scope=view`, capture Flutter at
+`layout_manifest.viewport`, compare it with the canonical Figma screenshot,
+and persist `evidence/figma-fidelity-report.json` using
+`docs/templates/schemas/figma-fidelity-report.schema.json`. The report records
+root viewport, render references, geometry deltas, child-order result, exact
+invariants, global/regional pixel differences, and pass/fail against manifest
+tolerances. Missing capture or comparison is
+`blocked_input: FIGMA_FIDELITY_COMPARISON_UNAVAILABLE`.
 - Semantics:
   - decorative -> exclude from semantics
   - informative/interactive -> explicit semantic label
