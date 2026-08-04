@@ -333,6 +333,32 @@ Update `spec.yaml` sections `contracts.api`, `domain_model_plan`,
 
 ### PHASE 2 — Domain Layer
 
+#### Executable Phase Gate (mandatory)
+
+Before presenting the initial review, run `scripts/sopp_gate.rb open-initial`,
+show its spec hash and approval challenge, and end the response. Before every
+code-producing phase, run `scripts/sopp_gate.rb can-enter` for the
+target phase. After Domain, Data or Presentation generation and evidence, run
+`open-checkpoint` and end the response. The controller must never write an
+approval state directly or infer approval from the initial plan approval.
+
+If the human requests changes, remain in the current layer:
+
+1. Record the verbatim request with `request-changes`.
+2. Write a bounded proposal at
+   `revisions/<layer>/<revision>/proposal.md`, including files, criteria and
+   earliest affected layer.
+3. Run `propose-adjustment` and stop for a later human authorization.
+4. After `authorize-adjustment`, apply only the proposed scope, regenerate
+   evidence and run `open-checkpoint` again.
+5. Require a fresh approval of the new artifact hash. Revision authorization
+   is never layer approval.
+
+If a revision affects an earlier layer, invalidate that layer and every
+dependent checkpoint as `stale`, then resume from the earliest affected layer.
+Questions or ambiguous feedback do not change state. A missing executable gate,
+evidence file, schema target, approval record or matching hash is blocking.
+
 **Agent:** `@feature-builder`
 Mandatory compact handoff:
 

@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "open3"
 require "yaml"
 
 ROOT = File.expand_path("../../..", __dir__)
@@ -181,6 +182,50 @@ def validate_workflow_steering_sync(findings, cleared)
   else
     add(findings, "HIGH", "WORKFLOW_STEERING_DRIFT", "Workflow/steering drift found", misses.join("\n"))
   end
+end
+
+def validate_sopp_gate_contract(findings, cleared)
+  gate_path = "chapters/mobile/scripts/sopp_gate.rb"
+  test_path = "chapters/mobile/scripts/test_sopp_gate.rb"
+  resources = {
+    gate_path => %w[open-initial open-checkpoint request-changes propose-adjustment authorize-adjustment approve-initial can-enter ARTIFACT_HASH_MISMATCH],
+    "chapters/mobile/agents/_all/feature-builder.agent.md" => ["Executable Gate Contract", "Never write `approved`"],
+    "chapters/mobile/workflows/_all/new-feature.workflow.md" => ["Executable Phase Gate", "Revision authorization"],
+    "chapters/mobile/skills/_all/mobile-sdd-spec-validation/SKILL.md" => ["Deterministic Change Requests", "objects are invalid"]
+  }
+  issues = []
+  resources.each do |path, phrases|
+    unless File.file?(path)
+      issues << "#{path}: missing"
+      next
+    end
+    text = File.read(path)
+    phrases.each { |phrase| issues << "#{path}: missing #{phrase.inspect}" unless text.include?(phrase) }
+  end
+
+  if File.file?(test_path)
+    output, status = Open3.capture2e("ruby", test_path)
+    issues << "#{test_path}: regression suite failed\n#{output}" unless status.success?
+  else
+    issues << "#{test_path}: missing"
+  end
+
+  schema = read_yaml("chapters/mobile/docs/templates/schemas/mobile-spec.schema.yaml")
+  new_feature_rule = (schema["allOf"] || []).find do |rule|
+    rule.dig("if", "properties", "workflow", "const") == "new-feature" &&
+      rule.dig("then", "properties", "human_review")
+  end
+  required = new_feature_rule&.dig("then", "properties", "human_review", "required") || []
+  expected = %w[initial_spec_approval layer_checkpoints stage_checkpoints]
+  issues << "mobile-spec schema: new-feature must require #{expected.join(', ')}" unless (expected - required).empty?
+
+  if issues.empty?
+    cleared << "Executable SDD gate and revision-loop regression tests passed"
+  else
+    add(findings, "CRITICAL", "SOPP_GATE_CONTRACT_DRIFT", "Executable approval gate is missing or weakened", issues.join("\n"))
+  end
+rescue StandardError => e
+  add(findings, "CRITICAL", "SOPP_GATE_VALIDATION_ERROR", "Unable to validate executable approval gate", e.message)
 end
 
 def workflow_frontmatter(path)
@@ -1306,6 +1351,7 @@ validate_no_legacy_refs(findings, cleared)
 validate_no_source_root_refs(findings, cleared)
 validate_references(findings, cleared)
 validate_workflow_steering_sync(findings, cleared)
+validate_sopp_gate_contract(findings, cleared)
 validate_invocation_contracts(findings, cleared)
 validate_semantics(findings, cleared)
 validate_language_policy(findings, cleared)

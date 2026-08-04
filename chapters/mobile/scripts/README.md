@@ -33,3 +33,38 @@ Strict language mode enforces the policy that internal KB assets are written in
 English while human-facing review templates and user responses remain Spanish.
 Use it during the English migration pass or before publishing a new mobile KB
 version.
+
+## `sopp_gate.rb`
+
+Executable state machine for full Mobile Spec Packet approvals. It validates
+schema references, evidence, artifact hashes, approval records and phase order.
+It also owns the deterministic change-request loop; agents must not edit
+approval fields in `context.json` directly.
+
+Typical layer flow:
+
+```bash
+ruby .kiro/scripts/sopp_gate.rb open-initial --packet "$PACKET"
+# Stop. The human repeats the emitted approval challenge in a later turn.
+ruby .kiro/scripts/sopp_gate.rb approve-initial --packet "$PACKET" \
+  --spec-hash sha256:<reviewed-hash> --approval-id human-turn:<challenge>
+ruby .kiro/scripts/sopp_gate.rb can-enter --packet "$PACKET" --phase domain_layer
+ruby .kiro/scripts/sopp_gate.rb open-checkpoint --packet "$PACKET" --layer domain
+# Stop. A later human turn repeats the emitted challenge and approves the hash.
+ruby .kiro/scripts/sopp_gate.rb approve --packet "$PACKET" --layer domain \
+  --artifact-hash sha256:<reviewed-hash> --approval-id human-turn:<challenge>
+```
+
+Change-request flow:
+
+```bash
+ruby .kiro/scripts/sopp_gate.rb request-changes --packet "$PACKET" \
+  --layer domain --message "<verbatim human request>"
+ruby .kiro/scripts/sopp_gate.rb propose-adjustment --packet "$PACKET" \
+  --layer domain --proposal "$PACKET/revisions/domain/001/proposal.md"
+# Stop. Apply only after a later human turn authorizes the proposal hash.
+```
+
+The command uses only Ruby standard-library packages and therefore does not
+consume AI tokens. Target roots are resolved from `spec.target_roots` or the
+nearest `.sopp/config/project.config.yaml`.

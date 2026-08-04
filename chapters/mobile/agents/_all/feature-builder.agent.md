@@ -144,6 +144,34 @@ checkpoint, update `context.json.checkpoints.<layer>.status`, generated
 artifacts, validation evidence and `pending_human_review` until the developer
 approves the next layer.
 
+### Executable Gate Contract
+
+The Markdown instruction is not the enforcement boundary. Use
+`scripts/sopp_gate.rb` for every state transition:
+
+1. Run `validate`, then `open-initial`, before presenting the initial review.
+   Show its spec hash and approval challenge, then end the response.
+2. Run `can-enter` before creating or modifying artifacts for Domain, Data,
+   Presentation or Wiring.
+3. After a layer is generated and its evidence exists, run `open-checkpoint`.
+4. Stop the response. Show the emitted approval challenge; only a later human
+   turn may repeat it for `approve` or `authorize-adjustment`.
+5. Never write `approved`, `approval_ref`, `approved_at`, `artifact_hash`,
+   `completed_phases`, or approval events directly.
+
+If the developer requests changes, do not treat the request as approval and do
+not modify code immediately. Record it with `request-changes`, write a bounded
+proposal under `revisions/<layer>/<revision>/proposal.md`, run
+`propose-adjustment`, and stop for authorization. After authorization, change
+only the proposed artifacts, regenerate evidence, and reopen the checkpoint.
+Any change to an approved artifact invalidates its hash and all dependent layer
+approvals. Resume from the earliest affected layer; later checkpoints become
+`stale`.
+
+If `sopp_gate.rb` is unavailable or returns a blocking code, stop with
+`PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING` or the returned gate code. A
+manually edited `context.json` is never a fallback.
+
 ## Input Contract
 
 Required from the orchestrator or user:

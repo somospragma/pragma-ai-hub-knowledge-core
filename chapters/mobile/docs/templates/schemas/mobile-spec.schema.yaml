@@ -737,6 +737,15 @@ allOf:
     then:
       required: [execution_capabilities]
       properties:
+        human_review:
+          required: [initial_spec_approval, layer_checkpoints, stage_checkpoints]
+          properties:
+            initial_spec_approval:
+              const: required
+            layer_checkpoints:
+              const: required
+            stage_checkpoints:
+              const: required
         inputs:
           required: [feature_name, description]
   - if:

@@ -324,6 +324,47 @@ test outcomes. It uses `@test-engineer` when the active tool surface can
 delegate; otherwise it executes that role contract directly. The three stages
 keep their order and evidence requirements in either mode.
 
+### `/new-feature` approval and revision flow
+
+`/new-feature` always uses the same executable sequence; there is no fast mode
+that removes checkpoints:
+
+```text
+initial spec approval
+→ Domain → human checkpoint
+→ Data → human checkpoint
+→ Presentation → human checkpoint
+→ Wiring → mandatory tests → audit → delivery
+```
+
+Before showing the initial review, `feature-builder` runs `sopp_gate.rb
+open-initial`, presents the spec hash and challenge, and stops. Before each
+layer it runs `can-enter`; after each layer it generates the corresponding
+evidence and runs `open-checkpoint`. The next layer cannot begin until a later
+human turn repeats the challenge and approves the reviewed artifact hash.
+
+If a layer is not satisfactory, describe the desired change instead of
+approving it. The controller records the request without modifying code and
+returns a bounded proposal such as:
+
+```text
+Domain adjustment proposal — revision 1
+- Change ReviewsQuery pagination contract.
+- Update ReviewsRepository and LoadReviewsUseCase.
+- Update four Domain tests.
+- Earliest affected layer: Domain.
+```
+
+After the developer authorizes that proposal in a later turn, the controller
+applies only its declared scope, regenerates evidence and asks for a fresh
+approval. If feedback during Presentation requires a Domain change, Domain,
+Data and Presentation approvals become `stale` and those gates are replayed in
+order. Questions and ambiguous comments leave the current checkpoint pending.
+
+The gate and revision records are local deterministic operations and consume
+no AI tokens. Human checkpoint messages remain compact and refer to packet
+files instead of repeating the full spec or generated code.
+
 ## `/refactor-component`
 
 Purpose: refactor an existing Design System component while preserving behavior

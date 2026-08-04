@@ -25,6 +25,11 @@ Use this skill in any mobile workflow that generates or consumes a Spec Packet:
 Validation happens before applying changes and before declaring any phase as
 approved.
 
+For layer and stage transitions, validation is executable rather than
+narrative. Use `../../scripts/sopp_gate.rb`; do not directly author approval
+state in `context.json` or reconstruct it at delivery time. A successful schema
+read without a successful gate transition does not authorize implementation.
+
 ## Instruction
 
 Validate the corresponding SDD packet with selective file reads. Do not paste
@@ -167,6 +172,31 @@ Minimum checks:
     not contradict `spec.yaml`.
 18. `context.json.phase_results` exists. Every completed, failed, blocked or
     skipped phase has a compact result with a status, summary and references.
+19. Every `schema_ref` resolves to an existing file from the file that declares
+    it. A correct basename pointing to a missing path is invalid.
+20. Every approved checkpoint has `decision_ref`, `artifact_hash`,
+    `approval_ref`, and `approved_at`; the approval record exists and contains
+    the challenge repeated by a later human turn. Bare `{status: approved}`
+    objects are invalid.
+21. Domain, Data and Presentation evidence exists before their checkpoints can
+    open. Before entering a phase, run the executable `can-enter` transition.
+22. `pipeline.log.md` is derived from append-only packet events. It is not
+    acceptable evidence for an approval that has no structured approval event.
+
+### Deterministic Change Requests
+
+At a pending checkpoint, a human response has exactly one of three effects:
+
+- explicit approval: approve the exact reviewed artifact hash;
+- explicit change request: record `changes_requested` and create no code yet;
+- question or ambiguous feedback: leave the checkpoint pending.
+
+For a change request, persist the verbatim request, propose a bounded artifact
+plan, and wait for a later human authorization. After authorization, apply the
+revision, regenerate validation evidence and calculate a new artifact hash.
+Return to `pending_human_review`; authorization to revise is not approval of the
+revised layer. If the proposal reaches an earlier layer, mark every dependent
+checkpoint `stale` and resume from the earliest affected layer.
 
 ### `/new-view` Plan Gate
 

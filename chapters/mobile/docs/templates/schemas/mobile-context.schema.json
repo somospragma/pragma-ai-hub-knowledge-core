@@ -57,7 +57,7 @@
       "additionalProperties": { "$ref": "#/$defs/checkpoint" }
     },
     "pending_human_review": {
-      "type": "object",
+      "type": ["object", "null"],
       "additionalProperties": false,
       "required": ["kind", "review_ref"],
       "properties": {
@@ -80,9 +80,36 @@
       "properties": {
         "required": { "type": "boolean" },
         "phase": { "type": "string", "minLength": 1 },
-        "status": { "type": "string", "enum": ["pending", "approved", "changes_requested", "skipped"] },
-        "decision_ref": { "type": "string", "minLength": 1 }
-      }
+        "status": { "type": "string", "enum": ["pending", "approved", "changes_requested", "adjustment_proposed", "revision_authorized", "stale", "skipped"] },
+        "decision_ref": { "type": "string", "minLength": 1 },
+        "artifact_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "approval_ref": { "type": "string", "minLength": 1 },
+        "approved_at": { "type": "string", "format": "date-time" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "change_request_ref": { "type": "string", "minLength": 1 },
+        "proposal_ref": { "type": "string", "minLength": 1 },
+        "proposal_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "authorization_ref": { "type": "string", "minLength": 1 },
+        "approval_challenge": { "type": "string", "pattern": "^[a-f0-9]{8}$" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "approved" } }, "required": ["status"] },
+          "then": { "required": ["artifact_hash", "approval_ref", "approved_at"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "changes_requested" } }, "required": ["status"] },
+          "then": { "required": ["change_request_ref"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "adjustment_proposed" } }, "required": ["status"] },
+          "then": { "required": ["proposal_ref", "proposal_hash"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "revision_authorized" } }, "required": ["status"] },
+          "then": { "required": ["proposal_ref", "proposal_hash", "authorization_ref"] }
+        }
+      ]
     },
     "phase_result": {
       "type": "object",
