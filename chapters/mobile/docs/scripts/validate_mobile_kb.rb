@@ -5,7 +5,7 @@ require "json"
 require "open3"
 require "yaml"
 
-ROOT = File.expand_path("../../..", __dir__)
+ROOT = File.expand_path("../../../..", __dir__)
 Dir.chdir(ROOT)
 STRICT_LANGUAGE = ARGV.include?("--strict-language") ||
                   ENV["MOBILE_KB_STRICT_LANGUAGE"] == "1"
@@ -57,10 +57,10 @@ def validate_no_legacy_refs(findings, cleared)
     "TARGET_ROOT" => /(?<![A-Z0-9_])TARGET_ROOT\b/,
     "documentation-projects:" => /documentation-projects:/
   }
-  self_path = "chapters/mobile/scripts/validate_mobile_kb.rb"
+  self_path = "chapters/mobile/docs/scripts/validate_mobile_kb.rb"
   ignore_paths = [
     self_path,
-    "chapters/mobile/scripts/README.md"
+    "chapters/mobile/docs/scripts/README.md"
   ]
 
   hits = []
@@ -84,7 +84,7 @@ end
 
 def validate_no_source_root_refs(findings, cleared)
   files = Dir[
-    "chapters/mobile/{agents,workflows,steering,prompts,skills,docs,examples}/**/*.{md,yaml,yml,json}"
+    "chapters/mobile/{agents,workflows,prompts,skills,docs}/**/*.{md,yaml,yml,json}"
   ].select { |path| File.file?(path) }
 
   hits = []
@@ -118,7 +118,7 @@ def validate_references(findings, cleared)
   ]
 
   agent_misses = []
-  Dir["chapters/mobile/{workflows,steering,agents,prompts}/_all/*.md"].each do |path|
+  Dir["chapters/mobile/{workflows,agents,prompts}/_all/*.md"].each do |path|
     File.read(path).scan(/@([A-Za-z][A-Za-z0-9-]+)/).flatten.each do |name|
       next if allowed_annotations.include?(name)
       next if known_agents.include?(name)
@@ -129,7 +129,7 @@ def validate_references(findings, cleared)
 
   known_prompts = Dir["chapters/mobile/prompts/_all/*.prompt.md"].map { |p| File.basename(p) }
   prompt_misses = []
-  Dir["chapters/mobile/{agents,workflows,steering,prompts}/_all/*.md"].each do |path|
+  Dir["chapters/mobile/{agents,workflows,prompts}/_all/*.md"].each do |path|
     File.read(path).scan(/`([a-z0-9-]+\.prompt\.md)`/).flatten.each do |prompt|
       prompt_misses << "#{path}: #{prompt}" unless known_prompts.include?(prompt)
     end
@@ -163,30 +163,9 @@ def validate_references(findings, cleared)
   cleared << "Agent, prompt and Active Skill references resolve" if agent_misses.empty? && prompt_misses.empty? && skill_misses.empty?
 end
 
-def validate_workflow_steering_sync(findings, cleared)
-  misses = []
-  Dir["chapters/mobile/workflows/_all/*.workflow.md"].each do |workflow_path|
-    steering_path = workflow_path.sub("/workflows/", "/steering/")
-    unless File.exist?(steering_path)
-      misses << "#{workflow_path}: steering missing"
-      next
-    end
-
-    expected = File.read(workflow_path).sub("type: workflow", "type: steering")
-    actual = File.read(steering_path)
-    misses << "#{workflow_path} != #{steering_path}" unless expected == actual
-  end
-
-  if misses.empty?
-    cleared << "Workflow and steering files are synchronized"
-  else
-    add(findings, "HIGH", "WORKFLOW_STEERING_DRIFT", "Workflow/steering drift found", misses.join("\n"))
-  end
-end
-
 def validate_sopp_gate_contract(findings, cleared)
-  gate_path = "chapters/mobile/scripts/sopp_gate.rb"
-  test_path = "chapters/mobile/scripts/test_sopp_gate.rb"
+  gate_path = "chapters/mobile/docs/scripts/sopp_gate.rb"
+  test_path = "chapters/mobile/docs/scripts/test_sopp_gate.rb"
   resources = {
     gate_path => %w[open-initial open-checkpoint request-changes propose-adjustment authorize-adjustment approve-initial can-enter ARTIFACT_HASH_MISMATCH],
     "chapters/mobile/agents/_all/feature-builder.agent.md" => ["Executable Gate Contract", "Never write `approved`"],
@@ -226,6 +205,82 @@ def validate_sopp_gate_contract(findings, cleared)
   end
 rescue StandardError => e
   add(findings, "CRITICAL", "SOPP_GATE_VALIDATION_ERROR", "Unable to validate executable approval gate", e.message)
+end
+
+def validate_mobile_workflow_distribution(findings, cleared)
+  issues = []
+  issues << "chapters/mobile/steering must not exist" if Dir.exist?("chapters/mobile/steering")
+
+  ide_config = JSON.parse(File.read("_config/ides.json"))
+  kiro = ide_config.fetch("ides").find { |ide| ide["id"] == "kiro" }
+  expected_path = ".kiro/workflows/{id}.md"
+  actual_path = kiro&.dig("workspace_paths", "workflow")
+  issues << "Kiro workflow path must be #{expected_path}; actual=#{actual_path.inspect}" unless actual_path == expected_path
+
+  workflow_count = Dir["chapters/mobile/workflows/_all/*.workflow.md"].size
+  issues << "mobile workflows are missing" if workflow_count.zero?
+
+  if issues.empty?
+    cleared << "Mobile workflows are canonical and Kiro exports them under .kiro/workflows"
+  else
+    add(findings, "CRITICAL", "MOBILE_WORKFLOW_DISTRIBUTION_DRIFT", "Mobile workflows must not be duplicated as steering", issues.join("\n"))
+  end
+end
+
+def validate_no_legacy_mobile_script_paths(findings, cleared)
+  validator_path = "chapters/mobile/docs/scripts/validate_mobile_kb.rb"
+  patterns = {
+    "legacy source directory" => "chapters/mobile/scripts/",
+    "legacy Kiro export directory" => ".kiro/scripts/",
+    "legacy chapter-root gate path" => "`scripts/sopp_gate.rb",
+    "legacy chapter-root validator command" => "ruby scripts/validate_mobile_kb.rb"
+  }
+  issues = []
+  files = Dir["chapters/mobile/**/*"].select { |path| File.file?(path) && path != validator_path }
+  files.each do |path|
+    text = File.read(path)
+    patterns.each do |label, pattern|
+      issues << "#{path}: #{label}" if text.include?(pattern)
+    end
+  end
+  if Dir.exist?("chapters/mobile/scripts") && !Dir.empty?("chapters/mobile/scripts")
+    issues << "chapters/mobile/scripts: legacy directory is not empty"
+  end
+
+  if issues.empty?
+    cleared << "No legacy mobile script locations or runtime references"
+  else
+    add(findings, "HIGH", "LEGACY_MOBILE_SCRIPT_PATH", "Mobile scripts must live under docs/scripts", issues.join("\n"))
+  end
+end
+
+def validate_platform_storage_boundary(findings, cleared)
+  validator_path = "chapters/mobile/docs/scripts/validate_mobile_kb.rb"
+  issues = []
+  files = Dir["chapters/mobile/**/*"].select { |path| File.file?(path) && path != validator_path }
+  tool_runtime_pattern = %r{\.(?:github|kiro)/(?:config|bootstrap|flow_result|evidence|approvals|revisions)(?:/|`|\s)}
+  obsolete_copilot_root = ".co" + "pilot"
+
+  files.each do |path|
+    text = File.read(path)
+    issues << "#{path}: obsolete Copilot-specific location" if text.include?(obsolete_copilot_root)
+    text.each_line.with_index(1) do |line, number|
+      next unless line.match?(tool_runtime_pattern)
+
+      issues << "#{path}:#{number}: runtime state under a tool-specific KB folder"
+    end
+  end
+
+  compatibility = File.read("chapters/mobile/docs/copilot-kiro-compatibility.md")
+  %w[.github/ .kiro/ .sopp/].each do |canonical_root|
+    issues << "compatibility docs missing #{canonical_root}" unless compatibility.include?(canonical_root)
+  end
+
+  if issues.empty?
+    cleared << "Platform storage boundary uses .github/.kiro for KB resources and .sopp for runtime state"
+  else
+    add(findings, "CRITICAL", "PLATFORM_STORAGE_BOUNDARY_DRIFT", "Tool and runtime storage boundaries are inconsistent", issues.join("\n"))
+  end
 end
 
 def workflow_frontmatter(path)
@@ -364,7 +419,7 @@ def validate_semantics(findings, cleared)
     add(findings, "CRITICAL", "CONTEXT_APPROVAL_STATE_MISSING", "mobile context schema must allow approved_for_execution")
   end
 
-  example_contexts = Dir["chapters/mobile/examples/spec-packets/*/*/context.json"]
+  example_contexts = Dir["chapters/mobile/docs/examples/spec-packets/*/*/context.json"]
   example_contexts.each do |path|
     context = JSON.parse(File.read(path))
     missing = required_context_fields.reject { |field| context.key?(field) }
@@ -374,6 +429,10 @@ def validate_semantics(findings, cleared)
     end
     unless context["schema_ref"].to_s.end_with?("mobile-context.schema.json")
       add(findings, "HIGH", "CONTEXT_EXAMPLE_SCHEMA_REF_MISSING", "#{path} must reference mobile-context.schema.json")
+    end
+    schema_path = File.expand_path(context["schema_ref"].to_s, File.dirname(path))
+    unless File.file?(schema_path)
+      add(findings, "HIGH", "CONTEXT_EXAMPLE_SCHEMA_TARGET_MISSING", "#{path} schema_ref must resolve to an existing schema", context["schema_ref"])
     end
     unless context["checkpoints"].is_a?(Hash) && context.dig("checkpoints", "initial_spec", "status") == "pending"
       add(findings, "HIGH", "CONTEXT_EXAMPLE_CHECKPOINT_INVALID", "#{path} must use an initial_spec checkpoint object")
@@ -816,7 +875,7 @@ def validate_semantics(findings, cleared)
   end
 
   unless ds_orchestrator.include?("Do not invoke `/bootstrap-workspace` automatically") &&
-         ds_orchestrator.include?("CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND")
+         ds_orchestrator.include?("CONFIG_NON_CANONICAL_TOOL_STATE_FOUND")
     add(findings, "HIGH", "FUNCTIONAL_BOOTSTRAP_AUTORUN", "ds-orchestrator must block instead of auto-running bootstrap and reject legacy config")
   end
 
@@ -1216,6 +1275,35 @@ def validate_semantics(findings, cleared)
   cleared << "Semantic workflow/template/schema checks passed" unless findings.any?
 end
 
+def validate_examples_location(findings, cleared)
+  validator_path = "chapters/mobile/docs/scripts/validate_mobile_kb.rb"
+  legacy_path = ["chapters", "mobile", "examples"].join("/")
+  issues = []
+  issues << "#{legacy_path}: legacy directory still exists" if Dir.exist?(legacy_path)
+
+  files = Dir["chapters/mobile/**/*"].select { |path| File.file?(path) && path != validator_path }
+  files.each do |path|
+    text = File.read(path)
+    issues << "#{path}: references legacy examples location" if text.include?(legacy_path)
+  end
+
+  example_files = Dir["chapters/mobile/docs/examples/spec-packets/*/*/{spec.yaml,context.json}"]
+  example_files.each do |path|
+    structured = path.end_with?(".json") ? JSON.parse(File.read(path)) : read_yaml(path)
+    schema_ref = structured["schema_ref"].to_s
+    schema_path = File.expand_path(schema_ref, File.dirname(path))
+    issues << "#{path}: schema_ref does not resolve: #{schema_ref}" unless File.file?(schema_path)
+  end
+
+  if issues.empty?
+    cleared << "Mobile examples live under docs/examples with resolvable schema references"
+  else
+    add(findings, "HIGH", "MOBILE_EXAMPLES_LOCATION_DRIFT", "Mobile examples must live under docs/examples", issues.join("\n"))
+  end
+rescue StandardError => e
+  add(findings, "CRITICAL", "MOBILE_EXAMPLES_VALIDATION_ERROR", "Unable to validate mobile examples", e.message)
+end
+
 def validate_language_policy(findings, cleared)
   spanish_markers = /
     \b(
@@ -1276,7 +1364,8 @@ def validate_language_policy(findings, cleared)
 
   allowed_paths = [
     %r{\Achapters/mobile/docs/templates/.*/review\.md\z},
-    %r{\Achapters/mobile/docs/templates/spec-packets/review\.md\z}
+    %r{\Achapters/mobile/docs/templates/spec-packets/review\.md\z},
+    %r{\Achapters/mobile/docs/examples/spec-packets/.*/review\.md\z}
   ]
 
   allowed_line_patterns = [
@@ -1296,7 +1385,7 @@ def validate_language_policy(findings, cleared)
   hits = []
   quality_hits = []
   files = Dir[
-    "chapters/mobile/{docs,workflows,steering,agents,prompts,skills}/**/*.{md,yaml,yml,json}"
+    "chapters/mobile/{docs,workflows,agents,prompts,skills}/**/*.{md,yaml,yml,json}"
   ].select { |path| File.file?(path) }
 
   files.each do |path|
@@ -1350,8 +1439,11 @@ parse_all_structured_files(findings, cleared)
 validate_no_legacy_refs(findings, cleared)
 validate_no_source_root_refs(findings, cleared)
 validate_references(findings, cleared)
-validate_workflow_steering_sync(findings, cleared)
+validate_mobile_workflow_distribution(findings, cleared)
 validate_sopp_gate_contract(findings, cleared)
+validate_no_legacy_mobile_script_paths(findings, cleared)
+validate_platform_storage_boundary(findings, cleared)
+validate_examples_location(findings, cleared)
 validate_invocation_contracts(findings, cleared)
 validate_semantics(findings, cleared)
 validate_language_policy(findings, cleared)

@@ -26,7 +26,7 @@ Validation happens before applying changes and before declaring any phase as
 approved.
 
 For layer and stage transitions, validation is executable rather than
-narrative. Use `../../scripts/sopp_gate.rb`; do not directly author approval
+narrative. Use `../../docs/scripts/sopp_gate.rb`; do not directly author approval
 state in `context.json` or reconstruct it at delivery time. A successful schema
 read without a successful gate transition does not authorize implementation.
 

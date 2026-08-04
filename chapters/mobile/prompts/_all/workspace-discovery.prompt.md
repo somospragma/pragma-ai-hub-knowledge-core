@@ -82,10 +82,9 @@ canonical final triplet in `<APP_REPO_ROOT>/.sopp/config/`.
    `CONFIG_BOOTSTRAP_CONFIG_INVALID`.
 4. Do not automatically repair either state. Continue only after an explicit
    reinvocation with `FORCE_RECONFIGURE: true`.
-5. Ignore `.copilot/config/` and `.kiro/config/` completely as configuration
-   sources. They are legacy tool-specific state; report their presence as
-   ignored evidence and use `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND` when
-   no canonical triplet exists.
+5. Ignore runtime-looking files under tool-specific KB folders completely as
+   configuration sources. Report their presence as ignored evidence and use
+   `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND` when no canonical triplet exists.
 
 ### Phase B1 - Resolve Roots To Scan
 
@@ -269,4 +268,4 @@ candidates, confidence, executed validations, and the recommended next step.
 - `BOOTSTRAP_APPLY_NOT_APPROVED`
 - `CONFIG_BOOTSTRAP_INCOMPLETE`
 - `CONFIG_BOOTSTRAP_CONFIG_INVALID`
-- `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND`
+- `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND`

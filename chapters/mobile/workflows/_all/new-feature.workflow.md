@@ -335,9 +335,9 @@ Update `spec.yaml` sections `contracts.api`, `domain_model_plan`,
 
 #### Executable Phase Gate (mandatory)
 
-Before presenting the initial review, run `scripts/sopp_gate.rb open-initial`,
+Before presenting the initial review, run `docs/scripts/sopp_gate.rb open-initial`,
 show its spec hash and approval challenge, and end the response. Before every
-code-producing phase, run `scripts/sopp_gate.rb can-enter` for the
+code-producing phase, run `docs/scripts/sopp_gate.rb can-enter` for the
 target phase. After Domain, Data or Presentation generation and evidence, run
 `open-checkpoint` and end the response. The controller must never write an
 approval state directly or infer approval from the initial plan approval.

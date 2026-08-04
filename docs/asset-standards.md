@@ -348,7 +348,8 @@ El webhook procesa el cambio en `_config/` y lo sube a S3. Las lambdas lo leen e
 ### Kiro
 - Skills siguen el estándar [Agent Skills](https://agentskills.io/) — carpeta con `SKILL.md` dentro: `.kiro/skills/{id}/SKILL.md`
 - El frontmatter de skills usa `name` + `description` (Agent Skills standard), el Hub transforma automáticamente
-- Steering, workflows, prompts y agents van en `.kiro/steering/{id}.md`
+- Steering, prompts y agents van en `.kiro/steering/{id}.md`; workflows van en
+  `.kiro/workflows/{id}.md`.
 - Steering usa modo `auto` con `name` + `description` para activación automática por contexto
 - Hooks van en `.kiro/hooks/{id}.kiro.hook` (formato JSON)
 - Soporta scope global (`~/.kiro/steering/`, `~/.kiro/skills/`) y workspace

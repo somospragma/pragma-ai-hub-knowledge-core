@@ -147,7 +147,7 @@ approves the next layer.
 ### Executable Gate Contract
 
 The Markdown instruction is not the enforcement boundary. Use
-`scripts/sopp_gate.rb` for every state transition:
+`docs/scripts/sopp_gate.rb` for every state transition:
 
 1. Run `validate`, then `open-initial`, before presenting the initial review.
    Show its spec hash and approval challenge, then end the response.

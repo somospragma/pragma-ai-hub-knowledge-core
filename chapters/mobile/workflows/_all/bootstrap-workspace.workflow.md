@@ -77,9 +77,9 @@ final canonical files in `<APP_REPO_ROOT>/.sopp/config/`.
 4. Continue after either failure only when the human explicitly re-invokes with
    `FORCE_RECONFIGURE: true`; record a compact diff against the prior canonical
    configuration in the proposal.
-5. `.copilot/config/` and `.kiro/config/` are legacy tool-specific state. They
-   are never configuration inputs or write destinations. If no canonical
-   triplet exists, report `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND`.
+5. Runtime-looking files under tool-specific KB folders are non-canonical.
+   They are never configuration inputs or write destinations. If no canonical
+   triplet exists, report `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND`.
 
 ### PHASE B1 — Discovery
 

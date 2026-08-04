@@ -125,11 +125,11 @@ canonical files:
 3. If all files exist but fail validation, finish with
    `CONFIG_BOOTSTRAP_CONFIG_INVALID`. Do not replace them unless the human
    re-invokes bootstrap with `FORCE_RECONFIGURE: true`.
-4. If `.copilot/config/` or `.kiro/config/` exists, treat it as legacy
-   tool-specific state. Never read it as input, write to it, or merge it with
-   `.sopp/config`. Record the path as ignored evidence. If no canonical
-   `.sopp/config` triplet exists, also report
-   `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND`.
+4. If runtime-looking files exist under a tool-specific KB folder, treat them
+   as non-canonical state. Never read them as input, write to them, or merge
+   them with `.sopp/config`. Record the path as ignored evidence. If no
+   canonical `.sopp/config` triplet exists, also report
+   `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND`.
 5. With `FORCE_RECONFIGURE: true`, continue to B1 and create a proposal that
    includes a compact diff against the existing canonical configuration. Apply
    still requires explicit approval and backups.
@@ -345,4 +345,4 @@ Validate that the project is ready for the canonical pipeline:
 - `BOOTSTRAP_APPLY_NOT_APPROVED`
 - `CONFIG_BOOTSTRAP_INCOMPLETE`
 - `CONFIG_BOOTSTRAP_CONFIG_INVALID`
-- `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND`
+- `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND`

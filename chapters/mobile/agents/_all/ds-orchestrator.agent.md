@@ -180,11 +180,11 @@ their ownership/schema contracts, `project.repository_local_path` resolves to
 that candidate, and the configured app target has the required executable
 signals. Select exactly one valid candidate and set it as `PROJECT_ROOT`.
 
-Never use, merge, migrate, or write `.copilot/config/` as functional project
-configuration. A tool-specific resource folder such as `.copilot/` or `.kiro/`
-may contain exported agents and workflows, but `.sopp/` is the only canonical
-runtime state. If a legacy `.copilot/config/` is present, record it as ignored
-evidence only; it cannot become a fallback configuration source.
+Never use, merge, migrate, or write runtime-looking files under tool-specific
+KB folders as functional project configuration. Those folders may contain
+exported agents and workflows, but `.sopp/` is the only canonical runtime
+state. Record non-canonical tool state as ignored evidence only; it cannot
+become a fallback configuration source.
 
 Stop before any functional write in these cases:
 
@@ -193,7 +193,7 @@ Stop before any functional write in these cases:
 - a triplet exists but fails schema, ownership, root, or target validation:
   `CONFIG_BOOTSTRAP_CONFIG_INVALID`
 - more than one valid app-root candidate is found: `CONFIG_PROJECT_CONFIG_AMBIGUOUS`
-- only legacy `.copilot/config` exists: `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND`
+- only non-canonical tool state exists: `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND`
 
 Do not invoke `/bootstrap-workspace` automatically. Return the blocking code,
 the inspected canonical paths, and the next explicit command. The human may
@@ -342,7 +342,7 @@ Before starting any workflow:
    - `CONFIG_BOOTSTRAP_INCOMPLETE`
    - `CONFIG_BOOTSTRAP_CONFIG_INVALID`
    - `CONFIG_PROJECT_CONFIG_AMBIGUOUS`
-   - `CONFIG_LEGACY_COPILOT_CONFIGURATION_FOUND`
+   - `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND`
    - `CONFIG_TOPOLOGY_INVALID`
    - `CONFIG_MELOS_ROOT_MISSING`
    - `CONFIG_TARGET_PACKAGE_MISSING`

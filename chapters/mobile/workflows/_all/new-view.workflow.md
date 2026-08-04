@@ -83,8 +83,8 @@ Before any packet, log, Figma request, or code generation:
    files.
 3. Require one valid configuration triplet whose
    `project.repository_local_path` matches the resolved app repository.
-4. Ignore `.copilot/config/` and `.kiro/config/`; they are not project runtime
-   state.
+4. Ignore runtime-looking files under any tool-specific KB folder; only
+   `<APP_REPO_ROOT>/.sopp/` may contain project runtime state.
 5. If the triplet is missing, partial, invalid, or ambiguous, finish with
    `blocked_input`. Do not create a bootstrap proposal or write any YAML.
 

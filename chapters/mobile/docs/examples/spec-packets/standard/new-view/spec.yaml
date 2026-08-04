@@ -1,5 +1,5 @@
 schema_version: 1
-schema_ref: ../../../../docs/templates/schemas/mobile-spec.schema.yaml
+schema_ref: ../../../../templates/schemas/mobile-spec.schema.yaml
 workflow: new-view
 spec_level: standard
 execution_mode: propose_then_apply

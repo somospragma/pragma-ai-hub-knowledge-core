@@ -337,11 +337,12 @@ initial spec approval
 → Wiring → mandatory tests → audit → delivery
 ```
 
-Before showing the initial review, `feature-builder` runs `sopp_gate.rb
-open-initial`, presents the spec hash and challenge, and stops. Before each
-layer it runs `can-enter`; after each layer it generates the corresponding
-evidence and runs `open-checkpoint`. The next layer cannot begin until a later
-human turn repeats the challenge and approves the reviewed artifact hash.
+Before showing the initial review, `feature-builder` runs
+`docs/scripts/sopp_gate.rb open-initial`, presents the spec hash and challenge,
+and stops. Before each layer it runs `can-enter`; after each layer it generates
+the corresponding evidence and runs `open-checkpoint`. The next layer cannot
+begin until a later human turn repeats the challenge and approves the reviewed
+artifact hash.
 
 If a layer is not satisfactory, describe the desired change instead of
 approving it. The controller records the request without modifying code and

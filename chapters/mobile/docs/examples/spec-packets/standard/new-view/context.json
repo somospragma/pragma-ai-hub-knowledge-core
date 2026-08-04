@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "schema_ref": "../../../../docs/templates/schemas/mobile-context.schema.json",
+  "schema_ref": "../../../../templates/schemas/mobile-context.schema.json",
   "run_id": "example-standard-new-view",
   "workflow": "new-view",
   "spec_level": "standard",

@@ -56,7 +56,7 @@ human approval; specialized agents return a compact handoff instead.
 `packet_owner_target_id` and `packet_root` make the packet location explicit
 without conflating it with the active artifact target.
 
-Approval state is owned by the exported `scripts/sopp_gate.rb` state machine,
+Approval state is owned by the exported `docs/scripts/sopp_gate.rb` state machine,
 not by prose instructions or direct agent edits to `context.json`:
 
 1. `open-initial` validates the packet, hashes `spec.yaml`, creates an approval
@@ -284,9 +284,9 @@ A partial or invalid triplet is `blocked_input`; it is never silently replaced.
 `FORCE_RECONFIGURE: true` is required for an intentional repair or migration
 proposal, which still requires human approval before applying changes.
 
-`.copilot/` and `.kiro/` can host exported agent resources, but neither folder
-owns project configuration. Their `config/` contents are legacy state and must
-not be read, merged, or written by functional workflows.
+`.github/` and `.kiro/` host exported KB resources only. Project configuration,
+evidence, logs, approvals and execution state live exclusively under `.sopp/`
+and must not be read from or written to tool-specific KB folders.
 
 ## Initial Configuration Files
 
@@ -345,10 +345,10 @@ Use the shared skill conceptually inside workflows and the local validator when
 editing the KB. From the exported chapter root, run:
 
 ```bash
-ruby scripts/validate_mobile_kb.rb
-ruby scripts/validate_mobile_kb.rb --strict-language
+ruby docs/scripts/validate_mobile_kb.rb
+ruby docs/scripts/validate_mobile_kb.rb --strict-language
 ```
 
-The validator checks parseability, references, workflow/steering sync,
+The validator checks parseability, references, workflow distribution paths,
 permissions, Figma MCP rules, schema expectations, language policy and
 anti-drift rules.

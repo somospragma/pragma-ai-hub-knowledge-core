@@ -176,7 +176,7 @@ Do not validate raw templates with placeholders as final specs.
 From the exported chapter root, run:
 
 ```bash
-ruby scripts/validate_mobile_kb.rb
+ruby docs/scripts/validate_mobile_kb.rb
 ```
 
 The validator checks:
@@ -184,7 +184,7 @@ The validator checks:
 - YAML/JSON parseability.
 - Legacy references.
 - Agent, prompt and skill references.
-- Workflow/steering synchronization.
+- Workflow invocation and distribution-path validation.
 - Template permissions for executing agents.
 - Figma MCP requirements.
 - Documentation/report artifacts under `artifact_plan.planned[group=docs]`.

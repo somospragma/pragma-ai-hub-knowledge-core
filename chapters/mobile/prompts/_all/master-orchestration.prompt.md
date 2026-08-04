@@ -20,8 +20,8 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 
 1. Receive `PROJECT_ROOT` and `PROJECT_CONFIG_PATH` from the workflow
    controller after its canonical configuration gate. Do not rediscover
-   configuration from the current directory and never use `.copilot/config` or
-   `.kiro/config` as a fallback.
+   configuration from the current directory and never use tool-specific KB
+   folders as a runtime-state fallback.
 2. Require the final `.sopp/config` triplet to be valid and owned by
    `PROJECT_ROOT`. If it is missing, partial, invalid, or ambiguous, return the
    matching `CONFIG_*` blocker without creating pipeline outputs.

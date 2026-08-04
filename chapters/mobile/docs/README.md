@@ -25,8 +25,6 @@ controller; it does not own packet state or human checkpoints.
   required inputs, checkpoints and expected results.
 - [Mobile Spec Packet](mobile-spec.md): spec levels, initial files, config
   files, schemas and template locations.
-- [Copilot/Kiro Compatibility](copilot-kiro-compatibility.md): renderer
-  portability rules and what must remain IDE-neutral.
 
 ## Runtime State
 
@@ -42,7 +40,7 @@ Generated project state is stored in the target app repository:
 └── flow_result/specs/{workflow_slug}/
 ```
 
-Tool-specific export folders such as `.copilot/` and `.kiro/` may contain
+Tool-specific export folders such as `.github/` and `.kiro/` may contain
 agents, workflows, prompts, skills, and docs. They never own project runtime
 configuration; functional workflows use only `<APP_REPO_ROOT>/.sopp/`.
 
@@ -50,9 +48,10 @@ configuration; functional workflows use only `<APP_REPO_ROOT>/.sopp/`.
 
 - Templates: `./templates/`
 - Schemas: `./templates/schemas/`
+- Executable validation and gate scripts: `./scripts/`
 - Workflows: `../workflows/`
 - Agents: `../agents/`
-- Examples: `../examples/` (non-normative samples only)
+- Examples: `./examples/` (non-normative samples only)
 - Shared validation skill:
   `../skills/mobile-sdd-spec-validation/SKILL.md`
 
@@ -68,6 +67,6 @@ From the exported chapter root, run after changing workflows, agents, prompts,
 templates, schemas or docs:
 
 ```bash
-ruby scripts/validate_mobile_kb.rb
-ruby scripts/validate_mobile_kb.rb --strict-language
+ruby docs/scripts/validate_mobile_kb.rb
+ruby docs/scripts/validate_mobile_kb.rb --strict-language
 ```
