@@ -1,7 +1,25 @@
 
 # Receta del prototipo de front (opt-in pre-desarrollo)
 
-Materializa la opción opt-in del camino "sin front y sin back" (`execution-modes-live-mocked-hybrid.md`): un front descartable en **HTML/CSS/JS plano** generado desde el Figma + locator map, para ejecutar la suite antes de que exista el front real. Solo a elección explícita del usuario, con la advertencia de fidelidad declarada.
+Materializa la opción opt-in del camino "sin front y sin back" (`execution-modes-live-mocked-hybrid.md`): un front descartable generado desde el Figma + locator map, para ejecutar la suite antes de que exista el front real. Solo a elección explícita del usuario, con la advertencia de fidelidad declarada.
+
+## Regla previa: ¿con qué tecnología se construirá el front real?
+
+Preguntar SIEMPRE antes de generar — la tecnología del prototipo la dicta el front real:
+
+| Front real | Prototipo | Por qué |
+|---|---|---|
+| Framework DOM (React, Angular, Vue, server-rendered...) | **HTML/CSS/JS plano** (esta receta) | Playwright ve DOM en ambos casos; el contrato `data-testid` transfiere si dev lo implementa |
+| **Flutter Web** | **Flutter Web** (`flutter build web`) | Flutter renderiza a canvas: NO hay DOM de la UI; solo existe el árbol `flt-semantics`, que además hay que **activar**. Un prototipo HTML validaría `getByTestId` que la app real jamás tendrá — valida en falso, prohibido |
+| Sin definir | No hay prototipo fiel posible | Camino oficial: construcción + ejecución diferida |
+
+**Caso Flutter Web** — lo que cambia respecto a esta receta:
+
+- El prototipo es la app Flutter (si el producto es multiplataforma, **el mismo prototipo del stack Appium sirve**: `flutter build web` — ver [[calidad-appium-screenplay-android]], `references/flutter-apps-and-prototype.md`, incluido su contrato de fidelidad y gate de paridad).
+- **Arranque**: el árbol de accesibilidad se construye cuando la app lo publica; la suite debe ejecutar la secuencia de activación ANTES de localizar nada (navegar con `domcontentloaded`, esperar el botón de activación adjunto al documento, activarlo por despacho de evento, esperar los nodos semánticos). El prototipo debe ofrecer el mismo punto de activación que la app real (o habilitar semántica permanente en AMBAS, jamás solo en el prototipo).
+- **Selectores**: `flt-semantics[role="button"]:has-text("...")`, `[aria-label="..."]` — NO `data-testid`. Los campos con `explicitChildNodes: true` producen `<input>` reales (localizables como input); sin él no hay elemento de formulario. La columna `web` del locator map usa esta convención (aria-label/rol/texto del catálogo).
+- **Textos = contrato**: los selectores buscan por texto visible; el catálogo de traducciones es el catálogo de selectores (paridad carácter a carácter, ambos idiomas, labels por defecto en inglés sin traducir).
+- **Gate de paridad** idéntico al mobile: cada selector del mapa → exactamente una coincidencia, en ambos idiomas, antes de usar el prototipo.
 
 ## Reglas de construcción
 

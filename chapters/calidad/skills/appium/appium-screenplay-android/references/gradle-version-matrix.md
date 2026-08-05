@@ -23,6 +23,10 @@ Estas versiones se han validado juntas. Cambiar una sola rompe la cadena (en par
 | `testImplementation` | Cucumber JUnit Platform engine, JUnit Platform Suite, JUnit Jupiter, JUnit Vintage, AssertJ | Solo se usan en `src/test`. |
 | `compileOnly` + `annotationProcessor` | Lombok | Procesado en compile-time, sin runtime overhead. |
 
+**JUnit Vintage NO es prescindible aunque suene a legacy**: Serenity/Cucumber lo necesitan para ejecutar los ejemplos de `Scenario Outline`. Sin él, cada ejemplo muere con `NoClassDefFoundError: org/junit/runners/ParentRunner` y los escenarios data-driven desaparecen del conteo **en silencio** (verificado en campo: 9 de 20 escenarios perdidos, justo los BVA). Al revisar dependencias, jamás eliminarlo "por limpieza".
+
+**Precedencia**: esta matriz es la fuente de verdad sobre `templates.md`. Si difieren, gana la matriz y el template se corrige.
+
 ## Snippet `build.gradle` (parcial)
 
 ```groovy

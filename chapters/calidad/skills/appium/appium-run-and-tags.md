@@ -1,6 +1,6 @@
 ---
 id: calidad-appium-run-and-tags
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: skill
 chapter: calidad
@@ -38,6 +38,14 @@ gradlew.bat clean test aggregate
 # Ambos
 ./gradlew clean test aggregate -Dcucumber.filter.tags='@smoke or @proposed'
 ```
+
+## Selección de runner (cuando hay más de uno)
+
+Cada `@Suite` lleva su propio filtro de tags: invocar `test` a secas corre TODOS los runners (y sus filtros se suman — en campo esto ejecutó 40 escenarios donde se esperaban 2). Reglas:
+
+- **`--tests` es incompatible con `aggregate` en la misma invocación** (Gradle lo rechaza). Para seleccionar un runner con reporte: property propia en `build.gradle` (`test { if (project.hasProperty('runner')) { filter.includeTestsMatching(project.property('runner')) } }`) e invocar `./gradlew clean test aggregate -Prunner='co.com.pragma.runners.LoginRunner'`.
+- Alternativa: mantener UN runner por suite lógica y filtrar solo por `-Dcucumber.filter.tags`.
+- Tras cualquier cambio de runners/filtros, verificar el CONTEO de escenarios ejecutados contra los diseñados (checklist de reportería en [[calidad-appium-screenplay-android]], consultar `references/mobile-evidence-and-triage.md`).
 
 ## Override de env
 

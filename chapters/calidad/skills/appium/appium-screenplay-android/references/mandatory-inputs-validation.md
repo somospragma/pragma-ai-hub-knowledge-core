@@ -6,7 +6,8 @@
 | Input | Obligatorio | Default | Notas |
 |---|---|---|---|
 | `project_name` | Sí | — | kebab-case. |
-| `apk_path` | Sí | — | ruta absoluta al APK. |
+| `apk_path` | Sí, **salvo camino pre-desarrollo** | — | ruta absoluta al APK. Con `execution_target != real` ([[calidad-sut-readiness-gate]]) puede no existir APK: se registra `waived_by_pre_development_path` y el camino es deferred/prototipo — NO abortar. |
+| `app_technology` | Sí si no hay APK real | — | `flutter` / `nativa` / `react-native` / `sin-definir`. Determina la estrategia de locators y la tecnología del prototipo (ver `flutter-apps-and-prototype.md`). |
 | `include_login_case` | Sí | — | boolean o string coercible: `"true"`, `"si"`, `"sí"`, `"yes"`, `"1"`. |
 | `user_story` o `test_cases` | Sí (uno de los dos) | — | mínimo un item si es `test_cases`. |
 | `app_package` | No | `com.example.app` | TODO en README si default. |
@@ -22,7 +23,7 @@
 | # | Regla | Mensaje de error |
 |---|---|---|
 | 1 | `platform_name` (cuando viene) en minúsculas debe ser exactamente `"android"`. | `"En Appium V2 solo se soporta Android."` |
-| 2 | `apk_path` no vacío. | `"Falta apk_path."` |
+| 2 | `apk_path` no vacío **O** camino pre-desarrollo resuelto por el SUT readiness gate (`execution_target != real` + `app_technology` declarada). | `"Falta apk_path (o resolver el camino pre-desarrollo con el SUT readiness gate)."` |
 | 3 | `project_name` no vacío. | `"Falta project_name."` |
 | 4 | `user_story` presente O `test_cases` con len ≥ 1. | `"Debes enviar user_story o test_cases para generar escenarios."` |
 | 5 | `include_login_case` presente (bool o coercible). | `"Falta include_login_case (true/false)."` |

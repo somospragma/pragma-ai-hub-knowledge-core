@@ -1,6 +1,6 @@
 ---
 id: calidad-sut-readiness-gate
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -68,6 +68,8 @@ En **brownfield** (cualquier stack), el gate aplica solo a los tests nuevos de l
 - `data_strategy: synthetic` → Faker con locale de la jurisdicción y `FAKER_SEED` fijo (`[[calidad-test-data-management]]`, `references/synthetic-data-faker.md`); el mismo seed alimenta los data buckets del mock (`--faker-seed` de Mockoon) para que test y mock generen datos coherentes.
 - `locator_map: provided` → Playwright genera selectores `getByTestId` desde el mapa; Appium genera `Target` desde los identifiers del mapa (Flutter: `semantics_identifier` → `AppiumBy.id`). Al llegar el desarrollo, validar drift mapa vs DOM/jerarquía real **antes** de correr la suite (`[[calidad-ui-locator-map-contract]]`).
 - **Prototipos opt-in (front web / app mobile)**: cuando no existe el front o la app, el usuario puede elegir explícitamente que el agente genere un prototipo descartable desde Figma + locator map para ejecutar la suite antes del desarrollo (recetas en las references de cada stack). NUNCA por defecto; siempre con la advertencia de fidelidad, `front_prototype`/`app_prototype: true` en `mock_evidence` y `certification: pending_real_integration`. Para móvil, **preguntar SIEMPRE antes con qué tecnología se construirá la app real** (Flutter / nativa Android / React Native / sin definir): el prototipo se construye con la **misma tecnología declarada** — lo que Appium "ve" (jerarquía de semántica Flutter, widgets nativos, o views RN con testID) depende de la tecnología, y un prototipo en otra distinta valida en falso y está prohibido. Tecnología sin definir → sin prototipo fiel posible: camino oficial (ejecución diferida). Flutter es el caso documentado en detalle ([[calidad-appium-screenplay-android]], `references/flutter-apps-and-prototype.md`).
+- **La misma pregunta aplica al front web**: framework DOM (React/Angular/Vue...) → prototipo HTML plano; **Flutter Web** → prototipo Flutter Web (renderiza a canvas: no hay DOM de la UI, solo el árbol `flt-semantics` que además se activa al arranque — un prototipo HTML validaría selectores que la app real jamás tendrá). Si el producto es Flutter multiplataforma, un solo prototipo Flutter sirve para mobile y web. Regla y receta en [[calidad-playwright-greenfield]] (consultar `references/front-prototype-recipe.md`).
+- Todo prototipo pasa su **gate de paridad** antes de usarse (cada selector del locator map → exactamente una coincidencia) y respeta el **contrato de fidelidad** (replica lo que la app real publicará; PROHIBIDO ajustar su semántica/estructura para que una prueba pase — anti-cheating extendido al prototipo).
 
 ## Mock ≠ certificación (contrato de cierre)
 

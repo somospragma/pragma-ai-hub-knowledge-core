@@ -1,6 +1,6 @@
 ---
 id: calidad-ui-locator-map-contract
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -46,7 +46,9 @@ Un archivo `locator-map.json` versionado en el proyecto de tests (y referenciado
 Reglas del formato:
 
 1. `name` es el identificador lógico que usan Page Objects y Tasks; `web`/`mobile` son los valores literales que desarrollo se compromete a implementar (`data-testid` en web; en Android nativo `resource-id`/`contentDescription` según convención acordada).
-1b. **Apps Flutter**: la convención `mobile` preferida es `semantics_identifier` — el equipo dev se compromete a envolver cada elemento del mapa en `Semantics(identifier: '<valor>')`, que se expone como `resource-id` en Android (Flutter 3.19+) y `accessibilityIdentifier` en iOS → `AppiumBy.id` con el stack estándar. `semantics_label` (→ `content-desc`) es secundario: es texto de accesibilidad real y cambia con i18n. Detalle en [[calidad-appium-screenplay-android]] (consultar `references/flutter-apps-and-prototype.md` en su subfolder).
+1b. **Apps Flutter**: la convención `mobile` la declara el equipo dev — `semantics_identifier` (se expone como `resource-id` en Android con Flutter 3.19+ y `accessibilityIdentifier` en iOS; estable ante i18n, preferida cuando dev la adopta) o `semantics_label` (→ `content-desc`/`@name`; muy común en campo — su costo: el catálogo de textos pasa a ser parte del contrato, paridad carácter a carácter en todos los idiomas). **Ambas son de primera clase**: el mapa registra cuál rige. OJO en la resolución Android: `AppiumBy.id` NO resuelve el identifier de Flutter — la estrategia verificada está en [[calidad-appium-screenplay-android]] (consultar `references/locator-resolution-protocol.md` en su subfolder).
+1c. **El mapa garantiza identidad, no capacidad**: el nodo del identificador puede ser un contenedor sin capacidad de click/escritura; el eje hacia el nodo capaz se resuelve en runtime por pantalla (protocolo de resolución) y se registra como `resolution_verified_<fecha>` en el mapa. El contrato con dev incluye además las prácticas que hacen automatizable cada elemento (`ExcludeSemantics` en compuestos, `explicitChildNodes` en campos editables — un componente = UN nodo).
+1d. **Flutter Web**: la columna `web` no usa `data-testid` (no hay DOM de la UI) — usa la proyección del árbol de semántica (`aria-label` / rol / texto del catálogo), con el paso de activación de accesibilidad al arranque. Ver [[calidad-playwright-greenfield]] (consultar `references/front-prototype-recipe.md`).
 2. Naming kebab-case (web) / snake_case (mobile), prefijado por pantalla, sin valores derivados de texto visible (el texto cambia con i18n; el testid no).
 3. `role` opcional documenta el rol ARIA esperado — habilita fallback `getByRole` y validación de accesibilidad.
 4. Todo elemento con el que el robot interactúe o aserte DEBE estar en el mapa. Elementos decorativos no.

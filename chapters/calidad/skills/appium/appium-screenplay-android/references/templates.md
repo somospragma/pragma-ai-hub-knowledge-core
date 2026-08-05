@@ -2,6 +2,8 @@
 
 Cada seccion corresponde a un archivo que el agente debe materializar en la ruta indicada (relativa a la raiz del proyecto generado). Respeta los placeholders `{{...}}`.
 
+**Regla de precedencia**: ante cualquier discrepancia entre estas plantillas y `gradle-version-matrix.md`, **la matriz manda** (versiones, forma de declarar el plugin, scopes). Las contradicciones template-vs-matrix ya costaron una PoC entera; si detectas una, corrige el template y repórtala.
+
 ## `LoginRunner.java`
 
 ```java
@@ -123,6 +125,8 @@ Tras cada `./gradlew test aggregate`:
 | `UnsupportedClassVersionError` | JDK < 21. | Instalar JDK 21 (Temurin, Corretto). |
 | `Task 'aggregate' not found` | Plugin Serenity no aplicado. | Revisar `build.gradle` (ver `[no-aggregate-collision](no-aggregate-collision.md)`). |
 | `cannot find symbol` en `compileJava` | Package declarations no coinciden con path físico. | Verificar `co.com.pragma.*` ↔ `src/main/java/co/com/pragma/*`. |
+| `Activity class ... does not exist` al lanzar | Puede ser el APK — o el PackageManager del AVD corrupto. | BISECAR PRIMERO: ¿otro paquete de usuario del emulador resuelve su activity? Si tampoco → el problema es el AVD: `adb reboot` no basta, arrancar con `-wipe-data` o cambiar de AVD. Solo si otras apps sí resuelven, investigar el APK (DEX, plugin Kotlin aplicado en `app/build.gradle.kts`). |
+| Reporte con `0 tests` o menos escenarios que los diseñados | Falso verde de reportería. | Correr el checklist de verificación de reportería (`[mobile-evidence-and-triage](mobile-evidence-and-triage.md)`): SerenityReporter en cucumber.plugin, junit-vintage presente, aggregate no UP-TO-DATE. |
 ````
 
 ## `STRATEGY.md`
@@ -183,15 +187,25 @@ Appium cubre validación E2E mobile. Los SLAs aplicables:
 - Datos sensibles tratados por la app: {{sensitive_data}}
 - Restricciones regulatorias: {{regulatory_constraints}}
 
-## 6. Próximos pasos
+## 6. Execution target y plan de switchover (mock vs real)
+
+Resuelto por `[[calidad-sut-readiness-gate]]` — obligatoria aunque el target sea `real`:
+
+- `execution_target`: {{execution_target}} (real / mock / hybrid)
+- Tecnología de la app real: {{app_technology}} (flutter / nativa / react-native — determina la estrategia de locators Y la tecnología del prototipo si aplica)
+- Si mock: data file Mockoon en `mocks/mockoon/environment.json`, seed Faker {{faker_seed}}, purga de estado entre escenarios vía Admin API (hook `@Before`).
+- Si app prototype: `mocks/app-prototype/` en la MISMA tecnología declarada, gate de paridad selector a selector antes del smoke.
+- Plan de switchover: la URL del backend vive en un único punto ({{switchover_mechanism}}); certificación pendiente hasta re-ejecutar contra la app real (`certification: pending_real_integration`).
+
+## 7. Próximos pasos
 
 - Archivos a generar: `build.gradle`, `settings.gradle`, `gradlew`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md`, Page Objects bajo `co.com.pragma.*`, Tasks (`LoginTask`, etc.), `*.feature` con escenarios `@smoke` + `@proposed`, `LoginRunner.java`.
 - Comando de ejecución: `./gradlew clean test aggregate -p <project_path> -Dcucumber.filter.tags=@smoke`.
 - Reporte ejecutivo: formato {{report_format}} (default `html`) con device matrix y locators auto-discovery vs deferred.
 
-## 7. Estrategia Appium
+## 8. Estrategia Appium
 
-### 7.1 Capabilities
+### 8.1 Capabilities
 
 | Capability | Valor |
 |---|---|
@@ -206,7 +220,7 @@ Appium cubre validación E2E mobile. Los SLAs aplicables:
 | noReset | {{no_reset}} |
 | autoGrantPermissions | {{auto_grant_permissions}} |
 
-### 7.2 Device matrix
+### 8.2 Device matrix
 
 | Device | Tipo | OS | Form factor | Prioridad |
 |---|---|---|---|---|
@@ -216,7 +230,7 @@ Appium cubre validación E2E mobile. Los SLAs aplicables:
 
 (Editar la matrix según devices realmente disponibles. Cada celda del reporte ejecutivo se desglosa por feature en esta matrix.)
 
-### 7.3 Screens identificadas
+### 8.3 Screens identificadas
 
 | Screen | Page Object | Selectores estimados | Locator source |
 |---|---|---|---|
@@ -224,13 +238,14 @@ Appium cubre validación E2E mobile. Los SLAs aplicables:
 | Dashboard | DashboardPage | 12 | {{dashboard_locator_source}} |
 | Checkout | CheckoutPage | 8 | {{checkout_locator_source}} |
 
-### 7.4 Locator strategy
+### 8.4 Locator strategy
 
-- Modo: {{locator_mode}} (`auto-discovery` o `deferred`).
+- Modo: {{locator_mode}} (`auto-discovery`, `deferred` o `locator-map` con app Flutter/prototipo).
+- Resolución verificada: aplicar el protocolo de `[locator-resolution-protocol](locator-resolution-protocol.md)` ANTES de escribir los Targets (identidad ≠ capacidad; conteo de nodos = 1; candar con test unitario).
 - Si `auto-discovery`: el agente recorre la app vía APK + emulador + Appium server (paso 4 del workflow) y persiste resultados en `.evidence/locators-discovered.json` con score de confianza por locator. Aplica `[[calidad-appium-apk-auto-discovery]]`.
 - Si `deferred`: cada Page Object queda con `// TODO: update real locator`. El usuario completa después con `[[calidad-complete-deferred-locators]]` usando Appium Inspector.
 
-### 7.5 Escenarios `@smoke` y `@proposed`
+### 8.5 Escenarios `@smoke` y `@proposed`
 
 - 2 escenarios `@android @smoke` mínimos siempre: arranque + login básico (si `include_login_case = true`).
 - N escenarios `@android @proposed` derivados de `user_story` / `test_cases`. Cumplir `[gherkin-syntax-rules](gherkin-syntax-rules.md)` (≤80 chars por línea, newlines a espacios).
@@ -247,10 +262,17 @@ Al recibir "aprobado" del usuario, este documento queda congelado y el agente pr
 ```groovy
 plugins {
     id 'java'
+    // El plugin va AQUI, en el bloque plugins{} con version explicita
+    // (forma de gradle-version-matrix.md). NUNCA con `apply plugin:` suelto al
+    // final: sin el plugin en el classpath del build script falla con
+    // "Plugin with id ... not found".
+    id 'net.serenity-bdd.serenity-gradle-plugin' version '4.1.14'
 }
 
-sourceCompatibility = 21
-targetCompatibility = 21
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
 
 repositories {
     mavenCentral()
@@ -267,19 +289,24 @@ dependencies {
     implementation 'net.serenity-bdd:serenity-screenplay:4.1.14'
     implementation 'net.serenity-bdd:serenity-screenplay-webdriver:4.1.14'
     implementation 'io.appium:java-client:8.6.0'
-    implementation 'org.slf4j:slf4j-api:2.0.9'
-    implementation 'ch.qos.logback:logback-classic:1.4.14'
+    implementation 'org.slf4j:slf4j-api:2.0.13'
+    implementation 'ch.qos.logback:logback-classic:1.5.6'
 
     // src/test usa runners JUnit Platform + Cucumber + asserts. NO mover a
     // implementation (no aplican al main source set).
     testImplementation 'io.cucumber:cucumber-junit-platform-engine:7.14.0'
     testImplementation 'org.junit.platform:junit-platform-suite:1.10.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
-    testImplementation 'org.assertj:assertj-core:3.24.2'
+    // junit-vintage NO es opcional aunque suene a legacy: Serenity/Cucumber lo
+    // usan para los ejemplos de Scenario Outline. Sin el, CADA ejemplo muere con
+    // NoClassDefFoundError (org/junit/runners/ParentRunner) y los escenarios
+    // data-driven (los BVA) se pierden EN SILENCIO del conteo.
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.10.2'
+    testImplementation 'org.assertj:assertj-core:3.25.3'
 
     // Lombok solo en compile-time, sin runtime overhead.
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
 }
 
 test {
@@ -287,13 +314,22 @@ test {
     // NO usar useJUnit() — corresponde a JUnit 4 y rompe el runner de Cucumber.
     useJUnitPlatform()
     systemProperties System.getProperties()
+    // El reporte se genera SIEMPRE, tambien (sobre todo) cuando hay fallos:
+    // finalizedBy corre aggregate aunque test falle, sin ignoreFailures
+    // (ignoreFailures=true daria BUILD SUCCESSFUL con rojos — inaceptable en CI).
+    finalizedBy 'aggregate'
 }
 
 // serenity-gradle-plugin auto-registra la tarea `aggregate` (y `reports`, `clean`).
 // NUNCA redefinir esas tareas con `task aggregate { ... }` ni
 // `tasks.register('aggregate') { ... }` — colision garantizada en Gradle 8.x.
-// Si necesitas personalizar, usar `tasks.named('aggregate') { ... }`.
-apply plugin: 'net.serenity-bdd.serenity-gradle-plugin'
+// Personalizacion permitida SOLO via tasks.named:
+tasks.named('aggregate') {
+    // Sin esto, Gradle puede marcar aggregate UP-TO-DATE (reporte viejo con "0
+    // tests") u ordenarlo ANTES de test en la misma invocacion.
+    outputs.upToDateWhen { false }
+    mustRunAfter tasks.named('test')
+}
 ```
 
 ## `gradle-wrapper.properties`
@@ -347,9 +383,115 @@ zipStorePath=wrapper/dists
 
 ```properties
 cucumber.junit-platform.naming-strategy=long
-cucumber.plugin=pretty, html:target/cucumber-reports/cucumber.html, json:target/cucumber-reports/cucumber.json
+# SerenityReporter en PRIMERA posicion es OBLIGATORIO. Sin el, Serenity nunca
+# registra su BaseStepListener: los Click/Enter NO se ejecutan y los pasos
+# reportan "passed" en falso (falso verde total, verificado en campo).
+cucumber.plugin=io.cucumber.core.plugin.SerenityReporter, pretty, html:target/cucumber-reports/cucumber.html, json:target/cucumber-reports/cucumber.json
 cucumber.glue=co.com.pragma.stepdefinitions
-cucumber.features=src/test/resources/features
+# PROHIBIDO declarar cucumber.features aqui: anula los selectores del @Suite
+# (corren TODOS los features ignorando el filtro de tags -> el smoke gate deja
+# de existir). Los features los selecciona @SelectClasspathResource del runner.
+```
+
+## `serenity.conf`
+
+```hocon
+serenity {
+    project.name = "{{project_name}}"
+    take.screenshots = AFTER_EACH_STEP
+    # Redimensionar para no inflar el reporte con screenshots full-res
+    resized.image.width = 600
+    logging = VERBOSE
+    # El ciclo de vida del driver lo maneja el proyecto (hooks), no Serenity:
+    restart.browser.for.each = NEVER
+    report.encoding = utf8
+}
+
+# REGLAS DE ESTE BLOQUE (aprendidas en campo, no negociables):
+# 1. Las claves van SIN el prefijo "appium:" — Serenity 4.x las espera peladas
+#    dentro del bloque appium{} y las convierte el solo. Con prefijo falla con
+#    "The browser under test or path to the app ... needs to be provided".
+# 2. `app` exige RUTA ABSOLUTA al APK. Usar `app` (no appPackage/appActivity
+#    solos) cuando se necesita garantizar (re)instalacion y foco de la app.
+# 3. PROHIBIDO nombrar una system property "appium.app" para sustituirla aqui:
+#    ${?appium.app} dentro del bloque appium{} es una referencia circular que
+#    HOCON descarta EN SILENCIO. Nombrarla fuera del namespace, ej:
+#    app = ${?credimovil.apk.path}
+appium {
+    platformName = Android
+    automationName = UiAutomator2
+    deviceName = "{{device_name}}"
+    platformVersion = "{{platform_version}}"
+    app = "{{apk_absolute_path}}"
+    autoGrantPermissions = true
+    hub = "{{appium_server_url}}"
+}
+```
+
+## `Hooks.java` (stepdefinitions)
+
+```java
+package co.com.pragma.stepdefinitions;
+
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import net.serenitybdd.core.Serenity;
+import net.serenitybdd.screenplay.actors.OnStage;
+import net.serenitybdd.screenplay.actors.OnlineCast;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
+public class Hooks {
+
+    @Before(order = 0)
+    public void setTheStage() {
+        OnStage.setTheStage(new OnlineCast());
+    }
+
+    // SOLO con execution_target: mock — aislamiento de datos entre escenarios.
+    // Purga buckets + variables globales del Mockoon para que cada escenario
+    // arranque del MISMO estado (sin esto, una transferencia del escenario N
+    // contamina el saldo que espera el escenario N+1: falso rojo dependiente
+    // del orden que parece flakiness). Requiere MOCKOON_ADMIN_API_TOKEN
+    // (el Admin API responde 401 sin token — exportarlo tambien para la suite).
+    @Before(order = 1)
+    public void purgeMockState() throws Exception {
+        String mockUrl = System.getenv().getOrDefault("MOCK_BASE_URL", "http://10.0.2.2:3010");
+        String token = System.getenv("MOCKOON_ADMIN_API_TOKEN");
+        if (token == null) return; // sin mock (execution_target: real) no aplica
+        HttpURLConnection con = (HttpURLConnection) new URL(
+                mockUrl.replace("10.0.2.2", "localhost") + "/mockoon-admin/state/purge").openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Authorization", "Bearer " + token);
+        if (con.getResponseCode() != 200) {
+            throw new IllegalStateException("Mock state purge fallo: HTTP " + con.getResponseCode());
+        }
+    }
+
+    // Evidencia de primera linea por fallo: screenshot + PAGE SOURCE.
+    // El page source es el diagnostico que una imagen no da (clickable=false,
+    // resource-id ausente, nodos duplicados). Se persiste SIEMPRE que un
+    // escenario falla, ANTES de cualquier hipotesis de triage.
+    @After(order = 100)
+    public void captureFailureEvidence(Scenario scenario) throws Exception {
+        if (!scenario.isFailed()) return;
+        WebDriver driver = net.serenitybdd.core.Serenity.getDriver();
+        Path dir = Paths.get(".evidence", "failures");
+        Files.createDirectories(dir);
+        String name = scenario.getName().replaceAll("[^a-zA-Z0-9-]", "_");
+        byte[] png = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+        Files.write(dir.resolve(name + ".png"), png);
+        Files.writeString(dir.resolve(name + ".xml"), driver.getPageSource());
+    }
+}
 ```
 
 ## `preflight-appium.sh`

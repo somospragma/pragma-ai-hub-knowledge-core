@@ -127,7 +127,7 @@ chapters/calidad/
 │   │   │   └── references/{convention-detection, selector-update-strategy}.md
 │   │   └── appium-screenplay-android/
 │   │       ├── SKILL.md
-│   │       └── references/{android-only-scope-rationale, contractual-questions, deferred-locators-strategy, flutter-apps-and-prototype, gherkin-syntax-rules, gradle-version-matrix, health-check-pipeline, mandatory-inputs-validation, metadata-emitter-appium, mobile-accessibility, mobile-visual-regression, no-aggregate-collision, preflight, project-structure, screenplay-layers, smoke-gate-gradle, smoke-vs-proposed-scenarios, step-isolation-appium, templates}.md
+│   │       └── references/{android-only-scope-rationale, contractual-questions, deferred-locators-strategy, flutter-apps-and-prototype, gherkin-syntax-rules, gradle-version-matrix, health-check-pipeline, locator-resolution-protocol, mandatory-inputs-validation, metadata-emitter-appium, mobile-accessibility, mobile-evidence-and-triage, mobile-interactions-catalog, mobile-visual-regression, no-aggregate-collision, preflight, project-structure, screenplay-layers, smoke-gate-gradle, smoke-vs-proposed-scenarios, step-isolation-appium, templates}.md
 │   │
 │   ├── k6/
 │   │   ├── k6-run-and-suite.md
@@ -341,7 +341,7 @@ Arquitectura modular: `scenarios/ + workloads/ + tests/{escenario}/main.js + sha
 | `appium-brownfield/SKILL.md`                   | Extiende un proyecto Appium Android/iOS existente respetando convenciones; plataforma detectada del proyecto. |
 | `appium-run-and-tags.md`                       | Comandos Gradle, filtros por tags y override de env.                                       |
 
-Incluye references para capas Screenplay, locators diferidos vs auto-discovery (score de confianza por selector), smoke vs proposed scenarios, smoke gate Gradle, matriz de versiones Gradle inmutable, health-check pipeline, accesibilidad móvil, visual regression móvil y reglas anti-colisión de tasks Gradle.
+Incluye references para capas Screenplay, locators diferidos vs auto-discovery (score de confianza por selector), smoke vs proposed scenarios, smoke gate Gradle, matriz de versiones Gradle inmutable, health-check pipeline, accesibilidad móvil, visual regression móvil, reglas anti-colisión de tasks Gradle, y el paquete de robustez mobile endurecido con feedback de campo: protocolo de resolución de locators (identidad ≠ capacidad, con la matriz Flutter verificada), catálogo de interacciones de experto (escritura, OTP, scroll W3C, esperas, recuperación), y protocolo de evidencia y triage (screenshot → page source como árbol → log del mock antes de hipotetizar; checklist anti falsos-verdes de reportería).
 
 ### Workflows
 
