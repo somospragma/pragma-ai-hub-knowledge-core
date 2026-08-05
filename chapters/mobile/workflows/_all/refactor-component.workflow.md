@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: ds-orchestrator
-input_contract: ../docs/templates/spec-packets/overlays/refactor-component.yaml
+input_contract: ../docs/templates/spec-packets/refactor-component.overlay.yaml
 invocation_mode: explicit_agent
 description: >
   Deterministic workflow to refactor an existing Design System component. Use when the user requests implementation, API, visual, accessibility, or maintainability changes to an existing component with review and audit gates.

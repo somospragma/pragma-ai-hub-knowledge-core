@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: ds-orchestrator
-input_contract: ../docs/templates/spec-packets/overlays/new-component.yaml
+input_contract: ../docs/templates/spec-packets/new-component.overlay.yaml
 invocation_mode: explicit_agent
 description: >
   Deterministic workflow to create a new Design System component from Figma. Use when the user requests a reusable atom, molecule, or organism with spec packet validation, Figma MCP preflight, human review, code generation, tests, Widgetbook, and audit gates.

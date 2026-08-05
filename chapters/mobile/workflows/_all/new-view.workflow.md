@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: ds-orchestrator
-input_contract: ../docs/templates/spec-packets/overlays/new-view.yaml
+input_contract: ../docs/templates/spec-packets/new-view.overlay.yaml
 invocation_mode: explicit_agent
 description: >
   Deterministic workflow to create a Flutter view or screen from Figma using DS components and the app presentation layer. Use when the user requests a Figma-driven app screen with view states, tests, Widgetbook, and audit gates.

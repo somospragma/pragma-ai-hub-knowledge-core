@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: workspace-discovery
-input_contract: ../docs/templates/spec-packets/overlays/bootstrap-workspace.yaml
+input_contract: ../docs/templates/spec-packets/bootstrap-workspace.overlay.yaml
 invocation_mode: explicit_agent
 description: >
   SDD-aware workflow to discover workspace topology and paths, propose the initial configuration, and apply it only after human approval. Use when project roots or target configuration are missing, ambiguous, or multi-repo.

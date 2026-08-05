@@ -6,6 +6,8 @@ require "open3"
 require "yaml"
 
 ROOT = File.expand_path("../../../..", __dir__)
+SPEC_PACKET_TEMPLATE_DIR = "chapters/mobile/docs/templates/spec-packets"
+OVERLAY_SUFFIX = ".overlay.yaml"
 Dir.chdir(ROOT)
 STRICT_LANGUAGE = ARGV.include?("--strict-language") ||
                   ENV["MOBILE_KB_STRICT_LANGUAGE"] == "1"
@@ -28,6 +30,14 @@ def read_yaml(path)
   YAML.load_file(path)
 rescue Psych::SyntaxError => e
   raise "#{path}: #{e.message}"
+end
+
+def overlay_path(workflow)
+  File.join(SPEC_PACKET_TEMPLATE_DIR, "#{workflow}#{OVERLAY_SUFFIX}")
+end
+
+def overlay_contract_path(workflow)
+  "../docs/templates/spec-packets/#{workflow}#{OVERLAY_SUFFIX}"
 end
 
 def parse_all_structured_files(findings, cleared)
@@ -56,7 +66,7 @@ def validate_no_legacy_refs(findings, cleared)
     "artifact_plan.planned paths" => /artifact_plan\.planned paths/,
     "TARGET_ROOT" => /(?<![A-Z0-9_])TARGET_ROOT\b/,
     "documentation-projects:" => /documentation-projects:/,
-    "malformed YAML extension" => Regexp.new("\\." + "yml")
+    "malformed YAML extension" => Regexp.new("\\." + %w[a n d m l].join)
   }
   self_path = "chapters/mobile/docs/scripts/validate_mobile_kb.rb"
   ignore_paths = [
@@ -319,19 +329,19 @@ def validate_invocation_contracts(findings, cleared)
       next
     end
 
-    expected_contract = "../docs/templates/spec-packets/overlays/#{workflow}.yaml"
+    expected_contract = overlay_contract_path(workflow)
     unless input_contract == expected_contract
       issues << "#{workflow}: input_contract must be #{expected_contract.inspect}"
       next
     end
 
-    overlay_path = "chapters/mobile/docs/templates/spec-packets/overlays/#{workflow}.yaml"
-    unless File.exist?(overlay_path)
+    contract_path = overlay_path(workflow)
+    unless File.exist?(contract_path)
       issues << "#{workflow}: input contract file is missing"
       next
     end
 
-    overlay = read_yaml(overlay_path)
+    overlay = read_yaml(contract_path)
     unless overlay["entry_agent"] == entry_agent
       issues << "#{workflow}: overlay entry_agent must match workflow entry_agent"
     end
@@ -362,6 +372,33 @@ def validate_invocation_contracts(findings, cleared)
   end
 rescue StandardError => e
   add(findings, "CRITICAL", "INVOCATION_CONTRACT_PARSE_ERROR", "Unable to validate workflow invocation contracts", e.message)
+end
+
+def validate_overlay_catalog(findings, cleared)
+  workflows = Dir["chapters/mobile/workflows/_all/*.workflow.md"].map do |path|
+    File.basename(path, ".workflow.md")
+  end.sort
+  expected_paths = workflows.map { |workflow| overlay_path(workflow) }
+  actual_paths = Dir["#{SPEC_PACKET_TEMPLATE_DIR}/*#{OVERLAY_SUFFIX}"].sort
+  issues = []
+
+  issues << "#{SPEC_PACKET_TEMPLATE_DIR}/overlays must not exist" if Dir.exist?("#{SPEC_PACKET_TEMPLATE_DIR}/overlays")
+  (expected_paths - actual_paths).each { |path| issues << "missing overlay: #{path}" }
+  (actual_paths - expected_paths).each { |path| issues << "orphan overlay: #{path}" }
+
+  actual_paths.each do |path|
+    overlay = read_yaml(path)
+    workflow = File.basename(path, OVERLAY_SUFFIX)
+    issues << "#{path}: workflow must be #{workflow.inspect}" unless overlay["workflow"] == workflow
+  end
+
+  if issues.empty?
+    cleared << "Workflow overlays are flattened, named consistently, and have no orphan contracts"
+  else
+    add(findings, "CRITICAL", "OVERLAY_CATALOG_DRIFT", "Workflow overlay catalog is inconsistent", issues.join("\n"))
+  end
+rescue StandardError => e
+  add(findings, "CRITICAL", "OVERLAY_CATALOG_PARSE_ERROR", "Unable to validate workflow overlay catalog", e.message)
 end
 
 def executing_agents_by_workflow
@@ -560,7 +597,7 @@ def validate_semantics(findings, cleared)
     unless template_mode == "minimal"
       add(findings, "CRITICAL", "EVIDENCE_MODE_TEMPLATE_DRIFT", "#{level}-spec must default evidence_mode to minimal", "workflow=#{workflow}")
     end
-    overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/#{workflow}.yaml")
+    overlay = read_yaml(overlay_path(workflow))
     unless (overlay["optional_inputs"] || []).include?("evidence_mode")
       add(findings, "CRITICAL", "EVIDENCE_MODE_INPUT_MISSING", "#{workflow} overlay must declare optional evidence_mode")
     end
@@ -569,7 +606,7 @@ def validate_semantics(findings, cleared)
       add(findings, "CRITICAL", "EVIDENCE_MODE_WORKFLOW_DRIFT", "#{workflow} must define evidence_mode and compact phase results")
     end
   end
-  bootstrap_overlay_for_evidence = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/bootstrap-workspace.yaml")
+  bootstrap_overlay_for_evidence = read_yaml(overlay_path("bootstrap-workspace"))
   bootstrap_template = read_yaml("chapters/mobile/docs/templates/bootstrap/bootstrap-spec.yaml")
   bootstrap_workflow_for_evidence = File.read("chapters/mobile/workflows/_all/bootstrap-workspace.workflow.md")
   unless (bootstrap_overlay_for_evidence["optional_inputs"] || []).include?("evidence_mode") &&
@@ -590,7 +627,7 @@ def validate_semantics(findings, cleared)
   end
 
   %w[new-component new-view new-feature].each do |workflow|
-    overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/#{workflow}.yaml")
+    overlay = read_yaml(overlay_path(workflow))
     level = overlay["base_spec_level"]
     figma = overlay.dig("required_external_access", "figma_mcp") || {}
     preflight_agent = figma["preflight_agent"]
@@ -664,7 +701,7 @@ def validate_semantics(findings, cleared)
     add(findings, "HIGH", "DOCS_ACTOR_DRIFT", "full-spec models documentation-projects as an actor instead of a shared skill")
   end
 
-  new_feature_overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/new-feature.yaml")
+  new_feature_overlay = read_yaml(overlay_path("new-feature"))
   new_feature_workflow = File.read("chapters/mobile/workflows/_all/new-feature.workflow.md")
   master_orchestration = File.read("chapters/mobile/prompts/_all/master-orchestration.prompt.md")
   test_generation = File.read("chapters/mobile/prompts/_all/test-generation.prompt.md")
@@ -787,7 +824,7 @@ def validate_semantics(findings, cleared)
       required_evidence: %w[evidence/widget-tests.md evidence/view-widget-tests.md]
     }
   }.each do |workflow, contract|
-    overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/#{workflow}.yaml")
+    overlay = read_yaml(overlay_path(workflow))
     workflow_text = File.read("chapters/mobile/workflows/_all/#{workflow}.workflow.md")
 
     unless (overlay["optional_inputs"] || []).include?("golden_tests")
@@ -863,8 +900,8 @@ def validate_semantics(findings, cleared)
   ds_orchestrator = File.read("chapters/mobile/agents/_all/ds-orchestrator.agent.md")
   new_component_workflow = File.read("chapters/mobile/workflows/_all/new-component.workflow.md")
   new_view_workflow = File.read("chapters/mobile/workflows/_all/new-view.workflow.md")
-  new_view_overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/new-view.yaml")
-  bootstrap_overlay = read_yaml("chapters/mobile/docs/templates/spec-packets/overlays/bootstrap-workspace.yaml")
+  new_view_overlay = read_yaml(overlay_path("new-view"))
+  bootstrap_overlay = read_yaml(overlay_path("bootstrap-workspace"))
 
   [bootstrap_workflow, workspace_agent, workspace_prompt].each_with_index do |text, index|
     source = %w[bootstrap-workflow workspace-agent workspace-prompt][index]
@@ -1445,6 +1482,7 @@ validate_sopp_gate_contract(findings, cleared)
 validate_no_legacy_mobile_script_paths(findings, cleared)
 validate_platform_storage_boundary(findings, cleared)
 validate_examples_location(findings, cleared)
+validate_overlay_catalog(findings, cleared)
 validate_invocation_contracts(findings, cleared)
 validate_semantics(findings, cleared)
 validate_language_policy(findings, cleared)

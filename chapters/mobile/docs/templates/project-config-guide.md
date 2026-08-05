@@ -40,15 +40,14 @@ This separation reduces drift without creating one oversized configuration file.
     ├── full-spec.yaml
     ├── context.json
     ├── review.md
-    └── overlays/
-        ├── new-component.yaml
-        ├── bootstrap-workspace.yaml
-        ├── refactor-component.yaml
-        ├── fix-pr-comments.yaml
-        ├── new-view.yaml
-        ├── new-feature.yaml
-        ├── refactor-feature.yaml
-        └── test-plan.yaml
+    ├── new-component.overlay.yaml
+    ├── bootstrap-workspace.overlay.yaml
+    ├── refactor-component.overlay.yaml
+    ├── fix-pr-comments.overlay.yaml
+    ├── new-view.overlay.yaml
+    ├── new-feature.overlay.yaml
+    ├── refactor-feature.overlay.yaml
+    └── test-plan.overlay.yaml
 ```
 
 ## Recommended Bootstrap
@@ -145,7 +144,7 @@ The base templates in `spec-packets/` are generative skeletons. The agent must:
 
 1. Hydrate placeholders such as `{{WORKFLOW}}`, `{{PHASE}}`, `{{AGENT}}` and
    success criteria.
-2. Apply the workflow overlay from `spec-packets/overlays/` and use its
+2. Apply the workflow overlay named `spec-packets/<workflow>.overlay.yaml` and use its
    `entry_agent` as the workflow entry point.
 3. Complete `agent_permissions`.
 4. Declare `external_access.figma_mcp`; `/new-component` and `/new-view` must

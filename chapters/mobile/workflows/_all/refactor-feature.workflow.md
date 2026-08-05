@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: refactoring-advisor
-input_contract: ../docs/templates/spec-packets/overlays/refactor-feature.yaml
+input_contract: ../docs/templates/spec-packets/refactor-feature.overlay.yaml
 invocation_mode: explicit_agent
 description: >
   Workflow for refactoring an existing feature that follows, or should migrate toward, Clean Architecture. Use to analyze code, plan incremental changes, apply domain/data/presentation refactors, add tests, and produce refactoring documentation.

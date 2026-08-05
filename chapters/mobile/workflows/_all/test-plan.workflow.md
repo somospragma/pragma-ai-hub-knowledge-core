@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: test-coverage-engineer
-input_contract: ../docs/templates/spec-packets/overlays/test-plan.yaml
+input_contract: ../docs/templates/spec-packets/test-plan.overlay.yaml
 invocation_mode: explicit_agent
 description: >
   Workflow for analyzing, planning, and generating complete test coverage for an existing feature. Use when the user provides a feature path and needs coverage inventory, test strategy, generated tests, execution evidence, and a testing report.

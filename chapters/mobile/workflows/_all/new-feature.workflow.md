@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: feature-builder
-input_contract: ../docs/templates/spec-packets/overlays/new-feature.yaml
+input_contract: ../docs/templates/spec-packets/new-feature.overlay.yaml
 invocation_mode: explicit_agent
 description: >
   Workflow for building a complete Clean Architecture feature with domain, data, and presentation layers. Use when the user requests a new feature, module, flow, or Melos feature package, optionally coordinating missing DS components.

@@ -313,11 +313,8 @@ Templates live under this documentation folder:
 └── schemas/
 ```
 
-Workflow overlays live in:
-
-```text
-./templates/spec-packets/overlays/
-```
+Workflow overlays live alongside the base templates in `./templates/spec-packets/`
+and use the `*.overlay.yaml` suffix.
 
 Each overlay declares its `entry_agent` and required inputs. Invoke that agent
 with the workflow command as documented in [Workflows](workflows.md). The

@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: mobile
 entry_agent: ds-orchestrator
-input_contract: ../docs/templates/spec-packets/overlays/fix-pr-comments.yaml
+input_contract: ../docs/templates/spec-packets/fix-pr-comments.overlay.yaml
 invocation_mode: explicit_agent
 description: Deterministic workflow to fix Pull Request comments in a traceable way. Use it when actionable review feedback already exists.
 ---
