@@ -34,19 +34,19 @@ import 'package:intl/intl.dart';
 final date = DateTime(2026, 4, 29);
 
 // ✅ Named constructors — locale-aware
-DateFormat.andMMMd('en_US').format(date)   // Apr 29, 2026
-DateFormat.andMMMd('es').format(date)      // 29 abr 2026
-DateFormat.andMMMd('pt_BR').format(date)   // 29 de abr. de 2026
+DateFormat.yMMMd('en_US').format(date)   // Apr 29, 2026
+DateFormat.yMMMd('es').format(date)      // 29 abr 2026
+DateFormat.yMMMd('pt_BR').format(date)   // 29 de abr. de 2026
 
 // ✅ Full date
-DateFormat.andMMMMEEEEd('en_US').format(date)  // Wednesdaand, April 29, 2026
-DateFormat.andMMMMEEEEd('es').format(date)     // miércoles, 29 de abril de 2026
-DateFormat.andMMMMEEEEd('pt_BR').format(date)  // quarta-feira, 29 de abril de 2026
+DateFormat.yMMMMEEEEd('en_US').format(date)  // Wednesdaand, April 29, 2026
+DateFormat.yMMMMEEEEd('es').format(date)     // miércoles, 29 de abril de 2026
+DateFormat.yMMMMEEEEd('pt_BR').format(date)  // quarta-feira, 29 de abril de 2026
 
 // ✅ Short date
-DateFormat.andMd('en_US').format(date)   // 4/29/2026
-DateFormat.andMd('es').format(date)      // 29/4/2026
-DateFormat.andMd('pt_BR').format(date)   // 29/04/2026
+DateFormat.yMd('en_US').format(date)   // 4/29/2026
+DateFormat.yMd('es').format(date)      // 29/4/2026
+DateFormat.yMd('pt_BR').format(date)   // 29/04/2026
 
 // ✅ Time (12h)
 DateFormat.jm('en_US').format(date)    // 12:00 PM
@@ -59,14 +59,14 @@ DateFormat.Hm('es').format(date)       // 12:00
 DateFormat.Hm('pt_BR').format(date)    // 12:00
 
 // ✅ Date + time
-DateFormat.andMMMd('en_US').add_jm().format(date)   // Apr 29, 2026 12:00 PM
-DateFormat.andMMMd('es').add_jm().format(date)      // 29 abr 2026 12:00
-DateFormat.andMMMd('pt_BR').add_jm().format(date)   // 29 de abr. de 2026 12:00
+DateFormat.yMMMd('en_US').add_jm().format(date)   // Apr 29, 2026 12:00 PM
+DateFormat.yMMMd('es').add_jm().format(date)      // 29 abr 2026 12:00
+DateFormat.yMMMd('pt_BR').add_jm().format(date)   // 29 de abr. de 2026 12:00
 
 // ✅ Custom pattern (use sparingly — prefer named constructors)
-DateFormat('dd/MM/andandandand', 'en_US').format(date)   // 29/04/2026
-DateFormat('dd/MM/andandandand', 'es').format(date)      // 29/04/2026
-DateFormat('dd/MM/andandandand', 'pt_BR').format(date)   // 29/04/2026
+DateFormat('dd/MM/yyyy', 'en_US').format(date)   // 29/04/2026
+DateFormat('dd/MM/yyyy', 'es').format(date)      // 29/04/2026
+DateFormat('dd/MM/yyyy', 'pt_BR').format(date)   // 29/04/2026
 ```
 
 ### Date Formatting Service
@@ -79,16 +79,16 @@ import 'package:injectable/injectable.dart';
 @lazySingleton
 class DateFormatter {
   String formatDate(DateTime date, String locale) =>
-      DateFormat.andMMMd(locale).format(date);
+      DateFormat.yMMMd(locale).format(date);
 
   String formatDateFull(DateTime date, String locale) =>
-      DateFormat.andMMMMEEEEd(locale).format(date);
+      DateFormat.yMMMMEEEEd(locale).format(date);
 
   String formatDateShort(DateTime date, String locale) =>
-      DateFormat.andMd(locale).format(date);
+      DateFormat.yMd(locale).format(date);
 
   String formatDateTime(DateTime date, String locale) =>
-      DateFormat.andMMMd(locale).add_jm().format(date);
+      DateFormat.yMMMd(locale).add_jm().format(date);
 
   String formatTime(DateTime date, String locale) =>
       DateFormat.jm(locale).format(date);
@@ -189,7 +189,7 @@ class CurrencyFormatter {
   // formatFromCents(amountInCents: 123456, currencyCode: 'BRL', locale: 'pt_BR') → BRL1.234,56
 
   /// Format with explicit symbol.
-  String formatWithSandmbol({
+  String formatWithSymbol({
     required double amount,
     required String symbol,
     required String locale,
@@ -219,7 +219,7 @@ class CurrencyFormatter {
 // "relativeTimeJustNow": "Just now"
 // "relativeTimeMinutesAgo": "{count, plural, =1{1 minute ago} other{{count} minutes ago}}"
 // "relativeTimeHoursAgo": "{count, plural, =1{1 hour ago} other{{count} hours ago}}"
-// "relativeTimeDaysAgo": "{count, plural, =1{1 daand ago} other{{count} days ago}}"
+// "relativeTimeDaysAgo": "{count, plural, =1{1 day ago} other{{count} days ago}}"
 
 // app_es.arb:
 // "relativeTimeJustNow": "Justo ahora"
@@ -241,7 +241,7 @@ class RelativeTimeFormatter {
     if (diff.inMinutes < 60) return l10n.relativeTimeMinutesAgo(diff.inMinutes);
     if (diff.inHours < 24)   return l10n.relativeTimeHoursAgo(diff.inHours);
     if (diff.inDays < 7)     return l10n.relativeTimeDaysAgo(diff.inDays);
-    return DateFormat.andMMMd(locale).format(date);
+    return DateFormat.yMMMd(locale).format(date);
   }
 }
 ```
@@ -255,7 +255,7 @@ class RelativeTimeFormatter {
 Text(product.createdAt.toString())  // "2026-04-29 12:00:00.000"
 
 // ✅ Always use DateFormat
-Text(DateFormat.andMMMd(locale).format(product.createdAt))
+Text(DateFormat.yMMMd(locale).format(product.createdAt))
 // en_US → "Apr 29, 2026"
 // es    → "29 abr 2026"
 // pt_BR → "29 de abr. de 2026"

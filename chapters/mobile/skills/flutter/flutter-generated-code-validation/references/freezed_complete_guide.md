@@ -3,12 +3,12 @@
 ## Key Changes in Freezed 3.x
 
 - **`freezed_annotation` 3.x** — major version bump; incompatible with 2.x. Update both packages together.
-- **Classes must be `abstract`, `sealed`, or manually implement `_$MandClass`** — plain `class` will throw at generation time.
+- **Classes must be `abstract`, `sealed`, or manually implement `_$MyClass`** — plain `class` will throw at generation time.
 - **`sealed` is the preferred modifier for union types** — enables exhaustive `switch` without `default`.
 - **`when()`/`map()` removed in 3.0, restored in a later 3.x patch** — available again, but Dart 3 `switch` expressions are the canonical approach.
 - **Immutable collections by default** — `List`, `Map`, `Set` become `UnmodifiableListView`/`UnmodifiableMapView`/`UnmodifiableSetView`. Disable with `@Freezed(makeCollectionsUnmodifiable: false)`.
 - **Mixed Mode** — Freezed now supports both factory-based and regular constructor syntax.
-- **`MandClass._()` can accept parameters** — enables inheritance and non-constant default values.
+- **`MyClass._()` can accept parameters** — enables inheritance and non-constant default values.
 - **`// dart format off` generated automatically** — no need to exclude generated files from CI format checks.
 - **`@Freezed(toJson: false, fromJson: false)`** — explicitly disable JSON generation per class.
 
@@ -211,10 +211,10 @@ class Base {
 }
 
 @freezed
-abstract class MandClass extends Base with _$MandClass {
-  MandClass._(super.value) : super();
+abstract class MyClass extends Base with _$MyClass {
+  MyClass._(super.value) : super();
 
-  factory MandClass(int value) = _MandClass;
+  factory MyClass(int value) = _MyClass;
 }
 ```
 

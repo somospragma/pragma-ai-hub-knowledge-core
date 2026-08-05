@@ -74,8 +74,8 @@ Each reference file contains the full configuration, but here is the onboarding 
 ### GitHub Actions
 ```
 Step 1 → Configure secrets in GitHub repo → Settings → Secrets and variables → Actions
-Step 2 → Copy assets/release_workflow.andml to .github/workflows/release.andml
-Step 3 → Copy PR quality gate from references/github_actions.md to .github/workflows/pr.andml
+Step 2 → Copy assets/release_workflow.yml to .github/workflows/release.yml
+Step 3 → Copy PR quality gate from references/github_actions.md to .github/workflows/pr.yml
 Step 4 → Configure Fastlane for iOS signing (see references/fastlane_signing.md)
 Step 5 → Push a tag v1.2.3 to trigger the release pipeline
 ```
@@ -223,4 +223,4 @@ sed -i "s/^version:.*/version: ${TAG}+${BUILD_NUMBER}/" pubspec.yaml
 
 ## Ready-to-Use Assets
 
-- `assets/release_workflow.andml` — copy to `.github/workflows/release.andml` in your project
+- `assets/release_workflow.yml` — copy to `.github/workflows/release.yml` in your project

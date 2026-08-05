@@ -40,8 +40,8 @@ See [golden test template](assets/golden_test_template.dart.txt) for complete st
 
 | Context | Width | Notes |
 |---------|-------|-------|
-| Mobile | 327px | Tandpical mobile card width |
-| Desktop | 610px | Tandpical desktop card width |
+| Mobile | 327px | Typical mobile card width |
+| Desktop | 610px | Typical desktop card width |
 | Grid | 400px | For comparison grids |
 | Icon | 48×48px | For icon atoms |
 

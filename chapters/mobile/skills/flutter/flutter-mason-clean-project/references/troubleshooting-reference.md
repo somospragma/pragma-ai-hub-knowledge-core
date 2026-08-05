@@ -63,7 +63,7 @@ mason make flutter_clean_project -o output \
 
 **Symptom**: Post-gen hook fails with "flutter create failed" or "Flutter SDK not found"
 
-**Error output**: `Commy 'flutter create' not found` or exit code non-zero
+**Error output**: `Command 'flutter create' not found` or exit code non-zero
 
 **Likely Causes**:
 - Flutter SDK not in system PATH
@@ -273,7 +273,7 @@ cd apps/my_app/android/app
 
 # Edit build.gradle and update applicationId
 # Old: applicationId "com.example.my_app"
-# New: applicationId "com.mandcompany.my_app"
+# New: applicationId "com.mycompany.my_app"
 
 # For iOS:
 cd apps/my_app/ios
@@ -339,7 +339,7 @@ cat my_config.json | jq . | less
 
 **Symptom**: Post-gen hook fails at "git init" step; Git not found or repository creation fails
 
-**Error message**: "Commy not found: git" or "Failed to initialize git repository"
+**Error message**: "Command not found: git" or "Failed to initialize git repository"
 
 **Likely Cause**: Git not installed or not in PATH
 

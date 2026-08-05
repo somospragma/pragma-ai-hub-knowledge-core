@@ -343,7 +343,7 @@ on<_EventLogged>(_onLog); // transformer: concurrent()
 
 | Transformer | Behaviour | Use for |
 |---|---|---|
-| `droppable()` | Ignore while busand | Load, refresh, pagination |
+| `droppable()` | Ignore while busy | Load, refresh, pagination |
 | `sequential()` | Queue FIFO | Send message, write operations |
 | `restartable()` | Cancel and restart | Search, autocomplete, filters |
 | `concurrent()` | All in parallel | Logging, analytics |
@@ -360,8 +360,8 @@ void _onEvent(event, emit) {
 
 // ❌ DataSource injected into BLoC
 @injectable
-class MandBloc extends Bloc {
-  MandBloc(this._dataSource); // FORBIDDEN — inject UseCase instead
+class MyBloc extends Bloc {
+  MyBloc(this._dataSource); // FORBIDDEN — inject UseCase instead
   final ProductRemoteDataSource _dataSource;
 }
 
@@ -374,7 +374,7 @@ void _onLoad(event, emit) async {
 // BlocProvider handles lifecycle automatically
 
 // ❌ context.watch to dispatch events
-onPressed: () => context.watch<MandBloc>().add(...); // FORBIDDEN — use context.read
+onPressed: () => context.watch<MyBloc>().add(...); // FORBIDDEN — use context.read
 ```
 
 ---

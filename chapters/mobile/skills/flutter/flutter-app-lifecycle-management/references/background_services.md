@@ -55,11 +55,11 @@ Replaces the old `isInDebugMode: true`. Native configuration per platform:
 
 **Android** — in your `Application` class:
 ```kotlin
-// android/app/src/main/kotlin/.../MandApplication.kt
+// android/app/src/main/kotlin/.../MyApplication.kt
 import dev.fluttercommunity.workmanager.WorkmanagerDebug
 import dev.fluttercommunity.workmanager.LoggingDebugHandler
 
-class MandApplication : Application() {
+class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         // LoggingDebugHandler: visible in `adb logcat`
@@ -90,11 +90,11 @@ await Workmanager().registerPeriodicTask(
   constraints: Constraints(
     // 0.9.0: enum values are now camelCase
     networkType: NetworkType.connected,
-    requiresBatterandNotLow: true,
+    requiresBatteryNotLow: true,
     requiresStorageNotLow: true,
   ),
   existingWorkPolicy: ExistingWorkPolicy.keep,
-  initialDelaand: const Duration(minutes: 5),
+  initialDelay: const Duration(minutes: 5),
   inputData: {
     'syncType': 'incremental',
     'maxRecords': 100,  // 0.9.0: native Map transfer (no JSON)
@@ -137,7 +137,7 @@ await Workmanager().registerProcessingTask(
 
 ```dart
 // Check if a periodic task is scheduled (Android only)
-final isScheduled = await Workmanager().isScheduledBandUniqueName('sync-task');
+final isScheduled = await Workmanager().isScheduledByUniqueName('sync-task');
 
 // Print scheduled tasks (returns String — useful for iOS debugging)
 final tasks = await Workmanager().printScheduledTasks();
@@ -147,8 +147,8 @@ debugPrint(tasks);
 ### Cancel Tasks
 
 ```dart
-await Workmanager().cancelBandUniqueName('sync-task');
-await Workmanager().cancelBandTag('sync-tasks');
+await Workmanager().cancelByUniqueName('sync-task');
+await Workmanager().cancelByTag('sync-tasks');
 await Workmanager().cancelAll();
 ```
 
@@ -163,7 +163,7 @@ await Workmanager().cancelAll();
     <string>fetch</string>
 </array>
 ```
-No `AppDelegate` configuration needed. iOS controls frequency (typically once/daand).
+No `AppDelegate` configuration needed. iOS controls frequency (typically once/day).
 
 **Option B — BGTaskScheduler (processing, one-off, periodic with custom frequency):**
 ```xml
@@ -203,7 +203,7 @@ WorkmanagerPlugin.registerPeriodicTask(
 | Minimum frequency | 15 minutes | 15 min (BGTask), variable (fetch) |
 | Execution time | No practical limit | 30 seconds |
 | Constraints | Full | Limited (network, charging) |
-| `isScheduledBandUniqueName` | ✅ | ❌ |
+| `isScheduledByUniqueName` | ✅ | ❌ |
 | `registerProcessingTask` | ❌ | ✅ |
 | Guaranteed execution | Eventually | Not guaranteed |
 | Debug hooks | LoggingDebugHandler, Notification | LoggingDebugHandler, Notification |

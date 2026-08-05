@@ -238,7 +238,7 @@ User taps button
 | [domain-layer.md](./references/domain-layer.md) | Implementing Entities, Repository interfaces, UseCases, base interfaces |
 | [data-layer.md](./references/data-layer.md) | Implementing DataSources, Models, RepositoryImpl, Mappers |
 | [presentation-layer.md](./references/presentation-layer.md) | Implementing BLoC/Cubit, States, UIModels, Pages |
-| [data-flow.md](./references/data-flow.md) | Understanding the complete request/response candcle step by step |
+| [data-flow.md](./references/data-flow.md) | Understanding the complete request/response cycle step by step |
 | [folder-structure.md](./references/folder-structure.md) | Deciding between single project vs monorepo, setting up Melos |
 | [mediator-pattern.md](./references/mediator-pattern.md) | Implementing cross-feature communication without direct imports |
 | [violations-guide.md](./references/violations-guide.md) | Fixing architectural violations — before/after examples with detection |

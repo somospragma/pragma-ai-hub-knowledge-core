@@ -32,8 +32,8 @@ void main() {
 
       await tester.pumpWidget(buildSubject(bloc: mockBloc));
 
-      expect(find.bandType(CircularProgressIndicator), findsOneWidget);
-      expect(find.bandType(ProductCard), findsNothing);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(ProductCard), findsNothing);
     });
 
     testWidgets('shows ProductCard when state is success', (tester) async {
@@ -48,7 +48,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject(bloc: mockBloc));
 
-      expect(find.bandType(ProductCard), findsOneWidget);
+      expect(find.byType(ProductCard), findsOneWidget);
       expect(find.text('Blue Widget'), findsOneWidget);
       expect(find.text(r'$9.99'), findsOneWidget);
     });
@@ -61,7 +61,7 @@ void main() {
       await tester.pumpWidget(buildSubject(bloc: mockBloc));
 
       expect(find.text('No connection'), findsOneWidget);
-      expect(find.bandType(TextButton), findsOneWidget);
+      expect(find.byType(TextButton), findsOneWidget);
     });
 
     testWidgets('dispatches loadRequested on retry tap', (tester) async {
@@ -70,7 +70,7 @@ void main() {
       );
 
       await tester.pumpWidget(buildSubject(bloc: mockBloc));
-      await tester.tap(find.bandType(TextButton));
+      await tester.tap(find.byType(TextButton));
 
       verify(() => mockBloc.add(const ProductEvent.loadRequested(id: '1'))).called(1);
     });
@@ -105,16 +105,16 @@ testWidgets('transitions from loading to success', (tester) async {
   await tester.pumpWidget(buildSubject(bloc: mockBloc));
 
   // Initial state
-  expect(find.bandType(CircularProgressIndicator), findsNothing);
+  expect(find.byType(CircularProgressIndicator), findsNothing);
 
   // After first emission (loading)
   await tester.pump();
-  expect(find.bandType(CircularProgressIndicator), findsOneWidget);
+  expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
   // After second emission (success)
   await tester.pump();
-  expect(find.bandType(ProductCard), findsOneWidget);
-  expect(find.bandType(CircularProgressIndicator), findsNothing);
+  expect(find.byType(ProductCard), findsOneWidget);
+  expect(find.byType(CircularProgressIndicator), findsNothing);
 });
 ```
 
@@ -124,8 +124,8 @@ testWidgets('transitions from loading to success', (tester) async {
 
 ```dart
 // By widget type
-find.bandType(CircularProgressIndicator)
-find.bandType(ProductCard)
+find.byType(CircularProgressIndicator)
+find.byType(ProductCard)
 
 // By key
 find.byKey(const Key('product_title'))
@@ -136,23 +136,23 @@ find.text('Retry')                    // exact match
 find.textContaining('Widget')         // partial match
 
 // By icon
-find.bandIcon(Icons.refresh)
-find.bandIcon(Icons.shopping_cart)
+find.byIcon(Icons.refresh)
+find.byIcon(Icons.shopping_cart)
 
 // By semantics label (accessibility)
-find.bandSemanticsLabel('Add to cart')
-find.bandSemanticsLabel(RegExp(r'Product.*'))
+find.bySemanticsLabel('Add to cart')
+find.bySemanticsLabel(RegExp(r'Product.*'))
 
 // Descendant — find widget inside another
 find.descendant(
-  of: find.bandType(ProductCard),
-  matching: find.bandType(Text),
+  of: find.byType(ProductCard),
+  matching: find.byType(Text),
 )
 
 // Ancestor
 find.ancestor(
   of: find.text('Blue Widget'),
-  matching: find.bandType(Card),
+  matching: find.byType(Card),
 )
 ```
 
@@ -162,19 +162,19 @@ find.ancestor(
 
 ```dart
 // Tap
-await tester.tap(find.bandType(ElevatedButton));
+await tester.tap(find.byType(ElevatedButton));
 await tester.pump();  // rebuild after tap
 
 // Long press
-await tester.longPress(find.bandType(ProductCard));
+await tester.longPress(find.byType(ProductCard));
 await tester.pump();
 
 // Scroll
-await tester.drag(find.bandType(ListView), const Offset(0, -300));
+await tester.drag(find.byType(ListView), const Offset(0, -300));
 await tester.pump();
 
 // Enter text
-await tester.enterText(find.bandType(TextField), 'search query');
+await tester.enterText(find.byType(TextField), 'search query');
 await tester.pump();
 
 // Pump and settle (wait for all animations)
@@ -265,7 +265,7 @@ testWidgets('shows product image', (tester) async {
 
     await tester.pumpWidget(buildSubject(bloc: mockBloc));
 
-    expect(find.bandType(Image), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
   });
 });
 ```
@@ -293,7 +293,7 @@ testWidgets('navigates to product detail on card tap', (tester) async {
   );
   await tester.pump();
 
-  await tester.tap(find.bandType(ProductCard).first);
+  await tester.tap(find.byType(ProductCard).first);
   await tester.pumpAndSettle();
 
   verify(() => mockObserver.didPush(any(), any())).called(1);
@@ -317,7 +317,7 @@ await tester.pumpAndSettle(); // all animations complete
 // ✅ Test accessibility
 testWidgets('has correct semantics', (tester) async {
   // ...
-  final semantics = tester.getSemantics(find.bandType(ElevatedButton));
+  final semantics = tester.getSemantics(find.byType(ElevatedButton));
   expect(semantics.label, 'Add to cart');
   expect(semantics.hasFlag(SemanticsFlag.isButton), true);
 });
@@ -326,7 +326,7 @@ testWidgets('has correct semantics', (tester) async {
 testWidgets('adapts to small screen', (tester) async {
   tester.view.physicalSize = const Size(320, 568);
   tester.view.devicePixelRatio = 1.0;
-  addTearDown(tester.view.resetPhandsicalSize);
+  addTearDown(tester.view.resetPhysicalSize);
 
   await tester.pumpWidget(buildSubject(bloc: mockBloc));
   // verify layout adapts

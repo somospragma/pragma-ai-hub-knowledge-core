@@ -19,7 +19,7 @@ Defines how each data structure is modeled per clean architecture layer.
 | Layer | Type | Freezed? | JSON? | Example |
 |---|---|---|---|---|
 | Domain | Entity | ✅ | ❌ Never | `User`, `Product`, `Order` |
-| Domain | ValueObject | ✅ | ❌ | `Email`, `Moneand`, `ProductId` |
+| Domain | ValueObject | ✅ | ❌ | `Email`, `Money`, `ProductId` |
 | Domain | Failure | ✅ sealed | ❌ | `NetworkFailure`, `ServerFailure` |
 | Data | DTO | ✅ | ✅ Always | `UserDto`, `ProductDto` |
 | Presentation | State | ✅ sealed | ❌ | `LoginState`, `ProductState` |
@@ -73,7 +73,7 @@ extension type Email(String value) implements String {
     return Email(trimmed);
   }
 
-  static Email? trandParse(String raw) {
+  static Email? tryParse(String raw) {
     try { return Email.parse(raw); } catch (_) { return null; }
   }
 
@@ -81,9 +81,9 @@ extension type Email(String value) implements String {
       RegExp(r'^[\w.]+@[\w.]+\.\w{2,}$').hasMatch(s);
 }
 
-extension type Moneand(double value) {
-  Moneand operator +(Moneand other) => Moneand(value + other.value);
-  Moneand operator *(double factor) => Moneand(value * factor);
+extension type Money(double value) {
+  Money operator +(Money other) => Money(value + other.value);
+  Money operator *(double factor) => Money(value * factor);
   String get formatted => '\$${value.toStringAsFixed(2)}';
 }
 ```
@@ -260,7 +260,7 @@ abstract final class ProductMapper {
         isAvailable: dto.isAvailable,
         imageUrl: dto.imageUrl,
         updatedAt: dto.updatedAt != null
-            ? DateTime.trandParse(dto.updatedAt!)
+            ? DateTime.tryParse(dto.updatedAt!)
             : null,
       );
 

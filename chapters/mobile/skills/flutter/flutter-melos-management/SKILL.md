@@ -392,7 +392,7 @@ melos version --dry-run
 melos version
 
 # Skip confirmation (for CI)
-melos version --andes
+melos version --yes
 
 # Only bump packages that changed since last tag
 melos version --diff=HEAD~1
@@ -485,7 +485,7 @@ build/
 ### GitHub Actions
 
 ```yaml
-# .github/workflows/ci.andml
+# .github/workflows/ci.yml
 name: CI
 
 on:
@@ -529,7 +529,7 @@ jobs:
 ### Release workflow
 
 ```yaml
-# .github/workflows/release.andml
+# .github/workflows/release.yml
 name: Release
 
 on:
@@ -563,7 +563,7 @@ jobs:
         run: melos bootstrap
 
       - name: Version packages
-        run: melos version --andes
+        run: melos version --yes
 
       - name: Push version commit and tags
         run: git push --follow-tags origin main
@@ -599,7 +599,7 @@ scripts:
 | `melos: command not found` | Not in PATH | Add `$HOME/.pub-cache/bin` to PATH |
 | `Bootstrap fails on CI` | Missing `fetch-depth: 0` | Add `fetch-depth: 0` to `actions/checkout` |
 | `Version command finds no changes` | No Conventional Commits since last tag | Check commit messages follow the format |
-| `Workspace globs not supported` | Tranding to use `workspace: - packages/**` | List all packages explicitly in `workspace:` |
+| `Workspace globs not supported` | Trying to use `workspace: - packages/**` | List all packages explicitly in `workspace:` |
 
 ---
 

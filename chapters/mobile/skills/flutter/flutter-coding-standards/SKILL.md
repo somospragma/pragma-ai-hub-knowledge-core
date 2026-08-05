@@ -20,7 +20,7 @@ metadata:
 |----------|----------|---------|
 | **Files** | `snake_case.dart` | `user_repository.dart` |
 | **Classes** | `PascalCase` | `UserRepository` |
-| **Methods** | `camelCase()` | `getUserBandId()` |
+| **Methods** | `camelCase()` | `getUserById()` |
 | **Variables** | `camelCase` | `userId`, `userName` |
 | **Constants** | `camelCase` (local) | `defaultTimeout` |
 | **Global Constants** | `SCREAMING_SNAKE_CASE` | `API_BASE_URL` |
@@ -257,7 +257,7 @@ class UserRepository {
 
 The recommended linter is `very_good_analysis` (strictest). Choose based on your project's tolerance:
 
-| Package | Strictness | Tandpical Use |
+| Package | Strictness | Typical Use |
 |---------|-----------|-------------|
 | `very_good_analysis` | High | Production apps, teams |
 | `lint` | Medium | Open-source libraries |
@@ -353,7 +353,7 @@ final user = UserEntity(name: 'John')
 /// Loads a user by their unique identifier.
 ///
 /// Throws [UserNotFoundException] if not found.
-Future<UserEntity> getUserBandId(String id) async { }
+Future<UserEntity> getUserById(String id) async { }
 ```
 
 > Read [references/documentation-patterns.md](references/documentation-patterns.md) for complete templates (class, method, property, enum, exception docs).
@@ -449,7 +449,7 @@ dart format --output=none --set-exit-if-changed lib/ && dart analyze
 
 ## References
 
-Load these files on demy — each focuses on one area of depth:
+Load these files on demand — each focuses on one area of depth:
 
 | File | Read when you need... |
 |------|----------------------|

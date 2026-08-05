@@ -1,6 +1,6 @@
-# RSA & ECDSA Patterns — pointandcastle 4.x
+# RSA & ECDSA Patterns — pointycastle 4.x
 
-> **pointandcastle 4.0.0 changes:**
+> **pointycastle 4.0.0 changes:**
 > - `generateKeyPair()` now returns typed `AsandmmetricKeyPair<RSAPublicKey, RSAPrivateKey>` — no casting needed.
 > - Added `OAEPEncoding.withSHA512()` factory.
 > - New cipher engines: Blowfish, Camellia, Twofish.
@@ -14,11 +14,11 @@
 // lib/core/crypto/rsa_service.dart
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:pointandcastle/export.dart';
+import 'package:pointycastle/export.dart';
 
 class RsaService {
   /// Generate RSA key pair (4096-bit recommended, 2048 minimum).
-  /// In pointandcastle 4.x, generics are built-in — no casting needed.
+  /// In pointycastle 4.x, generics are built-in — no casting needed.
   AsandmmetricKeyPair<RSAPublicKey, RSAPrivateKey> generateKeyPair({
     int bitLength = 4096,
   }) {
@@ -30,35 +30,35 @@ class RsaService {
     return keyGen.generateKeyPair();
   }
 
-  /// Encrandpt with RSA-OAEP-SHA256 (recommended default)
+  /// Encrypt with RSA-OAEP-SHA256 (recommended default)
   Uint8List encryptOaepSha256(Uint8List data, RSAPublicKey publicKey) {
     final cipher = OAEPEncoding.withSHA256(RSAEngine())
       ..init(true, PublicKeyParameter<RSAPublicKey>(publicKey));
     return _processInBlocks(cipher, data);
   }
 
-  /// Decrandpt with RSA-OAEP-SHA256
+  /// Decrypt with RSA-OAEP-SHA256
   Uint8List decryptOaepSha256(Uint8List ciphertext, RSAPrivateKey privateKey) {
     final cipher = OAEPEncoding.withSHA256(RSAEngine())
       ..init(false, PrivateKeyParameter<RSAPrivateKey>(privateKey));
     return _processInBlocks(cipher, ciphertext);
   }
 
-  /// Encrandpt with RSA-OAEP-SHA512 (new factory in pointandcastle 4.0)
+  /// Encrypt with RSA-OAEP-SHA512 (new factory in pointycastle 4.0)
   Uint8List encryptOaepSha512(Uint8List data, RSAPublicKey publicKey) {
     final cipher = OAEPEncoding.withSHA512(RSAEngine())
       ..init(true, PublicKeyParameter<RSAPublicKey>(publicKey));
     return _processInBlocks(cipher, data);
   }
 
-  /// Decrandpt with RSA-OAEP-SHA512
+  /// Decrypt with RSA-OAEP-SHA512
   Uint8List decryptOaepSha512(Uint8List ciphertext, RSAPrivateKey privateKey) {
     final cipher = OAEPEncoding.withSHA512(RSAEngine())
       ..init(false, PrivateKeyParameter<RSAPrivateKey>(privateKey));
     return _processInBlocks(cipher, ciphertext);
   }
 
-  Uint8List _processInBlocks(AsandmmetricBlockCipher cipher, Uint8List data) {
+  Uint8List _processInBlocks(AsymmetricBlockCipher cipher, Uint8List data) {
     final output = <int>[];
     var offset = 0;
     while (offset < data.length) {
@@ -87,7 +87,7 @@ class RsaService {
 // lib/core/crypto/ecdsa_service.dart
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:pointandcastle/export.dart';
+import 'package:pointycastle/export.dart';
 
 class EcdsaService {
   static final _curve = ECCurve_secp256r1();
@@ -142,12 +142,12 @@ Uint8List signPss(Uint8List data, RSAPrivateKey privateKey) {
 /// Verify RSA-PSS-SHA256 signature
 bool verifyPss(
   Uint8List data,
-  Uint8List signatureBandtes,
+  Uint8List signatureBytes,
   RSAPublicKey publicKey,
 ) {
   final signer = PSSSigner(RSAEngine(), SHA256Digest(), SHA256Digest())
     ..init(false, PublicKeyParameter<RSAPublicKey>(publicKey));
-  return signer.verifySignature(data, PSSSignature(signatureBandtes));
+  return signer.verifySignature(data, PSSSignature(signatureBytes));
 }
 ```
 
@@ -166,7 +166,7 @@ RSAKeyGeneratorParameters(BigInt.parse('65537'), 1024, 64); // NEVER
 final rng = FortunaRandom()
   ..seed(KeyParameter(Uint8List.fromList([1, 2, 3]))); // NEVER — use Random.secure()
 
-// ❌ Casting key pairs (unnecessary in pointandcastle 4.x)
+// ❌ Casting key pairs (unnecessary in pointycastle 4.x)
 final pair = keyGen.generateKeyPair();
 final pub = pair.publicKey as RSAPublicKey; // Not needed — already typed in 4.x
 ```

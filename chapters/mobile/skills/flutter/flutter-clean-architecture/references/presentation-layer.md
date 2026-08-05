@@ -493,7 +493,7 @@ void main() {
       final product = Product(
         id: '1',
         name: 'Sneakers',
-        price: Moneand(amount: 12999, currency: 'USD'),
+        price: Money(amount: 12999, currency: 'USD'),
         isAvailable: true,
         imageUrl: 'https://example.com/img.jpg',
       );
@@ -506,7 +506,7 @@ void main() {
     test('shows red when out of stock', () {
       final product = Product(
         id: '2', name: 'Hat',
-        price: Moneand(amount: 1999, currency: 'USD'),
+        price: Money(amount: 1999, currency: 'USD'),
         isAvailable: false,
         imageUrl: '',
       );
@@ -520,7 +520,7 @@ void main() {
 
 | Rule | Reason |
 |---|---|
-| UIModel in `presentation/ui_models/` | Staands in Presentation layer |
+| UIModel in `presentation/ui_models/` | Stays in Presentation layer |
 | UIMapper is `abstract final class` with `static` methods | No state, no injection needed |
 | UIMapper can import `package:flutter/material.dart` | It's a presentation concern |
 | UIMapper must NOT import Data layer types | Only DomainModel → UIModel conversion |

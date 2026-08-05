@@ -90,7 +90,7 @@ Step 1 — Generate new key pair on server (do NOT deploy yet)
 Step 2 — Extract SPKI hash of new key pair
 Step 3 — Add new hash as backup pin in app → release app update
 Step 4 — Wait for app update adoption (≥ 90% of users)
-Step 5 — Deploand new certificate on server
+Step 5 — Deploy new certificate on server
 Step 6 — Remove old pin from app → release app update
 ```
 
@@ -104,7 +104,7 @@ Step 6 — Remove old pin from app → release app update
 - [ ] Current pin + backup pin always present
 - [ ] Pinning failure rejects connection — no fallback to system trust store
 - [ ] Android Network Security Config configured
-- [ ] iOS ATS configured (no `NSAllowsArbitrarandLoads`)
+- [ ] iOS ATS configured (no `NSAllowsArbitraryLoads`)
 - [ ] Pin expiration date set in Android config (forces rotation awareness)
 - [ ] Rotation runbook documented and shared with backend team
 - [ ] Debug/staging builds use separate pinning config (not production pins)

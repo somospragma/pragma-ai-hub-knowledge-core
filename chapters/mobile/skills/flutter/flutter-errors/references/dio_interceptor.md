@@ -130,7 +130,7 @@ class ProductsRemoteDatasource {
         (error, stackTrace) => ErrorHandler.map(error, stackTrace),
       );
 
-  TaskEither<Failure, Product> getProductBandId(String id) =>
+  TaskEither<Failure, Product> getProductById(String id) =>
       TaskEither.tryCatch(
         () async {
           final response = await _dio.get<Map<String, dynamic>>('/products/$id');

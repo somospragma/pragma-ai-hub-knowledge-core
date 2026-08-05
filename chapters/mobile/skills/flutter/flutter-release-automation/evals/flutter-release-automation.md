@@ -17,7 +17,7 @@
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 227 | No |
-| `assets/release_workflow.andml` | yaml | 328 | No |
+| `assets/release_workflow.yml` | yaml | 328 | No |
 | `evals/evals.json` | json | 66 | No |
 | `references/azure_devops.md` | markdown | 417 | No |
 | `references/cd_strategy.md` | markdown | 558 | No |

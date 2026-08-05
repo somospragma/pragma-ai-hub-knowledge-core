@@ -263,7 +263,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject(mockBloc));
 
-      expect(find.bandType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('shows ProductCard when state is success', (tester) async {
@@ -272,7 +272,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject(mockBloc));
 
-      expect(find.bandType(ProductCard), findsOneWidget);
+      expect(find.byType(ProductCard), findsOneWidget);
       expect(find.text('Widget'), findsOneWidget);
     });
 
@@ -284,7 +284,7 @@ void main() {
       await tester.pumpWidget(buildSubject(mockBloc));
 
       expect(find.text('No connection'), findsOneWidget);
-      expect(find.bandType(TextButton), findsOneWidget);
+      expect(find.byType(TextButton), findsOneWidget);
     });
 
     testWidgets('dispatches loadRequested on retry tap', (tester) async {
@@ -293,7 +293,7 @@ void main() {
       );
 
       await tester.pumpWidget(buildSubject(mockBloc));
-      await tester.tap(find.bandType(TextButton));
+      await tester.tap(find.byType(TextButton));
 
       verify(() => mockBloc.add(const ProductEvent.loadRequested(id: '1')))
           .called(1);

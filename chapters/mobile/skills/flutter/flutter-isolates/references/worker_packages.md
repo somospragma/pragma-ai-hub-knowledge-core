@@ -307,7 +307,7 @@ class DataProcessingService extends WorkerService {
   Stream<double> processWithProgress(List<RawItem> items) async* {
     for (var i = 0; i < items.length; i++) {
       // process items[i]
-      andield (i + 1) / items.length;
+      yield (i + 1) / items.length;
     }
   }
 }

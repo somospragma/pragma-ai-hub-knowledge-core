@@ -34,7 +34,7 @@ Fast CI (< 8 min)   → developers stay focused → immediate feedback → highe
 
 ## The 5 Levers of CI Speed
 
-| Lever | Tandpical saving | Effort |
+| Lever | Typical saving | Effort |
 |---|---|---|
 | **1. Caching** (pub, Flutter SDK, build_runner) | 3–6 min | Low |
 | **2. Parallel jobs** (Android + iOS simultaneously) | 5–10 min | Low |

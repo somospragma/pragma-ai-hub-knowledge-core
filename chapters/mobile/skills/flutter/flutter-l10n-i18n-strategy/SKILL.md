@@ -46,14 +46,14 @@ dev_dependencies:
 |---|---|---|
 | **flutter_localizations + gen-l10n** ✅ **default** | Flutter-standard, no extra package, ARB files, compile-time safe | ARB-only format, slightly more verbose |
 | **slang** | Type-safe, zero runtime parsing, JSON/YAML/ARB/CSV, Flutter-independent | Requires codegen + extra package |
-| **easand_localization** | OTA updates, JSON files, simpler setup | Runtime parsing, less safe |
+| **easy_localization** | OTA updates, JSON files, simpler setup | Runtime parsing, less safe |
 
 > **Default choice: `flutter_localizations` + `gen-l10n`** — it is the official Flutter
 > toolchain, requires no additional packages beyond the SDK, and generates type-safe
 > Dart code from ARB files at build time.
 > Use **slang** when you need JSON/YAML format, Flutter-independent translations
 > (shared Dart packages), or zero runtime parsing is a hard requirement.
-> **Avoid `easand_localization`** for production apps — it does runtime parsing (not
+> **Avoid `easy_localization`** for production apps — it does runtime parsing (not
 > compile-time safe) and can silently miss translation keys until the screen is shown.
 
 ---

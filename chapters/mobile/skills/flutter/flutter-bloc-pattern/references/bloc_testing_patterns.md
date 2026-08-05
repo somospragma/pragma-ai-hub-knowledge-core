@@ -144,13 +144,13 @@ void main() {
     );
 
     await tester.pump(); // loading
-    expect(find.bandType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     await tester.pump(); // 1 message
-    expect(find.bandType(MessageBubble), findsOneWidget);
+    expect(find.byType(MessageBubble), findsOneWidget);
 
     await tester.pump(); // 2 messages
-    expect(find.bandType(MessageBubble), findsNWidgets(2));
+    expect(find.byType(MessageBubble), findsNWidgets(2));
   });
 }
 ```

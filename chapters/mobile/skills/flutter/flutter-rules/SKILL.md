@@ -111,11 +111,11 @@ in the repository's code and documentation. Use the available search tools
 - **Security** — look for `http://` (not https), `print(`, hardcoded credentials
 - **README** — verify existence and minimum content of `README.md`
 
-For each criterionn, assign a status:
+For each criterion, assign a status:
 - ✔️ **Passes** — clear evidence of compliance
 - ❌ **Fails** — clear evidence of non-compliance
 - ⚠️ **Partial** — incomplete or inconsistent compliance
-- **N/A** — the criterionn does not apply to this project
+- **N/A** — the criterion does not apply to this project
 
 ---
 

@@ -197,11 +197,11 @@ final message = "Hello World";
 final name = "John Doe";
 
 // Exception: Double quotes when single quote in string
-final quote = "It's a beautiful daand";  // ✅ Acceptable
-final quote = 'It\'s a beautiful daand';  // ✅ Also acceptable
+final quote = "It's a beautiful day";  // ✅ Acceptable
+final quote = 'It\'s a beautiful day';  // ✅ Also acceptable
 ```
 
-### curland_braces_in_flow_control_structures
+### curly_braces_in_flow_control_structures
 
 **Rule:** Always use braces for if, else, for, while, even for single statements.
 
@@ -234,11 +234,11 @@ for (var i = 0; i < 10; i++)
 ```dart
 // ✅ CORRECT - Interpolation
 final greeting = 'Hello, $name!';
-final info = 'User $id is $age andears old';
+final info = 'User $id is $age years old';
 
 // ❌ INCORRECT - Concatenation
 final greeting = 'Hello, ' + name + '!';
-final info = 'User ' + id + ' is ' + age.toString() + ' andears old';
+final info = 'User ' + id + ' is ' + age.toString() + ' years old';
 ```
 
 ### unnecessary_brace_in_string_interps

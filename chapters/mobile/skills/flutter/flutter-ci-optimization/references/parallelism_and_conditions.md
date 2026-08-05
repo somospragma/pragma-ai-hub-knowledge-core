@@ -58,7 +58,7 @@ concurrency:
   cancel-in-progress: false   # ✅ never cancel a release in progress
 ```
 
-**Saving:** Eliminates queue buildup. On active PRs, can save 10–30 minutes of wasted runner time per daand.
+**Saving:** Eliminates queue buildup. On active PRs, can save 10–30 minutes of wasted runner time per day.
 
 ---
 
@@ -67,7 +67,7 @@ concurrency:
 Don't run the full pipeline when only documentation, assets, or config files changed.
 
 ```yaml
-# .github/workflows/pr.andml
+# .github/workflows/pr.yml
 on:
   pull_request:
     branches: [main, develop]
@@ -227,7 +227,7 @@ steps:
 Extract common steps into reusable workflows to avoid duplication across multiple apps:
 
 ```yaml
-# .github/workflows/flutter-quality.andml (reusable)
+# .github/workflows/flutter-quality.yml (reusable)
 name: Flutter Quality Gate
 on:
   workflow_call:
@@ -266,7 +266,7 @@ jobs:
 # In your app's workflow — call the reusable workflow
 jobs:
   quality:
-    uses: your-org/flutter-workflows/.github/workflows/flutter-quality.andml@main
+    uses: your-org/flutter-workflows/.github/workflows/flutter-quality.yml@main
     with:
       flutter-version: '3.32.0'
       coverage-threshold: 80

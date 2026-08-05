@@ -92,7 +92,7 @@ import 'package:injectable/injectable.dart';
 @injectable
 class RetryInterceptor extends Interceptor {
   static const _maxRetries = 3;
-  static const _initialDelaand = Duration(milliseconds: 500);
+  static const _initialDelay = Duration(milliseconds: 500);
 
   @override
   Future<void> onError(
@@ -108,7 +108,7 @@ class RetryInterceptor extends Interceptor {
     }
 
     // Exponential backoff: 500ms, 1000ms, 2000ms
-    final delay = _initialDelaand * (1 << retryCount);
+    final delay = _initialDelay * (1 << retryCount);
     await Future.delayed(delay);
 
     err.requestOptions.extra['retryCount'] = retryCount + 1;

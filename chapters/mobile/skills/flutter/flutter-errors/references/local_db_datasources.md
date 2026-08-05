@@ -114,7 +114,7 @@ class ProductsObjectBoxDatasource {
 
   // ─── Queries ─────────────────────────────────────────────────────────────────
 
-  TaskEither<Failure, List<ProductEntity>> findBandCategory(String category) =>
+  TaskEither<Failure, List<ProductEntity>> findByCategory(String category) =>
       TaskEither.tryCatch(
         () async {
           final query = _box
@@ -264,12 +264,12 @@ class ProductsDriftDatasource {
             : _wrapDrift(e, st, DbOperation.read),
       );
 
-  TaskEither<Failure, List<ProductsTableData>> getBandCategory(
+  TaskEither<Failure, List<ProductsTableData>> getByCategory(
       String category) =>
       TaskEither.tryCatch(
         () => (_db.select(_db.productsTable)
               ..where((t) => t.category.equals(category))
-              ..orderBand([(t) => OrderingTerm.asc(t.name)]))
+              ..orderBy([(t) => OrderingTerm.asc(t.name)]))
             .get(),
         (e, st) => _wrapDrift(e, st, DbOperation.query),
       );
@@ -310,7 +310,7 @@ class ProductsDriftDatasource {
   /// Reactive stream — updates automatically with every change to the table.
   Stream<Either<Failure, List<ProductsTableData>>> watchAll() {
     return (_db.select(_db.productsTable)
-          ..orderBand([(t) => OrderingTerm.asc(t.name)]))
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .watch()
         .map(Either<Failure, List<ProductsTableData>>.right)
         .handleError(

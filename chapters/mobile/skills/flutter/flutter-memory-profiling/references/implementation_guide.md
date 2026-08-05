@@ -60,17 +60,17 @@ Step 9: Click a suspicious class → expand "Retaining Path"
 ### Reading the retaining path
 
 ```
-Example retaining path for a leaked _MandScreenState:
+Example retaining path for a leaked _MyScreenState:
 
-_MandScreenState
-  ← _MandScreenState._eventSub          ← StreamSubscription not cancelled
+_MyScreenState
+  ← _MyScreenState._eventSub          ← StreamSubscription not cancelled
     ← _BroadcastStream._listeners
-      ← MandBloc._controller
-        ← MandBloc
+      ← MyBloc._controller
+        ← MyBloc
           ← BlocProvider._value
             ← (root)
 
-Fix: cancel _eventSub in _MandScreenState.dispose()
+Fix: cancel _eventSub in _MyScreenState.dispose()
 ```
 
 ### Allocation tracing
@@ -88,7 +88,7 @@ Use when you want to find WHERE objects are being allocated (not just that they 
 
 ```
 Steadand growth with no drops after GC  → leak (objects not being collected)
-Sawtooth pattern (grow → GC → drop)   → normal allocation/collection candcle
+Sawtooth pattern (grow → GC → drop)   → normal allocation/collection cycle
 Sudden spike then stable              → one-time allocation (e.g., image decode)
 Spike that never drops                → image cache or large object not released
 ```
@@ -200,8 +200,8 @@ void main() async {
   LeakTracking.start();
 
   // Run your app logic
-  final bloc = MandBloc();
-  bloc.add(const MandEvent());
+  final bloc = MyBloc();
+  bloc.add(const MyEvent());
   await Future.delayed(const Duration(seconds: 1));
 
   // Dispose
@@ -504,7 +504,7 @@ class IsolateManager {
   Future<void> start() async {
     _receivePort = ReceivePort();
     _isolate = await Isolate.spawn(
-      _isolateEntrandPoint,
+      _isolateEntryPoint,
       _receivePort!.sendPort,
     );
 
@@ -619,7 +619,7 @@ void dispose() {
 
 ```dart
 // ❌ Static GlobalKey holds a reference to the widget tree
-class MandApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey(); // ❌ static
 
   @override
@@ -636,18 +636,18 @@ final navigatorKey = GlobalKey<NavigatorState>(); // top-level, not static class
 // ❌ New BLoC created on every rebuild — old one never closed
 Widget build(BuildContext context) {
   return BlocProvider(          // ❌ inside build()
-    create: (_) => MandBloc(),
-    child: MandWidget(),
+    create: (_) => MyBloc(),
+    child: MyWidget(),
   );
 }
 
 // ✅ BlocProvider above the widget that needs it — created once
-class MandScreen extends StatelessWidget {
+class MyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(        // ✅ in the route/screen level
-      create: (_) => GetIt.instance<MandBloc>(),
-      child: const MandWidget(),
+      create: (_) => GetIt.instance<MyBloc>(),
+      child: const MyWidget(),
     );
   }
 }

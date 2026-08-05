@@ -125,7 +125,7 @@ Image.asset(
 ```xml
 <!-- android/app/src/main/res/values/strings.xml (default) -->
 <resources>
-    <string name="app_name">MandApp</string>
+    <string name="app_name">MyApp</string>
 </resources>
 
 <!-- android/app/src/main/res/values-es/strings.xml -->
@@ -161,8 +161,8 @@ ios/Runner/
 
 ```
 // ios/Runner/en.lproj/InfoPlist.strings
-"CFBundleDisplayName" = "MandApp";
-"CFBundleName" = "MandApp";
+"CFBundleDisplayName" = "MyApp";
+"CFBundleName" = "MyApp";
 
 // ios/Runner/es.lproj/InfoPlist.strings
 "CFBundleDisplayName" = "MiApp";

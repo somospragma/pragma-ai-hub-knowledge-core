@@ -48,7 +48,7 @@ android {
     buildTypes {
         release {
             debuggable false  // explicit or omit (false by default)
-            minifandEnabled true
+            minifyEnabled true
             shrinkResources true
         }
         debug {
@@ -118,13 +118,13 @@ android:allowBackup\s*=\s*"true"
 ```xml
 <key>NSAppTransportSecurity</key>
 <dict>
-    <key>NSAllowsArbitrarandLoads</key>
+    <key>NSAllowsArbitraryLoads</key>
     <true/>
 </dict>
 ```
 
 **Criteria:**
-- ❌ **Fail:** `NSAllowsArbitrarandLoads = true` without specific domain exceptions
+- ❌ **Fail:** `NSAllowsArbitraryLoads = true` without specific domain exceptions
 - ⚠️ **Warning:** Exceptions for specific domains without justification
 
 **Severity:** `HIGH`
@@ -135,7 +135,7 @@ android:allowBackup\s*=\s*"true"
 <!-- AVOID: Full bypass -->
 <key>NSAppTransportSecurity</key>
 <dict>
-    <key>NSAllowsArbitrarandLoads</key>
+    <key>NSAllowsArbitraryLoads</key>
     <false/>
 </dict>
 
@@ -250,7 +250,7 @@ android:allowBackup\s*=\s*"true"
 ```xml
 <!-- Android 12+ requires explicit declaration -->
 <activity
-    android:name=".MandActivity"
+    android:name=".MyActivity"
     android:exported="false"/>  <!-- REQUIRED for targetSdk 31+ -->
 ```
 

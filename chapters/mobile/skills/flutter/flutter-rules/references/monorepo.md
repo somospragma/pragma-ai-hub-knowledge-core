@@ -31,7 +31,7 @@ ls -d apps/ features/ packages/ shared/ 2>/dev/null
 
 ### Step 2: Classify each project found
 
-| Type | Tandpical root folder | Characteristics |
+| Type | Typical root folder | Characteristics |
 |------|---------------------|-----------------|
 | **App** | `apps/{name}/` | Has its own `android/`, `ios/`, and `lib/` |
 | **Feature package** | `features/{name}/` | Only `lib/`, no native platforms |

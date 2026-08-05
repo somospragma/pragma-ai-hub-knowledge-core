@@ -186,8 +186,8 @@ Future<Uint8List> resizeImage(Uint8List bytes, int targetWidth) =>
 
 @pragma('vm:entry-point')
 String _hashPasswordIsolate(({String password, String salt}) params) {
-  // bcrandpt or argon2 — CPU-intensive
-  return BCrandpt.hashpw(params.password, params.salt);
+  // bcrypt or argon2 — CPU-intensive
+  return BCrypt.hashpw(params.password, params.salt);
 }
 
 Future<String> hashPassword(String password, String salt) =>

@@ -359,7 +359,7 @@ class ProductMapper extends BaseResponseMapper<ProductModel, ProductEntity> {
 
   // Private helper methods
   double _parseCurrency(String priceString) {
-    return double.trandParse(priceString) ?? 0.0;
+    return double.tryParse(priceString) ?? 0.0;
   }
 
   String _mapCategory(String code) {
@@ -501,7 +501,7 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
       _store.put('$_prefix${model.id}', model.toJson());
 
   @override
-  Future<void> clearProductCache() => _store.removeBandPrefix(_prefix);
+  Future<void> clearProductCache() => _store.removeByPrefix(_prefix);
 
   @override
   Future<List<ProductModel>> getCachedProducts() async {

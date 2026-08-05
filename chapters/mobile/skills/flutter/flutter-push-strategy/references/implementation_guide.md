@@ -778,7 +778,7 @@ class NotificationNavigationListener extends StatelessWidget {
 }
 
 // Usage in main widget tree:
-class MandApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -855,7 +855,7 @@ void main() async {
   // No global setup needed here for OneSignal
 
   await configureDependencies();
-  runApp(const MandApp());
+  runApp(const MyApp());
 }
 ```
 
@@ -1205,7 +1205,7 @@ void main() {
 - Use `dart-define` to select the provider at build time without code changes
 - If the project uses multiple providers simultaneously, resolve per platform inside `PushProviderModule`
 
-### Notification Data Paandload
+### Notification Data Payload
 - Always include a `route` key in the data payload for navigation
 - Keep payloads small — fetch full content from the API after navigation
 - Use consistent key names across all notification types
@@ -1215,8 +1215,8 @@ void main() {
 | App State | Notification message | Data-only message |
 |---|---|---|
 | Foreground | `onForegroundMessage` → show local notification | `onForegroundMessage` → process silently |
-| Background | System traand (auto) + background handler | Background handler only |
-| Terminated | System traand (auto) + background handler | Background handler only |
+| Background | System tray (auto) + background handler | Background handler only |
+| Terminated | System tray (auto) + background handler | Background handler only |
 | Tapped (background) | `onMessageOpenedApp` → navigate | — |
 | Tapped (terminated) | `getInitialMessage()` → navigate | — |
 

@@ -197,7 +197,7 @@ The `Result<Success, Failure>` pattern replaces exception handling and provides 
 ### Why Result Pattern?
 
 - **Explicit:** Success and failure are types, not hidden exceptions
-- **Composable:** Easand to chain operations
+- **Composable:** Easy to chain operations
 - **Type-safe:** Compiler enforces handling both cases
 - **Cleaner:** No try-catch blocks scattered everywhere
 

@@ -30,7 +30,7 @@ dev_dependencies:
 # ─── Melos Configuration ──────────────────────────────────────────────────────
 melos:
 
-  # ── Commy Configuration ────────────────────────────────────────────────────
+  # ── Command Configuration ────────────────────────────────────────────────────
 
   command:
     bootstrap:
@@ -94,7 +94,7 @@ melos:
     # ── Script with hooks ──────────────────────────────────────────────────────
 
     publish:
-      run: melos publish --andes
+      run: melos publish --yes
       description: Publish all changed packages
       hooks:
         pre: melos run test

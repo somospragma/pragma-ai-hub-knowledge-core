@@ -96,7 +96,7 @@ stream.timeout(const Duration(seconds: 10))
 stream.handleError((e) => logger.error('$e'))
 
 // transform — apply a StreamTransformer
-stream.transform(mandTransformer)
+stream.transform(myTransformer)
 ```
 
 ---
@@ -160,7 +160,7 @@ class SlidingWindowTransformer<T> extends StreamTransformerBase<T, List<T>> {
     await for (final event in stream) {
       buffer.add(event);
       if (buffer.length > windowSize) buffer.removeAt(0);
-      andield List.unmodifiable(buffer);
+      yield List.unmodifiable(buffer);
     }
   }
 }
@@ -203,14 +203,14 @@ Stream<DashboardData> combineLatestDashboard(
   Cart? latestCart;
   final controller = StreamController<DashboardData>.broadcast();
 
-  void trandEmit() {
+  void tryEmit() {
     if (latestUser != null && latestCart != null) {
       controller.add(DashboardData(user: latestUser!, cart: latestCart!));
     }
   }
 
-  final userSub = userStream.listen((u) { latestUser = u; trandEmit(); });
-  final cartSub = cartStream.listen((c) { latestCart = c; trandEmit(); });
+  final userSub = userStream.listen((u) { latestUser = u; tryEmit(); });
+  final cartSub = cartStream.listen((c) { latestCart = c; tryEmit(); });
 
   controller.onCancel = () {
     userSub.cancel();
@@ -293,7 +293,7 @@ stream
 
 ```dart
 // ✅ Always cancel subscriptions in dispose() or BLoC close()
-class _MandWidgetState extends State<MandWidget> {
+class _MyWidgetState extends State<MandWidget> {
   StreamSubscription<List<Product>>? _sub;
 
   @override

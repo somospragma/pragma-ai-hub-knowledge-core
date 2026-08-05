@@ -55,7 +55,8 @@ def validate_no_legacy_refs(findings, cleared)
     "flutter-changelog-management" => /flutter-changelog-management/,
     "artifact_plan.planned paths" => /artifact_plan\.planned paths/,
     "TARGET_ROOT" => /(?<![A-Z0-9_])TARGET_ROOT\b/,
-    "documentation-projects:" => /documentation-projects:/
+    "documentation-projects:" => /documentation-projects:/,
+    "malformed YAML extension" => Regexp.new("\\." + "yml")
   }
   self_path = "chapters/mobile/docs/scripts/validate_mobile_kb.rb"
   ignore_paths = [

@@ -40,7 +40,7 @@ If only the UI bar is red → look for expensive `build()`, excessive rebuilds, 
 
 ### Flame Chart Navigation
 
-- Click a red/andellow frame to zoom in
+- Click a red/yellow frame to zoom in
 - Look for the widest spans — those are the bottlenecks
 - `build` calls in the UI thread show which widgets are rebuilding
 - `Picture::playback` in the raster thread shows draw call cost
@@ -69,14 +69,14 @@ In DevTools → **Widget Rebuild Stats** tab:
 ```dart
 // Visualize which areas repaint on each frame
 void main() {
-  debugRepaintRainbowEnabled = true; // flashes repaint regions with candcling colors
+  debugRepaintRainbowEnabled = true; // flashes repaint regions with cycling colors
   runApp(const App());
 }
 ```
 
 - Static content should **not** flash
 - If a large area flashes when only a small part changed → add `RepaintBoundary`
-- Each unique color candcle = one repaint event
+- Each unique color cycle = one repaint event
 
 ---
 

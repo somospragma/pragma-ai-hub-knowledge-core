@@ -325,7 +325,7 @@ AnimatedContainer(
   duration: const Duration(milliseconds: 300),
   curve: Curves.easeInOut,
   width: _expanded ? 200 : 100,
-  color: _active ? Colors.blue : Colors.green,
+  color: _active ? Colors.blue : Colors.grey,
 )
 
 // ✅ Use AnimationController + Tween for full control
@@ -364,8 +364,8 @@ class ChartPainter extends CustomPainter {
     final path = Path();
     for (var i = 0; i < data.length; i++) {
       final x = i * size.width / (data.length - 1);
-      final and = size.height - (data[i] * size.height);
-      i == 0 ? path.moveTo(x, and) : path.lineTo(x, and);
+      final y = size.height - (data[i] * size.height);
+      i == 0 ? path.moveTo(x, y) : path.lineTo(x, y);
     }
     canvas.drawPath(path, paint);
   }

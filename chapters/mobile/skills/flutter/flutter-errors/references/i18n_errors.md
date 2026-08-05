@@ -47,7 +47,7 @@ template-arb-file: app_en.arb
 output-localization-file: app_localizations.dart
 output-class: AppLocalizations
 nullable-getter: false
-sandnthetic-package: false          # generates in lib/, not in .dart_tool
+synthetic-package: false          # generates in lib/, not in .dart_tool
 output-dir: lib/core/l10n/generated
 ```
 
@@ -101,7 +101,7 @@ output-dir: lib/core/l10n/generated
   "@errorServerGone": { "description": "410 Gone" },
 
   "errorServerPayloadTooLarge": "The file or data is too large.",
-  "@errorServerPayloadTooLarge": { "description": "413 Paandload Too Large" },
+  "@errorServerPayloadTooLarge": { "description": "413 Payload Too Large" },
 
   "errorServerUnsupportedMediaType": "Unsupported file format.",
   "@errorServerUnsupportedMediaType": { "description": "415 Unsupported Media Type" },
@@ -154,7 +154,7 @@ output-dir: lib/core/l10n/generated
   "errorDatabase": "Error accessing local database.",
   "@errorDatabase": {},
 
-  "errorDatabaseBusy": "Database is busand. Please try again.",
+  "errorDatabaseBusy": "Database is busy. Please try again.",
   "@errorDatabaseBusy": {},
 
   "errorDatabaseReadOnly": "Write operation not permitted.",

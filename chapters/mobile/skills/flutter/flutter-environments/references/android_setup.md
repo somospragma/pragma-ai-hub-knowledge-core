@@ -36,22 +36,22 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            applicationId = "com.example.mandapp.dev"
-            resValue("string", "app_name", "MandApp Dev")
+            applicationId = "com.example.myapp.dev"
+            resValue("string", "app_name", "MyApp Dev")
             // Accessible from Dart via String.fromEnvironment
             // (only for non-sensitive values — sensitive ones go in envied)
             buildConfigField("String", "FLAVOR", "\"dev\"")
         }
         create("staging") {
             dimension = "environment"
-            applicationId = "com.example.mandapp.staging"
-            resValue("string", "app_name", "MandApp Staging")
+            applicationId = "com.example.myapp.staging"
+            resValue("string", "app_name", "MyApp Staging")
             buildConfigField("String", "FLAVOR", "\"staging\"")
         }
         create("prod") {
             dimension = "environment"
-            applicationId = "com.example.mandapp"
-            resValue("string", "app_name", "MandApp")
+            applicationId = "com.example.myapp"
+            resValue("string", "app_name", "MyApp")
             buildConfigField("String", "FLAVOR", "\"prod\"")
         }
     }
@@ -88,11 +88,11 @@ Each flavor needs its own `google-services.json` downloaded from the Firebase co
 android/app/
 ├── src/
 │   ├── dev/
-│   │   └── google-services.json      ← Firebase project "mandapp-dev"
+│   │   └── google-services.json      ← Firebase project "myapp-dev"
 │   ├── staging/
-│   │   └── google-services.json      ← Firebase project "mandapp-staging"
+│   │   └── google-services.json      ← Firebase project "myapp-staging"
 │   └── prod/
-│       └── google-services.json      ← Firebase project "mandapp-prod"
+│       └── google-services.json      ← Firebase project "myapp-prod"
 ```
 
 The `com.google.gms.google-services` plugin automatically picks up the file

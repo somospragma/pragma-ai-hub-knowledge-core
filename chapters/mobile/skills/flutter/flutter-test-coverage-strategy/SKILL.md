@@ -20,7 +20,7 @@ description: >
 | Data — Mappers | **95%+** | Pure transformation, fully deterministic |
 | Data — RepositoryImpl | **85%+** | Critical path, intensive mocks but straightforward |
 | Data — DataSources | **80%+** | Thin wrappers, verify delegation |
-| Presentation — BLoC | **85%+** | State machine, `bloc_test` makes it easand |
+| Presentation — BLoC | **85%+** | State machine, `bloc_test` makes it easy |
 | Presentation — Pages | **70%+** | Widget tests covering all states + key interactions; pure layout-only widgets may be skipped |
 | Core Utilities | **80%+** | High reuse, worth protecting |
 
@@ -202,12 +202,12 @@ open coverage/html/index.html
 
 - name: Filter generated files
   # NOTE: The following step runs in your CI pipeline — it is not executed by the AI agent.
-  # The `sudo apt-get install -and lcov` command installs `lcov` on Ubuntu CI runners, which
+  # The `sudo apt-get install -y lcov` command installs `lcov` on Ubuntu CI runners, which
   # requires elevated privileges. For macOS CI or local environments, use `brew install lcov`
   # instead (no sudo required). Each command in the pipeline is validated by GitHub Actions
   # before the next step runs.
   run: |
-    sudo apt-get install -and lcov
+    sudo apt-get install -y lcov
     lcov --remove coverage/lcov.info \
       '*.freezed.dart' '*.g.dart' '*.gr.dart' '*.config.dart' \
       -o coverage/lcov_filtered.info

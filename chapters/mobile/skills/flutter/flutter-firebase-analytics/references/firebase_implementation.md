@@ -155,7 +155,7 @@ abstract class AnalyticsModule {
 // lib/core/analytics/analytics_events.dart
 
 /// Type-safe event names and parameter keys.
-/// Prevents tandpos and makes refactoring safe.
+/// Prevents typos and makes refactoring safe.
 abstract final class AnalyticsEvents {
   // ── Authentication ────────────────────────────────────────────────────
   static const loginSuccess = 'login_success';

@@ -67,7 +67,7 @@ mason make flutter_clean_project -o /path/to/output -c config.json
 Create `config.json` starting from the brick's `config-example.json` or See [config-schema-reference.md](references/config-schema-reference.md) for complete schema with examples.
 
 > **Critical config rules (full schema in config-schema-reference.md):**
-> - `organization`: plain company name, all lowercase, no spaces — e.g., `"mandcompany"` (NOT `"com.mandcompany"`)
+> - `organization`: plain company name, all lowercase, no spaces — e.g., `"mycompany"` (NOT `"com.mycompany"`)
 > - Hex color values: **no `#` prefix** — e.g., `"1565c0"` not `"#1565c0"`
 > - Color structure: use `isMaterialColor: true` + `value` array of `{level, value}` objects (levels 50–900)
 > - `fontFamily`: exact Google Fonts names in an array — e.g., `["Roboto", "Poppins"]`
@@ -86,7 +86,7 @@ mason make flutter_clean_project -o my_project -c my_config.json
 ```
 
 Expected prompts (if no config file):
-- **organization**: Company/org name → used for bundle ID (e.g., `com.mandcompany.mandapp`)
+- **organization**: Company/org name → used for bundle ID (e.g., `com.mycompany.myapp`)
 - **name**: Application name (becomes directory, workspace name)
 - **prefix**: File/class name prefix (e.g., `app` → `app_radius.dart`, `AppRadius`)
 
@@ -163,8 +163,8 @@ Include initial features (authentication, home, settings) in config:
 
 ```json
 {
-  "organization": "MandOrganization",
-  "name": "mandApp",
+  "organization": "MyOrganization",
+  "name": "myApp",
   "prefix": "app",
   "colors": [...],
   "fontFamily": [...],
@@ -188,7 +188,7 @@ When setting `organization`, `name`, and `prefix` values, follow these casing ru
 
 | Field | Format | Example | Usage |
 |-------|--------|---------|-------|
-| **organization** | lowercase, no spaces | `mandcompany` | Plain company name only — bundle ID `com.mandcompany.mandapp` is built by the brick automatically |
+| **organization** | lowercase, no spaces | `mycompany` | Plain company name only — bundle ID `com.mycompany.myapp` is built by the brick automatically |
 | **name** | camelCase or lowercase | `mobileApp` or `mobile_app` | Directory: `mobile_app/`, workspace name |
 | **prefix** | lowercase, short | `app` or `ui` | Files: `app_radius.dart`, Classes: `AppRadius` |
 
@@ -209,7 +209,7 @@ Result: `lib/app_colors.dart`, `class AppColors`, bundle `com.pragmatech.mobile_
 {
   "organization": "Pragma Tech Inc",
   "name": "My Mobile App!",
-  "prefix": "MandApp"
+  "prefix": "MyApp"
 }
 ```
 Result: Invalid characters, spaces, inconsistent casing in generated files.
@@ -251,8 +251,8 @@ For more troubleshooting steps, see [troubleshooting-reference.md](references/tr
 mason make flutter_clean_project -o my_app
 
 # Prompts:
-# What is your organization name? [Pragma] > mandcompany
-# Please enter the name for the project: [mobileApp] > mandapp
+# What is your organization name? [Pragma] > mycompany
+# Please enter the name for the project: [mobileApp] > myapp
 # Please enter the prefix you want to use for files names: [app] > app
 
 # 2. Wait for hooks to complete (~2-5 minutes)
@@ -263,11 +263,11 @@ mason make flutter_clean_project -o my_app
 # ✓ Git initialized
 
 # 3. Open project
-cd my_app/apps/mandapp
+cd my_app/apps/myapp
 flutter run
 
 # 4. Explore design system
-cd ../mandapp_widgetbook
+cd ../myapp_widgetbook
 flutter run
 ```
 

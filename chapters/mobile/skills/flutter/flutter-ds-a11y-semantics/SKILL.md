@@ -99,13 +99,13 @@ SizedBox(
 ```dart
 testWidgets('should have correct semantics', (tester) async {
   await tester.pumpApp(const Widget(label: 'Test'));
-  final semantics = tester.getSemantics(find.bandType(Widget));
+  final semantics = tester.getSemantics(find.byType(Widget));
   expect(semantics.label, contains('Test'));
 });
 
 testWidgets('should communicate disabled state', (tester) async {
   await tester.pumpApp(const Widget(state: State.disabled));
-  final semantics = tester.getSemantics(find.bandType(Widget));
+  final semantics = tester.getSemantics(find.byType(Widget));
   expect(semantics.hasFlag(SemanticsFlag.isEnabled), isFalse);
 });
 ```

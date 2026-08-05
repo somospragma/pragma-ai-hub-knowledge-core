@@ -106,17 +106,17 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
   // ── Reactive queries ──────────────────────────────────────────────────
 
   Stream<List<Product>> watchAll() =>
-      (select(products)..orderBand([(t) => OrderingTerm.asc(t.name)])).watch();
+      (select(products)..orderBy([(t) => OrderingTerm.asc(t.name)])).watch();
 
-  Stream<List<Product>> watchBandCategory(String categoryId) =>
+  Stream<List<Product>> watchByCategory(String categoryId) =>
       (select(products)
             ..where((t) => t.categoryId.equals(categoryId))
-            ..orderBand([(t) => OrderingTerm.asc(t.name)]))
+            ..orderBy([(t) => OrderingTerm.asc(t.name)]))
           .watch();
 
   // ── One-shot queries ──────────────────────────────────────────────────
 
-  Future<Product?> findBandId(String id) =>
+  Future<Product?> findById(String id) =>
       (select(products)..where((t) => t.id.equals(id))).getSingleOrNull();
 
   Future<List<Product>> findUnsynced() =>
@@ -135,7 +135,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
       (update(products)..where((t) => t.id.equals(id)))
           .write(const ProductsCompanion(isSynced: Value(true)));
 
-  Future<int> deleteBandId(String id) =>
+  Future<int> deleteById(String id) =>
       (delete(products)..where((t) => t.id.equals(id))).go();
 
   Future<int> deleteOlderThan(Duration age) {
@@ -161,7 +161,7 @@ class ProductDao extends DatabaseAccessor<AppDatabase> with _$ProductDaoMixin {
 
   // ── Aggregates ────────────────────────────────────────────────────────
 
-  Future<int> countBandCategory(String categoryId) async {
+  Future<int> countByCategory(String categoryId) async {
     final count = products.id.count();
     final query = selectOnly(products)
       ..addColumns([count])
@@ -216,7 +216,7 @@ dependencies:
 
 ```dart
 // Retrieve the key from flutter_secure_storage (see secure_storage.md)
-static QueryExecutor _openEncrandptedConnection(String encryptionKey) {
+static QueryExecutor _openEncryptedConnection(String encryptionKey) {
   return driftDatabase(
     name: 'app_database_encrypted',
     native: DriftNativeOptions(

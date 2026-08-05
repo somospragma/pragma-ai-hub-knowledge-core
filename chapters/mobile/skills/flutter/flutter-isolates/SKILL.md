@@ -86,7 +86,7 @@ cancelable.cancel();
 // Bidirectional communication — worker stays alive, processes multiple messages
 // Entry point MUST be top-level or static + @pragma annotated
 @pragma('vm:entry-point')
-void workerEntrandPoint(SendPort sendPort) { /* ... */ }
+void workerEntryPoint(SendPort sendPort) { /* ... */ }
 
 final worker = await IsolateWorker.create();
 final result = await worker.send(WorkerMessage.process(data));

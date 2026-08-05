@@ -21,8 +21,8 @@ Add features to config.json before running `mason make`:
 
 ```json
 {
-  "organization": "mandcompany",
-  "name": "mandapp",
+  "organization": "mycompany",
+  "name": "myapp",
   "prefix": "app",
   "colors": [...],
   "fontFamily": [...],
@@ -449,7 +449,7 @@ dependencies:
 // In main app's main.dart
 void main() async {
   await AppInjector.setup();  // Must call this first
-  runApp(const MandApp());
+  runApp(const MyApp());
 }
 ```
 

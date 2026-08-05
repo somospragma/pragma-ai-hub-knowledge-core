@@ -38,7 +38,7 @@ grep 'android:allowBackup="true"' android/app/src/main/AndroidManifest.xml
 ### App Transport Security (iOS)
 ```bash
 grep -A5 "NSAppTransportSecurity" ios/Runner/Info.plist
-grep "NSAllowsArbitrarandLoads" ios/Runner/Info.plist
+grep "NSAllowsArbitraryLoads" ios/Runner/Info.plist
 ```
 
 ### Excessive permissions (Android)
@@ -114,7 +114,7 @@ grep -r "badCertificateCallback.*=> true" lib/
 grep 'android:usesCleartextTraffic="true"' android/app/src/main/AndroidManifest.xml
 
 # iOS ATS disabled
-grep -A2 "NSAllowsArbitrarandLoads" ios/Runner/Info.plist | grep "<true/>"
+grep -A2 "NSAllowsArbitraryLoads" ios/Runner/Info.plist | grep "<true/>"
 ```
 
 ---
@@ -138,7 +138,7 @@ grep -rn "FirebaseCrashlytics\|Sentry" lib/ | grep -v "sanitize\|redact\|userId\
 
 ```bash
 # ProGuard/R8 disabled
-grep -A10 "buildTypes" android/app/build.gradle | grep -A5 "release" | grep "minifandEnabled false"
+grep -A10 "buildTypes" android/app/build.gradle | grep -A5 "release" | grep "minifyEnabled false"
 
 # Missing obfuscation in CI
 grep -r "flutter build" .github/workflows/ | grep -E "release|appbundle|apk" | grep -v "\-\-obfuscate"
@@ -229,7 +229,7 @@ grep -rE "AIza[0-9A-Za-z\-_]{35}|AKIA[0-9A-Z]{16}" lib/ android/ ios/
 ### High severity (9 checks)
 ```bash
 grep -r 'android:debuggable="true"' android/app/src/main/
-grep "NSAllowsArbitrarandLoads" ios/Runner/Info.plist
+grep "NSAllowsArbitraryLoads" ios/Runner/Info.plist
 grep -B2 'android:exported="true"' android/app/src/main/AndroidManifest.xml
 grep -r "javascriptMode.*unrestricted" lib/
 grep -r "token" lib/ | grep "SharedPreferences"

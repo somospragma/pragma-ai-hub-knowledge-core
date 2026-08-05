@@ -109,7 +109,7 @@ Future<List<SearchResult>> searchResults(SearchResultsRef ref) async {
 | Live search | `_DebounceStreamTransformer` + `restartable()` (BLoC) / `Future.delayed` (Riverpod) |
 | Real-time feed | Broadcast `StreamController` + `BehaviorSubject`-like pattern |
 | Multi-source data | `StreamZip` / `asyncExpand` / Riverpod provider composition |
-| Optimistic update | `async*` andield optimistic → andield confirmed/rollback |
+| Optimistic update | `async*` yield optimistic → yield confirmed/rollback |
 | Pagination | `scan`-like accumulator with `asyncExpand` |
 | Event bus | `StreamController.broadcast()` singleton |
 | Connectivity-aware | `asyncExpand` on connectivity changes |

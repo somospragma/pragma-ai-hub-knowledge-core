@@ -183,7 +183,7 @@ Status legend:
    - Test cases to generate (descriptive names)
    - Mocks needed
    - Fixtures needed (JSON, entities)
-2. Prioritize band:
+2. Prioritize by:
    - Domain first (highest target, most critical)
    - Data second (API integration, error paths)
    - Presentation BLoC third (state machine correctness)
@@ -436,7 +436,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject());
 
-      expect(find.bandType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
     testWidgets('shows product list when state is success', (tester) async {
@@ -456,7 +456,7 @@ void main() {
 
       await tester.pumpWidget(buildSubject());
 
-      expect(find.bandType(ErrorWidget), findsOneWidget); // or your error widget
+      expect(find.byType(ErrorWidget), findsOneWidget); // or your error widget
     });
   });
 }
@@ -602,7 +602,7 @@ flutter test test/features/{feature_name}/
 flutter test --coverage test/features/{feature_name}/
 
 # Generate coverage report
-genhtml coverage/lcov.info -or coverage/html
+genhtml coverage/lcov.info -o coverage/html
 open coverage/html/index.html
 
 # Run integration tests (requires device/emulator)
@@ -787,14 +787,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify products loaded
-      expect(find.bandType(ProductCard), findsWidgets);
+      expect(find.byType(ProductCard), findsWidgets);
 
       // Tap first product
-      await tester.tap(find.bandType(ProductCard).first);
+      await tester.tap(find.byType(ProductCard).first);
       await tester.pumpAndSettle();
 
       // Verify detail page
-      expect(find.bandType(ProductDetailPage), findsOneWidget);
+      expect(find.byType(ProductDetailPage), findsOneWidget);
     });
   });
 }
@@ -903,8 +903,8 @@ void main() {
     await tester.pumpAndSettle();
 
     // App starts authenticated — navigates directly to home/products
-    expect(find.bandType(ProductListPage), findsOneWidget);
-    expect(find.bandType(LoginPage), findsNothing);
+    expect(find.byType(ProductListPage), findsOneWidget);
+    expect(find.byType(LoginPage), findsNothing);
   });
 }
 ```

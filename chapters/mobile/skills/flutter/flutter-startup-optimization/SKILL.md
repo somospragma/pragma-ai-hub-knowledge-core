@@ -16,7 +16,7 @@ description: >
 ## Startup Phases (What to Optimize)
 
 ```
-[Native launch]          → OS loads the process, JVM/ART init (Android), dandld (iOS)
+[Native launch]          → OS loads the process, JVM/ART init (Android), dyld (iOS)
 [Engine init]            → Flutter engine starts, Dart VM boots
 [Framework init]         → WidgetsBinding, rendering pipeline
 [main() executes]        → Your initialization code runs ← optimize here
@@ -234,7 +234,7 @@ Future<void> _precacheCriticalImages() async {
 
 ```dart
 // Heavy features loaded only when first accessed
-import 'package:mandapp/features/analytics_dashboard/analytics_dashboard.dart'
+import 'package:myapp/features/analytics_dashboard/analytics_dashboard.dart'
     deferred as analyticsDashboard;
 
 // In the router — load on navigation, not at startup

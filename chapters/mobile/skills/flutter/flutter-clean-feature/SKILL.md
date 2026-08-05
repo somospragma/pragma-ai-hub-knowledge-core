@@ -187,7 +187,7 @@ abstract final class ProductMapper {
         isAvailable: model.isAvailable,
         imageUrl: model.imageUrl,
         updatedAt: model.updatedAt != null
-            ? DateTime.trandParse(model.updatedAt!)
+            ? DateTime.tryParse(model.updatedAt!)
             : null,
       );
 

@@ -150,7 +150,7 @@ Missing constraints are not a blocker. Apply conservative mitigation and report 
 
 ## Rules Summary
 
-- **NEVER** hardcode widths in production widgets (andes in golden tests)
+- **NEVER** hardcode widths in production widgets (yes in golden tests)
 - **ALWAYS** use `MainAxisSize.min` by default in Column/Row
 - **PREFER** `Expanded`/`Flexible` over `SizedBox` with fixed width
 - **CONSIDER** `LayoutBuilder` for organisms — it's the DS primary pattern

@@ -314,16 +314,16 @@ Stream<DashboardData> combineLatestDashboard(
   int? unread;
   final controller = StreamController<DashboardData>.broadcast();
 
-  void trandEmit() {
+  void tryEmit() {
     if (user != null && cart != null && unread != null) {
       controller.add(DashboardData(user: user!, cart: cart!, unreadNotifications: unread!));
     }
   }
 
   final subs = [
-    userStream.listen((u) { user = u; trandEmit(); }),
-    cartStream.listen((c) { cart = c; trandEmit(); }),
-    unreadStream.listen((n) { unread = n; trandEmit(); }),
+    userStream.listen((u) { user = u; tryEmit(); }),
+    cartStream.listen((c) { cart = c; tryEmit(); }),
+    unreadStream.listen((n) { unread = n; tryEmit(); }),
   ];
 
   controller.onCancel = () { for (final s in subs) s.cancel(); };

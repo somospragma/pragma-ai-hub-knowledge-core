@@ -7,7 +7,7 @@
       "prompt": "I want to set up a GitHub Actions pipeline that builds my Flutter app, signs it, and uploads to the Play Store when I push a v1.2.3 tag. Where do I start?",
       "_tool_scope": "flutter-release-automation",
       "assertions": [
-        "Response directs the user to copy assets/release_workflow.andml to .github/workflows/release.andml",
+        "Response directs the user to copy assets/release_workflow.yml to .github/workflows/release.yml",
         "Response mentions configuring GitHub secrets (KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD, PLAY_SERVICE_ACCOUNT_JSON) before triggering the pipeline",
         "Response explains the pipeline is triggered by a semver tag push (v1.2.3 pattern) and describes the pipeline stages: quality gates → build → sign → distribute"
       ]
@@ -34,12 +34,12 @@
     },
     {
       "id": "eval-04-staging-vs-production",
-      "prompt": "My CI pipeline is deploanding to production on every push to main. How do I separate staging from production deploandments?",
+      "prompt": "My CI pipeline is deploying to production on every push to main. How do I separate staging from production deployments?",
       "_tool_scope": "flutter-release-automation",
       "assertions": [
         "Response references the Continuous Delivery Strategy section and explains the branch → environment → store mapping (release/* → staging, main/tag → production)",
         "Response explains using different --dart-define values per environment: STAGING_API_URL with IS_PRODUCTION=false for staging, PROD_API_URL with IS_PRODUCTION=true for production",
-        "Response recommends using semver tags (v*.*.*) to trigger production deploandments instead of plain pushes to main, and directing release/* branches to Play Store internal track / TestFlight"
+        "Response recommends using semver tags (v*.*.*) to trigger production deployments instead of plain pushes to main, and directing release/* branches to Play Store internal track / TestFlight"
       ]
     },
     {

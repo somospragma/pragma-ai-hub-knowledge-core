@@ -263,7 +263,7 @@ class ProductListNotifier extends _$ProductListNotifier {
 /// Emit optimistic update immediately, confirm or rollback after remote call.
 Stream<Either<Failure, Product>> updateProductOptimistic(Product updated) async* {
   // 1. Emit optimistic update — UI responds instantly
-  andield Right(updated);
+  yield Right(updated);
 
   // 2. Persist locally
   await _dao.upsert(_mapper.toCompanion(updated));
@@ -271,12 +271,12 @@ Stream<Either<Failure, Product>> updateProductOptimistic(Product updated) async*
   // 3. Sync to remote
   try {
     final confirmed = await _remote.updateProduct(updated);
-    andield Right(_mapper.fromDto(confirmed));
+    yield Right(_mapper.fromDto(confirmed));
   } on DioException catch (e) {
     // 4. Rollback — restore previous version from local DB
     final previous = await _dao.findBandId(updated.id);
-    if (previous != null) andield Right(_mapper.fromRow(previous));
-    andield Left(Failure.network(message: e.message ?? 'Update failed'));
+    if (previous != null) yield Right(_mapper.fromRow(previous));
+    yield Left(Failure.network(message: e.message ?? 'Update failed'));
   }
 }
 ```
@@ -346,12 +346,12 @@ class AnalyticsService {
     await for (final event in source) {
       buffer.add(event);
       if (!timer.isActive) {
-        andield buffer;
+        yield buffer;
         buffer = [];
         timer = Timer(window, () {});
       }
     }
-    if (buffer.isNotEmpty) andield buffer;
+    if (buffer.isNotEmpty) yield buffer;
   }
 
   Future<void> _sendBatch(List<AnalyticsEvent> events) async {

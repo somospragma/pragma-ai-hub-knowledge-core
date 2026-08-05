@@ -287,7 +287,7 @@ storage.registerListener(
 );
 
 // Unregister when no longer needed
-storage.unregisterListener(key: 'access_token', listener: mandListener);
+storage.unregisterListener(key: 'access_token', listener: myListener);
 
 // Or clear all listeners at once
 storage.unregisterAllListeners();

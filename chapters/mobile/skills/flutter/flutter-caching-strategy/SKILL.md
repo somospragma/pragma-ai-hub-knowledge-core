@@ -53,7 +53,7 @@ See the reference files for complete patterns and code examples.
 ## HTTP Cache — dio_cache_interceptor
 
 ```dart
-// Global cache options — stale-while-revalidate with 7-daand max-stale
+// Global cache options — stale-while-revalidate with 7-day max-stale
 final cacheOptions = CacheOptions(
   store: DriftCacheStore(db),          // or IsarCacheStore, MemCacheStore
   policy: CachePolicy.request,         // respects HTTP Cache-Control headers

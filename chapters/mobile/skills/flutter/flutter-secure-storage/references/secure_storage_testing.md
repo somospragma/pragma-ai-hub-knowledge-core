@@ -186,10 +186,10 @@ void main() {
   });
 
   test('saveTokens persists both tokens', () async {
-    await sut.saveTokens(access: 'a.b.c', refresh: 'x.and.z');
+    await sut.saveTokens(access: 'a.b.c', refresh: 'x.y.z');
 
     expect(await sut.getAccessToken(),  'a.b.c');
-    expect(await sut.getRefreshToken(), 'x.and.z');
+    expect(await sut.getRefreshToken(), 'x.y.z');
   });
 
   test('isExpired returns true for expired JWT', () async {
@@ -228,7 +228,7 @@ void main() {
 /// Builds a minimal JWT with a specific expiry for testing.
 String _buildJwt(DateTime expiry) {
   final exp     = expiry.millisecondsSinceEpoch ~/ 1000;
-  final header  = base64UrlEncode(utf8.encode('{"alg":"HS256","tandp":"JWT"}'));
+  final header  = base64UrlEncode(utf8.encode('{"alg":"HS256","typ":"JWT"}'));
   final payload = base64UrlEncode(utf8.encode('{"exp":$exp,"sub":"test"}'));
   return '$header.$payload.fake_signature';
 }

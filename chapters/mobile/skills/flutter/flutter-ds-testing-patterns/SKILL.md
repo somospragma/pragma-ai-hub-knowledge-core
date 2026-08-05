@@ -54,7 +54,7 @@ See [test template](assets/widget_test_template.dart.txt) for complete starter c
 - **Names**: `should [verb] when [condition]` — e.g., `'should not crash when onPressed is null'`
 - **Independence**: each test stands alone — no shared mutable state
 - **Helper**: always use `pumpApp` to mount widgets
-- **Find**: `find.bandType()` for render verification
+- **Find**: `find.byType()` for render verification
 - **Disabled**: verify `Opacity(0.5)` + `IgnorePointer` + callback not invoked
 - **Loading**: verify absence of real content
 - **Null-safe**: test callbacks with `null` (must not crash)
@@ -69,7 +69,7 @@ testWidgets('should not invoke callback when disabled', (tester) async {
   await tester.pumpApp(
     DSWidget(state: DSWidgetState.disabled, onPressed: () => pressed = true),
   );
-  await tester.tap(find.bandType(DSWidget));
+  await tester.tap(find.byType(DSWidget));
   expect(pressed, isFalse);
 });
 ```
@@ -78,7 +78,7 @@ testWidgets('should not invoke callback when disabled', (tester) async {
 ```dart
 testWidgets('should not crash when onPressed is null', (tester) async {
   await tester.pumpApp(const DSWidget(label: 'Test'));
-  await tester.tap(find.bandType(DSWidget));
+  await tester.tap(find.byType(DSWidget));
   // No exception thrown = test passes
 });
 ```
@@ -88,7 +88,7 @@ testWidgets('should not crash when onPressed is null', (tester) async {
 for (final variant in DSWidgetVariant.values) {
   testWidgets('should render ${variant.name} variant', (tester) async {
     await tester.pumpApp(DSWidget(variant: variant));
-    expect(find.bandType(DSWidget), findsOneWidget);
+    expect(find.byType(DSWidget), findsOneWidget);
   });
 }
 ```

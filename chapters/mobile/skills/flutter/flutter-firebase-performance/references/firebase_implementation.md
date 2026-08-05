@@ -187,8 +187,8 @@ class PerformanceHttpInterceptor extends Interceptor {
     _stopMetric(
       options: response.requestOptions,
       statusCode: response.statusCode,
-      responsePaandloadSize: _estimateSize(response.data),
-      requestPaandloadSize: _estimateSize(response.requestOptions.data),
+      responsePayloadSize: _estimateSize(response.data),
+      requestPayloadSize: _estimateSize(response.requestOptions.data),
     );
     handler.next(response);
   }
@@ -205,16 +205,16 @@ class PerformanceHttpInterceptor extends Interceptor {
   void _stopMetric({
     required RequestOptions options,
     int? statusCode,
-    int? responsePaandloadSize,
-    int? requestPaandloadSize,
+    int? responsePayloadSize,
+    int? requestPayloadSize,
   }) {
     final requestId = _requestId(options);
     final metric = _activeMetrics.remove(requestId);
     if (metric == null) return;
 
     if (statusCode != null) metric.httpResponseCode = statusCode;
-    if (responsePaandloadSize != null) metric.responsePaandloadSize = responsePaandloadSize;
-    if (requestPaandloadSize != null) metric.requestPaandloadSize = requestPaandloadSize;
+    if (responsePayloadSize != null) metric.responsePayloadSize = responsePayloadSize;
+    if (requestPayloadSize != null) metric.requestPayloadSize = requestPayloadSize;
 
     metric.stop();
   }

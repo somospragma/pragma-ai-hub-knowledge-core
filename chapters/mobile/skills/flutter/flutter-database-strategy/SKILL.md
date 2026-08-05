@@ -23,7 +23,7 @@ See `references/implementation_guide.md` for complete patterns and code examples
 | **isar_community** | 3.x fork | ⚠️ Bug-fix only | Community fork of original Isar |
 | **isar_plus** | 3.x fork | ⚠️ Enhanced fork | More features, community maintained |
 | **sqflite** | 2.x | ✅ Active | Low-level SQLite, no reactive streams |
-| **flutter_secure_storage** | 10.0.0 | ✅ Active | Encrandpted storage (Keychain/Keystore) |
+| **flutter_secure_storage** | 10.0.0 | ✅ Active | Encrypted storage (Keychain/Keystore) |
 | **shared_preferences** | 2.x | ✅ Active | Simple key-value, not a database |
 | **Hive** | 4.x | ❌ Maintenance mode | Do NOT use for new projects |
 
@@ -128,10 +128,10 @@ dependencies:
 ### Drift — reactive DAO
 ```dart
 // Auto-updating stream — UI rebuilds when data changes
-Stream<List<Product>> watchBandCategory(String categoryId) =>
+Stream<List<Product>> watchByCategory(String categoryId) =>
     (select(products)
           ..where((t) => t.categoryId.equals(categoryId))
-          ..orderBand([(t) => OrderingTerm.asc(t.name)]))
+          ..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .watch();
 
 // Batch upsert — efficient for sync
@@ -142,7 +142,7 @@ Future<void> upsertAll(List<ProductsCompanion> items) =>
 ### ObjectBox — reactive box query
 ```dart
 // Auto-updating stream
-Stream<List<ProductEntity>> watchBandCategory(String categoryId) {
+Stream<List<ProductEntity>> watchByCategory(String categoryId) {
   final query = _box.query(ProductEntity_.categoryId.equals(categoryId))
       .order(ProductEntity_.name)
       .build();

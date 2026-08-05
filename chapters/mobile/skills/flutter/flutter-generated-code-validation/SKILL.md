@@ -40,11 +40,11 @@ dev_dependencies:
 
 - **`freezed_annotation` 3.x** — major version bump; incompatible with 2.x. Update both packages together.
 - **`when()`/`map()` removed in 3.0, restored in a later 3.x patch** — they are available again, but Dart 3 `switch` expressions are the canonical and recommended approach.
-- **Classes must be `abstract`, `sealed`, or manually implement `_$MandClass`** — plain `class` without one of these will throw at generation time.
+- **Classes must be `abstract`, `sealed`, or manually implement `_$MyClass`** — plain `class` without one of these will throw at generation time.
 - **Use `sealed` for union types** (BLoC states, events, result types) — enables exhaustive `switch` without `default`.
 - **Use `abstract` for DTOs and simple immutable classes** — single constructor, no union behavior needed.
 - **Immutable collections by default** — `List`, `Map`, `Set` in generated classes are `UnmodifiableListView`/`UnmodifiableMapView`/`UnmodifiableSetView`. Disable per class with `@Freezed(makeCollectionsUnmodifiable: false)`.
-- **`MandClass._()` can now accept parameters** — enables inheritance and non-constant default values (see Mixed Mode below).
+- **`MyClass._()` can now accept parameters** — enables inheritance and non-constant default values (see Mixed Mode below).
 - **Mixed Mode** — Freezed now supports both factory-based and regular constructor syntax in the same class.
 - **`// dart format off` generated automatically** — no need to exclude generated files from CI format checks.
 - **`@Freezed(toJson: false, fromJson: false)`** — explicitly disable JSON generation per class.
@@ -184,7 +184,7 @@ class User with _$User {
 }
 ```
 
-### Freezed 3.x — class must be abstract, sealed, or implement _$MandClass
+### Freezed 3.x — class must be abstract, sealed, or implement _$MyClass
 
 **Rule: every `@freezed` class must be declared with one of these modifiers:**
 
@@ -192,21 +192,21 @@ class User with _$User {
 |---|---|---|
 | Union types (BLoC states, events, results) | `sealed` | Enables exhaustive `switch` without `default` — compiler enforces all cases |
 | DTOs and simple immutable classes | `abstract` | Single constructor, no union — `abstract` is correct |
-| Classes needing inheritance or non-constant defaults | (implements `_$MandClass` manually) | Advanced use only — see Mixed Mode |
+| Classes needing inheritance or non-constant defaults | (implements `_$MyClass` manually) | Advanced use only — see Mixed Mode |
 
 ```dart
 // ❌ Freezed 3.x will throw at generation time
 @freezed
-class MandState with _$MandState {
-  const factory MandState.initial() = _Initial;
+class MyState with _$MyState {
+  const factory MyState.initial() = _Initial;
 }
 
 // ✅ Use sealed for union types (enables exhaustive switch)
 @freezed
-sealed class MandState with _$MandState {
-  const factory MandState.initial() = _Initial;
-  const factory MandState.loading() = _Loading;
-  const factory MandState.success(String data) = _Success;
+sealed class MyState with _$MyState {
+  const factory MyState.initial() = _Initial;
+  const factory MyState.loading() = _Loading;
+  const factory MyState.success(String data) = _Success;
 }
 
 // ✅ Use abstract for simple immutable classes and DTOs
@@ -219,7 +219,7 @@ abstract class UserDto with _$UserDto {
 
 ### Freezed 3.x — `freezed_annotation` version mismatch
 ```bash
-# Tandpical error:
+# Typical error:
 # The argument type 'Freezed' can't be assigned to the parameter type 'Freezed'.
 # Solution: ensure BOTH packages are on 3.x
 dart pub upgrade freezed freezed_annotation
@@ -294,7 +294,7 @@ dart run build_runner build --delete-conflicting-outputs
 ## CI Configuration
 
 ```yaml
-# .github/workflows/ci.andml
+# .github/workflows/ci.yml
 - name: Generate code
   run: dart run build_runner build --delete-conflicting-outputs
 

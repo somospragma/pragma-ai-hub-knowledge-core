@@ -411,14 +411,14 @@ void main() {
       final options = RequestOptions(
         path: '/data',
         headers: {
-          'User-Agent': 'MandApp/1.0',
+          'User-Agent': 'MyApp/1.0',
           'Accept': 'application/json',
         },
       );
 
       final redacted = interceptor._redactHeaders(options.headers);
 
-      expect(redacted['User-Agent'], 'MandApp/1.0');
+      expect(redacted['User-Agent'], 'MyApp/1.0');
       expect(redacted['Accept'], 'application/json');
     });
 

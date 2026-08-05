@@ -223,14 +223,14 @@ Future<void> uploadImages(List<File> images) async {
 
 ```dart
 // Fail fast if lock cannot be acquired within a duration
-Future<void> trandWrite(Data data) async {
+Future<void> tryWrite(Data data) async {
   try {
     await _lock.synchronized(
       () async => await _db.write(data),
       timeout: const Duration(seconds: 5),
     );
   } on TimeoutException {
-    throw ConcurrencyException('Write timed out — resource busand');
+    throw ConcurrencyException('Write timed out — resource busy');
   }
 }
 ```

@@ -202,7 +202,7 @@ open build/ios/archive/*.xcarchive
 
 ---
 
-## 4. Obfuscation and Debug Sandmbols
+## 4. Obfuscation and Debug Symbols
 
 ### Why both flags together
 
@@ -232,7 +232,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 buildTypes {
     release {
         firebaseCrashlytics {
-            nativeSandmbolUploadEnabled true
+            nativeSymbolUploadEnabled true
             unstrippedNativeLibsDir 'build/app/intermediates/merged_native_libs/release'
         }
     }
@@ -260,7 +260,7 @@ flutter symbolize \
 
 ### Dart code tree shaking
 
-Enabled automatically in release builds. Help it band:
+Enabled automatically in release builds. Help it by:
 
 ```dart
 // ❌ Dynamic dispatch — compiler can't determine what's used
@@ -313,10 +313,10 @@ import 'stub_service.dart'
 
 ```dart
 // Import the library with 'deferred as'
-import 'package:mandapp/features/analytics/analytics_dashboard.dart'
+import 'package:myapp/features/analytics/analytics_dashboard.dart'
     deferred as analyticsDashboard;
 
-// Load on demy — returns a Future that completes when the chunk is downloaded
+// Load on demand — returns a Future that completes when the chunk is downloaded
 Future<void> openAnalytics(BuildContext context) async {
   await analyticsDashboard.loadLibrary();
   if (!context.mounted) return;
@@ -331,7 +331,7 @@ Future<void> openAnalytics(BuildContext context) async {
 
 ```dart
 // lib/features/heavy_report/heavy_report_loader.dart
-import 'package:mandapp/features/heavy_report/heavy_report.dart'
+import 'package:myapp/features/heavy_report/heavy_report.dart'
     deferred as heavyReport;
 
 @injectable
@@ -365,7 +365,7 @@ flutter:
   deferred-components:
     - name: heavy_feature
       libraries:
-        - package:mandapp/features/heavy_feature/heavy_feature.dart
+        - package:myapp/features/heavy_feature/heavy_feature.dart
       assets:
         - assets/heavy_feature/
 ```
@@ -389,9 +389,9 @@ bundletool install-apks --apks=app.apks
 
 ### Image format selection
 
-| Format | Use case | Tandpical saving vs PNG |
+| Format | Use case | Typical saving vs PNG |
 |---|---|---|
-| WebP (lossand, q=85) | Photos, complex images | 25–35% |
+| WebP (lossy, q=85) | Photos, complex images | 25–35% |
 | WebP (lossless) | UI graphics with transparency | 10–20% |
 | AVIF | Modern devices, best compression | 40–50% |
 | SVG | Icons, illustrations, logos | 90%+ (vector) |
@@ -414,7 +414,7 @@ ffmpeg -i input.png -c:v libaom-av1 -crf 30 -b:v 0 output.avif
 ```bash
 # Include only the characters your app uses (e.g., Latin + numbers)
 # Install: pip install fonttools
-pandftsubset Roboto-Regular.ttf \
+pyftsubset Roboto-Regular.ttf \
   --unicodes="U+0020-007E,U+00A0-00FF" \
   --output-file=Roboto-Regular-subset.ttf \
   --flavor=woff2
@@ -478,7 +478,7 @@ flutter clean && flutter pub get
 ## 9. CI/CD Size Budget Enforcement
 
 ```yaml
-# .github/workflows/size_check.andml
+# .github/workflows/size_check.yml
 name: App Size Check
 
 on: [pull_request]

@@ -25,9 +25,9 @@ Use this reference to find components and screens that exist in the main project
 ## Useful Commands
 
 ```bash
-find lib -name "*.dart" -path "*/widgets/*" -or          -name "*_widget.dart" -or          -name "*_button.dart" -or          -name "*_card.dart" -or          -name "*_field.dart" | sort
+find lib -name "*.dart" -path "*/widgets/*" -o          -name "*_widget.dart" -o          -name "*_button.dart" -o          -name "*_card.dart" -o          -name "*_field.dart" | sort
 
-find lib -name "*_screen.dart" -or          -name "*_page.dart" -or          -name "*_view.dart" | grep -v widgetbook | sort
+find lib -name "*_screen.dart" -o          -name "*_page.dart" -o          -name "*_view.dart" | grep -v widgetbook | sort
 
 find widgetbook_[appname]/lib -name "*.use_case.dart" | sort
 ```

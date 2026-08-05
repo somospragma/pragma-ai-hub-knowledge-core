@@ -46,8 +46,8 @@ Extend that system by creating per-flavor configs that include them:
 ```xcconfig
 #include "Generated.xcconfig"
 FLUTTER_TARGET=lib/main_dev.dart
-APP_BUNDLE_ID=com.example.mandapp.dev
-APP_DISPLAY_NAME=MandApp Dev
+APP_BUNDLE_ID=com.example.myapp.dev
+APP_DISPLAY_NAME=MyApp Dev
 FLUTTER_FLAVOR=dev
 ```
 
@@ -56,8 +56,8 @@ FLUTTER_FLAVOR=dev
 ```xcconfig
 #include "Generated.xcconfig"
 FLUTTER_TARGET=lib/main_staging.dart
-APP_BUNDLE_ID=com.example.mandapp.staging
-APP_DISPLAY_NAME=MandApp Staging
+APP_BUNDLE_ID=com.example.myapp.staging
+APP_DISPLAY_NAME=MyApp Staging
 FLUTTER_FLAVOR=staging
 ```
 
@@ -66,8 +66,8 @@ FLUTTER_FLAVOR=staging
 ```xcconfig
 #include "Generated.xcconfig"
 FLUTTER_TARGET=lib/main_prod.dart
-APP_BUNDLE_ID=com.example.mandapp
-APP_DISPLAY_NAME=MandApp
+APP_BUNDLE_ID=com.example.myapp
+APP_DISPLAY_NAME=MyApp
 FLUTTER_FLAVOR=prod
 ```
 
@@ -176,9 +176,9 @@ Assign per Build Configuration:
 
 | Configuration | Bundle ID | Provisioning Profile |
 |---|---|---|
-| `Release-dev` | `com.example.mandapp.dev` | `MandApp Dev Distribution` |
-| `Release-staging` | `com.example.mandapp.staging` | `MandApp Staging Distribution` |
-| `Release-prod` | `com.example.mandapp` | `MandApp Distribution` |
+| `Release-dev` | `com.example.myapp.dev` | `MyApp Dev Distribution` |
+| `Release-staging` | `com.example.myapp.staging` | `MyApp Staging Distribution` |
+| `Release-prod` | `com.example.myapp` | `MyApp Distribution` |
 
 ### ExportOptions.plist per Flavor
 
@@ -196,8 +196,8 @@ CI needs one `ExportOptions.plist` per flavor for `xcodebuild -exportArchive`:
     <string>YOUR_TEAM_ID</string>
     <key>provisioningProfiles</key>
     <dict>
-        <key>com.example.mandapp</key>
-        <string>MandApp Distribution</string>
+        <key>com.example.myapp</key>
+        <string>MyApp Distribution</string>
     </dict>
     <key>signingCertificate</key>
     <string>Apple Distribution</string>

@@ -466,7 +466,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
       }
 
       // Process different link types
-      return await _processLinkBandType(uri);
+      return await _processLinkByType(uri);
     } catch (e) {
       return Left(DeepLinkFailure.unknown(
         message: 'Failed to process deep link: $e',
@@ -474,7 +474,7 @@ class DeepLinkRepositoryImpl implements DeepLinkRepository {
     }
   }
 
-  Future<Either<DeepLinkFailure, DeepLinkResult>> _processLinkBandType(Uri uri) async {
+  Future<Either<DeepLinkFailure, DeepLinkResult>> _processLinkByType(Uri uri) async {
     final path = uri.path;
 
     // Product links
@@ -814,10 +814,10 @@ void main() async {
   // Configure dependency injection
   await configureDependencies();
 
-  runApp(MandApp());
+  runApp(MyApp());
 }
 
-class MandApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -1070,7 +1070,7 @@ void main() {
 void main() {
   group('Deep Link Integration Tests', () {
     testWidgets('should navigate to product page from deep link', (tester) async {
-      await tester.pumpWidget(MandApp());
+      await tester.pumpWidget(MyApp());
 
       // Simulate deep link
       await tester.binding.defaultBinaryMessenger.handlePlatformMessage(

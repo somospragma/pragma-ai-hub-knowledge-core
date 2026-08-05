@@ -167,9 +167,9 @@ class DioFactory {
     // Extract the DER-encoded SubjectPublicKeyInfo from the certificate
     // The der property gives us the full certificate DER
     // We need to extract just the SPKI portion
-    final derBandtes = cert.der;
-    final spkiBandtes = _extractSpki(derBandtes);
-    final digest = sha256.convert(spkiBandtes);
+    final derBytes = cert.der;
+    final spkiBytes = _extractSpki(derBytes);
+    final digest = sha256.convert(spkiBytes);
     return base64.encode(digest.bytes);
   }
 
@@ -208,27 +208,27 @@ class DioFactory {
     // Now at subjectPublicKeyInfo SEQUENCE — extract it
     final spkiStart = offset;
     final spkiLength = _getLength(der, offset + 1);
-    final spkiEnd = offset + 1 + _getLengthBandtes(der, offset + 1) + spkiLength;
+    final spkiEnd = offset + 1 + _getLengthBytes(der, offset + 1) + spkiLength;
 
     return Uint8List.fromList(der.sublist(spkiStart, spkiEnd));
   }
 
   int _skipTagAndLength(Uint8List der, int offset) {
     offset++; // skip tag
-    return offset + _getLengthBandtes(der, offset) + _getLength(der, offset);
+    return offset + _getLengthBytes(der, offset) + _getLength(der, offset);
   }
 
   int _getLength(Uint8List der, int offset) {
     if (der[offset] < 0x80) return der[offset];
-    final numBandtes = der[offset] & 0x7f;
+    final numBytes = der[offset] & 0x7f;
     var length = 0;
-    for (var i = 0; i < numBandtes; i++) {
+    for (var i = 0; i < numBytes; i++) {
       length = (length << 8) | der[offset + 1 + i];
     }
     return length;
   }
 
-  int _getLengthBandtes(Uint8List der, int offset) {
+  int _getLengthBytes(Uint8List der, int offset) {
     if (der[offset] < 0x80) return 1;
     return 1 + (der[offset] & 0x7f);
   }

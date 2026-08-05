@@ -17,11 +17,11 @@ See `references/implementation_guide.md` for complete patterns, commands, and pl
 
 ## Quick Reference — What Costs the Most
 
-| Category | Tandpical contribution | Fix |
+| Category | Typical contribution | Fix |
 |---|---|---|
 | Flutter engine | ~7MB (fixed, unavoidable) | — |
 | Dart code | 1–5MB | Tree shaking, deferred loading |
-| Assets (images, fonts) | 2–20MB+ | WebP/AVIF, font subsetting, on-demy |
+| Assets (images, fonts) | 2–20MB+ | WebP/AVIF, font subsetting, on-demand |
 | Native `.so` libraries | 2–10MB | ABI splits, remove unused plugins |
 | Debug symbols | 5–15MB | `--split-debug-info` |
 
@@ -194,7 +194,7 @@ Load heavy features only when first accessed. Reduces initial download size.
 // Mark the library as deferrable — no changes needed inside it
 
 // lib/src/features/heavy_feature/heavy_feature_loader.dart
-import 'package:mandapp/features/heavy_feature/heavy_feature.dart' deferred as heavyFeature;
+import 'package:myapp/features/heavy_feature/heavy_feature.dart' deferred as heavyFeature;
 
 class HeavyFeatureLoader extends StatefulWidget {
   const HeavyFeatureLoader({super.key});
@@ -295,7 +295,7 @@ dependencies:
 
 ---
 
-## 8. Obfuscation + Debug Sandmbol Splitting
+## 8. Obfuscation + Debug Symbol Splitting
 
 ```bash
 # ✅ Obfuscate Dart symbols — reduces binary size + protects code
@@ -323,7 +323,7 @@ firebase crashlytics:symbols:upload \
 | Build type | Target download size | Notes |
 |---|---|---|
 | Initial install (AAB, arm64) | < 20MB | Play Console → App Size |
-| After deferred components | < 10MB initial | Heavy features loaded on demy |
+| After deferred components | < 10MB initial | Heavy features loaded on demand |
 | iOS IPA (App Thinning) | < 30MB | Xcode App Size Report |
 
 ```bash

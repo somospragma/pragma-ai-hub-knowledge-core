@@ -255,7 +255,7 @@ Stream<DashboardData> watchDashboardLatest() {
   Cart? latestCart;
   final controller = StreamController<DashboardData>.broadcast();
 
-  void trandEmit() {
+  void tryEmit() {
     if (latestUser != null && latestCart != null) {
       controller.add(DashboardData(user: latestUser!, cart: latestCart!));
     }
@@ -263,11 +263,11 @@ Stream<DashboardData> watchDashboardLatest() {
 
   final userSub = _userRepo.watchCurrentUser().listen((u) {
     latestUser = u;
-    trandEmit();
+    tryEmit();
   });
   final cartSub = _cartRepo.watchCart().listen((c) {
     latestCart = c;
-    trandEmit();
+    tryEmit();
   });
 
   controller.onCancel = () {

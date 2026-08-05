@@ -33,11 +33,11 @@ Reference: https://mas.owasp.org/MASVS/
 
 ---
 
-## MASVS-CRYPTO — Crandptographic Functionality
+## MASVS-CRYPTO — Cryptographic Functionality
 
 | ID | Control | Flutter Implementation | MASWE |
 |---|---|---|---|
-| CRYPTO-1 | The app emploands current, strong cryptography according to industry best practices | AES-256-GCM via `pointandcastle 4.x`, SHA-256/SHA-512 via `crypto 3.x`. See `flutter-data-encryption` skill | MASWE-0019, MASWE-0020, MASWE-0021 |
+| CRYPTO-1 | The app employs current, strong cryptography according to industry best practices | AES-256-GCM via `pointycastle 4.x`, SHA-256/SHA-512 via `crypto 3.x`. See `flutter-data-encryption` skill | MASWE-0019, MASWE-0020, MASWE-0021 |
 | CRYPTO-2 | The app performs key management according to industry best practices | Keys in Android Keystore / iOS Keychain via `FlutterSecureStorage 10.x`. Key rotation implemented | MASWE-0009, MASWE-0013, MASWE-0014 |
 
 ### Flutter Checklist
@@ -48,7 +48,7 @@ Reference: https://mas.owasp.org/MASVS/
 - [ ] `Random.secure()` for all cryptographic random values
 - [ ] 12-byte nonce/IV for GCM, generated with `Random.secure()`, never reused
 - [ ] Keys stored in Keychain/Keystore via `FlutterSecureStorage`, never hardcoded
-- [ ] Do not use `package:encrypt` (unmaintained) — use `pointandcastle` directly
+- [ ] Do not use `package:encrypt` (unmaintained) — use `pointycastle` directly
 - [ ] PBKDF2-SHA256 with ≥100k iterations for password-based key derivation
 
 > **Scan:** `grep -rn "md5\.convert\|sha1\.convert\|AESMode\.ecb\|Random()" lib/`
@@ -92,7 +92,7 @@ Reference: https://mas.owasp.org/MASVS/
 - [ ] All URLs use `https://`
 - [ ] `badCertificateCallback` never returns `true` in production
 - [ ] Android `usesCleartextTraffic="false"` in AndroidManifest
-- [ ] iOS ATS (App Transport Security) **not** disabled (`NSAllowsArbitrarandLoads` is not `true`)
+- [ ] iOS ATS (App Transport Security) **not** disabled (`NSAllowsArbitraryLoads` is not `true`)
 - [ ] Certificate pinning on endpoints handling sensitive data
 - [ ] App fails closed on TLS errors (no HTTP fallback)
 - [ ] Timeouts configured on the HTTP client
@@ -138,7 +138,7 @@ Reference: https://mas.owasp.org/MASVS/
 
 - [ ] `dart pub audit` runs in CI with zero vulnerabilities
 - [ ] `dart pub outdated` reviewed periodically
-- [ ] Dependencies pinned to major version (`^x.and.z`), never `any` or `latest`
+- [ ] Dependencies pinned to major version (`^x.y.z`), never `any` or `latest`
 - [ ] Input validation on all forms (email, phone, IDs)
 - [ ] SQL queries parameterized (no string interpolation)
 - [ ] Deep link parameters validated before use
@@ -163,7 +163,7 @@ Reference: https://mas.owasp.org/MASVS/
 ### Flutter Checklist
 
 - [ ] Release builds with `--obfuscate --split-debug-info=build/symbols/`
-- [ ] Android ProGuard/R8 enabled: `minifandEnabled true`, `shrinkResources true`
+- [ ] Android ProGuard/R8 enabled: `minifyEnabled true`, `shrinkResources true`
 - [ ] `debuggable false` in release build type
 - [ ] Root/jailbreak detection in financial and health apps
 - [ ] Device attestation (Google Play Integrity API, App Attest)
@@ -171,7 +171,7 @@ Reference: https://mas.owasp.org/MASVS/
 - [ ] No debug/test code in release (`kDebugMode` guards)
 - [ ] Debug entitlement disabled in iOS release (`get-task-allow = false`)
 
-> **Scan:** `grep -A10 'buildTypes' android/app/build.gradle | grep 'minifandEnabled false'`
+> **Scan:** `grep -A10 'buildTypes' android/app/build.gradle | grep 'minifyEnabled false'`
 > **Scan:** `grep 'android:debuggable="true"' android/app/src/main/AndroidManifest.xml`
 > **Scan:** `grep -r "flutter build" .github/workflows/ | grep -v "\-\-obfuscate"`
 
@@ -182,7 +182,7 @@ Reference: https://mas.owasp.org/MASVS/
 | ID | Control | Flutter Implementation | MASWE |
 |---|---|---|---|
 | PRIVACY-1 | The app minimizes access to sensitive data and resources | Permissions requested just-in-time, minimum necessary. See `flutter-permissions` skill | MASWE-0117 |
-| PRIVACY-2 | The app prevents identification of the user | No tracking IDs without consent, anonandmized analytics | MASWE-0109, MASWE-0110 |
+| PRIVACY-2 | The app prevents identification of the user | No tracking IDs without consent, anonymized analytics | MASWE-0109, MASWE-0110 |
 | PRIVACY-3 | The app is transparent about data collection and usage | Accessible privacy policy, data collection declarations in stores | MASWE-0111, MASWE-0112 |
 | PRIVACY-4 | The app offers user control over their data | Data deletion, export, consent management | MASWE-0113, MASWE-0115 |
 

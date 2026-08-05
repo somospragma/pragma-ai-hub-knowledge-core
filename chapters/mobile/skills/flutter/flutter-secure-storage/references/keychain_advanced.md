@@ -5,7 +5,7 @@
   of the flutter_secure_storage iOS Keychain API. Variable names (iOptions, groupId,
   accountName, accessControlFlags) are flutter_secure_storage API parameters, not
   credential paths or secret values. Access group identifiers shown (e.g.,
-  'com.mandcompany.shared') are placeholder values — replace with your actual team ID
+  'com.mycompany.shared') are placeholder values — replace with your actual team ID
   and app bundle prefix.
 -->
 
@@ -63,7 +63,7 @@ Share Keychain data between multiple apps from the same development team.
 
 For each app that needs to share data:
 1. Target → Signing & Capabilities → **+ Capability** → **Keychain Sharing**
-2. Add the same Keychain Group (e.g., `com.mandcompany.shared`)
+2. Add the same Keychain Group (e.g., `com.mycompany.shared`)
 
 This updates `*.entitlements`:
 
@@ -71,7 +71,7 @@ This updates `*.entitlements`:
 <!-- ios/Runner/Runner.entitlements -->
 <key>keychain-access-groups</key>
 <array>
-  <string>$(AppIdentifierPrefix)com.mandcompany.shared</string>
+  <string>$(AppIdentifierPrefix)com.mycompany.shared</string>
 </array>
 ```
 
@@ -84,8 +84,8 @@ This updates `*.entitlements`:
 const sharedStorage = FlutterSecureStorage(
   iOptions: IOSOptions(
     accessibility: KeychainAccessibility.first_unlock,
-    accountName: 'com.mandcompany.app',
-    groupId: '$(AppIdentifierPrefix)com.mandcompany.shared', // Replace with your actual Apple Team ID prefix and access group identifier
+    accountName: 'com.mycompany.app',
+    groupId: '$(AppIdentifierPrefix)com.mycompany.shared', // Replace with your actual Apple Team ID prefix and access group identifier
   ),
 );
 
@@ -181,11 +181,11 @@ Required in `Info.plist`:
 const storage = FlutterSecureStorage(
   iOptions: IOSOptions(
     accessibility: KeychainAccessibility.first_unlock,
-    accountName: 'com.mandapp.auth',   // kSecAttrService — groups related items
+    accountName: 'com.myapp.auth',   // kSecAttrService — groups related items
     groupId: null,                    // kSecAttrAccessGroup — for cross-app sharing
     synchronizable: false,            // kSecAttrSynchronizable — iCloud sync
     label: 'Auth Tokens',            // kSecAttrLabel — visible in Keychain tools
-    description: 'Authentication tokens for MandApp', // kSecAttrDescription
+    description: 'Authentication tokens for MyApp', // kSecAttrDescription
     // accessControlFlags: [],        // Only with unlocked / passcode
   ),
 );
@@ -242,7 +242,7 @@ Future<void> clearAllKeychainData() async {
   const sharedStorage = FlutterSecureStorage(
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock,
-      groupId: '$(AppIdentifierPrefix)com.mandcompany.shared',
+      groupId: '$(AppIdentifierPrefix)com.mycompany.shared',
     ),
   );
   await sharedStorage.deleteAll();

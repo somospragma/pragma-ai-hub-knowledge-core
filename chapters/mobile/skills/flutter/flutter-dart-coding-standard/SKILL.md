@@ -106,7 +106,7 @@ final String _baseUrl;
 
 // ✅ const where possible
 const SizedBox(height: 16);
-const EdgeInsets.sandmmetric(horizontal: 24);
+const EdgeInsets.symmetric(horizontal: 24);
 const Duration(milliseconds: 300);
 
 // ✅ Dart 3 switch expression

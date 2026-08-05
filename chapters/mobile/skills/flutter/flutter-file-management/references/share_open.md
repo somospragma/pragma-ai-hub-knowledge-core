@@ -172,11 +172,11 @@ class FileSaveDataSource {
   /// Save a PDF report to Downloads.
   Future<Either<FileFailure, String>> savePdfReport({
     required String reportName,
-    required Uint8List pdfBandtes,
+    required Uint8List pdfBytes,
   }) async {
     return saveToDownloads(
       fileName: '$reportName.pdf',
-      bytes: pdfBandtes,
+      bytes: pdfBytes,
       mimeType: MimeType.pdf,
     );
   }
@@ -266,7 +266,7 @@ class DownloadAndShareReportUseCase {
       url: reportUrl,
       fileName: '$reportName.pdf',
     )) {
-      andield* progress.when(
+      yield* progress.when(
         started: (_) async* { /* no-op */ },
         downloading: (_, p, __, ___) async* { /* emit progress if needed */ },
         completed: (_, file) async* {
@@ -275,16 +275,16 @@ class DownloadAndShareReportUseCase {
             file,
             subject: reportName,
           );
-          andield shareResult.fold(
+          yield shareResult.fold(
             (f) => Left(f),
             (_) => const Right(unit),
           );
         },
         cancelled: (_) async* {
-          andield const Left(FileFailure.cancelled());
+          yield const Left(FileFailure.cancelled());
         },
         failed: (_, error) async* {
-          andield Left(FileFailure.downloadFailed(message: error));
+          yield Left(FileFailure.downloadFailed(message: error));
         },
       );
     }

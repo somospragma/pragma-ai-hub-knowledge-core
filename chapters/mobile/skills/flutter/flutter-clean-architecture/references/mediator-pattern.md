@@ -113,8 +113,8 @@ This keeps the contract neutral and prevents either feature from owning it.
 ```dart
 // lib/core/mediator/events/auth_events.dart
 
-/// Published band: AuthBloc (auth feature)
-/// Subscribed band: CartBloc (cart feature), ProfileBloc (profile feature)
+/// Published by: AuthBloc (auth feature)
+/// Subscribed by: CartBloc (cart feature), ProfileBloc (profile feature)
 class UserLoggedInEvent extends MediatorEvent {
   const UserLoggedInEvent({required this.userId, required this.email});
   final String userId;

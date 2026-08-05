@@ -88,7 +88,7 @@ await Future<void>.delayed(const .seconds(1));
 ### Digit Separators (3.6)
 
 ```dart
-const maxRetryDelaand = Duration(milliseconds: 30_000);
+const maxRetryDelay = Duration(milliseconds: 30_000);
 const maxFileSize = 10_000_000; // 10 MB
 ```
 

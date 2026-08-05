@@ -62,7 +62,7 @@ Data (RepositoryImpl)
 // Then sync from remote and emit updated data
 Stream<Either<Failure, List<Product>>> watchProducts() async* {
   // Phase 1: Emit local data immediately (no network wait)
-  andield* _local.watchProducts().map(
+  yield* _local.watchProducts().map(
     (products) => Right<Failure, List<Product>>(products),
   );
 
@@ -80,7 +80,7 @@ Stream<Either<Failure, List<Product>>> watchProducts() async* {
 ```dart
 // Drift watchAll() returns a Stream — UI updates automatically when DB changes
 Stream<List<Product>> watchProducts() =>
-    (_db.select(_db.products)..orderBand([(t) => OrderingTerm.asc(t.name)]))
+    (_db.select(_db.products)..orderBy([(t) => OrderingTerm.asc(t.name)]))
         .watch();
 ```
 

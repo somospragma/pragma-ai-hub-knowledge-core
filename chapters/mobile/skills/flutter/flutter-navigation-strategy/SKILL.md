@@ -552,7 +552,7 @@ PopScope(
     final shouldLeave = await _showUnsavedChangesDialog(context);
     if (shouldLeave && context.mounted) context.pop();
   },
-  child: const MandFormPage(),
+  child: const MyFormPage(),
 )
 ```
 
@@ -676,7 +676,7 @@ GoRouter(
 
 ```dart
 // ❌ FORBIDDEN — Navigator 1.0 mixed with go_router
-Navigator.of(context).push(MaterialPageRoute(builder: (_) => MandPage()));
+Navigator.of(context).push(MaterialPageRoute(builder: (_) => MyPage()));
 
 // ❌ FORBIDDEN — context.go when you want to push (go replaces the stack)
 context.go('/details'); // Use context.push if you want to add to the stack

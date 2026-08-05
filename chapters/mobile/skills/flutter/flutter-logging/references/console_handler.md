@@ -10,7 +10,7 @@ import '../log_event.dart';
 import '../log_handler.dart';
 
 /// Pretty-prints to the console. Active in dev only.
-/// Formats events to be easand to read in the IDE.
+/// Formats events to be easy to read in the IDE.
 final class ConsoleHandler implements LogHandler {
   @override
   String get name => 'console';

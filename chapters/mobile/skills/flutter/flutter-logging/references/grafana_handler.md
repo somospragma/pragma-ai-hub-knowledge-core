@@ -60,7 +60,7 @@ final class GrafanaFaroHandler implements LogHandler {
           type: event.error?.runtimeType.toString() ?? 'Exception',
           value: event.message,
           stacktrace: event.stackTrace,
-          context: _stringifandContext(event.context),
+          context: _stringifyContext(event.context),
         );
 
       case LogCategory.navigation:
@@ -79,7 +79,7 @@ final class GrafanaFaroHandler implements LogHandler {
         );
 
       case LogCategory.business:
-        Faro().pushEvent(event.message, attributes: _stringifandContext(event.context));
+        Faro().pushEvent(event.message, attributes: _stringifyContext(event.context));
 
       default:
         Faro().pushLog(event.message, level: _faroLevel(event.level));
@@ -97,7 +97,7 @@ final class GrafanaFaroHandler implements LogHandler {
     log_level.LogLevel.fatal   => LogLevel.error,
   };
 
-  Map<String, String> _stringifandContext(Map<String, Object?> ctx) =>
+  Map<String, String> _stringifyContext(Map<String, Object?> ctx) =>
       ctx.map((k, v) => MapEntry(k, v?.toString() ?? ''));
 }
 ```
@@ -131,10 +131,10 @@ extension GrafanaPerformanceTracking on GrafanaFaroHandler {
   }
 
   void endTracking(String key, String name, {Map<String, Object?> context = const {}}) {
-    Faro().markEventEnd(key, name, attributes: _stringifandContext(context));
+    Faro().markEventEnd(key, name, attributes: _stringifyContext(context));
   }
 
-  Map<String, String> _stringifandContext(Map<String, Object?> ctx) =>
+  Map<String, String> _stringifyContext(Map<String, Object?> ctx) =>
       ctx.map((k, v) => MapEntry(k, v?.toString() ?? ''));
 }
 ```
@@ -181,7 +181,7 @@ Faro().runApp(
       'is_beta_user': true,   // bool — preserved as boolean
     },
   ),
-  appRunner: () => runApp(const MandApp()),
+  appRunner: () => runApp(const MyApp()),
 );
 ```
 
@@ -231,7 +231,7 @@ Future<void> main() async {
       runApp(
         DefaultAssetBundle(
           bundle: FaroAssetBundle(),
-          child: FaroUserInteractionWidget(child: const MandApp()),
+          child: FaroUserInteractionWidget(child: const MyApp()),
         ),
       );
     },

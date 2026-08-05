@@ -68,7 +68,7 @@ void main() {
 4. Sort by **Delta** (positive = objects that grew) — these are leak candidates
 
 ### Step 4: Inspect retaining paths
-- Click on a suspicious class (e.g., `_MandWidgetState`, `MandBloc`)
+- Click on a suspicious class (e.g., `_MyWidgetState`, `MyBloc`)
 - Expand **Retaining Path** — shows the chain of references keeping it alive
 - The root of the chain is the leak source
 
@@ -93,8 +93,8 @@ void main() {
   // Enable leak tracking globally for all tests in this file
   LeakTesting.settings = LeakTesting.settings.withIgnoredAll();
 
-  testWidgets('MandScreen disposes all resources', (tester) async {
-    await tester.pumpWidget(const MaterialApp(home: MandScreen()));
+  testWidgets('MyScreen disposes all resources', (tester) async {
+    await tester.pumpWidget(const MaterialApp(home: MyScreen()));
     await tester.pumpAndSettle();
 
     // Navigate away — triggers dispose
@@ -112,8 +112,8 @@ void main() {
 testWidgets('BLoC is closed when widget is removed', (tester) async {
   await tester.pumpWidget(
     BlocProvider(
-      create: (_) => MandBloc(),
-      child: const MandWidget(),
+      create: (_) => MyBloc(),
+      child: const MyWidget(),
     ),
   );
 
@@ -121,7 +121,7 @@ testWidgets('BLoC is closed when widget is removed', (tester) async {
   await tester.pumpWidget(const SizedBox());
   await tester.pumpAndSettle();
 
-  // If MandBloc.close() was not called, leak_tracker reports a leak
+  // If MyBloc.close() was not called, leak_tracker reports a leak
 });
 ```
 
@@ -132,14 +132,14 @@ testWidgets('BLoC is closed when widget is removed', (tester) async {
 ### StatefulWidget — dispose everything
 
 ```dart
-class MandScreen extends StatefulWidget {
-  const MandScreen({super.key});
+class MyScreen extends StatefulWidget {
+  const MyScreen({super.key});
 
   @override
-  State<MandScreen> createState() => _MandScreenState();
+  State<MyScreen> createState() => _MyScreenState();
 }
 
-class _MandScreenState extends State<MandScreen>
+class _MyScreenState extends State<MyScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _animController;
   late final TextEditingController _textController;
@@ -228,21 +228,21 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
 ```dart
 // ❌ Context outlives the widget — crash or stale reference
-class MandService {
+class MyService {
   final BuildContext context; // ❌ NEVER do this
-  MandService(this.context);
+  MyService(this.context);
 }
 
 // ❌ Storing context in a BLoC
-class MandBloc extends Bloc<MandEvent, MandState> {
+class MyBloc extends Bloc<MandEvent, MandState> {
   final BuildContext _context; // ❌
-  MandBloc(this._context) : super(/* ... */);
+  MyBloc(this._context) : super(/* ... */);
 }
 
 // ✅ Pass data, not context — use callbacks or navigation service
-class MandBloc extends Bloc<MandEvent, MandState> {
+class MyBloc extends Bloc<MandEvent, MandState> {
   final NavigationService _navigation; // ✅ injected service, not context
-  MandBloc(this._navigation) : super(/* ... */);
+  MyBloc(this._navigation) : super(/* ... */);
 }
 
 // ✅ If you must use context in a widget callback, check mounted first
@@ -298,7 +298,7 @@ Future<void> runHeavyWork() async {
 }
 
 // ✅ Always kill isolates when done or when the widget is disposed
-class _MandWidgetState extends State<MandWidget> {
+class _MyWidgetState extends State<MyWidget> {
   Isolate? _isolate;
   ReceivePort? _receivePort;
 

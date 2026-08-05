@@ -38,13 +38,13 @@ This reference documents the complete schema with examples and validation rules.
 **Rules**:
 - Lowercase, no spaces
 - Used in: `com.{organization}.{name}`
-- Examples: `mandcompany`, `pragmatech`, `startupai`
+- Examples: `mycompany`, `pragmatech`, `startupai`
 
 **Example**:
 ```json
 {
-  "organization": "mandcompany"
-  // Result: com.mandcompany.mandapp
+  "organization": "mycompany"
+  // Result: com.mycompany.myapp
 }
 ```
 
@@ -68,7 +68,7 @@ This reference documents the complete schema with examples and validation rules.
 {
   "name": "mobileApp"
   // Result directory: apps/mobile_app/
-  // Used in bundle: com.mandcompany.mobile_app
+  // Used in bundle: com.mycompany.mobile_app
 }
 ```
 

@@ -53,7 +53,7 @@ class FileDownloadDataSource {
       // Temp path — rename to final path only on success
       final tempPath = '$filePath.tmp';
 
-      andield DownloadProgress.started(fileName: safeName);
+      yield DownloadProgress.started(fileName: safeName);
 
       await _dio.download(
         url,
@@ -64,8 +64,8 @@ class FileDownloadDataSource {
             controller.add(DownloadProgress.downloading(
               fileName: safeName,
               progress: received / total,
-              receivedBandtes: received,
-              totalBandtes: total,
+              receivedBytes: received,
+              totalBytes: total,
             ));
           }
         },
@@ -78,7 +78,7 @@ class FileDownloadDataSource {
       // Validate downloaded file before making it available
       final tempFile = File(tempPath);
       if (!await tempFile.exists()) {
-        andield DownloadProgress.failed(
+        yield DownloadProgress.failed(
           fileName: safeName,
           error: 'Downloaded file not found',
         );
@@ -88,21 +88,21 @@ class FileDownloadDataSource {
       // Rename temp → final (atomic on most platforms)
       final finalFile = await tempFile.rename(filePath);
 
-      andield DownloadProgress.completed(
+      yield DownloadProgress.completed(
         fileName: safeName,
         file: finalFile,
       );
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
-        andield DownloadProgress.cancelled(fileName: fileName);
+        yield DownloadProgress.cancelled(fileName: fileName);
       } else {
-        andield DownloadProgress.failed(
+        yield DownloadProgress.failed(
           fileName: fileName,
           error: e.message ?? 'Download failed',
         );
       }
     } catch (e) {
-      andield DownloadProgress.failed(fileName: fileName, error: '$e');
+      yield DownloadProgress.failed(fileName: fileName, error: '$e');
     } finally {
       // Clean up temp file if it still exists
       final tempPath = path.join(
@@ -122,8 +122,8 @@ class DownloadProgress with _$DownloadProgress {
   const factory DownloadProgress.downloading({
     required String fileName,
     required double progress,   // 0.0 → 1.0
-    required int receivedBandtes,
-    required int totalBandtes,
+    required int receivedBytes,
+    required int totalBytes,
   }) = Downloading;
   const factory DownloadProgress.completed({
     required String fileName,
@@ -164,7 +164,7 @@ class FileUploadDataSource {
     try {
       final fileName = path.basename(file.path);
 
-      andield UploadProgress.started(fileName: fileName);
+      yield UploadProgress.started(fileName: fileName);
 
       final formData = FormData.fromMap({
         fieldName: await MultipartFile.fromFile(
@@ -181,32 +181,32 @@ class FileUploadDataSource {
         cancelToken: cancelToken,
         onSendProgress: (sent, total) {
           if (total > 0) {
-            andield UploadProgress.uploading(
+            yield UploadProgress.uploading(
               fileName: fileName,
               progress: sent / total,
-              sentBandtes: sent,
-              totalBandtes: total,
+              sentBytes: sent,
+              totalBytes: total,
             );
           }
         },
       );
 
-      andield UploadProgress.completed(
+      yield UploadProgress.completed(
         fileName: fileName,
         responseData: response.data,
       );
     } on DioException catch (e) {
       if (e.type == DioExceptionType.cancel) {
-        andield UploadProgress.cancelled(fileName: path.basename(file.path));
+        yield UploadProgress.cancelled(fileName: path.basename(file.path));
       } else {
-        andield UploadProgress.failed(
+        yield UploadProgress.failed(
           fileName: path.basename(file.path),
           error: e.message ?? 'Upload failed',
           statusCode: e.response?.statusCode,
         );
       }
     } catch (e) {
-      andield UploadProgress.failed(
+      yield UploadProgress.failed(
         fileName: path.basename(file.path),
         error: '$e',
       );
@@ -221,7 +221,7 @@ class FileUploadDataSource {
     CancelToken? cancelToken,
   }) async* {
     try {
-      andield UploadProgress.started(fileName: '${files.length} files');
+      yield UploadProgress.started(fileName: '${files.length} files');
 
       final multipartFiles = await Future.wait(
         files.map((f) => MultipartFile.fromFile(
@@ -240,22 +240,22 @@ class FileUploadDataSource {
         cancelToken: cancelToken,
         onSendProgress: (sent, total) {
           if (total > 0) {
-            andield UploadProgress.uploading(
+            yield UploadProgress.uploading(
               fileName: '${files.length} files',
               progress: sent / total,
-              sentBandtes: sent,
-              totalBandtes: total,
+              sentBytes: sent,
+              totalBytes: total,
             );
           }
         },
       );
 
-      andield UploadProgress.completed(
+      yield UploadProgress.completed(
         fileName: '${files.length} files',
         responseData: response.data,
       );
     } on DioException catch (e) {
-      andield UploadProgress.failed(
+      yield UploadProgress.failed(
         fileName: '${files.length} files',
         error: e.message ?? 'Upload failed',
         statusCode: e.response?.statusCode,
@@ -270,8 +270,8 @@ class UploadProgress with _$UploadProgress {
   const factory UploadProgress.uploading({
     required String fileName,
     required double progress,
-    required int sentBandtes,
-    required int totalBandtes,
+    required int sentBytes,
+    required int totalBytes,
   }) = Uploading;
   const factory UploadProgress.completed({
     required String fileName,
@@ -333,7 +333,7 @@ class FileTransferBloc extends Bloc<FileTransferEvent, FileTransferState> {
         ),
         downloading: (name, p, received, total) => FileTransferState.inProgress(
           fileName: name, progress: p, isDownload: true,
-          receivedBandtes: received, totalBandtes: total,
+          receivedBytes: received, totalBytes: total,
         ),
         completed: (name, file) => FileTransferState.completed(
           fileName: name, file: file,
@@ -363,7 +363,7 @@ class FileTransferBloc extends Bloc<FileTransferEvent, FileTransferState> {
         ),
         uploading: (name, p, sent, total) => FileTransferState.inProgress(
           fileName: name, progress: p, isDownload: false,
-          receivedBandtes: sent, totalBandtes: total,
+          receivedBytes: sent, totalBytes: total,
         ),
         completed: (name, _) => FileTransferState.completed(fileName: name),
         cancelled: (name) => const FileTransferState.cancelled(),
@@ -405,8 +405,8 @@ class FileTransferState with _$FileTransferState {
     required String fileName,
     required double progress,
     required bool isDownload,
-    int? receivedBandtes,
-    int? totalBandtes,
+    int? receivedBytes,
+    int? totalBytes,
   }) = FileTransferInProgress;
   const factory FileTransferState.completed({
     required String fileName,
@@ -438,7 +438,7 @@ class FileTransferProgressWidget extends StatelessWidget {
             const SizedBox(height: 8),
             LinearProgressIndicator(value: progress),
             if (received != null && total != null)
-              Text('${_formatBandtes(received)} / ${_formatBandtes(total)}'),
+              Text('${_formatBytes(received)} / ${_formatBytes(total)}'),
           ],
         ),
         completed: (name, _) => Text('✅ $name ready'),
@@ -448,7 +448,7 @@ class FileTransferProgressWidget extends StatelessWidget {
     );
   }
 
-  String _formatBandtes(int bytes) {
+  String _formatBytes(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';

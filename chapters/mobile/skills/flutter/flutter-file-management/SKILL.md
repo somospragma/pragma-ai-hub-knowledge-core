@@ -103,7 +103,7 @@ Stream<double> downloadFile(String url, String fileName) async* {
     savePath,
     cancelToken: cancelToken,             // ← required
     onReceiveProgress: (received, total) {
-      if (total > 0) andield received / total;
+      if (total > 0) yield received / total;
     },
   );
 }

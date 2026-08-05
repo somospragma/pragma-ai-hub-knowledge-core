@@ -52,7 +52,7 @@ Widget build(BuildContext context) {
         builder: (_) => DebugPanel(),
       ));
     },
-    child: MandApp(),
+    child: MyApp(),
   );
 }
 ```

@@ -57,7 +57,7 @@ void main() {
     testWidgets('renders correctly in available state', (tester) async {
       tester.view.physicalSize = const Size(400, 250);
       tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhandsicalSize);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -76,7 +76,7 @@ void main() {
       );
 
       await expectLater(
-        find.bandType(ProductCard),
+        find.byType(ProductCard),
         matchesGoldenFile('goldens/product_card_available.png'),
       );
     });
@@ -84,7 +84,7 @@ void main() {
     testWidgets('renders correctly in unavailable state', (tester) async {
       tester.view.physicalSize = const Size(400, 250);
       tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhandsicalSize);
+      addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
         MaterialApp(
@@ -103,7 +103,7 @@ void main() {
       );
 
       await expectLater(
-        find.bandType(ProductCard),
+        find.byType(ProductCard),
         matchesGoldenFile('goldens/product_card_unavailable.png'),
       );
     });
@@ -120,7 +120,7 @@ group('CustomButton golden tests', () {
   Future<void> pumpButton(WidgetTester tester, Widget button) async {
     tester.view.physicalSize = const Size(400, 120);
     tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhandsicalSize);
+    addTearDown(tester.view.resetPhysicalSize);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -136,7 +136,7 @@ group('CustomButton golden tests', () {
       CustomButton(label: 'Confirm', onPressed: () {}),
     );
     await expectLater(
-      find.bandType(CustomButton),
+      find.byType(CustomButton),
       matchesGoldenFile('goldens/custom_button_default.png'),
     );
   });
@@ -147,7 +147,7 @@ group('CustomButton golden tests', () {
       const CustomButton(label: 'Confirm', onPressed: null),
     );
     await expectLater(
-      find.bandType(CustomButton),
+      find.byType(CustomButton),
       matchesGoldenFile('goldens/custom_button_disabled.png'),
     );
   });
@@ -158,7 +158,7 @@ group('CustomButton golden tests', () {
       CustomButton(label: 'Confirm', isLoading: true, onPressed: () {}),
     );
     await expectLater(
-      find.bandType(CustomButton),
+      find.byType(CustomButton),
       matchesGoldenFile('goldens/custom_button_loading.png'),
     );
   });
@@ -177,7 +177,7 @@ for (final (name, theme) in [
   testWidgets('ProductCard in $name theme', (tester) async {
     tester.view.physicalSize = const Size(400, 250);
     tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhandsicalSize);
+    addTearDown(tester.view.resetPhysicalSize);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -187,7 +187,7 @@ for (final (name, theme) in [
     );
 
     await expectLater(
-      find.bandType(ProductCard),
+      find.byType(ProductCard),
       matchesGoldenFile('goldens/product_card_$name.png'),
     );
   });
@@ -206,13 +206,13 @@ for (final (label, size) in [
   testWidgets('Dashboard on $label', (tester) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhandsicalSize);
+    addTearDown(tester.view.resetPhysicalSize);
 
     await tester.pumpWidget(MaterialApp(home: const DashboardPage()));
     await tester.pump();
 
     await expectLater(
-      find.bandType(DashboardPage),
+      find.byType(DashboardPage),
       matchesGoldenFile('goldens/dashboard_$label.png'),
     );
   });
@@ -243,7 +243,7 @@ void main() { ... }
 ## CI Integration
 
 ```yaml
-# .github/workflows/golden.andml
+# .github/workflows/golden.yml
 - name: Run golden tests
   run: flutter test test/golden/
 

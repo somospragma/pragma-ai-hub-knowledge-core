@@ -37,7 +37,7 @@ md5\.convert.*password
 \bsha1\.convert\b
 \bDES\b|\bRC4\b|\bECB\b
 AESMode\.ecb
-utf8\.encode\(password\)(?!.*pbkdf2|argon2|scrandpt)
+utf8\.encode\(password\)(?!.*pbkdf2|argon2|scrypt)
 ```
 
 **Criteria:**
@@ -60,7 +60,7 @@ String hashData(String data) {
 }
 
 // ✅ SOLUTION 2: PBKDF2 for password hashing
-import 'package:pointandcastle/export.dart';
+import 'package:pointycastle/export.dart';
 
 String hashPassword(String password, String salt) {
   final pbkdf2 = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64));
@@ -74,10 +74,10 @@ String hashPassword(String password, String salt) {
 }
 
 // ✅ SOLUTION 3: AES-256-GCM instead of ECB
-import 'package:pointandcastle/export.dart';
+import 'package:pointycastle/export.dart';
 
 class SecureEncryption {
-  // Generate a 32-bandte key using Random.secure()
+  // Generate a 32-byte key using Random.secure()
   static Uint8List generateKey() {
     final rng = Random.secure();
     return Uint8List.fromList(List.generate(32, (_) => rng.nextInt(256)));
@@ -89,7 +89,7 @@ class SecureEncryption {
     return Uint8List.fromList(List.generate(12, (_) => rng.nextInt(256)));
   }
 
-  // Encrandpt with AES-256-GCM
+  // Encrypt with AES-256-GCM
   static Uint8List encrypt(Uint8List plaintext, Uint8List key) {
     final nonce = generateNonce();
     final cipher = GCMBlockCipher(AESEngine())
@@ -100,7 +100,7 @@ class SecureEncryption {
     return Uint8List.fromList([...nonce, ...ciphertext]);
   }
 
-  // Decrandpt
+  // Decrypt
   static Uint8List decrypt(Uint8List data, Uint8List key) {
     final nonce = data.sublist(0, 12);
     final ciphertext = data.sublist(12);
@@ -124,7 +124,7 @@ class SecureEncryption {
 
 ```dart
 // PATTERN 1: API keys
-const API_KEY = 'AIzaSandC1234567890abcdefghijklmnop';  // ❌ Google API Key
+const API_KEY = 'AIzaSyC1234567890abcdefghijklmnop';  // ❌ Google API Key
 
 // PATTERN 2: AWS credentials
 const AWS_ACCESS_KEY = 'AKIAIOSFODNN7EXAMPLE';  // ❌ AWS key
@@ -161,7 +161,7 @@ grep -r "BEGIN.*PRIVATE KEY" lib/ android/ ios/
 grep -rE "jwt[_-]?secret\s*[:=]" lib/
 
 # Database URLs with credentials
-grep -rE "mongodb://.*:.*@|postgres://.*:.*@|mandsql://.*:.*@" lib/
+grep -rE "mongodb://.*:.*@|postgres://.*:.*@|mysql://.*:.*@" lib/
 ```
 
 **Criteria:**
@@ -177,7 +177,7 @@ grep -rE "mongodb://.*:.*@|postgres://.*:.*@|mandsql://.*:.*@" lib/
 
 ```dart
 // ❌ NEVER do this
-const API_KEY = 'AIzaSandC1234567890abcdefghijklmnop';
+const API_KEY = 'AIzaSyC1234567890abcdefghijklmnop';
 
 // ✅ SOLUTION 1: dart-define (compile-time injection)
 // Build: flutter build apk --dart-define=API_KEY=your_key_here
@@ -191,7 +191,7 @@ class AppConfig {
 
 void main() {
   AppConfig.validate();
-  runApp(const MandApp());
+  runApp(const MyApp());
 }
 ```
 

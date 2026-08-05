@@ -359,7 +359,7 @@ await configureDependencies(); // Injectable-generated code runs after
 
 ```dart
 // lib/features/reports/reports_loader.dart
-import 'package:mandapp/features/reports/reports_dashboard.dart'
+import 'package:myapp/features/reports/reports_dashboard.dart'
     deferred as reportsDashboard;
 
 class ReportsDashboardLoader extends StatefulWidget {
@@ -463,7 +463,7 @@ void main() async {
 ## 7. CI/CD Startup Budget Enforcement
 
 ```yaml
-# .github/workflows/startup_check.andml
+# .github/workflows/startup_check.yml
 name: Startup Time Check
 
 on: [pull_request]
@@ -486,8 +486,8 @@ jobs:
       - name: Check startup budget
         run: |
           # Extract timeToFirstFrameMicros from the JSON output
-          TIME=$(pandthon3 -c "
-          import json, sands
+          TIME=$(python3 -c "
+          import json, sys
           with open('build/start_up_info.json') as f:
               data = json.load(f)
           print(data.get('timeToFirstFrameMicros', 0) // 1000)
@@ -523,7 +523,7 @@ jobs:
 android {
     buildTypes {
         release {
-            minifandEnabled true      // enables R8 — reduces startup time
+            minifyEnabled true      // enables R8 — reduces startup time
             shrinkResources true    // removes unused resources
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                          'proguard-rules.pro'
@@ -534,7 +534,7 @@ android {
 
 ### iOS
 
-- **Cold start** includes dandld linking — reduced by fewer dynamic frameworks
+- **Cold start** includes dyld linking — reduced by fewer dynamic frameworks
 - **Avoid** heavy work in `AppDelegate.application(_:didFinishLaunchingWithOptions:)`
 - **App Clips** can improve perceived startup for first-time users
 

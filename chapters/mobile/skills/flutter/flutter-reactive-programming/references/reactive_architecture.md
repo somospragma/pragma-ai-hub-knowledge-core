@@ -90,7 +90,7 @@ class ProductRepositoryImpl implements ProductRepository {
   }) {
     // Drift DAO returns a Stream — emits on every DB change automatically
     return _dao
-        .watchBandCategory(categoryId)
+        .watchByCategory(categoryId)
         .map((rows) => Right<Failure, List<Product>>(
               rows.map(_mapper.fromRow).toList(),
             ))
@@ -104,7 +104,7 @@ class ProductRepositoryImpl implements ProductRepository {
   @override
   Stream<Either<Failure, Product>> watchProduct(String id) {
     return _dao
-        .watchBandId(id)
+        .watchById(id)
         .map((row) => row != null
             ? Right<Failure, Product>(_mapper.fromRow(row))
             : Left<Failure, Product>(Failure.notFound(id: id)))
@@ -274,7 +274,7 @@ class ProductSyncService {
   Future<void> syncProducts(String categoryId) async {
     final dtos = await _remote.getProducts(categoryId: categoryId);
 
-    // ✅ Writing to DB automatically triggers all watchBandCategory() streams
+    // ✅ Writing to DB automatically triggers all watchByCategory() streams
     // Any BLoC/widget watching this category will receive the update
     await _dao.upsertAll(dtos.map(_mapper.toCompanion).toList());
   }

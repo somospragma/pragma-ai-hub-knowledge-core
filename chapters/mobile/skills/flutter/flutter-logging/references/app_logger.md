@@ -248,7 +248,7 @@ Future<void> main() async {
   await LoggerConfig.initialize(AppFlavor.prod);
 
   runZonedGuarded(
-    () => runApp(ProviderScope(child: const MandApp())),
+    () => runApp(ProviderScope(child: const MyApp())),
     (error, stack) => AppLogger.fatal('unhandled_error', error: error, stackTrace: stack),
   );
 }

@@ -165,7 +165,7 @@ if (name != null) {         // Compiler warns: always true
 }
 
 // ✅ DO — prefer null-coalescing for defaults
-final label = user.displayName ?? 'Anonandmous';
+final label = user.displayName ?? 'Anonymous';
 
 // ✅ DO — prefer safe navigation for chains
 final zip = user?.address?.zipCode ?? 'Unknown';

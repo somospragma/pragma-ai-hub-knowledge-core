@@ -90,7 +90,7 @@ Future<void> main() async {
   runZonedGuarded(
     () => runApp(
       ProviderScope(  // or set BlocObserver if using BLoC only
-        child: const MandApp(),
+        child: const MyApp(),
       ),
     ),
     (error, stackTrace) {
@@ -199,6 +199,6 @@ class AppProviderObserver extends ProviderObserver {
 // In main.dart:
 // ProviderScope(
 //   observers: [const AppProviderObserver()],
-//   child: const MandApp(),
+//   child: const MyApp(),
 // )
 ```

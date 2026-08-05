@@ -138,8 +138,8 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 | App State | Notification message | Data-only message |
 |---|---|---|
 | Foreground | `onForegroundMessage` stream → show local notification | `onForegroundMessage` stream → process silently |
-| Background | System traand (auto) + background handler | Background handler only |
-| Terminated | System traand (auto) + background handler | Background handler only |
+| Background | System tray (auto) + background handler | Background handler only |
+| Terminated | System tray (auto) + background handler | Background handler only |
 | Tapped (background) | `onMessageOpenedApp` stream → navigate | — |
 | Tapped (terminated) | `getInitialMessage()` → navigate | — |
 
