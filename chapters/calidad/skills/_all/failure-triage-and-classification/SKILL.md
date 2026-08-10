@@ -32,9 +32,9 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
 
 ## Instrucción
 
-1. **Aislar el fallo.** Antes de clasificar, recolectar la evidencia mínima: `test_id`, mensaje de error completo, stack trace, screenshot/trace (Playwright/Appium), request/response (Karate/API), métricas y thresholds (K6), `environment context` (URL del SUT, branch, commit, runner, OS, browser/device). Sin esta evidencia el triage es opinión, no análisis. Ver `[[calidad-test-evidence-and-traceability]]` para el formato canónico.
+1. **Aislar el fallo y MIRAR la evidencia antes de teorizar.** Orden obligatorio: (1) screenshot del momento del fallo, (2) DOM/page source **parseado como árbol** —nunca deducir la topología de la indentación impresa—, (3) log del mock/backend (¿llegó la petición? ¿con qué body?), (4) recién entonces la hipótesis. Prohibido formular una segunda hipótesis sin haber completado 1-3: la evidencia suele estar generada y sin mirar. Recolectar además la evidencia mínima: `test_id`, mensaje de error completo, stack trace, screenshot/trace (Playwright/Appium), request/response (Karate/API), métricas y thresholds (K6), `environment context` (URL del SUT, branch, commit, runner, OS, browser/device). Sin esta evidencia el triage es opinión, no análisis. Ver `[[calidad-test-evidence-and-traceability]]` para el formato canónico.
 
-2. **Aplicar el protocolo de re-run para determinismo** descrito en `references/re-run-protocol-for-determinism.md`: re-ejecutar el test N veces (default N=3) en el **mismo entorno y con los mismos datos**. Resultado:
+2. **Aplicar el protocolo de re-run para determinismo** — **re-ejecutando SOLO el test en cuestión**, aislado por nombre o tag (nunca la suite completa) descrito en `references/re-run-protocol-for-determinism.md`: re-ejecutar el test N veces (default N=3) en el **mismo entorno y con los mismos datos**. Resultado:
    - 3/3 fallan con el mismo error → `deterministic`.
    - 3/3 fallan con errores distintos → `flaky_high_variance` (race condition probable).
    - 1/3 o 2/3 fallan → `flaky`.

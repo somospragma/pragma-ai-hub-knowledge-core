@@ -60,6 +60,13 @@ Lista completa en `[[calidad-karate-brownfield]] (consultar `references/mandator
 
 ## Pasos
 
+### Paso 0 — Leer la traza del pipeline (SIEMPRE)
+
+Aplica `[[calidad-pipeline-state-tracking]]` antes de tocar nada: si el `project_root`/`output_path` ya tiene `.evidence/pipeline-state.json`, leerlo y abrir el turno reportando fase actual, pendientes, bloqueos y `open_corrections`. Si no existe, crearlo con las fases de la ruta brownfield en `pending`. Actualizarlo al cerrar cada fase, con evidencia.
+
+En brownfield el riesgo de perder el hilo es MAYOR que en greenfield: son sesiones largas sobre proyectos grandes del cliente, que es justo donde el contexto se llena y el proceso se fragmenta.
+
+
 ### 1. Detectar convenciones cliente-específicas
 Pistas: paths con prefix de ticket (`{TICKET-XXX}`), variable de base URL no estándar, naming de scenarios con frases tipo "solicitud exitosa/fallida", headers transversales presentes en TODOS los features (p. ej. `Transaction-Id`, `Sid`, `Auth-Id`, `X-Channel`). El usuario también puede declararlo explícitamente. Si detectas convenciones cliente-específicas, activa las reglas documentadas en `references/client-specific-conventions.md`.
 
@@ -89,6 +96,9 @@ Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.** Brownfield: la auto-corrección aplica **EXCLUSIVAMENTE** a los `.feature` y bodies recién generados por este workflow; NUNCA a los preexistentes del cliente, aunque fallen (ver `[[calidad-brownfield-vs-greenfield]]` sección "Auto-corrección en brownfield").
 
+**Cadencia de corrección (aplica a los tests nuevos de esta corrida)**: gate de un escenario → suite de los tests nuevos como inventario → **corrección aislada, re-ejecutando SOLO el test que se corrige** → regresión de los nuevos. Nunca relanzar la suite en cada iteración. Detalle en `[[calidad-test-self-correction-loop]]`. La suite preexistente del cliente no entra en este ciclo.
+
+
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP — clientes con convenciones cliente-específicas estrictas suelen ameritar `dry-run`) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin `mvn`, sin acceso al ambiente del cliente), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` filtrado por el tag de la nueva historia (`mvn test -Dkarate.options="--tags @user-story:{ticket-id}"`), de modo que la corrida toque sólo los features nuevos.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz. Si un test preexistente del cliente falla por daño colateral (p. ej. cambio compartido en `karate-config.js`), detenerse y reportar — NO auto-corregir.
@@ -100,7 +110,7 @@ Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-
 9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/SSL), emitir `.evidence/execution-status.json` según [[calidad-environment-blocker-evidence]]. El estado pasa a `partial` con razón.
 10. **Metadata por corrida**: emitir `results/karate/{date}/{ISO}-metadata.json` según el schema universal [[calidad-execution-metadata-schema]]. En brownfield, el campo `workload_or_scope` debe distinguir "N features/scenarios nuevos sobre M preexistentes".
 11. **Reporte ejecutivo**: invocar `[[calidad-generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `karate-report-template.md`. El reporte debe segregar explícitamente "features/scenarios nuevos (en scope de esta sesión)" de "features preexistentes (referencia, no ejecutados en el gate)".
-12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
+12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` — **precondición: leer `.evidence/pipeline-state.json` y verificar cero fases obligatorias pendientes; con pendientes NO se emite el gate, se emite reporte de estado y el trabajo continúa** — con: status declarado coherente con execution, manifest de archivos nuevos, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en tests preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 

@@ -56,6 +56,13 @@ Recolección según `[[calidad-mandatory-inputs-protocol]]`.
 
 ## Pasos
 
+### Paso 0 — Leer la traza del pipeline (SIEMPRE)
+
+Aplica `[[calidad-pipeline-state-tracking]]` antes de tocar nada: si el `project_root`/`output_path` ya tiene `.evidence/pipeline-state.json`, leerlo y abrir el turno reportando fase actual, pendientes, bloqueos y `open_corrections`. Si no existe, crearlo con las fases de la ruta brownfield en `pending`. Actualizarlo al cerrar cada fase, con evidencia.
+
+En brownfield el riesgo de perder el hilo es MAYOR que en greenfield: son sesiones largas sobre proyectos grandes del cliente, que es justo donde el contexto se llena y el proceso se fragmenta.
+
+
 1. **Analizar proyecto existente** — Recorre los archivos entregados. Identifica `tests/`, `pages/`, `fixtures/`, `mocks/`.
 2. **Extraer convenciones** — Aplica `[[calidad-playwright-brownfield]] (consultar `references/convention-detection.md` en su subfolder)` para producir el objeto de convenciones. Output mandatorio antes de generar nada.
 3. **Aplicar selector-update si la UI cambió** — Si `change_request` es de tipo (a), aplica `[[calidad-playwright-brownfield]] (consultar `references/selector-update-strategy.md` en su subfolder)` página por página. Solo cambian las cadenas dentro de los `getBy*`. Preservar TODO lo demás.
@@ -67,6 +74,9 @@ Recolección según `[[calidad-mandatory-inputs-protocol]]`.
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.** Brownfield: la auto-corrección aplica **EXCLUSIVAMENTE** a los Page Objects y `*.spec.ts` recién generados/modificados por este workflow; NUNCA a los tests preexistentes del cliente, aunque fallen (ver `[[calidad-brownfield-vs-greenfield]]` sección "Auto-corrección en brownfield").
 
+**Cadencia de corrección (aplica a los tests nuevos de esta corrida)**: gate de un escenario → suite de los tests nuevos como inventario → **corrección aislada, re-ejecutando SOLO el test que se corrige** → regresión de los nuevos. Nunca relanzar la suite en cada iteración. Detalle en `[[calidad-test-self-correction-loop]]`. La suite preexistente del cliente no entra en este ciclo.
+
+
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin navegadores, sin red al frontend), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` filtrado a los specs nuevos/modificados (`npx playwright test tests/<spec>.spec.ts` o por tag de la nueva historia). Capturar `playwright-report/`, traces y screenshots como evidencia.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky y diagnosticar causa raíz. Si un spec preexistente del cliente falla por daño colateral (p. ej. cambio compartido en un Page Object reusado), detenerse y reportar — NO auto-corregir el legado.
@@ -74,11 +84,11 @@ Recolección según `[[calidad-mandatory-inputs-protocol]]`.
 5. Reportar estado final: `success` | `partial` | `failed` con contexto completo si se escala a humano.
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`.
 7. **Invocar `[[calidad-post-generation-protocol]]`** para coherence checks post-emisión (find paths, grep de imports cruzados entre fixtures/data/tests nuevos, `npx tsc --noEmit` si modo=full) antes de cerrar.
-8. **Smoke gate universal (tests nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [[calidad-smoke-gate-policy]]. En brownfield Playwright, el gate ejecuta **únicamente los specs nuevos/modificados** filtrados por tag o path: `npx playwright test --grep "@smoke @new" --project=chromium-live --max-failures=1` o filtrado por path del spec recién generado. Los specs preexistentes NO se ejecutan en el gate para no inflar tiempo ni contaminar resultados. Si fallan tests preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado.
+8. **Smoke gate universal (tests nuevos)**: antes de declarar `success`, ejecutar el smoke gate del stack según [[calidad-smoke-gate-policy]]. En brownfield Playwright, el gate ejecuta **únicamente los specs nuevos/modificados** filtrados por tag o path: `npx playwright test --grep "<tag de la historia>" --max-failures=1` o filtrado por path del spec recién generado. **UN solo spec**: el más end-to-end de los nuevos, con el conteo verificado (`--list`). NO inventar tags que el proyecto no usa (`@new` no existe en el proyecto del cliente). Los specs preexistentes NO se ejecutan en el gate para no inflar tiempo ni contaminar resultados. Si fallan tests preexistentes al correr la suite completa después, eso NO bloquea la entrega — se reporta como issue separado.
 9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/browser launch failure), emitir `.evidence/execution-status.json` según [[calidad-environment-blocker-evidence]]. El estado pasa a `partial` con razón.
 10. **Metadata por corrida**: emitir `results/playwright/{date}/{ISO}-metadata.json` según el schema universal [[calidad-execution-metadata-schema]]. En brownfield, el campo `workload_or_scope` debe distinguir "N specs nuevos sobre M preexistentes".
 11. **Reporte ejecutivo**: invocar `[[calidad-generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `playwright-report-template.md`. El reporte debe segregar explícitamente "specs/Page Objects nuevos (en scope de esta sesión)" de "specs preexistentes (referencia, no ejecutados en el gate)".
-12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/modificados, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log + traces si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en specs preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
+12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` — **precondición: leer `.evidence/pipeline-state.json` y verificar cero fases obligatorias pendientes; con pendientes NO se emite el gate, se emite reporte de estado y el trabajo continúa** — con: status declarado coherente con execution, manifest de archivos nuevos/modificados, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, execution log + traces si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en specs preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 

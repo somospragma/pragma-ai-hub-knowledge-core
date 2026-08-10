@@ -68,6 +68,13 @@ Si falta cualquier obligatorio, detente y solicítalo.
 
 ## Pasos
 
+### Paso 0 — Leer la traza del pipeline (SIEMPRE)
+
+Aplica `[[calidad-pipeline-state-tracking]]` antes de tocar nada: si el `project_root`/`output_path` ya tiene `.evidence/pipeline-state.json`, leerlo y abrir el turno reportando fase actual, pendientes, bloqueos y `open_corrections`. Si no existe, crearlo con las fases de la ruta brownfield en `pending`. Actualizarlo al cerrar cada fase, con evidencia.
+
+En brownfield el riesgo de perder el hilo es MAYOR que en greenfield: son sesiones largas sobre proyectos grandes del cliente, que es justo donde el contexto se llena y el proceso se fragmenta.
+
+
 ### Paso 1 — Analizar proyecto existente
 
 Inspecciona `project_root`. Verifica que cumple los criterios brownfield (`tests/config.js`, `tests/utils.js`, ≥1 `tests/*-test.js`). Anota qué scripts de los 5 canónicos (`smoke`, `load`, `stress`, `spike`, `soak`) están presentes y cuáles faltan.
@@ -125,6 +132,9 @@ Detalle de comandos en `[[calidad-k6-run-and-suite]]`.
 
 **Esta fase es parte del contrato de entrega del workflow, no opcional.** En K6 brownfield, esta fase usa **únicamente smoke individual del/los script(s) nuevo(s) o modificado(s)**: `load/stress/spike/soak` quedan fuera del loop. Además, la auto-corrección aplica **EXCLUSIVAMENTE** a los scripts/patches generados por este workflow; NUNCA a los scripts preexistentes del cliente, aunque fallen (ver `[[calidad-brownfield-vs-greenfield]]` sección "Auto-corrección en brownfield").
 
+**Cadencia de corrección (aplica a los tests nuevos de esta corrida)**: gate de un escenario → suite de los tests nuevos como inventario → **corrección aislada, re-ejecutando SOLO el test que se corrige** → regresión de los nuevos. Nunca relanzar la suite en cada iteración. Detalle en `[[calidad-test-self-correction-loop]]`. La suite preexistente del cliente no entra en este ciclo.
+
+
 1. **Resolver modo de operación** con el usuario (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin `k6`, sin red al `BASE_URL`, sin `AUTH_TOKEN` cuando aplique), degradar a `scaffold-only` y reportar `partial`.
 2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` sólo el smoke individual del nuevo script (`k6 run -e BASE_URL=$BASE_URL tests/<nuevo-script>-test.js`). Si el cambio fue patch a `utils.js`/`config.js`, correr el smoke del primer script afectado. Capturar `results/${timestamp}-summary.json`.
 3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar como deterministic / flaky. Causas típicas: payload mal correlacionado con el nuevo endpoint, header faltante, `AUTH_TOKEN` mal seteado, threshold heredado irreal para el nuevo flujo. Fallos de scripts preexistentes del cliente por daño colateral del patch: detenerse y reportar, NO auto-corregir el legado.
@@ -136,7 +146,7 @@ Detalle de comandos en `[[calidad-k6-run-and-suite]]`.
 9. **Evidencia de bloqueo de ambiente**: si la ejecución sufre bloqueo de ambiente (WAF/network/auth/rate limit/throughput cap), emitir `.evidence/execution-status.json` según [[calidad-environment-blocker-evidence]]. El estado pasa a `partial` con razón.
 10. **Metadata por corrida**: emitir `results/k6/{date}/{ISO}-metadata.json` según el schema universal [[calidad-execution-metadata-schema]]. En brownfield, el campo `workload_or_scope` debe distinguir "N scripts/escenarios nuevos sobre M preexistentes" e incluir VUs/iterations efectivos.
 11. **Reporte ejecutivo**: invocar `[[calidad-generate-executive-report]]` para producir reporte consolidado en `.evidence/report-{ISO}.{html|pptx|docx|md}`, usando `k6-report-template.md`. El reporte debe segregar explícitamente "scripts nuevos (en scope de esta sesión)" de "scripts preexistentes (referencia, no ejecutados en el gate)" e incluir comparación corrida nueva vs baseline preexistente si los `results/*-summary.json` previos están disponibles.
-12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` con: status declarado coherente con execution, manifest de archivos nuevos/patches, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, `results/${timestamp}-summary.json` si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en scripts preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
+12. **Emitir el bloque `delivery_gate` yaml** según `[[calidad-delivery-gate-contract]]` — **precondición: leer `.evidence/pipeline-state.json` y verificar cero fases obligatorias pendientes; con pendientes NO se emite el gate, se emite reporte de estado y el trabajo continúa** — con: status declarado coherente con execution, manifest de archivos nuevos/patches, evidencia (`.evidence/session-config.json`, `.evidence/generation-manifest.json`, `results/${timestamp}-summary.json` si modo=full, `.evidence/execution-status.json` si hubo bloqueo de ambiente, metadata por corrida, reporte ejecutivo, audit log si hubo correcciones), blockers (fallos en scripts preexistentes del cliente reportados como blocker con status `partial`, jamás auto-corregidos).
 
 ## Criterios de finalización
 

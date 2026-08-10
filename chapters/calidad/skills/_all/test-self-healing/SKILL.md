@@ -37,7 +37,11 @@ Combinar siempre con `[[calidad-chapter-perspective]]` (perspectiva del chapter)
 
 1. **Identificar la superficie de fragilidad por SUT.** Para web: selectors DOM, timings de render, modales asíncronos. Para mobile: cambios de OS, accessibility-id no garantizados por dev, popups de permisos. Para API REST/GraphQL: response shape, campos opcionales del proveedor, paginación. Para K6: drift de schema en endpoints bajo carga. Documentar la superficie en un `healing-surface.md` dentro del suite y cruzar con `[[calidad-sut-types-and-adaptations]]`.
 
-2. **Aplicar multi-locator fallback en Page Objects** siguiendo orden de prioridad estricto:
+2. **Antes de "sanar", verificar que el locator apuntaba al nodo correcto.** El identificador da **identidad, no capacidad**: el nodo del contrato puede ser un contenedor no clickeable/no editable cuyo elemento capaz es un descendiente. Aplicar el protocolo de resolución (`[[calidad-appium-screenplay-android]]`, consultar `references/locator-resolution-protocol.md`; equivalente web en `selector-priority.md` de `[[calidad-playwright-greenfield]]`): volcar la jerarquía, enumerar ejes, **contar nodos (único válido = 1)** y validar por efecto externo. Un "healing" que cambia de estrategia sin este paso puede estar tapando un locator mal resuelto.
+
+   **Prohibido relajar el discriminante** hasta que "algo" haga match (quitar el ancla, pasar a `contains` genérico, tomar el primero de N): eso reintroduce ambigüedad y produce verdes falsos. El identificador del contrato sigue siendo el ancla; lo que se re-resuelve es el eje hacia el nodo capaz.
+
+3. **Aplicar multi-locator fallback en Page Objects** siguiendo orden de prioridad estricto:
    - Playwright: `getByTestId` → `getByRole` → `getByLabel` → `getByText` → CSS (último recurso).
    - Appium: `AppiumBy.accessibilityId` → `AppiumBy.id` → `AppiumBy.xpath` (xpath solo como último fallback, nunca primario).
    - Ver `references/multi-locator-fallback-pattern.md` para snippets y `references/healing-aware-page-object.md` para el patrón de inyección.

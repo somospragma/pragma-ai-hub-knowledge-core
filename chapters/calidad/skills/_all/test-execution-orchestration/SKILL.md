@@ -43,6 +43,16 @@ Política por defecto:
 - Sin shell o sin acceso a env → `scaffold-only` automático.
 - Validación sobre suite ya existente → `execute-only`.
 
+## Cadencia y aislamiento (regla universal)
+
+1. **Instrumentar ANTES de la primera corrida**: logfile del servidor de automatización, log de transacciones del mock si aplica, hook de evidencia por fallo (screenshot + DOM/page source) y screenshots por paso. Instrumentar después del primer fallo es diagnosticar a ciegas justo el caso que importaba.
+2. **Gate 1:1 primero**: UN escenario end-to-end (`[[calidad-smoke-gate-policy]]`), con el conteo verificado contra el filtro pedido.
+3. **Suite completa como inventario**, una vez, para conocer todos los fallos.
+4. **Corrección aislada**: cada re-ejecución durante la corrección corre **solo el test que se está corrigiendo** (por nombre o tag). Relanzar la suite en cada iteración está prohibido (`[[calidad-test-self-correction-loop]]`).
+5. **Regresión final**: suite completa una vez más, para confirmar.
+
+**Salidas de comandos largos a archivo**, y nunca diagnosticar sobre output de terminal truncado, entremezclado o reusado de una corrida anterior.
+
 ## Instrucción
 
 1. **Resolver modo** según contexto del cliente y capacidad técnica del agente. Confirmar con `[[calidad-mandatory-inputs-protocol]]` si hay ambigüedad. Si se degrada a `scaffold-only`, registrar la razón.

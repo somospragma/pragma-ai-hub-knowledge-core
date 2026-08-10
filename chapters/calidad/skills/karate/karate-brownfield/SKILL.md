@@ -17,6 +17,21 @@ Cuando el usuario tiene un **proyecto Karate ya inicializado** (al menos `karate
 
 Si el usuario no provee archivos del proyecto, no asumas: solicítalos o usa `[[calidad-karate-greenfield]]` previo acuerdo.
 
+## Lectura obligatoria antes de tocar el proyecto
+
+El conocimiento técnico del stack vive en el bundle **greenfield** del mismo stack; brownfield no lo duplica, lo consume. **Abrir antes de generar** y declarar cuáles se leyeron (traza en `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| [[calidad-karate-greenfield]] (`references/feature-design-dsl.md`) | Tipos de escenario, tags y estilo |
+| [[calidad-karate-greenfield]] (`references/contract-testing-match-patterns.md`) | Notación `match`, `#type` vs `##type` |
+| [[calidad-karate-greenfield]] (`references/negative-coverage-formula.md`) | Cobertura defendible por endpoint |
+| `references/convention-detection.md` · `references/client-specific-conventions.md` | Convenciones del proyecto (propias de este skill) |
+
+**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo resolver un locator, cómo interactuar, cómo diagnosticar). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
+
+**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del chapter (p. ej. `OnlineCast` disparando ChromeDriver, runner con tags hardcodeados que anulan el filtro de CLI, falta de `SerenityReporter` en `cucumber.plugin`, imports legacy de Serenity 3.x), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
+
 ## Instrucción
 
 1. **Recolectar inputs** — Usa `[[calidad-mandatory-inputs-protocol]]` y la lista de `references/mandatory-inputs-brownfield.md`. Inputs mínimos: `spec`, archivos de proyecto existente (`karate-config.js` + ≥1 `.feature`), `ticket_id`, `Body_Mode` (A = JSON externo, B = inline), `Scenario_Prefix` (opcional, se autodetecta del proyecto). Si el proyecto impone convenciones cliente-específicas (ver `references/client-specific-conventions.md`), `user_story` y `firma` pasan a OBLIGATORIO.

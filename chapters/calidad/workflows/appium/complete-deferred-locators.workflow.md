@@ -1,6 +1,6 @@
 ---
 id: calidad-complete-deferred-locators
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: workflow
 chapter: calidad
@@ -84,6 +84,9 @@ Agregar este step al pipeline CI para que falle si quedan TODOs.
 4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop-workflow]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` (multi-locator fallback en orden `accessibilityId → id → xpath`, LLM-driven selector repair contra el page source). Respetar `max_iterations` (default 3) y los **anti-cheating guardrails**: nunca volver al `TODO: update real locator`, nunca reemplazar la `Interaction` real (`TapOn`, `Enter`) por el flag en memoria, nunca debilitar `AppIsResponsive`, nunca downgrade a smoke trivial (`assertTrue(true)`) para forzar verde.
 5. Reportar estado final: `success` (los 2 smokes pasan contra DOM real) | `partial` (algún locator quedó pendiente y requiere otra sesión con Appium Inspector) | `failed` (escalado a humano con stage, screenshot del Inspector, page source y locator propuesto).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Si el guardrail CI del paso 6 detecta `TODO` residual, marca el reporte como `partial` automáticamente.
+
+
+**Verificación obligatoria de cada locator descubierto** (`[[calidad-appium-screenplay-android]]`, consultar `references/locator-resolution-protocol.md`): un identificador encontrado en la jerarquía da **identidad, no capacidad**. Antes de fijarlo en un Page Object: contar cuántos nodos resuelve (**único válido = 1**), identificar el nodo realmente capaz (el contenedor del identificador suele no ser clickeable ni editable) y validar por **efecto externo** (la interacción produce navegación o una petición al backend). Un locator "descubierto" que nunca se ejerció es una hipótesis, no un hallazgo.
 
 ## Criterios de finalización
 

@@ -1,6 +1,6 @@
 ---
 id: calidad-pre-generation-protocol
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: steering
 chapter: calidad
@@ -18,7 +18,9 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 
 ## Pasos del protocolo
 
-1. **Confirmar mandatory inputs** (todos obligatorios, no se asume ninguno):
+0. **Leer la traza del pipeline** — Si el `output_path` ya existe, leer `.evidence/pipeline-state.json` (`[[calidad-pipeline-state-tracking]]`) y reportar dónde quedó el proceso antes de hacer nada. Si no existe, crearlo. Continuar por su `next_action`, no por lo que parezca urgente.
+
+1. **Confirmar mandatory inputs** (todos obligatorios, no se asume ninguno) y **leer COMPLETO cada insumo entregado**, emitiendo la tabla de extracción (qué se extrajo de cada uno y dónde se usará — `[[calidad-mandatory-inputs-protocol]]`). Un insumo sin fila es un insumo ignorado:
    - `intent`: qué tipo de pruebas (Karate / Playwright / K6 / Appium)
    - `project_name`: kebab-case
    - `output_path`: ruta absoluta

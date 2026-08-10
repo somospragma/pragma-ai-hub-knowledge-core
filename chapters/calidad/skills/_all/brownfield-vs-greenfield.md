@@ -132,8 +132,23 @@ Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calida
 
 Tras este chapter, todos los workflows brownfield reciben las mismas garantías universales que greenfield: smoke gate (universal), evidencia de bloqueo de ambiente, metadata por corrida, reporte ejecutivo, step isolation, validación contractual no superficial y STRATEGY.md condicional cuando el alcance es grande. La diferencia es de **scope de aplicación**: en brownfield estas mejoras se aplican **solo a archivos NUEVOS emitidos en la sesión**, nunca a tests preexistentes. Concretamente:
 
-- **Smoke gate**: en brownfield ejecuta únicamente tests nuevos (filtrado por tag `@new`, por path de archivo emitido, o equivalente del framework). Los preexistentes no se ejecutan en el gate.
+- **Smoke gate**: en brownfield ejecuta **un único escenario nuevo** (el más end-to-end), filtrado por el tag de la historia de la corrida o por el path del archivo emitido, con el conteo verificado antes de correr. **No inventar tags que el proyecto no usa** (`@new` no existe en el proyecto del cliente): las convenciones detectadas mandan. Los preexistentes no se ejecutan en el gate.
+- **Traza del pipeline**: `.evidence/pipeline-state.json` (`[[calidad-pipeline-state-tracking]]`) aplica igual que en greenfield — se lee al abrir cada sesión y el delivery gate no se emite con fases pendientes. En brownfield importa más: las sesiones son largas sobre proyectos grandes.
+- **Cadencia de corrección**: gate de un escenario → inventario de los nuevos → **corrección aislada test por test** → regresión de los nuevos (`[[calidad-test-self-correction-loop]]`). La suite preexistente nunca entra al ciclo.
 - **Step isolation y validación contractual**: aplican solo a archivos nuevos. Los preexistentes mantienen su estructura aunque no cumplan los patrones.
 - **Auto-corrección**: solo sobre archivos emitidos en la sesión; preexistentes son intocables.
 - **Reporte ejecutivo**: debe segregar explícitamente "nuevos (en scope de esta sesión)" de "preexistentes (referencia)".
 - **STRATEGY.md**: documenta lo NUEVO, no rediseña lo existente.
+
+## Brownfield contra un SUT que aún no existe (shift-left)
+
+Caso real y frecuente: el cliente tiene una suite viva y quiere agregar pruebas de un servicio o pantalla **que todavía no está desplegada**. Brownfield y shift-left no son excluyentes — el `[[calidad-sut-readiness-gate]]` se resuelve igual (paso 1.5 del router) y aplica **solo a los tests nuevos**:
+
+| Capacidad | En brownfield |
+|---|---|
+| **Mock de servicios** (`[[calidad-service-virtualization-mockoon]]`) | **Sí**. El data file vive junto al proyecto (`mocks/mockoon/`) y los tests nuevos apuntan al mock **por configuración**, usando el mecanismo que el proyecto YA tenga para cambiar de ambiente (env, profile, config existente). Prohibido introducir un mecanismo nuevo de configuración ni reapuntar los tests preexistentes. |
+| **Datos sintéticos** | Sí, con los builders/factories del proyecto si existen; no se introduce una segunda estrategia de datos. |
+| **Locator map** (`[[calidad-ui-locator-map-contract]]`) | Sí para pantallas nuevas, **respetando la convención de identificadores del proyecto** (si el proyecto localiza por label, el mapa se expresa en labels). |
+| **Prototipo de front/app** | **Normalmente NO**. Si la app ya existe y solo falta una pantalla, se difiere la ejecución de esos escenarios; un prototipo paralelo a una app real produce dos fuentes de verdad. Solo si el usuario lo pide explícitamente y se declara el riesgo. |
+
+Cierre: la corrida cierra con `execution_target: mock` y `certification: pending_real_integration` **para los tests nuevos**, sin alterar el estado de certificación de la suite preexistente.

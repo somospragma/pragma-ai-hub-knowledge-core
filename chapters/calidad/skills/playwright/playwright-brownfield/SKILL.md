@@ -25,6 +25,21 @@ Si el proyecto Playwright no existe todavía, usa `[[calidad-playwright-greenfie
 
 Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]` y recolecta inputs con `[[calidad-mandatory-inputs-protocol]]`.
 
+## Lectura obligatoria antes de tocar el proyecto
+
+El conocimiento técnico del stack vive en el bundle **greenfield** del mismo stack; brownfield no lo duplica, lo consume. **Abrir antes de generar** y declarar cuáles se leyeron (traza en `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| [[calidad-playwright-greenfield]] (`references/selector-priority.md`) | Orden de selectores y prohibiciones |
+| [[calidad-playwright-greenfield]] (`references/execution-modes-live-mocked-hybrid.md`) | @live/@mocked/@hybrid y qué valida cada modo |
+| [[calidad-playwright-greenfield]] (`references/waits-policy.md`) | Política de esperas |
+| `references/convention-detection.md` · `references/selector-update-strategy.md` | Convenciones del proyecto (propias de este skill) |
+
+**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo resolver un locator, cómo interactuar, cómo diagnosticar). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
+
+**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del chapter (p. ej. `OnlineCast` disparando ChromeDriver, runner con tags hardcodeados que anulan el filtro de CLI, falta de `SerenityReporter` en `cucumber.plugin`, imports legacy de Serenity 3.x), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
+
 ## Instrucción
 
 1. **Analizar proyecto existente** — Recorre el árbol entregado por el usuario: `playwright.config.ts`, `tsconfig.json`, `package.json`, `tests/`, `pages/`, `fixtures/`, `mocks/`. Identifica archivos representativos de cada categoría y el modo de ejecución actual (`@live` / `@mocked` / `@hybrid` si aplica).

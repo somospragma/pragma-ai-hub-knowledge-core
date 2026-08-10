@@ -22,6 +22,21 @@ Cuando el usuario tiene un **proyecto K6 ya inicializado** (mínimo `tests/confi
 
 La decisión brownfield vs greenfield se toma en `[[calidad-brownfield-vs-greenfield]]`. Si el usuario no provee archivos del proyecto, no asumas: solicítalos o usa `[[calidad-k6-greenfield]]` previo acuerdo.
 
+## Lectura obligatoria antes de tocar el proyecto
+
+El conocimiento técnico del stack vive en el bundle **greenfield** del mismo stack; brownfield no lo duplica, lo consume. **Abrir antes de generar** y declarar cuáles se leyeron (traza en `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| [[calidad-k6-greenfield]] (`references/thresholds-three-tiers.md`) | Tiers de thresholds y justificación |
+| [[calidad-k6-greenfield]] (`references/crud-dynamic-id-correlation.md`) | Correlación de IDs |
+| [[calidad-k6-greenfield]] (`references/handle-summary-evidence.md`) | handleSummary y evidencia |
+| `references/convention-detection.md` · `references/extension-patterns.md` | Convenciones del proyecto (propias de este skill) |
+
+**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo resolver un locator, cómo interactuar, cómo diagnosticar). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
+
+**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del chapter (p. ej. `OnlineCast` disparando ChromeDriver, runner con tags hardcodeados que anulan el filtro de CLI, falta de `SerenityReporter` en `cucumber.plugin`, imports legacy de Serenity 3.x), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
+
 ## Instrucción
 
 1. **Recolectar inputs adicionales** — Además de los gobernados por `[[calidad-mandatory-inputs-protocol]]`, exige: `project_root` (ruta del proyecto K6 existente), `scripts_to_extend` (lista de scripts a modificar, vacía si todos los cambios son archivos nuevos), `new_endpoints_or_thresholds` (descripción libre del delta a aplicar). Si falta cualquier obligatorio, detente y solicítalo.

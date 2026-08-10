@@ -1,6 +1,6 @@
 ---
 id: calidad-appium-apk-auto-discovery
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: skill
 chapter: calidad
@@ -37,6 +37,9 @@ Invocado desde `[[calidad-generate-appium-screenplay-android]]` en su paso (desp
 6. **Crawling sistemático**: usar `references/crawler-strategy.md` — heurísticas conservadoras (tap en cada Button/clickable, swipe vertical para scroll, back para volver), capturar `getPageSource()` por pantalla, identificar pantallas únicas por hash del XML, evitar loops, limit de profundidad 5.
 7. **Extracción de selectores** según `references/selector-extraction-rules.md`: priorizar `resource-id` (más estable) > `content-desc` (accessibility) > `text` (frágil) > `xpath` (último recurso). Score de confianza por locator según `references/locator-confidence-scoring.md`.
 8. **Generar Page Objects** con selectores reales (no TODOs). Persistir `.evidence/locators-discovered.json` con pantalla, selector elegido, alternativas descartadas, score. Cleanup según `references/safety-and-cleanup.md`.
+
+
+**Verificación obligatoria de cada locator descubierto** (`[[calidad-appium-screenplay-android]]`, consultar `references/locator-resolution-protocol.md`): un identificador encontrado en la jerarquía da **identidad, no capacidad**. Antes de fijarlo en un Page Object: contar cuántos nodos resuelve (**único válido = 1**), identificar el nodo realmente capaz (el contenedor del identificador suele no ser clickeable ni editable) y validar por **efecto externo** (la interacción produce navegación o una petición al backend). Un locator "descubierto" que nunca se ejerció es una hipótesis, no un hallazgo.
 
 ## Restricciones
 
