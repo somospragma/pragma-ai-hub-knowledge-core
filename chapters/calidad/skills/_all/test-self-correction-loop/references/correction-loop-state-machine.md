@@ -72,12 +72,14 @@ State machine canónica del self-correction loop. Cualquier corrección que no a
 | `FAILED` | Hay >0 fallos. Triage invocado por cada fallo. | desde `EXECUTED` | escribe `triage_report.json` por fallo |
 | `DIAGNOSING` | Identificación del cambio mínimo necesario, sobre el diff expected/actual y el catálogo `failure-pattern-catalog.md`. | desde `FAILED` (si el triage habilita auto-fix) | produce propuesta de cambio en memoria, aún no aplicada |
 | `FIXING` | Cambio validado contra guardrails y aplicado. Audit log persistido. | desde `DIAGNOSING` (si guardrails pasan) | escribe en `correction-audit-log.md`; modifica archivos en el workspace |
-| `RE-EXECUTING` | Re-ejecutar el test (o el suite mínimo afectado) para validar la corrección. | desde `FIXING` | nuevo bloque de evidencia con `iteration=N` |
+| `RE-EXECUTING` | Re-ejecutar **SOLO el test que se está corrigiendo**, aislado por su identificador/tag. NUNCA la suite completa. | desde `FIXING` | nuevo bloque de evidencia con `iteration=N` |
+| `REGRESSION` | Suite completa, **una sola vez**, cuando ya no quedan fallos abiertos: confirma que las correcciones no rompieron nada. | desde `VALIDATED` del último fallo | evidencia de la corrida completa final |
 | `VALIDATED` | El test pasa. `correction_count` queda registrado en evidencia del run. | desde `EXECUTED` (sin fallos) o desde `RE-EXECUTING` (pasó) | reporte final `success` |
 | `ESCALATED` | Imposible auto-corregir. Contexto completo entregado al humano. | desde `FAILED` (triage bloquea), `DIAGNOSING` (guardrails bloquean), `RE-EXECUTING` (max_iterations agotado) | escalation report (ver `iteration-limits-and-escalation.md`); en modo estricto, revertir cambios del loop |
 
 ## Transiciones prohibidas
 
+- `RE-EXECUTING` lanzando la **suite completa** en cada iteración: prohibido. El aislamiento es la regla; la suite completa solo aparece en `REGRESSION`, al final.
 - `PRISTINE → FIXING` (sin ejecutar previamente: ciego, prohibido).
 - `EXECUTED → FIXING` (sin triage previo: viola el contrato anti-cheating).
 - `FAILED → FIXING` (sin diagnóstico ni guardrails: ciego, prohibido).

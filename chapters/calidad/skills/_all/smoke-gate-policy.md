@@ -28,6 +28,8 @@ El gate ejecuta **exactamente un** escenario: el flujo crítico end-to-end más 
 
 **Regla de orden ante fallos**: mientras el gate no esté verde, se re-ejecuta **solo ese escenario**. Está prohibido lanzar la suite completa para "ver qué más falla": primero un caso verde end-to-end, después cobertura.
 
+**Después del gate sí va la suite completa** — el gate no reemplaza la cobertura. La cadencia completa (gate 1:1 → suite de inventario → corrección aislada test por test → suite de regresión) está en `[[calidad-test-self-correction-loop]]`. Lo que nunca se hace es relanzar la suite entera en cada iteración de corrección: durante la corrección se ejecuta **solo el test que se está corrigiendo**.
+
 ## Comando por stack
 
 | Stack | Comando smoke gate (1 escenario) | Verificación de conteo previa |

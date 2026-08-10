@@ -104,7 +104,7 @@ Si el modo efectivo es `full`:
 
 - Aplicar las correcciones que pasaron guardrails, hasta `max_iterations` por test.
 - Logear cada cambio en el audit log con formato canónico.
-- Después de cada cambio, re-ejecutar el test (y dependencias directas) para validar.
+- Después de cada cambio, re-ejecutar **SOLO el test corregido**, aislado por nombre o tag (nunca la suite completa: eso es inventario al inicio y regresión al final — ver la cadencia en `[[calidad-test-self-correction-loop]]`).
 
 ### Paso 9 — Re-ejecución y bucle
 

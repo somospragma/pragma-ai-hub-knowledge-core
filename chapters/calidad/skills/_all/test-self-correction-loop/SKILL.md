@@ -1,6 +1,6 @@
 ---
 id: calidad-test-self-correction-loop
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -16,6 +16,8 @@ verification:
     failure_message: "Bloqueado: no hay audit log de las correcciones; sin trazabilidad la auto-corrección es inválida."
   - check: "input de triage presente y clasificación distinta a bug del SUT antes de activar el loop"
     failure_message: "Bloqueado: el loop se activó sin triage previo o sobre fallos clasificados como bug del SUT."
+  - check: "cada iteración de corrección re-ejecutó SOLO el test corregido (aislado); la suite completa se corrió una vez al inicio para inventariar fallos y una vez al final como regresión"
+    failure_message: "Bloqueado: se relanzó la suite completa dentro del ciclo de corrección. Cada iteración debe aislar el test que se está corrigiendo."
 ---
 
 # Test Self-Correction Loop — Auto-corrección Controlada con Guardrails Anti-Cheating
@@ -32,6 +34,26 @@ Aplica este skill **únicamente después** de que `[[calidad-failure-triage-and-
 Este skill es invocado como **fase final obligatoria** del workflow `[[calidad-test-self-correction-loop]]`, que a su vez es la cola común de todos los workflows de construcción de tests del chapter (Karate, Playwright, K6, Appium, greenfield y brownfield).
 
 Cruzar siempre con `[[calidad-chapter-perspective]]`, `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-security-testing]]` y `[[calidad-cicd-integration]]`.
+
+## Cadencia de ejecución: aislar para corregir, suite para confirmar
+
+El ciclo completo, en este orden y sin atajos:
+
+| # | Momento | Qué se ejecuta | Por qué |
+|---|---|---|---|
+| 1 | Gate 1:1 | **Un** escenario crítico (`@smoke-gate`) | Destapa los problemas transversales con un solo diagnóstico (`[[calidad-smoke-gate-policy]]`) |
+| 2 | Inventario | **Suite completa, una vez** | Saber TODOS los fallos que hay, no descubrirlos de a uno |
+| 3 | Agrupar | (sin ejecutar) | Varios fallos suelen compartir causa raíz: se agrupan y se corrige la causa, no cada síntoma |
+| 4 | Corrección | **SOLO el test que se está corrigiendo**, aislado, en cada iteración | Es la regla de este skill (ver abajo) |
+| 5 | Regresión | **Suite completa, una vez más** | Confirmar que las correcciones no rompieron nada |
+
+**Regla dura del paso 4**: mientras se corrige un test, cada re-ejecución corre **ese test y nada más** (por nombre/tag: `-Dcucumber.filter.tags=@TC-207`, `--grep "nombre exacto"`, `-Dtest=...`, `--tests`). Relanzar la suite completa en cada iteración está prohibido: multiplica el tiempo, mezcla el resultado del cambio con ruido de otros fallos y hace imposible atribuir la mejora — verificado en campo, donde el usuario tuvo que pedirlo tres veces ("no ejecutes tantos test hasta no confirmar el primero exitoso, siempre reejecuta solo el que intentas corregir").
+
+Corolarios:
+
+- **Un fallo a la vez.** Si el inventario dio 5 fallos, se toma uno, se aísla, se corrige y se cierra antes de pasar al siguiente. Corregir cinco en paralelo y relanzar todo impide saber qué arregló qué (es la misma lógica de "una variable por iteración").
+- **Si el fallo aislado sigue rojo tras 3 iteraciones**, escala — no se lanza la suite "a ver si con otros datos pasa".
+- **La suite completa nunca es una herramienta de diagnóstico**: es inventario (paso 2) o confirmación (paso 5).
 
 ## Modos de operación
 
