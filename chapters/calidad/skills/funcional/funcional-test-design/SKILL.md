@@ -19,6 +19,16 @@ tags: [funcional, test-design, istqb, bva, equivalence-partitioning, decision-ta
 
 Prerrequisito: la HU pasó por `[[calidad-funcional-story-analysis]]` con veredicto `ready | ready_with_warnings`. Diseñar sobre una HU `not_ready` produce casos que validan ambigüedades — se rechaza y se ofrece el análisis primero.
 
+## Lectura obligatoria antes de producir el entregable
+
+Este SKILL es el índice; el método vive en `references/`. **Abrir estos ANTES de escribir el entregable** y declarar cuáles se leyeron (traza en `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| `references/technique-selection-guide.md` | Qué técnica aplica según el comportamiento |
+| `references/equivalence-partitioning-bva.md` | Particiones y valores límite |
+| `references/test-case-format.md` | Formato canónico del caso y matriz de trazabilidad |
+
 ## Instrucción
 
 1. **Clasificar la HU y elegir técnicas** — con `references/technique-selection-guide.md`: el tipo de comportamiento (validación de entradas, reglas combinadas, ciclo de vida, flujo de usuario, configuración multi-plataforma) determina las técnicas. La selección se declara y justifica ANTES de escribir casos — nunca "casos por intuición".

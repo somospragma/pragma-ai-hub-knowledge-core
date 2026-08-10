@@ -133,7 +133,7 @@ public final class AppiumDriverOf {
 
 ## Anti-patterns
 
-- `OnStage.setTheStage(OnlineCast.whereEveryoneCan(...))` — ambigüedad de sobrecargas en Serenity 4.1.14. Usar `new OnlineCast()`.
+- `OnlineCast` en cualquiera de sus formas — dispara ChromeDriver junto al driver de Appium (Chrome se abre en cada corrida). Usar `Cast.ofStandardActors()` con `webdriver.driver=provided`.
 - Task sin `@Step` en factory: invisible en el reporte.
 - Question con side effects (escribe en UI): rompe el contrato Screenplay.
 - Locators sueltos fuera de `userinterfaces/`: duplica selectores y dificulta `[[calidad-complete-deferred-locators]]`.

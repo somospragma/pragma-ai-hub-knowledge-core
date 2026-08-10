@@ -1,6 +1,6 @@
 ---
 id: calidad-smoke-gate-policy
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -17,14 +17,27 @@ Antes de declarar `status: success` en el contrato `[[calidad-delivery-gate-cont
 
 Aplica a los 4 frameworks del chapter (Karate, Playwright, K6, Appium) tanto en greenfield como en brownfield, y a los 5 IDEs soportados.
 
+## 1:1 significa UN escenario, no un tag que matchea varios
+
+El gate ejecuta **exactamente un** escenario: el flujo crítico end-to-end más representativo de la entrega. No "los escenarios `@smoke`", no "la suite mínima". Razones:
+
+- Un caso crítico completo destapa los problemas **transversales** (locators, esperas, datos, instrumentación) con un solo diagnóstico. Lanzar N escenarios que fallan por la misma causa multiplica el ruido y el tiempo — verificado en campo, con el usuario pidiendo tres veces "no ejecutes tantos test hasta no confirmar el primero".
+- Un tag compartido por varios escenarios deja de ser un gate y pasa a ser una suite parcial.
+
+**Convención**: tag dedicado **`@smoke-gate`** sobre **un solo** escenario (que además puede llevar `@smoke`). Antes de ejecutar, **verificar el conteo**: si `@smoke-gate` matchea ≠ 1 escenario, el gate está mal construido y se corrige antes de correr. El resto de `@smoke` es suite, no gate.
+
+**Regla de orden ante fallos**: mientras el gate no esté verde, se re-ejecuta **solo ese escenario**. Está prohibido lanzar la suite completa para "ver qué más falla": primero un caso verde end-to-end, después cobertura.
+
 ## Comando por stack
 
-| Stack | Comando smoke gate |
-|---|---|
-| Karate | `mvn test -f pom.xml -Dkarate.options="--tags @smoke"` (con al menos 1 happy path etiquetado `@smoke`) |
-| Playwright | `npx playwright test --grep @smoke --project=chromium-live --workers=1 --max-failures=1` |
-| K6 | `k6 run tests/linea-base/main.js --vus 1 --iterations 1` (ver `[k6 smoke-1-1-gate](../k6/k6-greenfield/references/smoke-1-1-gate.md)`) |
-| Appium | `./gradlew test -Dcucumber.filter.tags=@smoke` (con al menos 1 escenario `@smoke`) |
+| Stack | Comando smoke gate (1 escenario) | Verificación de conteo previa |
+|---|---|---|
+| Karate | `mvn test -f pom.xml -Dkarate.options="--tags @smoke-gate"` | `grep -rc "@smoke-gate" src/test/java/**/*.feature` == 1 |
+| Playwright | `npx playwright test --grep @smoke-gate --workers=1 --max-failures=1` | `npx playwright test --grep @smoke-gate --list` devuelve 1 |
+| K6 | `k6 run tests/linea-base/main.js --vus 1 --iterations 1` (ver `[k6 smoke-1-1-gate](../k6/k6-greenfield/references/smoke-1-1-gate.md)`) | 1 VU / 1 iteración por construcción |
+| Appium | `./gradlew test -Dcucumber.filter.tags=@smoke-gate` | `grep -rc "@smoke-gate" src/test/resources/features/` == 1 |
+
+**El filtro debe llegar de verdad al runner**: si el runner lleva tags hardcodeados, el `-D...filter.tags` se ignora y corre lo que el runner diga (causa raíz verificada en campo). Un solo runner por proyecto, tags solo por CLI — ver el detalle por stack en sus references de ejecución.
 
 ## Reglas
 
@@ -51,6 +64,7 @@ El campo `smoke_gate` se agrega al bloque `delivery_gate` (ver `[[calidad-delive
 smoke_gate:
   framework: karate | playwright | k6 | appium
   command: "..."
+  scenarios_matched: 1                # DEBE ser 1; distinto de 1 invalida el gate
   executed: true | false | skipped
   executed_against: real | mock | hybrid
   exit_code: <int>

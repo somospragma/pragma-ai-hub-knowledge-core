@@ -42,6 +42,7 @@ chapters/calidad/
 │   │   ├── figma-mcp-integration.md
 │   │   ├── intent-detection.md
 │   │   ├── mandatory-inputs-protocol.md
+│   │   ├── pipeline-state-tracking.md
 │   │   ├── post-generation-execution-prompt.md
 │   │   ├── pre-design-strategy-document.md
 │   │   ├── results-structure-universal.md
@@ -156,7 +157,7 @@ chapters/calidad/
 │       │   └── SKILL.md
 │       └── playwright-greenfield/
 │           ├── SKILL.md
-│           └── references/{accessibility-axe-wcag, auth-detection-rules, auth-storage-state, coherence-checks, contractual-checks-from-ui, coverage-formula, execution-modes-live-mocked-hybrid, fixtures-composition, front-prototype-recipe, metadata-emitter-playwright, mocks-page-route, page-object-model, playwright-config-strict-ts, playwright-native-tags-v142, preflight, project-structure, selector-priority, smoke-gate-playwright, step-isolation-playwright, templates, ui-source-priority, visual-regression, waits-policy}.md
+│           └── references/{accessibility-axe-wcag, auth-detection-rules, auth-storage-state, coherence-checks, contractual-checks-from-ui, coverage-formula, execution-modes-live-mocked-hybrid, fixtures-composition, front-prototype-recipe, interactive-design-prototype-source, metadata-emitter-playwright, mocks-page-route, page-object-model, playwright-config-strict-ts, playwright-native-tags-v142, preflight, project-structure, selector-priority, smoke-gate-playwright, step-isolation-playwright, templates, ui-source-priority, visual-regression, waits-policy}.md
 │
 ├── workflows/
 │   ├── _all/
@@ -228,6 +229,7 @@ chapters/calidad/
 | `brownfield-vs-greenfield.md`          | Distingue proyectos existentes vs nuevos y define qué se genera y qué no en cada modo.                       |
 | `business-driven-prioritization.md`    | Asignación de prioridad CRITICAL/HIGH/MEDIUM/LOW por valor de negocio, nunca por keywords del path.          |
 | `pre-design-strategy-document.md`      | `STRATEGY.md` como design-doc obligatorio aprobado por humano antes de generar código (los 4 stacks en greenfield). |
+| `pipeline-state-tracking.md`           | Traza viva del pipeline en `.evidence/pipeline-state.json`: qué fase está hecha, cuál falta y con qué evidencia. Se lee al abrir cualquier sesión y se escribe tras cada fase, para que el proceso sobreviva a los cortes de contexto y ninguna entrega se cierre con fases pendientes. |
 | `sut-readiness-gate.md`                | Gate del paso 1.5 del router: ¿desarrollo desplegado o pruebas antes del desarrollo? Resuelve `execution_target` (real/mock/hybrid), `data_strategy` (real/synthetic) y `locator_map`, y endurece los inputs obligatorios por stack en modo pre-desarrollo. Regla maestra: mock valida construcción, nunca certifica. |
 
 #### Generación (cómo se emite el scaffold)
@@ -424,7 +426,7 @@ Cada IDE soporta un subset de los tipos de asset. Esta es la matriz para el chap
 | Asset del Chapter | Cantidad | Kiro | Claude Code | GitHub Copilot | Amazon Q (IDE) | Amazon Q (CLI) |
 |---|---|---|---|---|---|---|
 | `steering`     | 3   | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `skill`        | 51  | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `skill`        | 52  | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `workflow`     | 16  | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `prompt`       | 18  | ✓ | — | ✓ | ✓ | — |
 

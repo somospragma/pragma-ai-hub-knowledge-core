@@ -56,9 +56,21 @@ ls target/site/serenity/*.json | wc -l          # > 0
 
 # 5. Prueba del generador: forzar UN fallo deliberado y verificar que el reporte
 #    se genera igual y lo muestra en rojo (aggregate corre en fallo — finalizedBy)
+
+# 6. Si el conteo NO coincide, revisar en este orden ANTES de culpar a la herramienta:
+#    a) tag hardcodeado en el runner            grep -rn "FILTER_TAGS_PROPERTY_NAME" src/test
+#    b) runner duplicado                        ls src/test/java/**/runners/
+#    c) default de tags en build.gradle         grep -n "cucumber.filter.tags" build.gradle
+#    d) aggregate re-ejecutando test            ./gradlew aggregate --dry-run
 ```
 
 Cualquier discrepancia bloquea la declaración del smoke gate: un gate que lee un reporte falso no es un gate.
+
+## "Limitación conocida" es una conclusión, no una excusa
+
+Prohibido archivar una discrepancia como *"comportamiento conocido de la herramienta"* sin **causa raíz probada**. Ocurrió en campo: el reporte mostraba 1 test de 4 ejecutados y se cerró como limitación de Serenity — cuando la causa real (un default de tags en `build.gradle` que hacía re-ejecutar y sobrescribir en cada `aggregate`) estaba a un `grep` de distancia.
+
+Para declarar una limitación se exige, en este orden: (1) causa raíz identificada con evidencia, (2) intento de corrección documentado, (3) referencia externa (issue/doc oficial) que la respalde, (4) **workaround verificado**. Sin las cuatro, la discrepancia es un **blocker abierto** y así se reporta en la traza y en el delivery gate. Un reporte que miente sobre cuántos tests corrieron invalida el gate que lo lee.
 
 ## Anti-cheating del triage (extensión al prototipo/mock)
 

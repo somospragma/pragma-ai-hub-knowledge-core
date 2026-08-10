@@ -3,17 +3,18 @@
 
 ## Regla
 
-- Siempre se generan **2 escenarios `@android @smoke`** ejecutables, independientes de los inputs:
+- **Exactamente UNO** de los escenarios lleva `@smoke-gate`: es el gate 1:1 del chapter (`[[calidad-smoke-gate-policy]]`) y debe ser el flujo crítico end-to-end más representativo. Verificar el conteo antes de correr: `grep -rc "@smoke-gate" src/test/resources/features/` == 1.
+- Se generan **2 escenarios `@android @smoke`** ejecutables, independientes de los inputs (uno de ellos, el más end-to-end, lleva además `@smoke-gate`):
   1. Flujo base de login sin localizadores finales.
   2. Validación de carga y DOM de la aplicación.
 - Si los inputs traen `user_story` o `test_cases` (≥1 item), se agregan **escenarios `@android @proposed`** aspiracionales, uno por item.
 
-`LoginRunner` filtra por `@smoke` por default (constante `FILTER_TAGS_PROPERTY_NAME=@smoke`). `@proposed` es opt-in.
+**Los tags NO se hardcodean en el runner.** Un solo runner por proyecto, sin `@ConfigurationParameter(FILTER_TAGS_PROPERTY_NAME, ...)`: el filtro llega por CLI (`-Dcucumber.filter.tags`). Un tag fijo en el runner **sobreescribe** el de la línea de comandos y hace que "correr el smoke" ejecute otra cosa — causa raíz verificada en campo (el usuario mandaba `@smoke` y corrían todos). Ver `[[calidad-appium-run-and-tags]]`.
 
 ## `@smoke` (siempre, sin localizadores reales)
 
 ```gherkin
-@android @smoke
+@android @smoke @smoke-gate
 Scenario: Flujo base de login sin localizadores finales
   Given el usuario abre la app movil
   When ejecuta el flujo base de login sin localizadores definitivos
@@ -49,8 +50,11 @@ Scenario: Login con credenciales invalidas muestra mensaje de error
 ## Ejecución
 
 ```bash
-# default: solo @smoke
-./gradlew clean test aggregate -p .
+# GATE 1:1 — exactamente un escenario (esto es lo primero que se ejecuta)
+./gradlew clean test aggregate -Dcucumber.filter.tags=@smoke-gate
+
+# suite smoke
+./gradlew clean test aggregate -Dcucumber.filter.tags=@smoke
 
 # opt-in: solo aspiracionales
 ./gradlew clean test aggregate -Dcucumber.filter.tags=@proposed
@@ -58,5 +62,7 @@ Scenario: Login con credenciales invalidas muestra mensaje de error
 # ambos
 ./gradlew clean test aggregate -Dcucumber.filter.tags='@smoke or @proposed'
 ```
+
+Si el conteo ejecutado no coincide con el filtro pedido, el problema está en el runner (tag hardcodeado), en un runner duplicado o en un default de `build.gradle` — no se sigue adelante hasta corregirlo.
 
 Ver `[[calidad-appium-run-and-tags]]` para más combinaciones.

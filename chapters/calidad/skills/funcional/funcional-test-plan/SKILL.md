@@ -17,6 +17,16 @@ tags: [funcional, test-plan, iso-29119, ieee-829, risk-analysis, rtm, traceabili
 - Como fase del workflow `[[calidad-build-test-strategy-and-plan]]`.
 - Para los entregables satélite del proceso: matriz de trazabilidad (RTM), informes de avance y reporte de cierre.
 
+## Lectura obligatoria antes de producir el entregable
+
+Este SKILL es el índice; el método vive en `references/`. **Abrir estos ANTES de escribir el entregable** y declarar cuáles se leyeron (traza en `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| `references/test-plan-structure.md` | Estructura ISO/IEC/IEEE 29119-3 |
+| `references/risk-analysis-matrix.md` | Matriz de riesgos producto + proyecto |
+| `references/entry-exit-criteria.md` | Criterios medibles de entrada/salida/suspensión |
+
 ## Instrucción
 
 1. **Resolver el nivel del plan** — release/iteración vs proyecto/máster. Preguntar al usuario qué exige su contexto (cliente regulado suele exigir plan formal completo; equipo ágil interno, plan ligero de 3-5 páginas). La estructura no cambia; la profundidad sí.

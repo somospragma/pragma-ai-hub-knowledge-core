@@ -3,19 +3,23 @@
 
 Playwright valida la capa de presentación. El insumo debe describir UI real. Esta referencia documenta las 4 fuentes aceptadas, cuándo usar cada una y qué profundidad de extracción esperar.
 
-## Las 4 fuentes (en orden de preferencia)
+## Las fuentes (en orden de preferencia)
 
 1. **URL de aplicación viva** — la app está accesible (dev/staging/prod) y autenticable.
-2. **Figma / wireframes / mockups UI** — diseños con jerarquía de páginas y componentes.
-3. **User stories con flujos UI explícitos** — historias que enumeran páginas, acciones y transiciones.
-4. **Storybook / sistema de diseño existente** — componentes catalogados con sus rutas demo.
+2. **Prototipo interactivo de diseño** (export navegable de Figma Make / design capture / Framer, demo del design system) — **se recorre como una app**: da textos exactos, datos, formatos, estados y grafo de navegación. Muy superior al Figma estático; ver `[interactive-design-prototype-source](interactive-design-prototype-source.md)`.
+3. **Figma / wireframes / mockups UI** — diseños con jerarquía de páginas y componentes.
+4. **User stories con flujos UI explícitos** — historias que enumeran páginas, acciones y transiciones.
+5. **Storybook / sistema de diseño existente** — componentes catalogados con sus rutas demo.
 
 ## Árbol de decisión
 
 ```
 ¿La app está corriendo en algún ambiente?
 ├── Sí → URL viva. Usa Playwright Codegen o MCP browser tools (preferido).
-└── No → ¿Existe Figma / mockup con rutas?
+└── No → ¿Hay un prototipo interactivo navegable del diseño?
+        ├── Sí → RECÓRRELO headless y extrae textos/datos/formato/navegación
+        │        (interactive-design-prototype-source.md) + LOCATOR MAP obligatorio.
+        └── No → ¿Existe Figma / mockup con rutas?
         ├── Sí → Figma + LOCATOR MAP obligatorio (ver abajo).
         └── No → ¿Hay user story con flujos UI explícitos?
                 ├── Sí → User story + LOCATOR MAP obligatorio. Mismo caveat de Figma.

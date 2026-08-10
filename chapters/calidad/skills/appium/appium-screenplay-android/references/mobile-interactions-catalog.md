@@ -59,6 +59,49 @@ Diseñarlo ANTES de la primera corrida (no descubrirlo como falso rojo dependien
 
 `BrowseTheWeb.as(actor).getDriver()` devuelve un `WebDriverFacade` de Serenity; para APIs de Appium (hideKeyboard, pressKey, executeScript `mobile: *`) hay que **desenvolver** con `getProxiedDriver()` (o castear según topología). Encapsular en un helper único (`AppiumDriverOf.theActor(actor)`) y — regla dura — **si el helper no puede obtener el driver, LANZA excepción**: un `return null` con fallback silencioso produce interacciones que "corren" sin ejecutarse (verificado en campo: la implementación nueva nunca se invocó y se iteró a ciegas sobre ella).
 
+## Leer texto en Flutter: un solo helper, nunca ad hoc
+
+`getText()` devuelve **vacío** en widgets Flutter: el texto visible viaja en `content-desc`. Centralizar en un único helper y usarlo en TODAS las Questions que lean texto — en campo el mismo bug se arrastró por seis Questions antes de unificarlo:
+
+```java
+public static String visibleTextOf(WebElement el) {
+    if (el == null) return "";
+    String t = el.getAttribute("text");                 // nativo Android
+    if (t != null && !t.isEmpty()) return t;
+    String cd = el.getAttribute("content-desc");         // Flutter: texto visible
+    if (cd != null && !cd.isEmpty()) return cd;
+    return "";
+}
+```
+
+Nota de API: sobre elementos Appium el método es `getAttribute(...)`, no `getDomAttribute(...)`.
+
+## Comparar valores formateados (moneda, fechas)
+
+La UI muestra `"1.240.500 $"` o `"$180.000"`; el feature escribe otra variante. **Normalizar AMBOS lados antes de comparar** con un único helper (`long parseCurrency(String)` que deja solo dígitos), en vez de encadenar `replace` en cada aserción. El formato real se toma del diseño/prototipo interactivo, no se supone.
+
+## Presencia ≠ clickeabilidad: verificar viewport antes del tap
+
+En Flutter un elemento puede existir en la jerarquía con `isDisplayed() == true` y estar **fuera de la pantalla visible**: el tap "se ejecuta" y no pasa nada. El tap robusto verifica la posición real y hace scroll cíclico hasta que el elemento entra en el viewport útil (descontando status bar y barra inferior) antes de pulsar:
+
+```java
+boolean inViewport(WebElement el, int screenHeight) {
+    int top = el.getLocation().getY();
+    return top >= 100 && top < screenHeight - 150;   // márgenes de status/nav bar
+}
+```
+
+Mismo principio para esperas: esperar `isVisible()` sobre un contenedor Flutter no garantiza interactuabilidad — esperar el ancla + verificar viewport.
+
+## Cerrar el teclado (Appium Java Client 8.x)
+
+`driver.hideKeyboard()` dejó de estar disponible directamente en el driver. Vía canónica en Appium 2 + UiAutomator2:
+
+```java
+driver.executeScript("mobile: hideKeyboard");            // primaria
+// fallback: driver.pressKey(new KeyEvent(AndroidKey.BACK));
+```
+
 ## Verificaciones que valen (Questions contractuales)
 
 Asertar **contenido contra el contrato**, no visibilidad: el saldo parseado y comparado con el valor esperado, el mensaje de error comparado con el `message` exacto del `ApiError` del spec, el comprobante contra su patrón (`^TRX-[0-9]{6}$`). "Una tarjeta de saldo vacía pasa un assert de visibilidad" — las Questions contractuales son lo que detecta el gap. Cuando Flutter colapsa una card en un solo nodo, el patrón es leer el `content-desc` completo y asertar `allOf(containsString(...))` sobre las piezas esperadas, o regex para extraer el valor numérico.

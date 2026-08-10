@@ -38,7 +38,7 @@ Reglas:
    - Si `ui_constants` NO esta vacio: orquestar `actor.attemptsTo(...)` con `Interaction`s reales (ej. `TapOn.theElement(LoginPage.LOGIN_BUTTON)`).
    - Si `ui_constants` esta vacio: aplicar el patron deferred — solo `actor.remember("<task_name>Done", true)` y NO invocar gestos UI. Marcar con comentario `// TODO: implementar gestos reales cuando los locators esten listos`.
 6. Imports requeridos: `net.serenitybdd.screenplay.Actor`, `net.serenitybdd.screenplay.Performable`, `net.serenitybdd.screenplay.Task`, `net.serenitybdd.screenplay.Tasks`, `net.thucydides.core.annotations.Step`. Si se usan Interactions, agregar imports correspondientes.
-7. NO usar `OnStage.setTheStage(OnlineCast.whereEveryoneCan(...))` — ambiguedad en Serenity 4.1.14.
+7. NO usar `OnlineCast` (ninguna forma) — dispara ChromeDriver junto al driver Appium. Usar `Cast.ofStandardActors()`.
 8. Output: solo el archivo Java, sin prosa adicional.
 
 Ejemplo de salida para task_name=Login, steps=["Abrir la app"], ui_constants=[]:

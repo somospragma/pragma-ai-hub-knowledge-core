@@ -19,6 +19,16 @@ tags: [funcional, user-story, invest, acceptance-criteria, ambiguity, definition
 
 Las HUs llegan pegadas en el chat, en archivos, o directamente desde Azure DevOps / Jira vía `[[calidad-alm-mcp-integration]]` (work items con título, descripción, criterios de aceptación y links).
 
+## Lectura obligatoria antes de producir el entregable
+
+Este SKILL es el índice; el método vive en `references/`. **Abrir estos ANTES de escribir el entregable** y declarar cuáles se leyeron (traza en `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| `references/invest-scoring.md` | Rúbrica INVEST con evidencia |
+| `references/acceptance-criteria-quality.md` | Auditoría de criterios de aceptación |
+| `references/ambiguity-taxonomy.md` | Clasificación de ambigüedades y vacíos |
+
 ## Instrucción
 
 1. **Recolectar la HU completa** — título, narrativa (Como/Quiero/Para), criterios de aceptación, descripción, adjuntos referenciados, links a otras HUs/features/épicas. Si viene del ALM, traer también estado, prioridad y relaciones (parent, related, blocked-by). Si algún elemento no existe, registrarlo como hallazgo, no inventarlo.

@@ -25,6 +25,21 @@ Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]`,
 2. **Figma, wireframes o mockups UI** — descripciones visuales con jerarquía de componentes, rutas tentativas y form fields.
 3. **User stories con flujos UI explícitos** — historias que enumeran páginas, transiciones y acciones (no historias que solo describen reglas de negocio).
 4. **Storybook o sistema de diseño existente** — componentes catalogados con sus rutas demo.
+## Lectura obligatoria antes de generar
+
+Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/` (23 archivos). **Abrir estos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza de `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| `references/templates.md` | Contenido textual de config, fixtures, POMs y specs |
+| `references/ui-source-priority.md` | Qué fuente UI usar y qué exige cada una |
+| `references/selector-priority.md` | Orden de selectores y prohibiciones |
+| `references/page-object-model.md` | Estructura de POMs y fixtures |
+| `references/execution-modes-live-mocked-hybrid.md` | @live/@mocked/@hybrid y caminos front/back |
+| `references/smoke-gate-playwright.md` | Comando y criterio del gate 1:1 |
+
+Regla del chapter: saltarse esta lectura es la causa raíz verificada de retrabajo — en campo, un agente redescubrió por ensayo y error, y reportó como defectos del chapter, cosas ya escritas en estas references.
+
 ## Instrucción
 
 1. **Validar UI source** — Verifica que el insumo describa UI real:

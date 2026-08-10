@@ -30,10 +30,21 @@ Inputs obligatorios y opcionales gobernados por `[[calidad-mandatory-inputs-prot
 
 ## Pasos
 
+### Paso 0 — Leer la traza del pipeline (SIEMPRE, sesión nueva o continuación)
+
+Aplica `[[calidad-pipeline-state-tracking]]` **antes de cualquier otra cosa**:
+
+- Si `output_path` ya existe y tiene `.evidence/pipeline-state.json`, leerlo y **abrir el turno reportando**: fase actual, fases pendientes, bloqueos y `open_corrections` vigentes. Continuar por `next_action`, no por lo que parezca urgente.
+- Si no existe, crearlo con todas las fases de la ruta en `pending`.
+- **Actualizar la traza al cerrar cada fase**, en el mismo turno. Una fase sin evidencia no se marca `done`.
+
+Este paso existe porque una generación real no cabe en una sesión: sin traza en disco, cada corte de contexto pierde el proceso (verificado en campo: seis sesiones, fases saltadas, correcciones del usuario olvidadas y dos contratos de cierre emitidos sin haber ejecutado la suite).
+
 ### Paso 1 — Recolectar inputs
 
 Aplica `[[calidad-mandatory-inputs-protocol]]`:
 
+- **Lee COMPLETO cada insumo entregado y emite la tabla de extracción** (qué se extrajo de cada uno y dónde se usará). Un insumo sin fila es un insumo ignorado → blocker.
 - Verifica que `intent`, `project_name`, `output_path` y (cuando aplique) `spec` estén presentes y bien formados.
 - Pregunta por `user_story` y `firma`; recomiéndalos explícitamente.
 - Si falta algún obligatorio, **detente**, solicita exactamente lo que falta y espera.
@@ -143,12 +154,14 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 5. Reportar estado final agregado: `success` (todos los tests pasan determinísticamente en el framework delegado) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con contexto completo del framework correspondiente).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. El router NO finaliza con éxito si esta fase quedó sin cerrar.
 7. **Invocar `[[calidad-generate-executive-report]]`** para producir el reporte consolidado post-corrida en formato HTML/PPTX/DOC. Si modo es `scaffold-only` o `dry-run` → omitir y registrar `null` en el `delivery_gate.evidence_persisted.executive_report`.
-8. **Emitir `[[calidad-delivery-gate-contract]]`** con el bloque YAML completo antes del mensaje final. Sin este bloque, la entrega se considera incompleta.
+8. **Emitir `[[calidad-delivery-gate-contract]]`** con el bloque YAML completo antes del mensaje final. Sin este bloque, la entrega se considera incompleta. **Precondición**: leer `.evidence/pipeline-state.json` y verificar cero fases obligatorias pendientes — con fases pendientes NO se emite el gate, se emite un reporte de estado y el trabajo continúa. Un smoke verde no es el final del pipeline: faltan suite completa, verificación del reporte, triage y reporte ejecutivo.
 
 ## Criterios de finalización
 
 Este workflow se considera completo **solo cuando**:
 
+- [ ] La **traza del pipeline** (`.evidence/pipeline-state.json`) fue leída al abrir la sesión y actualizada al cerrar cada fase; el delivery gate se emitió con cero fases obligatorias pendientes.
+- [ ] Cada insumo entregado tiene su fila en la **tabla de extracción** (qué se extrajo, dónde se usó) o su justificación de no aplicabilidad.
 - [ ] El framework destino y el modo (greenfield / brownfield) fueron resueltos correctamente para los **4 frameworks soportados** (Karate, Playwright, K6, Appium) en cualquiera de sus dos modos — o la solicitud se bifurcó a la **ruta funcional** con su workflow correcto.
 - [ ] Si la ruta fue funcional: el workflow delegado cerró con su delivery gate documental y sus gates humanos cumplidos (nada escrito al ALM sin aprobación/confirmación).
 - [ ] El **SUT readiness gate** (paso 1.5) fue resuelto explícitamente: `execution_target`, `data_strategy` y (front/mobile) `locator_map` registrados en STRATEGY.md y delivery gate. Si `execution_target != real`, el delivery gate declara `certification: pending_real_integration` y `next_steps` incluye el switchover a integraciones reales.

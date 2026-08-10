@@ -108,7 +108,7 @@ Pasos concretos para iniciar manualmente un proyecto Appium iOS Screenplay aline
    ./gradlew clean test aggregate -Denv=ios-device
    ```
 
-El proyecto resultante respeta las mismas restricciones del chapter (no redefinir `aggregate`/`reports`/`clean`, package `co.com.pragma.*`, no usar `OnStage.setTheStage(OnlineCast.whereEveryoneCan(...))`, etc.).
+El proyecto resultante respeta las mismas restricciones del chapter (no redefinir `aggregate`/`reports`/`clean`, package `co.com.pragma.*`, no usar `OnlineCast` —dispara ChromeDriver—, etc.).
 
 ## Roadmap
 

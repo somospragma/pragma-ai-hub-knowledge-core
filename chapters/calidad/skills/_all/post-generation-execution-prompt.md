@@ -56,7 +56,7 @@ El agente puede acompañar el prompt con una sugerencia explícita según el sta
    ```
 4. Si la respuesta es **(d) Cancelar**, el agente detiene el `[[calidad-post-generation-protocol]]` en el paso de ejecución, emite delivery gate con `status: cancelled_by_user` y conserva los archivos generados sin ejecutar nada.
 5. Si la respuesta es **(c) scaffold-only**, omitir smoke gate y suite completa; documentar en `audit-log` que la ejecución se deja al usuario.
-6. Si la respuesta es **(b) smoke 1:1**, ejecutar SOLO el smoke gate del stack (ej. K6 `--vus 1 --iterations 1`, Karate `@smoke`, Playwright `--grep @smoke`, Appium `LoginRunner @smoke`). NO ejecutar el resto.
+6. Si la respuesta es **(b) smoke 1:1**, ejecutar SOLO el smoke gate 1:1 del stack — UN escenario (ej. K6 `--vus 1 --iterations 1`, Karate `--tags @smoke-gate`, Playwright `--grep @smoke-gate`, Appium `-Dcucumber.filter.tags=@smoke-gate`). NO ejecutar el resto.
 7. Si la respuesta es **(a) full**, ejecutar smoke gate primero; solo si pasa, ejecutar la suite completa.
 
 ## Mapeo a los pasos del post-generation-protocol

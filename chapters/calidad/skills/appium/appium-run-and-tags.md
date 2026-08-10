@@ -26,7 +26,7 @@ gradlew.bat clean test aggregate
 
 ## Filtros por tag
 
-`LoginRunner` filtra `@smoke` por default. Para override:
+`SuiteRunner` NO lleva tags: el filtro llega siempre por CLI.
 
 ```bash
 # Solo escenarios @smoke (idempotente con el default)
@@ -39,11 +39,20 @@ gradlew.bat clean test aggregate
 ./gradlew clean test aggregate -Dcucumber.filter.tags='@smoke or @proposed'
 ```
 
-## Selección de runner (cuando hay más de uno)
+## Un solo runner, tags por CLI
+
+Regla dura del chapter: **un runner por proyecto, sin tags hardcodeados** (`SuiteRunner`). Si el conteo ejecutado no coincide con el filtro pedido, revisar en este orden: (1) tag hardcodeado en el runner, (2) runner duplicado, (3) default de `cucumber.filter.tags` en `build.gradle`. Las tres causas se verificaron en campo y las tres hacen que `-Dcucumber.filter.tags=@smoke-gate` ejecute otra cosa.
+
+```bash
+# GATE 1:1 (siempre primero, exactamente 1 escenario)
+./gradlew clean test aggregate -Dcucumber.filter.tags=@smoke-gate
+```
+
+## Selección de runner (proyectos heredados con más de uno)
 
 Cada `@Suite` lleva su propio filtro de tags: invocar `test` a secas corre TODOS los runners (y sus filtros se suman — en campo esto ejecutó 40 escenarios donde se esperaban 2). Reglas:
 
-- **`--tests` es incompatible con `aggregate` en la misma invocación** (Gradle lo rechaza). Para seleccionar un runner con reporte: property propia en `build.gradle` (`test { if (project.hasProperty('runner')) { filter.includeTestsMatching(project.property('runner')) } }`) e invocar `./gradlew clean test aggregate -Prunner='co.com.pragma.runners.LoginRunner'`.
+- **`--tests` es incompatible con `aggregate` en la misma invocación** (Gradle lo rechaza). Para seleccionar un runner con reporte: property propia en `build.gradle` (`test { if (project.hasProperty('runner')) { filter.includeTestsMatching(project.property('runner')) } }`) e invocar `./gradlew clean test aggregate -Prunner='co.com.pragma.runners.SuiteRunner'`.
 - Alternativa: mantener UN runner por suite lógica y filtrar solo por `-Dcucumber.filter.tags`.
 - Tras cualquier cambio de runners/filtros, verificar el CONTEO de escenarios ejecutados contra los diseñados (checklist de reportería en [[calidad-appium-screenplay-android]], consultar `references/mobile-evidence-and-triage.md`).
 

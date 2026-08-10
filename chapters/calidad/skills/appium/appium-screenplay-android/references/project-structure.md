@@ -12,7 +12,7 @@
 ├── gradle/
 │   └── wrapper/
 │       └── gradle-wrapper.properties  # distributionUrl ...gradle-8.10-bin.zip
-├── serenity.properties             # webdriver.driver=appium
+├── serenity.properties             # webdriver.driver=provided (NO chrome)
 ├── android.conf                    # capabilities por defecto
 ├── README.md                       # Spanish: install, run, chmod +x gradlew
 └── src/
@@ -33,7 +33,7 @@
     └── test/
         ├── java/co/com/pragma/
         │   ├── runners/
-        │   │   └── LoginRunner.java     # @Suite, FILTER_TAGS_PROPERTY_NAME=@smoke
+        │   │   └── SuiteRunner.java     # @Suite unico, SIN tags (filtro por CLI)
         │   └── stepdefinitions/
         │       └── LoginStepDefinitions.java
         └── resources/
@@ -50,15 +50,15 @@
 - **`settings.gradle`**: una sola línea `rootProject.name = '{project_name}'`.
 - **`gradlew` / `gradlew.bat`**: wrappers oficiales Gradle 8.10. Unix con shebang `#!/usr/bin/env sh` y mode 0755.
 - **`gradle/wrapper/gradle-wrapper.properties`**: `distributionUrl=https\://services.gradle.org/distributions/gradle-8.10-bin.zip`.
-- **`serenity.properties`**: `webdriver.driver=appium` y referencia a `serenity.conf`.
+- **`serenity.properties`**: `webdriver.driver=provided` + `webdriver.autodownload=false` (evita que Serenity levante ChromeDriver) y referencia a `serenity.conf`.
 - **`android.conf`**: capabilities por defecto (HOCON) usando los valores normalizados de ``mandatory-inputs-validation.md``.
 - **`README.md`**: instrucciones en español: instalar JDK 21, `chmod +x gradlew`, comandos de `[[calidad-appium-run-and-tags]]`, TODO de `app_package`/`app_activity` si se usaron defaults.
 - **`tasks/LoginTask.java`**: implementa `Task`, factory anotada `@Step`, `performAs` registra `appResponsive=true` (deferred).
 - **`questions/AppIsResponsive.java`**: `static value(Actor)` retorna `Boolean`.
 - **`interactions/TapOn.java`**: implementa `Interaction`, factory `theElement(Target)` con `@Step`.
 - **`userinterfaces/LoginPage.java`**: 3 constantes `Target` (`USERNAME`, `PASSWORD`, `LOGIN_BUTTON`) con `// TODO: update real locator`.
-- **`runners/LoginRunner.java`**: `@Suite` + `@IncludeEngines("cucumber")` + `@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@smoke")`.
-- **`stepdefinitions/LoginStepDefinitions.java`**: glue para los steps de `login.feature` usando `OnStage`, `new OnlineCast()` (NO `OnlineCast.whereEveryoneCan(...)`).
+- **`runners/SuiteRunner.java`**: `@Suite` + `@IncludeEngines("cucumber")` + `@SelectClasspathResource("features")`, **sin** `FILTER_TAGS_PROPERTY_NAME` (los tags se pasan por CLI; un solo runner por proyecto).
+- **`stepdefinitions/LoginStepDefinitions.java`**: glue para los steps de `login.feature` usando `OnStage` con `Cast.ofStandardActors()` (NUNCA `OnlineCast`: dispara ChromeDriver).
 - **`resources/serenity.conf`**: HOCON con `webdriver.driver` y bloque `appium { ... }` con las capabilities.
 - **`resources/logback-test.xml`**: log al console nivel INFO, package `co.com.pragma` en DEBUG.
 - **`resources/junit-platform.properties`**: `cucumber.plugin=pretty,html:target/cucumber-report.html,json:target/cucumber.json` + `cucumber.glue=co.com.pragma.stepdefinitions`.

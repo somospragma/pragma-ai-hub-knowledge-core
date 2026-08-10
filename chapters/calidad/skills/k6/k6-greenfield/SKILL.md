@@ -25,6 +25,21 @@ Además de los gobernados por `[[calidad-mandatory-inputs-protocol]]` (spec, pro
   - `spec`: el comportamiento histórico. `authToken` / `Authorization` se incluyen únicamente si el spec declara `security` (`components.securitySchemes` o `securityDefinitions`).
   - `external`: override. `authToken: __ENV.AUTH_TOKEN || ''` se incluye SIEMPRE en `config.js` y `Authorization: Bearer ${config.authToken}` se incluye SIEMPRE en `getDefaultHeaders()`, aunque el spec no declare security. Casos de uso: API gateway delante del microservicio, token emitido por IdP externo (Cognito/Keycloak/Okta), AWS SigV4 / JWS request signing, mTLS, tokens obtenidos out-of-band por el equipo de performance. Equivalente: env var `EXTERNAL_AUTH=true`. Detalle en ``references/enums-headers-security-extraction.md``.
 
+## Lectura obligatoria antes de generar
+
+Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/` (23 archivos). **Abrir estos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza de `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| `references/templates.md` | Contenido textual de los scripts, config.js, utils.js, run-all.sh |
+| `references/vocabulary-and-scenario-mapping.md` | Nomenclatura de escenarios (decisión previa a todo) |
+| `references/thresholds-three-tiers.md` | Tier de thresholds y su justificación |
+| `references/crud-dynamic-id-correlation.md` | Correlación de IDs en flujos CRUD |
+| `references/handle-summary-evidence.md` | handleSummary y evidencia por corrida |
+| `references/smoke-1-1-gate.md` | Gate 1:1 (1 VU / 1 iteración) |
+
+Regla del chapter: saltarse esta lectura es la causa raíz verificada de retrabajo — en campo, un agente redescubrió por ensayo y error, y reportó como defectos del chapter, cosas ya escritas en estas references.
+
 ## Instrucción
 
 0. **Resolver vocabulario de escenarios** — Antes de cualquier otra acción, consulta [vocabulary-and-scenario-mapping](references/vocabulary-and-scenario-mapping.md) para decidir si el proyecto usa nomenclatura de negocio (Línea Base / Carga / Estrés) o nomenclatura k6 docs (smoke / load / stress). La decisión se aplica a filenames, carpetas, scripts npm, `run-all.sh`, reports y `delivery_gate`. Adicionalmente, evalúa si Spike y/o Soak aplican como opt-in según `user_story`, `firma` o `risk_map` y registra la justificación en `.evidence/scenarios-opt-in.md`.

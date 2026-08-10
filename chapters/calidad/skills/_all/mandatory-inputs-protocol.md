@@ -1,6 +1,6 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 1.3.0
+version: 1.4.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -41,6 +41,23 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 | `sut_available` | Obligatorio (pregunta sí/parcial/no)           | ¿El desarrollo está desplegado y accesible?                                                       | Resuelve `execution_target: real | hybrid | mock` vía `[[calidad-sut-readiness-gate]]` (paso 1.5 del router)  |
 | `data_available` | Obligatorio (pregunta sí/no)                   | ¿Existen datos de prueba en el ambiente (o catálogo de datasets del cliente)?                     | Resuelve `data_strategy: real | synthetic` (`[[calidad-test-data-management]]`)                               |
 | `locator_map`  | Condicional (front/mobile; **obligatorio** si `execution_target != real`) | Mapeo acordado QA+dev de identificadores UI (`data-testid` / accessibility ids)  | Fuente única de selectores pre-desarrollo; formato y contrato en `[[calidad-ui-locator-map-contract]]`        |
+
+## Todo insumo entregado se lee COMPLETO y se declara qué se extrajo
+
+Un insumo que el usuario entrega es una instrucción, no un adorno. Antes de generar nada, emitir una **tabla de extracción** —una fila por insumo— con: qué es, qué se extrajo de él y dónde se usará.
+
+| Insumo | Qué se extrajo | Dónde se usa |
+|---|---|---|
+| `locator-map.json` | 13 pantallas, 173 identificadores, convención `semantics_identifier`, bloque `resolution_verified` con la estrategia Android | Targets, prototipo, gate de paridad |
+| Prototipo interactivo (HTML) | 82 textos exactos, modelo de datos, formato de moneda, grafo de navegación | Catálogo de textos, datos del prototipo, orden de pantallas |
+| … | … | … |
+
+Reglas duras:
+
+- **Leer el archivo entero**, no su primera pantalla. Los bloques que resuelven el trabajo suelen estar al final (verificado en campo: el `locator-map.json` traía el bloque con la estrategia de locators correcta y el agente pasó cinco turnos redescubriéndola por ensayo y error).
+- **Un insumo sin fila en la tabla es un insumo ignorado** → blocker. Si de verdad no aporta, se declara explícitamente por qué.
+- **Volver a los insumos durante el trabajo**, no solo al inicio: ante un fallo de datos, textos, montos o navegación, el insumo original manda sobre la inferencia. En campo, un prototipo interactivo entregado como insumo se abrió una sola vez, antes de escribir la estrategia, y nunca más — contenía la respuesta a cinco de los diecinueve problemas que costaron la sesión.
+- Los valores del insumo **se copian, no se recuerdan**: montos, textos y rutas se transcriben del archivo, no de memoria.
 
 ## Reglas de uso
 

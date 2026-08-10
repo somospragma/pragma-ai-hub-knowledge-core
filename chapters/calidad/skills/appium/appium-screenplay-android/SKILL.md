@@ -19,6 +19,32 @@ Para extender un proyecto Appium existente (Android **o** iOS), usar `[[calidad-
 
 Antes de activar este skill confirma intent con `[[calidad-intent-detection]]` y recolecta inputs obligatorios con `[[calidad-mandatory-inputs-protocol]]`. Aplica la perspectiva del chapter en `[[calidad-chapter-perspective]]`.
 
+## Lectura obligatoria antes de generar
+
+Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/`. **Abrir estos archivos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza del pipeline):
+
+| Reference | Para qué |
+|---|---|
+| `references/gradle-version-matrix.md` | Versiones y scopes (fuente de verdad sobre los templates) |
+| `references/templates.md` | Contenido textual de build.gradle, serenity.conf, Hooks, runner, junit-platform.properties |
+| `references/locator-resolution-protocol.md` | Cómo resolver locators ANTES de escribir Targets |
+| `references/mobile-interactions-catalog.md` | Escritura, taps, scroll, esperas, recuperación |
+| `references/mobile-evidence-and-triage.md` | Instrumentación previa y orden de triage |
+| `references/flutter-apps-and-prototype.md` | Solo si la app es Flutter o hay prototipo |
+
+Ignorar esta lectura es la causa raíz verificada de una PoC completa: el agente redescubrió por ensayo y error —y reportó como defectos del chapter— cosas ya escritas en estas references, incluida una que su propio insumo le daba resuelta.
+
+## Reglas duras (no negociables, resumen de las references)
+
+1. **Locators**: `AppiumBy.id` NO resuelve `Semantics(identifier:)` de Flutter → `androidUIAutomator` con `resourceId` **anclado** (un `resourceIdMatches` parcial matchea también `..._label`). El identificador da identidad, no capacidad: el nodo capaz suele ser un descendiente. Conteo de nodos válido = 1.
+2. **Texto en Flutter**: `getText()` devuelve vacío; el texto visible está en `content-desc`. Centralizar en un único helper, nunca leer atributos ad hoc por Question.
+3. **Cast**: `Cast.ofStandardActors()` + `webdriver.driver=provided` + `webdriver.autodownload=false`. `OnlineCast` dispara ChromeDriver y abre Chrome en cada corrida.
+4. **Runner**: uno solo, **sin tags hardcodeados**; el filtro llega por CLI. Sin defaults de tags en `build.gradle`.
+5. **Reportería**: `SerenityReporter` primero en `cucumber.plugin`, `junit-vintage` presente, `aggregate` no UP-TO-DATE, sin `cucumber.features`. Verificar el conteo del reporte contra lo diseñado en la primera corrida.
+6. **Imports Serenity 4.x**: `net.serenitybdd.annotations.Step`, `net.thucydides.model.util.EnvironmentVariables`. `Ensure` requiere la dependencia `serenity-ensure` (existe; no está "eliminada").
+7. **Evidencia primero**: screenshot → page source como árbol → log del mock → recién entonces hipótesis. Instrumentar ANTES de la primera corrida.
+8. **JDK 21 no se degrada**: si falta, el toolchain lo descarga; bajar la matriz por conveniencia está prohibido.
+
 ## Instrucción
 
 1. **Validar inputs** — Aplica las 5 reglas de ``references/mandatory-inputs-validation.md``. Rechaza con mensaje exacto si falla. Coerciona "true"/"si"/"sí"/"yes"/"1" a booleano para `include_login_case`.
@@ -51,7 +77,7 @@ Estructura completa Gradle + Screenplay en ``references/project-structure.md``. 
 - `junit-platform.properties` — naming-strategy, plugin (SerenityReporter primero), glue; SIN `cucumber.features`.
 - `serenity.conf` — bloque `appium{}` con claves sin prefijo, `app` con ruta absoluta, screenshots AFTER_EACH_STEP.
 - `Hooks.java` — evidencia por fallo (screenshot + page source) y purga del mock entre escenarios cuando aplica.
-- `LoginRunner.java` — runner canónico filtrado por `@smoke`.
+- `SuiteRunner.java` — runner ÚNICO, sin tags hardcodeados (el filtro llega por CLI).
 
 ```
 {project_name}/
@@ -75,7 +101,7 @@ Estructura completa Gradle + Screenplay en ``references/project-structure.md``. 
 - **JAMÁS redefinir la tarea `aggregate`.** El plugin `serenity-gradle-plugin` 4.1.14 ya la registra. Prohibido `task aggregate { ... }` o `tasks.register('aggregate') { ... }`. Lo mismo aplica a `reports` y `clean`. Solo se permite `tasks.named('aggregate') { ... }`. Ver ``references/no-aggregate-collision.md``.
 - **Locators diferidos son deuda explícita.** El scaffold ship con `// TODO: update real locator` y `LoginTask.performAs` no invoca gestos UI reales. `@smoke` debe pasar SIN selectores finales (BUILD SUCCESSFUL). Riesgo y mitigación en ``references/deferred-locators-strategy.md`` y workflow `[[calidad-complete-deferred-locators]]`.
 - **No mover Serenity/Appium a `testImplementation`** — rompe `compileJava` cuando la capa Screenplay vive en `src/main/java`. Ver ``references/gradle-version-matrix.md``.
-- **No usar `OnStage.setTheStage(OnlineCast.whereEveryoneCan(...))`.** Ambigüedad de sobrecargas en Serenity 4.1.14. Usar `new OnlineCast()`.
+- **NUNCA usar `OnlineCast` en proyectos Appium** (ni `new OnlineCast()` ni `OnlineCast.whereEveryoneCan(...)`): Serenity intenta crear un ChromeDriver además del driver de Appium y abre Chrome en cada corrida. Usar `OnStage.setTheStage(Cast.ofStandardActors())` + `webdriver.driver=provided` + `webdriver.autodownload=false`, y asignar el AndroidDriver al actor en el hook.
 - **Triage con evidencia primero.** Ante cualquier fallo de UI: screenshot → page source parseado como árbol → log del mock/backend → recién entonces hipótesis. Protocolo completo, reglas de método y checklist de verificación de reportería en ``references/mobile-evidence-and-triage.md``. La reportería se verifica en la PRIMERA corrida (los falsos verdes de reportería son indetectables leyendo el reporte).
 - **No `# note` inline tras step keyword.** Gherkin lo rechaza. Comentarios solo al inicio de línea.
 - **Package declarations deben coincidir con el path físico** (`co.com.pragma.tasks` → `src/main/java/co/com/pragma/tasks/`). De lo contrario, cascade de `cannot find symbol` en `compileJava`.
@@ -84,7 +110,7 @@ Estructura completa Gradle + Screenplay en ``references/project-structure.md``. 
 - **JUnit Platform obligatorio**: `useJUnitPlatform()` en `test { }`. NO `useJUnit()` (eso es JUnit 4 y rompe Cucumber JUnit Platform).
 - **Scopes correctos**: src/main → `implementation` (Serenity Core/Cucumber/Screenplay/Screenplay-WebDriver, Appium Java Client, SLF4J, Logback). Tests → `testImplementation` (Cucumber JUnit Platform engine, JUnit Platform Suite, JUnit Jupiter, AssertJ). Lombok → `compileOnly` + `annotationProcessor`.
 - **`junit-platform.properties` obligatorio** en `src/test/resources/` con `cucumber.glue`, `cucumber.plugin` (con `io.cucumber.core.plugin.SerenityReporter` en PRIMERA posición — sin él los pasos "pasan" sin ejecutarse) y `cucumber.junit-platform.naming-strategy=long`. **PROHIBIDO `cucumber.features`** (anula los selectores del `@Suite` y el filtro de tags — el smoke gate dejaría de existir). Ver ``references/templates.md` (sección `junit-platform.properties`)`.
-- **Runner canónico `LoginRunner`** (`co.com.pragma.runners.LoginRunner`) con `@Suite + @IncludeEngines("cucumber") + @SelectClasspathResource("features")` y filtro `@smoke`. Ver ``references/templates.md` (sección `LoginRunner.java`)`.
+- **Runner ÚNICO `SuiteRunner`** (`co.com.pragma.runners.SuiteRunner`) con `@Suite + @IncludeEngines("cucumber") + @SelectClasspathResource("features")` y **sin** `FILTER_TAGS_PROPERTY_NAME`: un tag fijo en el runner sobreescribe el de la CLI. Prohibido crear runners adicionales. Ver ``references/templates.md` (sección `SuiteRunner.java`)`.
 - **Step isolation obligatorio** cuando el escenario tiene setup/auth/main/cleanup: Tasks separadas para Setup vs Main; Questions de dominio (contractuales) evaluadas SOLO en main; cleanup en `@After` con falla no-fatal. La cobertura sólo cuenta escenarios `@main-step`. Detalle en `references/step-isolation-appium.md`.
 - **Questions contractuales obligatorias** para validar datos del dominio: regla "no sólo `displayed()`" — usar Questions que devuelvan valores específicos (`rowCount`, `firstRowAmountText`, `paginationText`) comparados con matchers explícitos. Detalle, tabla por tipo de pantalla y anti-patterns en `references/contractual-questions.md`.
 - Aplica `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]` y `[[calidad-delivery-gate-contract]]` para declarar/verificar la matriz de versiones y la presencia del wrapper antes de cerrar la entrega.

@@ -17,6 +17,21 @@ Cuando el usuario solicita generar un proyecto Karate **desde cero** a partir de
 
 Antes de activar este skill, valida el spec con `[[calidad-spec-validation]]` y confirma intent con `[[calidad-intent-detection]]`. Recolecta inputs obligatorios con `[[calidad-mandatory-inputs-protocol]]`.
 
+## Lectura obligatoria antes de generar
+
+Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/` (12 archivos). **Abrir estos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza de `[[calidad-pipeline-state-tracking]]`):
+
+| Reference | Para qué |
+|---|---|
+| `references/templates.md` | Contenido textual de pom.xml, karate-config.js, TestRunner, feature base |
+| `references/project-structure.md` | Estructura canónica y constraint de ubicación de archivos |
+| `references/feature-design-dsl.md` | Tipos de escenario, tags y estilo de los .feature |
+| `references/negative-coverage-formula.md` | Cuántos escenarios por endpoint (cobertura defendible) |
+| `references/contract-testing-match-patterns.md` | Notación `match` y `#type` vs `##type` |
+| `references/smoke-gate-mvn.md` | Comando y criterio del gate 1:1 |
+
+Regla del chapter: saltarse esta lectura es la causa raíz verificada de retrabajo — en campo, un agente redescubrió por ensayo y error, y reportó como defectos del chapter, cosas ya escritas en estas references.
+
 ## Instrucción
 
 1. **Validar spec** — Verifica que el archivo sea OpenAPI 3.x (>200 chars), Swagger 2.0 (>200 chars) o WSDL (>100 chars) y que parsee correctamente. Si falla, detente y reporta el error específico.

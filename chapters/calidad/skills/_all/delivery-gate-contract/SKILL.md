@@ -1,6 +1,6 @@
 ---
 id: calidad-delivery-gate-contract
-version: 1.3.0
+version: 1.4.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -17,13 +17,32 @@ Siempre, al final de todo workflow de generación (greenfield o brownfield, los 
 
 Aplica universalmente a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE, Amazon Q CLI). Sin este bloque, la entrega se considera incompleta.
 
+## Precondición: la traza manda
+
+**Antes de emitir el bloque, leer `.evidence/pipeline-state.json` (`[[calidad-pipeline-state-tracking]]`) y verificar que ninguna fase obligatoria está en `pending` o `in_progress`.** Si las hay:
+
+- NO se emite el gate como cierre. Se emite un **reporte de estado** que enumera las fases pendientes y la siguiente acción, y el trabajo continúa.
+- Un gate emitido sobre fases pendientes es una entrega falsa, aunque todos sus campos estén rellenos. Verificado en campo: dos gates emitidos en la misma corrida, el primero sin ninguna ejecución y el segundo con `status: success` mientras 3 de 4 escenarios estaban `SKIPPED`.
+
+Reglas de coherencia que el propio agente debe verificar antes de emitir:
+
+| Si… | Entonces… |
+|---|---|
+| `mode: full` | `suite_executed` y `report_verified` en `done`; `execution.*` con datos reales |
+| `status: success` | cero fases obligatorias pendientes, cero `blockers`, y `execution.skipped` coherente con lo realmente ejecutado |
+| hay escenarios `SKIPPED` por filtro | NO pueden contarse como `coverage.delivered` |
+| `blockers[]` no vacío | cada blocker con **evidencia del sondeo** que lo comprobó (comando + salida), no una afirmación |
+| `execution_target: mock` | tráfico verificado contra el mock (ver `mock_evidence.traffic_verified`) |
+
 ## Instrucción
 
 Emite literalmente este bloque YAML (rellenando los slots) antes de cualquier despedida:
 
 ```yaml
 delivery_gate:
-  schema_version: "1.0"
+  schema_version: "1.1"
+  pipeline_state: ".evidence/pipeline-state.json"   # traza leída; cero fases obligatorias pendientes
+  phases_pending: []                                # si no está vacío, esto NO es un cierre
   framework: karate | playwright | k6 | appium
   mode: full | dry-run | scaffold-only | execute-only
   execution_target: real | mock | hybrid    # contra qué corrió la fase de ejecución (SUT readiness gate)
@@ -34,7 +53,9 @@ delivery_gate:
     faker_seed: 12345
     locator_map: "locator-map.json" | null  # solo front/mobile pre-desarrollo
     front_prototype: true | false           # opt-in: prototipo HTML del front (mocks/front-prototype/)
-    app_prototype: true | false             # opt-in: prototipo Flutter de la app (mocks/app-prototype/)
+    app_prototype: true | false             # opt-in: prototipo de app en la tecnología real (mocks/app-prototype/)
+    prototype_acceptance: ".evidence/prototype-acceptance.json"  # paridad + fidelidad + CA recorribles
+    traffic_verified: true | false          # el SUT (app/front) consumió REALMENTE el mock: peticiones en su log
     switchover_plan: "STRATEGY.md#6"        # dónde quedó documentado el plan mock -> real
   preflight:
     tool_version: "11.0.21"           # Java/Node/k6/Gradle según stack
@@ -133,6 +154,12 @@ verification:
     failure_message: "Bloqueado: la corrida contra mock no declara la certificación pendiente o carece de evidencia del mock y plan de switchover."
   - check: "si execution_target es mock o hybrid, el mensaje de cierre posterior al bloque YAML repite la advertencia de certificación pendiente"
     failure_message: "Bloqueado: el cierre no advierte que los resultados contra mock no certifican el SUT. La advertencia al inicio del flujo no sustituye la del cierre."
+  - check: "pipeline-state.json leído y sin fases obligatorias pendientes; phases_pending vacío"
+    failure_message: "Bloqueado: hay fases del pipeline sin completar. Emitir el gate ahora sería declarar terminada una entrega incompleta."
+  - check: "cada blocker declarado incluye la evidencia del sondeo (comando ejecutado + salida) que lo comprueba"
+    failure_message: "Bloqueado: hay blockers afirmados sin sondear. Un bloqueo de ambiente supuesto ya cerró una entrega en falso."
+  - check: "si execution_target es mock/hybrid, mock_evidence.traffic_verified es true con evidencia del log del mock"
+    failure_message: "Bloqueado: no se demostró que el SUT consumiera el mock. Una suite verde contra un SUT que ignora el mock no valida el contrato."
 ```
 
 ## Cross-links

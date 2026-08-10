@@ -4,7 +4,7 @@ Cada seccion corresponde a un archivo que el agente debe materializar en la ruta
 
 **Regla de precedencia**: ante cualquier discrepancia entre estas plantillas y `gradle-version-matrix.md`, **la matriz manda** (versiones, forma de declarar el plugin, scopes). Las contradicciones template-vs-matrix ya costaron una PoC entera; si detectas una, corrige el template y repórtala.
 
-## `LoginRunner.java`
+## `SuiteRunner.java` — UN SOLO runner por proyecto
 
 ```java
 package co.com.pragma.runners;
@@ -14,17 +14,24 @@ import org.junit.platform.suite.api.IncludeEngines;
 import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
 
-import static io.cucumber.core.options.Constants.FILTER_TAGS_PROPERTY_NAME;
 import static io.cucumber.core.options.Constants.GLUE_PROPERTY_NAME;
 
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "co.com.pragma.stepdefinitions")
-@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "@smoke")
-public class LoginRunner {
+// SIN @ConfigurationParameter(FILTER_TAGS_PROPERTY_NAME, ...): un tag fijo aquí
+// SOBREESCRIBE el -Dcucumber.filter.tags de la CLI y hace que "correr el smoke"
+// ejecute otra cosa (causa raíz verificada en campo).
+public class SuiteRunner {
 }
 ```
+
+**Reglas del runner** (las tres causas de ejecuciones fantasma vistas en campo):
+
+1. **Un solo runner por proyecto.** Nada de `SmokeRunner` + `RegressionRunner`: Gradle los ejecuta todos y cada uno aplica sus propios tags.
+2. **Cero tags hardcodeados** en el runner; el filtro llega siempre por CLI.
+3. **Cero defaults de tags en `build.gradle`** (`systemProperty 'cucumber.filter.tags', ... '@smoke'`): reintroduce el problema por la puerta de atrás y, combinado con `aggregate`, re-ejecuta y sobrescribe resultados.
 
 ## `README.md`
 
@@ -199,7 +206,7 @@ Resuelto por `[[calidad-sut-readiness-gate]]` — obligatoria aunque el target s
 
 ## 7. Próximos pasos
 
-- Archivos a generar: `build.gradle`, `settings.gradle`, `gradlew`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md`, Page Objects bajo `co.com.pragma.*`, Tasks (`LoginTask`, etc.), `*.feature` con escenarios `@smoke` + `@proposed`, `LoginRunner.java`.
+- Archivos a generar: `build.gradle`, `settings.gradle`, `gradlew`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md`, Page Objects bajo `co.com.pragma.*`, Tasks (`LoginTask`, etc.), `*.feature` con escenarios `@smoke-gate` (uno) + `@smoke` + `@proposed`, `SuiteRunner.java` (único).
 - Comando de ejecución: `./gradlew clean test aggregate -p <project_path> -Dcucumber.filter.tags=@smoke`.
 - Reporte ejecutivo: formato {{report_format}} (default `html`) con device matrix y locators auto-discovery vs deferred.
 
@@ -396,6 +403,13 @@ cucumber.glue=co.com.pragma.stepdefinitions
 ## `serenity.conf`
 
 ```hocon
+# OBLIGATORIO en proyectos Appium: sin esto Serenity intenta levantar ChromeDriver
+# (Chrome se abre en cada corrida y el actor puede acabar con el driver equivocado).
+webdriver {
+    driver = provided
+    autodownload = false
+}
+
 serenity {
     project.name = "{{project_name}}"
     take.screenshots = AFTER_EACH_STEP
@@ -437,8 +451,8 @@ import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import net.serenitybdd.core.Serenity;
+import net.serenitybdd.screenplay.actors.Cast;
 import net.serenitybdd.screenplay.actors.OnStage;
-import net.serenitybdd.screenplay.actors.OnlineCast;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -453,7 +467,11 @@ public class Hooks {
 
     @Before(order = 0)
     public void setTheStage() {
-        OnStage.setTheStage(new OnlineCast());
+        // Cast.ofStandardActors() — NUNCA OnlineCast: Serenity crearia ademas un
+        // ChromeDriver y Chrome se abriria en cada corrida (verificado en campo).
+        // El AndroidDriver se asigna al actor aparte:
+        //   OnStage.theActorCalled("usuario").can(BrowseTheWeb.with(androidDriver));
+        OnStage.setTheStage(Cast.ofStandardActors());
     }
 
     // SOLO con execution_target: mock — aislamiento de datos entre escenarios.
