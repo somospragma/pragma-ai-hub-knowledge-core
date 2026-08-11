@@ -35,10 +35,13 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
 | [[calidad-playwright-greenfield]] (`references/execution-modes-live-mocked-hybrid.md`) | @live/@mocked/@hybrid y qué valida cada modo |
 | [[calidad-playwright-greenfield]] (`references/waits-policy.md`) | Política de esperas |
 | `references/convention-detection.md` · `references/selector-update-strategy.md` | Convenciones del proyecto (propias de este skill) |
+| `references/playwright-as-library-cucumber.md` | **Obligatoria** si el proyecto no tiene `playwright.config.ts` y usa cucumber-js como runner |
 
-**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo resolver un locator, cómo interactuar, cómo diagnosticar). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
+**Antes de leer el resto, determina qué tipo de proyecto Playwright es.** Si no existe `playwright.config.ts`, no hay archivos `*.spec.ts` y el runner es cucumber-js, Playwright está usado **como librería de navegador** y no como framework: la mitad de las references de este bundle (config, fixtures, tags nativos, smoke gate del runner) no aplican. Abre `references/playwright-as-library-cucumber.md` antes de proponer nada, y toma las convenciones de la capa Cucumber de `[[calidad-cucumber-bdd-conventions]]`. Proponer una migración al runner nativo en ese contexto es una reescritura de la suite, no una mejora.
 
-**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del chapter (p. ej. `OnlineCast` disparando ChromeDriver, runner con tags hardcodeados que anulan el filtro de CLI, falta de `SerenityReporter` en `cucumber.plugin`, imports legacy de Serenity 3.x), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
+**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo resolver un locator, cómo interactuar, cómo esperar, cómo diagnosticar). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
+
+**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del stack (p. ej. `page.waitForTimeout` usado como espera en vez de esperas por condición, selectores acoplados a estructura del DOM en vez de roles o test ids, `projects` sin browser declarado, aserciones sin `expect` con reintento, contextos de navegador que no se cierran en el teardown, o `baseURL` hardcodeado en los tests en vez de en la configuración), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
 
 ## Instrucción
 

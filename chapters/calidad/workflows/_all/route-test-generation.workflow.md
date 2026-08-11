@@ -5,7 +5,7 @@ scope: chapter
 type: workflow
 chapter: calidad
 description: Workflow rector del Chapter Calidad para enrutar cualquier solicitud de generación de pruebas al framework correcto.
-tags: [workflow, routing, orchestration, karate, k6, playwright, appium]
+tags: [workflow, routing, orchestration, karate, k6, playwright, appium, appium-wdio]
 ---
 
 # Route Test Generation — Workflow Rector del Chapter Calidad
@@ -62,9 +62,11 @@ Aplica `[[calidad-sut-readiness-gate]]` inmediatamente después de los inputs ba
 
 Aplica `[[calidad-intent-detection]]`:
 
-- Determina si la solicitud es Karate, K6, Playwright, Appium — o **funcional** (análisis/refinamiento de HUs, diseño de casos de alto nivel, estrategia o plan de pruebas). Ver la desambiguación de "pruebas funcionales" en el skill.
+- Determina si la solicitud es Karate, K6, Playwright, Appium JVM, Appium TypeScript — o **funcional** (análisis/refinamiento de HUs, diseño de casos de alto nivel, estrategia o plan de pruebas). Ver la desambiguación de "pruebas funcionales" en el skill.
 - Si el intent es ambiguo, **pregunta**; no asumas Playwright por defecto.
-- Si el usuario pide mobile iOS greenfield, no abortes: el scaffolder V2 no lo genera automáticamente, pero el chapter sí soporta iOS via scaffold manual (apuntar a `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`). Si es mobile iOS brownfield, enrutar a `[[calidad-appium-brownfield]]`.
+- Si el intent es mobile, resuelve **cuál de los dos stacks Appium** aplica con la tabla de desambiguación de `[[calidad-intent-detection]]`. En greenfield sin señales del ecosistema, pregunta; no elijas por ti.
+- Si el usuario pide mobile iOS, no abortes: iOS está soportado. La única limitación es la del scaffolder greenfield JVM, que se resuelve con scaffold manual.
+- Si el repositorio es híbrido (web y mobile en el mismo proyecto), enruta **las dos** rutas y declara que se entregan dos stacks.
 
 ### Ruta funcional (bifurcación temprana desde el paso 2)
 
@@ -121,10 +123,17 @@ Transfiere el control al workflow concreto según el resultado de los pasos 2 y 
 | Playwright brownfield       | `[[calidad-update-playwright-brownfield]]`            |
 | K6 greenfield               | `[[calidad-generate-k6-suite]]`                       |
 | K6 brownfield               | `[[calidad-extend-k6-brownfield]]`                    |
-| Appium greenfield (Android, V2)   | `[[calidad-generate-appium-screenplay-android]]`    |
-| Appium brownfield (Android / iOS) | `[[calidad-extend-appium-brownfield]]`              |
+| Appium JVM greenfield (Android, V2)   | `[[calidad-generate-appium-screenplay-android]]`    |
+| Appium JVM brownfield (Android / iOS) | `[[calidad-extend-appium-brownfield]]`              |
+| Appium TypeScript greenfield          | `[[calidad-generate-appium-wdio-greenfield]]`       |
+| Appium TypeScript brownfield          | `[[calidad-extend-appium-wdio-brownfield]]`         |
+| Migrar selectores hardcodeados a test-data (TypeScript) | `[[calidad-migrate-selectors-to-testdata]]` |
 
-> Nota Appium: el scaffolder greenfield V2 solo genera proyectos Android (limitación de tooling). Para greenfield iOS, apuntar al usuario al workaround manual descrito en `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`. El brownfield Appium sí soporta Android e iOS (la plataforma se detecta del proyecto), ver `[[calidad-appium-brownfield]]`.
+> **Nota mobile — dos stacks Appium.** El chapter soporta Appium sobre JVM (Java, Screenplay, Serenity, Gradle) y sobre TypeScript (WebdriverIO, cucumber-js). Comparten el servidor Appium y difieren en todo lo demás. La elección la determina el ecosistema del equipo o el proyecto existente, nunca la preferencia del agente: ver la tabla de desambiguación en `[[calidad-intent-detection]]` y, ante greenfield sin señales, **preguntar**.
+>
+> **Nota iOS.** El único alcance Android es el del *scaffolder* greenfield JVM; para greenfield iOS en JVM se aplica el scaffold manual de `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`. El stack TypeScript genera iOS de forma nativa y el brownfield de ambos stacks soporta Android e iOS. iOS exige entorno macOS: si no está disponible, se entrega lo generado y se reporta `partial`, nunca se degrada a Android en silencio.
+>
+> **Nota repos híbridos.** Un repositorio con navegador y app nativa orquestados por un único cucumber-js necesita **dos rutas**, no una: la web por su stack y la mobile por el suyo. Las convenciones comunes de la capa Cucumber —catálogo de steps, sufijo de plataforma, tagging, propiedades verificables— vienen de `[[calidad-cucumber-bdd-conventions]]` y aplican a las dos.
 
 ### Paso 6 — Emitir archivos con disciplina
 
@@ -162,14 +171,16 @@ Este workflow se considera completo **solo cuando**:
 
 - [ ] La **traza del pipeline** (`.evidence/pipeline-state.json`) fue leída al abrir la sesión y actualizada al cerrar cada fase; el delivery gate se emitió con cero fases obligatorias pendientes.
 - [ ] Cada insumo entregado tiene su fila en la **tabla de extracción** (qué se extrajo, dónde se usó) o su justificación de no aplicabilidad.
-- [ ] El framework destino y el modo (greenfield / brownfield) fueron resueltos correctamente para los **4 frameworks soportados** (Karate, Playwright, K6, Appium) en cualquiera de sus dos modos — o la solicitud se bifurcó a la **ruta funcional** con su workflow correcto.
+- [ ] El framework destino y el modo (greenfield / brownfield) fueron resueltos correctamente para los **5 stacks soportados** (Karate, Playwright, K6, Appium JVM, Appium TypeScript) en cualquiera de sus dos modos — o la solicitud se bifurcó a la **ruta funcional** con su workflow correcto.
+- [ ] Si el intent fue mobile: el stack Appium se resolvió por señales del ecosistema o preguntando, nunca por preferencia del agente.
+- [ ] Si el repositorio era híbrido: se enrutaron ambos stacks y las convenciones Cucumber comunes se aplicaron con `[[calidad-cucumber-bdd-conventions]]`.
 - [ ] Si la ruta fue funcional: el workflow delegado cerró con su delivery gate documental y sus gates humanos cumplidos (nada escrito al ALM sin aprobación/confirmación).
 - [ ] El **SUT readiness gate** (paso 1.5) fue resuelto explícitamente: `execution_target`, `data_strategy` y (front/mobile) `locator_map` registrados en STRATEGY.md y delivery gate. Si `execution_target != real`, el delivery gate declara `certification: pending_real_integration` y `next_steps` incluye el switchover a integraciones reales.
 - [ ] Las **capacidades transversales complementarias** (accesibilidad, SEO, seguridad, regresión visual, contract, performance) fueron evaluadas con `[[calidad-transversal-capabilities]]`, propuestas al usuario y registradas (aplicadas u omitidas con motivo) en el bloque `transversal_capabilities` del delivery-gate.
 - [ ] Todos los archivos de prueba esperados están escritos en `output_path` y son consistentes con el spec/firma.
 - [ ] En greenfield, la infraestructura completa (`pom.xml`/`package.json`/`build.gradle`, configs, runners, README) está presente.
 - [ ] En brownfield (Karate, Playwright, K6 y Appium), **no** se sobrescribió infraestructura existente y las convenciones detectadas se respetaron.
-- [ ] El comando de ejecución (`mvn test`, `npx playwright test`, `k6 run ...`, `./gradlew test`) está documentado en el `README.md` generado.
+- [ ] El comando de ejecución (`mvn test`, `npx playwright test`, `k6 run ...`, `./gradlew test`, `npx cucumber-js --profile <plataforma>`) está documentado en el `README.md` generado.
 - [ ] La ruta del reporte de evidencia está documentada y el reporter está activo.
 - [ ] El checklist de calidad propio del framework destino (ver el workflow específico) está aprobado.
 - [ ] El usuario tiene un mensaje final que enumera (a) archivos generados, (b) comando de ejecución, (c) ruta del reporte, (d) tags de trazabilidad usados.

@@ -4,15 +4,20 @@
 
 El Chapter Calidad de Pragma agrupa el conocimiento accionable para **QA automation para cualquier sistema bajo prueba — APIs, web, mobile, performance — sin presunción de sector o región**. Capacidades específicas (compliance, anonimización, mobile clouds) se activan según el contexto del cliente, no por defecto. Los assets de este chapter están diseñados para alimentar agentes que generan, extienden y operan suites de pruebas reales en producción.
 
-Cubre cuatro frameworks de automatización y un stack funcional:
+Cubre cinco stacks de automatización:
 
 - **Karate** — API testing (REST/SOAP) sobre OpenAPI/Swagger/WSDL.
 - **Playwright** — E2E web testing y accesibilidad.
 - **K6** — Performance testing.
-- **Appium** — Mobile testing (Android V2 con Screenplay + Serenity + Cucumber).
-- **Funcional** — el trabajo funcional del proceso de pruebas: análisis y refinamiento de historias de usuario (INVEST, criterios de aceptación, ambigüedades), diseño de casos de alto nivel con técnicas formales, estrategias y planes de prueba (ISO/IEC/IEEE 29119-3), con integración a Azure DevOps y Jira vía MCP para traer insumos y llevar resultados. Sus entregables son documentos y artefactos ALM, no código; sus casos diseñados alimentan a los stacks de automatización.
+- **Appium** (JVM) — Mobile testing con Screenplay + Serenity + Cucumber sobre Gradle.
+- **Appium WebdriverIO** — Mobile testing multi-plataforma en TypeScript con cucumber-js: Android, iOS, tablets y navegador móvil, en local y en device farm.
 
-Y cinco ejes cross-cutting que aplican a los cuatro frameworks:
+Los dos stacks Appium comparten el servidor Appium y difieren en todo lo demás. La elección la determina el ecosistema del equipo, nunca la preferencia del agente: ver la desambiguación en `[[calidad-intent-detection]]`.
+
+Y los ejes cross-cutting que aplican a todos los stacks:
+
+- **Funcional** — el trabajo funcional del proceso de pruebas: análisis y refinamiento de historias de usuario (INVEST, criterios de aceptación, ambigüedades), diseño de casos de alto nivel con técnicas formales, estrategias y planes de prueba (ISO/IEC/IEEE 29119-3), con integración a Azure DevOps y Jira vía MCP. Sus entregables son documentos y artefactos ALM, no código; sus casos diseñados alimentan a los stacks de automatización. **Es transversal, no un stack**: no tiene artefacto detectable en un repositorio y el router bifurca a él desde cualquier stack, por lo que viaja en todos los bundles.
+- **Convenciones Cucumber** — arquetipos multi-plataforma donde Cucumber orquesta web y mobile con un vocabulario Gherkin compartido: catálogo de steps, sufijo de plataforma, tagging y propiedades verificables por análisis estático.
 
 - **Seguridad** (OWASP API Top 10, DAST con ZAP).
 - **Datos de prueba** y trazabilidad requisito → test → resultado.
@@ -100,8 +105,9 @@ chapters/calidad/
 │   │   └── test-self-healing/
 │   │       ├── SKILL.md
 │   │       └── references/{commercial-vs-oss-healing-tools, healing-aware-page-object, healing-strategies-by-framework, llm-driven-selector-repair, multi-locator-fallback-pattern, over-healing-guardrails, visual-ai-healing}.md
-│   │
-│   ├── funcional/
+│   │   ├── cucumber-bdd-conventions/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{file-structure-conventions, gherkin-tagging-and-naming, hooks-and-world-contract, platform-suffix-and-ambiguity, static-correctness-properties, step-catalog}.md
 │   │   ├── funcional-story-analysis/
 │   │   │   ├── SKILL.md
 │   │   │   └── references/{acceptance-criteria-quality, ambiguity-taxonomy, analysis-report-format, invest-scoring}.md
@@ -161,14 +167,17 @@ chapters/calidad/
 │
 ├── workflows/
 │   ├── _all/
+│   │   ├── analyze-and-refine-stories.workflow.md
+│   │   ├── build-test-strategy-and-plan.workflow.md
+│   │   ├── design-test-cases.workflow.md
 │   │   ├── generate-executive-report.workflow.md
 │   │   ├── route-test-generation.workflow.md
 │   │   ├── seo-audit.workflow.md
 │   │   └── test-self-correction-loop.workflow.md
-│   ├── funcional/
-│   │   ├── analyze-and-refine-stories.workflow.md
-│   │   ├── build-test-strategy-and-plan.workflow.md
-│   │   └── design-test-cases.workflow.md
+│   ├── appium-wdio/
+│   │   ├── extend-appium-wdio-brownfield.workflow.md
+│   │   ├── generate-appium-wdio-greenfield.workflow.md
+│   │   └── migrate-selectors-to-testdata.workflow.md
 │   ├── appium/
 │   │   ├── complete-deferred-locators.workflow.md
 │   │   ├── extend-appium-brownfield.workflow.md
@@ -186,11 +195,12 @@ chapters/calidad/
 │
 └── prompts/
     ├── _all/
-    │   └── generate-mockoon-environment.prompt.md
-    ├── funcional/
     │   ├── analyze-user-story.prompt.md
     │   ├── generate-high-level-test-cases.prompt.md
+    │   ├── generate-mockoon-environment.prompt.md
     │   └── generate-test-plan-document.prompt.md
+    ├── appium-wdio/
+    │   └── validate-appium-wdio-inputs.prompt.md
     ├── appium/
     │   ├── generate-cucumber-feature-android.prompt.md
     │   ├── generate-screenplay-task.prompt.md
@@ -290,9 +300,7 @@ chapters/calidad/
 | `seo/SKILL.md`                         | Auditoría SEO técnica agnóstica de stack para pruebas web; 8 dimensiones (técnico, on-page, performance, schema, imágenes, sitemap, hreflang, accesibilidad) como references. |
 | `visual-regression.md`                 | Política transversal de regresión visual (web/móvil): baselines, dinamismo, match levels, anti-patrones.    |
 
-### Skills per-framework
-
-#### Funcional (`skills/funcional/`)
+#### Funcional — análisis, diseño, estrategia y plan (`skills/_all/`)
 
 | Asset | Capacidad |
 |---|---|
@@ -302,7 +310,19 @@ chapters/calidad/
 | `funcional-test-strategy/SKILL.md` | Estrategia: niveles/cuadrantes, enfoque risk-based, frontera con lo unitario, mapeo a los stacks de automatización y al camino shift-left (mocks, locator map). |
 | `funcional-test-plan/SKILL.md` | Plan ISO/IEC/IEEE 29119-3 (equivalencia IEEE 829): riesgos con análisis, criterios entrada/salida/suspensión medibles, RTM, informes de avance y reporte de cierre. |
 
-El stack funcional produce documentos y artefactos ALM (no código): sus casos alimentan a los stacks de automatización, y sus insumos/resultados viajan a Azure DevOps / Jira vía `[[calidad-alm-mcp-integration]]`.
+El trabajo funcional produce documentos y artefactos ALM (no código): sus casos alimentan a los stacks de automatización, y sus insumos/resultados viajan a Azure DevOps / Jira vía `[[calidad-alm-mcp-integration]]`.
+
+**Por qué es cross-cutting y no un stack**: no tiene artefacto detectable en un repositorio (los stacks se detectan por `karate-config.js`, `playwright.config.ts`, `webdriverio` en el `package.json`), el router bifurca a él en el paso 2 —antes de elegir framework— y sus assets los referencian skills transversales. Vive en `skills/_all/`, `workflows/_all/` y `prompts/_all/`, y por tanto viaja en todos los bundles.
+
+#### Convenciones Cucumber (`skills/_all/cucumber-bdd-conventions/`)
+
+| Asset | Capacidad |
+|---|---|
+| `cucumber-bdd-conventions/SKILL.md` | Arquetipos donde Cucumber orquesta varias plataformas o drivers a la vez: catálogo de steps y protocolo de reutilización, sufijo de plataforma contra ambigüedad del registro global, tagging y naming, estructura de archivos, contrato de hooks y World, y 12 propiedades verificables por análisis estático con sus comandos. |
+
+Aplica a cualquier stack con Gherkin —Appium WebdriverIO, Playwright usado como librería, Karate— y es la capa que hace mantenible un repositorio híbrido web y mobile.
+
+### Skills per-framework
 
 #### Karate (`skills/karate/`)
 
@@ -345,6 +365,18 @@ Arquitectura modular: `scenarios/ + workloads/ + tests/{escenario}/main.js + sha
 
 Incluye references para capas Screenplay, locators diferidos vs auto-discovery (score de confianza por selector), smoke vs proposed scenarios, smoke gate Gradle, matriz de versiones Gradle inmutable, health-check pipeline, accesibilidad móvil, visual regression móvil, reglas anti-colisión de tasks Gradle, y el paquete de robustez mobile endurecido con feedback de campo: protocolo de resolución de locators (identidad ≠ capacidad, con la matriz Flutter verificada), catálogo de interacciones de experto (escritura, OTP, scroll W3C, esperas, recuperación), y protocolo de evidencia y triage (screenshot → page source como árbol → log del mock antes de hipotetizar; checklist anti falsos-verdes de reportería).
 
+#### Appium WebdriverIO (`skills/appium-wdio/`)
+
+| Asset                                          | Capacidad                                                                                  |
+|------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `appium-wdio-greenfield/SKILL.md`              | Genera un arquetipo mobile multi-plataforma en TypeScript (WebdriverIO + cucumber-js): Android, iOS, iPad, tablet y navegador móvil, en local y en device farm. |
+| `appium-wdio-brownfield/SKILL.md`              | Extiende un arquetipo TypeScript existente respetando sus convenciones, con línea base de propiedades antes de tocar nada. |
+| `appium-wdio-run-and-profiles.md`              | Perfiles de cucumber-js, filtros por tag y combinación de plataforma, modo de ejecución y tipo de dispositivo. |
+
+Incluye references con la matriz de capabilities de cada plataforma —el bloque WebDriverAgent de iOS documentado capability por capability, que es donde falla la primera sesión en cualquier máquina nueva—, ciclo de vida del servidor Appium y de emuladores gestionado por el propio framework, el patrón de perfil-de-plataforma-como-dato que evita un hook por plataforma, ejecución local contra device farm con fallback de dispositivos y cancelación de sesión en cola, contextos nativo y webview con deep links y diálogos del sistema, selectores fuera del código en archivos de test-data, capa de objetos de pantalla, evidencia y video, idioma como dimensión de prueba, y una tabla de fallos conocidos con causa y solución verificadas.
+
+La capa Cucumber de este stack —catálogo de steps, sufijo de plataforma, tagging, propiedades verificables— no se duplica aquí: viene de `[[calidad-cucumber-bdd-conventions]]`.
+
 ### Workflows
 
 | Tipo                                   | Asset                                                                                  |
@@ -362,9 +394,12 @@ Incluye references para capas Screenplay, locators diferidos vs auto-discovery (
 | Appium greenfield                      | `workflows/appium/generate-appium-screenplay-android.workflow.md`                      |
 | Appium brownfield                      | `workflows/appium/extend-appium-brownfield.workflow.md`                                |
 | Appium locators                        | `workflows/appium/complete-deferred-locators.workflow.md`                              |
-| Funcional — análisis/refinamiento      | `workflows/funcional/analyze-and-refine-stories.workflow.md`                           |
-| Funcional — diseño de casos + ALM      | `workflows/funcional/design-test-cases.workflow.md`                                    |
-| Funcional — estrategia y plan          | `workflows/funcional/build-test-strategy-and-plan.workflow.md`                         |
+| Appium WebdriverIO greenfield          | `workflows/appium-wdio/generate-appium-wdio-greenfield.workflow.md`                    |
+| Appium WebdriverIO brownfield          | `workflows/appium-wdio/extend-appium-wdio-brownfield.workflow.md`                      |
+| Appium WebdriverIO — migrar selectores | `workflows/appium-wdio/migrate-selectors-to-testdata.workflow.md`                      |
+| Funcional — análisis/refinamiento      | `workflows/_all/analyze-and-refine-stories.workflow.md`                                |
+| Funcional — diseño de casos + ALM      | `workflows/_all/design-test-cases.workflow.md`                                         |
+| Funcional — estrategia y plan          | `workflows/_all/build-test-strategy-and-plan.workflow.md`                              |
 
 ### Prompts (`prompts/`)
 
@@ -392,7 +427,7 @@ pragma-ai init --ide kiro --chapter calidad --stack karate     # API testing
 pragma-ai init --ide kiro --chapter calidad --stack playwright # E2E web
 pragma-ai init --ide kiro --chapter calidad --stack k6         # performance
 pragma-ai init --ide kiro --chapter calidad --stack appium     # mobile Android
-pragma-ai init --ide kiro --chapter calidad --stack funcional  # análisis HUs, casos, estrategia, planes, ALM
+pragma-ai init --ide kiro --chapter calidad --stack appium-wdio # mobile multi-plataforma en TypeScript (WebdriverIO + cucumber-js)
 
 # 3. Verificar instalación
 pragma-ai status
@@ -404,7 +439,7 @@ pragma-ai update              # aplicar
 
 `init` crea `pragma.yaml` en la raíz del proyecto, descarga los assets del chapter Calidad para el stack indicado (más todos los skills cross-cutting de `_all/`) en el path nativo del IDE, agrega `.pragma/` al `.gitignore` e instala los hooks para telemetría. Detalle completo de la CLI en el manual de `pragma-ai`.
 
-**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium`, `funcional`. Los cuatro primeros corresponden a frameworks de automatización; `funcional` cubre el trabajo documental del proceso (análisis/refinamiento de HUs, diseño de casos, estrategia, planes) con integración ALM. Un proyecto típico usa un solo stack de automatización; `funcional` suele convivir con cualquiera de ellos. Si la suite combina varios frameworks (ej. APIs + UI + perf en el mismo repo), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos del stack se suman sin conflicto.
+**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium`, `appium-wdio`. El trabajo **funcional** (análisis/refinamiento de HUs, diseño de casos, estrategia, planes, integración ALM) y las **convenciones Cucumber** no son stacks: son cross-cutting y llegan con cualquier `init`, sin pedirlos. Si la suite combina varios frameworks (APIs + UI + mobile en el mismo repositorio), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos de cada stack se suman sin conflicto. Un repositorio híbrido web y mobile necesita los dos stacks correspondientes, no uno.
 
 **Multi-IDE** en el mismo proyecto: repetir `--ide`:
 
@@ -458,7 +493,7 @@ Ese workflow se encarga de:
 
 1. Recolectar inputs obligatorios (`[[calidad-mandatory-inputs-protocol]]`).
 2. **SUT readiness gate** (`[[calidad-sut-readiness-gate]]`, paso 1.5): ¿el desarrollo está desplegado, o las pruebas deben ser ejecutables antes del desarrollo? Resuelve `execution_target` (real/mock/hybrid), `data_strategy` (real/synthetic) y, para front/mobile, la existencia del `locator_map` (`[[calidad-ui-locator-map-contract]]`). En modo pre-desarrollo endurece los inputs (spec con response schemas para API; Figma + locator map para Playwright; locator map para Appium) y activa `[[calidad-service-virtualization-mockoon]]`.
-3. Identificar framework (`[[calidad-intent-detection]]`) — incluida la **ruta funcional**: los intents de análisis/refinamiento de HUs, diseño de casos, estrategia y plan bifurcan aquí directo a los workflows del stack `funcional` (`[[calidad-analyze-and-refine-stories]]`, `[[calidad-design-test-cases]]`, `[[calidad-build-test-strategy-and-plan]]`), sin spec-validation ni gates de ejecución, con delivery gate documental y gates humanos propios (aprobación del PO, confirmación antes de escribir al ALM).
+3. Identificar framework (`[[calidad-intent-detection]]`) — incluida la **ruta funcional**: los intents de análisis/refinamiento de HUs, diseño de casos, estrategia y plan bifurcan aquí directo a los workflows funcionales cross-cutting (`[[calidad-analyze-and-refine-stories]]`, `[[calidad-design-test-cases]]`, `[[calidad-build-test-strategy-and-plan]]`), sin spec-validation ni gates de ejecución, con delivery gate documental y gates humanos propios (aprobación del PO, confirmación antes de escribir al ALM).
 4. Validar el spec si aplica (`[[calidad-spec-validation]]`).
 5. Decidir greenfield vs brownfield (`[[calidad-brownfield-vs-greenfield]]`).
 6. **Pre-diseño**: redactar `STRATEGY.md` y esperar aprobación humana (`[[calidad-pre-design-strategy-document]]`). Incluye la sección "Execution target y plan de switchover" cuando se prueba antes del desarrollo. En greenfield es obligatorio; en brownfield grande se simplifica a un delta-strategy.

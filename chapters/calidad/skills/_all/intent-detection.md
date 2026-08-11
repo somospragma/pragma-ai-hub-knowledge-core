@@ -33,8 +33,22 @@ Esta skill decide **con qué framework** se generan las pruebas. La decisión de
 | Karate     | "pruebas funcionales", "API testing", "REST", "SOAP", "OpenAPI", "Swagger", "WSDL", "contract testing", "Karate"       | "proyecto existente", "agregar tests", "integrar", "ya tenemos"   | greenfield → `[[calidad-karate-greenfield]]` · brownfield → `[[calidad-karate-brownfield]]` |
 | K6         | "performance", "carga", "load", "stress", "spike", "soak", "K6", "VUs", "latencia", "throughput", "p95", "p99"          | (no se trata brownfield)                                          | `[[calidad-k6-greenfield]]`                                                     |
 | Playwright | "web", "browser", "E2E", "UI", "frontend", "Playwright", "page object", "visual", "accessibility", "regresión visual" | "proyecto existente", "actualizar selectores", "ya hay tests web" | greenfield → `[[calidad-playwright-greenfield]]` · brownfield → `[[calidad-playwright-brownfield]]` |
-| Appium     | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity"                        | (no se trata brownfield)                                          | `[[calidad-appium-screenplay-android]]`                                         |
+| Appium (JVM) | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity", "Serenity", "Gradle" | "proyecto existente", "agregar escenarios", "ya tenemos suite mobile" | greenfield → `[[calidad-appium-screenplay-android]]` · brownfield → `[[calidad-appium-brownfield]]` |
+| Appium (TypeScript) | "mobile" + "TypeScript"/"WebdriverIO"/"WDIO"/"cucumber-js"/"Node", "iPad", "tablet", "web móvil", "app y navegador móvil" | "proyecto existente", "actualizar selectores", "agregar plataforma" | greenfield → `[[calidad-appium-wdio-greenfield]]` · brownfield → `[[calidad-appium-wdio-brownfield]]` |
 | Funcional  | "analizar historia", "HU", "INVEST", "criterios de aceptación", "refinamiento", "refinar", "casos de prueba" (diseño, no código), "test cases", "test plan", "plan de pruebas", "estrategia de pruebas", "matriz de trazabilidad", "Azure DevOps"/"Jira" como fuente de HUs | (no aplica greenfield/brownfield)                                 | análisis/refinamiento → `[[calidad-analyze-and-refine-stories]]` · diseño de casos → `[[calidad-design-test-cases]]` · estrategia/plan → `[[calidad-build-test-strategy-and-plan]]` |
+
+**Desambiguación mobile: ¿JVM o TypeScript?** Los dos stacks Appium comparten el servidor Appium y difieren en todo lo demás (lenguaje, cliente, runner, patrón, build). La decisión **no la toma el agente por preferencia**: la determina el ecosistema del equipo y, en brownfield, el proyecto que ya existe.
+
+| Señal | Stack |
+|---|---|
+| `build.gradle` con `appium-java-client`, `pom.xml`, Serenity, Screenplay | Appium JVM |
+| `package.json` con `webdriverio`, `cucumber.config.js`, `.steps.ts`, objetos de pantalla en TypeScript | Appium TypeScript |
+| El equipo pide explícitamente Java o TypeScript | Lo pedido |
+| Greenfield sin señal de ecosistema | **Pregunta.** No asumas |
+
+Señales que **no** desambiguan por sí solas: "Appium", "mobile", "Android", "iOS". Aparecen en los dos stacks.
+
+**Repos híbridos web y mobile**: un mismo repositorio puede necesitar dos stacks a la vez —por ejemplo, navegador con Playwright y app nativa con Appium TypeScript, orquestados por un único cucumber-js—. En ese caso se entregan **ambos** bundles y las convenciones comunes de la capa Cucumber vienen de `[[calidad-cucumber-bdd-conventions]]`. No se fuerza un stack único ni se ignora la mitad del repositorio.
 
 **Desambiguación "pruebas funcionales"**: si el intent pide *generar/automatizar* pruebas funcionales de una API (hay spec, endpoints, "automatiza") → Karate. Si pide *diseñar, documentar o gestionar* — analizar HUs, escribir casos de alto nivel, plan, estrategia — → stack funcional. Ante la duda, la pregunta es: "¿el entregable es código de pruebas ejecutable, o documentos/casos en el ALM?". El camino natural completo es funcional primero (diseño) y automatización después (los casos diseñados alimentan a los stacks).
 
@@ -42,7 +56,8 @@ Esta skill decide **con qué framework** se generan las pruebas. La decisión de
 
 - Si el intent no es claro o cae entre dos frameworks, **pregunta explícitamente**; nunca asumas Playwright por defecto.
 - Los intents funcionales NO pasan por spec-validation ni brownfield-vs-greenfield: el router los bifurca directo al workflow funcional (ver la ruta funcional en `[[calidad-route-test-generation]]`).
-- **Appium requiere señales explícitas de Android** (APK, `app_package`, `app_activity`, "mobile Android"). La versión actual del Chapter (Appium V2) **no soporta iOS**: si el usuario pide mobile iOS, repórtalo como fuera de alcance y detente.
+- **iOS sí está soportado por el chapter.** Lo que tiene alcance Android es el *scaffolder* greenfield del stack JVM (`[[calidad-appium-screenplay-android]]`), no el chapter: para iOS greenfield en JVM se aplica el scaffold manual documentado en su `references/android-only-scope-rationale.md`; el stack TypeScript (`[[calidad-appium-wdio-greenfield]]`) genera iOS de forma nativa, y el brownfield de ambos stacks soporta Android e iOS. Nunca reportes iOS como fuera de alcance.
+- **iOS exige entorno macOS** con Xcode y, en dispositivo físico, credenciales de firma. Si el entorno no lo cumple, no se degrada a Android en silencio: se genera lo pedido, se declara que no se pudo ejecutar y se reporta `partial`.
 - K6 y Playwright/Karate pueden coexistir en un mismo programa de pruebas, pero **no en una sola solicitud de generación**: cada framework se genera por separado, en su propio `output_path`.
 - Una vez decidido el framework, transfiere el control al workflow específico; no mezcles instrucciones de generación de distintos frameworks.
 - Cuando detectes brownfield, antes de delegar al skill brownfield, asegúrate de que el `output_path` realmente contiene código previo (ver `[[calidad-brownfield-vs-greenfield]]`).

@@ -110,6 +110,14 @@ Pasos concretos para iniciar manualmente un proyecto Appium iOS Screenplay aline
 
 El proyecto resultante respeta las mismas restricciones del chapter (no redefinir `aggregate`/`reports`/`clean`, package `co.com.pragma.*`, no usar `OnlineCast` —dispara ChromeDriver—, etc.).
 
+## Alternativa: el stack Appium sobre TypeScript
+
+Antes de asumir scaffold manual para iOS, evalúa si el ecosistema del equipo admite el otro stack Appium del chapter: `[[calidad-appium-wdio-greenfield]]` genera iOS de forma nativa —simulador y dispositivo físico— sobre TypeScript, WebdriverIO y cucumber-js, sin las limitaciones del scaffolder JVM.
+
+La decisión no es del agente: la determina el ecosistema del equipo (un equipo Java no adopta TypeScript por conveniencia del generador) y, en brownfield, el proyecto que ya existe. Ver la tabla de desambiguación en `[[calidad-intent-detection]]`.
+
+Si el camino es JVM con scaffold manual, la matriz completa de capabilities iOS —incluido el bloque WebDriverAgent con sus timeouts, reintentos e identificadores de firma, que es donde falla la primera sesión en cualquier máquina nueva— está documentada en `references/capabilities-matrix-ios.md` de `[[calidad-appium-wdio-greenfield]]`. Las capabilities son del servidor Appium y aplican igual desde Java: solo cambia la sintaxis con la que se declaran.
+
 ## Roadmap
 
 - **V3 del scaffolder** incluirá un generador iOS con perfiles dual Android/iOS, mapeo de selectores `iOSClassChain` y `iOSNsPredicateString`, plantillas de capabilities para simulador y device real, y health-check específico para XCUITest.
