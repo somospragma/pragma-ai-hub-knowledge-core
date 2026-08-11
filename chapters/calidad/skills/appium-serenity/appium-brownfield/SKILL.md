@@ -4,7 +4,7 @@ version: 1.0.0
 scope: stack
 type: skill
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Extiende un proyecto Appium existente con nuevos escenarios, Tasks, Questions, o cambios de selectores respetando convenciones del proyecto.
 tags: [appium, brownfield, mobile, screenplay, conventions]
 ---
@@ -30,8 +30,8 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
 
 | Reference | Para qué |
 |---|---|
-| [[calidad-appium-screenplay-android]] (`references/locator-resolution-protocol.md`) | Resolver locators: identidad ≠ capacidad, conteo = 1, matriz Flutter |
-| [[calidad-appium-screenplay-android]] (`references/mobile-interactions-catalog.md`) | Escritura, taps, scroll, esperas, recuperación, estado entre escenarios |
+| [[calidad-mobile-locator-resolution]] | Resolver locators: identidad ≠ capacidad, conteo = 1, matriz Flutter (stack `appium-core`) |
+| [[calidad-mobile-interactions]] | Escritura, taps, scroll, esperas, recuperación, estado entre escenarios (stack `appium-core`) |
 | [[calidad-appium-screenplay-android]] (`references/mobile-evidence-and-triage.md`) | Instrumentación previa y orden de triage (screenshot → page source → logs) |
 | `references/convention-detection.md` · `references/selector-update-strategy.md` | Convenciones del proyecto (propias de este skill) |
 

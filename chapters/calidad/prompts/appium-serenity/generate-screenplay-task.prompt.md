@@ -4,7 +4,7 @@ version: 1.0.0
 scope: stack
 type: prompt
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Prompt para generar una clase Task Screenplay (Serenity) en co.com.pragma.tasks con anotaciones @Step.
 tags: [appium, screenplay, task, java, prompt, serenity]
 ---

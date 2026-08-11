@@ -4,7 +4,7 @@ version: 1.1.0
 scope: stack
 type: skill
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Comandos Gradle para ejecutar proyectos Appium Screenplay Android con filtros de tags y override de env.
 tags: [appium, gradle, run, tags, cucumber, serenity-report]
 ---

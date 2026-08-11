@@ -4,7 +4,7 @@ version: 1.1.0
 scope: stack
 type: workflow
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Reemplaza los placeholders TODO de LoginPage con selectores reales extraídos con Appium Inspector y promueve los smoke a validación real.
 tags: [appium, locators, inspector, smoke, technical-debt, completion]
 ---
@@ -86,7 +86,7 @@ Agregar este step al pipeline CI para que falle si quedan TODOs.
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. Si el guardrail CI del paso 6 detecta `TODO` residual, marca el reporte como `partial` automáticamente.
 
 
-**Verificación obligatoria de cada locator descubierto** (`[[calidad-appium-screenplay-android]]`, consultar `references/locator-resolution-protocol.md`): un identificador encontrado en la jerarquía da **identidad, no capacidad**. Antes de fijarlo en un Page Object: contar cuántos nodos resuelve (**único válido = 1**), identificar el nodo realmente capaz (el contenedor del identificador suele no ser clickeable ni editable) y validar por **efecto externo** (la interacción produce navegación o una petición al backend). Un locator "descubierto" que nunca se ejerció es una hipótesis, no un hallazgo.
+**Verificación obligatoria de cada locator descubierto** (`[[calidad-appium-screenplay-android]]`, consultar [[calidad-mobile-locator-resolution]]): un identificador encontrado en la jerarquía da **identidad, no capacidad**. Antes de fijarlo en un Page Object: contar cuántos nodos resuelve (**único válido = 1**), identificar el nodo realmente capaz (el contenedor del identificador suele no ser clickeable ni editable) y validar por **efecto externo** (la interacción produce navegación o una petición al backend). Un locator "descubierto" que nunca se ejerció es una hipótesis, no un hallazgo.
 
 ## Criterios de finalización
 

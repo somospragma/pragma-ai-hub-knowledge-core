@@ -248,7 +248,7 @@ Resuelto por `[[calidad-sut-readiness-gate]]` — obligatoria aunque el target s
 ### 8.4 Locator strategy
 
 - Modo: {{locator_mode}} (`auto-discovery`, `deferred` o `locator-map` con app Flutter/prototipo).
-- Resolución verificada: aplicar el protocolo de `[locator-resolution-protocol](locator-resolution-protocol.md)` ANTES de escribir los Targets (identidad ≠ capacidad; conteo de nodos = 1; candar con test unitario).
+- Resolución verificada: aplicar el protocolo de `[[calidad-mobile-locator-resolution]]` ANTES de escribir los Targets (identidad ≠ capacidad; conteo de nodos = 1; candar con test unitario).
 - Si `auto-discovery`: el agente recorre la app vía APK + emulador + Appium server (paso 4 del workflow) y persiste resultados en `.evidence/locators-discovered.json` con score de confianza por locator. Aplica `[[calidad-appium-apk-auto-discovery]]`.
 - Si `deferred`: cada Page Object queda con `// TODO: update real locator`. El usuario completa después con `[[calidad-complete-deferred-locators]]` usando Appium Inspector.
 

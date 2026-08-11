@@ -4,7 +4,7 @@ version: 1.2.0
 scope: stack
 type: workflow
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Flujo completo para generar un proyecto Appium V2 Android con Screenplay + Serenity + Cucumber listo para ejecutarse.
 tags: [appium, mobile, android, screenplay, workflow, greenfield]
 ---
@@ -36,7 +36,7 @@ Cuando `[[calidad-intent-detection]]` identifica un escenario greenfield para Ap
 Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`, incluido el SUT readiness gate (`[[calidad-sut-readiness-gate]]`). Sin APK real, dos caminos:
 
 - **Oficial**: scaffold + deferred locators desde el `locator_map`, modo `scaffold-only`, ejecución diferida a `[[calidad-complete-deferred-locators]]`.
-- **Opt-in — app prototype**: ANTES de ofrecerlo, **preguntar con qué tecnología se construirá la app real** (Flutter / nativa Android / React Native / sin definir) — el prototipo se construye con la MISMA tecnología declarada; una distinta valida en falso, y sin definición no hay prototipo fiel posible (camino oficial). Con tecnología declarada, ofrecer (nunca ejecutar por defecto) generar la app descartable desde Figma + locator map y correr la suite en emulador contra ella. Requiere elección explícita del usuario, el SDK correspondiente (verificar en el preflight del paso 1 cuando esta opción esté en juego) y `locator_map` con la convención de esa tecnología. Advertencia obligatoria al ofrecer: valida la mecánica de la suite, no la app del producto. El caso Flutter (receta completa, `semantics_identifier` → `AppiumBy.id`) en [[calidad-appium-screenplay-android]] (consultar `references/flutter-apps-and-prototype.md` en su subfolder); si la app real será Flutter, el mapa y los Targets usan `semantics_identifier` desde el diseño, haya o no prototipo.
+- **Opt-in — app prototype**: ANTES de ofrecerlo, **preguntar con qué tecnología se construirá la app real** (Flutter / nativa Android / React Native / sin definir) — el prototipo se construye con la MISMA tecnología declarada; una distinta valida en falso, y sin definición no hay prototipo fiel posible (camino oficial). Con tecnología declarada, ofrecer (nunca ejecutar por defecto) generar la app descartable desde Figma + locator map y correr la suite en emulador contra ella. Requiere elección explícita del usuario, el SDK correspondiente (verificar en el preflight del paso 1 cuando esta opción esté en juego) y `locator_map` con la convención de esa tecnología. Advertencia obligatoria al ofrecer: valida la mecánica de la suite, no la app del producto. El caso Flutter (receta completa, `semantics_identifier` → `AppiumBy.id`) en [[calidad-appium-screenplay-android]] (consultar [[calidad-mobile-locator-resolution]] (`references/flutter-under-appium.md`) en su subfolder); si la app real será Flutter, el mapa y los Targets usan `semantics_identifier` desde el diseño, haya o no prototipo.
 
 Mock de backend (`[[calidad-service-virtualization-mockoon]]`): con APK real que permite override de base URL, o embebido en el prototipo vía `--dart-define=BASE_URL=http://10.0.2.2:3010/api`.
 

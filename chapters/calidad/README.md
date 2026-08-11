@@ -4,15 +4,16 @@
 
 El Chapter Calidad de Pragma agrupa el conocimiento accionable para **QA automation para cualquier sistema bajo prueba — APIs, web, mobile, performance — sin presunción de sector o región**. Capacidades específicas (compliance, anonimización, mobile clouds) se activan según el contexto del cliente, no por defecto. Los assets de este chapter están diseñados para alimentar agentes que generan, extienden y operan suites de pruebas reales en producción.
 
-Cubre cinco stacks de automatización:
+Cubre seis stacks de automatización:
 
 - **Karate** — API testing (REST/SOAP) sobre OpenAPI/Swagger/WSDL.
 - **Playwright** — E2E web testing y accesibilidad.
 - **K6** — Performance testing.
-- **Appium** (JVM) — Mobile testing con Screenplay + Serenity + Cucumber sobre Gradle.
-- **Appium WebdriverIO** — Mobile testing multi-plataforma en TypeScript con cucumber-js: Android, iOS, tablets y navegador móvil, en local y en device farm.
+- **Appium Serenity** (`appium-serenity`) — Mobile sobre JVM: Serenity + Cucumber sobre Gradle, en patrón Screenplay o Page Object Model.
+- **Appium WebdriverIO** (`appium-wdio`) — Mobile multi-plataforma en TypeScript con cucumber-js: Android, iOS, tablets y navegador móvil, en local y en device farm.
+- **Appium Core** (`appium-core`) — El conocimiento mobile que **no depende del lenguaje**: resolución de locators, comportamiento de apps Flutter bajo Appium, catálogo de interacciones y auto-discovery de locators desde el binario.
 
-Los dos stacks Appium comparten el servidor Appium y difieren en todo lo demás. La elección la determina el ecosistema del equipo, nunca la preferencia del agente: ver la desambiguación en `[[calidad-intent-detection]]`.
+`appium-core` no es un stack que se elija: **acompaña** a cualquiera de los dos de producto y se instala aparte. Entre `appium-serenity` y `appium-wdio` decide el ecosistema del equipo, nunca la preferencia del agente: ver la desambiguación en `[[calidad-intent-detection]]`.
 
 Y los ejes cross-cutting que aplican a todos los stacks:
 
@@ -124,7 +125,7 @@ chapters/calidad/
 │   │       ├── SKILL.md
 │   │       └── references/{entry-exit-criteria, progress-and-closure-reports, risk-analysis-matrix, test-plan-structure, traceability-rtm}.md
 │   │
-│   ├── appium/
+│   ├── appium-serenity/
 │   │   ├── appium-run-and-tags.md
 │   │   ├── appium-apk-auto-discovery/
 │   │   │   ├── SKILL.md
@@ -178,7 +179,7 @@ chapters/calidad/
 │   │   ├── extend-appium-wdio-brownfield.workflow.md
 │   │   ├── generate-appium-wdio-greenfield.workflow.md
 │   │   └── migrate-selectors-to-testdata.workflow.md
-│   ├── appium/
+│   ├── appium-serenity/
 │   │   ├── complete-deferred-locators.workflow.md
 │   │   ├── extend-appium-brownfield.workflow.md
 │   │   └── generate-appium-screenplay-android.workflow.md
@@ -201,7 +202,7 @@ chapters/calidad/
     │   └── generate-test-plan-document.prompt.md
     ├── appium-wdio/
     │   └── validate-appium-wdio-inputs.prompt.md
-    ├── appium/
+    ├── appium-serenity/
     │   ├── generate-cucumber-feature-android.prompt.md
     │   ├── generate-screenplay-task.prompt.md
     │   └── validate-appium-inputs.prompt.md
@@ -354,7 +355,7 @@ Incluye references para Page Object Model, fixtures, selectores, auth storage st
 
 Arquitectura modular: `scenarios/ + workloads/ + tests/{escenario}/main.js + shared/`. Cinco tipos de script (smoke, load, stress, spike, soak) con `options.scenarios` y executors (`ramping-vus`, `constant-vus`, `ramping-arrival-rate`). Includes references para thresholds en tres tiers con justificación, smoke 1:1 gate, contractual checks desde user story, auth strategy (setup-vs-per-vu), métricas de disponibilidad desde RNF, tag policy + step isolation, sleep policy realista, correlación dinámica de IDs en CRUD, extracción de enums/headers/security, vocabulary mapping (línea-base/carga/estrés vs smoke/load/stress), discovery checklist, preflight, templates y schema de results/metadata.
 
-#### Appium (`skills/appium/`)
+#### Appium Serenity (`skills/appium-serenity/`)
 
 | Asset                                          | Capacidad                                                                                  |
 |------------------------------------------------|--------------------------------------------------------------------------------------------|
@@ -364,6 +365,16 @@ Arquitectura modular: `scenarios/ + workloads/ + tests/{escenario}/main.js + sha
 | `appium-run-and-tags.md`                       | Comandos Gradle, filtros por tags y override de env.                                       |
 
 Incluye references para capas Screenplay, locators diferidos vs auto-discovery (score de confianza por selector), smoke vs proposed scenarios, smoke gate Gradle, matriz de versiones Gradle inmutable, health-check pipeline, accesibilidad móvil, visual regression móvil, reglas anti-colisión de tasks Gradle, y el paquete de robustez mobile endurecido con feedback de campo: protocolo de resolución de locators (identidad ≠ capacidad, con la matriz Flutter verificada), catálogo de interacciones de experto (escritura, OTP, scroll W3C, esperas, recuperación), y protocolo de evidencia y triage (screenshot → page source como árbol → log del mock antes de hipotetizar; checklist anti falsos-verdes de reportería).
+
+#### Appium Core (`skills/appium-core/`)
+
+| Asset | Capacidad |
+|---|---|
+| `mobile-locator-resolution/SKILL.md` | Protocolo de resolución de locators: identidad no es capacidad, conteo de nodos igual a uno, validación por efecto externo. Incluye qué ve Appium en una app Flutter y el race del árbol de semántica. |
+| `mobile-interactions/SKILL.md` | Canon de escritura, campos OTP, gestos W3C, esperas en tres capas, pantallas condicionales y aserciones que verifican el contrato en vez de la mera presencia. |
+| `appium-apk-auto-discovery/SKILL.md` | Descubre locators reales recorriendo el binario: bootstrap de emulador, view hierarchy vía la API REST del inspector, extracción con score de confianza y cleanup. Alternativa a los locators diferidos cuando no hay mapa de identificadores. |
+
+Es el conocimiento mobile **agnóstico del lenguaje**: opera contra el servidor Appium y el árbol de accesibilidad del dispositivo, no contra el cliente. Los stacks de producto aportan la sintaxis; cada SKILL trae su tabla de equivalencias Java y TypeScript. Vive aparte precisamente para que no se duplique entre `appium-serenity` y `appium-wdio` —el patrón que ya nos costó una divergencia— y para que un cliente de Karate no lo reciba sin necesitarlo.
 
 #### Appium WebdriverIO (`skills/appium-wdio/`)
 
@@ -391,9 +402,9 @@ La capa Cucumber de este stack —catálogo de steps, sufijo de plataforma, tagg
 | K6 greenfield                          | `workflows/k6/generate-k6-suite.workflow.md`                                           |
 | K6 brownfield                          | `workflows/k6/extend-k6-brownfield.workflow.md`                                        |
 | K6 calibración                         | `workflows/k6/calibrate-k6-thresholds.workflow.md`                                     |
-| Appium greenfield                      | `workflows/appium/generate-appium-screenplay-android.workflow.md`                      |
-| Appium brownfield                      | `workflows/appium/extend-appium-brownfield.workflow.md`                                |
-| Appium locators                        | `workflows/appium/complete-deferred-locators.workflow.md`                              |
+| Appium JVM greenfield                      | `workflows/appium-serenity/generate-appium-screenplay-android.workflow.md`                      |
+| Appium JVM brownfield                      | `workflows/appium-serenity/extend-appium-brownfield.workflow.md`                                |
+| Appium JVM locators                        | `workflows/appium-serenity/complete-deferred-locators.workflow.md`                              |
 | Appium WebdriverIO greenfield          | `workflows/appium-wdio/generate-appium-wdio-greenfield.workflow.md`                    |
 | Appium WebdriverIO brownfield          | `workflows/appium-wdio/extend-appium-wdio-brownfield.workflow.md`                      |
 | Appium WebdriverIO — migrar selectores | `workflows/appium-wdio/migrate-selectors-to-testdata.workflow.md`                      |
@@ -427,7 +438,8 @@ pragma-ai init --ide kiro --chapter calidad --stack karate     # API testing
 pragma-ai init --ide kiro --chapter calidad --stack playwright # E2E web
 pragma-ai init --ide kiro --chapter calidad --stack k6         # performance
 pragma-ai init --ide kiro --chapter calidad --stack appium     # mobile Android
-pragma-ai init --ide kiro --chapter calidad --stack appium-wdio # mobile multi-plataforma en TypeScript (WebdriverIO + cucumber-js)
+pragma-ai init --ide kiro --chapter calidad --stack appium-wdio  # mobile TypeScript (WebdriverIO + cucumber-js)
+pragma-ai init --ide kiro --chapter calidad --stack appium-core  # compañero obligatorio de cualquier stack mobile
 
 # 3. Verificar instalación
 pragma-ai status
@@ -439,7 +451,7 @@ pragma-ai update              # aplicar
 
 `init` crea `pragma.yaml` en la raíz del proyecto, descarga los assets del chapter Calidad para el stack indicado (más todos los skills cross-cutting de `_all/`) en el path nativo del IDE, agrega `.pragma/` al `.gitignore` e instala los hooks para telemetría. Detalle completo de la CLI en el manual de `pragma-ai`.
 
-**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium`, `appium-wdio`. El trabajo **funcional** (análisis/refinamiento de HUs, diseño de casos, estrategia, planes, integración ALM) y las **convenciones Cucumber** no son stacks: son cross-cutting y llegan con cualquier `init`, sin pedirlos. Si la suite combina varios frameworks (APIs + UI + mobile en el mismo repositorio), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos de cada stack se suman sin conflicto. Un repositorio híbrido web y mobile necesita los dos stacks correspondientes, no uno.
+**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium-serenity`, `appium-wdio` y `appium-core`. Los dos primeros stacks mobile son de producto y mutuamente excluyentes por proyecto; **`appium-core` acompaña a cualquiera de los dos y se instala aparte** (`init` una vez por stack). El trabajo **funcional** (análisis/refinamiento de HUs, diseño de casos, estrategia, planes, integración ALM) y las **convenciones Cucumber** no son stacks: son cross-cutting y llegan con cualquier `init`, sin pedirlos. Si la suite combina varios frameworks (APIs + UI + mobile en el mismo repositorio), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos de cada stack se suman sin conflicto. Un repositorio híbrido web y mobile necesita los dos stacks correspondientes, no uno.
 
 **Multi-IDE** en el mismo proyecto: repetir `--ide`:
 

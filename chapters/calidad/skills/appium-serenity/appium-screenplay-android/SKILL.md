@@ -4,16 +4,20 @@ version: 1.1.0
 scope: stack
 type: skill
 chapter: calidad
-stack: [appium]
-description: Genera proyecto Appium V2 Android con Screenplay + Serenity + Cucumber listo para ejecutarse de primera.
-tags: [appium, mobile, android, screenplay, serenity, cucumber, gradle]
+stack: [appium-serenity]
+description: Genera proyecto Appium Android sobre JVM con Serenity + Cucumber, en patrón Screenplay (por defecto) o Page Object Model, listo para ejecutarse de primera.
+tags: [appium, mobile, android, screenplay, pom, serenity, cucumber, gradle, jvm]
 ---
 
 # Appium Screenplay Android
 
 ## Cuándo aplicar
 
-Cuando el usuario solicita generar un proyecto greenfield de pruebas mobile en Appium V2 sobre Android, usando el patrón Screenplay con Serenity BDD y Cucumber sobre Gradle. **El scaffolder V2 solo genera proyectos Android**: si el `platform_name` indica iOS, este skill rechaza la solicitud. Esto es una **limitación del auto-generador**, no del Chapter — Pragma's Chapter Calidad sí soporta Appium iOS mediante scaffold manual con el mismo patrón Screenplay. Ver la separación completa entre alcance del scaffolder y capacidad del chapter en `references/android-only-scope-rationale.md`.
+Cuando el usuario solicita generar un proyecto greenfield de pruebas mobile en Appium sobre **JVM**: Serenity BDD y Cucumber sobre Gradle.
+
+**Patrón de diseño**: el stack soporta **Screenplay** (por defecto del chapter) y **Page Object Model**. Se pregunta al usuario cuál usar cuando no lo declara, y en brownfield **manda el patrón que el proyecto ya usa** — introducir Screenplay en un proyecto POM, o al revés, produce dos modelos conviviendo y es motivo de rechazo en revisión. Las capas de Screenplay están en `references/screenplay-layers.md`; con POM, la capa de objetos de pantalla cumple el mismo rol y el resto del scaffold (Gradle, runner, reportería, tags) es idéntico.
+
+**Este stack requiere `appium-core` instalado**: el conocimiento mobile que no depende del lenguaje —resolución de locators, comportamiento de Flutter, catálogo de interacciones, auto-discovery de APK— vive ahí y no se duplica aquí. Si no está, decláralo como carencia: sin el protocolo de locators se generan selectores plausibles en vez de verificados. **El scaffolder V2 solo genera proyectos Android**: si el `platform_name` indica iOS, este skill rechaza la solicitud. Esto es una **limitación del auto-generador**, no del Chapter — Pragma's Chapter Calidad sí soporta Appium iOS mediante scaffold manual con el mismo patrón Screenplay. Ver la separación completa entre alcance del scaffolder y capacidad del chapter en `references/android-only-scope-rationale.md`.
 
 Para extender un proyecto Appium existente (Android **o** iOS), usar `[[calidad-appium-brownfield]]`.
 
@@ -27,10 +31,10 @@ Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `ref
 |---|---|
 | `references/gradle-version-matrix.md` | Versiones y scopes (fuente de verdad sobre los templates) |
 | `references/templates.md` | Contenido textual de build.gradle, serenity.conf, Hooks, runner, junit-platform.properties |
-| `references/locator-resolution-protocol.md` | Cómo resolver locators ANTES de escribir Targets |
-| `references/mobile-interactions-catalog.md` | Escritura, taps, scroll, esperas, recuperación |
+| [[calidad-mobile-locator-resolution]] | Cómo resolver locators ANTES de escribir Targets (stack `appium-core`) |
+| [[calidad-mobile-interactions]] | Escritura, taps, scroll, esperas, recuperación (stack `appium-core`) |
 | `references/mobile-evidence-and-triage.md` | Instrumentación previa y orden de triage |
-| `references/flutter-apps-and-prototype.md` | Solo si la app es Flutter o hay prototipo |
+| [[calidad-mobile-locator-resolution]] (`references/flutter-under-appium.md`) | Solo si la app es Flutter o hay prototipo |
 
 Ignorar esta lectura es la causa raíz verificada de una PoC completa: el agente redescubrió por ensayo y error —y reportó como defectos del chapter— cosas ya escritas en estas references, incluida una que su propio insumo le daba resuelta.
 
@@ -49,9 +53,9 @@ Ignorar esta lectura es la causa raíz verificada de una PoC completa: el agente
 
 1. **Validar inputs** — Aplica las 5 reglas de ``references/mandatory-inputs-validation.md``. Rechaza con mensaje exacto si falla. Coerciona "true"/"si"/"sí"/"yes"/"1" a booleano para `include_login_case`.
 2. **Extraer metadata** — Normaliza defaults Android: `appium_server_url=http://127.0.0.1:4723`, `device_name=Android Emulator`, `automation_name=UiAutomator2`, `platform_version=12.0`, Java 21. Si falta `app_package`/`app_activity`, usa `com.example.app` / `.MainActivity` y deja TODO en el README con el comando `aapt dump badging`.
-3. **Extraer selector templates** — Solo si el input `selectors` viene provisto. Mapea a `AppiumBy.xpath`, `AppiumBy.accessibilityId`, `androidUIAutomator` o `AppiumBy.id` **aplicando el protocolo de resolución de `references/locator-resolution-protocol.md`** (en apps Flutter, `AppiumBy.id` NO resuelve `Semantics(identifier:)` — verificado en campo). Si no viene, sigue el patrón diferido de ``references/deferred-locators-strategy.md``.
+3. **Extraer selector templates** — Solo si el input `selectors` viene provisto. Mapea a `AppiumBy.xpath`, `AppiumBy.accessibilityId`, `androidUIAutomator` o `AppiumBy.id` **aplicando el protocolo de resolución de [[calidad-mobile-locator-resolution]]** (en apps Flutter, `AppiumBy.id` NO resuelve `Semantics(identifier:)` — verificado en campo). Si no viene, sigue el patrón diferido de ``references/deferred-locators-strategy.md``.
 4. **Generar Gradle scaffold** — Crea `build.gradle`, `settings.gradle`, wrapper (`gradlew`, `gradlew.bat`, `gradle-wrapper.properties`) usando las versiones inmutables de ``references/gradle-version-matrix.md``. Respeta las reglas de scope (Serenity/Appium en `implementation`, Cucumber/JUnit en `testImplementation`, Lombok en `compileOnly` + `annotationProcessor`).
-5. **Generar capa Screenplay** — Crea las 4 capas (Task, Question, Interaction, UserInterface) bajo `co.com.pragma.*` siguiendo ``references/screenplay-layers.md`` y el repertorio de ``references/mobile-interactions-catalog.md`` (canon de escritura Click→Enter→HideKeyboard, esperas por presencia de ancla, Check.whether para condicionales). Incluye `LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` con locators diferidos marcados `// TODO: update real locator`.
+5. **Generar capa Screenplay** — Crea las 4 capas (Task, Question, Interaction, UserInterface) bajo `co.com.pragma.*` siguiendo ``references/screenplay-layers.md`` y el repertorio de `[[calidad-mobile-interactions]]` (canon de escritura Click→Enter→HideKeyboard, esperas por presencia de ancla, Check.whether para condicionales). Incluye `LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` con locators diferidos marcados `// TODO: update real locator`.
 6. **Generar escenarios** — Siempre 2 escenarios `@android @smoke` ejecutables (login base + carga/DOM). Si los inputs traen `user_story` o `test_cases`, agrega escenarios `@android @proposed` aspiracionales (opt-in). Aplica ``references/smoke-vs-proposed-scenarios.md`` y ``references/gherkin-syntax-rules.md``.
 7. **Ejecutar health-check** — Aplica las 14 stages estáticas + el pipeline de compilación Gradle (`clean → compileJava → testClasses`, 300s timeout). Calcula `generation_status` según ``references/health-check-pipeline.md``.
 8. **Construir run command** — `./gradlew clean test aggregate -p <project_path>`; documenta filtros por tag y override de `-Denv=staging` (ver `[[calidad-appium-run-and-tags]]`).
@@ -112,6 +116,6 @@ Estructura completa Gradle + Screenplay en ``references/project-structure.md``. 
 - **`junit-platform.properties` obligatorio** en `src/test/resources/` con `cucumber.glue`, `cucumber.plugin` (con `io.cucumber.core.plugin.SerenityReporter` en PRIMERA posición — sin él los pasos "pasan" sin ejecutarse) y `cucumber.junit-platform.naming-strategy=long`. **PROHIBIDO `cucumber.features`** (anula los selectores del `@Suite` y el filtro de tags — el smoke gate dejaría de existir). Ver ``references/templates.md` (sección `junit-platform.properties`)`.
 - **Runner ÚNICO `SuiteRunner`** (`co.com.pragma.runners.SuiteRunner`) con `@Suite + @IncludeEngines("cucumber") + @SelectClasspathResource("features")` y **sin** `FILTER_TAGS_PROPERTY_NAME`: un tag fijo en el runner sobreescribe el de la CLI. Prohibido crear runners adicionales. Ver ``references/templates.md` (sección `SuiteRunner.java`)`.
 - **Step isolation obligatorio** cuando el escenario tiene setup/auth/main/cleanup: Tasks separadas para Setup vs Main; Questions de dominio (contractuales) evaluadas SOLO en main; cleanup en `@After` con falla no-fatal. La cobertura sólo cuenta escenarios `@main-step`. Detalle en `references/step-isolation-appium.md`.
-- **Questions contractuales obligatorias** para validar datos del dominio: regla "no sólo `displayed()`" — usar Questions que devuelvan valores específicos (`rowCount`, `firstRowAmountText`, `paginationText`) comparados con matchers explícitos. Detalle, tabla por tipo de pantalla y anti-patterns en `references/contractual-questions.md`.
+- **Questions contractuales obligatorias** para validar datos del dominio: regla "no sólo `displayed()`" — usar Questions que devuelvan valores específicos (`rowCount`, `firstRowAmountText`, `paginationText`) comparados con matchers explícitos. Detalle, tabla por tipo de pantalla y anti-patterns en [[calidad-mobile-interactions]] (`references/contractual-assertions.md`).
 - Aplica `[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]` y `[[calidad-delivery-gate-contract]]` para declarar/verificar la matriz de versiones y la presencia del wrapper antes de cerrar la entrega.
 - Entrega los archivos usando `[[calidad-streaming-files-protocol]]`.

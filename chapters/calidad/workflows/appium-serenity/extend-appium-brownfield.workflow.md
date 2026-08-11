@@ -4,7 +4,7 @@ version: 1.0.0
 scope: stack
 type: workflow
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Flujo para extender un proyecto Appium existente (Android o iOS) con nuevos escenarios, pages o selector updates respetando convenciones detectadas.
 tags: [appium, brownfield, workflow, mobile, screenplay, conventions]
 ---
@@ -34,7 +34,7 @@ Esta regla es non-negotiable y es enforcement obligatorio del `[[calidad-test-se
 
 Refuerzos adicionales:
 - **Step isolation** (ver `[[calidad-step-isolation-pattern]]`) aplica a las Tasks/Questions/Interactions y `.feature` NUEVOS. Los archivos preexistentes mantienen su estructura aunque no cumplan el patrón; no se les aplica refactor.
-- **Validación contractual no superficial** según [[calidad-appium-screenplay-android]] (consultar `references/contractual-questions.md`) aplica solo a Questions/scenarios nuevos. NO re-escribir aserciones de Questions preexistentes.
+- **Validación contractual no superficial** según [[calidad-appium-screenplay-android]] (consultar [[calidad-mobile-interactions]] (`references/contractual-assertions.md`)) aplica solo a Questions/scenarios nuevos. NO re-escribir aserciones de Questions preexistentes.
 - **Auto-discovery APK**: si el proyecto preexistente ya tiene Page Objects (UserInterfaces) con selectores reales, NO re-correr auto-discovery sobre el APK ni reemplazar selectores existentes. Auto-discovery aplica únicamente a los UserInterfaces NUEVOS generados en esta sesión.
 
 ### Paso previo — Análisis condicional con STRATEGY.md

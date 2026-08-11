@@ -35,6 +35,8 @@ El conocimiento técnico del stack vive en el bundle **greenfield**; brownfield 
 | `[[calidad-appium-wdio-greenfield]]` (`references/hybrid-web-native-context.md`) | Contextos y diálogos del sistema, si la historia toca webviews |
 | `[[calidad-appium-wdio-greenfield]]` (`references/selectors-in-testdata-json.md`) | Dónde van los selectores y cómo se resuelven las plataformas derivadas |
 | `[[calidad-appium-wdio-greenfield]]` (`references/troubleshooting-mobile-wdio.md`) | Fallos conocidos antes de diagnosticar desde cero |
+| `[[calidad-mobile-locator-resolution]]` | Resolver locators antes de tocar uno (stack `appium-core`) |
+| `[[calidad-mobile-interactions]]` | Repertorio de interacción y aserciones (stack `appium-core`) |
 | `[[calidad-cucumber-bdd-conventions]]` | Catálogo de steps, sufijo de plataforma, tagging, propiedades verificables |
 | `references/convention-detection.md` | Qué detectar del proyecto y en qué orden (propio de este skill) |
 | `references/selector-update-strategy.md` | Cómo actualizar selectores sin tocar lógica (propio de este skill) |

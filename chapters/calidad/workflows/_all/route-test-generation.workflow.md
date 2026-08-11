@@ -123,13 +123,13 @@ Transfiere el control al workflow concreto según el resultado de los pasos 2 y 
 | Playwright brownfield       | `[[calidad-update-playwright-brownfield]]`            |
 | K6 greenfield               | `[[calidad-generate-k6-suite]]`                       |
 | K6 brownfield               | `[[calidad-extend-k6-brownfield]]`                    |
-| Appium JVM greenfield (Android, V2)   | `[[calidad-generate-appium-screenplay-android]]`    |
+| Appium JVM greenfield (Android)       | `[[calidad-generate-appium-screenplay-android]]`    |
 | Appium JVM brownfield (Android / iOS) | `[[calidad-extend-appium-brownfield]]`              |
 | Appium TypeScript greenfield          | `[[calidad-generate-appium-wdio-greenfield]]`       |
 | Appium TypeScript brownfield          | `[[calidad-extend-appium-wdio-brownfield]]`         |
 | Migrar selectores hardcodeados a test-data (TypeScript) | `[[calidad-migrate-selectors-to-testdata]]` |
 
-> **Nota mobile — dos stacks Appium.** El chapter soporta Appium sobre JVM (Java, Screenplay, Serenity, Gradle) y sobre TypeScript (WebdriverIO, cucumber-js). Comparten el servidor Appium y difieren en todo lo demás. La elección la determina el ecosistema del equipo o el proyecto existente, nunca la preferencia del agente: ver la tabla de desambiguación en `[[calidad-intent-detection]]` y, ante greenfield sin señales, **preguntar**.
+> **Nota mobile — dos stacks de producto y un core compartido.** El chapter soporta Appium sobre JVM (`appium-serenity`: Serenity y Gradle, con Screenplay o POM) y sobre TypeScript (`appium-wdio`: WebdriverIO y cucumber-js). Ambos requieren **`appium-core`**, que aporta lo que no depende del lenguaje: resolución de locators, comportamiento de Flutter, catálogo de interacciones y auto-discovery de binario. `appium-core` no se elige: acompaña. Los dos stacks de producto difieren en todo lo demás. La elección la determina el ecosistema del equipo o el proyecto existente, nunca la preferencia del agente: ver la tabla de desambiguación en `[[calidad-intent-detection]]` y, ante greenfield sin señales, **preguntar**.
 >
 > **Nota iOS.** El único alcance Android es el del *scaffolder* greenfield JVM; para greenfield iOS en JVM se aplica el scaffold manual de `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`. El stack TypeScript genera iOS de forma nativa y el brownfield de ambos stacks soporta Android e iOS. iOS exige entorno macOS: si no está disponible, se entrega lo generado y se reporta `partial`, nunca se degrada a Android en silencio.
 >

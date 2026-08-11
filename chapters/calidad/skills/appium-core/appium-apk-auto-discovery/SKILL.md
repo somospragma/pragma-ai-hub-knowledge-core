@@ -4,7 +4,7 @@ version: 1.1.0
 scope: stack
 type: skill
 chapter: calidad
-stack: [appium]
+stack: [appium-core]
 enforcement: mandatory
 description: "Auto-descubre selectores reales recorriendo una app Android desde su APK: arranca emulador/device, instala APK, captura view hierarchy con Appium Inspector REST API, extrae selectores reales (resource-id > content-desc > xpath) y los inyecta en los Page Objects en vez de TODOs."
 tags: [appium, mobile, android, apk, auto-discovery, view-hierarchy, selector-extraction, runtime]
@@ -39,7 +39,7 @@ Invocado desde `[[calidad-generate-appium-screenplay-android]]` en su paso (desp
 8. **Generar Page Objects** con selectores reales (no TODOs). Persistir `.evidence/locators-discovered.json` con pantalla, selector elegido, alternativas descartadas, score. Cleanup según `references/safety-and-cleanup.md`.
 
 
-**Verificación obligatoria de cada locator descubierto** (`[[calidad-appium-screenplay-android]]`, consultar `references/locator-resolution-protocol.md`): un identificador encontrado en la jerarquía da **identidad, no capacidad**. Antes de fijarlo en un Page Object: contar cuántos nodos resuelve (**único válido = 1**), identificar el nodo realmente capaz (el contenedor del identificador suele no ser clickeable ni editable) y validar por **efecto externo** (la interacción produce navegación o una petición al backend). Un locator "descubierto" que nunca se ejerció es una hipótesis, no un hallazgo.
+**Verificación obligatoria de cada locator descubierto** (`[[calidad-appium-screenplay-android]]`, consultar [[calidad-mobile-locator-resolution]]): un identificador encontrado en la jerarquía da **identidad, no capacidad**. Antes de fijarlo en un Page Object: contar cuántos nodos resuelve (**único válido = 1**), identificar el nodo realmente capaz (el contenedor del identificador suele no ser clickeable ni editable) y validar por **efecto externo** (la interacción produce navegación o una petición al backend). Un locator "descubierto" que nunca se ejerció es una hipótesis, no un hallazgo.
 
 ## Restricciones
 

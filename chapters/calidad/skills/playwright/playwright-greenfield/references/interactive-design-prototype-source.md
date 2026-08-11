@@ -35,4 +35,4 @@ En campo, un prototipo interactivo entregado como insumo contenía la respuesta 
 
 ## Cross-links
 
-`ui-source-priority.md` (dónde encaja en el orden de fuentes), `front-prototype-recipe.md`, `[[calidad-playwright-from-live-app]]`, `[[calidad-ui-locator-map-contract]]`, `[[calidad-appium-screenplay-android]]` (consultar `references/flutter-apps-and-prototype.md` para el gate de aceptación del prototipo mobile).
+`ui-source-priority.md` (dónde encaja en el orden de fuentes), `front-prototype-recipe.md`, `[[calidad-playwright-from-live-app]]`, `[[calidad-ui-locator-map-contract]]`, `[[calidad-appium-screenplay-android]]` (consultar [[calidad-mobile-locator-resolution]] (`references/flutter-under-appium.md`) para el gate de aceptación del prototipo mobile).

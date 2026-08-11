@@ -4,7 +4,7 @@ version: 1.0.0
 scope: stack
 type: prompt
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Prompt para generar login.feature con 2 escenarios @smoke ejecutables + @proposed aspiracionales derivados de user_story/test_cases.
 tags: [appium, cucumber, gherkin, feature, prompt, smoke, proposed]
 ---

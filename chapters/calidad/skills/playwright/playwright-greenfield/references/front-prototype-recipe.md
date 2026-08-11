@@ -15,7 +15,7 @@ Preguntar SIEMPRE antes de generar — la tecnología del prototipo la dicta el 
 
 **Caso Flutter Web** — lo que cambia respecto a esta receta:
 
-- El prototipo es la app Flutter (si el producto es multiplataforma, **el mismo prototipo del stack Appium sirve**: `flutter build web` — ver [[calidad-appium-screenplay-android]], `references/flutter-apps-and-prototype.md`, incluido su contrato de fidelidad y gate de paridad).
+- El prototipo es la app Flutter (si el producto es multiplataforma, **el mismo prototipo del stack Appium sirve**: `flutter build web` — ver [[calidad-appium-screenplay-android]], [[calidad-mobile-locator-resolution]] (`references/flutter-under-appium.md`), incluido su contrato de fidelidad y gate de paridad).
 - **Arranque**: el árbol de accesibilidad se construye cuando la app lo publica; la suite debe ejecutar la secuencia de activación ANTES de localizar nada (navegar con `domcontentloaded`, esperar el botón de activación adjunto al documento, activarlo por despacho de evento, esperar los nodos semánticos). El prototipo debe ofrecer el mismo punto de activación que la app real (o habilitar semántica permanente en AMBAS, jamás solo en el prototipo).
 - **Selectores**: `flt-semantics[role="button"]:has-text("...")`, `[aria-label="..."]` — NO `data-testid`. Los campos con `explicitChildNodes: true` producen `<input>` reales (localizables como input); sin él no hay elemento de formulario. La columna `web` del locator map usa esta convención (aria-label/rol/texto del catálogo).
 - **Textos = contrato**: los selectores buscan por texto visible; el catálogo de traducciones es el catálogo de selectores (paridad carácter a carácter, ambos idiomas, labels por defecto en inglés sin traducir).

@@ -40,7 +40,17 @@ Este SKILL es el índice. El detalle que hace que el proyecto arranque de primer
 | `references/i18n-locale-injection.md` | Idioma y región como dimensión de prueba |
 | `references/troubleshooting-mobile-wdio.md` | Fallos conocidos con causa y solución verificadas |
 
-Las convenciones de la capa Cucumber —catálogo de steps, sufijo de plataforma, tagging, propiedades verificables— son transversales y viven en `[[calidad-cucumber-bdd-conventions]]`. Este skill no las duplica: las consume.
+**El conocimiento mobile que no depende del lenguaje vive en el stack `appium-core`** y se instala aparte. Este skill no lo duplica: lo consume.
+
+| Bundle de `appium-core` | Para qué |
+|---|---|
+| `[[calidad-mobile-locator-resolution]]` | Resolver locators contra la jerarquía real: identidad no es capacidad, conteo de nodos igual a uno, validación por efecto externo, y qué ve Appium en una app Flutter |
+| `[[calidad-mobile-interactions]]` | Canon de escritura, campos OTP, gestos W3C, esperas en tres capas, pantallas condicionales y aserciones que verifican el contrato |
+| `[[calidad-appium-apk-auto-discovery]]` | Descubrir locators reales recorriendo el binario cuando no hay mapa de identificadores |
+
+Si el proyecto no tiene `appium-core` instalado, decláralo como carencia al usuario: sin el protocolo de locators, la generación produce selectores plausibles en vez de verificados.
+
+Las convenciones de la capa Cucumber —catálogo de steps, sufijo de plataforma, tagging, propiedades verificables— son transversales y viven en `[[calidad-cucumber-bdd-conventions]]`. Este skill tampoco las duplica.
 
 ## Reglas duras
 

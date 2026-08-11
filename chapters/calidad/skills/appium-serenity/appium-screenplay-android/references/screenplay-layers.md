@@ -142,4 +142,4 @@ public final class AppiumDriverOf {
 - Helper de driver que devuelve `null` y cae a un fallback silencioso: la interacción "corre" sin ejecutarse y el triage itera a ciegas.
 - `getDomAttribute(...)` sobre elementos Appium: el método correcto es `getAttribute(...)`.
 
-El repertorio completo de interacciones robustas (escritura, OTP, scroll, esperas, recuperación) está en `[mobile-interactions-catalog](mobile-interactions-catalog.md)`.
+El repertorio completo de interacciones robustas (escritura, OTP, scroll, esperas, recuperación) está en `[[calidad-mobile-interactions]]`.

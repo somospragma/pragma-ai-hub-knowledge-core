@@ -4,7 +4,7 @@ version: 1.0.0
 scope: stack
 type: prompt
 chapter: calidad
-stack: [appium]
+stack: [appium-serenity]
 description: Prompt para aplicar las 5 reglas de validación de inputs Appium y emitir un JSON con is_valid, errores y valores coercionados.
 tags: [appium, inputs, validation, prompt, json]
 ---

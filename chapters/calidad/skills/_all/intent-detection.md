@@ -33,16 +33,18 @@ Esta skill decide **con qué framework** se generan las pruebas. La decisión de
 | Karate     | "pruebas funcionales", "API testing", "REST", "SOAP", "OpenAPI", "Swagger", "WSDL", "contract testing", "Karate"       | "proyecto existente", "agregar tests", "integrar", "ya tenemos"   | greenfield → `[[calidad-karate-greenfield]]` · brownfield → `[[calidad-karate-brownfield]]` |
 | K6         | "performance", "carga", "load", "stress", "spike", "soak", "K6", "VUs", "latencia", "throughput", "p95", "p99"          | (no se trata brownfield)                                          | `[[calidad-k6-greenfield]]`                                                     |
 | Playwright | "web", "browser", "E2E", "UI", "frontend", "Playwright", "page object", "visual", "accessibility", "regresión visual" | "proyecto existente", "actualizar selectores", "ya hay tests web" | greenfield → `[[calidad-playwright-greenfield]]` · brownfield → `[[calidad-playwright-brownfield]]` |
-| Appium (JVM) | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity", "Serenity", "Gradle" | "proyecto existente", "agregar escenarios", "ya tenemos suite mobile" | greenfield → `[[calidad-appium-screenplay-android]]` · brownfield → `[[calidad-appium-brownfield]]` |
-| Appium (TypeScript) | "mobile" + "TypeScript"/"WebdriverIO"/"WDIO"/"cucumber-js"/"Node", "iPad", "tablet", "web móvil", "app y navegador móvil" | "proyecto existente", "actualizar selectores", "agregar plataforma" | greenfield → `[[calidad-appium-wdio-greenfield]]` · brownfield → `[[calidad-appium-wdio-brownfield]]` |
+| Appium JVM (`appium-serenity`) | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity", "Serenity", "Gradle" | "proyecto existente", "agregar escenarios", "ya tenemos suite mobile" | greenfield → `[[calidad-appium-screenplay-android]]` · brownfield → `[[calidad-appium-brownfield]]` |
+| Appium TypeScript (`appium-wdio`) | "mobile" + "TypeScript"/"WebdriverIO"/"WDIO"/"cucumber-js"/"Node", "iPad", "tablet", "web móvil", "app y navegador móvil" | "proyecto existente", "actualizar selectores", "agregar plataforma" | greenfield → `[[calidad-appium-wdio-greenfield]]` · brownfield → `[[calidad-appium-wdio-brownfield]]` |
 | Funcional  | "analizar historia", "HU", "INVEST", "criterios de aceptación", "refinamiento", "refinar", "casos de prueba" (diseño, no código), "test cases", "test plan", "plan de pruebas", "estrategia de pruebas", "matriz de trazabilidad", "Azure DevOps"/"Jira" como fuente de HUs | (no aplica greenfield/brownfield)                                 | análisis/refinamiento → `[[calidad-analyze-and-refine-stories]]` · diseño de casos → `[[calidad-design-test-cases]]` · estrategia/plan → `[[calidad-build-test-strategy-and-plan]]` |
+
+**Todo intent mobile requiere `appium-core`**, sea cual sea el stack de producto: ahí vive el conocimiento que no depende del lenguaje (resolución de locators, Flutter, catálogo de interacciones, auto-discovery de binario). No es un stack que el usuario elija: es el compañero obligatorio. Si no está instalado, decláralo como carencia antes de generar.
 
 **Desambiguación mobile: ¿JVM o TypeScript?** Los dos stacks Appium comparten el servidor Appium y difieren en todo lo demás (lenguaje, cliente, runner, patrón, build). La decisión **no la toma el agente por preferencia**: la determina el ecosistema del equipo y, en brownfield, el proyecto que ya existe.
 
 | Señal | Stack |
 |---|---|
-| `build.gradle` con `appium-java-client`, `pom.xml`, Serenity, Screenplay | Appium JVM |
-| `package.json` con `webdriverio`, `cucumber.config.js`, `.steps.ts`, objetos de pantalla en TypeScript | Appium TypeScript |
+| `build.gradle` con `appium-java-client`, `pom.xml`, Serenity | `appium-serenity` (soporta Screenplay y POM) |
+| `package.json` con `webdriverio`, `cucumber.config.js`, `.steps.ts`, objetos de pantalla en TypeScript | `appium-wdio` |
 | El equipo pide explícitamente Java o TypeScript | Lo pedido |
 | Greenfield sin señal de ecosistema | **Pregunta.** No asumas |
 
