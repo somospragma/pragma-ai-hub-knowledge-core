@@ -149,7 +149,8 @@ If there are no scannable roots, finish with `blocked_input`.
 Search `SCAN_ROOTS` for signals:
 
 1. `pubspec.yaml`
-2. `melos.yaml`
+2. Melos configuration candidates: legacy `melos.yaml`, or a root `pubspec.yaml`
+   with `workspace:` plus a Melos dependency or `melos:` section
 3. executable app signals:
    - `lib/main.dart` or `lib/main_*.dart`
    - platform folders (`android/`, `ios/`) in the app repo
@@ -181,8 +182,8 @@ Apply this strict order:
      package in Melos
    - if it does not pass, block with `BOOTSTRAP_APP_REPO_MISMATCH_HINT`
    - if it passes, set `APP_REPO_ROOT` and do not use another candidate
-2. If `melos.yaml` exists:
-   - `APP_REPO_ROOT` must be the repo where the app project `melos.yaml` lives
+2. If the Melos resolver succeeds for the candidate app package:
+   - `APP_REPO_ROOT` must be the repo where the resolved Melos configuration lives
    - validate that `target_scope` resolves to an app package, not DS/shared
    - if `EXPECTED_APP_PACKAGE` exists and is not present in the Melos app repo,
      block with `BOOTSTRAP_APP_PACKAGE_NOT_FOUND`
@@ -200,8 +201,8 @@ Required veto rules:
 
 ### Phase B4 - Topology Inference
 
-1. `topology.repo_mode=monorepo_melos` when `melos.yaml` and multiple Flutter
-   packages exist.
+1. `topology.repo_mode=monorepo_melos` when the deterministic Melos resolver
+   succeeds and multiple Flutter packages exist.
 2. `repo_mode=single_repo` when there is only an isolated app repo.
 3. `repo_mode=multi_repo` when multiple feature/app repos exist outside Melos.
 
@@ -219,8 +220,8 @@ Root selection rule:
 - `APP_REPO_ROOT` must be the repository for the target app.
 - Do not use a dependency root (DS/core) or the global workspace root as the
   final configuration destination.
-- In `monorepo_melos`, `APP_REPO_ROOT` is the repo containing the app monorepo
-  `melos.yaml`, not an external dependency.
+- In `monorepo_melos`, `APP_REPO_ROOT` is the repo containing the resolved app
+  Melos configuration, not an external dependency.
 
 ### Phase B5 - Bootstrap Spec Packet + Configuration Proposal
 
@@ -273,8 +274,10 @@ Validate:
 
 1. `project.repository_local_path` exists.
 2. Each `targets.registry.*.root` exists.
-3. If a target uses `location_strategy=melos_package`, `repo_root/melos.yaml`
-   and `repo_root/package_path` exist.
+3. If a target uses `location_strategy=melos_package`, run
+   `docs/scripts/melos_workspace.rb resolve` with `repo_root` and
+   `package_path`. Require `ok=true`, then persist `config_source` and
+   `config_path` under `resolved.melos` and `topology.melos`.
 4. Local dependencies use `source=target` and an existing `target_id`.
 5. Writable output folder exists in `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}`.
 6. The generated architecture proposal is parseable YAML.

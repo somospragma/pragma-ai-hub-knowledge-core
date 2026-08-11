@@ -456,7 +456,7 @@ EOF
 dart pub get
 ```
 
-### Adding the package to melos.yaml
+### Adding the package to the root Melos workspace
 
 ```yaml
 # pubspec.yaml (project root) — workspace list
@@ -617,11 +617,11 @@ melos exec --scope=feature_catalog -- "flutter test --coverage"
 □   (monorepo: melos exec --scope={package} -- "flutter test --coverage")
 
 Monorepo only:
-□ New package added to melos.yaml packages glob (if applicable)
+□ New package added to the root `pubspec.yaml` `workspace:` entries (if applicable)
 □ melos bootstrap run after adding new package
 □ Barrel export (lib/{package}.dart) updated with new public API
 □ App's injection_container.dart declares ExternalModule if new package
-□ App's pubspec.yaml declares the new package as a path dependency
+□ App's pubspec.yaml declares the new workspace package with `any`
 ```
 
 ---

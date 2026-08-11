@@ -105,6 +105,10 @@ its generated components but never the packet root, evidence or reports.
 - `project.repository_local_path`: app repo that owns `.sopp/config`.
 - `workspace.roots`: IDE/workspace roots used for discovery.
 - `topology.repo_mode`: `single_repo | monorepo_melos | multi_repo`.
+- `topology.melos`: resolved Melos configuration source, root and manifest when
+  `repo_mode=monorepo_melos`; it distinguishes legacy `melos.yaml` from a
+  modern root `pubspec.yaml` workspace. Bootstrap persists its root and
+  configuration path as absolute paths.
 - `targets.registry`: logical targets (`app`, `design_system`, `core`,
   `project_docs`, `feature_*`) with `kind`, `location_strategy`, `repo_root`,
   `package_path`, `root` and `package_name`.
@@ -159,8 +163,11 @@ Do not validate raw templates with placeholders as final specs.
 
 ## Coherence Rules
 
-1. If a target uses `location_strategy=melos_package`, `melos.yaml` must exist
-   at `repo_root` and the package must exist at `repo_root/package_path`.
+1. If a target uses `location_strategy=melos_package`, resolve it with
+   `docs/scripts/melos_workspace.rb`. The target is valid when it uses either
+   legacy `melos.yaml` or a Melos 7+ root `pubspec.yaml` workspace and the
+   package belongs to that workspace. Persist the resulting `topology.melos`
+   metadata; never require `melos.yaml` by itself.
 2. If `shared_core_mode=external_core_package`,
    `dependencies-contract.yaml.external_dependencies.shared_core.enabled=true`.
 3. Productive paths should point to `lib/src`.

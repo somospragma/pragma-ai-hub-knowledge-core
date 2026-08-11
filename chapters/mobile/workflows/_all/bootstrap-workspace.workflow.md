@@ -146,7 +146,10 @@ Validate:
 4. `project.repository_local_path` exists.
 5. Each `targets.registry.*.root` resolves to an existing directory.
 6. Each Dart/Flutter target declares `pubspec.yaml`.
-7. If a target uses `location_strategy=melos_package`, `repo_root/melos.yaml` and `repo_root/package_path` exist.
+7. If a target uses `location_strategy=melos_package`, run
+   `docs/scripts/melos_workspace.rb resolve` with `repo_root` and
+   `package_path`; require `ok=true` and persist the returned configuration
+   source. Do not require `melos.yaml` by itself.
 8. `app` targets have executable app signals (`lib/main.dart`, `lib/main_*.dart`, `android/`, or `ios/`).
 9. `design_system` targets have Design System signals (`atoms`, `molecules`, `organisms`, or a DS barrel file).
 10. Dependencies with `source=target` reference an existing `target_id` in `project.config.yaml.targets.registry`.

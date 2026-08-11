@@ -127,8 +127,7 @@ my_project/
 │   └── l10n/                      # Localization
 ├── features/                      # (empty, for flutter_clean_feature)
 ├── docs/                          # Project documentation
-├── melos.yaml                     # Monorepo configuration
-└── pubspec.yaml                   # Workspace root
+└── pubspec.yaml                   # Workspace root and Melos 7+ configuration
 ```
 
 Open `apps/my_app/` to start developing.

@@ -1,6 +1,6 @@
 ---
 id: mobile-sdd-spec-validation
-version: 1.3.0
+version: 1.4.0
 scope: chapter
 type: skill
 chapter: mobile
@@ -97,8 +97,9 @@ Minimum checks:
    executable app signals.
 7. Every `targets.registry.*.root` exists and, when it is a Dart/Flutter
    package, contains `pubspec.yaml`.
-8. If a target uses `location_strategy=melos_package`, `repo_root/melos.yaml`
-   and `repo_root/package_path` exist.
+8. If a target uses `location_strategy=melos_package`, run the deterministic
+   Melos resolver. It must return `ok=true`; a legacy `melos.yaml` is accepted,
+   but a modern root `pubspec.yaml` workspace is equally valid.
 9. Every local dependency uses `source=target` and its `target_id` exists in
    `project.config.yaml.targets.registry`.
 10. `validation-report.md` and `drift-analysis.md` exist. Detailed discovery
@@ -110,6 +111,37 @@ Minimum checks:
     `validation` must be `true`: `schema_valid`,
     `app_root_has_executable_signal`, `no_dependency_root_selected`,
     `target_registry_paths_resolved` and `no_contract_drift_detected`.
+
+## Melos Workspace Resolution
+
+Do not use the presence of `melos.yaml` as the Melos criterion. Resolve every
+`location_strategy=melos_package` target with the exported deterministic helper:
+
+```bash
+ruby ../../docs/scripts/melos_workspace.rb resolve \
+  --root "<repo_root>" \
+  --package-path "<package_path>"
+```
+
+The command is local, read-only and returns JSON. A passing result identifies
+`config_source` as either `legacy_yaml` (Melos 6) or `root_pubspec` (Melos 7+),
+and verifies package membership before a workflow proceeds. Persist only the
+compact result fields in the Bootstrap Spec Packet:
+
+```yaml
+resolved:
+  melos:
+    enabled: true
+    root: <repo_root>
+    config_source: root_pubspec
+    config_path: <repo_root>/pubspec.yaml
+```
+
+Map a failing result to `BOOTSTRAP_MELOS_INVALID` and retain its `code` and
+`message` as compact validation evidence. A root `pubspec.yaml` containing only
+`workspace:` is a Dart pub workspace, not proof of Melos; it must also declare
+Melos through `dev_dependencies.melos`, `dependencies.melos`, or a `melos:`
+section. Do not invoke `melos` merely to identify the workspace.
 
 ## Mobile Spec Packet
 

@@ -317,9 +317,11 @@ Before starting any workflow:
    `single_repo | monorepo_melos | multi_repo`.
 2. If `TOPOLOGY_REPO_MODE = monorepo_melos`:
    - require `MELOS_ENABLED = true`
-   - require `MELOS_ROOT/melos.yaml`
+   - require non-empty `MELOS_CONFIG_PATH`
    - require `MELOS_TARGET_SCOPE` no empty
    - require `TARGET_PACKAGE_PATH` existing.
+   - run `docs/scripts/melos_workspace.rb resolve` with `MELOS_ROOT` and
+     `TARGET_PACKAGE_PATH`; require `ok=true`.
 3. If `TOPOLOGY_SHARED_CORE_MODE = external_core_package`:
    - require `external_dependencies.shared_core.enabled = true`.
 4. If any validation fails, stop with `blocked_input`.
@@ -363,8 +365,8 @@ Applies to all functional workflows (`/new-component`, `/new-view`,
 2. Validate signals app executable:
   - `single_repo | multi_repo`: `PROJECT_ROOT` must have at least one
      app (`lib/main.dart` or `lib/main_*.dart` or folder `android/` or `ios/`).
-   - `monorepo_melos`: `MELOS_ROOT/melos.yaml` + `TARGET_PACKAGE_PATH` valid and
-     the target package must not be DS/core/shared.
+   - `monorepo_melos`: a passing Melos resolver result + `TARGET_PACKAGE_PATH`
+     valid, and the target package must not be DS/core/shared.
 3. Apply dependency veto:
    - if `PROJECT_ROOT` or `TARGET_PACKAGE_NAME` show a pattern of library
      (`design_system`, `ui_kit`, `shared`, `core`, `common`) and there is no
@@ -490,7 +492,8 @@ Each delegation must include:
 - `project_root` (local path of the target repo for execution/write access)
 - `topology` (`repo_mode`, `feature_location_mode`, `shared_core_mode`, `ds_mode`)
 - `target` (`package_name`, `package_path`, `target_root`, `feature_root`)
-- `execution_context` (`melos_enabled`, `melos_root`, `target_scope`)
+- `execution_context` (`melos_enabled`, `melos_root`, `melos_config_path`,
+  `melos_config_source`, `target_scope`)
 - `contracts_context` (`generation_scope`, `contracts_policy`)
 - `figma_truth_context` (`literal_texts`, `metadata_sources`, `non_inference_policy`) for Figma-driven workflows (`/new-component`, `/new-view`)
 - `layout_safety_context` (`layout_constraints`, `overflow_risk_matrix`, `mitigation_policy`) for Figma-driven workflows (`/new-component`, `/new-view`)

@@ -93,8 +93,8 @@ Before any packet, log, Figma request, or code generation:
 1. Validate `TOPOLOGY_REPO_MODE`.
 2. Validate roots (`PROJECT_ROOT`, `APP_TARGET_ID` and
    `DESIGN_SYSTEM_TARGET_ID` if DS components will be created).
-3. In targets `location_strategy=melos_package`, validate `repo_root/melos.yaml`
-   and `repo_root/package_path`.
+3. In targets `location_strategy=melos_package`, resolve `repo_root` and
+   `package_path` with `docs/scripts/melos_workspace.rb`; require `ok=true`.
 
 ### Gate 0.2 - Spec Packet Ownership
 
@@ -120,7 +120,7 @@ Before writing any packet, log, report or Figma evidence:
 3. Minimum app signals:
    - `single_repo | multi_repo`: exists `lib/main.dart` or `lib/main_*.dart`
      or folder `android/` or `ios/`.
-   - `monorepo_melos`: exists `melos.yaml`, package target valid and package
+   - `monorepo_melos`: Melos resolver passes, package target is valid and the
      target is not classified as DS/shared/core.
 4. If it fails, block with:
    - `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`

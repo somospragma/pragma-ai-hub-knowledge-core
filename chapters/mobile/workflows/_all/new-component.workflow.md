@@ -46,8 +46,8 @@ delivery result.
 2. `PROJECT_ROOT` and `ACTIVE_TARGET_ROOT` accessible.
 3. `ACTIVE_TARGET_ID` exists in `targets.registry` and its `kind` is
    `design_system`.
-4. If `location_strategy=melos_package`: `repo_root/melos.yaml` and
-   `repo_root/package_path` exist.
+4. If `location_strategy=melos_package`, resolve `repo_root` and
+   `package_path` with `docs/scripts/melos_workspace.rb`; require `ok=true`.
 
 If any validation fails, finish with `blocked_input`.
 
@@ -59,7 +59,7 @@ If any validation fails, finish with `blocked_input`.
 3. Minimum app signals:
    - `single_repo | multi_repo`: exists `lib/main.dart` or `lib/main_*.dart`
      or folder `android/` or `ios/`.
-   - `monorepo_melos`: exists `melos.yaml`, package target valid and package
+   - `monorepo_melos`: Melos resolver passes, package target is valid and the
      target is not classified as DS/shared/core.
 4. If it fails, block with:
    - `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`

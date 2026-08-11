@@ -21,6 +21,7 @@ Default checks:
 - Required agent permissions.
 - Figma MCP preflight requirements.
 - Bootstrap anti-drift requirements.
+- Deterministic legacy and modern Melos workspace resolution.
 - Documentation target permissions.
 
 Run the strict internal-language audit:
@@ -68,3 +69,20 @@ ruby .kiro/docs/scripts/sopp_gate.rb propose-adjustment --packet "$PACKET" \
 The command uses only Ruby standard-library packages and therefore does not
 consume AI tokens. Target roots are resolved from `spec.target_roots` or the
 nearest `.sopp/config/project.config.yaml`.
+
+## `melos_workspace.rb`
+
+Read-only resolver for Melos package targets. It accepts legacy Melos 6
+`melos.yaml` and the Melos 7+ configuration in the root `pubspec.yaml`; an
+absent `melos.yaml` is never a failure by itself.
+
+```bash
+ruby .github/docs/scripts/melos_workspace.rb resolve \
+  --root "$MELOS_ROOT" \
+  --package-path "$TARGET_PACKAGE_PATH"
+```
+
+The JSON result reports `config_source`, target membership and a package scope.
+It exits with status 2 and a machine-readable error when the selected target is
+not a valid Melos package. It does not contact the network, run `pub get`, or
+require the `melos` executable.

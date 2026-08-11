@@ -19,8 +19,9 @@ with its own scope and then aggregate the results into a unified view.
 ### Step 1: Look for monorepo indicators
 
 ```bash
-# Strongest indicator: melos.yaml at the root
-ls melos.yaml 2>/dev/null
+# Melos indicator: legacy melos.yaml or modern root pubspec.yaml configuration
+test -f melos.yaml && echo legacy_melos
+test -f pubspec.yaml && rg -n '^(workspace|melos|dev_dependencies):|^\s+melos:' pubspec.yaml
 
 # Strong indicator: multiple nested pubspec.yaml
 find . -name "pubspec.yaml" -not -path "./pubspec.yaml" -maxdepth 5
@@ -44,21 +45,30 @@ has `android/` and `ios/` folders as siblings.
 **Clear package signal**: the `pubspec.yaml` has `flutter:` only for assets/fonts or has
 no `flutter:` section at all.
 
-### Step 3: Read melos.yaml if it exists
+### Step 3: Resolve the Melos configuration
 
-`melos.yaml` defines exactly which packages are part of the workspace and which are
-excluded. Use it as the source of truth instead of inferring from the filesystem:
+Use the root configuration as the source of truth instead of inferring packages
+from the filesystem. Melos 6 uses `melos.yaml`; Melos 7+ uses the root
+`pubspec.yaml` with `workspace:` and a Melos dependency or `melos:` section.
+When this KB is available, run `docs/scripts/melos_workspace.rb resolve` for
+each target package.
 
 ```yaml
-# Ejemplo de melos.yaml
-packages:
+# Modern root pubspec.yaml
+workspace:
   - apps/**
   - features/**
   - packages/**
   - shared/**
+
+dev_dependencies:
+  melos: ^8.0.0
+
+melos:
+  scripts: {}
 ```
 
-If `melos.yaml` excludes a directory, do not evaluate it.
+If the resolved Melos workspace excludes a directory, do not evaluate it.
 
 ---
 

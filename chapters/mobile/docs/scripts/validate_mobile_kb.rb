@@ -218,6 +218,62 @@ rescue StandardError => e
   add(findings, "CRITICAL", "SOPP_GATE_VALIDATION_ERROR", "Unable to validate executable approval gate", e.message)
 end
 
+def validate_melos_workspace_contract(findings, cleared)
+  resolver_path = "chapters/mobile/docs/scripts/melos_workspace.rb"
+  test_path = "chapters/mobile/docs/scripts/test_melos_workspace.rb"
+  resources = {
+    resolver_path => ["root_pubspec", "legacy_yaml", "CONFIG_MELOS_PACKAGE_NOT_IN_WORKSPACE"],
+    "chapters/mobile/skills/_all/mobile-sdd-spec-validation/SKILL.md" => ["Melos Workspace Resolution", "melos_workspace.rb"],
+    "chapters/mobile/agents/_all/workspace-discovery.agent.md" => ["melos_workspace.rb", "resolved Melos configuration"],
+    "chapters/mobile/prompts/_all/master-orchestration.prompt.md" => ["MELOS_CONFIG_PATH", "melos_workspace.rb"],
+    "chapters/mobile/docs/templates/project.config.yaml" => ["config_source", "workspace_mode"],
+    "chapters/mobile/docs/templates/schemas/project-config.schema.yaml" => ["root_pubspec", "legacy_yaml"]
+  }
+  workflow_paths = Dir["chapters/mobile/workflows/_all/*.workflow.md"]
+  workflow_paths.each do |path|
+    next unless File.read(path).include?("location_strategy=melos_package") ||
+                File.read(path).include?("location_strategy = melos_package")
+
+    resources[path] = ["melos_workspace.rb"]
+  end
+
+  issues = []
+  resources.each do |path, phrases|
+    unless File.file?(path)
+      issues << "#{path}: missing"
+      next
+    end
+    text = File.read(path)
+    phrases.each { |phrase| issues << "#{path}: missing #{phrase.inspect}" unless text.include?(phrase) }
+  end
+
+  raw_gate_paths = resources.keys.grep(%r{chapters/mobile/(agents|prompts|workflows|skills|docs/templates)/})
+  forbidden = [/repo_root\/melos\.yaml/, /MELOS_ROOT\/melos\.yaml/, /exists `?melos\.yaml`?/]
+  raw_gate_paths.each do |path|
+    next unless File.file?(path)
+
+    text = File.read(path)
+    forbidden.each do |pattern|
+      issues << "#{path}: obsolete Melos file-only gate #{pattern.inspect}" if text.match?(pattern)
+    end
+  end
+
+  if File.file?(test_path)
+    output, status = Open3.capture2e("ruby", test_path)
+    issues << "#{test_path}: regression suite failed\n#{output}" unless status.success?
+  else
+    issues << "#{test_path}: missing"
+  end
+
+  if issues.empty?
+    cleared << "Melos resolver accepts legacy and modern workspaces without a file-only gate"
+  else
+    add(findings, "CRITICAL", "MELOS_WORKSPACE_CONTRACT_DRIFT", "Melos workspace resolver is missing or weakened", issues.join("\n"))
+  end
+rescue StandardError => e
+  add(findings, "CRITICAL", "MELOS_WORKSPACE_VALIDATION_ERROR", "Unable to validate Melos workspace resolver", e.message)
+end
+
 def validate_mobile_workflow_distribution(findings, cleared)
   issues = []
   issues << "chapters/mobile/steering must not exist" if Dir.exist?("chapters/mobile/steering")
@@ -1479,6 +1535,7 @@ validate_no_source_root_refs(findings, cleared)
 validate_references(findings, cleared)
 validate_mobile_workflow_distribution(findings, cleared)
 validate_sopp_gate_contract(findings, cleared)
+validate_melos_workspace_contract(findings, cleared)
 validate_no_legacy_mobile_script_paths(findings, cleared)
 validate_platform_storage_boundary(findings, cleared)
 validate_examples_location(findings, cleared)

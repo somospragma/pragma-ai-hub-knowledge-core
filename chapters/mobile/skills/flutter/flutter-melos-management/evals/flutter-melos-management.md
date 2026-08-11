@@ -18,7 +18,7 @@
 |------|------|-------|------------|
 | `SKILL.md` | markdown | 610 | No |
 | `evals/flutter-melos-management.md` | markdown | 31 | No |
-| `references/melos_yaml_complete.md` | markdown | 230 | No |
+| `references/pubspec_yaml_complete.md` | markdown | 230 | No |
 | `references/versioning_guide.md` | markdown | 229 | No |
 
 ## Issues (4)

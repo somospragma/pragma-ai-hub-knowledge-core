@@ -64,8 +64,8 @@ Do NOT use for:
 2. Validate `PROJECT_ROOT` and `ACTIVE_TARGET_ROOT` are accessible.
 3. Validate `feature_path` exists and contains Dart files.
 4. Validate each affected file maps to an allowed `target_id`.
-5. If `location_strategy=melos_package`, validate `repo_root/melos.yaml` and
-   `repo_root/package_path`.
+5. If `location_strategy=melos_package`, resolve `repo_root` and
+   `package_path` with `docs/scripts/melos_workspace.rb`; require `ok=true`.
 
 If any validation fails, terminate with `blocked_input`.
 

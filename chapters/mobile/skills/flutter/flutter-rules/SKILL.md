@@ -1,6 +1,6 @@
 ---
 id: flutter-rules
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: skill
 chapter: mobile
@@ -33,7 +33,7 @@ Load the corresponding file before each phase:
 
 | File | When to load |
 |------|--------------|
-| [references/monorepo.md](references/monorepo.md) | When Step 1 detects multiple `pubspec.yaml` or `melos.yaml` |
+| [references/monorepo.md](references/monorepo.md) | When Step 1 detects multiple `pubspec.yaml` files or a Melos configuration |
 | [references/maintainability.md](references/maintainability.md) | When evaluating the Maintainability domain |
 | [references/traceability.md](references/traceability.md) | When evaluating the Traceability domain |
 | [references/performance.md](references/performance.md) | When evaluating the Performance domain |
@@ -64,8 +64,9 @@ correctly avoids false positives (non-existent paths) and false negatives (omitt
 ### Detect the project type
 
 ```bash
-# Strongest monorepo indicator: melos.yaml at the root
-ls melos.yaml 2>/dev/null
+# Melos can be legacy melos.yaml or modern root pubspec.yaml configuration
+test -f melos.yaml && echo legacy_melos
+test -f pubspec.yaml && rg -n '^(workspace|melos|dev_dependencies):|^\s+melos:' pubspec.yaml
 
 # Detect multiple pubspec.yaml
 find . -name "pubspec.yaml" -not -path "./pubspec.yaml" -maxdepth 5
@@ -84,7 +85,8 @@ Evaluate standard paths and continue with Step 2:
 ### If monorepo
 
 Load [references/monorepo.md](references/monorepo.md) — it contains the full classification
-algorithm (apps vs packages vs features), how to read `melos.yaml`, the exact path scope
+algorithm (apps vs packages vs features), how to resolve modern or legacy Melos
+configuration, the exact path scope
 by project type, the cross-impact algorithm, and the consolidated report template.
 
 Once all projects are identified:

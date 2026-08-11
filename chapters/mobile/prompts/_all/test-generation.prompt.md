@@ -53,6 +53,8 @@ The handoff must include:
 - `target.target_root`
 - `execution_context.melos_enabled`
 - `execution_context.melos_root`
+- `execution_context.melos_config_path`
+- `execution_context.melos_config_source`
 - `execution_context.target_scope`
 
 If any item is missing, stop with `blocked_input`.

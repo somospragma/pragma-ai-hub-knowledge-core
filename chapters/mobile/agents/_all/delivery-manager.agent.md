@@ -61,7 +61,8 @@ Before executing delivery, require:
 - `workflow`
 - `topology` (`repo_mode`, `feature_location_mode`, `shared_core_mode`, `ds_mode`)
 - `target` (`package_name`, `package_path`, `target_root`, `feature_root`)
-- `execution_context` (`melos_enabled`, `melos_root`, `target_scope`)
+- `execution_context` (`melos_enabled`, `melos_root`, `melos_config_path`,
+  `melos_config_source`, `target_scope`)
 - `spec_context` (`spec_ref`, `context_ref`, `spec_level`, `review_ref`) for workflows with Mobile Spec Packet
 
 If missing context, return `blocked_input`.

@@ -56,6 +56,20 @@ properties:
         type: string
       target_root:
         type: string
+      melos:
+        type: object
+        additionalProperties: false
+        required: [enabled, root, config_source, config_path]
+        properties:
+          enabled:
+            type: boolean
+          root:
+            type: string
+          config_source:
+            type: string
+            enum: [legacy_yaml, root_pubspec]
+          config_path:
+            type: string
       workspace_roots:
         type: array
         items:
@@ -79,6 +93,8 @@ properties:
             root:
               type: string
             package_name:
+              type: string
+            melos_scope:
               type: string
   contracts:
     type: object
@@ -114,6 +130,26 @@ properties:
         type: boolean
       no_contract_drift_detected:
         type: boolean
+      melos_workspace_valid:
+        type: boolean
+allOf:
+  - if:
+      properties:
+        resolved:
+          properties:
+            repo_mode:
+              const: monorepo_melos
+          required: [repo_mode]
+      required: [resolved]
+    then:
+      properties:
+        resolved:
+          required: [melos]
+          properties:
+            melos:
+              properties:
+                enabled:
+                  const: true
 $defs:
   proposed_contract:
     type: object

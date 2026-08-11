@@ -108,6 +108,18 @@ repository, bootstrap returns `reused_existing_config` and creates no proposal.
 When the triplet is partial or invalid, it blocks instead of replacing it. Run
 again with `FORCE_RECONFIGURE: true` only after reviewing the diagnosis.
 
+### Melos Detection
+
+For `monorepo_melos` and every target using `location_strategy: melos_package`,
+bootstrap resolves the target with `docs/scripts/melos_workspace.rb`. It accepts
+legacy Melos 6 `melos.yaml` and modern Melos 7+ root `pubspec.yaml`
+configuration. The absence of `melos.yaml` alone never blocks bootstrap.
+
+Modern detection requires a root `workspace:` plus a Melos dependency or a
+`melos:` section, and verifies that the selected package belongs to that
+workspace. The applied `project.config.yaml` records the resulting
+`topology.melos.config_source` and `config_path`.
+
 Expected proposal:
 
 ```text

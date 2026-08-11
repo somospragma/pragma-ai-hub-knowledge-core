@@ -53,7 +53,8 @@ Before implementation, validate that the handoff includes:
 2. `project_root`.
 3. `topology` (`repo_mode`, `feature_location_mode`, `shared_core_mode`, `ds_mode`).
 4. `target` (`package_name`, `package_path`, `target_root`, `feature_root`).
-5. `execution_context` (`melos_enabled`, `melos_root`, `target_scope`).
+5. `execution_context` (`melos_enabled`, `melos_root`, `melos_config_path`,
+   `melos_config_source`, `target_scope`).
 6. `contracts_context` (`generation_scope`, `contracts_policy`).
 7. `architecture_refs` (`contract_path`, optional `mermaid_path`).
 8. `input_refs` and `output_paths`.

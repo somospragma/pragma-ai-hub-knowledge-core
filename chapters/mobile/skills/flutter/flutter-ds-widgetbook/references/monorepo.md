@@ -4,7 +4,7 @@
 
 Common signals:
 
-- `melos.yaml` at the repository root
+- a legacy `melos.yaml`, or a root `pubspec.yaml` with `workspace:` and Melos configuration
 - `apps/` folder with multiple apps
 - multiple `pubspec.yaml` files under the same repository
 - shared packages under `packages/`, `features/`, `core/`, or `design_system/`

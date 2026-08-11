@@ -45,11 +45,11 @@
     },
     {
       "id": 4,
-      "prompt": "Evaluate my Flutter monorepo with Melos. The structure is: melos.yaml at the root, apps/mobile_app/, features/auth_feature/, features/checkout_feature/, and shared/design_system/. I want to know the overall status and which packages have the most technical debt.",
-      "expected_output": "The agent detects melos.yaml, reads references/monorepo.md, classifies the projects (1 app + 2 features + 1 shared), uses melos.yaml as the source of truth for the package list, evaluates each one with the correct scope (features and shared without Android/iOS criteria), reports shared/design_system cross-impact on the features and app, and produces a consolidated summary showing the project with the highest debt.",
+      "prompt": "Evaluate my Flutter monorepo with Melos. The root pubspec.yaml defines workspace entries for apps/mobile_app, features/auth_feature, features/checkout_feature and shared/design_system, declares melos in dev_dependencies, and has a melos: section. I want to know the overall status and which packages have the most technical debt.",
+      "expected_output": "The agent detects the modern Melos configuration in root pubspec.yaml, reads references/monorepo.md, classifies the projects (1 app + 2 features + 1 shared), uses the resolved workspace entries as the source of truth for the package list, evaluates each one with the correct scope (features and shared without Android/iOS criteria), reports shared/design_system cross-impact on the features and app, and produces a consolidated summary showing the project with the highest debt.",
       "files": [],
       "expectations": [
-        "The agent detects melos.yaml and uses it as the source of truth to list workspace projects",
+        "The agent detects modern Melos configuration and uses resolved workspace entries as the source of truth to list workspace projects",
         "The agent reads references/monorepo.md to obtain classification and scoping logic",
         "mobile_app is evaluated with App criteria including Android/iOS; features and shared have native platform criteria marked as N/A",
         "The agent verifies which features and apps consume shared/design_system by reading each project pubspec.yaml",

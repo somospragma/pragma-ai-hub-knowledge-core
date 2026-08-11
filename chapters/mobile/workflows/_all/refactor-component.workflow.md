@@ -43,8 +43,8 @@ delivery result.
 2. Validate `PROJECT_ROOT` and `ACTIVE_TARGET_ROOT`.
 3. Validate that `ACTIVE_TARGET_ID` exists in `targets.registry` and its `kind` is
    `design_system`.
-4. In `location_strategy=melos_package`, validate `repo_root/melos.yaml` and
-   `repo_root/package_path`.
+4. In `location_strategy=melos_package`, resolve `repo_root` and
+   `package_path` with `docs/scripts/melos_workspace.rb`; require `ok=true`.
 
 If it fails, finish with `blocked_input`.
 

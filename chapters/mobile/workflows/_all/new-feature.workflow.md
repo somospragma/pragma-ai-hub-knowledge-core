@@ -63,8 +63,8 @@ Do NOT use for:
 1. Validate `TOPOLOGY_REPO_MODE` (`single_repo | monorepo_melos | multi_repo`).
 2. Validate `PROJECT_ROOT` and `ACTIVE_TARGET_ROOT` are accessible.
 3. Validate `ACTIVE_TARGET_ID` exists in `targets.registry`.
-4. If `location_strategy = melos_package`, validate `repo_root/melos.yaml` and
-   `repo_root/package_path`.
+4. If `location_strategy = melos_package`, resolve `repo_root` and
+   `package_path` with `docs/scripts/melos_workspace.rb`; require `ok=true`.
 
 If any validation fails, terminate with `blocked_input`.
 

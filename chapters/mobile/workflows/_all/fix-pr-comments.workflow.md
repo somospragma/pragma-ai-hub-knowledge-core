@@ -59,8 +59,8 @@ evidence_mode: minimal                # optional, default minimal
 
 1. Validate `TOPOLOGY_REPO_MODE`.
 2. Validate roots (`PROJECT_ROOT` and each affected target).
-3. In targets `location_strategy=melos_package`, validate `repo_root/melos.yaml`
-   and `repo_root/package_path`.
+3. In targets `location_strategy=melos_package`, resolve `repo_root` and
+   `package_path` with `docs/scripts/melos_workspace.rb`; require `ok=true`.
 
 ## Canonical Sequence
 

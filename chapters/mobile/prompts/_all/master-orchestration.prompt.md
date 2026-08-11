@@ -54,9 +54,10 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
    - `ARCHITECTURE_CONTRACT_PATH = {PROJECT_ROOT}/{architecture.contract_path}`
    - `DEPENDENCIES_CONTRACT_PATH = {PROJECT_ROOT}/{dependencies.contract_path}` (fallback `.sopp/config/dependencies-contract.yaml`)
    - `REQUIRE_ARCHITECTURE_CONTRACT_FOR_NEW_VIEW = architecture_contract.generation_policies.view_generation.require_architecture_contract`
-   - `MELOS_ENABLED = monorepo.melos_enabled`
-   - `MELOS_ROOT = {PROJECT_ROOT}/{monorepo.melos_root}`
-   - `MELOS_TARGET_SCOPE = monorepo.target_scope`
+   - `MELOS_ENABLED = topology.melos.enabled`
+   - `MELOS_ROOT = topology.melos.root` (resolved absolute path)
+   - `MELOS_CONFIG_PATH = topology.melos.config_path` (resolved absolute path)
+   - `MELOS_TARGET_SCOPE = targets.registry.{ACTIVE_TARGET_ID}.melos_scope`
    - `GENERATION_SCOPE = architecture_contract.generation_policies.default_generation_scope` (fallback `presentation_only`)
    - `CONTRACTS_POLICY = architecture_contract.generation_policies.contracts_policy.default` (fallback `optional`)
    - `DETERMINISTIC_MODE = pipeline.deterministic_mode`
@@ -73,16 +74,17 @@ by `@workspace-discovery` and `workspace-discovery.prompt.md`.
    - Require `PROJECT_ROOT`, `SPEC_PACKET_OWNER_TARGET_ID`,
      `SPEC_PACKET_OWNER_ROOT`, `ACTIVE_TARGET_ID` and `ACTIVE_TARGET_ROOT`
      accessible.
-   - If `monorepo_melos`: require `MELOS_ENABLED=true`, `MELOS_ROOT/melos.yaml`,
-     `MELOS_TARGET_SCOPE` and `TARGET_PACKAGE_PATH` valid.
+   - If `monorepo_melos`: require `MELOS_ENABLED=true`, non-empty
+     `MELOS_CONFIG_PATH`, `MELOS_TARGET_SCOPE` and `TARGET_PACKAGE_PATH`; run
+     `docs/scripts/melos_workspace.rb resolve` and require `ok=true`.
    - If `TOPOLOGY_SHARED_CORE_MODE=external_core_package`: require
      `external_dependencies.shared_core.enabled=true`.
 6. Apply Gate 0.5 - App Repo Ownership Gate:
    - Require `PROJECT_CONFIG_PATH` canonical in `{PROJECT_ROOT}/.sopp/config/project.config.yaml`.
    - In `single_repo | multi_repo`: require signal app executable in `PROJECT_ROOT`
      (`lib/main.dart` or `lib/main_*.dart` or `android/` or `ios/`).
-   - In `monorepo_melos`: require `melos.yaml`, a valid package target and reject a
-     DS/core/shared target.
+   - In `monorepo_melos`: require a passing Melos resolver result, a valid package
+     target and reject a DS/core/shared target.
    - If `PROJECT_ROOT` or `TARGET_PACKAGE_NAME` look like a library (`design_system`,
      `ui_kit`, `shared`, `core`, `common`) and there is no executable app signal, block.
    - Use codes: `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`,

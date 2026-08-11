@@ -68,6 +68,23 @@ properties:
         type: string
       ds_mode:
         type: string
+      melos:
+        type: object
+        additionalProperties: false
+        required: [enabled, root, config_source, config_path, workspace_mode]
+        properties:
+          enabled:
+            type: boolean
+          root:
+            type: string
+          config_source:
+            type: string
+            enum: [none, legacy_yaml, root_pubspec]
+          config_path:
+            type: string
+          workspace_mode:
+            type: string
+            enum: [none, legacy_melos, dart_pub_workspace]
   targets:
     type: object
     additionalProperties: true
@@ -94,6 +111,8 @@ properties:
             root:
               type: string
             package_name:
+              type: string
+            melos_scope:
               type: string
   active_target_defaults:
     type: object
@@ -129,3 +148,27 @@ not:
     - required: [dependency_catalog]
     - required: [allowed_dependency_matrix]
     - required: [package_sources]
+allOf:
+  - if:
+      properties:
+        topology:
+          properties:
+            repo_mode:
+              const: monorepo_melos
+          required: [repo_mode]
+      required: [topology]
+    then:
+      properties:
+        topology:
+          required: [melos]
+          properties:
+            melos:
+              properties:
+                enabled:
+                  const: true
+                config_source:
+                  enum: [legacy_yaml, root_pubspec]
+                config_path:
+                  minLength: 1
+                workspace_mode:
+                  enum: [legacy_melos, dart_pub_workspace]

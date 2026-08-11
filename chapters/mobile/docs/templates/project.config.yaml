@@ -7,6 +7,7 @@ ownership:
     - project_identity
     - workspace
     - topology
+    - melos_topology
     - targets
     - active_target_defaults
     - pipeline
@@ -40,6 +41,12 @@ topology:
   feature_location_mode: "lib_only" # lib_only | hybrid_lib_and_packages | packages_only | feature_per_repo
   shared_core_mode: "none" # none | external_core_package
   ds_mode: "external_ds_package" # internal_ds_package | external_ds_package | none
+  melos:
+    enabled: false
+    root: "." # resolved absolute path in generated configuration
+    config_source: "none" # none | legacy_yaml | root_pubspec
+    config_path: "" # resolved absolute path: melos.yaml legacy or pubspec.yaml Melos 7+
+    workspace_mode: "none" # none | legacy_melos | dart_pub_workspace
 
 targets:
   registry:

@@ -99,7 +99,8 @@ If there are no roots, block with `BOOTSTRAP_SCAN_ROOTS_EMPTY`.
 Search each root for:
 
 1. `pubspec.yaml`
-2. `melos.yaml`
+2. Melos configuration candidates: legacy `melos.yaml`, or a root `pubspec.yaml`
+   with `workspace:` plus a Melos dependency or `melos:` section
 3. executable app signals (`lib/main.dart`, `lib/main_*.dart`, `android/`, `ios/`)
 4. canonical app signals (`lib/src/presentation`, `lib/src/features`)
 5. legacy app signals (`lib/presentation`, `lib/features`) only to alert
@@ -116,7 +117,8 @@ Classify `APP_CANDIDATE`, `DS_CANDIDATE`, `CORE_CANDIDATE`, and
 
 Rules:
 
-1. `monorepo_melos`: `melos.yaml` exists and multiple Flutter packages are present.
+1. `monorepo_melos`: the deterministic Melos resolver succeeds and multiple
+   Flutter packages are present.
 2. `single_repo`: isolated app without Melos.
 3. `multi_repo`: app/features live in separate repos outside Melos.
 
@@ -137,8 +139,8 @@ Root Selection Rule:
   global workspace root.
 - If `EXPECTED_APP_REPO_ROOT` is provided, use it as a strict pin and validate
   that it is an executable app; block if it does not pass.
-- In `monorepo_melos`, `APP_REPO_ROOT` must be the repo containing the app
-  monorepo `melos.yaml`.
+- In `monorepo_melos`, `APP_REPO_ROOT` must be the repo containing the resolved
+  app Melos configuration.
 - If there is a tie or ambiguity between app candidates, block and do not apply.
 
 Required decision order:
@@ -198,8 +200,9 @@ Rules:
 
 1. `APP_REPO_ROOT` exists.
 2. Each `targets.registry.*.root` exists.
-3. If a target uses `location_strategy=melos_package`, `repo_root/melos.yaml`
-   and `repo_root/package_path` exist.
+3. If a target uses `location_strategy=melos_package`, run
+   `docs/scripts/melos_workspace.rb resolve` with `repo_root` and
+   `package_path`; require `ok=true` and persist the returned source metadata.
 4. Local dependencies use `source=target` and an existing `target_id`.
 5. `.sopp/bootstrap/{run_id}` is writable in the app repo.
 6. The proposed architecture contract is parseable.
