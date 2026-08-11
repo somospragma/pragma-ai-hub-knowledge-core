@@ -20,7 +20,7 @@ Cuando el usuario provee un **proyecto Appium ya inicializado** (Android **o** i
 - Actualizar selectores tras un cambio de UI o nueva versión de la app.
 - Refactor localizado de Screenplay (renombrar Task, mover método, extraer Question) sin reescribir el runner ni el build.
 
-Si el proyecto **no existe** todavía, no aplicar este skill: usar el scaffolder greenfield `[[calidad-appium-screenplay-android]]` para Android, o el workaround manual descrito en `references/android-only-scope-rationale.md` para iOS. Decisión brownfield vs greenfield en `[[calidad-brownfield-vs-greenfield]]`.
+Si el proyecto **no existe** todavía, no aplicar este skill: usar el scaffolder greenfield `[[calidad-appium-screenplay-android]]` para Android, o el workaround manual descrito en [[calidad-appium-screenplay-android]] (consultar `references/android-only-scope-rationale.md` en su subfolder) para iOS. Decisión brownfield vs greenfield en `[[calidad-brownfield-vs-greenfield]]`.
 
 Antes de activar este skill, confirma intent con `[[calidad-intent-detection]]` y recolecta inputs obligatorios con `[[calidad-mandatory-inputs-protocol]]`. Aplica la perspectiva del chapter en `[[calidad-chapter-perspective]]`.
 
@@ -79,7 +79,7 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
 - **Respetar 100% el `base_package` detectado.** No introducir `co.com.pragma` si el proyecto usa `com.client.tests`.
 - **Preservar tags existentes.** Si el proyecto usa `@smoke @regression @mobile`, los nuevos escenarios usan el mismo set; los nuevos tags propios (`@user-story:HUT-XXX`) se agregan sin reemplazar.
 - **Preservar `gherkin_language` detectado.** No cambiar `en` por `es` ni viceversa, aunque el chapter prefiera uno; el proyecto manda.
-- **Soporta Android y iOS.** La plataforma se detecta del `serenity.conf`/`android.conf`/`ios.conf` y de las capabilities (`automationName=UiAutomator2` → Android, `automationName=XCUITest` → iOS). Para iOS, los selectores nuevos usan `AppiumBy.iOSClassChain`, `AppiumBy.iOSNsPredicateString` o `AppiumBy.accessibilityId` (ver `references/android-only-scope-rationale.md` del skill greenfield para guidance).
+- **Soporta Android y iOS.** La plataforma se detecta del `serenity.conf`/`android.conf`/`ios.conf` y de las capabilities (`automationName=UiAutomator2` → Android, `automationName=XCUITest` → iOS). Para iOS, los selectores nuevos usan `AppiumBy.iOSClassChain`, `AppiumBy.iOSNsPredicateString` o `AppiumBy.accessibilityId` (ver [[calidad-appium-screenplay-android]], consultar `references/android-only-scope-rationale.md` en su subfolder).
 - **No introducir dependencias nuevas** salvo que el feature lo requiera y el usuario lo apruebe.
 - **No "mejorar" el estilo del proyecto.** Si los Page Objects existentes no usan Lombok pero el chapter sí, no introducir Lombok aquí.
 - Entrega los archivos usando `[[calidad-streaming-files-protocol]]`.

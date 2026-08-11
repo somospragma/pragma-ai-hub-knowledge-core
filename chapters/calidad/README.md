@@ -535,6 +535,56 @@ No saltar pasos: el router protege contra la generación con inputs incompletos,
 - **Convenciones cliente-específicas detectadas en brownfield** se documentan como patrones genéricos en `skills/karate/karate-brownfield/references/client-specific-conventions.md`. El brownfield detecta y respeta esas convenciones (naming con prefix de ticket, headers transversales obligatorios, estilo step-by-step, etc.) sin nombrar clientes concretos.
   - El override de inputs obligatorios (cuando el cliente impone convenciones estrictas, `user_story` y `firma` pasan a obligatorios) se documenta en `skills/_all/mandatory-inputs-protocol.md` con pointer al skill.
 
+### Dónde va cada asset (decidir esto mal es lo que más caro sale)
+
+| Alcance | Carpeta | Criterio |
+|---|---|---|
+| Cross-cutting del chapter | `skills/_all/`, `workflows/_all/`, `prompts/_all/` | Aplica a **todos** los stacks. Viaja en todos los bundles. |
+| Stack de producto | `skills/{stack}/` | Es de una tecnología concreta y los stacks son **mutuamente excluyentes por proyecto**. |
+| Companion de familia | `skills/appium-core/` | Aplica a varios stacks de una misma familia pero **no a todos** los del chapter. Se instala aparte, junto al stack de producto. |
+
+Las tres preguntas, en orden:
+
+1. ¿Sirve a un cliente que solo hace API o performance? → `_all`.
+2. ¿Sirve a más de un stack de la misma familia, pero no a todos? → companion (`appium-core`).
+3. ¿Es de una tecnología sola? → su stack.
+
+**Lo que no se hace**: duplicar el mismo conocimiento en dos stacks. Diverge — ya ocurrió con el bloque de diagnóstico de los brownfield, que se copió a los cuatro stacks citando defectos de Serenity en Karate, K6 y Playwright.
+
+Un companion **declara su dependencia en los workflows que lo requieren** (Paso 0 de verificación) porque no se instala solo.
+
+### Regresión: correr antes de cada commit grande
+
+```bash
+python3 scripts/audit-chapter.py        # fuente: 7 checks, exit 1 si hay hallazgos
+python3 scripts/build-kiro-bundles.py   # construye salida/{stack}/.kiro/
+python3 scripts/audit-kiro-bundles.py   # bundles: cobertura, refs, paths rotos
+```
+
+`audit-chapter.py` verifica sobre la fuente:
+
+| Check | Qué detecta |
+|---|---|
+| Frontmatter e ids únicos | Campos faltantes, semver inválido, `scope`/`stack` incoherentes, ids duplicados |
+| Carpeta contra stack declarado | Un asset movido de carpeta al que se le olvidó actualizar `stack:` |
+| Referencias `[[id]]` | Punteros a assets que no existen |
+| Portabilidad | Paths relativos que **salen del bundle**: se rompen al aplanar en el IDE |
+| References propias | Un bundle que cita una reference suya que ya no está ahí |
+| Cadena de certificación | Que los eslabones del recorrido completo de una historia sigan existiendo |
+| Workflows huérfanos | Un workflow que ningún asset invoca: camino inalcanzable |
+
+Los tres últimos son los que fallan **después de mover archivos**, y son silenciosos: nada revienta, el agente simplemente se queda sin el conocimiento a mitad del recorrido.
+
+### Al mover o renombrar assets
+
+1. Usar `git mv`: preserva historial y el sync a Mimir lo ve como actualización, no como alta y baja.
+2. **No cambiar los `id`.** El id es la identidad estable; la carpeta y el stack son metadata. Un id nuevo crea un documento nuevo en Mimir y deja huérfano al viejo.
+3. Actualizar el campo `stack:` de todo lo movido.
+4. Reconectar los punteros: buscar el nombre viejo del archivo y de la carpeta en todo el chapter.
+5. Correr la regresión completa.
+6. Tras sincronizar, **verificar archivos huérfanos en Mimir**: el migrador sube y actualiza, pero nunca borra. Un archivo de bundle que se movió a otro sitio permanece en el documento anterior hasta que se elimine a mano.
+
+
 ## Roadmap
 
 Items conocidos pendientes en el chapter:
