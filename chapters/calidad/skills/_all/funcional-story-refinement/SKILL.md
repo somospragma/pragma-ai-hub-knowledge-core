@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-story-refinement
 version: 1.0.0
-scope: stack
+scope: chapter
 type: skill
 chapter: calidad
-stack: [funcional]
 description: "Refina historias de usuario a partir de un análisis previo: reescritura de narrativa y criterios, splitting con patrones SPIDR, Example Mapping / Tres Amigos para descubrir reglas y ejemplos. Todo refinamiento es una PROPUESTA que aprueba el PO; el agente jamás decide el negocio."
 tags: [funcional, refinement, spidr, example-mapping, three-amigos, user-story, gherkin]
 ---

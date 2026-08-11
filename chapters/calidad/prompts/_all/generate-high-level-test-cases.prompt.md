@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-generate-test-cases-prompt
 version: 1.0.0
-scope: stack
+scope: chapter
 type: prompt
 chapter: calidad
-stack: [funcional]
 description: "Prompt puntual que diseña los casos de prueba de alto nivel de UNA historia de usuario con técnicas formales declaradas y matriz CA-caso, en Gherkin español data-driven, sin publicar al ALM."
 tags: [funcional, prompt, test-design, gherkin, bva, data-driven]
 ---

@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-generate-test-plan-prompt
 version: 1.0.0
-scope: stack
+scope: chapter
 type: prompt
 chapter: calidad
-stack: [funcional]
 description: "Prompt puntual que redacta el documento de plan de pruebas (estructura ISO 29119-3) desde un contexto ya levantado, con riesgos y criterios medibles; marca como A DETERMINAR todo dato no provisto, sin inventar."
 tags: [funcional, prompt, test-plan, iso-29119, risk-analysis]
 ---

@@ -1,10 +1,9 @@
 ---
 id: calidad-build-test-strategy-and-plan
 version: 1.0.0
-scope: stack
+scope: chapter
 type: workflow
 chapter: calidad
-stack: [funcional]
 description: "Workflow para construir la estrategia de pruebas y/o el plan de pruebas de un producto o release: levantamiento de contexto, estrategia risk-based, plan ISO 29119-3 con riesgos y criterios medibles, aprobación humana y publicación (wiki/Confluence/ALM)."
 tags: [funcional, workflow, test-strategy, test-plan, risk-based, iso-29119, alm]
 ---

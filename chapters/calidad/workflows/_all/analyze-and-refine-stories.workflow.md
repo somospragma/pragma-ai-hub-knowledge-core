@@ -1,10 +1,9 @@
 ---
 id: calidad-analyze-and-refine-stories
 version: 1.0.0
-scope: stack
+scope: chapter
 type: workflow
 chapter: calidad
-stack: [funcional]
 description: "Workflow para analizar y refinar historias de usuario: trae HUs (ALM o manuales), analiza INVEST/CA/ambigüedades, propone refinamiento, espera aprobación del PO y aplica lo aprobado de vuelta al ALM."
 tags: [funcional, workflow, user-story, analysis, refinement, invest, alm]
 ---

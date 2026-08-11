@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-test-strategy
 version: 1.0.0
-scope: stack
+scope: chapter
 type: skill
 chapter: calidad
-stack: [funcional]
 description: "Define la estrategia de pruebas de un producto/iniciativa: niveles y tipos, cuadrantes ágiles, enfoque risk-based, pirámide y frontera con lo unitario, qué stacks de automatización del chapter se activan y cuándo, y cómo el shift-left (mocks, locator map) habilita probar antes del desarrollo."
 tags: [funcional, test-strategy, risk-based, levels, quadrants, pyramid, shift-left, automation]
 ---

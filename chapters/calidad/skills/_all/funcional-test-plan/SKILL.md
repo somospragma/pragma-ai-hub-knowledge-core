@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-test-plan
 version: 1.0.0
-scope: stack
+scope: chapter
 type: skill
 chapter: calidad
-stack: [funcional]
 description: "Elabora planes de prueba basados en ISO/IEC/IEEE 29119-3 (con equivalencia IEEE 829): objetivos, alcance, riesgos con análisis, estrategia embebida, tipos, premisas, criterios de entrada/salida/suspensión, ambientes, datos, roles y cronograma. Más los entregables satélite: RTM, informes de avance y reporte de cierre."
 tags: [funcional, test-plan, iso-29119, ieee-829, risk-analysis, rtm, traceability, deliverables]
 ---

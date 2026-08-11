@@ -1,10 +1,9 @@
 ---
 id: calidad-design-test-cases
 version: 1.0.0
-scope: stack
+scope: chapter
 type: workflow
 chapter: calidad
-stack: [funcional]
 description: "Workflow por fases para diseñar casos de prueba de alto nivel desde HUs y publicarlos al ALM (Azure Test Plans / Jira): obtener insumos, filtrar, respetar casos ya ejecutados, diseñar con técnicas formales, crear y vincular, reporte final. Funciona también sin ALM con salida markdown."
 tags: [funcional, workflow, test-design, test-cases, azure-test-plans, jira, alm, phases]
 ---

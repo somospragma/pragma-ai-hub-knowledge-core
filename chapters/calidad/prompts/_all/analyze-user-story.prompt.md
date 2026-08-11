@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-analyze-story-prompt
 version: 1.0.0
-scope: stack
+scope: chapter
 type: prompt
 chapter: calidad
-stack: [funcional]
 description: "Prompt puntual que analiza UNA historia de usuario (INVEST, criterios de aceptación, ambigüedades, veredicto DoR) y devuelve el reporte accionable, sin workflow ni escritura al ALM."
 tags: [funcional, prompt, user-story, invest, analysis, dor]
 ---

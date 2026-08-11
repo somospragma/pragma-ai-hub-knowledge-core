@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-story-analysis
 version: 1.0.0
-scope: stack
+scope: chapter
 type: skill
 chapter: calidad
-stack: [funcional]
 description: "Analiza historias de usuario con rigor: scoring INVEST criterio por criterio, calidad y testabilidad de los criterios de aceptación, taxonomía de ambigüedades y vacíos, y veredicto contra la Definition of Ready. Emite un reporte accionable, nunca reescribe la HU."
 tags: [funcional, user-story, invest, acceptance-criteria, ambiguity, definition-of-ready, analysis]
 ---

@@ -1,10 +1,9 @@
 ---
 id: calidad-funcional-test-design
 version: 1.0.0
-scope: stack
+scope: chapter
 type: skill
 chapter: calidad
-stack: [funcional]
 description: "Diseña casos de prueba de alto nivel desde HUs analizadas: selección de técnica ISTQB (particiones, BVA, tablas de decisión, transición de estados, pairwise, casos de uso, error guessing, exploratorio), formato Gherkin español data-driven, alineación BDD/ATDD/TDD y trazabilidad CA a caso al 100%."
 tags: [funcional, test-design, istqb, bva, equivalence-partitioning, decision-table, pairwise, gherkin, bdd, traceability]
 ---
