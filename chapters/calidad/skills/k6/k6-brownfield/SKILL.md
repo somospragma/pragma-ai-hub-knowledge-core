@@ -33,9 +33,9 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
 | [[calidad-k6-greenfield]] (`references/handle-summary-evidence.md`) | handleSummary y evidencia |
 | `references/convention-detection.md` · `references/extension-patterns.md` | Convenciones del proyecto (propias de este skill) |
 
-**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo resolver un locator, cómo interactuar, cómo diagnosticar). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
+**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo calibrar thresholds, cómo correlacionar datos entre peticiones, cómo instrumentar la evidencia, cómo diagnosticar una corrida). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
 
-**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del chapter (p. ej. `OnlineCast` disparando ChromeDriver, runner con tags hardcodeados que anulan el filtro de CLI, falta de `SerenityReporter` en `cucumber.plugin`, imports legacy de Serenity 3.x), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
+**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del stack (p. ej. `thresholds` ausentes o tan laxos que la corrida nunca falla, `check()` cuyo resultado no se traduce en fallo de la prueba, `sleep()` fijo en vez de pacing modelado, ausencia de `handleSummary` con lo que no queda evidencia archivable, o carga hardcodeada en el script en vez de parametrizada por escenario), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
 
 ## Instrucción
 

@@ -28,9 +28,9 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
 | [[calidad-karate-greenfield]] (`references/negative-coverage-formula.md`) | Cobertura defendible por endpoint |
 | `references/convention-detection.md` · `references/client-specific-conventions.md` | Convenciones del proyecto (propias de este skill) |
 
-**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo resolver un locator, cómo interactuar, cómo diagnosticar). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
+**Cómo se aplica en brownfield**: estas references aportan el **conocimiento técnico** (cómo estructurar un feature, cómo reusar bodies y helpers, cómo aseverar con precisión, cómo diagnosticar un fallo). Las **convenciones del proyecto del cliente siempre mandan** sobre las del chapter (naming, tags, idioma, estilo, versiones). Nunca se importan las convenciones del greenfield a un proyecto existente.
 
-**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del chapter (p. ej. `OnlineCast` disparando ChromeDriver, runner con tags hardcodeados que anulan el filtro de CLI, falta de `SerenityReporter` en `cucumber.plugin`, imports legacy de Serenity 3.x), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
+**Diagnóstico sin imposición**: si al analizar el proyecto detectas un defecto conocido del stack (p. ej. aserciones laxas del tipo `#notnull` donde el contrato permite validar el schema completo, URLs de ambiente hardcodeadas en los `.feature` en vez de `karate-config.js`, escenarios que dependen del orden porque comparten estado, login repetido por escenario en vez de `callonce`, o el runner con tags fijos que anulan el filtro de la línea de comandos), **repórtalo al usuario con su evidencia y el fix sugerido — no lo apliques por tu cuenta**. Corregirlo sin permiso viola la regla de no tocar infraestructura ajena; callarlo deja al cliente con un falso verde que ya conocemos.
 
 ## Instrucción
 
