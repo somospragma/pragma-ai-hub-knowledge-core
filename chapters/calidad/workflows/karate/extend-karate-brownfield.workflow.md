@@ -56,7 +56,7 @@ Respetar convenciones del proyecto cliente: el STRATEGY del brownfield documenta
 | `user_story` | Obligatorio si el cliente impone convenciones | Tag `@user-story:{ticket-id}`. |
 | `firma` | Obligatorio si el cliente impone convenciones | Documento técnico. |
 
-Lista completa en `[[calidad-karate-brownfield]] (consultar `references/mandatory-inputs-brownfield.md` en su subfolder)`.
+Lista completa en [[calidad-karate-brownfield]] (consultar `references/mandatory-inputs-brownfield.md` en su subfolder).
 
 ## Pasos
 
@@ -74,10 +74,10 @@ Pistas: paths con prefix de ticket (`{TICKET-XXX}`), variable de base URL no est
 Si el cliente impone convenciones, exigir `user_story` y `firma`. Validar `Body_Mode` ∈ {A, B}. Si falta cualquier obligatorio, detente y solicítalo (`[[calidad-mandatory-inputs-protocol]]`).
 
 ### 3. Analizar convenciones existentes
-Aplicar el algoritmo de `[[calidad-karate-brownfield]] (consultar `references/convention-detection.md` en su subfolder)`. Anota `features_dir`, `bodies_dir`, `package_name`, `base_url_var`, `header_style`, `body_loading_style`, `scenario_naming_pattern`, variables de `karate-config.js`. Si hay conflicto entre convención autodetectada y convenciones declaradas por el cliente, las del cliente ganan.
+Aplicar el algoritmo de [[calidad-karate-brownfield]] (consultar `references/convention-detection.md` en su subfolder). Anota `features_dir`, `bodies_dir`, `package_name`, `base_url_var`, `header_style`, `body_loading_style`, `scenario_naming_pattern`, variables de `karate-config.js`. Si hay conflicto entre convención autodetectada y convenciones declaradas por el cliente, las del cliente ganan.
 
 ### 4. Calcular cobertura
-Aplica `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`. Si hay headers transversales obligatorios del cliente, súmalos aunque el spec no los marque como required (ver `references/client-specific-conventions.md`).
+Aplica [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder). Si hay headers transversales obligatorios del cliente, súmalos aunque el spec no los marque como required (ver `references/client-specific-conventions.md`).
 
 ### 5. Generar SOLO `.feature` y body JSON
 - `.feature` en `features_dir` detectado, con naming y tags del proyecto (siguiendo las convenciones cliente-específicas detectadas si aplican).
@@ -88,7 +88,7 @@ Aplica `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-f
 - Convenciones detectadas respetadas al 100% (header_style, body_loading_style, naming, tags).
 - Convenciones cliente-específicas aplicadas si corresponde (naming, headers transversales obligatorios, assertions field-by-field).
 - Ningún archivo de infraestructura generado.
-- Verifica que el `pom.xml` existente cumpla `[[calidad-karate-greenfield]] (consultar `references/file-location-constraint.md` en su subfolder)`; si no, repórtalo al usuario sin modificarlo.
+- Verifica que el `pom.xml` existente cumpla [[calidad-karate-greenfield]] (consultar `references/file-location-constraint.md` en su subfolder); si no, repórtalo al usuario sin modificarlo.
 
 Entrega con `[[calidad-streaming-files-protocol]]`, trazabilidad con `[[calidad-test-evidence-and-traceability]]`.
 

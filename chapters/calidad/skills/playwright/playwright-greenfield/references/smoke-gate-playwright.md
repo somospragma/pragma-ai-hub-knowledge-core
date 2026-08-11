@@ -1,6 +1,6 @@
 # Smoke Gate (Playwright) — `npx playwright test --grep @smoke`
 
-Implementación Playwright de la política universal `[smoke-gate-policy](../../../_all/smoke-gate-policy.md)`. Antes de declarar `status: success`, el agente DEBE correr al menos un test taggeado `@smoke` en el project `chromium-live` y validar exit code 0.
+Implementación Playwright de la política universal `[[calidad-smoke-gate-policy]]`. Antes de declarar `status: success`, el agente DEBE correr al menos un test taggeado `@smoke` en el project `chromium-live` y validar exit code 0.
 
 ## Comando canónico
 
@@ -79,4 +79,4 @@ smoke_gate:
 
 ## Cross-links
 
-`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[smoke-gate-policy](../../../_all/smoke-gate-policy.md)`, `[playwright-native-tags-v142](./playwright-native-tags-v142.md)`.
+`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-smoke-gate-policy]]`, `[playwright-native-tags-v142](./playwright-native-tags-v142.md)`.

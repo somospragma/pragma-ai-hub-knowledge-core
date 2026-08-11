@@ -1,6 +1,6 @@
 # Execution Status & Blockers — Variante K6
 
-Versión K6 del schema universal `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`. Se emite cuando una corrida K6 termina sin poder validar performance porque el ambiente bloquea el tráfico (WAF, rate limit, IdP caído), no porque el SUT esté lento o roto.
+Versión K6 del schema universal `[[calidad-environment-blocker-evidence]]`. Se emite cuando una corrida K6 termina sin poder validar performance porque el ambiente bloquea el tráfico (WAF, rate limit, IdP caído), no porque el SUT esté lento o roto.
 
 ## Schema K6-específico
 
@@ -116,4 +116,4 @@ function inferDominantStatus(data) {
 
 ## Cross-links
 
-`[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`, `[handle-summary-evidence](./handle-summary-evidence.md)`, `[tag-policy-and-metrics-isolation](./tag-policy-and-metrics-isolation.md)`, `[[calidad-delivery-gate-contract]]`, `[[calidad-post-generation-protocol]]`.
+`[[calidad-environment-blocker-evidence]]`, `[handle-summary-evidence](./handle-summary-evidence.md)`, `[tag-policy-and-metrics-isolation](./tag-policy-and-metrics-isolation.md)`, `[[calidad-delivery-gate-contract]]`, `[[calidad-post-generation-protocol]]`.

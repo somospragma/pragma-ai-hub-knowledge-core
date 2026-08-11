@@ -17,6 +17,18 @@ Cuando el router `[[calidad-route-test-generation]]` resolvió intent mobile sob
 
 ## Pasos
 
+### Paso 0 — Verificar que `appium-core` está instalado
+
+Este stack **depende de `appium-core`**, que se instala aparte. Antes de cualquier otra cosa, comprueba que el workspace tiene los tres bundles del core: `[[calidad-mobile-locator-resolution]]`, `[[calidad-mobile-interactions]]` y `[[calidad-appium-apk-auto-discovery]]`.
+
+Si faltan, **detente y díselo al usuario** con el comando exacto:
+
+```
+pragma-ai init --ide <ide> --chapter calidad --stack appium-core
+```
+
+No es una recomendación: sin el protocolo de resolución de locators se generan selectores plausibles en vez de verificados, y eso produce una suite verde que no prueba nada. Si el usuario decide continuar sin el core, déjalo declarado en la traza del pipeline y en el delivery gate como una carencia asumida.
+
 ### Paso 1 — Validar inputs
 
 Aplica `[[calidad-appium-wdio-validate-inputs-prompt]]`. Obligatorios: `project_name`, `output_path`, `platforms`, `app_source`, `execution_mode`. Si falta uno, detente y solicítalo con `[[calidad-mandatory-inputs-protocol]]`.

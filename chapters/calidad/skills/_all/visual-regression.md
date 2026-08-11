@@ -58,7 +58,7 @@ política en un stack: enlázala.
 
 - **Web (Playwright):** `toHaveScreenshot` (solo Chromium), baselines en
   `tests/__screenshots__/`. Ver
-  `[visual-regression](../../playwright/playwright-greenfield/references/visual-regression.md)`.
+  [[calidad-playwright-greenfield]] (consultar `references/visual-regression.md` en su subfolder).
 - **Móvil (Appium/Screenplay):** Applitools Eyes / Percy, baselines por device profile.
   Ver
-  `[mobile-visual-regression](../../appium/appium-screenplay-android/references/mobile-visual-regression.md)`.
+  [[calidad-appium-screenplay-android]] (consultar `references/mobile-visual-regression.md` en su subfolder).

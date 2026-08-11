@@ -1,6 +1,6 @@
 # Metadata Emitter — Appium (Serenity + Gradle)
 
-Serenity genera `serenity.summary.json` al finalizar la tarea `aggregate`. Este reference define cómo derivar el `{ISO}-metadata.json` universal definido en `[execution-metadata-schema](../../../_all/execution-metadata-schema.md)` mediante un task Gradle que corre después de `test`.
+Serenity genera `serenity.summary.json` al finalizar la tarea `aggregate`. Este reference define cómo derivar el `{ISO}-metadata.json` universal definido en `[[calidad-execution-metadata-schema]]` mediante un task Gradle que corre después de `test`.
 
 ## Mecanismo
 
@@ -75,7 +75,7 @@ test.finalizedBy emitMetadata
 
 ## Reglas
 
-- Path final: `results/appium/{YYYY-MM-DD}/{ISO}-metadata.json` (alineado con `[results-structure-universal](../../../_all/results-structure-universal.md)`).
+- Path final: `results/appium/{YYYY-MM-DD}/{ISO}-metadata.json` (alineado con `[[calidad-results-structure-universal]]`).
 - `test.finalizedBy emitMetadata` garantiza ejecución incluso ante falla del `test` task — clave para evidencia de corridas rojas.
 - NUNCA registrar la task con `tasks.register('aggregate')` ni redefinirla; respeta ``no-aggregate-collision.md``. `emitMetadata` es una task nueva, no choca con `aggregate`/`reports`/`clean`.
 - Si el preflight (`preflight-appium.sh`) reporta device unavailable o JDK wrong, NO se ejecuta `test`; el script preflight escribe directamente `.evidence/execution-status.json` con `reason=environment_device_unavailable` o `environment_jdk_missing_or_wrong`.
@@ -83,4 +83,4 @@ test.finalizedBy emitMetadata
 
 ## Cross-links
 
-`[execution-metadata-schema](../../../_all/execution-metadata-schema.md)`, `[results-structure-universal](../../../_all/results-structure-universal.md)`, `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`, ``no-aggregate-collision.md``, `[[calidad-appium-screenplay-android]]`, `[[calidad-delivery-gate-contract]]`.
+`[[calidad-execution-metadata-schema]]`, `[[calidad-results-structure-universal]]`, `[[calidad-environment-blocker-evidence]]`, ``no-aggregate-collision.md``, `[[calidad-appium-screenplay-android]]`, `[[calidad-delivery-gate-contract]]`.

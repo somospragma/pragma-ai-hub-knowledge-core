@@ -1,6 +1,6 @@
 # Smoke Gate (Appium) — `./gradlew test` con `cucumber.filter.tags=@smoke`
 
-Implementación Appium/Serenity-Cucumber de la política universal `[smoke-gate-policy](../../../_all/smoke-gate-policy.md)`. Antes de declarar `status: success`, el agente DEBE correr al menos un escenario etiquetado `@smoke` y validar exit code 0.
+Implementación Appium/Serenity-Cucumber de la política universal `[[calidad-smoke-gate-policy]]`. Antes de declarar `status: success`, el agente DEBE correr al menos un escenario etiquetado `@smoke` y validar exit code 0.
 
 ## Comando canónico
 
@@ -69,8 +69,8 @@ smoke_gate:
   duration_seconds: 45
 ```
 
-> Recordar: el smoke gate Appium requiere device/emulator disponible. Si el device no está, el blocker se reclasifica como `environment_device_unavailable` según `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`.
+> Recordar: el smoke gate Appium requiere device/emulator disponible. Si el device no está, el blocker se reclasifica como `environment_device_unavailable` según `[[calidad-environment-blocker-evidence]]`.
 
 ## Cross-links
 
-`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[smoke-gate-policy](../../../_all/smoke-gate-policy.md)`, `[health-check-pipeline](./health-check-pipeline.md)`.
+`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-smoke-gate-policy]]`, `[health-check-pipeline](./health-check-pipeline.md)`.

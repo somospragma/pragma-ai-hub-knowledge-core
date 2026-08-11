@@ -61,7 +61,7 @@ ificar el test para evitar el WAF, o relajar matchers para sortear un 403, es **
 |---|---|
 | Karate | Hook AfterAll del runner inspecciona `karate-summary.json`; si `featuresFailed == featuresTotal` y todos los failures retornaron mismo status (ej. 403 + header CDN), emite `execution-status.json` con `reason="environment_blocked_waf"`. |
 | Playwright | Custom reporter `onEnd`: si `failureRate > 0.5` y todos los errores son `net::ERR_*` o `expect status 403`, emite el archivo. Pre-flight script detecta `environment_browser_install_missing` antes de `playwright test`. |
-| K6 | Dentro de `handleSummary` se inspeccionan `http_req_failed`, `http_reqs{status:403}`, y headers vistos. Ver `[execution-status-and-blockers](../k6/k6-greenfield/references/execution-status-and-blockers.md)`. |
+| K6 | Dentro de `handleSummary` se inspeccionan `http_req_failed`, `http_reqs{status:403}`, y headers vistos. Ver [[calidad-k6-greenfield]] (consultar `references/execution-status-and-blockers.md` en su subfolder). |
 | Appium | Pre-flight script (`preflight-appium.sh`) valida `adb devices`, Appium server y JDK. Gradle `doFirst` aborta y escribe el archivo si el preflight falla. |
 
 ## Cross-links

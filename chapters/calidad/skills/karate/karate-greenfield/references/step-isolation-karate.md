@@ -1,6 +1,6 @@
 # Step Isolation — Karate
 
-Implementación del patrón universal `[step-isolation-pattern](../../../_all/step-isolation-pattern.md)` en Karate. El mecanismo nativo es `Background:` para setup compartido + tags por scenario para aislar criterios.
+Implementación del patrón universal `[[calidad-step-isolation-pattern]]` en Karate. El mecanismo nativo es `Background:` para setup compartido + tags por scenario para aislar criterios.
 
 ## Mecanismo
 
@@ -64,4 +64,4 @@ Feature: Retrieve transactions
 
 ## Cross-links
 
-`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[feature-design-dsl](./feature-design-dsl.md)`, ``negative-coverage-formula.md``, `[metadata-emitter-karate](./metadata-emitter-karate.md)`, `[[calidad-karate-greenfield]]`.
+`[[calidad-step-isolation-pattern]]`, `[feature-design-dsl](./feature-design-dsl.md)`, ``negative-coverage-formula.md``, `[metadata-emitter-karate](./metadata-emitter-karate.md)`, `[[calidad-karate-greenfield]]`.

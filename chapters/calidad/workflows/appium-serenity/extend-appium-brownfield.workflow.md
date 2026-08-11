@@ -61,6 +61,19 @@ Recolectar inputs siguiendo `[[calidad-mandatory-inputs-protocol]]`. Si falta un
 
 ## Pasos
 
+### Paso 0 — Verificar que `appium-core` está instalado
+
+Este stack **depende de `appium-core`**, que se instala aparte. Antes de cualquier otra cosa, comprueba que el workspace tiene los tres bundles del core: `[[calidad-mobile-locator-resolution]]`, `[[calidad-mobile-interactions]]` y `[[calidad-appium-apk-auto-discovery]]`.
+
+Si faltan, **detente y díselo al usuario** con el comando exacto:
+
+```
+pragma-ai init --ide <ide> --chapter calidad --stack appium-core
+```
+
+No es una recomendación: sin el protocolo de resolución de locators se generan selectores plausibles en vez de verificados, y eso produce una suite verde que no prueba nada. Si el usuario decide continuar sin el core, déjalo declarado en la traza del pipeline y en el delivery gate como una carencia asumida.
+
+
 ### Paso 0 — Leer la traza del pipeline (SIEMPRE)
 
 Aplica `[[calidad-pipeline-state-tracking]]` antes de tocar nada: si el `project_root`/`output_path` ya tiene `.evidence/pipeline-state.json`, leerlo y abrir el turno reportando fase actual, pendientes, bloqueos y `open_corrections`. Si no existe, crearlo con las fases de la ruta brownfield en `pending`. Actualizarlo al cerrar cada fase, con evidencia.
@@ -89,7 +102,7 @@ Emitir `.feature` nuevo (o append al existente si así lo dicta el proyecto) en 
 - Keywords `Feature/Scenario/Given/When/Then` o `Característica/Escenario/Dado/Cuando/Entonces` coherentes con `gherkin_language`.
 - Tags = `scenario_tag_conventions` detectados + `@proposed` + `@user-story:<ID>` derivado de `new_user_story`.
 - Naming del archivo siguiendo `feature_naming_pattern` detectado.
-Cumplir `[[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder)` y `[[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder)`.
+Cumplir [[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder) y [[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder).
 
 ### 6. Si `change_type ∈ {new-page, new-scenario}`: preservar package coherence
 Cualquier `*.java` nuevo (Task, Question, Interaction, UserInterface, step definition) debe:
@@ -99,7 +112,7 @@ Cualquier `*.java` nuevo (Task, Question, Interaction, UserInterface, step defin
 - Reusar Tasks/Questions/Interactions existentes cuando cubran el flujo; no duplicar lógica.
 
 ### 7. Validar Gherkin
-Para cada `.feature` nuevo o tocado: parse Gherkin debe pasar (no comentarios `# ...` después de step keyword, no celdas `Examples` vacías, no `Scenario Outline` sin `Examples`). Reglas completas en `[[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder)`.
+Para cada `.feature` nuevo o tocado: parse Gherkin debe pasar (no comentarios `# ...` después de step keyword, no celdas `Examples` vacías, no `Scenario Outline` sin `Examples`). Reglas completas en [[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder).
 
 ### 8. Comando run con tag filter detectado
 Construir el comando de ejecución usando `build_system` y `runner_filter_tags` detectados, agregando el tag de la nueva historia:

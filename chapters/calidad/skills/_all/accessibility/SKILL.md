@@ -56,10 +56,10 @@ Anexar hallazgos como evidencia según `[[calidad-test-evidence-and-traceability
 ## Implementación por stack (pruebas automatizadas)
 
 - **Web (Playwright):** axe-core + WCAG tags. Ver
-  `[accessibility-axe-wcag](../../playwright/playwright-greenfield/references/accessibility-axe-wcag.md)`.
+  [[calidad-playwright-greenfield]] (consultar `references/accessibility-axe-wcag.md` en su subfolder).
 - **Móvil (Appium/Screenplay):** Espresso a11y + accessibility-test-framework /
   Accessibility Scanner. Ver
-  `[mobile-accessibility](../../appium/appium-screenplay-android/references/mobile-accessibility.md)`.
+  [[calidad-appium-screenplay-android]] (consultar `references/mobile-accessibility.md` en su subfolder).
 
 ## Relación con otras skills
 

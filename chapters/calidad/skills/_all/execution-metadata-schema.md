@@ -49,19 +49,19 @@ Cada corrida (cualquier framework) DEBE emitir un `{ISO}-metadata.json` junto al
 
 ### Karate
 
-Hook `AfterAll` (vía JS hook en `karate-config.js` o vía clase Java en el runner) que parsea `karate-summary.json` y escribe `metadata.json` al lado. Detalle en `[metadata-emitter-karate](../karate/karate-greenfield/references/metadata-emitter-karate.md)`.
+Hook `AfterAll` (vía JS hook en `karate-config.js` o vía clase Java en el runner) que parsea `karate-summary.json` y escribe `metadata.json` al lado. Detalle en [[calidad-karate-greenfield]] (consultar `references/metadata-emitter-karate.md` en su subfolder).
 
 ### Playwright
 
-Custom reporter que implementa la interfaz `Reporter` y en `onEnd` escribe `metadata.json` en el mismo directorio que el `results.json`. Detalle en `[metadata-emitter-playwright](../playwright/playwright-greenfield/references/metadata-emitter-playwright.md)`.
+Custom reporter que implementa la interfaz `Reporter` y en `onEnd` escribe `metadata.json` en el mismo directorio que el `results.json`. Detalle en [[calidad-playwright-greenfield]] (consultar `references/metadata-emitter-playwright.md` en su subfolder).
 
 ### K6
 
-Dentro de `handleSummary(data)`: construir el objeto metadata y devolverlo como segunda clave del map. Cubierto en oleada K6: `[handle-summary-evidence](../k6/k6-greenfield/references/handle-summary-evidence.md)`.
+Dentro de `handleSummary(data)`: construir el objeto metadata y devolverlo como segunda clave del map. Cubierto en oleada K6: [[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder).
 
 ### Appium
 
-Serenity expone `ExecutionStateListener` (SPI vía `META-INF/services`) o, alternativa más simple, un `doLast` en el task `test` de Gradle que parsea `serenity-summary.json` y escribe `metadata.json` al lado. Detalle en `[metadata-emitter-appium](../appium/appium-screenplay-android/references/metadata-emitter-appium.md)`.
+Serenity expone `ExecutionStateListener` (SPI vía `META-INF/services`) o, alternativa más simple, un `doLast` en el task `test` de Gradle que parsea `serenity-summary.json` y escribe `metadata.json` al lado. Detalle en [[calidad-appium-screenplay-android]] (consultar `references/metadata-emitter-appium.md` en su subfolder).
 
 ## Consistencia obligatoria
 

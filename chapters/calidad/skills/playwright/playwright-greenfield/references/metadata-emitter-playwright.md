@@ -1,6 +1,6 @@
 # Metadata Emitter — Playwright
 
-Playwright expone una interfaz `Reporter` que permite escribir reporters personalizados invocados durante la corrida. El metadata emitter es un reporter TS que en `onEnd` produce el `{ISO}-metadata.json` universal definido en `[execution-metadata-schema](../../../_all/execution-metadata-schema.md)`.
+Playwright expone una interfaz `Reporter` que permite escribir reporters personalizados invocados durante la corrida. El metadata emitter es un reporter TS que en `onEnd` produce el `{ISO}-metadata.json` universal definido en `[[calidad-execution-metadata-schema]]`.
 
 ## Mecanismo
 
@@ -87,7 +87,7 @@ export default defineConfig({
 
 ## Reglas
 
-- Path final: `results/playwright/{YYYY-MM-DD}/{ISO}-metadata.json` (alineado con `[results-structure-universal](../../../_all/results-structure-universal.md)`).
+- Path final: `results/playwright/{YYYY-MM-DD}/{ISO}-metadata.json` (alineado con `[[calidad-results-structure-universal]]`).
 - El reporter NO interfiere con `html` ni `json` builtin; corre en paralelo.
 - `auth_strategy` se setea desde `process.env.AUTH_STRATEGY` si el proyecto usa modos múltiples. Default `storageState` para greenfield con auth.
 - NO omitir claves: si no aplica, usar enum `"none"` o valor por defecto del schema.
@@ -95,4 +95,4 @@ export default defineConfig({
 
 ## Cross-links
 
-`[execution-metadata-schema](../../../_all/execution-metadata-schema.md)`, `[results-structure-universal](../../../_all/results-structure-universal.md)`, `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`, `[[calidad-delivery-gate-contract]]`, `[[calidad-playwright-greenfield]]`.
+`[[calidad-execution-metadata-schema]]`, `[[calidad-results-structure-universal]]`, `[[calidad-environment-blocker-evidence]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-playwright-greenfield]]`.

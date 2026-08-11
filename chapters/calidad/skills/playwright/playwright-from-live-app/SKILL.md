@@ -25,7 +25,7 @@ Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta
 
 ## Instrucción
 
-1. **Validar acceso** — Verifica que `base_url` responda (HTTP 200 / 302 a login). Si hay autenticación, recolecta credenciales o `storageState` y aplica `[ver auth](../playwright-greenfield/references/auth-storage-state.md)`.
+1. **Validar acceso** — Verifica que `base_url` responda (HTTP 200 / 302 a login). Si hay autenticación, recolecta credenciales o `storageState` y aplica [[calidad-playwright-greenfield]] (consultar `references/auth-storage-state.md` en su subfolder).
 2. **Elegir herramienta de extracción**:
    - **Playwright Codegen** (`npx playwright codegen {base_url}`) — interactivo; el QA navega la app y Codegen emite selectores y acciones.
    - **MCP browser tools** — si el LLM tiene capacidad de browser, navegar la app y capturar `getByRole` / `getByLabel` / `getByTestId` programáticamente.
@@ -33,7 +33,7 @@ Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta
 3. **Explorar flujos provistos** — Para cada `flow` declarado en `flows_to_explore`, navegar la app y registrar: rutas visitadas, headings, form fields, botones de acción, transiciones, errores observados.
 4. **Extraer páginas** — Invoca `[[calidad-playwright-extract-pages-from-live-app-prompt]]` con `base_url`, `auth_credentials` y `flows_to_explore`. Output: JSON con páginas, selectores reales con estrategia `getByTestId > getByRole > getByLabel > getByText`, navegación, form fields.
 5. **Validar selectores** — Para cada selector emitido, validar que sea único y estable (no clases generadas, no índices de hijos frágiles). Preferir `getByTestId` si el DOM expone `data-testid`; degradar a `getByRole` con `name`.
-6. **Generar POM + tests** — Aplica `[POM](../playwright-greenfield/references/page-object-model.md)` (usando `route` frontend reales) y `[selector-priority](../playwright-greenfield/references/selector-priority.md)`. Por defecto los tests llevan tag `@live` — ver `[execution-modes](../playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)`.
+6. **Generar POM + tests** — Aplica [[calidad-playwright-greenfield]] (consultar `references/page-object-model.md` en su subfolder) (usando `route` frontend reales) y [[calidad-playwright-greenfield]] (consultar `references/selector-priority.md` en su subfolder). Por defecto los tests llevan tag `@live` — ver [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md` en su subfolder).
 7. **Continuar con el workflow** — Delega el resto del proyecto (fixtures, config, README) a `[[calidad-generate-playwright-greenfield]]` con `ui_source_type: live-url` y el JSON de páginas extraído como `ui_source`.
 
 ## Inputs mínimos
@@ -65,10 +65,10 @@ Antes de activar: confirma intent con `[[calidad-intent-detection]]` y recolecta
 
 ## Cross-links
 
-- Fuente UI: `[ui-source-priority](../playwright-greenfield/references/ui-source-priority.md)`
-- POM: `[page-object-model](../playwright-greenfield/references/page-object-model.md)`
-- Selectores: `[selector-priority](../playwright-greenfield/references/selector-priority.md)`
-- Modos de corrida: `[execution-modes-live-mocked-hybrid](../playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)`
+- Fuente UI: [[calidad-playwright-greenfield]] (consultar `references/ui-source-priority.md` en su subfolder)
+- POM: [[calidad-playwright-greenfield]] (consultar `references/page-object-model.md` en su subfolder)
+- Selectores: [[calidad-playwright-greenfield]] (consultar `references/selector-priority.md` en su subfolder)
+- Modos de corrida: [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md` en su subfolder)
 - Extender proyecto existente: `[[calidad-playwright-brownfield]]`
 - Continuación: `[[calidad-generate-playwright-greenfield]]`, `[[calidad-playwright-greenfield]]`
 - Prompt asociado: `[[calidad-playwright-extract-pages-from-live-app-prompt]]`

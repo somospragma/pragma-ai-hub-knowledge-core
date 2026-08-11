@@ -36,7 +36,7 @@ El gate ejecuta **exactamente un** escenario: el flujo crítico end-to-end más 
 |---|---|---|
 | Karate | `mvn test -f pom.xml -Dkarate.options="--tags @smoke-gate"` | `grep -rc "@smoke-gate" src/test/java/**/*.feature` == 1 |
 | Playwright | `npx playwright test --grep @smoke-gate --workers=1 --max-failures=1` | `npx playwright test --grep @smoke-gate --list` devuelve 1 |
-| K6 | `k6 run tests/linea-base/main.js --vus 1 --iterations 1` (ver `[k6 smoke-1-1-gate](../k6/k6-greenfield/references/smoke-1-1-gate.md)`) | 1 VU / 1 iteración por construcción |
+| K6 | `k6 run tests/linea-base/main.js --vus 1 --iterations 1` (ver [[calidad-k6-greenfield]] (consultar `references/smoke-1-1-gate.md` en su subfolder)) | 1 VU / 1 iteración por construcción |
 | Appium | `./gradlew test -Dcucumber.filter.tags=@smoke-gate` | `grep -rc "@smoke-gate" src/test/resources/features/` == 1 |
 
 **El filtro debe llegar de verdad al runner**: si el runner lleva tags hardcodeados, el `-D...filter.tags` se ignora y corre lo que el runner diga (causa raíz verificada en campo). Un solo runner por proyecto, tags solo por CLI — ver el detalle por stack en sus references de ejecución.
@@ -77,10 +77,10 @@ smoke_gate:
 
 Cada framework documenta el detalle del comando, dónde colocar el `@smoke`, parseo de exit code y reporters:
 
-- Karate: `[smoke-gate-mvn](../karate/karate-greenfield/references/smoke-gate-mvn.md)`
-- Playwright: `[smoke-gate-playwright](../playwright/playwright-greenfield/references/smoke-gate-playwright.md)`
-- K6: `[smoke-1-1-gate](../k6/k6-greenfield/references/smoke-1-1-gate.md)` (cubierto en oleada K6 paralela)
-- Appium: `[smoke-gate-gradle](../appium/appium-screenplay-android/references/smoke-gate-gradle.md)`
+- Karate: [[calidad-karate-greenfield]] (consultar `references/smoke-gate-mvn.md` en su subfolder)
+- Playwright: [[calidad-playwright-greenfield]] (consultar `references/smoke-gate-playwright.md` en su subfolder)
+- K6: [[calidad-k6-greenfield]] (consultar `references/smoke-1-1-gate.md` en su subfolder) (cubierto en oleada K6 paralela)
+- Appium: [[calidad-appium-screenplay-android]] (consultar `references/smoke-gate-gradle.md` en su subfolder)
 
 ## Cross-links
 

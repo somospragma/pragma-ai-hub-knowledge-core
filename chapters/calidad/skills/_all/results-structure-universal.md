@@ -83,7 +83,7 @@ export default defineConfig({
 
 ### K6
 
-Cubierto en `[handle-summary-evidence](../k6/k6-greenfield/references/handle-summary-evidence.md)` y la oleada K6 paralela. `handleSummary()` devuelve un objeto cuyas claves son los paths a persistir:
+Cubierto en [[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder) y la oleada K6 paralela. `handleSummary()` devuelve un objeto cuyas claves son los paths a persistir:
 
 ```javascript
 return {

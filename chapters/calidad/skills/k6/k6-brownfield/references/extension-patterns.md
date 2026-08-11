@@ -68,7 +68,7 @@ Reglas:
 
 Caso: la calibración (`[[calidad-calibrate-k6-thresholds]]`) demostró que el SLA real es más estricto.
 
-- Reemplaza los valores numéricos en `options.thresholds` de los 5 scripts según el tier nuevo (`[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`).
+- Reemplaza los valores numéricos en `options.thresholds` de los 5 scripts según el tier nuevo ([[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)).
 - Documenta en el commit message la justificación con referencia al `results/${timestamp}-summary.json` que motivó el cambio.
 - NO toques `package.json`, `README.md` (a menos que el usuario lo pida explícitamente para actualizar la sección de "tier vigente").
 
@@ -79,7 +79,7 @@ Caso: el spec sumó `/orders` (POST + GET + DELETE).
 - Detecta cómo el proyecto extrae IDs hoy (`existing_id_correlation_pattern`). Reusa la **misma** función / mismo estilo de guard clause.
 - Añade los `buildXxxBody()` necesarios como patch en `utils.js` (no regeneres el archivo entero).
 - Si la clave del id es distinta (p. ej. `orderId` en lugar de `id`), confirma con el spec y mantén consistencia con la convención observada.
-- Patrón obligatorio en `[[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)`.
+- Patrón obligatorio en [[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder).
 
 ## 6. Migrar `auth_mode = spec` a `auth_mode = external`
 
@@ -118,4 +118,4 @@ Acciones complementarias (entregadas como nota al usuario, NO como modificación
 - Verificar que el smoke-test pasa con un token válido antes de correr load/stress/spike/soak.
 - Si el proyecto tenía un `run-all.sh` que sólo exportaba `BASE_URL`, advertir al usuario que ahora debe exportar también `AUTH_TOKEN`. No modificar `run-all.sh` sin permiso explícito (es infraestructura).
 
-Detalle completo del modo en `[[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)`.
+Detalle completo del modo en [[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder).

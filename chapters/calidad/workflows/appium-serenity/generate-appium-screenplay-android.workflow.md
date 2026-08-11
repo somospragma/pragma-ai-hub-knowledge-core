@@ -13,7 +13,7 @@ tags: [appium, mobile, android, screenplay, workflow, greenfield]
 
 ## Cuándo usar
 
-Cuando `[[calidad-intent-detection]]` identifica un escenario greenfield para Appium Android: el usuario quiere automatizar pruebas mobile en Android con el patrón Screenplay (Serenity + Cucumber) sobre Gradle. iOS está fuera de scope (`[[calidad-appium-screenplay-android]] (consultar `references/android-only-scope-rationale.md` en su subfolder)`).
+Cuando `[[calidad-intent-detection]]` identifica un escenario greenfield para Appium Android: el usuario quiere automatizar pruebas mobile en Android con el patrón Screenplay (Serenity + Cucumber) sobre Gradle. iOS está fuera de scope ([[calidad-appium-screenplay-android]] (consultar `references/android-only-scope-rationale.md` en su subfolder)).
 
 ## Inputs
 
@@ -44,6 +44,19 @@ Mock de backend (`[[calidad-service-virtualization-mockoon]]`): con APK real que
 
 ## Pasos
 
+### Paso 0 — Verificar que `appium-core` está instalado
+
+Este stack **depende de `appium-core`**, que se instala aparte. Antes de cualquier otra cosa, comprueba que el workspace tiene los tres bundles del core: `[[calidad-mobile-locator-resolution]]`, `[[calidad-mobile-interactions]]` y `[[calidad-appium-apk-auto-discovery]]`.
+
+Si faltan, **detente y díselo al usuario** con el comando exacto:
+
+```
+pragma-ai init --ide <ide> --chapter calidad --stack appium-core
+```
+
+No es una recomendación: sin el protocolo de resolución de locators se generan selectores plausibles en vez de verificados, y eso produce una suite verde que no prueba nada. Si el usuario decide continuar sin el core, déjalo declarado en la traza del pipeline y en el delivery gate como una carencia asumida.
+
+
 ### 1. Pre-flight check del stack (OBLIGATORIO)
 
 Antes de cualquier otra acción, ejecutar el pre-flight según [[calidad-appium-screenplay-android]] (consultar `references/preflight.md` en su subfolder):
@@ -62,10 +75,10 @@ Antes de generar cualquier código, generar `STRATEGY.md` en el `output_path` se
 NUNCA generar código sin STRATEGY.md aprobado explícitamente.
 
 ### 3. Validar inputs
-Aplica las 5 reglas de `[[calidad-appium-screenplay-android]] (consultar `references/mandatory-inputs-validation.md` en su subfolder)`. Si falla, abortar con el mensaje exacto.
+Aplica las 5 reglas de [[calidad-appium-screenplay-android]] (consultar `references/mandatory-inputs-validation.md` en su subfolder). Si falla, abortar con el mensaje exacto.
 
 ### 4. Rechazar si no es Android
-Si `platform_name` (cuando viene) en minúsculas no es `"android"`, responder `"En Appium V2 solo se soporta Android."` (`[[calidad-appium-screenplay-android]] (consultar `references/android-only-scope-rationale.md` en su subfolder)`).
+Si `platform_name` (cuando viene) en minúsculas no es `"android"`, responder `"En Appium V2 solo se soporta Android."` ([[calidad-appium-screenplay-android]] (consultar `references/android-only-scope-rationale.md` en su subfolder)).
 
 ### 5. Decidir estrategia de locators (auto-discovery vs deferred)
 
@@ -80,7 +93,7 @@ Si el pre-flight (paso 1) detectó:
 > 
 > (a) **Auto-descubrir selectores reales** recorriendo la app (~3-5 min, recomendado). Aplica `[[calidad-appium-apk-auto-discovery]]`. Los Page Objects se generan con selectores reales del DOM (resource-id, content-desc, etc.) y score de confianza por cada uno.
 > 
-> (b) **Continuar con locators diferidos** (`// TODO: update real locator`). Aplica `[[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)`. Tú completas los selectores manualmente después usando Appium Inspector.
+> (b) **Continuar con locators diferidos** (`// TODO: update real locator`). Aplica [[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder). Tú completas los selectores manualmente después usando Appium Inspector.
 > 
 > ¿Cuál prefieres?"
 
@@ -92,16 +105,16 @@ Si el pre-flight (paso 1) detectó:
 Mapear `user_story` y `test_cases` a items para escenarios `@proposed` (≤80 chars, newlines → espacios). Normalizar defaults Android. Si falta `app_package`/`app_activity`, dejar TODO en README con `aapt dump badging`.
 
 ### 7. Generar Gradle scaffold
-`build.gradle`, `settings.gradle`, `gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md` con las versiones inmutables de `[[calidad-appium-screenplay-android]] (consultar `references/gradle-version-matrix.md` en su subfolder)`. NO redefinir `aggregate`/`reports`/`clean` (`[[calidad-appium-screenplay-android]] (consultar `references/no-aggregate-collision.md` en su subfolder)`).
+`build.gradle`, `settings.gradle`, `gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md` con las versiones inmutables de [[calidad-appium-screenplay-android]] (consultar `references/gradle-version-matrix.md` en su subfolder). NO redefinir `aggregate`/`reports`/`clean` ([[calidad-appium-screenplay-android]] (consultar `references/no-aggregate-collision.md` en su subfolder)).
 
 ### 8. Generar capa Screenplay
-`LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` bajo `co.com.pragma.*` siguiendo `[[calidad-appium-screenplay-android]] (consultar `references/screenplay-layers.md` en su subfolder)`. Si el paso 5 eligió auto-discovery: inyectar selectores reales desde `.evidence/locators-discovered.json` (`[[calidad-appium-apk-auto-discovery]]`). Si eligió deferred o no había capacidades: aplicar deferred locators (`[[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)`).
+`LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` bajo `co.com.pragma.*` siguiendo [[calidad-appium-screenplay-android]] (consultar `references/screenplay-layers.md` en su subfolder). Si el paso 5 eligió auto-discovery: inyectar selectores reales desde `.evidence/locators-discovered.json` (`[[calidad-appium-apk-auto-discovery]]`). Si eligió deferred o no había capacidades: aplicar deferred locators ([[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)).
 
 ### 9. Generar features
-2 escenarios `@android @smoke` siempre + `@android @proposed` por cada item de `user_story`/`test_cases`. Cumplir `[[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder)`. Detalle en `[[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder)`.
+2 escenarios `@android @smoke` siempre + `@android @proposed` por cada item de `user_story`/`test_cases`. Cumplir [[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder). Detalle en [[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder).
 
 ### 10. Ejecutar health-check
-14 stages estáticas + pipeline Gradle (`clean → compileJava → testClasses` mínimo). Calcular `generation_status` según `[[calidad-appium-screenplay-android]] (consultar `references/health-check-pipeline.md` en su subfolder)`.
+14 stages estáticas + pipeline Gradle (`clean → compileJava → testClasses` mínimo). Calcular `generation_status` según [[calidad-appium-screenplay-android]] (consultar `references/health-check-pipeline.md` en su subfolder).
 
 ### 11. Validar 5 acceptance criteria
 Exit 0 sin cambios manuales; cero colisiones; cero errores `compileJava`/`compileTestJava`; todos los `*.feature` parsean; `gradlew` ejecutable de primera.
@@ -136,7 +149,7 @@ Invocar `[[calidad-generate-executive-report]]` con `results_path`, `strategy_md
 ## Criterios de finalización
 
 1. `generation_status = success` (no `partial`, no `failed`).
-2. Los 5 acceptance criteria pasan (`[[calidad-appium-screenplay-android]] (consultar `references/health-check-pipeline.md` en su subfolder)`).
+2. Los 5 acceptance criteria pasan ([[calidad-appium-screenplay-android]] (consultar `references/health-check-pipeline.md` en su subfolder)).
 3. `build.gradle` NO redefine `aggregate`, `reports` ni `clean`.
 4. Todos los `*.feature` parsean como Gherkin válido.
 5. `gradlew` ejecutable de primera (mode 0755) o README documenta `chmod +x gradlew` / `sh ./gradlew`.

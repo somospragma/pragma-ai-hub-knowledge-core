@@ -1,6 +1,6 @@
 # Step Isolation — Playwright
 
-Implementación del patrón universal `[step-isolation-pattern](../../../_all/step-isolation-pattern.md)` en Playwright. El mecanismo nativo es `test.beforeEach`/`test.afterEach` para aislar setup/cleanup + tags por step para filtrar reportes.
+Implementación del patrón universal `[[calidad-step-isolation-pattern]]` en Playwright. El mecanismo nativo es `test.beforeEach`/`test.afterEach` para aislar setup/cleanup + tags por step para filtrar reportes.
 
 ## Mecanismo
 
@@ -60,4 +60,4 @@ test.describe('Transactions list', { tag: ['@HU-101'] }, () => {
 
 ## Cross-links
 
-`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[playwright-native-tags-v142](./playwright-native-tags-v142.md)`, `[coverage-formula](./coverage-formula.md)`, `[auth-storage-state](./auth-storage-state.md)`, `[metadata-emitter-playwright](./metadata-emitter-playwright.md)`, `[[calidad-playwright-greenfield]]`.
+`[[calidad-step-isolation-pattern]]`, `[playwright-native-tags-v142](./playwright-native-tags-v142.md)`, `[coverage-formula](./coverage-formula.md)`, `[auth-storage-state](./auth-storage-state.md)`, `[metadata-emitter-playwright](./metadata-emitter-playwright.md)`, `[[calidad-playwright-greenfield]]`.

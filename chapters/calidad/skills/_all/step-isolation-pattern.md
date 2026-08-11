@@ -60,10 +60,10 @@ check(mainRes,  { 'transactions ok': r => r.status === 200 },
 
 ## Cross-links por stack
 
-- `[step-isolation-karate](../karate/karate-greenfield/references/step-isolation-karate.md)`
-- `[step-isolation-playwright](../playwright/playwright-greenfield/references/step-isolation-playwright.md)`
-- `[tag-policy-and-metrics-isolation](../k6/k6-greenfield/references/tag-policy-and-metrics-isolation.md)` (K6 ya cubierto)
-- `[step-isolation-appium](../appium/appium-screenplay-android/references/step-isolation-appium.md)`
+- [[calidad-karate-greenfield]] (consultar `references/step-isolation-karate.md` en su subfolder)
+- [[calidad-playwright-greenfield]] (consultar `references/step-isolation-playwright.md` en su subfolder)
+- [[calidad-k6-greenfield]] (consultar `references/tag-policy-and-metrics-isolation.md` en su subfolder) (K6 ya cubierto)
+- [[calidad-appium-screenplay-android]] (consultar `references/step-isolation-appium.md` en su subfolder)
 
 ## Cross-links generales
 

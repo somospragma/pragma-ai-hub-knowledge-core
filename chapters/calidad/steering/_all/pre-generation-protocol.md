@@ -40,7 +40,7 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
    Si pre-flight falla → reportar al usuario y **degradar a `scaffold-only`** con razón documentada. No continuar a generación full.
 
 3. **Declarar coverage upfront** antes de generar:
-   - Karate: por endpoint, calcular `effective_minimum` con fórmula `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)` y mostrar al usuario `{endpoint: N}`.
+   - Karate: por endpoint, calcular `effective_minimum` con fórmula [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder) y mostrar al usuario `{endpoint: N}`.
    - Playwright: por HU, calcular `effective_minimum = happy + 2_boundary + 2_negative + 1_edge ≈ 8` mínimo.
    - K6: los 3 escenarios Línea Base / Carga / Estrés (Smoke / Load / Stress en docs k6) son obligatorios. Spike y Soak son opt-in con justificación documentada en `.evidence/scenarios-opt-in.md` (ver [[calidad-k6-greenfield]] (consultar `references/vocabulary-and-scenario-mapping.md`)). Declarar también tier (Conservative/Moderate/Relaxed) con razón.
    - Appium: número de escenarios `@smoke` ejecutables + escenarios `@proposed` planeados.
@@ -59,4 +59,4 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 
 ## Cross-links
 
-`[[calidad-mandatory-inputs-protocol]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`, `[[calidad-business-driven-prioritization]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-generate-executive-report]]`.
+`[[calidad-mandatory-inputs-protocol]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-test-execution-orchestration]]`, [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder), `[[calidad-business-driven-prioritization]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-generate-executive-report]]`.

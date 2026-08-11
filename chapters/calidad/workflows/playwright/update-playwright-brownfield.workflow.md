@@ -64,8 +64,8 @@ En brownfield el riesgo de perder el hilo es MAYOR que en greenfield: son sesion
 
 
 1. **Analizar proyecto existente** — Recorre los archivos entregados. Identifica `tests/`, `pages/`, `fixtures/`, `mocks/`.
-2. **Extraer convenciones** — Aplica `[[calidad-playwright-brownfield]] (consultar `references/convention-detection.md` en su subfolder)` para producir el objeto de convenciones. Output mandatorio antes de generar nada.
-3. **Aplicar selector-update si la UI cambió** — Si `change_request` es de tipo (a), aplica `[[calidad-playwright-brownfield]] (consultar `references/selector-update-strategy.md` en su subfolder)` página por página. Solo cambian las cadenas dentro de los `getBy*`. Preservar TODO lo demás.
+2. **Extraer convenciones** — Aplica [[calidad-playwright-brownfield]] (consultar `references/convention-detection.md` en su subfolder) para producir el objeto de convenciones. Output mandatorio antes de generar nada.
+3. **Aplicar selector-update si la UI cambió** — Si `change_request` es de tipo (a), aplica [[calidad-playwright-brownfield]] (consultar `references/selector-update-strategy.md` en su subfolder) página por página. Solo cambian las cadenas dentro de los `getBy*`. Preservar TODO lo demás.
 4. **Generar nuevos tests con mismo estilo** — Si `change_request` es de tipo (b), invoca `[[calidad-playwright-brownfield]]` paso 4: copia exactamente el estilo de imports, naming, fixtures y granularidad de los specs existentes.
 5. **Validar coherencia** — Recorre cada archivo nuevo/modificado y verifica que respeta cada campo del objeto de convenciones (selector strategy, import style, file pattern, page object style).
 6. **Entregar SIN regenerar infraestructura** — Usa `[[calidad-streaming-files-protocol]]` para entregar exclusivamente los archivos cambiados o nuevos. No emitir `playwright.config.ts`, `tsconfig.json`, `package.json` ni `fixtures/base.fixture.ts` salvo que el usuario lo pida explícitamente.

@@ -102,4 +102,4 @@ Agregar este step al pipeline CI para que falle si quedan TODOs.
 10. Si el modo es `dry-run`: diff de locators propuesto entregado; ningún cambio aplicado sin aprobación humana.
 11. Tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@accessibility` NO fueron modificados por auto-corrección bajo ningún concepto (regla anti-cheating maestra).
 
-Ver `[[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)` para el rationale del patrón y `[[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder)` para la división original.
+Ver [[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder) para el rationale del patrón y [[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder) para la división original.

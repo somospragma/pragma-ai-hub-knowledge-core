@@ -60,4 +60,4 @@ Reglas estrictas:
 
 ## Notas
 
-Salida esperada: el contenido literal de `tests/config.js`, listo para persistir. Consume las reglas de `[[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)` y `[[calidad-k6-greenfield]] (consultar `references/config-and-utils-modules.md` en su subfolder)`.
+Salida esperada: el contenido literal de `tests/config.js`, listo para persistir. Consume las reglas de [[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder) y [[calidad-k6-greenfield]] (consultar `references/config-and-utils-modules.md` en su subfolder).

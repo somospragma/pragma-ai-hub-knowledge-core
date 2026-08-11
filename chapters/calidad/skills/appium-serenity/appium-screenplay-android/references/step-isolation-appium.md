@@ -1,6 +1,6 @@
 # Step Isolation — Appium (Screenplay)
 
-Implementación del patrón universal `[step-isolation-pattern](../../../_all/step-isolation-pattern.md)` en Appium con Screenplay. El mecanismo nativo: separar Tasks de Setup vs Tasks de Main, y evaluar Questions de dominio (contractuales) SOLO en el step main.
+Implementación del patrón universal `[[calidad-step-isolation-pattern]]` en Appium con Screenplay. El mecanismo nativo: separar Tasks de Setup vs Tasks de Main, y evaluar Questions de dominio (contractuales) SOLO en el step main.
 
 ## Mecanismo
 
@@ -74,4 +74,4 @@ public class TransactionsSteps {
 
 ## Cross-links
 
-`[step-isolation-pattern](../../../_all/step-isolation-pattern.md)`, `[screenplay-layers](./screenplay-layers.md)`, `[gherkin-syntax-rules](./gherkin-syntax-rules.md)`, `[metadata-emitter-appium](./metadata-emitter-appium.md)`, `[[calidad-appium-screenplay-android]]`.
+`[[calidad-step-isolation-pattern]]`, `[screenplay-layers](./screenplay-layers.md)`, `[gherkin-syntax-rules](./gherkin-syntax-rules.md)`, `[metadata-emitter-appium](./metadata-emitter-appium.md)`, `[[calidad-appium-screenplay-android]]`.

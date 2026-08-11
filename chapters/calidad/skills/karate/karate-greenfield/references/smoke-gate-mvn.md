@@ -1,6 +1,6 @@
 # Smoke Gate (Karate) — `mvn test` con `--tags @smoke`
 
-Implementación Karate de la política universal `[smoke-gate-policy](../../../_all/smoke-gate-policy.md)`. Antes de declarar `status: success`, el agente DEBE correr al menos un escenario etiquetado `@smoke` y validar exit code 0.
+Implementación Karate de la política universal `[[calidad-smoke-gate-policy]]`. Antes de declarar `status: success`, el agente DEBE correr al menos un escenario etiquetado `@smoke` y validar exit code 0.
 
 ## Comando canónico
 
@@ -69,4 +69,4 @@ smoke_gate:
 
 ## Cross-links
 
-`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[smoke-gate-policy](../../../_all/smoke-gate-policy.md)`.
+`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-smoke-gate-policy]]`.

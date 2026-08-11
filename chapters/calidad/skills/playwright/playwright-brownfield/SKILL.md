@@ -47,29 +47,29 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
 
 1. **Analizar proyecto existente** — Recorre el árbol entregado por el usuario: `playwright.config.ts`, `tsconfig.json`, `package.json`, `tests/`, `pages/`, `fixtures/`, `mocks/`. Identifica archivos representativos de cada categoría y el modo de ejecución actual (`@live` / `@mocked` / `@hybrid` si aplica).
 2. **Detectar convenciones** — Aplica ``references/convention-detection.md`` para extraer: `tests_dir`, `pages_dir`, `fixtures_dir`, `test_file_pattern`, `page_object_style`, `selector_strategy`, `import_style`, `path_aliases`, `base_url`, `auth_pattern`, `execution_mode_default`, `existing_page_objects[]`, `existing_tests[]`, `existing_fixtures[]`.
-3. **Validar contra UI real** — Para cualquier selector que vayas a modificar o crear, valida contra **la aplicación corriendo (live URL) o screenshots/Figma actualizados** provistos por el usuario. Si no hay forma de ver la UI, detente y pide la fuente UI (ver `[ui-source-priority](../playwright-greenfield/references/ui-source-priority.md)`).
+3. **Validar contra UI real** — Para cualquier selector que vayas a modificar o crear, valida contra **la aplicación corriendo (live URL) o screenshots/Figma actualizados** provistos por el usuario. Si no hay forma de ver la UI, detente y pide la fuente UI (ver [[calidad-playwright-greenfield]] (consultar `references/ui-source-priority.md` en su subfolder)).
 4. **Actualizar selectores manteniendo métodos** — Si hubo cambio UI, aplica ``references/selector-update-strategy.md``: reemplaza ÚNICAMENTE las asignaciones de Locator usando la `selector_strategy` ya detectada en el proyecto. Métodos, types, imports, comments y signatures se preservan literal.
 5. **Generar nuevos tests con mismo estilo** — Para tests/Page Objects nuevos, copia exactamente: convención de nombres, estilo de import (alias vs relativo), patrón de fixtures, naming de métodos, granularidad de pasos, tag de ejecución por defecto del proyecto. No introducir patrones nuevos.
-6. **Mocks solo opt-in** — Si la feature requiere cubrir un endpoint backend nuevo, materialízalo como handler bajo `@mocked` o `@hybrid` siguiendo `[execution-modes](../playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)`. No conviertas la suite existente a mocked por defecto.
+6. **Mocks solo opt-in** — Si la feature requiere cubrir un endpoint backend nuevo, materialízalo como handler bajo `@mocked` o `@hybrid` siguiendo [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md` en su subfolder). No conviertas la suite existente a mocked por defecto.
 7. **Validar coherencia** — Antes de entregar: verificar que cada nuevo archivo respeta la convención detectada en el paso 2. Si el proyecto usa selectores semánticos, no introducir `data-testid` ni CSS frágil; si usa relative imports, no introducir alias.
 
 ## Restricciones
 
 - **NO regenerar** `package.json`, `playwright.config.ts`, `tsconfig.json`, `fixtures/base.fixture.ts`, ni cualquier archivo de infraestructura existente.
-- **Las páginas y selectores se derivan exclusivamente de la UI real** (live URL, Figma, screenshots, Storybook). Ver `[ui-source-priority](../playwright-greenfield/references/ui-source-priority.md)`.
+- **Las páginas y selectores se derivan exclusivamente de la UI real** (live URL, Figma, screenshots, Storybook). Ver [[calidad-playwright-greenfield]] (consultar `references/ui-source-priority.md` en su subfolder).
 - **NO asumir** equivalencia entre endpoints backend y rutas frontend; un endpoint puede no tener pantalla y una pantalla puede consumir varios endpoints.
 - **Respetar Page Objects existentes** y su `selector_strategy` detectada: si el proyecto usa `getByRole`, los nuevos POM siguen `getByRole`; si usa `data-testid`, idem.
 - **Preservar TODO el código no-selector**: métodos, imports, types, comments, signatures, decoradores, orden de propiedades.
 - **No subir versiones** de dependencias salvo solicitud explícita del usuario.
 - **No agregar dependencias** nuevas salvo que el feature lo requiera y el usuario lo apruebe.
-- Si el proyecto no tiene `auth.setup.ts` y el nuevo flujo no requiere login real en browser, no introducirlo (ver `[auth-storage-state](../playwright-greenfield/references/auth-storage-state.md)`).
+- Si el proyecto no tiene `auth.setup.ts` y el nuevo flujo no requiere login real en browser, no introducirlo (ver [[calidad-playwright-greenfield]] (consultar `references/auth-storage-state.md` en su subfolder)).
 - Entrega los archivos modificados/nuevos usando `[[calidad-streaming-files-protocol]]`.
 
 ## Cross-links
 
-- Fuente UI obligatoria: `[ui-source-priority](../playwright-greenfield/references/ui-source-priority.md)`
-- Modos de ejecución (live / mocked / hybrid): `[execution-modes-live-mocked-hybrid](../playwright-greenfield/references/execution-modes-live-mocked-hybrid.md)`
-- Page Object Model: `[page-object-model](../playwright-greenfield/references/page-object-model.md)`
-- Prioridad de selectores: `[selector-priority](../playwright-greenfield/references/selector-priority.md)`
-- Auth en browser: `[auth-storage-state](../playwright-greenfield/references/auth-storage-state.md)`
+- Fuente UI obligatoria: [[calidad-playwright-greenfield]] (consultar `references/ui-source-priority.md` en su subfolder)
+- Modos de ejecución (live / mocked / hybrid): [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md` en su subfolder)
+- Page Object Model: [[calidad-playwright-greenfield]] (consultar `references/page-object-model.md` en su subfolder)
+- Prioridad de selectores: [[calidad-playwright-greenfield]] (consultar `references/selector-priority.md` en su subfolder)
+- Auth en browser: [[calidad-playwright-greenfield]] (consultar `references/auth-storage-state.md` en su subfolder)
 - Cuando la app está viva y conviene re-explorar: `[[calidad-playwright-from-live-app]]`

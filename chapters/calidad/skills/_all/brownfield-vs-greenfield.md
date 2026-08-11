@@ -94,7 +94,7 @@ En **brownfield K6** detecta y respeta:
 | `existing_id_correlation_pattern`| Cómo se extrae el id del response del POST y se reusa en GET/PUT/DELETE                      | `const id = res.json('id');` + guard     |
 | `handle_summary_path`            | Destino dentro de `handleSummary()`: `results/` (default) vs `reports/`                       | `results/${timestamp}-summary.json`      |
 
-Detalle del algoritmo en `[[calidad-k6-brownfield]] (consultar `references/convention-detection.md` en su subfolder)`. Patrones de extensión en `[[calidad-k6-brownfield]] (consultar `references/extension-patterns.md` en su subfolder)`.
+Detalle del algoritmo en [[calidad-k6-brownfield]] (consultar `references/convention-detection.md` en su subfolder). Patrones de extensión en [[calidad-k6-brownfield]] (consultar `references/extension-patterns.md` en su subfolder).
 
 ### Appium
 

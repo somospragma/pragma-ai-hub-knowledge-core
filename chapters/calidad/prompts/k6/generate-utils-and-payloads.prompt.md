@@ -17,7 +17,7 @@ tags: [k6, prompt, utils, payloads, uuid, headers]
 - `{{required_headers}}`: headers transversales requeridos por el spec.
 - `{{enums}}`: enums extraídos (top-level y property-level).
 - `{{security_info}}`: indicador booleano + detalle del scheme (`bearer`, `apiKey`, etc.) si el spec define security; null si no.
-- `{{auth_mode}}`: modo de autenticación elegido. Valores: `spec` (default) | `external` (override). Controla si `Authorization` se emite siempre o solo cuando `security_info` no es null. Ver `[[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)`.
+- `{{auth_mode}}`: modo de autenticación elegido. Valores: `spec` (default) | `external` (override). Controla si `Authorization` se emite siempre o solo cuando `security_info` no es null. Ver [[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder).
 
 ## Prompt
 
@@ -75,4 +75,4 @@ Reglas estrictas:
 
 ## Notas
 
-Consume reglas de `[[calidad-k6-greenfield]] (consultar `references/config-and-utils-modules.md` en su subfolder)` y `[[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)`. El resultado se persiste como `tests/utils.js` antes de la infraestructura, según `[[calidad-streaming-files-protocol]]`.
+Consume reglas de [[calidad-k6-greenfield]] (consultar `references/config-and-utils-modules.md` en su subfolder) y [[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder). El resultado se persiste como `tests/utils.js` antes de la infraestructura, según `[[calidad-streaming-files-protocol]]`.

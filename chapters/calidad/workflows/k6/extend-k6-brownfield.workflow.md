@@ -81,11 +81,11 @@ Inspecciona `project_root`. Verifica que cumple los criterios brownfield (`tests
 
 ### Paso 2 — Detectar convenciones
 
-Aplica el algoritmo de `[[calidad-k6-brownfield]] (consultar `references/convention-detection.md` en su subfolder)`. Consolida: `tests_dir`, `script_naming`, `groups_naming`, `auth_mode` actual, `existing_thresholds` (tier dominante), `existing_payload_builders`, `existing_id_correlation_pattern`, `handle_summary_path`, `import_style`, `env_vars_in_use`. Estos valores son el contrato para todo lo que se genere a continuación.
+Aplica el algoritmo de [[calidad-k6-brownfield]] (consultar `references/convention-detection.md` en su subfolder). Consolida: `tests_dir`, `script_naming`, `groups_naming`, `auth_mode` actual, `existing_thresholds` (tier dominante), `existing_payload_builders`, `existing_id_correlation_pattern`, `handle_summary_path`, `import_style`, `env_vars_in_use`. Estos valores son el contrato para todo lo que se genere a continuación.
 
 ### Paso 3 — Determinar tipo de cambio
 
-Mapea el `change_request` a uno o varios de los patrones de `[[calidad-k6-brownfield]] (consultar `references/extension-patterns.md` en su subfolder)`:
+Mapea el `change_request` a uno o varios de los patrones de [[calidad-k6-brownfield]] (consultar `references/extension-patterns.md` en su subfolder):
 
 - Añadir endpoint a script existente → patch.
 - Crear nuevo script → archivo nuevo.
@@ -108,7 +108,7 @@ Cada modificación a un archivo existente se entrega como **diff legible** (lín
 
 ### Paso 5 — Preservar `handleSummary()`
 
-Bajo ninguna circunstancia regenerar `handleSummary()` con un formato distinto al detectado. Si los scripts existentes exportan a `results/${timestamp}-summary.json` con un timestamp ISO específico, los scripts nuevos usan exactamente la misma función (idealmente copiada literal del primer script existente). Si el proyecto usa `vendor/k6-summary.js` (ver `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)` sección offline), los nuevos scripts también lo importan de ahí.
+Bajo ninguna circunstancia regenerar `handleSummary()` con un formato distinto al detectado. Si los scripts existentes exportan a `results/${timestamp}-summary.json` con un timestamp ISO específico, los scripts nuevos usan exactamente la misma función (idealmente copiada literal del primer script existente). Si el proyecto usa `vendor/k6-summary.js` (ver [[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder) sección offline), los nuevos scripts también lo importan de ahí.
 
 ### Paso 6 — Validar checklist
 
@@ -154,7 +154,7 @@ Detalle de comandos en `[[calidad-k6-run-and-suite]]`.
 2. Convenciones detectadas (`script_naming`, `groups_naming`, `auth_mode`, `existing_thresholds`, `existing_payload_builders`, `existing_id_correlation_pattern`, `handle_summary_path`, `import_style`) respetadas al 100%.
 3. Los nuevos scripts pasan smoke test individual (verificable con el comando entregado en el paso 7). Si el usuario no puede correrlo localmente, al menos `k6 inspect tests/<nuevo-script>-test.js` debe correr sin errores de parseo.
 4. Cada nuevo `check()` valida campos del response (no solo status code).
-5. Flujos CRUD nuevos usan IDs dinámicos (`[[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)`); cero IDs hardcodeados, aun si scripts viejos los tuvieran.
+5. Flujos CRUD nuevos usan IDs dinámicos ([[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)); cero IDs hardcodeados, aun si scripts viejos los tuvieran.
 6. `handleSummary()` preservado: ruta de salida, formato de timestamp y origen de `textSummary` (jslib remota o vendor local) idénticos a los del proyecto.
 7. Si hubo migración a `auth_mode = external`, el usuario fue notificado de actualizar `README.md` y CI con `AUTH_TOKEN` como variable obligatoria.
 8. Mensaje final al usuario enumera: (a) archivos nuevos, (b) patches a archivos existentes con path y resumen del cambio, (c) comando de ejecución, (d) cualquier acción manual pendiente.

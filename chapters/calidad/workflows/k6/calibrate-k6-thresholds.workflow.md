@@ -13,7 +13,7 @@ tags: [k6, thresholds, calibration, baseline, smoke]
 
 ## Cuándo usar
 
-Después de la primera corrida smoke con datos reales del servicio. Los thresholds iniciales generados con `[[calidad-k6-greenfield]]` son una estimación (Moderate por default — ver `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`); este workflow los alinea al comportamiento observado.
+Después de la primera corrida smoke con datos reales del servicio. Los thresholds iniciales generados con `[[calidad-k6-greenfield]]` son una estimación (Moderate por default — ver [[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)); este workflow los alinea al comportamiento observado.
 
 Aplícalo también cuando:
 
@@ -23,7 +23,7 @@ Aplícalo también cuando:
 
 ## Inputs
 
-- **Obligatorio**: JSON summary del smoke run anterior (archivo `results/${timestamp}-summary.json` exportado por `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)`).
+- **Obligatorio**: JSON summary del smoke run anterior (archivo `results/${timestamp}-summary.json` exportado por [[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)).
 - **Opcional**: `user_story.SLA` y/o `firma.SLA` actualizados, si el contexto de negocio cambió.
 
 ## Pasos
@@ -39,7 +39,7 @@ Lee el JSON del smoke y extrae:
 
 ### Paso 2 — Seleccionar tier
 
-Compara los valores medidos contra los tres tiers (`[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`):
+Compara los valores medidos contra los tres tiers ([[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)):
 
 - Si P95 medido < 500 ms y error rate < 0.001 → candidato Conservative.
 - Si P95 medido < 1000 ms y error rate < 0.01 → Moderate.
@@ -49,7 +49,7 @@ Si el `user_story` o `firma` declaran un SLA más estricto que el baseline, prev
 
 ### Paso 3 — Actualizar `options.thresholds`
 
-Aplica los valores del tier seleccionado a los 5 scripts (`smoke`, `load`, `stress`, `spike`, `soak`). Usa el snippet correspondiente de `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`.
+Aplica los valores del tier seleccionado a los 5 scripts (`smoke`, `load`, `stress`, `spike`, `soak`). Usa el snippet correspondiente de [[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder).
 
 ### Paso 4 — Re-correr smoke como validación
 

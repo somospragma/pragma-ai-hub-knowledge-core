@@ -16,14 +16,14 @@
 
 ## Complementarios
 
-- **k6** para perf: derivar VUs/stages del peak QPS real (ver `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`).
+- **k6** para perf: derivar VUs/stages del peak QPS real (ver [[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)).
 - **Pact** para contract testing consumer-driven cuando hay múltiples consumidores y se quiere prevenir breaking changes.
 - **Schemathesis** para fuzzing del contrato OpenAPI (cubre OWASP API1, API3, API8 parcial).
 
 ## Antipatrones
 
 - Hardcodear IDs y tokens en los `.feature` (rompe en cada ambiente).
-- Validar solo el happy path; sin cobertura negativa documentada (`[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`).
+- Validar solo el happy path; sin cobertura negativa documentada ([[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)).
 - Validar respuestas contra ejemplos del Swagger en lugar de contra el schema (los ejemplos suelen estar desactualizados).
 - Tests que dependen del orden de ejecución (cada feature debe ser independiente o explícitamente encadenado vía `karate.callSingle`).
 - Asumir que `POST` repetido produce el mismo recurso sin `Idempotency-Key`.

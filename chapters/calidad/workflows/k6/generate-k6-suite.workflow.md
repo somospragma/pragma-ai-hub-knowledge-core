@@ -20,7 +20,7 @@ Cuando el routing del chapter (`[[calidad-route-test-generation]]`) detecta inte
 Gobernados por `[[calidad-mandatory-inputs-protocol]]`:
 
 - **Obligatorios**: `spec` (OpenAPI 3.x o Swagger 2.0), `project_name`, `output_path`, `base_url`.
-- **Opcionales / recomendados**: `user_story` (para derivar SLA y elegir tier), `firma` (perfil del sistema — mission-critical → Conservative; business-as-usual → Moderate; internal → Relaxed), `auth_mode` (`spec` default | `external` override — ver paso 3 y `[[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)`).
+- **Opcionales / recomendados**: `user_story` (para derivar SLA y elegir tier), `firma` (perfil del sistema — mission-critical → Conservative; business-as-usual → Moderate; internal → Relaxed), `auth_mode` (`spec` default | `external` override — ver paso 3 y [[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)).
 
 ## Pasos
 
@@ -51,7 +51,7 @@ Lista cada `path` con `method`, `operationId`, parámetros y referencias de sche
 
 ### Paso 5 — Extraer config data y decidir auth_mode
 
-Aplica `[[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder)`: enums, headers requeridos y security schemes. Decide si `authToken` y `Authorization` aplican según el **modo de autenticación**:
+Aplica [[calidad-k6-greenfield]] (consultar `references/enums-headers-security-extraction.md` en su subfolder): enums, headers requeridos y security schemes. Decide si `authToken` y `Authorization` aplican según el **modo de autenticación**:
 
 - Rama A — `auth_mode = spec` (default, sin input explícito): incluye `authToken`/`Authorization` SOLO si el spec declara `security` (`components.securitySchemes` / `securityDefinitions`). Si no hay security, **no** los emitas.
 - Rama B — `auth_mode = external` (input explícito o env `EXTERNAL_AUTH=true`): incluye `authToken: __ENV.AUTH_TOKEN || ''` en `config.js` y `Authorization: Bearer ${config.authToken}` en `getDefaultHeaders()` **siempre**, aunque el spec no declare security. Marca `AUTH_TOKEN` como env var obligatoria para el README.
@@ -60,23 +60,23 @@ Anota la rama elegida; los pasos siguientes dependen de ella.
 
 ### Paso 6 — Detectar CRUD flows
 
-Aplica `[[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)`: normaliza paths, agrupa, clasifica `full` o `partial`.
+Aplica [[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder): normaliza paths, agrupa, clasifica `full` o `partial`.
 
 ### Paso 7 — Elegir tier de thresholds
 
-Aplica `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`: deriva desde `user_story.SLA` → `firma.SLA` → Moderate default.
+Aplica [[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder): deriva desde `user_story.SLA` → `firma.SLA` → Moderate default.
 
 ### Paso 8 — Generar utils template
 
-Construye el contenido de `utils.js` (`uuidv4`, `getDefaultHeaders`, `buildXxxBody`) según `[[calidad-k6-greenfield]] (consultar `references/config-and-utils-modules.md` en su subfolder)`. Aún no se escribe a disco; sirve de plantilla para los tests.
+Construye el contenido de `utils.js` (`uuidv4`, `getDefaultHeaders`, `buildXxxBody`) según [[calidad-k6-greenfield]] (consultar `references/config-and-utils-modules.md` en su subfolder). Aún no se escribe a disco; sirve de plantilla para los tests.
 
 ### Paso 9 — Emitir archivos (orden estricto)
 
 Aplica `[[calidad-streaming-files-protocol]]` y `[[calidad-k6-greenfield]]`:
 
-1. Tests primero, en este orden: primero los 3 obligatorios `smoke-test.js`, `load-test.js`, `stress-test.js`, luego los opt-in activados (`spike-test.js`, `soak-test.js`) si `user_story` / `firma` / `risk_map` los amerita. Ver [[calidad-k6-greenfield]] (consultar `references/vocabulary-and-scenario-mapping.md`). Cada script incluye stages, thresholds, `default function`, `check()` con validación de campos, `sleep(1)`, `handleSummary()` (`[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)`). Genera cada test invocando `[[calidad-k6-generate-script-prompt]]`.
+1. Tests primero, en este orden: primero los 3 obligatorios `smoke-test.js`, `load-test.js`, `stress-test.js`, luego los opt-in activados (`spike-test.js`, `soak-test.js`) si `user_story` / `firma` / `risk_map` los amerita. Ver [[calidad-k6-greenfield]] (consultar `references/vocabulary-and-scenario-mapping.md`). Cada script incluye stages, thresholds, `default function`, `check()` con validación de campos, `sleep(1)`, `handleSummary()` ([[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)). Genera cada test invocando `[[calidad-k6-generate-script-prompt]]`.
 2. Luego `utils.js` (vía `[[calidad-k6-generate-utils-prompt]]`) y `config.js` (vía `[[calidad-k6-extract-config-prompt]]`).
-3. Por último: `package.json`, `run-all.sh`, `.gitignore`, `README.md` (ver `[[calidad-k6-greenfield]] (consultar `references/project-structure.md` en su subfolder)`).
+3. Por último: `package.json`, `run-all.sh`, `.gitignore`, `README.md` (ver [[calidad-k6-greenfield]] (consultar `references/project-structure.md` en su subfolder)).
 
 ### Paso 10 — Validar DoD
 
@@ -84,7 +84,7 @@ Recorre el checklist de 10 items (`## Criterios de finalización`). Si algún í
 
 ### Fase final obligatoria — Ejecutar, triar y auto-corregir
 
-**Esta fase es parte del contrato de entrega del workflow, no opcional.** En K6, esta fase usa **únicamente `smoke-test.js`** como verificación rápida del scaffold: 1-2 VUs por un minuto. Los scripts `load`, `stress`, `spike`, `soak` NO se ejecutan dentro del loop de auto-corrección porque generan carga real y requieren ventana de mantenimiento + gobernanza (`[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`).
+**Esta fase es parte del contrato de entrega del workflow, no opcional.** En K6, esta fase usa **únicamente `smoke-test.js`** como verificación rápida del scaffold: 1-2 VUs por un minuto. Los scripts `load`, `stress`, `spike`, `soak` NO se ejecutan dentro del loop de auto-corrección porque generan carga real y requieren ventana de mantenimiento + gobernanza ([[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)).
 
 **Si `execution_target: mock | hybrid`** (resuelto por `[[calidad-sut-readiness-gate]]`): levantar el mock Mockoon antes del smoke (`[[calidad-service-virtualization-mockoon]]`) y correr con `-e BASE_URL=http://localhost:3010/api`. **Regla dura**: contra mock SOLO se ejecuta el smoke 1:1 para validar la construcción de los scripts (correlación, checks, estructura); `load/stress/spike/soak` contra mock están PROHIBIDOS y sus métricas jamás se reportan — el mock no representa el comportamiento del SUT bajo carga. La ejecución real de la suite de performance queda para el switchover (`certification: pending_real_integration` en el delivery gate) vía `[[calidad-calibrate-k6-thresholds]]` bajo ventana coordinada.
 
@@ -115,7 +115,7 @@ Invocar `[[calidad-generate-executive-report]]` con `results_path`, `strategy_md
 4. Credenciales y `baseUrl` provienen de `config.js`/`__ENV` (cero hardcoded en tests). En modo `external`, `AUTH_TOKEN` está documentada como obligatoria en el `README.md`.
 5. `options.stages` y `options.thresholds` presentes en cada script emitido (los 3 obligatorios y los opt-in activados).
 6. Cada `check()` valida campos del response (no solo el status code).
-7. Flujos CRUD usan IDs dinámicos con guard clause (`[[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)`).
+7. Flujos CRUD usan IDs dinámicos con guard clause ([[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)).
 8. Headers se construyen vía `getDefaultHeaders()` de `utils.js` (no inline).
 9. Payloads se construyen vía `buildXxxBody()` de `utils.js` (no inline).
 10. `handleSummary()` presente en cada script exportando JSON a `results/`.

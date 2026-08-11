@@ -74,4 +74,4 @@ Exporta primero la variable: `export BASE_URL=https://api.example.com/v1` y lueg
 
 - Nunca hardcodear `BASE_URL` o `AUTH_TOKEN` dentro de los scripts; siempre vía `__ENV` con fallback en `config.js`.
 - Si el spec no define security, no exportar `AUTH_TOKEN` ni incluirlo en los comandos.
-- Los resultados quedan en `results/` (ver `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)`); esa carpeta debe estar en `.gitignore`.
+- Los resultados quedan en `results/` (ver [[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)); esa carpeta debe estar en `.gitignore`.

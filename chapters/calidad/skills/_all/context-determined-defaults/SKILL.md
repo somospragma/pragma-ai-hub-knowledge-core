@@ -79,5 +79,5 @@ Los mismos criterios se aplican a clientes de **fintech, telco, retail, logísti
 - `[[calidad-test-evidence-and-traceability]]`
 - `[[calidad-security-testing]]`
 - `[[calidad-sut-types-and-adaptations]]`
-- `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`
-- `[[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)`
+- [[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)
+- [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)

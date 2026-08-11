@@ -61,7 +61,7 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
    - `refactor`: cambios mínimos enfocados; no introducir nuevas capas ni renombrar paquetes.
 5. **NO modificar build/infra** — `build.gradle`, `settings.gradle`, `pom.xml`, `gradlew`, `serenity.conf`, `serenity.properties`, `junit-platform.properties`, `logback-test.xml`, runner Cucumber existente: NO se tocan. Excepción única: si el cambio requiere una dependencia nueva (ej. una librería de visual regression), se reporta al usuario para que apruebe la edición puntual del `build.gradle`/`pom.xml`; no se decide unilateralmente.
 6. **Validar coherencia** — Antes de entregar:
-   - Validar Gherkin (`[[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder)`) en cada `.feature` nuevo o tocado.
+   - Validar Gherkin ([[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder)) en cada `.feature` nuevo o tocado.
    - Validar que el `package` de cada `.java` nuevo coincide con el path físico bajo `base_package` detectado.
    - Validar que los tags usados son subset o extensión coherente de los `scenario_tag_conventions` detectados.
    - Validar que el `gherkin_language` se respetó.

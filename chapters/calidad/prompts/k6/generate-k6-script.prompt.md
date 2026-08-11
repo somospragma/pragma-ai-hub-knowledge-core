@@ -89,4 +89,4 @@ Reglas estrictas:
 
 ## Notas
 
-Invocar este prompt una vez por `script_type` (5 invocaciones por proyecto). Stages y thresholds detallados en `[[calidad-k6-greenfield]] (consultar `references/five-script-types.md` en su subfolder)` y `[[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)`. Correlación CRUD en `[[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder)`. Evidencia en `[[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder)`.
+Invocar este prompt una vez por `script_type` (5 invocaciones por proyecto). Stages y thresholds detallados en [[calidad-k6-greenfield]] (consultar `references/five-script-types.md` en su subfolder) y [[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder). Correlación CRUD en [[calidad-k6-greenfield]] (consultar `references/crud-dynamic-id-correlation.md` en su subfolder). Evidencia en [[calidad-k6-greenfield]] (consultar `references/handle-summary-evidence.md` en su subfolder).

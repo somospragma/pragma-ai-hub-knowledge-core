@@ -68,7 +68,7 @@ Cada `@Suite` lleva su propio filtro de tags: invocar `test` a secas corre TODOS
 
 | Tarea | Para qué |
 |---|---|
-| `clean` | Limpia `build/` y `target/`. NO redefinir (`[[calidad-appium-screenplay-android]] (consultar `references/no-aggregate-collision.md` en su subfolder)`). |
+| `clean` | Limpia `build/` y `target/`. NO redefinir ([[calidad-appium-screenplay-android]] (consultar `references/no-aggregate-collision.md` en su subfolder)). |
 | `compileJava` | Compila `src/main` — usa Serenity/Appium del scope `implementation`. |
 | `compileTestJava` | Compila `src/test` — runners y step definitions. |
 | `testClasses` | Asegura que los tests compilan sin ejecutarlos. |
@@ -97,4 +97,4 @@ Alternativa sin chmod:
 sh ./gradlew clean test aggregate
 ```
 
-El health-check stage `gradlew:executable-flag-instruction` exige que el README documente este paso (`[[calidad-appium-screenplay-android]] (consultar `references/health-check-pipeline.md` en su subfolder)`).
+El health-check stage `gradlew:executable-flag-instruction` exige que el README documente este paso ([[calidad-appium-screenplay-android]] (consultar `references/health-check-pipeline.md` en su subfolder)).

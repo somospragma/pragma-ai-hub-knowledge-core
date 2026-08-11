@@ -1,6 +1,6 @@
 # Metadata Emitter — Karate
 
-Karate genera `karate-summary.json` al final de cada corrida vía Surefire. Este reference define cómo derivar el `{ISO}-metadata.json` universal a partir de ese summary, manteniendo el schema cross-stack definido en `[execution-metadata-schema](../../../_all/execution-metadata-schema.md)`.
+Karate genera `karate-summary.json` al final de cada corrida vía Surefire. Este reference define cómo derivar el `{ISO}-metadata.json` universal a partir de ese summary, manteniendo el schema cross-stack definido en `[[calidad-execution-metadata-schema]]`.
 
 ## Mecanismo
 
@@ -116,11 +116,11 @@ PY
 
 ## Reglas
 
-- Path final: `results/karate/{YYYY-MM-DD}/{ISO}-metadata.json` (alineado con `[results-structure-universal](../../../_all/results-structure-universal.md)`).
+- Path final: `results/karate/{YYYY-MM-DD}/{ISO}-metadata.json` (alineado con `[[calidad-results-structure-universal]]`).
 - El script se invoca DESPUÉS de `mvn test`, no antes. Si `mvn test` falla, el script sigue ejecutando para producir metadata con `exit_code` real.
 - NO omitir claves: si Karate no usa auth, escribir `"auth_strategy": "none"`, no eliminar la clave.
-- Si hay bloqueo de ambiente, el array `blockers` recibe el `reason` desde `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`.
+- Si hay bloqueo de ambiente, el array `blockers` recibe el `reason` desde `[[calidad-environment-blocker-evidence]]`.
 
 ## Cross-links
 
-`[execution-metadata-schema](../../../_all/execution-metadata-schema.md)`, `[results-structure-universal](../../../_all/results-structure-universal.md)`, `[environment-blocker-evidence](../../../_all/environment-blocker-evidence.md)`, `[[calidad-delivery-gate-contract]]`, `[[calidad-karate-greenfield]]`.
+`[[calidad-execution-metadata-schema]]`, `[[calidad-results-structure-universal]]`, `[[calidad-environment-blocker-evidence]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-karate-greenfield]]`.
