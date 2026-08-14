@@ -4,6 +4,16 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: golden-test-engineer
+tools: [read, write, shell]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/goldens/**", "**/test_assets/**"]
+    - capability: shell
+      effect: allow
+      match: ["dart test *", "flutter test *", "melos exec *"]
 description: >
   Generates and updates Flutter golden tests for visual regression coverage. Use when a workflow needs pixel-level validation across states, variants, themes, sizes, or Figma-driven visual expectations.
 ---

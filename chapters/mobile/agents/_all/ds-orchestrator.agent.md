@@ -6,6 +6,19 @@ type: agent
 chapter: mobile
 description: >
   Workflow controller for Design System and Figma-driven mobile work. Use for new components, new views, component refactors and DS-scoped PR comment fixes with required human checkpoints.
+name: ds-orchestrator
+tools: [read, write, shell, subagent, "@figma"]
+includeMcpJson: true
+permissions:
+  rules:
+    - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**"]}
+    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *"]}
+    - {capability: mcp, effect: allow, match: ["figma/*"]}
+    - {capability: subagent, effect: allow, match: ["figma-analyzer", "component-planner", "component-architect", "widget-developer", "test-engineer", "golden-test-engineer", "widgetbook-developer", "code-auditor", "delivery-manager"]}
+toolsSettings:
+  subagent:
+    availableAgents: [figma-analyzer, component-planner, component-architect, widget-developer, test-engineer, golden-test-engineer, widgetbook-developer, code-auditor, delivery-manager]
+    trustedAgents: [figma-analyzer, component-planner, component-architect, widget-developer, test-engineer, golden-test-engineer, widgetbook-developer, code-auditor, delivery-manager]
 ---
 # Design System Workflow Controller Instructions
 
@@ -534,6 +547,8 @@ No continue without explicit approval.
 ## Critical Rules
 
 - NEVER code or audit files directly; delegate.
+- A delegated response is not phase completion. Require the already-mandatory
+  evidence and the applicable existing SOPP checkpoint before reporting success.
 - NEVER execute Figma MCP directly when native delegation is available.
 - ALWAYS prefer `@figma-analyzer` for Figma access (Phase 1). When delegation
   is unavailable, execute only its bounded analysis role contract and only with

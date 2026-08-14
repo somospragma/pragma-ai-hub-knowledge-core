@@ -4,6 +4,16 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: widget-developer
+tools: [read, write, shell]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/assets/**", "**/test/**", "**/pubspec.yaml"]
+    - capability: shell
+      effect: allow
+      match: ["dart format *", "dart analyze *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
 description: >
   Implements pure Flutter widgets, Design System components, and presentation-layer views from an approved technical plan. Use when artifact paths, tokens, contracts, and success criteria are already defined.
 ---

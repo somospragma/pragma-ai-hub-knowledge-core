@@ -32,6 +32,128 @@ rescue Psych::SyntaxError => e
   raise "#{path}: #{e.message}"
 end
 
+def read_frontmatter(path)
+  content = File.read(path)
+  match = content.match(/\A---\r?\n(?<yaml>.*?)\r?\n---\r?\n/m)
+  raise "#{path}: missing YAML frontmatter" unless match
+
+  YAML.safe_load(match[:yaml], aliases: false) || {}
+rescue Psych::Exception => e
+  raise "#{path}: #{e.message}"
+end
+
+def kiro_agent_profiles
+  @kiro_agent_profiles ||= {
+    "mobile-orchestrator" => {
+      tools: %w[read subagent],
+      rules: [
+        { "capability" => "subagent", "effect" => "allow", "match" => %w[workspace-discovery ds-orchestrator feature-builder refactoring-advisor test-coverage-engineer] }
+      ],
+      delegates: %w[workspace-discovery ds-orchestrator feature-builder refactoring-advisor test-coverage-engineer]
+    },
+    "feature-builder" => {
+      tools: ["read", "write", "shell", "subagent", "@figma"],
+      include_mcp: true,
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
+        { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
+        { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer ds-orchestrator test-engineer golden-test-engineer code-auditor delivery-manager] }
+      ],
+      delegates: %w[figma-analyzer ds-orchestrator test-engineer golden-test-engineer code-auditor delivery-manager]
+    },
+    "ds-orchestrator" => {
+      tools: ["read", "write", "shell", "subagent", "@figma"],
+      include_mcp: true,
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *"] },
+        { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
+        { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer component-planner component-architect widget-developer test-engineer golden-test-engineer widgetbook-developer code-auditor delivery-manager] }
+      ],
+      delegates: %w[figma-analyzer component-planner component-architect widget-developer test-engineer golden-test-engineer widgetbook-developer code-auditor delivery-manager]
+    },
+    "refactoring-advisor" => {
+      tools: %w[read write shell subagent],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
+        { "capability" => "subagent", "effect" => "allow", "match" => %w[code-auditor ds-orchestrator] }
+      ],
+      delegates: %w[code-auditor ds-orchestrator]
+    },
+    "workspace-discovery" => {
+      tools: %w[read write shell],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"] }
+      ]
+    },
+    "code-auditor" => {
+      tools: %w[read write shell],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "melos exec *"] }
+      ]
+    },
+    "component-architect" => {
+      tools: %w[read write],
+      rules: [{ "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**"] }]
+    },
+    "component-planner" => {
+      tools: %w[read write],
+      rules: [{ "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**"] }]
+    },
+    "delivery-manager" => {
+      tools: %w[read write],
+      rules: [{ "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/docs/**", "**/README.md", "**/CHANGELOG.md"] }]
+    },
+    "figma-analyzer" => {
+      tools: ["read", "write", "@figma"],
+      include_mcp: true,
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**"] },
+        { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] }
+      ]
+    },
+    "golden-test-engineer" => {
+      tools: %w[read write shell],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/goldens/**", "**/test_assets/**"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["dart test *", "flutter test *", "melos exec *"] }
+      ]
+    },
+    "test-coverage-engineer" => {
+      tools: %w[read write shell],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/docs/**", "**/pubspec.yaml"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"] }
+      ]
+    },
+    "test-engineer" => {
+      tools: %w[read write shell],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/test_assets/**"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["dart test *", "flutter test *", "melos exec *", "melos run *"] }
+      ]
+    },
+    "widget-developer" => {
+      tools: %w[read write shell],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/assets/**", "**/test/**", "**/pubspec.yaml"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["dart format *", "dart analyze *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"] }
+      ]
+    },
+    "widgetbook-developer" => {
+      tools: %w[read write shell],
+      rules: [
+        { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/widgetbook/**", "**/pubspec.yaml"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["dart format *", "dart analyze *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"] }
+      ]
+    }
+  }.freeze
+end
+
 def overlay_path(workflow)
   File.join(SPEC_PACKET_TEMPLATE_DIR, "#{workflow}#{OVERLAY_SUFFIX}")
 end
@@ -125,7 +247,7 @@ def validate_references(findings, cleared)
     File.basename(path, ".agent.md")
   end
   allowed_annotations = %w[
-    freezed injectable override JsonKey LazySingleton Deprecated Envied Tags widgetbook
+    freezed injectable override JsonKey LazySingleton Deprecated Envied Tags widgetbook figma
   ]
 
   agent_misses = []
@@ -172,6 +294,76 @@ def validate_references(findings, cleared)
   add(findings, "HIGH", "SKILL_REF_MISSING", "Unknown Active Skills", skill_misses.join("\n")) if skill_misses.any?
 
   cleared << "Agent, prompt and Active Skill references resolve" if agent_misses.empty? && prompt_misses.empty? && skill_misses.empty?
+end
+
+def validate_kiro_agent_profiles(findings, cleared)
+  profiles = kiro_agent_profiles
+  agent_paths = Dir["chapters/mobile/agents/_all/*.agent.md"]
+  agent_ids = agent_paths.map { |path| File.basename(path, ".agent.md") }.sort
+  missing = profiles.keys.sort - agent_ids
+  unexpected = agent_ids - profiles.keys.sort
+  errors = []
+
+  errors << "Missing profile contracts: #{missing.join(', ')}" if missing.any?
+  errors << "Unreviewed agent profiles: #{unexpected.join(', ')}" if unexpected.any?
+
+  profiles.each do |agent_id, expected|
+    path = "chapters/mobile/agents/_all/#{agent_id}.agent.md"
+    next unless File.file?(path)
+
+    profile = read_frontmatter(path)
+    errors << "#{agent_id}: name must equal its canonical id" unless profile["name"] == agent_id
+
+    actual_tools = Array(profile["tools"]).map(&:to_s)
+    unless actual_tools.sort == expected[:tools].sort
+      errors << "#{agent_id}: tools must be #{expected[:tools].join(', ')}"
+    end
+
+    expected_mcp = expected[:include_mcp] == true
+    unless profile["includeMcpJson"] == expected_mcp || (!expected_mcp && profile["includeMcpJson"].nil?)
+      errors << "#{agent_id}: includeMcpJson must be #{expected_mcp}"
+    end
+
+    actual_rules = profile.dig("permissions", "rules") || []
+    unless actual_rules == expected[:rules]
+      errors << "#{agent_id}: permissions.rules differs from the least-privilege role matrix"
+    end
+
+    delegates = expected[:delegates]
+    actual_subagents = profile.dig("toolsSettings", "subagent")
+    if delegates
+      expected_subagents = {
+        "availableAgents" => delegates,
+        "trustedAgents" => delegates
+      }
+      unless actual_subagents == expected_subagents
+        errors << "#{agent_id}: availableAgents and trustedAgents must match its approved delegation list"
+      end
+    elsif actual_subagents
+      errors << "#{agent_id}: non-orchestrator profiles must not register subagents"
+    end
+
+    fs_write_rule = actual_rules.find { |rule| rule["capability"] == "fs_write" }
+    expected_fs_write_rule = expected[:rules].find { |rule| rule["capability"] == "fs_write" }
+    nested_sopp_paths = Array(expected_fs_write_rule&.fetch("match", [])).grep(%r{\A\*\*/\.sopp/})
+    if fs_write_rule && (nested_sopp_paths - Array(fs_write_rule["match"])).any?
+      errors << "#{agent_id}: fs_write must retain the nested .sopp path for multi-root workspaces"
+    end
+  rescue StandardError => e
+    errors << "#{agent_id}: cannot validate frontmatter (#{e.message})"
+  end
+
+  if errors.empty?
+    cleared << "Kiro agent profiles match the portable least-privilege role matrix"
+  else
+    add(
+      findings,
+      "HIGH",
+      "KIRO_AGENT_PROFILE",
+      "Kiro agent profile contract is invalid",
+      errors.join("\n")
+    )
+  end
 end
 
 def validate_sopp_gate_contract(findings, cleared)
@@ -1533,6 +1725,7 @@ parse_all_structured_files(findings, cleared)
 validate_no_legacy_refs(findings, cleared)
 validate_no_source_root_refs(findings, cleared)
 validate_references(findings, cleared)
+validate_kiro_agent_profiles(findings, cleared)
 validate_mobile_workflow_distribution(findings, cleared)
 validate_sopp_gate_contract(findings, cleared)
 validate_melos_workspace_contract(findings, cleared)

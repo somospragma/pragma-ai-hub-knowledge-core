@@ -4,6 +4,17 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: figma-analyzer
+tools: [read, write, "@figma"]
+includeMcpJson: true
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**"]
+    - capability: mcp
+      effect: allow
+      match: ["figma/*"]
 description: >
   Specialist in extracting and analyzing design information from Figma. Use this
   agent when the main task is to interpret a Figma component or screen, map

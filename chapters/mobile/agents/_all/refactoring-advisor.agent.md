@@ -6,6 +6,17 @@ type: agent
 chapter: mobile
 description: >
   Analyzes and refactors existing Clean Architecture features or legacy feature code. Use to detect code smells, architecture violations, and complexity, then execute incremental refactors with required tests and refactoring documentation.
+name: refactoring-advisor
+tools: [read, write, shell, subagent]
+permissions:
+  rules:
+    - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"]}
+    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]}
+    - {capability: subagent, effect: allow, match: ["code-auditor", "ds-orchestrator"]}
+toolsSettings:
+  subagent:
+    availableAgents: [code-auditor, ds-orchestrator]
+    trustedAgents: [code-auditor, ds-orchestrator]
 ---
 # Refactoring Advisor Agent Instructions
 
@@ -60,6 +71,8 @@ step reports. Preserve approvals, audit, required tests and delivery evidence.
   package moves or contract changes.
 - Must enforce `agent_permissions.refactoring-advisor` before file creation,
   modification, deletion, command execution or external access.
+- A delegated audit or Design System response is not completion until its
+  required evidence exists on disk and the applicable existing checkpoint passes.
 
 ---
 

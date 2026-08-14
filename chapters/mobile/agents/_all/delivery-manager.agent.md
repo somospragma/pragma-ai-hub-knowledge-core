@@ -4,6 +4,13 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: delivery-manager
+tools: [read, write]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/docs/**", "**/README.md", "**/CHANGELOG.md"]
 description: >
   Prepares the final delivery package after implementation, audits, and tests are complete. Use to assemble delivery evidence, summarize modified artifacts, document verification, and suggest commit/PR text without executing external Git operations.
 ---

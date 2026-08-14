@@ -4,6 +4,16 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: widgetbook-developer
+tools: [read, write, shell]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/widgetbook/**", "**/pubspec.yaml"]
+    - capability: shell
+      effect: allow
+      match: ["dart format *", "dart analyze *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
 description: >
   Creates and updates Widgetbook use cases, stories, knobs, and catalog entries for Design System components or app screens. Use when generated UI needs interactive documentation and catalog coverage.
 ---

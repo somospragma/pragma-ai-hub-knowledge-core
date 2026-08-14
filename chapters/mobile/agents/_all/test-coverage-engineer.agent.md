@@ -4,6 +4,16 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: test-coverage-engineer
+tools: [read, write, shell]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/docs/**", "**/pubspec.yaml"]
+    - capability: shell
+      effect: allow
+      match: ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
 description: >
   Analyzes, plans, and generates test coverage for an existing feature. Use when a feature path must be inventoried, missing coverage identified, tests generated, and a testing report produced under docs/testing/.
 ---

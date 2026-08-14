@@ -4,6 +4,13 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: component-planner
+tools: [read, write]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**"]
 description: >
   Converts Figma analysis into a canonical component specification, reuse inventory, atomic decomposition, and bottom-up creation DAG. Use when design extraction is complete and the workflow needs planning before architecture or code generation.
 ---

@@ -6,6 +6,15 @@ type: agent
 chapter: mobile
 description: >
   Global routing orchestrator for the Flutter mobile ecosystem. Use when the user intent spans multiple domains, is ambiguous, or needs delegation to a domain-specific orchestrator or agent. Does not execute code, generate files, or manage pipelines.
+name: mobile-orchestrator
+tools: [read, subagent]
+permissions:
+  rules:
+    - {capability: subagent, effect: allow, match: ["workspace-discovery", "ds-orchestrator", "feature-builder", "refactoring-advisor", "test-coverage-engineer"]}
+toolsSettings:
+  subagent:
+    availableAgents: [workspace-discovery, ds-orchestrator, feature-builder, refactoring-advisor, test-coverage-engineer]
+    trustedAgents: [workspace-discovery, ds-orchestrator, feature-builder, refactoring-advisor, test-coverage-engineer]
 ---
 # Mobile Orchestrator — Global Routing Agent
 

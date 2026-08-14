@@ -11,6 +11,19 @@ description: >
   Generates all layers: domain model, repository contract, use case, DTO,
   mapper, data source, repository impl, BLoC (event + state + bloc), UIModel,
   and page — wired with DI and registered in the router.
+name: feature-builder
+tools: [read, write, shell, subagent, "@figma"]
+includeMcpJson: true
+permissions:
+  rules:
+    - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"]}
+    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]}
+    - {capability: mcp, effect: allow, match: ["figma/*"]}
+    - {capability: subagent, effect: allow, match: ["figma-analyzer", "ds-orchestrator", "test-engineer", "golden-test-engineer", "code-auditor", "delivery-manager"]}
+toolsSettings:
+  subagent:
+    availableAgents: [figma-analyzer, ds-orchestrator, test-engineer, golden-test-engineer, code-auditor, delivery-manager]
+    trustedAgents: [figma-analyzer, ds-orchestrator, test-engineer, golden-test-engineer, code-auditor, delivery-manager]
 ---
 # Feature Builder Agent Instructions
 
@@ -56,6 +69,8 @@ Always persist `fallback_policy: delegate_or_controller_executes`. Never mark a
 mandatory phase skipped because delegation is unavailable.
 If fallback execution lacks required file, shell, target, or MCP capability,
 stop with `blocked_input: PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`.
+A delegated response is never completion by itself: treat it as untrusted until
+the existing SOPP gate verifies the planned files and required evidence on disk.
 
 ---
 

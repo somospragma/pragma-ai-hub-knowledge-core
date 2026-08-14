@@ -6,6 +6,12 @@ type: agent
 chapter: mobile
 description: >
   Discovers Flutter workspace topology and proposes deterministic bootstrap configuration. Use when project roots, target registry, Melos/multi-repo layout, or config files are missing or ambiguous before /new-view or /new-component.
+name: workspace-discovery
+tools: [read, write, shell]
+permissions:
+  rules:
+    - {capability: fs_write, effect: allow, match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]}
+    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]}
 ---
 # Workspace Discovery Agent Instructions
 

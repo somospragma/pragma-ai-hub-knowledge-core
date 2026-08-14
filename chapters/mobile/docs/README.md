@@ -25,6 +25,8 @@ controller; it does not own packet state or human checkpoints.
   required inputs, checkpoints and expected results.
 - [Mobile Spec Packet](mobile-spec.md): spec levels, initial files, config
   files, schemas and template locations.
+- [Kiro Agent Profiles](kiro-agent-profiles.md): native tool, delegation and
+  portable-path permissions declared by each mobile agent.
 
 ## Runtime State
 

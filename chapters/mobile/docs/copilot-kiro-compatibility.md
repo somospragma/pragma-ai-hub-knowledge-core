@@ -15,10 +15,9 @@ the model and are not required runtime context. Renderers must export
 
 | Asset | Copilot | Kiro | Requirement |
 |---|---|---|---|
-| Steering | `.github/copilot-instructions.md` | `.kiro/steering/*.md` | Must be self-contained and order-independent. |
 | Workflows | `.github/instructions/*.instructions.md` | `.kiro/workflows/*.md` | Must be plain Markdown with explicit steps. |
 | Skills | `.github/skills/{id}/SKILL.md` | `.kiro/skills/{id}/SKILL.md` or equivalent | Must avoid IDE-only assumptions. |
-| Agents | `.github/agents/{id}.md` | Kiro agent/steering assets | Must describe permissions and outputs. |
+| Agents | `.github/agents/{id}.md` | `.kiro/agents/*.agent.md` | Preserve the canonical `name`, declared tools, permissions and approved subagents. |
 | Executable gates | `.github/docs/scripts/*.rb` | `.kiro/docs/scripts/*.rb` | Must preserve the canonical `docs/scripts/` relative path and executable content. |
 | Hooks | Optional | Optional | Must never be required for correctness. |
 

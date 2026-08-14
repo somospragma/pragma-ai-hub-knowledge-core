@@ -4,6 +4,13 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: component-architect
+tools: [read, write]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**"]
 description: >
   Designs component and view implementation plans before code generation. Use when Figma analysis and planning are complete and the workflow needs interfaces, file structure, technical contracts, child component boundaries, or fragmentation decisions.
 ---

@@ -4,6 +4,16 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: code-auditor
+tools: [read, write, shell]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**"]
+    - capability: shell
+      effect: allow
+      match: ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "melos exec *"]
 description: >
   Audits generated Flutter code against the approved spec, architecture contracts, Design System tokens, accessibility, security, lint rules, and test expectations. Use when a workflow needs an approve/reject decision with actionable correction feedback.
 ---

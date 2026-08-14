@@ -4,6 +4,16 @@ version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
+name: test-engineer
+tools: [read, write, shell]
+permissions:
+  rules:
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/test_assets/**"]
+    - capability: shell
+      effect: allow
+      match: ["dart test *", "flutter test *", "melos exec *", "melos run *"]
 description: >
   Generates and updates Flutter widget/unit tests for components and views. Use when a workflow needs behavior validation, state coverage, callback checks, and automated test evidence after code generation or refactoring.
 ---
