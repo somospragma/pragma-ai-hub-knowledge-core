@@ -6,8 +6,8 @@ type: skill
 chapter: calidad
 stack: [appium-core]
 enforcement: mandatory
-description: "Auto-descubre selectores reales recorriendo una app Android desde su APK: arranca emulador/device, instala APK, captura view hierarchy con Appium Inspector REST API, extrae selectores reales (resource-id > content-desc > xpath) y los inyecta en los Page Objects en vez de TODOs."
-tags: [appium, mobile, android, apk, auto-discovery, view-hierarchy, selector-extraction, runtime]
+description: "OBLIGATORIO. Auto-descubre selectores reales recorriendo una app Android desde su APK: arranca emulador/device, instala APK, captura view hierarchy con Appium Inspector REST API, extrae selectores reales (resource-id > content-desc > xpath) y los inyecta en los Page Objects en vez de TODOs."
+tags: [appium, mobile, android, apk, auto-discovery, view-hierarchy, selector-extraction, runtime, mandatory]
 verification:
   - check: "Pregunta al usuario antes de activarse (auto vs deferred-locators)"
     failure_message: "Bloqueado: auto-discovery requiere consentimiento explícito del usuario"
@@ -48,6 +48,16 @@ Invocado desde `[[calidad-generate-appium-screenplay-android]]` en su paso (desp
 - Si crawl falla en >30% de pantallas detectadas → fallback a deferred-locators con razón documentada.
 - NUNCA modificar selectores ya descubiertos sin re-correr crawl completo.
 - Tiempo máximo: 10 minutos por sesión. Después → reportar parcial.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | Pregunta al usuario antes de activarse (auto vs deferred-locators) | Bloqueado: auto-discovery requiere consentimiento explícito del usuario |
+| 2 | Verifica capacidades previas (adb, appium server, emulator/device, APK válido) | Bloqueado: faltan capacidades; degradar a deferred-locators |
+| 3 | Genera .evidence/locators-discovered.json con score de confianza por locator | Bloqueado: sin auditoría de locators no se puede declarar success |
 
 ## Cross-links
 

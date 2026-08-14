@@ -4,7 +4,7 @@ version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: Asignación de prioridad de pruebas (CRITICAL/HIGH/MEDIUM/LOW) basada en valor de negocio y riesgo, no en heurísticas de nombre.
+description: "OBLIGATORIO. Asignación de prioridad de pruebas (CRITICAL/HIGH/MEDIUM/LOW) basada en valor de negocio y riesgo, no en heurísticas de nombre."
 tags: [prioritization, risk, business-value, governance, enforcement, mandatory]
 enforcement: mandatory
 verification:
@@ -88,3 +88,14 @@ Criterio de tie-break: si un item cumple criterios de dos niveles, se asigna el 
 
 - **NUNCA** generar pruebas con prioridades inventadas: documentar siempre la fuente de la asignación (PO, user_story, firma, default-pendiente-revisión).
 - **NUNCA** ocultar el default `HIGH` cuando se usó: hay que reportarlo explícitamente para que el usuario lo confirme o corrija.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | risk_map declarado por usuario (o derivado de user_story/firma) antes de generar el primer archivo | Bloqueado: no se puede priorizar ni generar sin risk_map confirmado por una fuente válida. |
+| 2 | fuente de la asignación documentada (PO, user_story, firma, default-pendiente-revisión) | Bloqueado: prioridades sin fuente documentada equivalen a prioridades inventadas. |
+| 3 | default HIGH reportado explícitamente cuando se usó, nunca silencioso | Bloqueado: se aplicó default silencioso sin advertir al usuario para revisión explícita. |
+| 4 | no se infirió prioridad por keywords del path/URL/nombre de archivo | Bloqueado: se detectó inferencia por keyword (/login → CRITICAL, etc.). Esa heurística está prohibida. |

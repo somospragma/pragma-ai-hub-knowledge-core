@@ -85,6 +85,26 @@ Extraer: qué hooks existen, cómo se decide qué driver se crea, qué campos ti
 
 Si el World está tipado, **los steps nuevos usan ese tipo**. Si no lo está, se usa el patrón existente sin introducir uno nuevo: proponer el tipado es una recomendación, no un cambio a aplicar.
 
+### 9. Patrón de carga de datos en los steps
+
+No basta con saber **dónde** viven los datos (paso 6): hay que saber **cómo los cargan** los steps existentes, porque el código nuevo debe usar el mismo mecanismo.
+
+```bash
+# Cómo se cargan los datos de prueba en los steps existentes
+grep -rn "TestDataLoader\|loadUsers\|fixtures\|testData" src --include='*.steps.ts' | head
+# Señales de deuda: credenciales o datos literales en el código
+grep -rniE "const (USER|PASS|PASSWORD|CARD|TARJETA|CUENTA)\s*=" src --include='*.steps.ts'
+```
+
+Extraer:
+
+- Qué función o helper carga los datos y con qué firma.
+- Qué estructura devuelve y cómo se seleccionan usuario, credencial o entidad dentro de ella.
+- Qué fallback usan los steps cuando la entidad no existe.
+- Si hay credenciales literales en el código: **es deuda a reportar, no un patrón a copiar**.
+
+**Regla dura:** nunca escribir credenciales ni datos de prueba literales en el código generado. Se usa el mismo mecanismo que los steps existentes. Verificado en campo: el agente hardcodeó usuario, contraseña y número de entidad en un archivo nuevo mientras el archivo hermano de la épica anterior los cargaba correctamente desde el catálogo del proyecto. Si el proyecto no tiene mecanismo alguno, se propone uno y se confirma con el usuario antes de introducirlo.
+
 ## El objeto de convenciones
 
 El resultado de la inspección se declara explícitamente antes de generar:
@@ -119,12 +139,17 @@ convenciones:
     plataformas_base: [web, android, ios, shared]
     patron_archivo: "{epica}.json"
     grupos_observados: [selectors, loginErrorSelectors, otpSelectors]
+  test_data:
+    patron_carga_en_steps: "TestDataLoader.loadUsers()"
+    credenciales_literales_detectadas: false
   ejecucion:
     modos: [local, cloud]
     variable_modo: EXECUTION_MODE
 ```
 
 Cada campo que quede sin resolver se pregunta al cliente. Asumir un valor por defecto del chapter donde el proyecto tiene otro es la vía más rápida a un rechazo en revisión.
+
+El objeto de convenciones se emite dentro de `.evidence/archetype-inventory.md` (ver `[[calidad-brownfield-vs-greenfield]]`) y se muestra al usuario **antes del primer archivo generado**.
 
 ## Señales de que el arquetipo tiene deuda
 

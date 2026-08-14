@@ -4,7 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Schema universal {ISO}-metadata.json (13 keys) emitido por cada corrida en los 4 frameworks para que dashboards y delivery-gate procesen evidencia cross-stack."
+description: "OBLIGATORIO. Schema universal {ISO}-metadata.json (13 keys) emitido por cada corrida en los 4 frameworks para que dashboards y delivery-gate procesen evidencia cross-stack."
 tags: [evidence, metadata, schema, universal, mandatory]
 enforcement: mandatory
 ---

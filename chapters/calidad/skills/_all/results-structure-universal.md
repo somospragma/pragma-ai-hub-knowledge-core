@@ -4,7 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Convención universal results/{categoría}/{fecha}/ para organización de evidencia en los 4 frameworks. Garantiza diffabilidad, agrupación por HU y compatibilidad con CI."
+description: "OBLIGATORIO. Convención universal results/{categoría}/{fecha}/ para organización de evidencia en los 4 frameworks. Garantiza diffabilidad, agrupación por HU y compatibilidad con CI."
 tags: [evidence, results, structure, universal, mandatory]
 enforcement: mandatory
 ---

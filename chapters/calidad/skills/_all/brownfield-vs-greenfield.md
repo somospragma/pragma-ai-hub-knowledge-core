@@ -30,6 +30,33 @@ Es **greenfield** si **todas** las siguientes son verdaderas:
 
 **Regla de oro:** si tienes duda, **inspecciona el `output_path` antes de decidir**. Si después de inspeccionar sigues con duda, pregunta al usuario.
 
+## Inventario del arquetipo — BLOCKER antes del primer archivo
+
+En brownfield, **no se genera ningún archivo hasta emitir `.evidence/archetype-inventory.md` y mostrarlo al usuario**. Es la puerta que evita el fallo más caro y más repetido del modo brownfield: generar antes de conocer el proyecto.
+
+Verificado en campo, tres fallos con la misma causa en una sola entrega: se redefinieron steps que ya existían en otra épica, se generó un step que colisionaba con otra historia, y se escribieron credenciales literales en el código mientras el proyecto ya tenía su mecanismo de carga de datos. El workflow decía "inventariar", pero no exigía **emitir** el inventario ni bloqueaba si faltaba.
+
+El inventario contiene, como mínimo:
+
+| Sección | Contenido | Fuente |
+|---|---|---|
+| Recursos y comandos | qué scripts y ejecutores existen y cuál se usa | `[[calidad-repo-capability-discovery]]` |
+| Catálogo de steps | vocabulario existente y **tabla de clasificación** de cada step candidato en reutilizar/extender/crear, con el archivo donde vive el existente | `[[calidad-cucumber-bdd-conventions]]`, `references/step-catalog.md` |
+| Patrón de carga de datos | cómo cargan los datos de prueba los steps existentes | reference de detección de convenciones del stack |
+| Taxonomía de tags | etiquetas en uso y su significado real | reference de detección de convenciones del stack |
+| Selectores | dónde viven, con qué sintaxis y cómo se resuelven | reference de detección de convenciones del stack |
+| Alcance del ejecutor | qué carga y, sobre todo, **qué queda fuera** | `[[calidad-repo-capability-discovery]]` |
+| Estructura | convención de directorios y de nombres por plataforma | reference de detección de convenciones del stack |
+| Deuda observada | señales de deuda del arquetipo, **para reportar, no para corregir** | reference de detección de convenciones del stack |
+
+Reglas asociadas:
+
+- **La tabla de clasificación de steps es blocker.** Un step clasificado `reuse` no se redefine.
+- **Búsqueda por similitud, no solo exacta**: los steps que verifican elementos comunes (fechas, montos, estados, títulos) colisionan entre épicas; los nuevos llevan su contexto en el nombre.
+- **Validación anti-duplicación después de generar**: definiciones repetidas es blocker, no advertencia.
+- **Nunca credenciales ni datos literales** en el código generado: se usa el mecanismo del proyecto.
+- El inventario se registra como fase en `[[calidad-pipeline-state-tracking]]` y se relee al retomar sesión.
+
 ## Reglas duras por framework
 
 ### Karate

@@ -5,7 +5,7 @@ scope: chapter
 type: skill
 chapter: calidad
 enforcement: mandatory
-description: "Contrato YAML que el agente DEBE emitir literalmente al final de toda generación, antes del mensaje de cierre. Sin este bloque, la entrega se considera incompleta. Universal a los 5 IDEs."
+description: "OBLIGATORIO. Contrato YAML que el agente DEBE emitir literalmente al final de toda generación, antes del mensaje de cierre. Sin este bloque, la entrega se considera incompleta. Universal a los 5 IDEs."
 tags: [delivery-gate, contract, mandatory, universal, all-ides]
 ---
 

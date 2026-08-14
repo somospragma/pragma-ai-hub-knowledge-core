@@ -34,9 +34,10 @@ Inputs obligatorios y opcionales gobernados por `[[calidad-mandatory-inputs-prot
 
 Aplica `[[calidad-pipeline-state-tracking]]` **antes de cualquier otra cosa**:
 
-- Si `output_path` ya existe y tiene `.evidence/pipeline-state.json`, leerlo y **abrir el turno reportando**: fase actual, fases pendientes, bloqueos y `open_corrections` vigentes. Continuar por `next_action`, no por lo que parezca urgente.
-- Si no existe, crearlo con todas las fases de la ruta en `pending`.
+- Si `output_path` ya existe y tiene `.evidence/pipeline-state.json`, leerlo **junto con `.evidence/session-log.md`** y **abrir el turno reportando**: fase actual, fases pendientes, bloqueos y `open_corrections` reafirmadas. Continuar por `next_action`, no por lo que parezca urgente.
+- Si no existen, crearlos: la traza con todas las fases de la ruta en `pending`, la bitácora con su entrada de apertura.
 - **Actualizar la traza al cerrar cada fase**, en el mismo turno. Una fase sin evidencia no se marca `done`.
+- **Anotar en la bitácora** cada evento significativo —comando y su código de salida, decisión con su motivo, instrucción del usuario citada textualmente, bloqueo con evidencia, escritura en el ALM con quién autorizó— en el turno en que ocurre. La bitácora es **append-only**: nunca se reescribe ni se resume.
 
 Este paso existe porque una generación real no cabe en una sesión: sin traza en disco, cada corte de contexto pierde el proceso (verificado en campo: seis sesiones, fases saltadas, correcciones del usuario olvidadas y dos contratos de cierre emitidos sin haber ejecutado la suite).
 
@@ -90,10 +91,20 @@ Reglas de la ruta:
 Aplica `[[calidad-transversal-capabilities]]`:
 
 - A partir del `intent`, el framework detectado, el tipo de SUT (`[[calidad-sut-types-and-adaptations]]`) y el contexto regulatorio, identifica qué capas complementarias hacen la prueba integral: **accesibilidad** (`[[calidad-accessibility-testing]]`), **SEO** (`[[calidad-seo]]`), **seguridad** (`[[calidad-security-testing]]`), **regresión visual** (`[[calidad-visual-regression]]`), **contract testing** (`[[calidad-contract-testing]]`) y **performance** como suite K6 aparte.
+- Si el alcance incluye publicar casos, sincronizar identificadores o subir evidencias al ALM, incorporar `[[calidad-alm-test-publishing-cycle]]`, cuyas escrituras pasan todas por `[[calidad-alm-write-authorization-gate]]`.
+- Si hay fuente de diseño o escenarios visuales, recordar que `@visual` obliga a comparación de imagen (`[[calidad-visual-regression]]`) y que los textos del diseño se clasifican antes de usarse (`[[calidad-data-volatility-and-assertion-anchoring]]`).
 - Aplica *risk-first* (`[[calidad-chapter-perspective]]`): en flujos críticos (login, MFA/OTP, pagos, transferencias, firma, onboarding) y sectores regulados (banca, salud, gobierno), seguridad y accesibilidad pasan de sugeridas a recomendadas con fuerza.
 - **Propón** las capas detectadas al usuario con su justificación; no las asumas. Confirma alcance.
 - Pasa al workflow específico (paso 5) la lista de capacidades confirmadas: cada una se teje como tag/suite (`@accessibility`, `@seo`, `@security`, `@visual`, `@contract`) dentro del proyecto del framework, o como suite separada cuando requiere otro runtime (performance K6).
 - Registra las capas detectadas, confirmadas y omitidas (con motivo) para el bloque `transversal_capabilities` del delivery-gate.
+
+### Paso 2.6 — Barrer el repositorio (solo brownfield, BLOCKER)
+
+Aplica `[[calidad-repo-capability-discovery]]` antes de generar o ejecutar nada:
+
+- Emitir `.evidence/repo-capability-map.md`: scripts y ejecutores disponibles, runbook real, taxonomía de etiquetas viva, alcance del ejecutor (y qué queda fuera), integraciones ya resueltas con el ALM o la nube de dispositivos, y recursos frágiles marcados como no reutilizables.
+- Emitir `.evidence/archetype-inventory.md` con la tabla de clasificación de steps (`[[calidad-brownfield-vs-greenfield]]`).
+- **Prohibido inventar comandos** y **prohibido construir a mano lo que el repositorio ya resuelve**. La convención del repositorio manda sobre los defaults del chapter en etiquetas, rutas y nomenclatura.
 
 ### Paso 3 — Validar el spec
 
@@ -157,8 +168,9 @@ Aplica `[[calidad-test-evidence-and-traceability]]`:
 **Esta fase es parte del contrato de entrega del router**: independientemente del workflow específico al que se haya delegado en el paso 5, el router exige que el ciclo de ejecución + triage + auto-corrección se haya cerrado. Cada workflow específico ya integra esta fase con adaptaciones por framework; el router la audita y confirma su cumplimiento antes de finalizar.
 
 1. **Resolver modo de operación universal** con el usuario si el workflow delegado no lo hizo (`full` / `dry-run` / `scaffold-only` / `execute-only`). Default: `full` salvo cliente regulado (HIPAA, SOX, PCI-DSS Level 1, FedRAMP) que defaultea a `dry-run`. Si el agente carece de capacidad técnica para ejecutar (sin shell, sin entornos, sin credenciales), degradar a `scaffold-only` y reportar `partial`. Si `execution_target: mock | hybrid` (paso 1.5), levantar el mock (`[[calidad-service-virtualization-mockoon]]`) ANTES del smoke gate; la ejecución contra mock es válida como verificación de construcción y el delivery gate la registra como `certification: pending_real_integration`. **"Sin ambiente real" NO es motivo de `scaffold-only` cuando hay mock**: el mock levantado cuenta como SUT alcanzable y el default sigue siendo `full` contra mock. No sugerir scaffold-only de entrada para luego redirigir a mocks — el gate del paso 1.5 ya resolvió el camino.
-2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` con el comando idiomático del framework delegado.
-3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz.
+1.5. **Preflight de ejecución (BLOCKER)**: aplicar `[[calidad-execution-preflight]]` y emitir `.evidence/preflight.json` con la salida real de cada sonda — SUT alcanzable, sesión apuntando al destino que se levantó, aplicación instalada y en primer plano con captura inicial. **Sin preflight verde no se ejecuta el smoke gate**, y nada de lo que ocurra después puede clasificarse como defecto del SUT.
+2. **Ejecutar** vía `[[calidad-test-execution-orchestration]]` con el comando del mapa de recursos del repositorio en brownfield (`[[calidad-repo-capability-discovery]]`), o el idiomático del framework en greenfield. Si la entrega cubre varias plataformas, aplicar `[[calidad-cross-platform-learning-propagation]]`: usar el ejecutor multiplataforma del repositorio si existe, y si la ejecución es secuencial, aplicar los aprendizajes compartidos antes de arrancar cada plataforma siguiente.
+3. Si hay fallos: aplicar `[[calidad-failure-triage-and-classification]]` para clasificar cada uno como deterministic / flaky y diagnosticar causa raíz. Declarar un defecto del SUT exige además la cadena de evidencia completa (`references/sut-defect-evidence-chain.md`), y publicarlo en el ALM exige la ficha de `[[calidad-alm-write-authorization-gate]]`.
 4. Si triage habilita correcciones: invocar `[[calidad-test-self-correction-loop-workflow]]` (workflow) que aplica `[[calidad-test-self-correction-loop]]` con `[[calidad-test-self-healing]]` cuando aplique. Respetar `max_iterations` (default 3) y los **anti-cheating guardrails maestros del chapter**.
 5. Reportar estado final agregado: `success` (todos los tests pasan determinísticamente en el framework delegado) | `partial` (entregado scaffold, no se pudo ejecutar) | `failed` (escalado a humano con contexto completo del framework correspondiente).
 6. Archivar evidencia + audit log según `[[calidad-test-evidence-and-traceability]]`. El router NO finaliza con éxito si esta fase quedó sin cerrar.

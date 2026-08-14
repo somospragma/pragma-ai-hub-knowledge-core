@@ -18,6 +18,8 @@ verification:
     failure_message: "Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario."
   - check: "sut_available, data_available y (front/mobile) locator_map resueltos vía SUT readiness gate antes de validar spec"
     failure_message: "Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate."
+  - check: "checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, con validación cruzada de cada entidad contra el catálogo del proyecto"
+    failure_message: "Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto."
 ---
 
 # Mandatory Inputs Protocol — Contrato de Entrada Antes de Generar
@@ -41,6 +43,24 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 | `sut_available` | Obligatorio (pregunta sí/parcial/no)           | ¿El desarrollo está desplegado y accesible?                                                       | Resuelve `execution_target: real | hybrid | mock` vía `[[calidad-sut-readiness-gate]]` (paso 1.5 del router)  |
 | `data_available` | Obligatorio (pregunta sí/no)                   | ¿Existen datos de prueba en el ambiente (o catálogo de datasets del cliente)?                     | Resuelve `data_strategy: real | synthetic` (`[[calidad-test-data-management]]`)                               |
 | `locator_map`  | Condicional (front/mobile; **obligatorio** si `execution_target != real`) | Mapeo acordado QA+dev de identificadores UI (`data-testid` / accessibility ids)  | Fuente única de selectores pre-desarrollo; formato y contrato en `[[calidad-ui-locator-map-contract]]`        |
+| `test_credentials` | Obligatorio cuando el flujo requiere autenticación | Usuario de prueba vigente y su contraseña                                    | Se cargan por el mecanismo del proyecto; **jamás literales en el código** ni escritas en evidencia            |
+| `test_data_entities` | Obligatorio cuando el escenario opera sobre entidades concretas | Los identificadores reales bajo prueba (cuenta, tarjeta, producto, contrato)  | Se validan contra el catálogo de datos del proyecto antes de generar                                          |
+
+## Checkpoint de datos de prueba (antes del STRATEGY.md)
+
+Los datos concretos con los que se va a ejecutar **son un insumo obligatorio**, no un detalle a resolver durante la generación. Verificado en campo: el usuario tuvo que adelantarse a darlos, y aun así uno de los identificadores no existía en el catálogo del proyecto sin que el agente lo detectara — la suite habría fallado por dato, no por defecto.
+
+Antes de emitir el `STRATEGY.md`, emitir esta tabla y **esperar confirmación explícita**:
+
+| Dato | Valor detectado en el proyecto | Valor indicado por el usuario | Estado |
+|---|---|---|---|
+| Usuario de prueba | `<el que usan los tests existentes>` | `<el que indicó el usuario>` | pendiente |
+| Contraseña | recibida (no se muestra) | recibida | pendiente |
+| Entidad bajo prueba | `<las disponibles en el catálogo>` | `<la indicada>` | pendiente |
+
+**Validación cruzada obligatoria.** Si el valor que da el usuario no aparece en el catálogo de datos del proyecto, se **detiene** y se pregunta, listando los disponibles: *"no encontré la entidad X para el usuario Y; las disponibles son [...]. ¿Usamos una de estas o actualizamos el catálogo?"*. Aceptar el valor sin cruzarlo es la vía directa a una suite roja por dato.
+
+Las contraseñas se marcan como recibidas y **nunca** se muestran, se transcriben a un asset, al `STRATEGY.md` ni a `.evidence/`.
 
 ## Todo insumo entregado se lee COMPLETO y se declara qué se extrajo
 
@@ -75,6 +95,7 @@ Reglas duras:
 1. Pedir al usuario los obligatorios faltantes, uno por uno o en bloque (preferir bloque para no fragmentar).
 2. Si un input está incompleto → indicar exactamente QUÉ falta, no devolver "está incompleto".
 3. Resolver el SUT readiness gate ([[calidad-sut-readiness-gate]]): sut_available, data_available y (front/mobile) locator_map. El resultado puede endurecer los inputs restantes.
+3.5. En brownfield, ejecutar [[calidad-repo-capability-discovery]] y emitir el checkpoint de datos de prueba con validación cruzada contra el catálogo del proyecto.
 4. Confirmar opcionales relevantes según framework detectado (firma, user_story, extra_params).
 5. Para proyectos con convenciones cliente-específicas detectadas (ver `[[calidad-karate-brownfield]]` y su reference `client-specific-conventions.md`), aplicar reglas adicionales descritas allí.
 6. Solo cuando TODOS los obligatorios están presentes → pasar el control a [[calidad-spec-validation]].
@@ -114,4 +135,19 @@ Cuando un cliente o proyecto necesite endurecer inputs:
 - **NUNCA proceder** sin los inputs obligatorios resueltos.
 - **NUNCA mezclar** convenciones cliente-específicas detectadas en un proyecto con proyectos genéricos de otros clientes.
 - **NUNCA asumir** valores por defecto para `base_url`, headers de auth o entornos: si falta, se pregunta.
+- **NUNCA dar por vigentes** los datos de prueba que encuentres en el proyecto sin confirmarlos: un catálogo puede estar desactualizado y el usuario es quien sabe qué sigue activo en el ambiente.
+- **NUNCA escribir credenciales** en el código generado, en el `STRATEGY.md` ni en la evidencia.
 - Encadena con `[[calidad-spec-validation]]` (paso siguiente) y con `[[calidad-intent-detection]]` (paso previo).
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | los 4 inputs base (intent, project_name, output_path, spec/ui_source/apk_path) + modo de operación confirmados explícitamente por el usuario | Bloqueado: faltan inputs obligatorios o el modo de operación no fue confirmado. No se puede generar sin contrato de entrada completo. |
+| 2 | project_name matchea ^[a-z][a-z0-9-]*[a-z0-9]$ y output_path es ruta absoluta verificada | Bloqueado: project_name u output_path no cumplen las reglas formales del protocolo. |
+| 3 | spec entregado como contenido completo, no como ruta de archivo | Bloqueado: se requiere el contenido completo del spec, no la ruta del archivo. |
+| 4 | risk_map confirmado por usuario o default HIGH reportado explícitamente para revisión | Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario. |
+| 5 | sut_available, data_available y (front/mobile) locator_map resueltos vía SUT readiness gate antes de validar spec | Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate. |
+| 6 | checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, con validación cruzada de cada entidad contra el catálogo del proyecto | Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto. |

@@ -4,7 +4,7 @@ version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Loop de auto-corrección de tests: ejecutar → triage → decidir si es test design issue → proponer fix → re-ejecutar → validar. Incluye guardrails anti-cheating estrictos para NO modificar tests que esconden bugs reales del SUT."
+description: "OBLIGATORIO. Loop de auto-corrección de tests: ejecutar → triage → decidir si es test design issue → proponer fix → re-ejecutar → validar. Incluye guardrails anti-cheating estrictos para NO modificar tests que esconden bugs reales del SUT."
 tags: [self-correction, loop, auto-fix, anti-cheating, guardrails, diff-aware, enforcement, mandatory]
 enforcement: mandatory
 verification:
@@ -41,7 +41,7 @@ El ciclo completo, en este orden y sin atajos:
 
 | # | Momento | Qué se ejecuta | Por qué |
 |---|---|---|---|
-| 1 | Gate 1:1 | **Un** escenario crítico (`@smoke-gate`) | Destapa los problemas transversales con un solo diagnóstico (`[[calidad-smoke-gate-policy]]`) |
+| 1 | Gate 1:1 | **Un** escenario crítico, seleccionado con la taxonomía del proyecto en brownfield o con `@smoke-gate` en greenfield | Destapa los problemas transversales con un solo diagnóstico (`[[calidad-smoke-gate-policy]]`) |
 | 2 | Inventario | **Suite completa, una vez** | Saber TODOS los fallos que hay, no descubrirlos de a uno |
 | 3 | Agrupar | (sin ejecutar) | Varios fallos suelen compartir causa raíz: se agrupan y se corrige la causa, no cada síntoma |
 | 4 | Corrección | **SOLO el test que se está corrigiendo**, aislado, en cada iteración | Es la regla de este skill (ver abajo) |
@@ -123,6 +123,18 @@ Estas son las restricciones más críticas del chapter; cada una está justifica
 6. **En `dry-run`, NO aplicar nada**: producir patch propuesto + justificación + evidencia para aprobación humana. Aplicar en `dry-run` rompe el contrato con clientes regulados.
 7. **Cliente regulado → modo obligatorio `dry-run`**. Default no negociable para HIPAA, SOX, PCI-DSS Level 1, FedRAMP y cualquier sector regulado equivalente. Ver `references/regulated-client-overrides.md`.
 8. **Cross-link mandatorio con `[[calidad-failure-triage-and-classification]]`** (input obligatorio del loop) y `[[calidad-test-self-healing]]` (healing es un tipo específico de auto-corrección que opera dentro de este mismo loop). Sin estos cruces el skill está incompleto.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | max 3 iteraciones respetadas; tras la tercera sin éxito, escalado a humano con reporte | Bloqueado: el loop superó 3 iteraciones sin escalar. Más iteraciones esconden bugs reales del SUT. |
+| 2 | no se modificó assertion de contrato, security ni compliance (anti-cheating estricto) | Bloqueado: se detectó modificación de assertion de contrato/security/compliance — violación de anti-cheating. |
+| 3 | audit log persistido en .evidence/audit-log-<fecha>.md con diff por iteración y guardrail verificado | Bloqueado: no hay audit log de las correcciones; sin trazabilidad la auto-corrección es inválida. |
+| 4 | input de triage presente y clasificación distinta a bug del SUT antes de activar el loop | Bloqueado: el loop se activó sin triage previo o sobre fallos clasificados como bug del SUT. |
+| 5 | cada iteración de corrección re-ejecutó SOLO el test corregido (aislado); la suite completa se corrió una vez al inicio para inventariar fallos y una vez al final como regresión | Bloqueado: se relanzó la suite completa dentro del ciclo de corrección. Cada iteración debe aislar el test que se está corrigiendo. |
 
 ## Cross-links
 

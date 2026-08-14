@@ -5,8 +5,8 @@ scope: chapter
 type: skill
 chapter: calidad
 enforcement: mandatory
-description: "Post-procesa los outputs técnicos de los 4 stacks (Karate/Playwright/K6/Appium) y genera un reporte ejecutivo consolidado en Markdown convertible a HTML/PPTX/DOC con narrativa, comparación entre corridas, cumplimiento de SLAs y recomendaciones para stakeholders."
-tags: [executive-report, post-processing, stakeholders, html, pptx, doc, pandoc, narrative]
+description: "OBLIGATORIO. Post-procesa los outputs técnicos de los 4 stacks (Karate/Playwright/K6/Appium) y genera un reporte ejecutivo consolidado en Markdown convertible a HTML/PPTX/DOC con narrativa, comparación entre corridas, cumplimiento de SLAs y recomendaciones para stakeholders."
+tags: [executive-report, post-processing, stakeholders, html, pptx, doc, pandoc, narrative, mandatory]
 verification:
   - check: "Lee múltiples corridas en results/ y produce 1 reporte consolidado"
     failure_message: "Bloqueado: sin reporte ejecutivo la entrega no es presentable a stakeholders"
@@ -116,6 +116,16 @@ Persistir el resultado en `.evidence/report-{ISO}.{ext}`.
 - Si no hay corridas previas → omitir sección "Comparación" y anotar "primera corrida — no hay baseline".
 - El reporte debe estar en español (audiencia stakeholders) salvo nombres técnicos (test IDs, endpoints, métricas K6) que se preservan tal cual.
 - Cross-link obligatorio a `[[calidad-failure-triage-and-classification]]` para utilizar el catálogo de patrones de fallo como insumo de la clasificación.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | Lee múltiples corridas en results/ y produce 1 reporte consolidado | Bloqueado: sin reporte ejecutivo la entrega no es presentable a stakeholders |
+| 2 | Identifica clasificación de fallos: SUT bug | threshold issue | env blocker | test design | Bloqueado: el reporte debe incluir root cause sugerido por fallo |
+| 3 | Reporta cumplimiento de SLAs declarados en STRATEGY.md | Bloqueado: el reporte debe contrastar resultados vs SLAs declarados |
 
 ## Cross-links
 

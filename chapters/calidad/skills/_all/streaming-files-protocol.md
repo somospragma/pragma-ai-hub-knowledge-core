@@ -4,7 +4,7 @@ version: 2.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: Define el orden de scaffold de un proyecto de pruebas por valor entregado (tests primero, utilitarios después, infraestructura al final).
+description: "OBLIGATORIO. Define el orden de scaffold de un proyecto de pruebas por valor entregado (tests primero, utilitarios después, infraestructura al final)."
 tags: [scaffold, prioritization, value-delivery, generation, enforcement, mandatory]
 enforcement: mandatory
 verification:
@@ -87,3 +87,13 @@ Configuración, build, documentación y scripts. Son los más fáciles de regene
 - **NUNCA** generar primero `pom.xml` o `package.json` "para tener la estructura"; eso bloquea valor real detrás de boilerplate.
 - **NUNCA** mezclar el orden entre frameworks: el orden es estricto por categoría (prueba → utilitario → infraestructura).
 - Encadena con `[[calidad-test-evidence-and-traceability]]` para configurar los reportes después de escribir la infraestructura.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | emit [ok] <ruta> por cada archivo persistido (una línea de log por archivo, no reporte global) | Bloqueado: la trazabilidad por archivo emitido falta. Sin log por archivo no hay manifiesto auditable. |
+| 2 | orden estricto respetado: tests → utilitarios/abstracciones → infraestructura | Bloqueado: el orden de scaffold se violó (infraestructura emitida antes que tests). Eso esconde valor detrás de boilerplate. |
+| 3 | directorio padre verificado antes de escribir; scaffold idempotente (no duplicar ni sobrescribir trabajo manual) | Bloqueado: archivo escrito sin verificar directorio padre o scaffold no idempotente. |

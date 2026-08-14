@@ -4,7 +4,7 @@ version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Ejecutar las pruebas generadas como capacidad del chapter: invocar comandos, capturar output, parsear resultados a un esquema común, gestionar modos de operación (full / scaffold-only / execute-only / dry-run)."
+description: "OBLIGATORIO. Ejecutar las pruebas generadas como capacidad del chapter: invocar comandos, capturar output, parsear resultados a un esquema común, gestionar modos de operación (full / scaffold-only / execute-only / dry-run)."
 tags: [execution, orchestration, runtime, result-parsing, modes, evidence, enforcement, mandatory]
 enforcement: mandatory
 verification:
@@ -74,6 +74,16 @@ Para decidir si la ejecución la hace el AI o el pipeline CI ver `references/exe
 - Si el SUT está caído o no responde, **NO confundir el outage con bug del test** — categorizar como `environment` y delegar a `[[calidad-failure-triage-and-classification]]`.
 - Si el output del runner excede umbrales de tamaño (logs muy verbosos, traces gigantes), respetar `[[calidad-streaming-files-protocol]]` para no saturar el contexto del agente.
 - Si el modo es `execute-only`, **no regenerar ni reescribir** archivos del test bajo ninguna circunstancia; reportar y delegar al humano.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | ejecutado al menos smoke en modo full con exit_code capturado, stdout persistido y artefactos archivados | Bloqueado: en modo full no se ejecutó nada o no se capturó evidencia de la corrida. La entrega no puede declarar success. |
+| 2 | modo confirmado explícitamente al inicio (no asumir full) y degradación a scaffold-only documentada cuando aplica | Bloqueado: el modo de operación no fue confirmado o la degradación automática no quedó documentada. |
+| 3 | resultados parseados a esquema común consumible por triage (calidad-failure-triage-and-classification) | Bloqueado: el output de ejecución no fue parseado al esquema común; triage no puede operar sobre datos crudos. |
 
 ## Cross-links
 

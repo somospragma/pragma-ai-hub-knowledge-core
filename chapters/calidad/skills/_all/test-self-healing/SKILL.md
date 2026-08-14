@@ -4,7 +4,7 @@ version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Estrategias de self-healing aplicadas en runtime a los tests generados por el chapter: multi-locator fallback, LLM-driven selector repair, visual AI healing, schema-drift tolerance. Incluye guardrails contra over-healing que esconde bugs reales."
+description: "OBLIGATORIO. Estrategias de self-healing aplicadas en runtime a los tests generados por el chapter: multi-locator fallback, LLM-driven selector repair, visual AI healing, schema-drift tolerance. Incluye guardrails contra over-healing que esconde bugs reales."
 tags: [self-healing, auto-healing, multi-locator, llm-repair, visual-ai, schema-drift, resilience, enforcement, mandatory]
 enforcement: mandatory
 verification:
@@ -66,6 +66,16 @@ Combinar siempre con `[[calidad-chapter-perspective]]` (perspectiva del chapter)
 - **No usar comerciales por default.** OSS primero (Healenium, Resemble.js, multi-locator pattern). Solo licenciar Mabl/Testim/Functionize si el cliente ya los paga (ver `references/commercial-vs-oss-healing-tools.md`).
 - **Cross-link obligatorio con `[[calidad-test-self-correction-loop]]`** (anti-cheating es regla maestra del chapter) y `[[calidad-failure-triage-and-classification]]` (triage decide si es healing válido o bug). Sin estos cruces, el healing está incompleto.
 - Activar este skill después de haber confirmado los inputs vía `[[calidad-mandatory-inputs-protocol]]` y haber priorizado el suite vía `[[calidad-business-driven-prioritization]]`.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | self-healing aplica solo a selectores/locators/schema-drift no críticos; nunca a assertions de negocio | Bloqueado: over-healing detectado; se intentó sanar una assertion de contrato/negocio en lugar de un locator. |
+| 2 | cada healing en runtime queda registrado con before/after y razón en evidencia | Bloqueado: el healing se aplicó sin dejar registro auditable en .evidence/. |
+| 3 | estrategia de healing diseñada antes de entregar (multi-locator, fallback, schema-drift) y no improvisada en runtime | Bloqueado: el suite se entregó sin estrategia de healing — viola la disciplina del chapter para suites en CI/CD recurrente. |
 
 ## Cross-links
 

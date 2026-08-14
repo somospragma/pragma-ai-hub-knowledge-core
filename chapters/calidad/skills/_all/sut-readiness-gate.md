@@ -85,6 +85,16 @@ En **brownfield** (cualquier stack), el gate aplica solo a los tests nuevos de l
 - **NUNCA** completar el locator map con valores adivinados; el mapa es un acuerdo con el equipo de desarrollo, no una hipótesis del QA.
 - El gate se resuelve una vez por corrida y queda registrado; si el usuario cambia de opinión a mitad de flujo (ej. "ya desplegaron"), re-ejecutar el gate y actualizar STRATEGY.md.
 
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | execution_target (real/mock/hybrid), data_strategy (real/synthetic) y, para front/mobile, locator_map resueltos explícitamente con el usuario antes de validar spec o generar código | Bloqueado: no se resolvió la disponibilidad del SUT, de los datos de prueba y del mapeo de locators. Sin este gate no se puede garantizar que los tests sean ejecutables ni deterministas. |
+| 2 | si execution_target es mock o hybrid, los inputs que la matriz por stack marca como obligatorios están presentes (spec con response schemas para API, locator map + fuente UI para front/mobile); ante locator_map ausente NO se generó código de UI salvo override explícito registrado como waived | Bloqueado: el modo pre-desarrollo exige insumos adicionales que no fueron entregados. Sin locator map no se generan page objects salvo waiver explícito del usuario. Consultar la matriz de obligatoriedad por stack. |
+| 3 | si execution_target es mock o hybrid, el delivery gate declara certification: pending_real_integration | Bloqueado: resultados contra mock no pueden presentarse como certificación del SUT. |
+
 ## Cross-links
 
 `[[calidad-route-test-generation]]`, `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-service-virtualization-mockoon]]`, `[[calidad-ui-locator-map-contract]]`, `[[calidad-test-data-management]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-smoke-gate-policy]]`, `[[calidad-delivery-gate-contract]]`.

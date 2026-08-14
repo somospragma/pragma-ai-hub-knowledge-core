@@ -2,9 +2,17 @@
 
 Árbol de decisión obligatorio para clasificar un fallo determinista. Su propósito es evitar el anti-patrón más caro del chapter: **"corregir" un test para que pase, escondiendo un bug real del SUT**.
 
+> **Precondición del árbol:** todo nodo que termina en "BUG en el SUT" exige además la cadena de evidencia completa de `sut-defect-evidence-chain.md`. El árbol clasifica; la cadena demuestra. Llegar al nodo no autoriza a reportar.
+
 ## Pseudocódigo del árbol
 
 ```
+¿el preflight de esta corrida está verde? (app alcanzable, sesión apuntando al
+ destino correcto, aplicación abierta, con salida de comando y captura)
+  NO  → NO hay nada que clasificar: la corrida no demostró tocar el SUT.
+        Corregir el preflight y re-ejecutar. Ver calidad-execution-preflight.
+  SÍ  ↓
+
 ¿el SUT está corriendo y respondiendo a un smoke básico (health-check)?
   NO  → environment issue. Escalar a plataforma cliente.
         NO clasificar como bug ni como test design issue.
@@ -88,3 +96,5 @@ El test asume `precio: 100` pero el SUT cobra `120` (precio actualizado por nego
 1. **En la duda, NO modificar el test**. Reportar y esperar decisión humana es siempre más barato que esconder un bug.
 2. **Toda decisión del árbol se documenta en la evidencia** del run con: nodo final alcanzado, justificación, evidencia que soporta cada ramificación.
 3. **El árbol NO se aplica a tests flaky**: para flaky, usar el `failure-pattern-catalog.md` y la matriz de acción del SKILL.md.
+4. **"No encontré el elemento" no es un nodo del árbol.** Es un síntoma que primero recorre los descartes de `sut-defect-evidence-chain.md`: localizador, ancla volátil, espera, contexto, visibilidad real, estado y datos, y pantalla correcta. Solo lo que sobrevive a los siete descartes entra al árbol.
+5. **Llegar a un nodo de BUG no autoriza a reportar**: hay que completar la cadena de evidencia y emitir su bloque de reporte, y la publicación en el ALM pasa por `[[calidad-alm-write-authorization-gate]]`.

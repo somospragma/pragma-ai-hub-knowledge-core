@@ -91,6 +91,51 @@ El comando canónico de Framelink es `npx -y figma-developer-mcp --figma-api-key
 - **Nombres de capas y componentes** → insumo para proponer los identificadores del `[[calidad-ui-locator-map-contract]]` (el nombre de capa NO es un selector: es la semilla del acuerdo con desarrollo).
 - **Variables/estilos y screenshots** (server oficial: `get_variable_defs`, `get_screenshot`; ver la lista completa de tools en la doc oficial) → soporte para revisión de accesibilidad desde diseño y para baselines visuales tempranas.
 
+**Al extraer textos, clasificarlos antes de usarlos.** El contenido de una maqueta es una
+muestra, no un dato: los nombres, montos y descripciones que se ven en el diseño cambian en
+cada registro real. Aplicar `[[calidad-data-volatility-and-assertion-anchoring]]` **antes**
+de convertir cualquier texto del diseño en localizador o en valor esperado. Rótulos,
+títulos y textos de botón son anclas válidas; el contenido no.
+
+## Persistencia de los artefactos de diseño
+
+Lo que se consume de Figma **se persiste**. Si no, la siguiente sesión no tiene con qué
+comparar y volver a obtenerlo depende de que la conexión siga viva — que es justo lo que
+falla en entornos corporativos.
+
+Todo consumo escribe en `.evidence/design/`:
+
+- **Recortes de frame en imagen**, nombrados por pantalla y nodo.
+- **`design-manifest.json`** con, por cada recorte: identificador de archivo, nodo, nombre
+  del frame, fecha de descarga, hash del contenido y para qué escenario o pantalla se usó.
+
+```json
+{
+  "schema_version": "1.0",
+  "file_key": "<file_key>",
+  "assets": [
+    {
+      "node_id": "<node>",
+      "frame_name": "<nombre del frame>",
+      "path": ".evidence/design/<pantalla>-<node>.png",
+      "hash": "<hash del contenido>",
+      "downloaded_at": "2026-08-13T10:20:00Z",
+      "used_for": ["locator_map:<pantalla>", "visual_baseline:<escenario>"]
+    }
+  ]
+}
+```
+
+Reglas:
+
+- **Si el manifiesto existe y el hash coincide, no se vuelve a descargar.** Evita depender
+  de la conexión en cada sesión y hace reproducible lo que se usó.
+- **Si el hash cambió, el diseño cambió**: se avisa al usuario antes de comparar contra un
+  baseline obsoleto o de derivar locators de una versión vieja.
+- Los recortes destinados a comparación quedan como **baselines candidatos** y se consumen
+  desde `[[calidad-visual-regression]]` con `baseline_source: design`.
+- El manifiesto **no guarda credenciales**: el PAT nunca se persiste (ver Restricciones).
+
 ## Restricciones
 
 - **NUNCA** persistir el PAT en ningún archivo versionable ni en la evidencia; si el usuario lo pega en el chat, usarlo solo para la config local y recordarle rotarlo si quedó expuesto.
@@ -100,4 +145,4 @@ El comando canónico de Framelink es `npx -y figma-developer-mcp --figma-api-key
 
 ## Cross-links
 
-`[[calidad-playwright-greenfield]]` (reference `ui-source-priority.md`), `[[calidad-ui-locator-map-contract]]`, `[[calidad-accessibility-testing]]` (reference `design-review.md`), `[[calidad-sut-readiness-gate]]`, `[[calidad-generate-playwright-greenfield]]`.
+`[[calidad-playwright-greenfield]]` (reference `ui-source-priority.md`), `[[calidad-ui-locator-map-contract]]`, `[[calidad-accessibility-testing]]` (reference `design-review.md`), `[[calidad-sut-readiness-gate]]`, `[[calidad-generate-playwright-greenfield]]`, `[[calidad-visual-regression]]`, `[[calidad-data-volatility-and-assertion-anchoring]]`.

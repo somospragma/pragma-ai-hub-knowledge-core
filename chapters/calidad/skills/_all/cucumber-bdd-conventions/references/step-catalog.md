@@ -22,12 +22,23 @@ Ejemplo de fila:
 | el sistema debe mostrar el mensaje {string} en {plataforma} | Then | web, android, ios, ipad, tablet | steps/common/messages.steps.ts | mensajes |
 ```
 
-## Protocolo de consulta (obligatorio antes de redactar Gherkin)
+## Protocolo de consulta (BLOCKER — obligatorio antes de redactar Gherkin)
+
+**No se genera ningún archivo de definiciones hasta completar este protocolo y emitir su tabla.**
 
 1. Abrir el catálogo **antes** de escribir el primer escenario, no después.
 2. Listar los steps del catálogo que cubren la historia en curso, por categoría.
-3. Para cada acción o verificación que el catálogo **no** cubra, ejecutar la búsqueda en código descrita abajo antes de declararla inexistente.
-4. Declarar en el turno la clasificación resultante (`reuse` / `extend-platform` / `new-local` / `new-shared`). Esa tabla es la traza de que el paso se hizo.
+3. Para cada acción o verificación que el catálogo **no** cubra, ejecutar la búsqueda en código descrita abajo —**exacta y por similitud**— antes de declararla inexistente.
+4. Emitir la tabla de clasificación, con el archivo donde vive cada step existente:
+
+   | Step | Clasificación | Archivo existente | Acción |
+   |---|---|---|---|
+   | el usuario autenticado visualiza el detalle en Android | `reuse` | `steps/nt-100_.../android/...steps.ts` | **NO crear** |
+   | el sistema debe mostrar la fecha del movimiento en tránsito en Android | `new-local` | — | Crear |
+
+   Las clasificaciones son `reuse` / `extend-platform` / `new-local` / `new-shared`. Un step clasificado `reuse` **no se redefine**: el perfil ya lo carga.
+
+Verificado en campo: se redefinieron steps que ya existían en otra épica del mismo proyecto porque la tabla se enunció en la estrategia pero nunca se contrastó contra el glob del perfil. El resultado fue ambigüedad en ejecución y mantenimiento duplicado.
 
 ## Búsqueda en código: cómo se hace bien
 
@@ -45,6 +56,41 @@ grep -rn "el usuario cierra sesión" src --include='*.steps.ts'
 ```
 
 La segunda búsqueda es la que más rinde: el step existe pero redactado distinto ("el sistema muestra el mensaje" contra "el sistema debe mostrar el mensaje"). Un duplicado semántico no rompe la ejecución pero fragmenta el vocabulario, y en la siguiente historia alguien reimplementa la tercera variante.
+
+### Búsqueda por similitud (no solo exacta)
+
+La búsqueda exacta no basta. Los steps que verifican **elementos comunes** —fechas, montos, estados, títulos, mensajes— existen en varias épicas con texto casi idéntico, y la colisión aparece recién en ejecución:
+
+```bash
+# Combinar los sustantivos clave del step candidato, no su texto completo
+grep -rniE "fecha.*(transacción|expiración)|(transacción|expiración).*fecha" src --include='*.steps.ts'
+grep -rniE "monto|importe|saldo" src --include='*.steps.ts'
+```
+
+Si aparecen steps similares, el nuevo se hace **más específico** antes de escribirlo (ver la regla siguiente).
+
+### Regla de especificidad para elementos comunes
+
+Un step que verifica un elemento genérico **debe llevar su contexto en el nombre**. Sin el contexto, el mismo texto sirve para tres épicas y colisiona con la primera que llegue:
+
+```
+Incorrecto: el sistema debe mostrar la fecha de transacción en Android
+Correcto:   el sistema debe mostrar la fecha de transacción del movimiento en tránsito en Android
+```
+
+Aplica especialmente a fechas (transacción, expiración, creación), montos (total, parcial, pendiente), estados (activo, pendiente, cancelado), títulos y encabezados. El sufijo de plataforma no resuelve esto: dos épicas de la misma plataforma colisionan igual (ver `platform-suffix-and-ambiguity.md`).
+
+## Validación anti-duplicación (post-generación, obligatoria)
+
+Después de generar y **antes** de declarar la entrega, listar las definiciones repetidas:
+
+```bash
+grep -rhoE "^(Given|When|Then)\('[^']+'" src --include='*.steps.ts' | sort | uniq -d
+```
+
+Cualquier salida es **blocker**: hay definiciones duplicadas y el escenario va a fallar como `ambiguous`. Se corrige antes de continuar, nunca se reporta como "advertencia".
+
+Complementariamente, un `--dry-run` filtrado por el tag de la historia debe cerrar sin `ambiguous` ni `undefined` antes de la primera ejecución real.
 
 ## Cuándo un step entra al catálogo
 

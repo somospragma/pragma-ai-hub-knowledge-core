@@ -18,32 +18,17 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 
 ## Pasos del protocolo
 
-0. **Leer la traza del pipeline** — Si el `output_path` ya existe, leer `.evidence/pipeline-state.json` (`[[calidad-pipeline-state-tracking]]`) y reportar dónde quedó el proceso antes de hacer nada. Si no existe, crearlo. Continuar por su `next_action`, no por lo que parezca urgente.
+0. **Leer la traza del pipeline y la bitácora** — Si el `output_path` ya existe, leer `.evidence/pipeline-state.json` y `.evidence/session-log.md` (`[[calidad-pipeline-state-tracking]]`) y ejecutar el ritual de apertura antes de tocar nada: fase actual, siguiente acción, bloqueos y `open_corrections` reafirmadas. Si no existen, crearlos. Continuar por su `next_action`, no por lo que parezca urgente.
 
-1. **Confirmar mandatory inputs** (todos obligatorios, no se asume ninguno) y **leer COMPLETO cada insumo entregado**, emitiendo la tabla de extracción (qué se extrajo de cada uno y dónde se usará — `[[calidad-mandatory-inputs-protocol]]`). Un insumo sin fila es un insumo ignorado:
-   - `intent`: qué tipo de pruebas (Karate / Playwright / K6 / Appium)
-   - `project_name`: kebab-case
-   - `output_path`: ruta absoluta
-   - `ui_source` (Playwright) / `spec` (Karate/K6) / `apk_path` (Appium): fuente principal
-   - **`modo` de operación**: `full | dry-run | scaffold-only | execute-only`
-   - `user_story`: HUT-XXX o `null` (declarar explícitamente)
-   - `firma`: documento de servicio o `null`
-   - `risk_map`: por endpoint/HU/script `{nombre: CRITICAL|HIGH|MEDIUM|LOW}`; si no se provee, default `HIGH` con confirmación
-   - Para K6, además de los inputs base, completar el checklist K6-específico (perfil de carga, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente) según `[[calidad-mandatory-inputs-protocol]]`
+1. **Confirmar mandatory inputs** (todos obligatorios, ninguno se asume) y **leer COMPLETO cada insumo entregado**, emitiendo la tabla de extracción: qué se extrajo de cada uno y dónde se usará (`[[calidad-mandatory-inputs-protocol]]`). **Un insumo sin fila es un insumo ignorado.** Como mínimo: `intent`, `project_name` en kebab-case, `output_path` absoluto, la fuente principal del stack, el **modo** de operación, `user_story` y `firma` declarados aunque sean nulos, y `risk_map` confirmado. K6 añade su checklist propio.
 
-2. **Ejecutar pre-flight check del stack** invocando la reference correspondiente:
-   - Karate → [[calidad-karate-greenfield]] (consultar `references/preflight.md` en su subfolder)
-   - Playwright → `references/preflight.md` análogo
-   - K6 → análogo
-   - Appium → análogo
+1.5. **Solo en brownfield — barrer el repositorio y emitir el inventario (BLOCKER)**: ejecutar `[[calidad-repo-capability-discovery]]` y emitir `.evidence/repo-capability-map.md` (qué scripts, runbook, taxonomía de etiquetas, alcance del ejecutor e integraciones ya existen), más `.evidence/archetype-inventory.md` con la tabla de clasificación de steps (`[[calidad-brownfield-vs-greenfield]]`). **Sin ambos artefactos mostrados al usuario no se genera nada.** De aquí salen los comandos de ejecución y la taxonomía real: prohibido inventarlos.
 
-   Si pre-flight falla → reportar al usuario y **degradar a `scaffold-only`** con razón documentada. No continuar a generación full.
+   Emitir también el **checkpoint de datos de prueba** con validación cruzada contra el catálogo del proyecto (`[[calidad-mandatory-inputs-protocol]]`) y esperar confirmación.
 
-3. **Declarar coverage upfront** antes de generar:
-   - Karate: por endpoint, calcular `effective_minimum` con fórmula [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder) y mostrar al usuario `{endpoint: N}`.
-   - Playwright: por HU, calcular `effective_minimum = happy + 2_boundary + 2_negative + 1_edge ≈ 8` mínimo.
-   - K6: los 3 escenarios Línea Base / Carga / Estrés (Smoke / Load / Stress en docs k6) son obligatorios. Spike y Soak son opt-in con justificación documentada en `.evidence/scenarios-opt-in.md` (ver [[calidad-k6-greenfield]] (consultar `references/vocabulary-and-scenario-mapping.md`)). Declarar también tier (Conservative/Moderate/Relaxed) con razón.
-   - Appium: número de escenarios `@smoke` ejecutables + escenarios `@proposed` planeados.
+2. **Ejecutar el pre-flight check del stack** invocando la reference `preflight.md` del skill greenfield correspondiente. Si falla → reportar y **degradar a `scaffold-only`** con razón documentada; no continuar a generación full.
+
+3. **Declarar coverage upfront** antes de generar, con la fórmula de cada stack y mostrando el número al usuario: por endpoint en Karate, por historia en Playwright, los tres escenarios base obligatorios más los opt-in justificados en K6, y escenarios ejecutables contra planeados en Appium. El detalle de cada fórmula vive en el skill greenfield del stack.
 
 4. **Generar `STRATEGY.md` y esperar aprobación del usuario antes de proceder a templates.** Aplicar `[[calidad-pre-design-strategy-document]]`. El documento se materializa en `output_path/STRATEGY.md` usando el `STRATEGY.md` del stack correspondiente (Karate / Playwright / K6 / Appium). El agente lo presenta, itera ante "modificar X" y SOLO avanza al paso 5 al recibir "aprobado" (o equivalente explícito). NUNCA se emite código antes de esta aprobación.
 
@@ -51,7 +36,9 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 
 ## Restricciones
 
-- NUNCA emitir el primer archivo sin que los 5 pasos se hayan completado.
+- NUNCA emitir el primer archivo sin que todos los pasos se hayan completado.
+- NUNCA generar ni ejecutar en brownfield sin el mapa de recursos y el inventario del arquetipo emitidos (paso 1.5).
+- NUNCA ejecutar un comando que no salga del mapa de recursos o que el usuario no haya confirmado.
 - NUNCA emitir código sin `STRATEGY.md` aprobado explícitamente (regla anti-cheating del paso 4).
 - NUNCA asumir `modo: full` por defecto — preguntar.
 - NUNCA asumir `risk: HIGH` sin confirmar — preguntar.

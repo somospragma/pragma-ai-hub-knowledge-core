@@ -4,7 +4,7 @@ version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Clasificar fallos de tests como deterministas vs intermitentes; identificar causa raíz (bug del SUT, test mal diseñado, data state, ambiente, timing, locator stale, infrastructura) antes de proponer cualquier corrección."
+description: "OBLIGATORIO. Clasificar fallos de tests como deterministas vs intermitentes; identificar causa raíz (bug del SUT, test mal diseñado, data state, ambiente, timing, locator stale, infrastructura) antes de proponer cualquier corrección."
 tags: [triage, classification, flakiness, root-cause, deterministic, quarantine, enforcement, mandatory]
 enforcement: mandatory
 verification:
@@ -14,6 +14,8 @@ verification:
     failure_message: "Bloqueado: triage no produjo causa raíz; auto-corrección sin causa raíz esconde bugs del SUT."
   - check: "fallos clasificados como bug del SUT NO pasan a self-correction; se escalan a humano con reporte"
     failure_message: "Bloqueado: se intentó auto-corregir un bug real del SUT — violación de anti-cheating."
+  - check: "todo fallo clasificado como bug del SUT cumple las seis precondiciones de references/sut-defect-evidence-chain.md, empezando por preflight verde en esa misma corrida"
+    failure_message: "Bloqueado: se declaró un defecto del SUT sin la cadena de evidencia completa. Ya ocurrió en campo reportar un defecto en una corrida donde la aplicación nunca se abrió."
 ---
 
 # Failure Triage and Classification — Clasificación de Fallos y Análisis de Causa Raíz antes de Corregir
@@ -43,7 +45,7 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
 3. **Clasificar el patrón de fallo** contra el catálogo en `references/failure-pattern-catalog.md`. Las categorías canónicas son: bug real del SUT, test design issue, data state, environment, timing/sync, locator stale, infrastructure. Cada patrón del catálogo trae síntomas observables, causa probable, evidencia a recolectar y acción recomendada.
 
 4. **Decidir acción** aplicando el árbol de decisión de `references/bug-vs-test-design-decision-tree.md`. Reglas resumidas:
-   - `deterministic + bug del SUT` → reportar al equipo de desarrollo del cliente con la evidencia. **NO modificar el test**.
+   - `deterministic + bug del SUT` → **antes de clasificar así, cumplir la cadena de evidencia de `references/sut-defect-evidence-chain.md`** (seis precondiciones acumulativas, empezando por preflight verde de `[[calidad-execution-preflight]]` en esa misma corrida). Con la cadena completa: reportar al equipo de desarrollo del cliente con el bloque de reporte que emite esa reference. **NO modificar el test**.
    - `deterministic + test design issue` → habilitado para `[[calidad-test-self-correction-loop]]`.
    - `flaky + locator stale` → habilitado para `[[calidad-test-self-healing]]`.
    - `flaky + data state` → fixear cleanup/fixtures; ver `[[calidad-test-data-management]]`.
@@ -64,8 +66,20 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
 - **NUNCA** ejecutar el protocolo de re-run sobre tests de performance/K6**: re-correr K6 puede dejar el SUT en estado degradado y los resultados no son comparables run-a-run por la naturaleza del workload. Usar análisis manual de métricas.
 - **El triage es obligatorio antes de cualquier auto-corrección**. Saltarse este skill y pasar directo a `[[calidad-test-self-correction-loop]]` está prohibido por la política del chapter.
 
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | re-run N=3 aplicado sobre cada fallo y clasificación deterministic|flaky|flaky_high_variance asignada por test | Bloqueado: no se aplicó re-run N=3 ni se clasificó cada fallo. No se puede pasar a corrección sin triage. |
+| 2 | causa raíz declarada (bug SUT, test design, data state, ambiente, timing, locator stale, infra) antes de proponer fix | Bloqueado: triage no produjo causa raíz; auto-corrección sin causa raíz esconde bugs del SUT. |
+| 3 | fallos clasificados como bug del SUT NO pasan a self-correction; se escalan a humano con reporte | Bloqueado: se intentó auto-corregir un bug real del SUT — violación de anti-cheating. |
+| 4 | todo fallo clasificado como bug del SUT cumple las seis precondiciones de references/sut-defect-evidence-chain.md, empezando por preflight verde en esa misma corrida | Bloqueado: se declaró un defecto del SUT sin la cadena de evidencia completa. Ya ocurrió en campo reportar un defecto en una corrida donde la aplicación nunca se abrió. |
+
 ## Cross-links
 
+- `references/sut-defect-evidence-chain.md` — precondiciones obligatorias y descartes documentados antes de declarar un defecto del SUT, más el bloque de reporte que se emite.
 - `references/re-run-protocol-for-determinism.md` — protocolo de re-ejecución para distinguir deterministic vs flaky.
 - `references/failure-pattern-catalog.md` — catálogo de patrones de fallo con síntomas, causa y acción.
 - `references/bug-vs-test-design-decision-tree.md` — árbol de decisión para decidir si corregir el test o reportar bug.
@@ -83,3 +97,7 @@ Cross-links con otros assets del chapter:
 - `[[calidad-test-self-healing]]`
 - `[[calidad-test-self-correction-loop]]`
 - `[[calidad-calibrate-k6-thresholds]]`
+- `[[calidad-execution-preflight]]`
+- `[[calidad-data-volatility-and-assertion-anchoring]]`
+- `[[calidad-cross-platform-learning-propagation]]`
+- `[[calidad-alm-write-authorization-gate]]`

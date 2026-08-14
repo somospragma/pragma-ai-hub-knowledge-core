@@ -7,6 +7,13 @@ chapter: calidad
 description: "Política universal de smoke gate 1:1 obligatorio antes de declarar success. Comando por stack, criterios de aceptación, comportamiento ante fallo."
 tags: [smoke-gate, universal, mandatory, post-generation]
 enforcement: mandatory
+verification:
+  - check: "el filtro del gate matchea exactamente 1 escenario, verificado con el conteo ANTES de ejecutar"
+    failure_message: "Bloqueado: el gate matchea un número de escenarios distinto de 1. Un tag compartido por varios deja de ser gate y pasa a ser suite parcial."
+  - check: "en brownfield el gate reutiliza la taxonomía de etiquetas del proyecto; no se introdujo ningún tag nuevo sin confirmación explícita del usuario"
+    failure_message: "Bloqueado: se introdujo una etiqueta de compuerta en un repositorio que ya tiene taxonomía propia. Verificado en campo: rompe la convención del equipo, rompe la trazabilidad hasta el ALM y el ejecutor puede componer el filtro de forma que el tag nuevo nunca encaje."
+  - check: "el preflight de esa misma corrida está verde antes de ejecutar el gate"
+    failure_message: "Bloqueado: un gate rojo contra un SUT que nunca se tocó no informa nada y arranca el diagnóstico sobre la causa equivocada."
 ---
 
 # Smoke Gate Policy — Universal cross-stack
@@ -24,13 +31,25 @@ El gate ejecuta **exactamente un** escenario: el flujo crítico end-to-end más 
 - Un caso crítico completo destapa los problemas **transversales** (locators, esperas, datos, instrumentación) con un solo diagnóstico. Lanzar N escenarios que fallan por la misma causa multiplica el ruido y el tiempo — verificado en campo, con el usuario pidiendo tres veces "no ejecutes tantos test hasta no confirmar el primero".
 - Un tag compartido por varios escenarios deja de ser un gate y pasa a ser una suite parcial.
 
-**Convención**: tag dedicado **`@smoke-gate`** sobre **un solo** escenario (que además puede llevar `@smoke`). Antes de ejecutar, **verificar el conteo**: si `@smoke-gate` matchea ≠ 1 escenario, el gate está mal construido y se corrige antes de correr. El resto de `@smoke` es suite, no gate.
+**El principio del gate es "un escenario", no un tag concreto.** Cómo se selecciona ese escenario depende de si el repositorio ya tiene taxonomía propia:
+
+| Situación | Cómo se selecciona el escenario del gate |
+|---|---|
+| **Brownfield con taxonomía de humo existente** | Se **reutiliza** la etiqueta del proyecto y se acota a un solo escenario combinándola con filtro por nombre. **Prohibido introducir un tag nuevo.** |
+| **Greenfield, o repositorio sin taxonomía** | Se crea el tag dedicado **`@smoke-gate`** sobre un solo escenario (que además puede llevar `@smoke`) |
+| **Se necesita un tag nuevo en un repo con convención propia** | Solo con confirmación explícita del usuario, registrada en la evidencia |
+
+La taxonomía real del repositorio sale del mapa de `[[calidad-repo-capability-discovery]]` y **manda sobre el default de este asset**. Verificado en campo: el agente creó `@smoke-gate` en un proyecto cuya etiqueta de humo estandarizada aparecía en los ejemplos de uso de sus propios ejecutores y viajaba hasta el ALM como etiqueta del caso; el tag nuevo rompió la convención y la trazabilidad, y además el ejecutor componía el filtro de forma que el tag nuevo nunca encajaba.
+
+En cualquiera de los tres casos, antes de ejecutar se **verifica el conteo**: si el filtro del gate matchea ≠ 1 escenario, el gate está mal construido y se corrige antes de correr. El resto de la etiqueta de humo es suite, no gate.
 
 **Regla de orden ante fallos**: mientras el gate no esté verde, se re-ejecuta **solo ese escenario**. Está prohibido lanzar la suite completa para "ver qué más falla": primero un caso verde end-to-end, después cobertura.
 
 **Después del gate sí va la suite completa** — el gate no reemplaza la cobertura. La cadencia completa (gate 1:1 → suite de inventario → corrección aislada test por test → suite de regresión) está en `[[calidad-test-self-correction-loop]]`. Lo que nunca se hace es relanzar la suite entera en cada iteración de corrección: durante la corrección se ejecuta **solo el test que se está corrigiendo**.
 
 ## Comando por stack
+
+**En brownfield, el comando sale del mapa de `[[calidad-repo-capability-discovery]]`, no de esta tabla.** Los comandos de abajo son el default para greenfield o para cuando el repositorio no provee ejecutor propio; en un repo real casi nunca son los correctos. Igualmente, el nombre del tag en los comandos se sustituye por la etiqueta real del proyecto cuando aplica la fila 1 de la tabla anterior.
 
 | Stack | Comando smoke gate (1 escenario) | Verificación de conteo previa |
 |---|---|---|
@@ -43,6 +62,7 @@ El gate ejecuta **exactamente un** escenario: el flujo crítico end-to-end más 
 
 ## Reglas
 
+- **Preflight verde primero.** El gate no se ejecuta sin `[[calidad-execution-preflight]]` en verde en esa misma corrida: un gate rojo contra un SUT que nunca se tocó no informa nada y arranca un diagnóstico sobre la causa equivocada.
 - **Exit 0** → smoke gate verde, continuar el flujo y permitir `status: success`.
 - **Exit ≠ 0** → status `partial` con `blocker: "smoke_gate_failed_<framework>"` (ej. `smoke_gate_failed_karate`, `smoke_gate_failed_playwright`, `smoke_gate_failed_k6`, `smoke_gate_failed_appium`). Escalar al usuario con stderr completo del comando.
 - El smoke gate NO ejecuta suite completa; solo valida que el scaffold corre end-to-end. La suite completa se ejecuta como parte del paso de ejecución del `[[calidad-post-generation-protocol]]`.
@@ -66,6 +86,7 @@ El campo `smoke_gate` se agrega al bloque `delivery_gate` (ver `[[calidad-delive
 smoke_gate:
   framework: karate | playwright | k6 | appium
   command: "..."
+  selector_source: repo_taxonomy | dedicated_tag | user_confirmed_new_tag
   scenarios_matched: 1                # DEBE ser 1; distinto de 1 invalida el gate
   executed: true | false | skipped
   executed_against: real | mock | hybrid
@@ -82,6 +103,16 @@ Cada framework documenta el detalle del comando, dónde colocar el `@smoke`, par
 - K6: [[calidad-k6-greenfield]] (consultar `references/smoke-1-1-gate.md` en su subfolder) (cubierto en oleada K6 paralela)
 - Appium: [[calidad-appium-screenplay-android]] (consultar `references/smoke-gate-gradle.md` en su subfolder)
 
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | el filtro del gate matchea exactamente 1 escenario, verificado con el conteo ANTES de ejecutar | Bloqueado: el gate matchea un número de escenarios distinto de 1. Un tag compartido por varios deja de ser gate y pasa a ser suite parcial. |
+| 2 | en brownfield el gate reutiliza la taxonomía de etiquetas del proyecto; no se introdujo ningún tag nuevo sin confirmación explícita del usuario | Bloqueado: se introdujo una etiqueta de compuerta en un repositorio que ya tiene taxonomía propia. Verificado en campo: rompe la convención del equipo, rompe la trazabilidad hasta el ALM y el ejecutor puede componer el filtro de forma que el tag nuevo nunca encaje. |
+| 3 | el preflight de esa misma corrida está verde antes de ejecutar el gate | Bloqueado: un gate rojo contra un SUT que nunca se tocó no informa nada y arranca el diagnóstico sobre la causa equivocada. |
+
 ## Cross-links
 
-`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-failure-triage-and-classification]]`.
+`[[calidad-post-generation-protocol]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-execution-preflight]]`, `[[calidad-repo-capability-discovery]]`.

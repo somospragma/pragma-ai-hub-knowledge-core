@@ -4,7 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Schema universal .evidence/execution-status.json para reportar bloqueos de ambiente (WAF, red, auth, rate-limit, DNS, device, browser, JDK) sin auto-corregir."
+description: "OBLIGATORIO. Schema universal .evidence/execution-status.json para reportar bloqueos de ambiente (WAF, red, auth, rate-limit, DNS, device, browser, JDK) sin auto-corregir."
 tags: [evidence, environment, blockers, universal, mandatory]
 enforcement: mandatory
 ---
