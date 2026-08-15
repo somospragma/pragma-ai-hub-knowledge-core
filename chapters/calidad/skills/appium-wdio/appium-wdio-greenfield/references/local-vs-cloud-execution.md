@@ -151,6 +151,23 @@ world.attach(urlSesion, 'text/uri-list');
 world.attach(`Dispositivo: ${device.deviceName} ${device.platformVersion}`, 'text/plain');
 ```
 
+## "Pasa en la granja, falla en local": qué difiere de verdad
+
+Es la observación que más veces termina en la decisión equivocada — *"entonces corramos siempre en la granja"* —, que cuesta el ciclo rápido de desarrollo y vuelve cada iteración dependiente de una infraestructura compartida.
+
+La diferencia entre los dos entornos no es una sola cosa. Son cuatro ejes, y **cada uno se mide por separado** antes de concluir:
+
+| Eje | Cómo difiere | Cómo se mide |
+|---|---|---|
+| Ajustes del dispositivo | Las granjas entregan los dispositivos con las escalas de animación en `0`; un dispositivo de escritorio las trae en `1.0`, y eso basta para que el driver nunca vea la UI quieta | `adb shell settings get global window_animation_scale` y sus dos hermanas |
+| Modelo y versión de sistema | La granja suele ofrecer gama alta reciente; el dispositivo de escritorio es el que había | El dispositivo asignado ya está en la evidencia del escenario: compararlo es gratis |
+| Host que ejecuta el cliente | En local, el proceso cliente vive en una máquina de escritorio con gestión de energía; en la nube conversa con un servidor remoto | Huecos entre requests en el log del servidor, ver `local-run-stalls-and-host-timers.md` |
+| Versiones de herramientas | Driver, servidor y binarios auxiliares pueden no coincidir entre la máquina y el runner | `appium driver list --installed` en ambos lados |
+
+**La regla:** un fallo que solo ocurre en local es un diferencial identificable, no una propiedad del entorno local. Hasta no nombrar cuál de los cuatro ejes lo produce, no hay diagnóstico — hay una preferencia por el entorno que hoy funciona.
+
+Y vale al revés: cuando una plataforma falla en la granja y otra pasa **en la misma corrida**, la que pasa es el control. Ver el protocolo de re-corridas en `[[calidad-failure-triage-and-classification]]`.
+
 ## Cuándo cada modo
 
 | | Local | Device farm |

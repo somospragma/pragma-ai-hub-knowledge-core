@@ -33,6 +33,17 @@ Orden de diagnóstico, siempre el mismo: **evidencia primero** (screenshot, árb
 | El primer escenario pasa y el segundo falla | Estado de la app persistido entre sesiones | Revisar `noReset` / `fullReset` con la tabla de decisión |
 | El clic golpea el teclado en vez del botón | El teclado tapa el elemento siguiente | Ocultar el teclado tras escribir |
 | El texto se escribe incompleto o desordenado | Autocompletado o campo con máscara | Tocar el campo, limpiar, escribir, verificar el valor resultante |
+| Cada `find` o `getPageSource` tarda segundos, y alguno decenas de segundos | La UI nunca queda "idle" para el driver: animaciones activas o árbol de accesibilidad que emite en continuo. Se agota `waitForIdleTimeout` (default 10 s) en cada comando | Capabilities anti-idle del perfil local, en `capabilities-matrix-android.md`. Diagnóstico en `local-run-stalls-and-host-timers.md` |
+| El arranque de cada sesión pierde ~5 s sin explicación | `adb connect` invocado con el serial de un dispositivo USB: adb lo resuelve como hostname y bloquea sincrónicamente | Invocar `connect` solo si el UDID tiene forma `host:puerto` |
+
+## Cuelgues en ejecución local
+
+| Síntoma | Causa | Solución |
+|---|---|---|
+| El escenario "se queda pegado" a ratos y muere por timeout, pero en la granja pasa siempre | Varias causas distintas comparten este síntoma. **No concluir sin medir** | Protocolo de huecos entre requests de `local-run-stalls-and-host-timers.md`: separa dispositivo, app y proceso cliente en una sola corrida |
+| El log del servidor muestra un hueco de decenas de segundos **sin un solo request**, con el servidor respondiendo en milisegundos antes y después | El proceso cliente quedó suspendido entre comandos: los `setTimeout` internos no despiertan a tiempo | Temporizador recurrente `unref()`-eado durante la corrida, solo en modo local. Ver `local-run-stalls-and-host-timers.md` |
+| No pasa nada en el dispositivo y el runner termina sin ejecutar | Script que anida otro script y pierde los argumentos por el camino | El script invoca el binario del runner directo. Ver `[[calidad-appium-wdio-run-and-profiles]]` |
+| El fallo desaparece al agregar instrumentación para diagnosticarlo | La instrumentación cambió la condición que producía el fallo. **Es el hallazgo, no un estorbo** | A/B con la instrumentación como única variable, varias corridas por brazo. Ver `[[calidad-failure-triage-and-classification]]` |
 
 ## Webviews y contextos
 

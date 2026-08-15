@@ -103,6 +103,16 @@ Grabar siempre cuesta tiempo por escenario y espacio en disco. Se activa por var
 if (process.env.RECORD_VIDEO !== 'true') return;
 ```
 
+## El costo de la captura tiene un techo
+
+La instrumentación de evidencia se paga en cada step, y en local —donde cada comando ya cuesta más que en la granja— puede pasar a dominar la corrida. El caso que más sorprende es el adorno visual: un realzador que dibuja un recuadro sobre el elemento usado **vuelve a consultar cada selector del step** para obtener su posición y tamaño. Con tres consultas por selector y varios selectores por step, son segundos por step que no aportan diagnóstico: el screenshot sin recuadro ya muestra la pantalla.
+
+Tres reglas que mantienen la evidencia útil sin que se coma la corrida:
+
+- **La captura reutiliza lo que el step ya resolvió**, nunca vuelve a buscar un elemento solo para adornar la imagen.
+- **Lo cosmético se separa de lo diagnóstico** y se activa por variable de entorno, igual que el video. El screenshot y el árbol de pantalla son diagnóstico; el recuadro no.
+- **Si la evidencia se sospecha del costo, se mide**: correr el mismo escenario con la captura encendida y apagada, y comparar. Sin ese número es una discusión de opiniones. El protocolo de A/B está en `[[calidad-failure-triage-and-classification]]`.
+
 ## Teardown: el orden importa
 
 ```typescript

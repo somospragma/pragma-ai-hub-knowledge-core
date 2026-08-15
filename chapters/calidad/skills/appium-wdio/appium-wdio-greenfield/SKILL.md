@@ -38,6 +38,7 @@ Este SKILL es el índice. El detalle que hace que el proyecto arranque de primer
 | `references/hybrid-web-native-context.md` | Contextos nativo y webview, deep links, diálogos del sistema |
 | `references/mobile-evidence-and-video.md` | Video, screenshots y adjuntos al reporte |
 | `references/i18n-locale-injection.md` | Idioma y región como dimensión de prueba |
+| `references/local-run-stalls-and-host-timers.md` | Cuelgues en ejecución local: separar dispositivo, app y proceso cliente midiendo huecos entre requests |
 | `references/troubleshooting-mobile-wdio.md` | Fallos conocidos con causa y solución verificadas |
 
 **El conocimiento mobile que no depende del lenguaje vive en el stack `appium-core`** y se instala aparte. Este skill no lo duplica: lo consume.

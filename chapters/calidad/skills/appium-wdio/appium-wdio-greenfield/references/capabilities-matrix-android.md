@@ -23,6 +23,27 @@ const base = {
 | `newCommandTimeout: 660` | Segundos que Appium espera un comando antes de matar la sesión. El valor por defecto (60) mata sesiones durante pausas legítimas: un OTP manual, un breakpoint. |
 | `settings[imageQuality]` | Calidad de los screenshots que toma el driver. Bajarla reduce el peso del reporte en un orden de magnitud sin perder diagnóstico. |
 
+## Anti-idle: obligatorio en ejecución local
+
+UiAutomator2 espera a que la interfaz quede quieta antes de resolver cada comando, hasta agotar `waitForIdleTimeout` (default **10 000 ms**). En un dispositivo de escritorio, con las animaciones del sistema activas, ese estado quieto puede no llegar nunca y **cada `find` paga la espera completa**. Los dispositivos de granja no lo reproducen porque vienen con las escalas de animación en `0`.
+
+```typescript
+if (!isCloudMode()) {
+  Object.assign(base, {
+    'appium:disableWindowAnimation': true,
+    'appium:settings[waitForIdleTimeout]': envNumber('ANDROID_WAIT_FOR_IDLE_TIMEOUT', 100),
+    'appium:settings[actionAcknowledgmentTimeout]': envNumber('ANDROID_ACTION_ACK_TIMEOUT', 300)
+  });
+}
+```
+
+| Variable | Default | Efecto |
+|---|---|---|
+| `ANDROID_WAIT_FOR_IDLE_TIMEOUT` | `100` | Milisegundos que el driver espera a que la UI quede quieta antes de cada comando. El default del driver es `10000`. |
+| `ANDROID_ACTION_ACK_TIMEOUT` | `300` | Milisegundos de espera de confirmación tras una acción. El default del driver es `3000`. |
+
+Se verifica en el log del servidor al crear la sesión, que imprime los valores realmente aplicados. Medición tras aplicarlo: los comandos más lentos de la corrida bajaron de ~1.7 s a ~0.7 s. Diagnóstico completo en `local-run-stalls-and-host-timers.md`, que además cubre el otro cuelgue local —el del proceso cliente— con el que este se confunde.
+
 ## `noReset` y `fullReset`: la tabla de decisión
 
 | Escenario | `noReset` | `fullReset` | Consecuencia |
@@ -68,8 +89,13 @@ El UDID no se hardcodea nunca: cambia por máquina y por sesión de emulador.
 function resolveAndroidUdid(): string {
   const envUdid = process.env.ANDROID_UDID;
   if (envUdid) {
-    // Dispositivo por red: asegurar la conexión antes de usarlo
-    spawnSync(adb, ['connect', envUdid], { stdio: 'ignore', shell: false });
+    // `adb connect` SOLO aplica a dispositivos por red (host:puerto). Con el
+    // serial de un dispositivo USB, adb intenta resolverlo como nombre de host
+    // y bloquea ~5s sincrónicos —bloqueando el event loop— antes de fallar,
+    // en cada arranque de sesión.
+    if (/^[^\s]+:\d+$/.test(envUdid)) {
+      spawnSync(adb, ['connect', envUdid], { stdio: 'ignore', shell: false });
+    }
     return envUdid;
   }
   // Autodetección: primer dispositivo en estado 'device'
@@ -84,6 +110,7 @@ function resolveAndroidUdid(): string {
 
 Detalles que importan:
 
+- **`adb connect` solo para UDID de red.** Verificado en campo: `adb connect <serial-usb>` tarda 5 segundos exactos en fallar con `failed to resolve host`, y esos 5 segundos son sincrónicos. Se paga en cada arranque y no deja rastro en el log del servidor Appium, así que aparece como un cuelgue sin causa.
 - **Se salta la primera línea** de `adb devices`: es el encabezado.
 - **Se filtra por estado `device`**: un dispositivo en `unauthorized` u `offline` aparece listado y produce una sesión que falla con un error que no menciona la autorización.
 - **`shell: false`** en todo `spawn`: el UDID viene de configuración externa y no debe interpretarse por un shell.

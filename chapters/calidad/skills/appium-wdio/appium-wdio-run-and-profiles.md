@@ -41,7 +41,20 @@ IOS_DEVICE_TYPE=simulator npm run test:ios
 2. **Nunca fijar tags en el archivo de configuración de un perfil más allá del tag de plataforma y la exclusión.** Un perfil que trae `@smoke` fijo hace que el filtro de la línea de comandos no pueda ampliar el alcance, y la suite de regresión no corre nunca.
 3. **Todo perfil filtra el tag de exclusión** (`and not @ignore`). Sin eso, los escenarios deshabilitados corren igual.
 4. **Un directorio de reporte por perfil.** Dos perfiles que escriben al mismo sitio hacen que el último pise al anterior, y el reporte consolidado miente.
-5. **El paralelismo está limitado por los dispositivos disponibles.** Un `parallel: 4` con dos dispositivos produce fallos por sesión rechazada que parecen fallos de la app.
+5. **El paralelismo está limitado por los dispositivos disponibles.** Un `parallel: 4` con dos dispositivos produce fallos por sesión rechazada que parecen fallos de la app. Bajarlo a uno es además la primera palanca de diagnóstico cuando una plataforma se pone intermitente: es más lento a propósito, y convierte una corrida ruidosa en una diagnosticable.
+6. **Un script del proyecto invoca el binario del runner, nunca a otro script del proyecto.** Anidar gestores de paquetes rompe el paso de argumentos:
+
+```json
+"test:local:android": "EXECUTION_MODE=local npm run test:android",
+```
+
+Invocado como `npm run test:local:android -- --tags '@smoke'`, los argumentos se pierden en el anidamiento y llegan al runner como si fueran rutas de archivo. El síntoma es desconcertante —**no pasa nada en el dispositivo**, o un error de archivo inexistente con el nombre del tag— y se confunde con un cuelgue. La forma correcta repite el comando completo en cada script:
+
+```json
+"test:local:android": "EXECUTION_MODE=local cucumber-js --config cucumber.config.js --profile android",
+```
+
+7. **Para el ciclo local, transpilar sin verificar tipos.** En proyectos sobre `ts-node`, la verificación de tipos en cada arranque duplica el tiempo hasta el primer step (medido: 40 s contra 22 s). Los tipos se verifican aparte con `tsc --noEmit`, que es donde el error se lee bien. La verificación estática no se elimina: se saca del camino crítico de cada corrida.
 
 ## Expresiones de tags útiles
 
