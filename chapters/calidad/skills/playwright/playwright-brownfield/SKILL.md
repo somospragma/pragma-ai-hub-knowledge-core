@@ -34,6 +34,7 @@ El conocimiento técnico del stack vive en el bundle **greenfield** del mismo st
 | [[calidad-playwright-greenfield]] (`references/selector-priority.md`) | Orden de selectores y prohibiciones |
 | [[calidad-playwright-greenfield]] (`references/execution-modes-live-mocked-hybrid.md`) | @live/@mocked/@hybrid y qué valida cada modo |
 | [[calidad-playwright-greenfield]] (`references/waits-policy.md`) | Política de esperas |
+| [[calidad-playwright-greenfield]] (`references/multi-outcome-waits-and-honest-failures.md`) | Esperas con varios desenlaces; obligatoria si vas a migrar un patrón repetido de login o navegación |
 | `references/convention-detection.md` · `references/selector-update-strategy.md` | Convenciones del proyecto (propias de este skill) |
 | `references/playwright-as-library-cucumber.md` | **Obligatoria** si el proyecto no tiene `playwright.config.ts` y usa cucumber-js como runner |
 

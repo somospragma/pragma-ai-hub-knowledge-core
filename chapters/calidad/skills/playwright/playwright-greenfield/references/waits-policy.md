@@ -18,6 +18,16 @@ Aplicaciones como Instaleap, Firebase Realtime Database, Pusher, Pub/Sub, Apollo
 
 `networkidle` solo es aceptable en sitios estáticos sin sockets abiertos. En caso de duda, asumir que **no** es aceptable.
 
+### 3. Esperar un solo desenlace cuando hay varios posibles
+
+```typescript
+await page.waitForURL('**/home**', { timeout: 30000 });
+```
+
+Correcto solo si ese es el **único** final posible. Cuando el flujo admite otros —un consentimiento pendiente, una verificación intermedia, un rechazo del backend—, esta espera los colapsa todos en el mismo mensaje de timeout y el test deja de informar: obliga a re-diagnosticar desde cero en cada aparición.
+
+La alternativa es sondear los desenlaces y escuchar la red para nombrar la capa que falló. Es la única excepción legítima al `waitForTimeout` prohibido arriba, y está acotada en ``multi-outcome-waits-and-honest-failures.md``, junto con la regla de derivar el timeout de una medición en vez de un número redondo.
+
 ## Alternativas obligatorias
 
 ### Esperar una respuesta de API específica
@@ -81,6 +91,7 @@ const results = await page.getByRole('listitem').count();
 
 ## Cross-links
 
+- ``multi-outcome-waits-and-honest-failures.md`` — esperas con varios desenlaces y fallos que nombran la capa responsable.
 - ``references/templates.md` (sección `package.json`)` — la regla ESLint vive aquí.
 - ``coherence-checks.md`` — auditoría de coherencia.
 - `[[calidad-post-generation-protocol]]` — la corrida de lint forma parte del post-protocolo.

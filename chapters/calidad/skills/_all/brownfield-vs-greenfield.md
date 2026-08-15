@@ -155,6 +155,20 @@ En brownfield, la auto-corrección aplica EXCLUSIVAMENTE a tests recién generad
 
 Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`) y a sus invocaciones desde cualquier workflow brownfield del chapter (`[[calidad-extend-karate-brownfield]]`, `[[calidad-update-playwright-brownfield]]`, `[[calidad-extend-k6-brownfield]]`, `[[calidad-extend-appium-brownfield]]`). El alcance de la auto-corrección se delimita por el conjunto de archivos producidos o modificados en la corrida actual; cualquier fallo fuera de ese conjunto se reporta y escala, no se repara.
 
+## Migración masiva de un patrón repetido
+
+Caso distinto del anterior: no se agregan tests, se **reemplaza un patrón defectuoso repetido decenas de veces** en tests preexistentes —un bloque de login copiado en 35 lugares, una espera mal calibrada, un helper que debió existir desde el principio. Es una de las pocas intervenciones legítimas sobre código preexistente, y solo bajo autorización explícita del usuario sobre el alcance, porque toca archivos que la regla anterior protege.
+
+La disciplina que la hace segura:
+
+1. **Inventariar y clasificar antes de tocar nada.** Cuántas ocurrencias hay y en cuántas formas distintas. Un inventario real: 35 bloques, de los cuales 14 no contemplaban un desenlace, 14 lo hacían en línea con una espera mal calibrada, 3 usaban un objeto de página y 4 no encajaban en ningún patrón. Ese último grupo es el que decide si la migración es viable.
+2. **Whitelist de lo migrable, no blacklist de lo prohibido.** Se enumera exactamente qué puede haber entre el punto de entrada y el de salida del bloque para considerarlo equivalente. Todo lo que no esté en la lista **no se migra**: queda para revisión manual. Una blacklist deja pasar lo que nadie previó.
+3. **Las exclusiones deliberadas se declaran y se justifican una por una.** El caso que siempre aparece: **el test que valida precisamente el comportamiento que el helper automatiza**. Migrarlo lo destruye — pasaría a aceptar automáticamente lo que su razón de ser es verificar. Igual el que ejerce a propósito el camino contrario. Detectarlos exige leer, no filtrar por patrón.
+4. **Antes de atribuirse un fallo, establecer la línea base.** Si un escenario falla después de la migración, correrlo contra el código original (`git stash`) y comparar el error. Idéntico significa preexistente, y se reporta como tal sin tocarlo; distinto significa que lo produjo la migración. Sin esta comprobación, cada rojo preexistente se convierte en tiempo perdido persiguiendo un cambio propio.
+5. **Declarar qué quedó verificado en ejecución y qué no.** Migrar 27 archivos y verificar uno end-to-end es un resultado legítimo; presentarlo como si los 27 estuvieran verificados no lo es. Lo demás está cubierto por typecheck y por la homogeneidad del patrón, y así se dice.
+
+El cierre exige, además de la suite verde: verificación estática limpia, tests unitarios del helper nuevo, y el conteo de bloques migrados contra bloques inventariados. Si no cuadra, falta explicar la diferencia.
+
 ## Paridad de garantías universales brownfield ↔ greenfield
 
 Tras este chapter, todos los workflows brownfield reciben las mismas garantías universales que greenfield: smoke gate (universal), evidencia de bloqueo de ambiente, metadata por corrida, reporte ejecutivo, step isolation, validación contractual no superficial y STRATEGY.md condicional cuando el alcance es grande. La diferencia es de **scope de aplicación**: en brownfield estas mejoras se aplican **solo a archivos NUEVOS emitidos en la sesión**, nunca a tests preexistentes. Concretamente:

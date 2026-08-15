@@ -97,6 +97,17 @@ npx playwright test --grep "@live|@hybrid"
 npx playwright test --grep-invert @mocked
 ```
 
+### Scripts del proyecto: invocar el binario, no otro script
+
+Un script que llama a otro script del mismo `package.json` pierde los argumentos por el camino: invocado como `npm run test:local -- --grep @smoke`, el filtro llega al runner como si fuera una ruta de archivo. El síntoma —nada se ejecuta, o un error de archivo inexistente con el nombre del tag— no se parece a su causa y se confunde con un cuelgue del runner.
+
+```json
+"test:local": "BASE_URL=http://localhost:3000 npm run test",              // rompe el paso de argumentos
+"test:local": "BASE_URL=http://localhost:3000 playwright test",           // correcto
+```
+
+Cada script repite el comando completo. Es más verboso y es la única forma de que los argumentos de la línea de comandos lleguen intactos.
+
 ### Variables de entorno
 
 | Variable      | Descripción                                                                 | Ejemplo                       |

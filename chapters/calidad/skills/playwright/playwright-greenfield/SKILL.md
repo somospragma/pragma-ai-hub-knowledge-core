@@ -27,7 +27,7 @@ Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]`,
 4. **Storybook o sistema de diseño existente** — componentes catalogados con sus rutas demo.
 ## Lectura obligatoria antes de generar
 
-Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/` (23 archivos). **Abrir estos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza de `[[calidad-pipeline-state-tracking]]`):
+Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/` (24 archivos). **Abrir estos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza de `[[calidad-pipeline-state-tracking]]`):
 
 | Reference | Para qué |
 |---|---|
@@ -37,6 +37,7 @@ Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `ref
 | `references/page-object-model.md` | Estructura de POMs y fixtures |
 | `references/execution-modes-live-mocked-hybrid.md` | @live/@mocked/@hybrid y caminos front/back |
 | `references/smoke-gate-playwright.md` | Comando y criterio del gate 1:1 |
+| `references/multi-outcome-waits-and-honest-failures.md` | Esperas con varios desenlaces y fallos que nombran la capa responsable |
 
 Regla del chapter: saltarse esta lectura es la causa raíz verificada de retrabajo — en campo, un agente redescubrió por ensayo y error, y reportó como defectos del chapter, cosas ya escritas en estas references.
 
