@@ -18,7 +18,7 @@ verification:
     failure_message: "Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario."
   - check: "sut_available, data_available y (front/mobile) locator_map resueltos vía SUT readiness gate antes de validar spec"
     failure_message: "Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate."
-  - check: "checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, con validación cruzada de cada entidad contra el catálogo del proyecto"
+  - check: "checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, derivado de los escenarios planificados (entidad + estado exigido), con validación cruzada contra el catálogo y con lo faltante comunicado al QA con dueño y fecha"
     failure_message: "Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto."
 ---
 
@@ -41,7 +41,7 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 | `firma`        | Opcional (altamente recomendado)                | Documento técnico del servicio: reglas de negocio, ejemplos de datos reales, terminología, SLAs   | Enriquecimiento de payloads, escenarios `@negative`, vocabulario en nombres de escenarios                    |
 | `extra_params` | Opcional                                        | JSON con parámetros framework-specific                                                            | Ej.: `{"include_login_case": true}` para Appium, `{"thresholds": {"http_req_duration": "p(95)<500"}}` para K6 |
 | `sut_available` | Obligatorio (pregunta sí/parcial/no)           | ¿El desarrollo está desplegado y accesible?                                                       | Resuelve `execution_target: real | hybrid | mock` vía `[[calidad-sut-readiness-gate]]` (paso 1.5 del router)  |
-| `data_available` | Obligatorio (pregunta sí/no)                   | ¿Existen datos de prueba en el ambiente (o catálogo de datasets del cliente)?                     | Resuelve `data_strategy: real | synthetic` (`[[calidad-test-data-management]]`)                               |
+| `data_available` | Obligatorio (**no es sí/no**: matriz de suficiencia) | ¿Existen los datos **en el estado que exige cada escenario planificado**? | Resuelve `data_strategy: real \| synthetic` (`[[calidad-test-data-management]]`) y produce la lista de lo que el QA debe gestionar, con dueño y fecha |
 | `locator_map`  | Condicional (front/mobile; **obligatorio** si `execution_target != real`) | Mapeo acordado QA+dev de identificadores UI (`data-testid` / accessibility ids)  | Fuente única de selectores pre-desarrollo; formato y contrato en `[[calidad-ui-locator-map-contract]]`        |
 | `test_credentials` | Obligatorio cuando el flujo requiere autenticación | Usuario de prueba vigente y su contraseña                                    | Se cargan por el mecanismo del proyecto; **jamás literales en el código** ni escritas en evidencia            |
 | `test_data_entities` | Obligatorio cuando el escenario opera sobre entidades concretas | Los identificadores reales bajo prueba (cuenta, tarjeta, producto, contrato)  | Se validan contra el catálogo de datos del proyecto antes de generar                                          |
@@ -59,6 +59,8 @@ Antes de emitir el `STRATEGY.md`, emitir esta tabla y **esperar confirmación ex
 | Entidad bajo prueba | `<las disponibles en el catálogo>` | `<la indicada>` | pendiente |
 
 **Validación cruzada obligatoria.** Si el valor que da el usuario no aparece en el catálogo de datos del proyecto, se **detiene** y se pregunta, listando los disponibles: *"no encontré la entidad X para el usuario Y; las disponibles son [...]. ¿Usamos una de estas o actualizamos el catálogo?"*. Aceptar el valor sin cruzarlo es la vía directa a una suite roja por dato.
+
+**La tabla de arriba es el mínimo, no el checkpoint completo.** Confirmar quién es el usuario y qué entidad se usa no dice si esa entidad está **en el estado que el escenario necesita**: una tarjeta que existe pero sin movimientos en tránsito no sirve para el escenario que valida movimientos en tránsito. Por eso el checkpoint se emite derivado de los escenarios planificados, con una fila por dato requerido y su estado exigido, y **lo que falte se le comunica al QA en el chat con dueño y fecha** — porque conseguir un dato en el ambiente de un cliente puede tardar días. Procedimiento, plantilla del mensaje y la diferencia entre mock (se sintetiza y se declara) y software ya desarrollado (bloqueo con fecha) en `[[calidad-test-data-management]]` (consultar `references/data-sufficiency-gate.md` en su subfolder).
 
 Las contraseñas se marcan como recibidas y **nunca** se muestran, se transcriben a un asset, al `STRATEGY.md` ni a `.evidence/`.
 
@@ -150,4 +152,4 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 3 | spec entregado como contenido completo, no como ruta de archivo | Bloqueado: se requiere el contenido completo del spec, no la ruta del archivo. |
 | 4 | risk_map confirmado por usuario o default HIGH reportado explícitamente para revisión | Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario. |
 | 5 | sut_available, data_available y (front/mobile) locator_map resueltos vía SUT readiness gate antes de validar spec | Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate. |
-| 6 | checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, con validación cruzada de cada entidad contra el catálogo del proyecto | Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto. |
+| 6 | checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, derivado de los escenarios planificados (entidad + estado exigido), con validación cruzada contra el catálogo y con lo faltante comunicado al QA con dueño y fecha | Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto. |

@@ -42,6 +42,7 @@ En greenfield sobre un repositorio existente (se agrega una suite nueva a un pro
 | **Alcance del ejecutor** | qué archivos carga realmente: globs de features, módulos requeridos, rutas de steps o de specs | **qué queda fuera** y por tanto no se ejecutará aunque exista |
 | **Integraciones resueltas** | scripts que hablan con el ALM, con el gestor de pruebas, con la nube de dispositivos o con reportería | qué operación ya está resuelta, con qué credencial y con qué contrato |
 | **Datos y configuración** | archivos de datos de prueba, plantillas de variables de entorno, perfiles por ambiente | dónde viven los datos y cómo los cargan las pruebas existentes |
+| **Pasos difíciles ya resueltos** | utilidades de autenticación, generación o lectura del segundo factor y de claves dinámicas, clientes de base de datos del ambiente de pruebas, siembra de estado, buzones de correo o mensajería de prueba, descarga y comparación de archivos | **qué paso costoso ya está resuelto y cómo se invoca**. Es lo que decide si un escenario es automatizable; ver `[[calidad-automation-feasibility-assessment]]` |
 | **Recursos frágiles** | llamadas a APIs internas o no públicas, dependencias a interfaces no documentadas | se marcan **no reutilizables**, con la razón |
 
 ## Salida obligatoria

@@ -106,6 +106,15 @@ Aplica `[[calidad-repo-capability-discovery]]` antes de generar o ejecutar nada:
 - Emitir `.evidence/archetype-inventory.md` con la tabla de clasificación de steps (`[[calidad-brownfield-vs-greenfield]]`).
 - **Prohibido inventar comandos** y **prohibido construir a mano lo que el repositorio ya resuelve**. La convención del repositorio manda sobre los defaults del chapter en etiquetas, rutas y nomenclatura.
 
+### Paso 2.7 — Evaluar factibilidad de automatización y suficiencia de datos (BLOCKER)
+
+Las dos preguntas que deciden si el alcance comprometido es ejecutable. Se responden **antes de escribir el primer archivo**, con los escenarios ya esbozados:
+
+- **¿Cada escenario se puede automatizar?** Aplica `[[calidad-automation-feasibility-assessment]]`: descomponer en pasos, clasificar cada paso, y en brownfield **buscar en el repositorio si los pasos difíciles ya están resueltos** (obtención de token, segundo factor o clave dinámica, lectura o actualización en base de datos, siembra de estado) antes de declarar nada imposible. Emitir el veredicto por escenario y esperar confirmación del alcance. Lo no automatizable **no se descarta**: se entrega como caso manual trazable, con su feature escrito y su caso creado en el gestor de pruebas.
+- **¿Los datos alcanzan?** Aplica `[[calidad-test-data-management]]` (consultar `references/data-sufficiency-gate.md` en su subfolder): derivar de los escenarios la matriz de datos con el **estado que cada uno exige**, cruzarla contra el catálogo del proyecto y **comunicar al QA en el chat lo que falte, con dueño y fecha**. Contra mocks el faltante se sintetiza y se declara como sintético; contra software ya desarrollado es un bloqueo con fecha.
+
+Ambos resultados entran al `STRATEGY.md` y al bloque final del delivery gate. Un alcance confirmado sin estas dos respuestas se descubre imposible a mitad de la entrega.
+
 ### Paso 3 — Validar el spec
 
 Aplica `[[calidad-spec-validation]]`:
