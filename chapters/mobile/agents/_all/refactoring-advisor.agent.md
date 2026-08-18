@@ -8,6 +8,23 @@ description: >
   Analyzes and refactors existing Clean Architecture features or legacy feature code. Use to detect code smells, architecture violations, and complexity, then execute incremental refactors with required tests and refactoring documentation.
 name: refactoring-advisor
 tools: [read, write, shell, subagent]
+resources:
+  - skill://flutter-clean-architecture
+  - skill://flutter-clean-feature
+  - skill://flutter-bloc-pattern
+  - skill://flutter-freezed-domain-modeling
+  - skill://flutter-dependency-injection-pattern
+  - skill://flutter-dart-coding-standard
+  - skill://flutter-dart-async-patterns
+  - skill://flutter-generated-code-validation
+  - skill://flutter-melos-management
+  - skill://flutter-errors
+  - skill://flutter-navigation-strategy
+  - skill://flutter-testing
+  - skill://flutter-test-coverage-strategy
+  - skill://flutter-environments
+  - skill://flutter-secure-storage
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"]}

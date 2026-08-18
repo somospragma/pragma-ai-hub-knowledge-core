@@ -6,6 +6,19 @@ type: agent
 chapter: mobile
 name: code-auditor
 tools: [read, write, shell]
+resources:
+  - skill://flutter-ds-theming-tokens
+  - skill://flutter-ds-lint-rules
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-secure-code
+  - skill://flutter-ds-widget-anatomy
+  - skill://flutter-ds-figma-checklist
+  - skill://flutter-ds-asset-management
+  - skill://flutter-ds-responsive-layout
+  - skill://flutter-owasp-mobile-top10
+  - skill://flutter-dart-coding-standard
+  - skill://flutter-errors
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write

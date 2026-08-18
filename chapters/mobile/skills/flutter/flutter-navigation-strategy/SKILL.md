@@ -1,5 +1,6 @@
 ---
 id: flutter-navigation-strategy
+name: flutter-navigation-strategy
 version: 2.2.0
 scope: stack
 type: skill

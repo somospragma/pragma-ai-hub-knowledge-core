@@ -1,5 +1,6 @@
 ---
 id: flutter-clean-feature
+name: flutter-clean-feature
 version: 1.1.0
 scope: stack
 type: skill

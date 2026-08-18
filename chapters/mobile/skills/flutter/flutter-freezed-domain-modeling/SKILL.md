@@ -1,5 +1,6 @@
 ---
 id: flutter-freezed-domain-modeling
+name: flutter-freezed-domain-modeling
 version: 2.2.0
 scope: stack
 type: skill

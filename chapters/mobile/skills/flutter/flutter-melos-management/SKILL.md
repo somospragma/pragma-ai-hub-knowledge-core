@@ -1,5 +1,6 @@
 ---
 id: flutter-melos-management
+name: flutter-melos-management
 version: 1.2.0
 scope: stack
 type: skill

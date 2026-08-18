@@ -6,6 +6,12 @@ type: agent
 chapter: mobile
 name: golden-test-engineer
 tools: [read, write, shell]
+resources:
+  - skill://flutter-ds-golden-testing
+  - skill://flutter-ds-theming-tokens
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-folder-structure
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write

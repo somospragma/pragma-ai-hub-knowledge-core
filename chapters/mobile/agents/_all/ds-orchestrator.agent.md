@@ -8,6 +8,14 @@ description: >
   Workflow controller for Design System and Figma-driven mobile work. Use for new components, new views, component refactors and DS-scoped PR comment fixes with required human checkpoints.
 name: ds-orchestrator
 tools: [read, write, shell, subagent, "@figma"]
+resources:
+  - skill://flutter-ds-folder-structure
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-responsive-layout
+  - skill://flutter-ds-figma-mcp
+  - skill://flutter-ds-figma-checklist
+  - skill://flutter-ds-asset-management
+  - skill://mobile-sdd-spec-validation
 includeMcpJson: true
 permissions:
   rules:

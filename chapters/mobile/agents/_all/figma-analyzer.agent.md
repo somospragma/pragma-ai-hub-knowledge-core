@@ -6,6 +6,13 @@ type: agent
 chapter: mobile
 name: figma-analyzer
 tools: [read, write, "@figma"]
+resources:
+  - skill://flutter-ds-figma-mcp
+  - skill://flutter-ds-theming-tokens
+  - skill://flutter-ds-figma-checklist
+  - skill://flutter-ds-atomic-hierarchy
+  - skill://flutter-ds-asset-management
+  - skill://mobile-sdd-spec-validation
 includeMcpJson: true
 permissions:
   rules:

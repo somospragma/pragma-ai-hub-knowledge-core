@@ -1,5 +1,6 @@
 ---
 id: flutter-dart-coding-standard
+name: flutter-dart-coding-standard
 version: 2.1.0
 scope: stack
 type: skill

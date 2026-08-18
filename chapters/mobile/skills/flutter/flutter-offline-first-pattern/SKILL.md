@@ -1,5 +1,6 @@
 ---
 id: flutter-offline-first-pattern
+name: flutter-offline-first-pattern
 version: 1.1.0
 scope: stack
 type: skill

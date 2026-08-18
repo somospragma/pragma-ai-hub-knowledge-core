@@ -1,5 +1,6 @@
 ---
 id: flutter-logging
+name: flutter-logging
 version: 2.1.0
 scope: stack
 type: skill

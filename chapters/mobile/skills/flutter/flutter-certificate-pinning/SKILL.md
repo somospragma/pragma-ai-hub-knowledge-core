@@ -1,5 +1,6 @@
 ---
 id: flutter-certificate-pinning
+name: flutter-certificate-pinning
 version: 1.1.0
 scope: stack
 type: skill

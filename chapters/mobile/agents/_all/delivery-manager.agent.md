@@ -6,6 +6,13 @@ type: agent
 chapter: mobile
 name: delivery-manager
 tools: [read, write]
+resources:
+  - skill://flutter-ds-folder-structure
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-markdown-docs
+  - skill://commit-conventions
+  - skill://changelog-management
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write

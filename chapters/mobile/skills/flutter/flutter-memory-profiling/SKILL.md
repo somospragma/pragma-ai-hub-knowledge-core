@@ -1,5 +1,6 @@
 ---
 id: flutter-memory-profiling
+name: flutter-memory-profiling
 version: 1.1.0
 scope: stack
 type: skill

@@ -6,6 +6,17 @@ type: agent
 chapter: mobile
 name: test-coverage-engineer
 tools: [read, write, shell]
+resources:
+  - skill://flutter-testing
+  - skill://flutter-test-coverage-strategy
+  - skill://flutter-bloc-pattern
+  - skill://flutter-errors
+  - skill://flutter-dart-async-patterns
+  - skill://flutter-clean-feature
+  - skill://flutter-clean-architecture
+  - skill://flutter-freezed-domain-modeling
+  - skill://flutter-dependency-injection-pattern
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write

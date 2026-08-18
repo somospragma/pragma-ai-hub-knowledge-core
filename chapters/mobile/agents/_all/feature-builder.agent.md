@@ -13,6 +13,23 @@ description: >
   and page — wired with DI and registered in the router.
 name: feature-builder
 tools: [read, write, shell, subagent, "@figma"]
+resources:
+  - skill://flutter-clean-feature
+  - skill://flutter-clean-architecture
+  - skill://flutter-bloc-pattern
+  - skill://flutter-freezed-domain-modeling
+  - skill://flutter-dependency-injection-pattern
+  - skill://flutter-api-rest-connection
+  - skill://flutter-errors
+  - skill://flutter-navigation-strategy
+  - skill://flutter-generated-code-validation
+  - skill://flutter-melos-management
+  - skill://flutter-dart-coding-standard
+  - skill://flutter-dart-async-patterns
+  - skill://flutter-environments
+  - skill://flutter-secure-storage
+  - skill://documentation-projects
+  - skill://mobile-sdd-spec-validation
 includeMcpJson: true
 permissions:
   rules:

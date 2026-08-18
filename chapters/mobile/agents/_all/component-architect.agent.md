@@ -6,6 +6,18 @@ type: agent
 chapter: mobile
 name: component-architect
 tools: [read, write]
+resources:
+  - skill://flutter-ds-atomic-hierarchy
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-folder-structure
+  - skill://flutter-ds-widget-anatomy
+  - skill://flutter-ds-component-template
+  - skill://flutter-ds-asset-management
+  - skill://flutter-ds-responsive-layout
+  - skill://flutter-bloc-pattern
+  - skill://flutter-dependency-injection-pattern
+  - skill://flutter-navigation-strategy
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write

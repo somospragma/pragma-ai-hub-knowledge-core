@@ -8,6 +8,9 @@ description: >
   Discovers Flutter workspace topology and proposes deterministic bootstrap configuration. Use when project roots, target registry, Melos/multi-repo layout, or config files are missing or ambiguous before /new-view or /new-component.
 name: workspace-discovery
 tools: [read, write, shell]
+resources:
+  - skill://mobile-sdd-spec-validation
+  - skill://flutter-melos-management
 permissions:
   rules:
     - {capability: fs_write, effect: allow, match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]}
@@ -26,6 +29,7 @@ mobile KB pipeline can run without ambiguity.
 ## Active Skills
 
 - mobile-sdd-spec-validation
+- flutter-melos-management
 
 ## Evidence Mode
 

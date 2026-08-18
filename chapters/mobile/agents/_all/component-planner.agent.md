@@ -6,6 +6,14 @@ type: agent
 chapter: mobile
 name: component-planner
 tools: [read, write]
+resources:
+  - skill://flutter-ds-theming-tokens
+  - skill://flutter-ds-folder-structure
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-atomic-hierarchy
+  - skill://flutter-ds-asset-management
+  - skill://flutter-ds-responsive-layout
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write

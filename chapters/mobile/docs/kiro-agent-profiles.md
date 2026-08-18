@@ -36,6 +36,34 @@ The `subagent` permission rule, `availableAgents` and `trustedAgents` carry
 the same list. Specialist profiles do not register subagents. This avoids a
 delegation permission being inferred from a mere `@agent` reference.
 
+## Skill Resources
+
+Kiro custom agents load Skills only when the agent declares them as
+`resources`. Every specialist therefore lists its exact `Active Skills` using
+the exported Skill id:
+
+```yaml
+resources:
+  - skill://flutter-clean-feature
+  - skill://mobile-sdd-spec-validation
+```
+
+The `resources` list and the readable `## Active Skills` section must remain
+identical. Do not use a wildcard for all chapter Skills: Kiro receives their
+metadata at startup, so an exact list limits irrelevant discovery context and
+avoids accidental activation. Kiro loads a Skill's full instructions only when
+it becomes relevant.
+
+Every exported `.kiro/skills/<id>/SKILL.md` must declare `name: <id>` and a
+non-empty `description`; these are required for Kiro Skill discovery.
+
+`workspace-discovery` declares only `mobile-sdd-spec-validation` and
+`flutter-melos-management`. The first governs its deterministic packet and
+SOPP validation; the second is necessary to identify legacy and modern Melos
+workspaces. It intentionally excludes feature, architecture and UI-generation
+Skills because bootstrap configures topology rather than implementing product
+code.
+
 ## Portable Paths
 
 Profiles never grant a blanket workspace write. Paths are relative glob
@@ -58,9 +86,10 @@ the existing SOPP gate to find the planned files and evidence on disk before a
 phase or checkpoint succeeds.
 
 `docs/scripts/validate_mobile_kb.rb` checks the entire profile matrix,
-canonical names, Figma access, delegation registration and portable `.sopp`
-boundaries. This is local static validation; it does not invoke an LLM or add
-runtime token/AI-credit usage.
+canonical names, Figma access, delegation registration, portable `.sopp`
+boundaries, Kiro Skill metadata and the exact agent-to-Skill mapping. This is
+local static validation; it does not invoke an LLM or add runtime token/AI-credit
+usage.
 
 Run it after changing an agent profile:
 

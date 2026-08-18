@@ -162,6 +162,17 @@ def overlay_contract_path(workflow)
   "../docs/templates/spec-packets/#{workflow}#{OVERLAY_SUFFIX}"
 end
 
+def active_skills_for_agent(path)
+  block = File.read(path)[/## Active Skills\n(.*?)(?=\n## |\z)/m, 1].to_s
+  block.scan(/^- `?([a-z0-9-]+)`?$/).flatten
+end
+
+def mobile_skill_paths
+  @mobile_skill_paths ||= (
+    Dir["chapters/mobile/skills/**/SKILL.md"] + Dir["shared/skills/**/SKILL.md"]
+  ).to_h { |path| [File.basename(File.dirname(path)), path] }
+end
+
 def parse_all_structured_files(findings, cleared)
   paths = Dir["chapters/mobile/**/*.{yaml,yml,json}"] +
           Dir["shared/skills/**/*.{yaml,yml,json}"]
@@ -268,23 +279,10 @@ def validate_references(findings, cleared)
     end
   end
 
-  known_skills = (
-    Dir["chapters/mobile/skills/{_all,flutter}/*/SKILL.md"] +
-    Dir["shared/skills/*/SKILL.md"]
-  ).map { |path| File.basename(File.dirname(path)) }
+  known_skills = mobile_skill_paths.keys
   skill_misses = []
   Dir["chapters/mobile/agents/_all/*.agent.md"].each do |path|
-    in_block = false
-    File.readlines(path).each do |line|
-      if line.strip == "## Active Skills"
-        in_block = true
-        next
-      end
-      in_block = false if in_block && line.start_with?("## ")
-      next unless in_block
-      next unless line =~ /^-\s+`?([a-z0-9][a-z0-9-]+)`?/
-
-      skill = Regexp.last_match(1)
+    active_skills_for_agent(path).each do |skill|
       skill_misses << "#{path}: #{skill}" unless known_skills.include?(skill)
     end
   end
@@ -294,6 +292,52 @@ def validate_references(findings, cleared)
   add(findings, "HIGH", "SKILL_REF_MISSING", "Unknown Active Skills", skill_misses.join("\n")) if skill_misses.any?
 
   cleared << "Agent, prompt and Active Skill references resolve" if agent_misses.empty? && prompt_misses.empty? && skill_misses.empty?
+end
+
+def validate_kiro_skill_resources(findings, cleared)
+  errors = []
+
+  mobile_skill_paths.each do |skill_id, path|
+    metadata = read_frontmatter(path)
+    unless metadata["name"] == skill_id
+      errors << "#{path}: name must equal the Skill folder name (#{skill_id})"
+    end
+    unless metadata["description"].is_a?(String) && !metadata["description"].strip.empty?
+      errors << "#{path}: Kiro Skill requires a non-empty description"
+    end
+  rescue StandardError => e
+    errors << "#{path}: cannot validate Kiro Skill frontmatter (#{e.message})"
+  end
+
+  Dir["chapters/mobile/agents/_all/*.agent.md"].sort.each do |path|
+    profile = read_frontmatter(path)
+    active_skills = active_skills_for_agent(path)
+    expected_resources = active_skills.map { |skill_id| "skill://#{skill_id}" }
+    actual_resources = Array(profile["resources"])
+
+    if actual_resources != expected_resources
+      errors << "#{path}: resources must exactly match its Active Skills using skill://<skill-id>"
+    end
+
+    unknown_skills = active_skills - mobile_skill_paths.keys
+    unless unknown_skills.empty?
+      errors << "#{path}: resources reference unknown Skills: #{unknown_skills.join(', ')}"
+    end
+  rescue StandardError => e
+    errors << "#{path}: cannot validate agent Skill resources (#{e.message})"
+  end
+
+  if errors.empty?
+    cleared << "Kiro Skills have valid metadata and each agent declares its exact Skill resources"
+  else
+    add(
+      findings,
+      "HIGH",
+      "KIRO_SKILL_RESOURCE",
+      "Kiro Skill resource contract is invalid",
+      errors.join("\n")
+    )
+  end
 end
 
 def validate_kiro_agent_profiles(findings, cleared)
@@ -1725,6 +1769,7 @@ parse_all_structured_files(findings, cleared)
 validate_no_legacy_refs(findings, cleared)
 validate_no_source_root_refs(findings, cleared)
 validate_references(findings, cleared)
+validate_kiro_skill_resources(findings, cleared)
 validate_kiro_agent_profiles(findings, cleared)
 validate_mobile_workflow_distribution(findings, cleared)
 validate_sopp_gate_contract(findings, cleared)

@@ -6,6 +6,20 @@ type: agent
 chapter: mobile
 name: widget-developer
 tools: [read, write, shell]
+resources:
+  - skill://flutter-ds-theming-tokens
+  - skill://flutter-ds-widget-anatomy
+  - skill://flutter-ds-component-template
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-responsive-layout
+  - skill://flutter-ds-a11y-semantics
+  - skill://flutter-ds-asset-management
+  - skill://flutter-ds-lint-rules
+  - skill://flutter-bloc-pattern
+  - skill://flutter-errors
+  - skill://flutter-dart-coding-standard
+  - skill://flutter-freezed-domain-modeling
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write

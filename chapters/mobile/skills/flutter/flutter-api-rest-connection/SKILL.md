@@ -1,5 +1,6 @@
 ---
 id: flutter-api-rest-connection
+name: flutter-api-rest-connection
 version: 2.0.0
 scope: stack
 type: skill
@@ -419,5 +420,4 @@ dev_dependencies:
 - **`flutter-certificate-pinning`** — HTTPS security for production APIs
 - **`flutter-caching-strategy`** — HTTP cache layer on top of Dio
 - **`flutter-offline-first-pattern`** — Local-first sync with remote backend
-
 

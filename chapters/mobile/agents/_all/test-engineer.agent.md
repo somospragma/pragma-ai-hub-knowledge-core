@@ -6,6 +6,13 @@ type: agent
 chapter: mobile
 name: test-engineer
 tools: [read, write, shell]
+resources:
+  - skill://flutter-ds-testing-patterns
+  - skill://flutter-ds-theming-tokens
+  - skill://flutter-ds-naming-conventions
+  - skill://flutter-ds-folder-structure
+  - skill://flutter-testing
+  - skill://mobile-sdd-spec-validation
 permissions:
   rules:
     - capability: fs_write
