@@ -1,1 +1,6 @@
 .DS_STORE
+
+# Scripts añadidos (no versionados)
+scripts/validate-assets-guide.md
+scripts/validate-assets.mjs
+scripts/validate-stack-skills.mjs
