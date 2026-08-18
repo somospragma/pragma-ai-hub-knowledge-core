@@ -27,6 +27,8 @@ Workflows que deben encadenar este workflow al cierre:
 - `[[calidad-generate-appium-screenplay-android]]`
 - `[[calidad-complete-deferred-locators]]`
 - `[[calidad-extend-appium-brownfield]]`
+- `[[generate-serenity-wdio-greenfield]]`
+- `[[extend-serenity-wdio-brownfield]]`
 
 El workflow rector `[[calidad-route-test-generation]]` lo encadena automáticamente como paso terminal.
 
@@ -35,7 +37,7 @@ El workflow rector `[[calidad-route-test-generation]]` lo encadena automáticame
 Obligatorios:
 
 - `tests_path`: ruta al proyecto de tests recién generado/modificado.
-- `framework`: `karate` | `playwright` | `k6` | `appium`.
+- `framework`: `karate` | `playwright` | `k6` | `appium` | `serenity-wdio`.
 - `mode`: `full` | `dry-run` | `scaffold-only` | `execute-only`.
 - `client_regulated` (boolean): si `true`, fuerza modo `dry-run` (ver `references/regulated-client-overrides.md` del skill).
 
