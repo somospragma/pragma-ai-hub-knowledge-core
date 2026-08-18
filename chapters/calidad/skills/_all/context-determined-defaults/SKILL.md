@@ -27,9 +27,9 @@ Este skill define cómo derivar los defaults técnicos (tier de k6, `risk_factor
 - **Criticidad operacional (operational criticality)**: `life-safety` (la falla puede causar daño físico), `mission` (la falla detiene el negocio o un proceso central), `business` (la falla degrada el negocio sin detenerlo), `internal` (la falla afecta solo operaciones internas). Detalle en `references/operational-criticality-tiers.md`.
 - **Ventana de downtime tolerable**: `zero` (24/7, sin ventana), `bajo` (minutos/mes), `medio` (horas/semana), `alto` (horas/día).
 
-## Tabla de derivación: contexto → tier k6 / cobertura Karate / prioridad Playwright
+## Tabla de derivación: contexto → tier k6 / cobertura Karate / prioridad páginas o features
 
-| Contexto | k6 tier | Karate `risk_factor` | Page priority |
+| Contexto | k6 tier | Karate `risk_factor` | Page/feature priority (Playwright / serenity-wdio) |
 |---|---|---|---|
 | RESTRICTED + life-safety + zero downtime | Conservative | 1.0 | CRITICAL |
 | CONFIDENTIAL + mission + bajo downtime | Conservative | 1.0 | CRITICAL |
@@ -38,7 +38,7 @@ Este skill define cómo derivar los defaults técnicos (tier de k6, `risk_factor
 | INTERNAL + internal + alto downtime | Relaxed | 0.2-0.4 | LOW-MEDIUM |
 | PUBLIC + internal + alto downtime | Relaxed | 0.2 | LOW |
 
-**Notar**: ninguna fila menciona sector. Solo variables objetivas. Dos sistemas del mismo cliente (mismo sector) pueden caer en filas diferentes, y eso es correcto.
+**Notar**: ninguna fila menciona sector. Solo variables objetivas. Dos sistemas del mismo cliente (mismo sector) pueden caer en filas diferentes, y eso es correcto. La columna "Page/feature priority" aplica a Playwright (páginas) y a serenity-wdio (features por canal: web, mobile, api) con la misma lógica: CRITICAL primero en el orden de scaffold y en la suite `@smoke`.
 
 ## Ejemplos cross-sector
 
@@ -81,3 +81,4 @@ Los mismos criterios se aplican a clientes de **fintech, telco, retail, logísti
 - `[[calidad-sut-types-and-adaptations]]`
 - [[calidad-k6-greenfield]] (consultar `references/thresholds-three-tiers.md` en su subfolder)
 - [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder)
+- [[serenity-wdio-greenfield]]

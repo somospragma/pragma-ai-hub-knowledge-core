@@ -104,3 +104,4 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 - `[[calidad-playwright-run-and-modes]]`
 - `[[calidad-k6-run-and-suite]]`
 - `[[calidad-appium-run-and-tags]]`
+- `[[serenity-wdio-run-and-tags]]`

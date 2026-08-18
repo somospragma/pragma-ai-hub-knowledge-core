@@ -4,7 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "OBLIGATORIO. Schema universal {ISO}-metadata.json (13 keys) emitido por cada corrida en los 4 frameworks para que dashboards y delivery-gate procesen evidencia cross-stack."
+description: "OBLIGATORIO. Schema universal {ISO}-metadata.json (13 keys) emitido por cada corrida en los stacks del chapter (Karate, Playwright, K6, Appium Serenity, Appium WebdriverIO, serenity-wdio) para que dashboards y delivery-gate procesen evidencia cross-stack."
 tags: [evidence, metadata, schema, universal, mandatory]
 enforcement: mandatory
 ---
@@ -18,7 +18,7 @@ Cada corrida (cualquier framework) DEBE emitir un `{ISO}-metadata.json` junto al
 ```json
 {
   "scenario_or_feature": "linea-base | login-flow | retrieve-transactions | addPet",
-  "framework": "karate | playwright | k6 | appium",
+  "framework": "karate | playwright | k6 | appium | serenity-wdio",
   "version": "v1",
   "environment": "staging | dev | qa | prod-readonly",
   "workload_or_scope": "ramping-vus 5-5-0 over 5min | 12 escenarios | 5 HU | 3 devices",
@@ -63,9 +63,13 @@ Dentro de `handleSummary(data)`: construir el objeto metadata y devolverlo como 
 
 Serenity expone `ExecutionStateListener` (SPI vía `META-INF/services`) o, alternativa más simple, un `doLast` en el task `test` de Gradle que parsea `serenity-summary.json` y escribe `metadata.json` al lado. Detalle en [[calidad-appium-screenplay-android]] (consultar `references/metadata-emitter-appium.md` en su subfolder).
 
+### serenity-wdio
+
+El hook `onComplete` de WebdriverIO (declarado en `wdio.shared.conf.ts`) parsea el reporte Cucumber JSON generado por Serenity/JS y escribe `{ISO}-metadata.json` junto al summary en `results/serenity-wdio/{YYYY-MM-DD}/{ISO}/`. Los campos `auth_strategy` se mapean a `"actor"` (Screenplay) o `"none"`. Detalle en `[metadata-emitter-serenity-wdio](../serenity-wdio/serenity-wdio-greenfield/references/metadata-emitter-serenity-wdio.md)`.
+
 ## Consistencia obligatoria
 
-- Los 4 emitters DEBEN producir un JSON con exactamente las mismas claves de nivel raíz.
+- Los 5 emitters DEBEN producir un JSON con exactamente las mismas claves de nivel raíz.
 - Si el framework no provee un dato (ej. K6 no tiene `auth_strategy="actor"`), usar el valor más cercano del enum o `"none"`. NUNCA omitir la clave.
 - El path final es `<results-dir>/{ISO}-metadata.json` siguiendo `[results-structure-universal](./results-structure-universal.md)`.
 

@@ -81,7 +81,14 @@ serenity.test.root=com.client.qa.mobile
 
 - Las screenshots se asocian automáticamente a cada `@Step` y quedan visibles en el reporte agregado.
 
-## Trazabilidad — Convención de tags
+### serenity-wdio
+
+- Reportes: `@wdio/allure-reporter` (Allure), `@serenity-js/serenity-bdd` (Serenity BDD single-page HTML), `wdio-cucumberjs-json-reporter` (Cucumber JSON), `wdio-video-reporter` (video en modo web).
+- Configuración en `wdio.shared.conf.ts`: declarar los cuatro reporters en el array `reporters`, apuntando a `results/serenity-wdio/{YYYY-MM-DD}/{ISO}/`.
+- Cada `Feature` lleva al menos un tag de canal (`@web`, `@mobile`, `@api`) y un tag de suite (`@smoke` o `@regression`). Tags de trazabilidad (`@user-story:HUT-123`) se añaden a nivel de `Scenario`.
+- Para CI: publicar el directorio `results/serenity-wdio/` como artifact. El reporte Serenity BDD (`serenity/index.html`) es el artefacto principal de auditoría.
+
+
 
 Aplica la misma convención de tags **en todos los frameworks** (Karate `@`, Cucumber `@`, Playwright `test.describe.parallel('@tag', ...)` o `test('... @tag', ...)`, K6 vía `tags` en `options`):
 

@@ -4,8 +4,8 @@ version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Política universal de smoke gate 1:1 obligatorio antes de declarar success. Comando por stack, criterios de aceptación, comportamiento ante fallo."
-tags: [smoke-gate, universal, mandatory, post-generation]
+description: "Política universal de smoke gate 1:1 obligatorio antes de declarar success. Comando por stack, criterios de aceptación, comportamiento ante fallo. Incluye serenity-wdio."
+tags: [smoke-gate, universal, mandatory, post-generation, serenity-wdio]
 enforcement: mandatory
 verification:
   - check: "el filtro del gate matchea exactamente 1 escenario, verificado con el conteo ANTES de ejecutar"
@@ -22,7 +22,7 @@ verification:
 
 Antes de declarar `status: success` en el contrato `[[calidad-delivery-gate-contract]]`, el agente DEBE ejecutar al menos un smoke test mínimo end-to-end por framework. El objetivo NO es validar cobertura ni regresion completa, sino confirmar que el scaffold compila, arranca y ejecuta un happy path básico contra el SUT. Es una puerta de calidad obligatoria — sin smoke verde no hay success.
 
-Aplica a los 4 frameworks del chapter (Karate, Playwright, K6, Appium) tanto en greenfield como en brownfield, y a los 5 IDEs soportados.
+Aplica a los 5 frameworks del chapter (Karate, Playwright, K6, Appium, serenity-wdio) tanto en greenfield como en brownfield, y a los 5 IDEs soportados.
 
 ## 1:1 significa UN escenario, no un tag que matchea varios
 
@@ -57,6 +57,7 @@ En cualquiera de los tres casos, antes de ejecutar se **verifica el conteo**: si
 | Playwright | `npx playwright test --grep @smoke-gate --workers=1 --max-failures=1` | `npx playwright test --grep @smoke-gate --list` devuelve 1 |
 | K6 | `k6 run tests/linea-base/main.js --vus 1 --iterations 1` (ver [[calidad-k6-greenfield]] (consultar `references/smoke-1-1-gate.md` en su subfolder)) | 1 VU / 1 iteración por construcción |
 | Appium | `./gradlew test -Dcucumber.filter.tags=@smoke-gate` | `grep -rc "@smoke-gate" src/test/resources/features/` == 1 |
+| serenity-wdio | `node scripts/run.mjs --mode=web --tags=@smoke-gate` (equiv. `npm run test:smoke`) | `grep -rc "@smoke-gate" features/**/*.feature` == 1 |
 
 **El filtro debe llegar de verdad al runner**: si el runner lleva tags hardcodeados, el `-D...filter.tags` se ignora y corre lo que el runner diga (causa raíz verificada en campo). Un solo runner por proyecto, tags solo por CLI — ver el detalle por stack en sus references de ejecución.
 
@@ -64,7 +65,7 @@ En cualquiera de los tres casos, antes de ejecutar se **verifica el conteo**: si
 
 - **Preflight verde primero.** El gate no se ejecuta sin `[[calidad-execution-preflight]]` en verde en esa misma corrida: un gate rojo contra un SUT que nunca se tocó no informa nada y arranca un diagnóstico sobre la causa equivocada.
 - **Exit 0** → smoke gate verde, continuar el flujo y permitir `status: success`.
-- **Exit ≠ 0** → status `partial` con `blocker: "smoke_gate_failed_<framework>"` (ej. `smoke_gate_failed_karate`, `smoke_gate_failed_playwright`, `smoke_gate_failed_k6`, `smoke_gate_failed_appium`). Escalar al usuario con stderr completo del comando.
+- **Exit ≠ 0** → status `partial` con `blocker: "smoke_gate_failed_<framework>"` (ej. `smoke_gate_failed_karate`, `smoke_gate_failed_playwright`, `smoke_gate_failed_k6`, `smoke_gate_failed_appium`, `smoke_gate_failed_serenity-wdio`). Escalar al usuario con stderr completo del comando.
 - El smoke gate NO ejecuta suite completa; solo valida que el scaffold corre end-to-end. La suite completa se ejecuta como parte del paso de ejecución del `[[calidad-post-generation-protocol]]`.
 - El agente DEBE garantizar que existe al menos un test/feature/escenario etiquetado o nombrado de modo que el comando smoke lo encuentre. Si no existe, el smoke gate se considera "no provisto" y bloquea con `blocker: "smoke_gate_missing_scenario_<framework>"`.
 - Si el smoke gate falla por causa ambiental (WAF, DNS, device caído), el blocker se reclasifica como `environment_blocked_*` según `[ver schema](./environment-blocker-evidence.md)`.
@@ -85,7 +86,7 @@ El campo `smoke_gate` se agrega al bloque `delivery_gate` (ver `[[calidad-delive
 
 ```yaml
 smoke_gate:
-  framework: karate | playwright | k6 | appium
+  framework: karate | playwright | k6 | appium | serenity-wdio
   command: "..."
   selector_source: repo_taxonomy | dedicated_tag | user_confirmed_new_tag
   scenarios_matched: 1                # DEBE ser 1; distinto de 1 invalida el gate
@@ -103,6 +104,7 @@ Cada framework documenta el detalle del comando, dónde colocar el `@smoke`, par
 - Playwright: [[calidad-playwright-greenfield]] (consultar `references/smoke-gate-playwright.md` en su subfolder)
 - K6: [[calidad-k6-greenfield]] (consultar `references/smoke-1-1-gate.md` en su subfolder) (cubierto en oleada K6 paralela)
 - Appium: [[calidad-appium-screenplay-android]] (consultar `references/smoke-gate-gradle.md` en su subfolder)
+- serenity-wdio: [[serenity-wdio-greenfield]] (consultar `references/smoke-gate-wdio.md` en su subfolder)
 
 ## Verificación
 

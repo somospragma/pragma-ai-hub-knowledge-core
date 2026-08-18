@@ -4,8 +4,8 @@ version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: Decide qué stack aplicar a partir del intent del usuario — los 4 frameworks de automatización (Karate, K6, Playwright, Appium) o el stack funcional (análisis/refinamiento de HUs, diseño de casos, estrategia y planes).
-tags: [intent, routing, karate, k6, playwright, appium, funcional]
+description: Decide qué stack aplicar a partir del intent del usuario — los frameworks de automatización (Karate, K6, Playwright, Appium Serenity, Appium WebdriverIO, serenity-wdio) o el stack funcional (análisis/refinamiento de HUs, diseño de casos, estrategia y planes).
+tags: [intent, routing, karate, k6, playwright, appium, serenity-wdio, funcional]
 ---
 
 # Intent Detection — Selección de Framework de Automatización
@@ -35,6 +35,7 @@ Esta skill decide **con qué framework** se generan las pruebas. La decisión de
 | Playwright | "web", "browser", "E2E", "UI", "frontend", "Playwright", "page object", "visual", "accessibility", "regresión visual" | "proyecto existente", "actualizar selectores", "ya hay tests web" | greenfield → `[[calidad-playwright-greenfield]]` · brownfield → `[[calidad-playwright-brownfield]]` |
 | Appium JVM (`appium-serenity`) | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity", "Serenity", "Gradle" | "proyecto existente", "agregar escenarios", "ya tenemos suite mobile" | greenfield → `[[calidad-appium-screenplay-android]]` · brownfield → `[[calidad-appium-brownfield]]` |
 | Appium TypeScript (`appium-wdio`) | "mobile" + "TypeScript"/"WebdriverIO"/"WDIO"/"cucumber-js"/"Node", "iPad", "tablet", "web móvil", "app y navegador móvil" | "proyecto existente", "actualizar selectores", "agregar plataforma" | greenfield → `[[calidad-appium-wdio-greenfield]]` · brownfield → `[[calidad-appium-wdio-brownfield]]` |
+| serenity-wdio | "WebdriverIO", "Serenity/JS", "Cucumber TS", "web/mobile/api multiplataforma", "TypeScript E2E", "Screenplay Pattern", "serenity-wdio", "wdio", "serenity-js", "multiplataforma TS" | "proyecto existente", "agregar tests", "ya tenemos wdio", "extender arquetipo" | greenfield → `[[serenity-wdio-greenfield]]` · brownfield → `[[serenity-wdio-brownfield]]` |
 | Funcional  | "analizar historia", "HU", "INVEST", "criterios de aceptación", "refinamiento", "refinar", "casos de prueba" (diseño, no código), "test cases", "test plan", "plan de pruebas", "estrategia de pruebas", "matriz de trazabilidad", "Azure DevOps"/"Jira" como fuente de HUs | (no aplica greenfield/brownfield)                                 | análisis/refinamiento → `[[calidad-analyze-and-refine-stories]]` · diseño de casos → `[[calidad-design-test-cases]]` · estrategia/plan → `[[calidad-build-test-strategy-and-plan]]` |
 
 **Todo intent mobile requiere `appium-core`**, sea cual sea el stack de producto: ahí vive el conocimiento que no depende del lenguaje (resolución de locators, Flutter, catálogo de interacciones, auto-discovery de binario). No es un stack que el usuario elija: es el compañero obligatorio. Si no está instalado, decláralo como carencia antes de generar.
@@ -58,8 +59,9 @@ Señales que **no** desambiguan por sí solas: "Appium", "mobile", "Android", "i
 
 - Si el intent no es claro o cae entre dos frameworks, **pregunta explícitamente**; nunca asumas Playwright por defecto.
 - Los intents funcionales NO pasan por spec-validation ni brownfield-vs-greenfield: el router los bifurca directo al workflow funcional (ver la ruta funcional en `[[calidad-route-test-generation]]`).
-- **iOS sí está soportado por el chapter.** Lo que tiene alcance Android es el *scaffolder* greenfield del stack JVM (`[[calidad-appium-screenplay-android]]`), no el chapter: para iOS greenfield en JVM se aplica el scaffold manual documentado en su `references/android-only-scope-rationale.md`; el stack TypeScript (`[[calidad-appium-wdio-greenfield]]`) genera iOS de forma nativa, y el brownfield de ambos stacks soporta Android e iOS. Nunca reportes iOS como fuera de alcance.
+- **iOS sí está soportado por el chapter.** Lo que tiene alcance Android es el *scaffolder* greenfield del stack JVM (`[[calidad-appium-screenplay-android]]`), no el chapter: para iOS greenfield en JVM se aplica el scaffold manual documentado en su `references/android-only-scope-rationale.md`; el stack TypeScript (`[[calidad-appium-wdio-greenfield]]`) genera iOS de forma nativa, y el brownfield de ambos stacks soporta Android e iOS. El stack `serenity-wdio` también cubre mobile Android e iOS (además de web, web_movil, desktop y api) de forma nativa en greenfield. Nunca reportes iOS como fuera de alcance.
 - **iOS exige entorno macOS** con Xcode y, en dispositivo físico, credenciales de firma. Si el entorno no lo cumple, no se degrada a Android en silencio: se genera lo pedido, se declara que no se pudo ejecutar y se reporta `partial`.
+- **serenity-wdio requiere señales de TypeScript/WebdriverIO** (package.json con `@serenity-js/webdriverio`, configs `wdio.*.conf.ts`, carpeta `features/`). Como comparte ecosistema TypeScript/WebdriverIO con `appium-wdio`, si el intent no aclara si necesita solo mobile (`appium-wdio`) o multiplataforma web+mobile+desktop+api (`serenity-wdio`), **pregunta** cuál es el alcance real antes de decidir.
 - K6 y Playwright/Karate pueden coexistir en un mismo programa de pruebas, pero **no en una sola solicitud de generación**: cada framework se genera por separado, en su propio `output_path`.
 - Una vez decidido el framework, transfiere el control al workflow específico; no mezcles instrucciones de generación de distintos frameworks.
 - Cuando detectes brownfield, antes de delegar al skill brownfield, asegúrate de que el `output_path` realmente contiene código previo (ver `[[calidad-brownfield-vs-greenfield]]`).

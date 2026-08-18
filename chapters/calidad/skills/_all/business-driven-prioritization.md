@@ -24,13 +24,13 @@ verification:
 
 Aplica este skill **cada vez** que sea necesario asignar una prioridad a:
 
-- Páginas web (Playwright) o pantallas móviles (Appium).
-- Escenarios o features (Karate, Cucumber).
-- Endpoints o métodos del contrato (Karate, K6).
+- Páginas web (Playwright, serenity-wdio web) o pantallas móviles (Appium, serenity-wdio movil).
+- Escenarios o features (Karate, Cucumber / serenity-wdio).
+- Endpoints o métodos del contrato (Karate, K6, serenity-wdio api).
 - Flujos end-to-end o user journeys completos.
 - Casos de uso dentro de una user story.
 
-Es transversal a los cuatro frameworks del Chapter Calidad y a cualquier workflow que necesite ordenar por importancia.
+Es transversal a los frameworks del Chapter Calidad y a cualquier workflow que necesite ordenar por importancia.
 
 ## Principio
 
@@ -82,6 +82,7 @@ Criterio de tie-break: si un item cumple criterios de dos niveles, se asigna el 
 
 - En Karate, el `risk_factor` definido en `chapters/calidad/skills/karate/karate-greenfield/references/negative-coverage-formula.md` consume directamente esta clasificación para modular la cantidad de escenarios negativos por endpoint.
 - En Playwright y Appium, el orden de scaffold (`[[calidad-streaming-files-protocol]]`) prioriza páginas/pantallas CRITICAL primero.
+- En serenity-wdio, el orden de scaffold prioriza features del canal correspondiente (`web`, `mobile`, `api`) CRITICAL primero; los escenarios `@smoke` deben cubrir al menos los flujos CRITICAL de cada canal activo.
 - En K6, los thresholds más estrictos se aplican a endpoints CRITICAL/HIGH.
 
 ## Restricciones

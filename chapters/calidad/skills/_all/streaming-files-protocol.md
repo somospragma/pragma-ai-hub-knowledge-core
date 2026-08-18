@@ -20,9 +20,9 @@ verification:
 
 ## Cuándo aplicar
 
-Aplica este skill **siempre** que armes un proyecto de pruebas en cualquier framework del Chapter Calidad (Karate, Playwright, K6, Appium), tanto en greenfield como en brownfield, ya sea de forma manual o asistida. Es el paso 6 de `[[calidad-route-test-generation]]`.
+Aplica este skill **siempre** que armes un proyecto de pruebas en cualquier framework del Chapter Calidad (Karate, Playwright, K6, Appium, serenity-wdio), tanto en greenfield como en brownfield, ya sea de forma manual o asistida. Es el paso 6 de `[[calidad-route-test-generation]]`.
 
-Su propósito es asegurar que **el activo entregable de mayor valor —los tests— se materialice primero**, y que el boilerplate regenerable quede para el final.
+Su propósito es asegurar que **el activo entregable de mayor valor —los tests— se materialice primero**, y que el boilerplate regenerable quede para el final. En brownfield, el orden aplica sobre los archivos **nuevos** de la sesión; la infraestructura existente no se toca.
 
 ## Alias
 
@@ -52,6 +52,7 @@ Los artefactos de mayor valor: el conocimiento extraído del spec y la firma mat
 | Playwright | `tests/**/*.spec.ts` (o `*.test.ts`)           |
 | K6         | `tests/*.js` (uno por escenario load/stress/spike/soak) |
 | Appium     | `*.feature` (Cucumber) y `tests/**/*Test.java` |
+| serenity-wdio | `features/**/*.feature` (por canal: web, mobile, api) |
 
 ### 2. LUEGO — Utilitarios compartidos y modelos
 
@@ -63,6 +64,7 @@ Refactorizaciones, helpers y abstracciones que dan estructura a los tests, pero 
 | Playwright | Page Objects (`pages/*.ts`), fixtures (`fixtures/*.ts`), utils                    |
 | K6         | `utils.js`, `config.js`, `payloads/*.js`, módulos de auth                          |
 | Appium     | Tasks, Questions, UI elements, Screenplay actors                                  |
+| serenity-wdio | Tasks, Interactions, Questions, UI Mapping (`PageElement`/selectores string), `support/parameter.config.ts` |
 
 ### 3. POR ÚLTIMO — Infraestructura
 
@@ -74,6 +76,7 @@ Configuración, build, documentación y scripts. Son los más fáciles de regene
 | Playwright | `package.json`, `playwright.config.ts`, `tsconfig.json`, `README.md`, scripts npm                    |
 | K6         | `package.json` (si aplica), `README.md`, scripts de ejecución, dashboards (opcional)                 |
 | Appium     | `build.gradle`, `serenity.conf`, `serenity.properties`, `README.md`, scripts gradle                  |
+| serenity-wdio | `package.json`, `tsconfig.json`, `configs/wdio.*.conf.ts`, `wdio.shared.conf.ts`, `scripts/run.mjs`, `.env.*`, `README.md` |
 
 ## Disciplina
 
