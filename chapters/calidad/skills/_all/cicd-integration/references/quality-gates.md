@@ -146,9 +146,41 @@ Reglas:
 | Nightly  | + K6 thresholds, visual regression, SCA Snyk                    |
 | Release  | + DAST ZAP, SAST Sonar, security High=0, manual approval        |
 
+## 6. El gate de calidad estático del PR sobre el código de pruebas
+
+El repositorio de automatización es código, y en muchos clientes pasa por el mismo analizador estático que el producto. Dos condiciones bloquean el PR con más frecuencia que el resto:
+
+**Issues nuevos.** El umbral suele ser cero. Son de arreglo mecánico y no se discuten: prefijo de módulo nativo en los imports, reemplazos globales con la API que corresponde, y demás recomendaciones de la versión del lenguaje configurada.
+
+**Cobertura del código nuevo.** El analizador mide **solo las líneas nuevas**, no el proyecto entero, así que un archivo de utilidad sin tests hunde el porcentaje aunque el resto esté al 100%.
+
+### Qué se excluye de cobertura y qué no
+
+El criterio no es "es código de pruebas, se excluye". Es **si la pieza se puede ejercitar sin hardware**:
+
+| Se excluye | Por qué |
+|---|---|
+| Objetos de página y de pantalla | Solo ejercitables contra un navegador o dispositivo real |
+| Steps, hooks, features | Son los tests mismos: cubrirlos con tests es circular |
+| Utilidades de línea de comandos y archivos de configuración | No tienen lógica que verificar |
+
+| Se incluye | Por qué |
+|---|---|
+| Utilidades, motor de ejecución, configuración resuelta, comparación de imágenes, cálculo de resultados | Lógica pura, testeable sin hardware, y **un bug ahí no rompe un test: hace que un test mienta** |
+
+Esa última frase es el argumento que decide la discusión. Un fallo en la utilidad que compara capturas no produce un rojo: produce un verde falso. Por eso se cubre, y por eso una exclusión "temporal" para desbloquear un PR no se revierte nunca y hay que negarse a ella.
+
+Señal de que la exclusión no falta: si las carpetas vecinas del archivo señalado ya están al 100%, el equipo venía cubriéndolas y el archivo es la excepción, no una categoría olvidada.
+
+### El reporte de ejecución también se verifica
+
+Hallazgo que pasa desapercibido: el analizador puede estar recibiendo la cobertura y **no los resultados de ejecución**, porque el archivo de resultados se genera vacío por un fallback del script que lo produce. El tablero muestra cobertura y cero tests. Se comprueba mirando el tamaño y el contenido del archivo generado, no asumiendo que existe.
+
 ## Anti-patterns
 
 - Reportes Allure sin gates — bonito dashboard, no detiene regresiones.
+- Excluir de cobertura una utilidad de pruebas para desbloquear un PR — un bug ahí no rompe tests, los hace mentir, y la exclusión nunca se revierte.
+- Dar por bueno el reporte de resultados sin abrirlo — puede estar vacío y el gate seguir en verde.
 - Gates configurados con `continue-on-error: true` — equivale a no tener gate.
 - Threshold K6 solo en `avg` — métrica engañosa; usar siempre percentiles.
 - `--update-snapshots` en pipeline de main — destruye el baseline visual.

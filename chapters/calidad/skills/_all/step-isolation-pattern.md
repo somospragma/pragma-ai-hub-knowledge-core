@@ -58,6 +58,31 @@ check(mainRes,  { 'transactions ok': r => r.status === 200 },
 - **Tag obligatorio cuando hay ≥2 steps**: si el test sólo tiene un step (smoke 1-endpoint), el tag se omite. A partir de 2 steps, es obligatorio.
 - **Cobertura sólo cuenta steps main**: la fórmula de `effective_minimum` por HU cuenta escenarios de main, NO de setup ni cleanup.
 
+## Un paso de setup que falta en N escenarios se arregla en el punto común
+
+Cuando aparece un desenlace nuevo en el setup —una pantalla de consentimiento, un modal de sesión, un aviso de versión— la primera reacción es agregarlo al escenario que falló. Si el setup es compartido, esa reacción deja el problema latente en todos los demás.
+
+Verificado en campo: de **45 flujos de login, 33 no contemplaban** una pantalla de consentimiento que la aplicación empezó a mostrar. Arreglar los 33 uno por uno no se hace nunca, y arreglar solo el que falló garantiza que reaparezca.
+
+**La corrección va en el punto por el que ya pasan todos**, sin tocar un solo escenario:
+
+```typescript
+async clickLogin(options: LoginOptions = {}): Promise<void> {
+  // ... la acción de siempre
+  if (options.handleConsent !== false) {
+    await this.acceptConsentIfAppears(options.consentTimeoutMs);
+  }
+}
+```
+
+Tres propiedades que hacen que esto sea seguro y no una bomba:
+
+1. **Opt-out explícito, no opt-in.** El comportamiento correcto es el default; quien necesita lo contrario lo pide. Al revés, los 33 flujos siguen rotos.
+2. **La lista de opt-out es corta, justificada y nominal.** Se excluyen exactamente los escenarios cuya intención es **verificar ese mismo desenlace** —el que valida la pantalla de consentimiento, los que prueban errores de autenticación— porque aceptarla automáticamente los volvería tests que no prueban nada. Es la regla anti-cheating aplicada al setup compartido: si el helper hace pasar un test que debía poder fallar, el helper está mal aplicado ahí.
+3. **La espera es en carrera, no un tiempo fijo.** En cuanto la acción anterior surte efecto, solo quedan un par de sondeos cortos. Un `sleep` de cortesía en el punto común multiplica su costo por la cantidad de escenarios de la suite.
+
+Después del cambio, la verificación no es "el escenario que fallaba ahora pasa": es que **los que ya pasaban sigan pasando**, medido, porque un punto común tocado mal degrada toda la suite a la vez.
+
 ## Cross-links por stack
 
 - [[calidad-karate-greenfield]] (consultar `references/step-isolation-karate.md` en su subfolder)

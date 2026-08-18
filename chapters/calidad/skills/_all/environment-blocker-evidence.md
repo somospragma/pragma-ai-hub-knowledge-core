@@ -46,6 +46,22 @@ Lista cerrada (no inventar nuevas categorías; si una corrida no encaja, escalar
 | `environment_browser_install_missing` | Playwright no encuentra browser binary (falta `npx playwright install`). | `Executable doesn't exist at ...`/`browserType.launch: ...`. |
 | `environment_jdk_missing_or_wrong` | JDK ausente o versión incompatible (Karate exige 11/17, Appium exige 21). | `UnsupportedClassVersionError`, `java: command not found`, `mvn` aborta por toolchain. |
 
+## Antes de declarar un bloqueo: descartar la red del propio puesto
+
+Un bloqueo de entorno acusa a la infraestructura del cliente, así que exige descartar primero lo que está bajo control de quien diagnostica. Verificado en campo: se afirmó *"el ambiente de pruebas no está montando la aplicación"* y lo que ocurría era que **la conexión corporativa de la máquina local estaba apagada**. El commit que iba a dejar esa conclusión escrita se frenó por un aviso del usuario, no por el análisis.
+
+Descartes obligatorios antes de emitir `execution-status.json`:
+
+| Descarte | Cómo |
+|---|---|
+| Conexión corporativa o red privada activa en la máquina que ejecuta | Resolver el nombre del entorno y alcanzar su puerta de entrada desde esa misma máquina |
+| El bloqueo se reproduce desde otro punto | La misma prueba desde el runner del pipeline, o desde otra máquina del equipo |
+| El entorno responde fuera de la suite | Una petición directa al servicio, sin pasar por la automatización |
+
+**Lo medido en el runner del pipeline sigue siendo válido aunque la máquina local esté mal**, porque no depende de ella. Al corregir una conclusión, se separa explícitamente qué evidencia se cae y cuál se mantiene: tirar todo el análisis por un error de premisa es tan costoso como sostener la premisa equivocada.
+
+Un bloqueo reportado sin estos descartes y luego desmentido cuesta credibilidad con el equipo de infraestructura del cliente, que es exactamente el interlocutor que hace falta cuando el bloqueo sí es real.
+
 ## Reglas
 
 - El status final del delivery_gate es `partial` (NUNCA `success`) con `blocker: "environment_blocked_<type>"`.

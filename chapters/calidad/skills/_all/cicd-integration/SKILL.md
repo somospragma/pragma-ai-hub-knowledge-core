@@ -33,6 +33,8 @@ Activa este skill después de generar suites con `[[calidad-karate-greenfield]]`
 6. **Agregar reportes** — Allure como dashboard por defecto (simple, ampliamente adoptado en Pragma). ReportPortal para clientes que requieren ML-based failure clustering e integración con Jira/ALM. Setup por tecnología en `references/allure-aggregation.md` y `references/rp-integration.md`.
 7. **Aplicar gates de calidad** — Cobertura mínima por endpoint (Karate), thresholds K6 (p95/p99/error_rate), pixel diff Playwright visual, accessibility violations, vulnerabilidades High/Critical de security. Cada gate debe **fallar el build** automáticamente; los overrides requieren justificación obligatoria en el commit message. Detalle en `references/quality-gates.md`.
 
+8. **Diagnosticar los fallos del pipeline como entorno distinto, no como "lo mismo pero más lento"** — El runner no tiene aceleración gráfica, su red no es la de la máquina de desarrollo y arranca siempre en frío. Antes de tocar el YAML: descartar la red del propio puesto, mirar las capturas de la corrida y separar petición rechazada de petición sin respuesta. Detalle en `references/runner-is-not-your-machine.md`.
+
 ## Restricciones
 
 - **NUNCA** commit de tokens, secrets, credenciales reales, claves privadas o certificados en archivos YAML del pipeline. Usa secret stores (Azure Key Vault, GitHub Secrets, GitLab masked variables, HashiCorp Vault) según `references/secrets-in-pipelines.md`.
@@ -50,6 +52,7 @@ Activa este skill después de generar suites con `[[calidad-karate-greenfield]]`
 - `references/gitlab-ci-jobs.md`
 - `references/sharding-and-parallelization.md`
 - `references/quality-gates.md`
+- `references/runner-is-not-your-machine.md`
 - `references/allure-aggregation.md`
 - `references/rp-integration.md`
 - `references/secrets-in-pipelines.md`

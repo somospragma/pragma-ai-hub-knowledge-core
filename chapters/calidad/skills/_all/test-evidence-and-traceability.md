@@ -95,6 +95,32 @@ Aplica la misma convención de tags **en todos los frameworks** (Karate `@`, Cuc
 | `@negative`               | Escenario de validación de error o regla de negocio             | `@negative`              |
 | `@performance`            | (K6) marca tipo de prueba (load/stress/spike/soak)              | `@performance:load`      |
 
+## Los screenshots del reporte se miran antes de concluir
+
+La evidencia visual no es un adjunto para el informe: es **la fuente que corrige las conclusiones equivocadas**. Un mensaje de error dice qué se rompió; el screenshot dice qué estaba pasando en pantalla, que casi nunca es lo mismo.
+
+Verificado en campo, dos veredictos publicados y falsos que se cayeron al abrir las imágenes del mismo reporte que ya se tenía:
+
+| Veredicto por texto y reloj | Lo que mostraba el screenshot |
+|---|---|
+| "El backend respondió hace 37 s y la app sigue en login: es un rechazo silencioso" | El botón con el spinner girando: la aplicación seguía procesando, el entorno era lento |
+| "El escenario falla al buscar el elemento" | El escritorio del sistema con un diálogo del sistema operativo encima de la aplicación |
+
+**Regla dura: ningún diagnóstico se cierra sin haber mirado las capturas de la corrida que se está diagnosticando.** Aplica al reporte propio y al que llega de un pipeline ajeno. Cuando la captura contradice la hipótesis, gana la captura.
+
+### Cómo llegar a las imágenes cuando el reporte es un archivo único
+
+Los reportes autocontenidos embeben las imágenes en base64 y pesan decenas de megabytes, lo que hace inviable leerlos enteros. Se extraen a archivos y se miran uno por uno:
+
+```bash
+# Localizar las imágenes embebidas sin abrir el archivo completo
+grep -o 'data:image/[a-z]*;base64,[A-Za-z0-9+/=]*' reporte.html | head
+```
+
+Cada bloque se decodifica a su archivo y se abre. Los dos que siempre importan son **la captura del step que falló** y **la del cierre del escenario**, segundos después: la diferencia entre ambas es la que revela si la aplicación avanzaba, si apareció una pantalla no contemplada o si quedó algo encima.
+
+Cuando el reporte no trae capturas del momento del fallo, eso es un hallazgo en sí mismo y se corrige antes de seguir diagnosticando: sin ellas, cada fallo cuesta una sesión de conjeturas.
+
 ## Cadena requisito → test → resultado → decisión
 
 1. **Requisito**: documentado en Jira/Confluence con ID estable (`HUT-123`, `RF-045`).

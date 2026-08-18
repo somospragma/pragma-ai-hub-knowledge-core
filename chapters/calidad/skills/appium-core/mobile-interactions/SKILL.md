@@ -23,6 +23,7 @@ Pertenece al stack `appium-core`, que se instala junto al stack de producto. Ant
 |---|---|
 | `references/mobile-interactions-catalog.md` | Canon de escritura, campos OTP, gestos, esperas en tres capas, pantallas condicionales, estado entre escenarios |
 | `references/contractual-assertions.md` | Aserciones que verifican el contrato y no la mera presencia de algo en pantalla |
+| `references/system-dialogs-and-scenario-contamination.md` | Diálogos del sistema que quedan sobre la app y rompen el escenario siguiente; verificación de descargas |
 
 ## Las reglas que más caro salen cuando se ignoran
 

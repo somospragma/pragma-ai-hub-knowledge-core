@@ -169,6 +169,47 @@ La disciplina que la hace segura:
 
 El cierre exige, además de la suite verde: verificación estática limpia, tests unitarios del helper nuevo, y el conteo de bloques migrados contra bloques inventariados. Si no cuadra, falta explicar la diferencia.
 
+## Resolver conflictos al integrar la rama larga
+
+Una rama de automatización que vivió varios días choca con la principal, y el conflicto casi siempre cae en los mismos dos sitios: **archivos de datos de prueba** (dos equipos agregaron claves distintas) y **archivos de steps** (dos personas resolvieron el mismo flujo de formas distintas).
+
+**Las opciones de un clic pierden trabajo.** "Tomar el origen" y "conservar el destino" descartan en bloque el aporte del otro lado. En un caso medido, la rama principal traía tres claves de datos que la rama no tenía; aceptar la rama entera las habría borrado sin que nadie lo notara hasta que un escenario ajeno fallara semanas después.
+
+El procedimiento que no pierde nada:
+
+1. **Simular el merge en memoria**, sin tocar el árbol de trabajo ni dejar el repositorio a medias:
+
+```bash
+git merge-tree --write-tree --name-only origin/main HEAD
+```
+
+2. **Clasificar cada conflicto.** Los de datos suelen ser unión limpia, sin decisión real. Los de código exigen decidir, y pegar las dos versiones **no es una opción**: dos definiciones del mismo step producen `ambiguous`, que es peor que cualquiera de las dos.
+
+3. **Medir qué sobrevive antes de elegir**, contando definiciones y usos de cada símbolo en disputa:
+
+```
+helperA:  definiciones=1  usos=3
+helperB:  definiciones=1  usos=5   (4 fuera del bloque en conflicto)
+```
+
+Un símbolo con usos fuera del bloque no se puede eliminar aunque su versión pierda. Ese conteo convierte la decisión en un dato.
+
+4. **La decisión de negocio es del usuario, no del agente.** Se presentan las opciones con sus consecuencias y se espera. Resolver por cuenta propia un conflicto entre dos implementaciones equivale a elegir por otro equipo.
+
+5. **Conservar el aporte que pierde, si es rescatable.** Cuando una versión gana, lo valioso de la otra puede sobrevivir en el mismo helper —por ejemplo, como último recurso de una cadena de localizadores— con un comentario que diga de dónde vino y por qué. Es preferible a duplicar la lógica en cada escenario.
+
+6. **Medir el antes y el después.** El merge no debe empeorar el estado de la suite, y eso se comprueba con números, no con impresión:
+
+| | escenarios | ambiguos |
+|---|---|---|
+| rama antes del merge | 619 | 32 |
+| principal actual | 632 | **37** |
+| resultado del merge | 636 | **37** |
+
+Los cinco ambiguos nuevos vienen de la principal, no del merge. Sin esta tabla, el equipo los atribuye a la integración y se pierde una tarde.
+
+7. **Verificar en ejecución al menos un escenario del archivo resuelto**, además de uno de control ajeno al conflicto.
+
 ## Paridad de garantías universales brownfield ↔ greenfield
 
 Tras este chapter, todos los workflows brownfield reciben las mismas garantías universales que greenfield: smoke gate (universal), evidencia de bloqueo de ambiente, metadata por corrida, reporte ejecutivo, step isolation, validación contractual no superficial y STRATEGY.md condicional cuando el alcance es grande. La diferencia es de **scope de aplicación**: en brownfield estas mejoras se aplican **solo a archivos NUEVOS emitidos en la sesión**, nunca a tests preexistentes. Concretamente:
