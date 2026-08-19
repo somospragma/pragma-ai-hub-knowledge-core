@@ -155,6 +155,7 @@ from Figma.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `component_name` | Yes | Snake case component name, usually with DS intent but without file extension. |
 | `figma_url` | Yes | Figma URL with file key and node id. |
 | `user_story` | No | Inline acceptance context or short user need. |
@@ -164,6 +165,7 @@ from Figma.
 
 ```text
 @ds-orchestrator /new-component
+hu_id: <user story id, e.g. US-12345>                       # required
 component_name: <ds_component_name>                         # required, e.g. ds_status_badge
 figma_url: <https://www.figma.com/file/...?...node-id=...>  # required
 user_story: <short acceptance context>                      # optional
@@ -171,6 +173,11 @@ user_story_path: <docs/user-stories/story-123.md>           # optional
 atomic_hint: <atom|molecule|organism>                       # optional
 golden_tests: <true|false>                                  # optional, default false
 ```
+
+`hu_id` is required so every component build is linked to a user story from
+the start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: DS source files, tests, optional goldens, Widgetbook use case,
 audit evidence and delivery summary under the `design_system` target.
