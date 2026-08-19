@@ -1,13 +1,12 @@
 ---
 id: flutter-navigation-strategy
-name: flutter-navigation-strategy
-version: 2.2.0
+version: 2.3.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
 description: >
-  Implements declarative navigation in Flutter using go_router 17.x. Use this skill when asking about routing, navigation, redirect guards, nested navigation, tab navigation, page transitions, ShellRoute, cross-module navigation, Mediator pattern for navigation, or how to navigate between screens. Triggers on GoRouter setup, context.go, context.push, redirect, ShellRoute, StatefulShellRoute, AppNavigator, PopScope, or any navigation request. For deep link platform configuration and implementation, see the flutter-deep-link-strategy skill. Stack: go_router, go_router_builder, build_runner. Requires Flutter >=3.29 / Dart >=3.7.
+  Implements declarative navigation in Flutter using go_router 17.x. Use this skill when asking about routing, navigation, redirect guards, nested navigation, tab navigation, page transitions, ShellRoute, cross-module navigation, Mediator pattern for navigation, or how to navigate between screens. Triggers on GoRouter setup, context.go, context.push, redirect, ShellRoute, StatefulShellRoute, AppNavigator, PopScope, or any navigation request. For deep link platform configuration and implementation, see the flutter-deep-link-strategy skill. Stack: go_router, go_router_builder, build_runner. Requires Flutter >=3.32 / Dart >=3.8.
 ---
 # Navigation Strategy — go_router 17.x
 

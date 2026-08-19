@@ -1,7 +1,7 @@
 ---
 id: flutter-logging
 name: flutter-logging
-version: 2.1.0
+version: 2.1.1
 scope: stack
 type: skill
 chapter: mobile
@@ -15,7 +15,7 @@ Defines the rules and best practices for implementing logging in Flutter applica
 
 ## Design Principles
 
-- **Client code never knows the handler.** `AppLogger` is the only facade — no widget, BLoC, or use case imports Crashlytics, Sentry, or DataDog directly. This allows switching or combining services without touching business logic.
+- **Client code never knows the handler.** `AppLogger` is the only facade — no widget, BLoC, or use case imports Crashlytics, Sentry, or DataDog directly. This allows switching the active service without touching business logic.
 - **Each service is a swappable Strategy.** `LogHandler` defines the contract; `CrashlyticsHandler`, `SentryHandler`, `DataDogHandler`, and `GrafanaHandler` implement it. The Logger maintains **a single active handler** — switching providers is as simple as changing one line in `LoggerConfig`.
 - **The environment determines which handler is active.** Dev uses `ConsoleHandler`. Staging and Prod use the chosen provider (Crashlytics, Sentry, DataDog, or Grafana). This decision lives in the configuration layer (`LoggerConfig`), not in the Logger.
 - **Logs have semantic type.** A `LogEvent` is not just a String — it carries a level, category (`error`, `navigation`, `performance`, `business`), structured context, and a timestamp. The active handler decides how to process each category based on the service's layerbilities.
@@ -78,8 +78,12 @@ Read the corresponding file before generating code for that area:
 
 ## Basic Usage from Any Layer
 
+> Every call goes through `AppLogger` and is processed by the **single active handler**
+> selected in `LoggerConfig` for the current flavor. The handler decides how to treat
+> each `category` based on the provider's capabilities.
+
 ```dart
-// Error with structured context (routed to Crashlytics + Sentry)
+// Error with structured context (category: error)
 AppLogger.error(
   'checkout_failed',
   context: {'product_id': id, 'amount': total},
@@ -87,13 +91,13 @@ AppLogger.error(
   stackTrace: stackTrace,
 );
 
-// Business event (routed to DataDog + Grafana)
+// Business event (category: business)
 AppLogger.business('purchase_completed', context: {'revenue': 99.9});
 
-// Performance metric (API latency)
+// Performance metric — API latency (category: performance)
 AppLogger.performance('api_latency', durationMs: elapsed, context: {'endpoint': '/orders'});
 
-// Navigation (routed to all active handlers)
+// Navigation event (category: navigation)
 AppLogger.navigation(from: 'HomeScreen', to: 'CheckoutScreen');
 ```
 

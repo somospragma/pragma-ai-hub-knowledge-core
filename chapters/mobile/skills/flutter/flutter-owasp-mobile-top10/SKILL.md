@@ -1,7 +1,7 @@
 ---
 id: flutter-owasp-mobile-top10
 name: flutter-owasp-mobile-top10
-version: 2.1.0
+version: 2.1.1
 scope: stack
 type: skill
 chapter: mobile
@@ -88,11 +88,12 @@ Future<String> getClientKey() async {
 ### Detection
 
 ```bash
-# Check for known vulnerabilities (Dart 3.x)
-dart pub audit
-
-# Check outdated packages
+# Check outdated packages (built-in)
 dart pub outdated
+
+# Scan pubspec.lock for known vulnerabilities against the OSV database.
+# Dart/Flutter have NO built-in `dart pub audit` command — use OSV-Scanner.
+osv-scanner --lockfile=pubspec.lock
 
 # Review direct dependencies
 grep -A100 "^dependencies:" pubspec.yaml
@@ -109,16 +110,19 @@ dependencies:
 ```
 
 ```bash
-# Run in CI — fail build on vulnerabilities
-dart pub audit --json | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-if data.get('vulnerabilities'):
-    for v in data['vulnerabilities']:
-        print(f'VULN: {v[\"name\"]} — {v[\"description\"]}')
-    sys.exit(1)
-print('No vulnerabilities found')
-"
+# Run in CI — osv-scanner exits non-zero when vulnerabilities are found,
+# which fails the build automatically. No custom parsing needed.
+osv-scanner --lockfile=pubspec.lock
+```
+
+```yaml
+# .github/dependabot.yml — automated vulnerability alerts and update PRs for pub
+version: 2
+updates:
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
 ```
 
 ---
@@ -226,16 +230,16 @@ WebViewController()
     },
   ));
 
-// ✅ Validate deep link params before navigating
-@override
-void onNavigation(NavigationResolver resolver, StackRouter router) async {
-  final id = resolver.route.pathParams.get('id');
-  if (id == null || !_isValidId(id)) {
-    resolver.redirect(const HomeRoute());
-    return;
-  }
-  resolver.next();
-}
+// ✅ Validate deep link params before navigating (go_router redirect)
+GoRoute(
+  path: '/item/:id',
+  redirect: (context, state) {
+    final id = state.pathParameters['id'];
+    if (id == null || !_isValidId(id)) return '/home'; // reject invalid input
+    return null; // allow navigation
+  },
+  builder: (context, state) => ItemPage(id: state.pathParameters['id']!),
+),
 ```
 
 ---
