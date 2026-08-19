@@ -1,0 +1,143 @@
+{
+  "skill_name": "flutter-logging",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "In my Flutter app I currently call FirebaseCrashlytics directly from my BLoCs and widgets to log errors. Management now wants to move to Sentry, and possibly DataDog later. How should I structure logging so switching the provider doesn't require touching my business logic?",
+      "expected_output": "Recommends the Strategy pattern with a single AppLogger facade as the only entry point, a LogHandler interface implemented by provider-specific handlers (CrashlyticsHandler, SentryHandler, DataDogHandler), and a LoggerConfig that selects the active handler. Business code (BLoCs, widgets, use cases) depends only on AppLogger and never imports Crashlytics/Sentry/DataDog. Switching providers means changing one line in LoggerConfig.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response applies the Strategy pattern with an AppLogger facade and a LogHandler interface implemented per provider",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response states that business code must depend only on AppLogger and never import Crashlytics/Sentry/DataDog directly, and that switching providers changes only LoggerConfig",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains AppLogger",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Implement the core logging contract for a Flutter app: a structured log event model and the Strategy interface that every logging provider must implement. Logs need a severity level and a category (error, navigation, performance, business).",
+      "expected_output": "Defines a LogLevel enum (debug, info, warning, error, fatal), a LogEvent model carrying level, category, structured context map, message, timestamp (and optional error/stackTrace), and a LogHandler abstract interface with a method to handle a LogEvent plus a dispose() method to release resources. Notes each handler decides how to process each category based on the provider's capabilities.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response defines a structured LogEvent (level, category, context, timestamp) rather than logging plain strings",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response defines a LogHandler abstract interface with a handle method and a dispose() to release resources",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains LogLevel",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I don't want my development logs polluting Crashlytics/Sentry, but in staging and production I do want them sent to the provider. How do I make the active logging destination depend on the flavor/environment in Flutter, without scattering if (kDebugMode) checks everywhere?",
+      "expected_output": "Recommends centralizing the decision in LoggerConfig, which selects ConsoleHandler for dev and the chosen provider handler (Crashlytics/Sentry/DataDog/Grafana) for staging/prod. The environment/flavor determines the active handler in one place; call sites always use AppLogger and never check kDebugMode. Dev noise stays out of external services.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response centralizes the per-flavor handler selection in LoggerConfig (ConsoleHandler in dev, provider in staging/prod)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response avoids scattering kDebugMode checks at call sites, keeping the environment decision in the configuration layer",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains LoggerConfig",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "My Flutter codebase is full of print() and debugPrint() calls, and some widgets import package:firebase_crashlytics directly to report errors. What's wrong with this and how do I clean it up properly?",
+      "expected_output": "Explains that raw print/debugPrint must not be used in production (no structure, no severity, leaks to logcat) and that importing Crashlytics directly in widgets couples business code to a provider. Recommends routing everything through the AppLogger facade, removing direct provider imports, and letting the active LogHandler (ConsoleHandler in dev) handle output. All error logs should include error and stackTrace, not just a message.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response says raw print/debugPrint must not be used in production and all logging must go through the AppLogger facade",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response says widgets/business code must not import Crashlytics (or any provider) directly",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response recommends error logs include error and stackTrace, not just a message",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "We need to add a new logging destination in our Flutter app: a custom internal HTTP endpoint that receives our logs. How do I plug this into our existing Strategy-based logging setup without changing any client code?",
+      "expected_output": "Shows creating a new handler (e.g. HttpHandler/GrafanaHandler) that implements the LogHandler interface, handling each LogEvent by POSTing to the endpoint and implementing dispose(). Registering it as the active handler in LoggerConfig is the only change required; AppLogger and all call sites remain untouched. This demonstrates the open/closed benefit of the Strategy pattern.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response creates a new class implementing the LogHandler interface (handle + dispose) for the custom destination",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response states the only change needed is registering the handler in LoggerConfig, leaving AppLogger and client code untouched",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains LogHandler",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Show me how to log the different kinds of events in my Flutter app through a single API: a checkout error with context, a navigation transition, an API latency metric, and a business event like a completed purchase.",
+      "expected_output": "Uses the AppLogger facade methods: AppLogger.error() with structured context plus error and stackTrace; AppLogger.navigation(from:, to:); AppLogger.performance() with durationMs and context (e.g. endpoint); AppLogger.business() with a snake_case event name and context. Emphasizes structured context maps and consistent snake_case keys for dashboards, and that the active handler routes each category appropriately.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response logs all event kinds through the single AppLogger facade (error, navigation, performance, business)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response passes structured context and includes error + stackTrace for the error case",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response uses consistent snake_case keys/event names for structured logging",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

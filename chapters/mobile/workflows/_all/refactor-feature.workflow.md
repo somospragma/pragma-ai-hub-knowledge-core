@@ -8,7 +8,7 @@ entry_agent: refactoring-advisor
 input_contract: ../docs/templates/spec-packets/refactor-feature.overlay.yaml
 invocation_mode: explicit_agent
 description: >
-  Workflow for refactoring an existing feature that follows, or should migrate toward, Clean Architecture. Use to analyze code, plan incremental changes, apply domain/data/presentation refactors, add tests, and produce refactoring documentation.
+  Workflow for refactoring an existing feature that already follows Clean Architecture (or close to it). Analyzes code smells, architectural violations, and complexity — then executes incremental improvements that keep the app compiling at every stage. Not for DS components (use /refactor-component) or legacy rewrites from scratch.
 ---
 # Workflow: Refactor Feature (Evolutionary Improvement)
 
