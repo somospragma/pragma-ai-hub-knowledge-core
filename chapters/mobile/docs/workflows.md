@@ -80,6 +80,7 @@ configuration files.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `HU_ID` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `WORKSPACE_ROOT` | Yes | Absolute path to the IDE/workspace root. |
 | `WORKSPACE_FILE` | No | Absolute path to `.code-workspace` when available. |
 | `EXPECTED_APP_REPO_ROOT` | No, recommended | Absolute path to the app repository that will own `.sopp/config`. |
@@ -92,6 +93,7 @@ configuration files.
 
 ```text
 @workspace-discovery /bootstrap-workspace
+HU_ID: <user story id, e.g. US-12345>                        # required
 WORKSPACE_ROOT: <absolute/path/to/workspace>                 # required
 WORKSPACE_FILE: <absolute/path/to/workspace.code-workspace>  # optional
 EXPECTED_APP_REPO_ROOT: <absolute/path/to/app-repo>          # optional, recommended
@@ -102,6 +104,11 @@ EXPECTED_REPO_MODE: <single_repo|monorepo_melos|multi_repo>  # optional
 APPLY_MODE: propose_then_apply                              # optional
 FORCE_RECONFIGURE: false                                    # optional; explicit repair/migration only
 ```
+
+`HU_ID` is required so every bootstrap run is linked to a user story from
+the start. The workflow maps `HU_ID` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 When a valid final `.sopp/config` triplet already exists for the resolved app
 repository, bootstrap returns `reused_existing_config` and creates no proposal.
