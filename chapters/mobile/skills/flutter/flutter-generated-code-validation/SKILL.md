@@ -9,7 +9,6 @@ name: flutter-generated-code-validation
 description: >
   Validates, runs, and troubleshoots Flutter code generation: build_runner, Freezed, json_serializable, Injectable, AutoRoute. Use this skill when the user mentions build_runner, generated files (.g.dart, .freezed.dart, .gr.dart, .config.dart), 'run code generation', 'my generated code is broken', 'build failed', annotations such as @freezed, @injectable, @JsonSerializable, @AutoRouterConfig, or questions about configuring code generation. Apply BEFORE and AFTER modifying any annotated Dart class. Stack: build_runner, freezed, freezed_annotation, json_serializable, json_annotation, injectable, injectable_generator, auto_route, auto_route_generator.
 ---
-
 # Flutter Code Generation — Validation and Troubleshooting
 
 Full lifecycle: setup → generation → validation → troubleshooting.

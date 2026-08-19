@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-widgetbook`  
-**Scanned:** 2026-06-22 15:56:50 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 15:56:50 UTC
 
 ## Risk Assessment
 
@@ -16,21 +16,21 @@
 
 | File | Type | Lines | Executable |
 |------|------|-------|------------|
-| `SKILL.md` | markdown | 118 | No |
-| `assets/knobs_reference.md` | markdown | 338 | No |
-| `evals/evals.json` | json | 79 | No |
-| `evals/flutter-ds-widgetbook.md` | markdown | 38 | No |
-| `references/coverage_audit.md` | markdown | 237 | No |
-| `references/features_guide.md` | markdown | 370 | No |
-| `references/mocks.md` | markdown | 207 | No |
-| `references/monorepo.md` | markdown | 271 | No |
-| `references/project_structure.md` | markdown | 267 | No |
-| `references/setup.md` | markdown | 789 | No |
-| `references/variants_guide.md` | markdown | 398 | No |
+| `SKILL.md` | markdown | 118 | Not |
+| `assets/knobs_reference.md` | markdown | 338 | Not |
+| `evals/evals.json` | json | 79 | Not |
+| `evals/flutter-ds-widgetbook.md` | markdown | 38 | Not |
+| `references/coverage_audit.md` | markdown | 237 | Not |
+| `references/features_guide.md` | markdown | 370 | Not |
+| `references/mocks.md` | markdown | 207 | Not |
+| `references/monotepo.md` | markdown | 271 | Not |
+| `references/project_structure.md` | markdown | 267 | Not |
+| `references/setup.md` | markdown | 789 | Not |
+| `references/variants_guide.md` | markdown | 398 | Not |
 
 ## Issues (0)
 
-No security issues detected.
+Not security issues detected.
 
 ## Metadata
 

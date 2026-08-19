@@ -4,12 +4,12 @@ version: 1.0.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt para generar código Flutter de un organismo del Design System. Usar   cuando toca construir una sección completa
+description: >
+  Prompt for generating Flutter code for an organism-level Design System component. Use when building a complete UI section that composes atoms and molecules and must satisfy user-story acceptance criteria.
 ---
+# Generation of Organism Flutter
 
-# Generación de Organismo Flutter
-
-## Skills de referencia
+## Reference Skills
 
 - flutter-ds-theming-tokens
 - flutter-ds-component-template
@@ -20,44 +20,54 @@ description: Prompt para generar código Flutter de un organismo del Design Syst
 - flutter-ds-responsive-layout
 - flutter-ds-a11y-semantics
 
-## INSTRUCCIÓN
+## Instruction
 
-Genera el código Flutter completo de un organismo del Design System,
-componiendo moléculas y átomos existentes y/o recién creados.
+Generate the complete Flutter code for an organism in the Design System,
+composing existing and/or newly created molecules and atoms.
 
-## INPUTS QUE RECIBIRÁS
+## SDD Contract
 
-1. Nombre del organismo a crear
-2. Especificaciones visuales completas (de §1 y §2)
-3. Lista de moléculas y átomos que compone (con paths e interfaces)
-4. Estados requeridos
-5. Criterios de aceptación funcionales (de la HU)
-6. Path de destino
-7. Interfaz diseñada (de §4)
-8. Contrato de textos y overflow (`§4.B`), obligatorio en `/new-component` y
-   `/new-view`; puede declarar "sin textos/riesgos" si no aplica al organismo
+When `spec_context` exists, read `spec_ref` and `context_ref` as machine
+sources. Use only `read_sections`, implement the artifacts declared in
+`artifact_plan`, record evidence in
+`{SPEC_PACKET_PATH}/evidence/codegen-report.md`, and treat `PIPELINE_SPEC_PATH`
+as the human report.
 
-## DIFERENCIAS VS MOLÉCULA
+## Inputs You Will Receive
 
-Un organismo:
-- Compone **moléculas + átomos** (mayor complejidad)
-- Típicamente es una **sección completa de UI** (card, form, navigation bar)
-- Puede tener **lógica de coordinación** entre moléculas
-- Generalmente usa **Material** para elevation y surface
-- Es el nivel más **parametrizable** (muchos callbacks y datos)
-- Es el que más directamente **responde a la HU de negocio**
+1. Name of the organism to create
+2. Complete visual specifications from `design_source` and `canonical_spec`
+3. List of molecules and atoms it composes (with paths and interfaces)
+4. Required states
+5. Functional acceptance criteria from the user story
+6. Destination path
+7. Interface designed from `technical_plan`
+8. Text and overflow contract (`contracts.text_overflow`), required in `/new-component` and
+   `/new-view`; can declare "without texts/risks" if it does not apply to the organism
+9. In SDD mode, the same inputs come from `canonical_spec`,
+   `technical_plan`, `contracts` and `artifact_plan`
 
-## REGLAS ESPECÍFICAS
+## Differences From Molecule
 
-### Comentarios en Código
+An organism:
+- Composes **molecules + atoms** with higher complexity
+- Typically, it is a **complete UI section** (card, form, navigation bar)
+- Can contain **coordination logic** between molecules
+- Usually uses **Material** for elevation and surface
+- Is the most **parameterized** level, with many callbacks and data inputs
+- Responds most directly to the business user story
 
-- Prohibidos comentarios inline, de bloque y Dartdoc por defecto.
-- Solo permitir comentario fundamental cuando no sea deducible del código
-  (ej: workaround temporal, restricción regulatoria o decisión crítica de interoperabilidad).
+## Specific Rules
 
-### Composición con Material
+### Comments in Code
 
-> Los comentarios del snippet son didácticos y no deben copiarse en el código generado.
+- Comments are prohibited inline, block and Dartdoc by default.
+- Only allow a fundamental comment when the code cannot make the reason clear
+  (e.g. temporary workaround, regulatory restriction or critical decision of interoperability).
+
+### Composition With Material
+
+> Comments in this snippet are instructional and must not be copied into generated code.
 
 ```dart
 @override
@@ -65,7 +75,7 @@ Widget build(BuildContext context) {
   return Material(
     elevation: 0, // ElevationTokens.level1
     borderRadius: BorderRadius.circular(0), // {{DS_PREFIX}}BorderRadius.l
-    color: /* token de surface */,
+    color: /* token of surface */,
     clipBehavior: Clip.antiAlias,
     child: switch (state) {
       ...State.loading => _buildLoading(context),
@@ -82,18 +92,18 @@ Widget build(BuildContext context) {
 }
 ```
 
-### Callbacks Múltiples
+### Callbacks Multiple
 
 ```dart
 const {{DS_PREFIX}}ProductCard({
-  // Datos
+  // Data
   required this.productName,
   required this.productPrice,
   this.productImageUrl,
   this.badgeLabel,
-  // Estado
+  // State
   this.state = {{DS_PREFIX}}ProductCardState.default_,
-  // Callbacks — uno por cada acción del usuario
+  // Callbacks - one per user action
   this.onTap,
   this.onAddToCart,
   this.onToggleFavorite,
@@ -101,23 +111,23 @@ const {{DS_PREFIX}}ProductCard({
 });
 ```
 
-### Criterios de Aceptación
+### Acceptance Criteria
 
-El organismo es donde se cumplen los criterios de la HU.
-Para CADA criterio, verificar que el código lo implementa:
+The organism is where the user story criteria are fulfilled.
+For each criterion, verify that the code implements it:
 
 ```dart
-// HU: "Debe mostrar imagen, nombre, precio y botón de acción"
-// → Verificar que el build incluye todos estos elementos
+// user story: "Must show image, name, price, and action button"
+// Verify that the build includes all these elements
 
-// HU: "El botón de favorito debe ser toggleable"
-// → Verificar que existe param isFavorite + callback onToggleFavorite
+// user story: "The button favorite must be toggleable"
+// Verify that parameter isFavorite and callback onToggleFavorite exist
 
-// HU: "En estado loading, mostrar skeleton"
-// → Verificar que _buildLoading() implementa skeleton COMPLETO
+// user story: "In loading state, show skeleton"
+// Verify that _buildLoading() implements the full skeleton
 ```
 
-### Responsividad
+### Responsiveness
 
 ```dart
 Widget _buildContent(BuildContext context) {
@@ -132,24 +142,25 @@ Widget _buildContent(BuildContext context) {
 }
 ```
 
-### Textos y Overflow
+### Text And Overflow
 
-- Usar únicamente textos literales provenientes de `§1.1b`/`§2`/`§4.B`.
-- No inventar empty states, error messages, badges, CTAs o microcopy si no están
-  en Figma/metadatos/anotaciones.
-- Diseñar composición defensiva contra overflow:
-  - `Flexible`/`Expanded` para textos en filas
-  - `Wrap` para grupos horizontales que puedan saltar línea
-  - scroll vertical cuando el organismo pueda crecer dentro de una vista
-  - constraints flexibles en lugar de tamaños fijos
-- Si Figma no trae constraints suficientes, aplicar la mitigación definida en
-  `§4.B`, continuar y registrar alerta.
+- Use only literal text from `literal_texts`,
+  `contracts.literal_texts` and `contracts.text_overflow`.
+- Do not invent empty states, error messages, badges, CTAs or microcopy if they are not
+  in Figma/metadata/annotations.
+- Design defensive composition against overflow:
+  - `Flexible`/`Expanded` for text in rows
+  - `Wrap` for horizontal groups that can wrap
+  - vertical scroll when the organism can grow inside a view
+  - flexible constraints instead of fixed sizes
+- If Figma does not provide constraints sufficient, apply the defined mitigation in
+  `contracts.text_overflow`, continue and record an alert.
 
-### Skeleton Completo
+### Full Skeleton
 
 ```dart
 Widget _buildLoading(BuildContext context) {
-  // El skeleton debe cubrir TODA la card, no solo partes
+  // The skeleton must cover the entire card, not only parts
   return Column(
     children: [
       // Header skeleton
@@ -165,18 +176,18 @@ Widget _buildLoading(BuildContext context) {
 }
 ```
 
-## CHECKLIST PRE-ENTREGA
+## Pre-Delivery Checklist
 
-Todo lo de átomo y molécula MÁS:
-- [ ] ¿Importa y usa moléculas + átomos del DS?
-- [ ] ¿Usa Material para elevation/surface?
-- [ ] ¿CADA criterio de aceptación de la HU está implementado?
-- [ ] ¿Todos los callbacks de interacción están expuestos?
-- [ ] ¿Considera responsividad (LayoutBuilder)?
-- [ ] ¿Loading muestra skeleton COMPLETO (no solo partes)?
-- [ ] ¿Error muestra indicadores claros?
-- [ ] ¿InkWell/GestureDetector para interacción principal?
-- [ ] ¿Accesibilidad: Semantics label con estado?
-- [ ] ¿Si >200 líneas, fragmentado en archivos privados?
-- [ ] ¿Textos visibles coinciden literalmente con Figma?
-- [ ] ¿Riesgos de overflow están mitigados o alertados?
+Everything from atom and molecule, plus:
+- [ ] Imports and uses molecules + atoms in the DS?
+- [ ] Uses Material for elevation/surface?
+- [ ] Each user-story acceptance criterion is implemented?
+- [ ] All interaction callbacks are exposed?
+- [ ] Considers responsiveness with LayoutBuilder?
+- [ ] Loading shows a full skeleton, not only partial placeholders?
+- [ ] Error state shows clear indicators?
+- [ ] Uses InkWell/GestureDetector for the main interaction?
+- [ ] Accessibility: Semantics label includes state?
+- [ ] If >200 lines, split into private files?
+- [ ] Visible text matches Figma literally with Figma?
+- [ ] Overflow risks are mitigated or flagged?

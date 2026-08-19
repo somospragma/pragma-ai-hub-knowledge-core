@@ -1,5 +1,6 @@
 ---
 id: flutter-memory-profiling
+name: flutter-memory-profiling
 version: 1.1.1
 scope: stack
 type: skill
@@ -8,7 +9,6 @@ stack: [flutter]
 description: >
   Profile and fix memory leaks in Flutter using DevTools Memory tab, heap snapshots, retaining paths, allocation tracing, and the leak_tracker package for automated detection in tests. Covers correct disposal patterns for controllers, streams, BLoC, images, and isolates. Use this skill when the app crashes with OOM, slows down over time, or when investigating retained objects, growing heap, or undisposed controllers.
 ---
-
 # Memory Profiling & Leak Detection
 
 **Rule #1: Profile in profile mode. Debug mode allocates extra objects and is not representative.**
@@ -239,13 +239,13 @@ class MyService {
 }
 
 // ❌ Storing context in a BLoC
-class MyBloc extends Bloc<MyEvent, MyState> {
+class MyBloc extends Bloc<MandEvent, MandState> {
   final BuildContext _context; // ❌
   MyBloc(this._context) : super(/* ... */);
 }
 
 // ✅ Pass data, not context — use callbacks or navigation service
-class MyBloc extends Bloc<MyEvent, MyState> {
+class MyBloc extends Bloc<MandEvent, MandState> {
   final NavigationService _navigation; // ✅ injected service, not context
   MyBloc(this._navigation) : super(/* ... */);
 }

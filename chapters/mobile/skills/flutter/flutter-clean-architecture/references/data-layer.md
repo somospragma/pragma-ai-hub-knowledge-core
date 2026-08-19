@@ -214,9 +214,9 @@ import '../../domain/repositories/user_repository.dart';
 import '../datasources/user_data_source.dart';
 import '../mappers/user_mapper.dart';
 
-class UserRepositoryImpl extends BaseRepository 
+class UserRepositoryImpl extends BaseRepository
     implements UserRepository {
-  
+
   const UserRepositoryImpl({
     required this.localDataSource,
     required this.remoteDataSource,
@@ -231,7 +231,7 @@ class UserRepositoryImpl extends BaseRepository
   Future<Result<UserEntity, Exception>> getUser(String id) async {
     // Step 1: Try local cache first
     final localResult = await localDataSource.getUser(id);
-    
+
     if (localResult is Success) {
       // Map model to entity and return
       return Success(mapper.from(response: localResult.value));
@@ -239,7 +239,7 @@ class UserRepositoryImpl extends BaseRepository
 
     // Step 2: Try remote API
     final remoteResult = await remoteDataSource.getUser(id);
-    
+
     return remoteResult.fold(
       (model) async {
         // Step 3: Cache the result locally
@@ -254,7 +254,7 @@ class UserRepositoryImpl extends BaseRepository
   @override
   Future<Result<List<UserEntity>, Exception>> getAllUsers() async {
     final remoteResult = await remoteDataSource.getAllUsers();
-    
+
     return remoteResult.fold(
       (models) async {
         // Cache all users
@@ -272,10 +272,10 @@ class UserRepositoryImpl extends BaseRepository
   Future<Result<UserEntity, Exception>> createUser(UserEntity user) async {
     // Convert entity to model
     final model = mapper.toModel(user);
-    
+
     // Create in remote
     final remoteResult = await remoteDataSource.createUser(model);
-    
+
     return remoteResult.fold(
       (createdModel) async {
         // Cache locally

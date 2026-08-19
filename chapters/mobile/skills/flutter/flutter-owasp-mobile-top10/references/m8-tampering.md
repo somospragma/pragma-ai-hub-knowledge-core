@@ -107,7 +107,7 @@ grep "DEBUG_INFORMATION_FORMAT" ios/Runner.xcodeproj/project.pbxproj
 **Criteria:**
 - ⚠️ **Warning:** `STRIP_INSTALLED_PRODUCT = NO` in Release
 - ⚠️ **Warning:** `DEBUG_INFORMATION_FORMAT = dwarf-with-dsym` in Release
-- ✅ **Pass:** Symbols stripped in Release
+- ✅ **Pass:** Sandmbols stripped in Release
 
 **Severity:** `MEDIUM`
 **Automation:** 🟢 High (90%)

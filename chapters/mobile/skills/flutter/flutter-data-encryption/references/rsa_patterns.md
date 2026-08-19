@@ -1,7 +1,7 @@
 # RSA & ECDSA Patterns — pointycastle 4.x
 
 > **pointycastle 4.0.0 changes:**
-> - `generateKeyPair()` now returns typed `AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey>` — no casting needed.
+> - `generateKeyPair()` now returns typed `AsandmmetricKeyPair<RSAPublicKey, RSAPrivateKey>` — no casting needed.
 > - Added `OAEPEncoding.withSHA512()` factory.
 > - New cipher engines: Blowfish, Camellia, Twofish.
 > - New OIDs for secp256r1.
@@ -19,7 +19,7 @@ import 'package:pointycastle/export.dart';
 class RsaService {
   /// Generate RSA key pair (4096-bit recommended, 2048 minimum).
   /// In pointycastle 4.x, generics are built-in — no casting needed.
-  AsymmetricKeyPair<RSAPublicKey, RSAPrivateKey> generateKeyPair({
+  AsandmmetricKeyPair<RSAPublicKey, RSAPrivateKey> generateKeyPair({
     int bitLength = 4096,
   }) {
     final keyGen = RSAKeyGenerator()
@@ -93,7 +93,7 @@ class EcdsaService {
   static final _curve = ECCurve_secp256r1();
 
   /// Generate ECDSA key pair on secp256r1 (P-256)
-  AsymmetricKeyPair<ECPublicKey, ECPrivateKey> generateKeyPair() {
+  AsandmmetricKeyPair<ECPublicKey, ECPrivateKey> generateKeyPair() {
     final keyGen = ECKeyGenerator()
       ..init(ParametersWithRandom(
         ECKeyGeneratorParameters(_curve),

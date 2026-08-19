@@ -76,16 +76,16 @@ import '../entities/user_entity.dart';
 abstract class UserRepository {
   /// Fetch a single user by ID
   Future<Result<UserEntity, Exception>> getUser(String id);
-  
+
   /// Fetch all users
   Future<Result<List<UserEntity>, Exception>> getAllUsers();
-  
+
   /// Create a new user
   Future<Result<UserEntity, Exception>> createUser(UserEntity user);
-  
+
   /// Delete a user by ID
   Future<Result<bool, Exception>> deleteUser(String id);
-  
+
   /// Update an existing user
   Future<Result<UserEntity, Exception>> updateUser(UserEntity user);
 }
@@ -121,9 +121,9 @@ import '../entities/user_entity.dart';
 import '../repositories/user_repository.dart';
 
 @LazySingleton()
-class GetUserUseCase 
+class GetUserUseCase
     extends BaseUseCase<String, Result<UserEntity, Exception>> {
-  
+
   const GetUserUseCase({required this.repository});
 
   final UserRepository repository;
@@ -142,9 +142,9 @@ class GetUserUseCase
 import 'package:commons/commons.dart';
 import 'package:injectable/injectable.dart';
 
-class AuthenticateUserUseCase 
+class AuthenticateUserUseCase
     extends BaseUseCase<AuthRequest, Result<AuthToken, Exception>> {
-  
+
   AuthenticateUserUseCase({
     required this.authRepository,
     required this.sessionRepository,
@@ -237,7 +237,7 @@ abstract class UserException implements Exception {
 class UserNotFoundException extends UserException {
   UserNotFoundException(this.userId);
   final String userId;
-  
+
   @override
   String get message => 'User $userId not found';
 }
@@ -245,7 +245,7 @@ class UserNotFoundException extends UserException {
 class InvalidUserException extends UserException {
   InvalidUserException(this.reason);
   final String reason;
-  
+
   @override
   String get message => 'Invalid user: $reason';
 }

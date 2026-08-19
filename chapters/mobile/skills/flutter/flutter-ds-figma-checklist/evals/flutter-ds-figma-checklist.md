@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-ds-figma-checklist  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-figma-checklist`  
-**Scanned:** 2026-06-16 15:00:44 UTC  
+**Skill:** flutter-ds-figma-checklist
+**Source:** `../`
+**Scanned:** 2026-06-16 15:00:44 UTC
 
 ## Risk Assessment
 

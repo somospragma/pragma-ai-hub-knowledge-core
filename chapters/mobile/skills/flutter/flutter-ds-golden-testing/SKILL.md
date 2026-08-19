@@ -11,7 +11,6 @@ description: >
   Use when creating visual snapshot tests, verifying pixel-perfect rendering,
   or setting up golden tests for light/dark themes and all variants/states.
 ---
-
 # Golden Testing
 
 ## Framework: Alchemist

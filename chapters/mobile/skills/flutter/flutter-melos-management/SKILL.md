@@ -1,19 +1,19 @@
 ---
 id: flutter-melos-management
-version: 1.1.0
+name: flutter-melos-management
+version: 1.2.0
 scope: stack
 type: skill
 chapter: mobile
 stack: [flutter]
 description: >
-  Professional management of Flutter monorepos with Melos 7.x. Use this skill for everything related to Melos: initial setup, pubspec.yaml workspace configuration, bootstrap, scripts, exec, versioning with Conventional Commits, publishing, CI/CD integration, adding packages, managing dependencies across packages, and workspace maintenance. Triggers on 'melos', 'monorepo', 'melos bootstrap', 'melos run', 'melos exec', 'melos version', 'add package to monorepo', 'shared package', 'workspace', 'resolution: workspace', or any question about managing multiple Flutter packages together. Stack: melos 7.5.1, Dart 3.8+, Flutter 3.32+.
+  Professional management of Flutter monorepos with Melos 7+ (including 8.x). Use this skill for everything related to Melos: initial setup, pubspec.yaml workspace configuration, bootstrap, scripts, exec, versioning with Conventional Commits, publishing, CI/CD integration, adding packages, managing dependencies across packages, and workspace maintenance. Triggers on 'melos', 'monorepo', 'melos bootstrap', 'melos run', 'melos exec', 'melos version', 'add package to monorepo', 'shared package', 'workspace', 'resolution: workspace', or any question about managing multiple Flutter packages together. Stack: Melos 7+, Dart 3.9+, Flutter 3.32+.
 ---
-
-# Melos 7.x — Flutter Monorepo Management
+# Melos 7+ — Flutter Monorepo Management
 
 Professional management of multi-package Flutter repositories.
-Melos 7.x uses **Dart pub workspaces** — no `melos.yaml`, no `pubspec_overrides.yaml`.
-All configuration lives in the root `pubspec.yaml`.
+Melos 7+ uses **Dart pub workspaces**. New workspaces configure Melos in the
+root `pubspec.yaml`; `melos.yaml` is supported only as a legacy Melos 6 format.
 
 ---
 
@@ -24,7 +24,7 @@ All configuration lives in the root `pubspec.yaml`.
 dart pub global activate melos
 
 # Verify
-melos --version   # should show 7.5.1
+melos --version   # use the version pinned by the workspace
 
 # Add to PATH if not already (add to ~/.zshrc or ~/.bashrc)
 export PATH="$PATH:$HOME/.pub-cache/bin"
@@ -64,7 +64,7 @@ my_project/
 
 ## Root pubspec.yaml — Complete Configuration
 
-In Melos 7.x, the root `pubspec.yaml` replaces `melos.yaml` entirely.
+In Melos 7+, the root `pubspec.yaml` replaces `melos.yaml` for new workspaces.
 
 ```yaml
 # pubspec.yaml (workspace root)
@@ -73,10 +73,10 @@ description: Workspace root — not a publishable package.
 publish_to: none
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"   # Dart 3.6+ required for pub workspaces
+  sdk: ">=3.9.0 <4.0.0"   # Dart 3.9+ is the reliable baseline for pub workspaces
 
 # ─── Pub Workspaces ───────────────────────────────────────────────────────────
-# List all packages explicitly — globs are not yet supported
+# Explicit package paths are clearest; current Melos also accepts workspace globs.
 workspace:
   - apps/app_mobile
   - apps/app_tablet
@@ -87,7 +87,7 @@ workspace:
   - packages/feature_checkout
 
 dev_dependencies:
-  melos: ^7.5.1
+  melos: ^8.0.0
 
 # ─── Melos Configuration ──────────────────────────────────────────────────────
 melos:
@@ -181,7 +181,7 @@ melos:
         melos run test
       description: Full CI pipeline — format, analyze, codegen, test
 
-    # ── Script Groups (7.x) ────────────────────────────────────────────────────
+    # ── Script Groups (7+) ─────────────────────────────────────────────────────
     # Groups allow running related scripts together
     groups:
       quality:
@@ -205,10 +205,10 @@ version: 0.1.0
 publish_to: none
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.32.0"
 
-# ← Required in every workspace package (Melos 7.x / pub workspaces)
+# ← Required in every non-root workspace package (Melos 7+ / pub workspaces)
 resolution: workspace
 
 dependencies:
@@ -249,7 +249,7 @@ dev_dependencies:
 ### Bootstrap
 
 ```bash
-# Resolve all workspace dependencies (replaces melos bootstrap in 7.x)
+# Resolve all workspace dependencies from the root
 dart pub get
 
 # Or use melos bootstrap (still works, calls dart pub get internally)
@@ -257,7 +257,7 @@ melos bootstrap
 melos bs
 ```
 
-> In Melos 7.x, `dart pub get` at the root resolves all workspace packages.
+> In Melos 7+, `dart pub get` at the root resolves all workspace packages.
 > No `pubspec_overrides.yaml` files are created.
 
 ### Exec
@@ -289,7 +289,7 @@ melos exec --order-dependents -- "flutter pub get"
 ```bash
 # List all available scripts
 melos run
-melos run --list   # 7.x: shows scripts as a list
+melos run --list   # lists available scripts
 
 # Run a specific script
 melos run analyze
@@ -297,11 +297,11 @@ melos run test
 melos run build_runner
 melos run ci
 
-# Run with package filter (7.x)
+# Run with a package filter
 melos run test --scope=feature_auth
 ```
 
-### Format (built-in in 7.x)
+### Format (built-in in 7+)
 
 ```bash
 # Format all packages
@@ -326,7 +326,7 @@ melos list --long
 # List as JSON
 melos list --json
 
-# List as Mermaid diagram (7.x)
+# List as Mermaid diagram
 melos list --mermaid
 
 # List packages that depend on a specific package
@@ -429,7 +429,7 @@ version: 0.1.0
 publish_to: none
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.32.0"
 
 resolution: workspace
@@ -467,7 +467,7 @@ dart pub get
 
 ---
 
-## .gitignore for Melos 7.x Workspaces
+## .gitignore for Melos 7+ Workspaces
 
 ```gitignore
 # Pub / Dart tool
@@ -475,7 +475,7 @@ dart pub get
 .packages
 build/
 
-# Melos 7.x — no pubspec_overrides.yaml generated
+# Melos 7+ — no pubspec_overrides.yaml generated
 # (nothing extra to ignore compared to a regular Flutter project)
 ```
 
@@ -509,7 +509,7 @@ jobs:
           cache: true
 
       - name: Install Melos
-        run: dart pub global activate melos 7.5.1
+        run: dart pub global activate melos 8.0.0
 
       - name: Bootstrap workspace
         run: melos bootstrap
@@ -558,7 +558,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Install Melos
-        run: dart pub global activate melos 7.5.1
+        run: dart pub global activate melos 8.0.0
 
       - name: Bootstrap
         run: melos bootstrap
@@ -600,7 +600,7 @@ scripts:
 | `melos: command not found` | Not in PATH | Add `$HOME/.pub-cache/bin` to PATH |
 | `Bootstrap fails on CI` | Missing `fetch-depth: 0` | Add `fetch-depth: 0` to `actions/checkout` |
 | `Version command finds no changes` | No Conventional Commits since last tag | Check commit messages follow the format |
-| `Workspace globs not supported` | Trying to use `workspace: - packages/**` | List all packages explicitly in `workspace:` |
+| `Package not resolved from workspace` | Target does not match root `workspace:` entries | Add its path or a matching workspace glob, then run `dart pub get` |
 
 ---
 

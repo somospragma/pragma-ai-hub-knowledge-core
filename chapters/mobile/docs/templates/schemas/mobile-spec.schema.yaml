@@ -1,0 +1,777 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://pragma.ai/schemas/mobile/mobile-spec.schema.yaml"
+title: Mobile Spec Packet
+type: object
+additionalProperties: true
+required:
+  - schema_version
+  - workflow
+  - spec_level
+  - execution_mode
+  - evidence_mode
+  - status
+  - inputs
+  - external_access
+  - agent_permissions
+  - human_review
+  - artifact_plan
+  - success_criteria
+  - handoffs
+properties:
+  schema_version:
+    type: integer
+    minimum: 1
+  workflow:
+    type: string
+    enum:
+      - new-component
+      - new-view
+      - new-feature
+      - refactor-component
+      - refactor-feature
+      - test-plan
+      - fix-pr-comments
+  spec_level:
+    type: string
+    enum: [mini, standard, full]
+  execution_mode:
+    type: string
+    enum: [propose_then_apply]
+  evidence_mode:
+    type: string
+    enum: [minimal, standard]
+    default: minimal
+  status:
+    type: string
+    enum:
+      - draft
+      - proposed
+      - approved_for_execution
+      - pending_human_review
+      - completed
+      - blocked_input
+  language:
+    type: object
+    additionalProperties: true
+    properties:
+      review_documents:
+        type: string
+        enum: [es]
+  inputs:
+    type: object
+    additionalProperties: true
+    properties:
+      figma_url:
+        type: string
+      figma_scope:
+        type: string
+        enum: [view, component_inventory]
+      golden_tests:
+        type: boolean
+        default: false
+      documentation:
+        type: boolean
+        default: false
+      pr_comments_source:
+        type: object
+        additionalProperties: true
+        properties:
+          kind:
+            type: string
+            enum: [pr_url, inline, exported_file, integration]
+          value:
+            type: string
+          access_status:
+            type: string
+            enum: [pending, available, blocked_input]
+  human_review:
+    type: object
+    additionalProperties: false
+    required:
+      - initial_spec_approval
+    properties:
+      initial_spec_approval:
+        type: string
+        enum: [required]
+      layer_checkpoints:
+        type: string
+        enum: [required, not_required]
+      stage_checkpoints:
+        type: string
+        enum: [required, not_required]
+      last_decision:
+        type: string
+        enum: [pending, approved, changes_requested, blocked]
+  external_access:
+    type: object
+    additionalProperties: true
+    required: [figma_mcp]
+    properties:
+      figma_mcp:
+        type: object
+        additionalProperties: true
+        required: [required, status, checks, evidence]
+        properties:
+          required:
+            type: boolean
+          status:
+            type: string
+            enum: [not_required, pending, verified, blocked_input]
+          checks:
+            type: array
+            items:
+              type: string
+          evidence:
+            type: string
+  execution_capabilities:
+    type: object
+    additionalProperties: false
+    required: [subagent_delegation, fallback_policy]
+    properties:
+      subagent_delegation:
+        type: string
+        enum: [pending, available, unavailable]
+      fallback_policy:
+        type: string
+        enum: [delegate_or_controller_executes]
+  agent_permissions:
+    type: object
+    minProperties: 1
+    additionalProperties:
+      type: object
+      additionalProperties: true
+      required:
+        - can_read
+        - can_write
+        - can_create_files
+        - can_modify_files
+        - can_delete_files
+        - can_call_external_tools
+        - evidence_required
+      properties:
+        can_read:
+          type: array
+          items:
+            type: string
+        can_write:
+          type: object
+          additionalProperties: false
+          properties:
+            spec_sections:
+              type: array
+              items:
+                type: string
+            artifact_targets:
+              type: array
+              items:
+                type: string
+            context_sections:
+              type: array
+              items:
+                type: string
+            evidence:
+              type: array
+              items:
+                type: string
+            generated_files_source:
+              type: string
+              enum: [artifact_plan.planned]
+        can_create_files:
+          type: boolean
+        can_modify_files:
+          type: boolean
+        can_delete_files:
+          type: boolean
+        can_call_external_tools:
+          type: array
+          items:
+            type: string
+        evidence_required:
+          type: array
+          items:
+            type: string
+  design_source:
+    type: object
+    additionalProperties: true
+  literal_texts:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+      required: [id, text, source]
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        source:
+          type: string
+        editable_by_agent:
+          type: boolean
+  layout_constraints:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+  assets:
+    type: array
+    items:
+      type: object
+      additionalProperties: true
+      required:
+        - id
+        - figma_node_id
+        - kind
+        - figma_export
+        - status
+      properties:
+        id:
+          type: string
+        figma_node_id:
+          type: string
+        kind:
+          type: string
+          enum: [icon, image, illustration, logo]
+        figma_export:
+          type: object
+          additionalProperties: false
+          required: [source, format, archive_path, sha256, status]
+          properties:
+            source:
+              type: string
+              const: figma_mcp
+            format:
+              type: string
+              enum: [svg, png, jpg, webp]
+            archive_path:
+              type: string
+              pattern: "^source-assets/figma/"
+            sha256:
+              type: string
+              pattern: "^sha256:[a-f0-9]{64}$"
+            status:
+              type: string
+              enum: [downloaded, blocked_input]
+        status:
+          type: string
+          enum: [resolved, blocked_input]
+  visual_manifest:
+    type: object
+    additionalProperties: false
+    required:
+      - reference_screenshot
+      - assets
+      - icons
+      - typography
+      - screen_chrome
+      - reconciliation
+    properties:
+      reference_screenshot:
+        type: object
+        additionalProperties: false
+        required: [node_id, status, reference]
+        properties:
+          node_id:
+            type: string
+          status:
+            type: string
+            enum: [captured, blocked_input]
+          reference:
+            type: string
+      assets:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required:
+            - id
+            - asset_id
+            - source_node_id
+            - visible_container_node_id
+            - render_strategy
+            - crop
+            - status
+          properties:
+            id:
+              type: string
+            asset_id:
+              type: string
+            source_node_id:
+              type: string
+            visible_container_node_id:
+              type: string
+            render_strategy:
+              type: string
+              enum: [direct_asset, explicit_clip_transform]
+            crop:
+              type: object
+              additionalProperties: true
+              required: [required]
+              properties:
+                required:
+                  type: boolean
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      icons:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required: [id, asset_id, figma_node_id, strategy, status]
+          properties:
+            id:
+              type: string
+            asset_id:
+              type: string
+            figma_node_id:
+              type: string
+            strategy:
+              type: string
+              enum: [ds_icon_exact, figma_svg_asset]
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      typography:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required:
+            - text_node_id
+            - font_family
+            - font_size
+            - font_weight
+            - line_height
+            - text_align
+            - token
+            - figma_source
+            - status
+          properties:
+            text_node_id:
+              type: string
+            font_family:
+              type: string
+            font_size:
+              type: [number, string]
+            font_weight:
+              type: [number, string]
+            line_height:
+              type: [number, string]
+            text_align:
+              type: string
+            token:
+              type: string
+            figma_source:
+              type: object
+              additionalProperties: false
+              required: [source, style_id, font_resolution]
+              properties:
+                source:
+                  type: string
+                  const: figma_mcp
+                style_id:
+                  type: string
+                font_resolution:
+                  type: string
+                  enum: [exact_project_font, blocked_input]
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      screen_chrome:
+        type: object
+        additionalProperties: false
+        required: [bottom_navigation]
+        properties:
+          bottom_navigation:
+            type: object
+            additionalProperties: true
+            required: [figma_visible, ownership, verification]
+            properties:
+              figma_visible:
+                type: boolean
+              ownership:
+                type: string
+                enum: [existing_app_shell, view_scaffold, not_present, blocked_input]
+              verification:
+                type: string
+      reconciliation:
+        type: object
+        additionalProperties: false
+        required:
+          - visible_element_count
+          - resolved_element_count
+          - unresolved_ids
+          - status
+          - visual_verification_required
+        properties:
+          visible_element_count:
+            type: integer
+            minimum: 0
+          resolved_element_count:
+            type: integer
+            minimum: 0
+          unresolved_ids:
+            type: array
+            items:
+              type: string
+          status:
+            type: string
+            enum: [pending, complete, blocked_input]
+          visual_verification_required:
+            type: boolean
+  layout_manifest:
+    type: object
+    additionalProperties: false
+    required: [root_node_id, viewport, nodes, reconciliation, tolerances]
+    properties:
+      root_node_id:
+        type: string
+      viewport:
+        type: object
+        additionalProperties: false
+        required: [width, height, device_pixel_ratio]
+        properties:
+          width:
+            type: number
+            exclusiveMinimum: 0
+          height:
+            type: number
+            exclusiveMinimum: 0
+          device_pixel_ratio:
+            type: number
+            exclusiveMinimum: 0
+      nodes:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required:
+            - figma_node_id
+            - parent_node_id
+            - child_index
+            - kind
+            - bounds
+            - layout
+            - shape
+            - status
+          properties:
+            figma_node_id:
+              type: string
+            parent_node_id:
+              type: string
+            child_index:
+              type: integer
+              minimum: 0
+            kind:
+              type: string
+              enum: [frame, group, component, instance, text, image, icon, vector, shape, navigation]
+            bounds:
+              type: object
+              additionalProperties: false
+              required: [x, y, width, height]
+              properties:
+                x: { type: number }
+                y: { type: number }
+                width: { type: number, exclusiveMinimum: 0 }
+                height: { type: number, exclusiveMinimum: 0 }
+            layout:
+              type: object
+              additionalProperties: true
+              required: [direction, alignment, padding, item_gap, clip]
+              properties:
+                direction:
+                  type: string
+                  enum: [horizontal, vertical, stack, none]
+                alignment:
+                  type: string
+                padding:
+                  type: object
+                  additionalProperties: false
+                  required: [top, right, bottom, left]
+                  properties:
+                    top: { type: number }
+                    right: { type: number }
+                    bottom: { type: number }
+                    left: { type: number }
+                item_gap:
+                  type: number
+                clip:
+                  type: boolean
+            shape:
+              type: object
+              additionalProperties: true
+              required: [top_left, top_right, bottom_right, bottom_left, border_width]
+              properties:
+                top_left: { type: number, minimum: 0 }
+                top_right: { type: number, minimum: 0 }
+                bottom_right: { type: number, minimum: 0 }
+                bottom_left: { type: number, minimum: 0 }
+                border_width: { type: number, minimum: 0 }
+            status:
+              type: string
+              enum: [resolved, blocked_input]
+      reconciliation:
+        type: object
+        additionalProperties: false
+        required: [visible_node_count, resolved_node_count, unresolved_ids, order_verified, status]
+        properties:
+          visible_node_count: { type: integer, minimum: 0 }
+          resolved_node_count: { type: integer, minimum: 0 }
+          unresolved_ids:
+            type: array
+            items: { type: string }
+          order_verified: { type: boolean }
+          status:
+            type: string
+            enum: [pending, complete, blocked_input]
+      tolerances:
+        type: object
+        additionalProperties: false
+        required: [geometry_dp, global_pixel_diff_percent, regional_pixel_diff_percent]
+        properties:
+          geometry_dp:
+            type: number
+            const: 1
+          global_pixel_diff_percent:
+            type: number
+            const: 2
+          regional_pixel_diff_percent:
+            type: number
+            const: 4
+  canonical_spec:
+    type: object
+    additionalProperties: true
+  inventory:
+    type: object
+    additionalProperties: true
+  dag:
+    type: object
+    additionalProperties: true
+  contracts:
+    type: object
+    additionalProperties: true
+  constraints:
+    type: object
+    additionalProperties: true
+  technical_plan:
+    type: object
+    additionalProperties: true
+  artifact_plan:
+    type: object
+    additionalProperties: true
+    required:
+      - planned
+    properties:
+      planned:
+        type: array
+        items:
+          type: object
+          additionalProperties: true
+          required: [target_id, path, action, owner]
+          properties:
+            target_id:
+              type: string
+            path:
+              type: string
+            action:
+              type: string
+              enum: [create, modify, move, delete, verify]
+            owner:
+              type: string
+            group:
+              type: string
+              enum:
+                - ds_components
+                - app_view
+                - scaffold
+                - domain
+                - data
+                - presentation
+                - wiring
+                - tests
+                - unit_tests
+                - widget_tests
+                - integration_tests
+                - golden_tests
+                - widgetbook
+                - docs
+                - audit
+                - delivery
+            source_asset:
+              type: object
+              additionalProperties: false
+              required: [asset_id, archive_path, sha256, copy_mode]
+              properties:
+                asset_id:
+                  type: string
+                archive_path:
+                  type: string
+                  pattern: "^source-assets/figma/"
+                sha256:
+                  type: string
+                  pattern: "^sha256:[a-f0-9]{64}$"
+                copy_mode:
+                  type: string
+                  enum: [byte_identical]
+  success_criteria:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: true
+      required: [id, description, evidence]
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        evidence:
+          type: array
+          minItems: 1
+          items:
+            type: string
+  handoffs:
+    type: array
+    minItems: 1
+    items:
+      type: object
+      additionalProperties: true
+      required: [phase, agent, read_sections]
+      properties:
+        phase:
+          type: string
+        agent:
+          type: string
+        read_sections:
+          type: array
+          minItems: 1
+          items:
+            type: string
+allOf:
+  - if:
+      properties:
+        spec_level:
+          const: mini
+    then:
+      properties:
+        human_review:
+          properties:
+            layer_checkpoints:
+              enum: [not_required, required]
+  - if:
+      properties:
+        spec_level:
+          enum: [standard, full]
+    then:
+      properties:
+        human_review:
+          required: [layer_checkpoints, stage_checkpoints]
+          properties:
+            layer_checkpoints:
+              const: required
+  - if:
+      properties:
+        workflow:
+          enum: [new-component, new-view]
+    then:
+      properties:
+        external_access:
+          properties:
+            figma_mcp:
+              properties:
+                required:
+                  const: true
+                status:
+                  enum: [pending, verified, blocked_input]
+  - if:
+      properties:
+        workflow:
+          const: new-component
+    then:
+      properties:
+        inputs:
+          required: [component_name, figma_url]
+  - if:
+      properties:
+        workflow:
+          const: new-view
+    then:
+      required: [visual_manifest, layout_manifest]
+      properties:
+        inputs:
+          required: [view_name, figma_url, user_story]
+  - if:
+      properties:
+        workflow:
+          const: new-feature
+        inputs:
+          required: [figma_url]
+    then:
+      properties:
+        external_access:
+          properties:
+            figma_mcp:
+              properties:
+                required:
+                  const: true
+                status:
+                  enum: [pending, verified, blocked_input]
+        inputs:
+          required: [figma_scope]
+  - if:
+      properties:
+        workflow:
+          const: new-feature
+        inputs:
+          properties:
+            figma_scope:
+              const: view
+          required: [figma_scope]
+    then:
+      required: [visual_manifest, layout_manifest]
+  - if:
+      properties:
+        workflow:
+          const: new-feature
+    then:
+      required: [execution_capabilities]
+      properties:
+        human_review:
+          required: [initial_spec_approval, layer_checkpoints, stage_checkpoints]
+          properties:
+            initial_spec_approval:
+              const: required
+            layer_checkpoints:
+              const: required
+            stage_checkpoints:
+              const: required
+        inputs:
+          required: [feature_name, description]
+  - if:
+      properties:
+        workflow:
+          const: refactor-feature
+    then:
+      properties:
+        inputs:
+          required: [feature_name, feature_path, refactor_goal]
+  - if:
+      properties:
+        workflow:
+          const: test-plan
+    then:
+      properties:
+        inputs:
+          required: [feature_name, feature_path]
+  - if:
+      properties:
+        workflow:
+          const: fix-pr-comments
+    then:
+      properties:
+        inputs:
+          required: [pr_comments_source]
+          properties:
+            pr_comments_source:
+              required: [kind, value, access_status]

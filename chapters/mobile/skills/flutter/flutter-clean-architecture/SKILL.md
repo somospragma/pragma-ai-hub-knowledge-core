@@ -13,7 +13,6 @@ license: Complete terms in LICENSE.txt
 metadata:
   category: productivity
 ---
-
 # Clean Architecture in Flutter
 
 Canonical reference for layers, boundaries, and dependency rules.
@@ -34,7 +33,7 @@ Code examples use these base classes from `package:commons/commons.dart`. Substi
 
 | Mode | Starting point | Strategy |
 |---|---|---|
-| **Greenfield** | New project, blank slate | Apply the full structure from day one. Use folder templates and contracts in reference files directly. |
+| **Greenfield** | New project, blank slate | Apply the full structure from daand one. Use folder templates and contracts in reference files directly. |
 | **Refactoring** | Existing codebase with violations | Apply incrementally — one feature at a time. Run the violation checklist to prioritize. Never rewrite everything at once. |
 
 ### Incremental Refactoring Order

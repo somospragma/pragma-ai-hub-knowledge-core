@@ -1,0 +1,79 @@
+schema_version: 1
+schema_ref: schemas/dependencies-contract.schema.yaml
+
+ownership:
+  file: dependencies-contract.yaml
+  owns:
+    - dependency_catalog
+    - external_dependencies
+    - internal_dependencies
+    - allowed_dependency_matrix
+  must_not_define:
+    - topology
+    - targets
+    - monorepo
+    - pipeline
+    - layer_rules
+    - generation_policies
+    - architecture_constraints
+
+external_dependencies:
+  design_system:
+    enabled: true
+    required: true
+    package_name: "design_system"
+    source: "target" # target | git | hosted | none
+    target_id: "design_system"
+    import_mode: "package"
+    barrel_import: "package:design_system/design_system.dart"
+  shared_core:
+    enabled: false
+    required_when_shared_core_mode: "external_core_package"
+    package_name: "app_core"
+    source: "target" # target | git | hosted | none
+    target_id: "core"
+    import_mode: "package"
+    preferred_imports:
+      failures: "package:app_core/app_core.dart"
+      result: "package:app_core/app_core.dart"
+      use_case: "package:app_core/app_core.dart"
+  network_client:
+    enabled: false
+    package_name: "network_client"
+    source: "none"
+    target_id: ""
+
+internal_dependencies:
+  app_core:
+    enabled: false
+    path_hint: "lib/src/core"
+  app_shared:
+    enabled: false
+    path_hint: "lib/src/shared"
+
+allowed_dependency_matrix:
+  domain:
+    allowed_external_packages:
+      - "app_core"
+    forbidden_packages:
+      - "flutter"
+      - "design_system"
+      - "data_layer_impl_private"
+  data:
+    allowed_external_packages:
+      - "app_core"
+      - "network_client"
+    forbidden_packages:
+      - "design_system"
+      - "presentation_layer_private"
+  presentation:
+    allowed_external_packages:
+      - "design_system"
+      - "app_core"
+    forbidden_packages:
+      - "data_layer_impl_private"
+
+validation:
+  fail_if_design_system_missing: true
+  fail_if_shared_core_required_but_missing: true
+  fail_if_target_dependency_missing: true

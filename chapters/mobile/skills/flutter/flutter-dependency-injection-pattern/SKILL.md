@@ -9,7 +9,6 @@ name: flutter-dependency-injection-pattern
 description: >
   Configures and wires dependency injection in Flutter using GetIt + Injectable. Use this skill when the user asks about DI, GetIt configuration, registering a service, 'how do I inject X?', 'wire my dependencies', 'add to DI', @injectable, @lazySingleton, @singleton, injection modules, or when adding any new class that must be resolved via getIt(). Also triggers when creating a new feature that requires DI registration, implementing flow-scoped instances (@Injectable(cache: true) + getIt.releaseInstance()), or registering third-party types via @module. Stack: get_it ^9.2.1, injectable ^3.0.0, injectable_generator, build_runner. Dart 3.8+ / Flutter 3.32+.
 ---
-
 # DI in Flutter — GetIt + Injectable
 
 Canonical DI configuration. GetIt is the service locator; Injectable generates the wiring.

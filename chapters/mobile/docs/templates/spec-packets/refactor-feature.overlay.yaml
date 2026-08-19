@@ -1,0 +1,37 @@
+workflow: refactor-feature
+entry_agent: refactoring-advisor
+base_spec_level: full
+purpose: Refactor an existing feature with risk analysis, staged execution and documentation.
+required_inputs:
+  - feature_name
+  - feature_path
+  - refactor_goal
+optional_inputs:
+  - evidence_mode
+required_external_access:
+  figma_mcp:
+    required: false
+required_agents:
+  - refactoring-advisor
+  - code-auditor
+artifact_groups:
+  - scaffold
+  - domain
+  - data
+  - presentation
+  - wiring
+  - tests
+  - docs
+  - audit
+required_human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+delete_elevation:
+  required_when_action_exists: delete
+  permission: agent_permissions.refactoring-advisor.can_delete_files
+  human_approval_required: true
+notes:
+  - Refactoring reports must be represented as artifact_plan.planned[group=docs].
+  - Delete actions remain blocked until the spec explicitly grants delete permission.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

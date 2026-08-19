@@ -109,7 +109,7 @@ class FilePickerDataSource {
       // Validate size
       if (!await FileSecurity.isWithinSizeLimit(file, maxSizeBytes)) {
         return Left(FileFailure.fileTooLarge(
-          maxBytes: maxSizeBytes,
+          maxBandtes: maxSizeBytes,
           actualBytes: await file.length(),
         ));
       }

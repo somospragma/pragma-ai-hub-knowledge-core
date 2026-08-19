@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-feature-development  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-feature-development`  
-**Scanned:** 2026-06-22 17:57:39 UTC  
+**Skill:** flutter-feature-development
+**Source:** `../`
+**Scanned:** 2026-06-22 17:57:39 UTC
 
 ## Risk Assessment
 
@@ -27,8 +27,8 @@
 
 ### 🟢 LOW: EA3
 
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
+**Location:** `LICENSE.txt:11`
+**Confidence:** 70%
 
 **Message:** Scope Creep
 
@@ -38,8 +38,8 @@
 
 ### 🟢 LOW: EA3
 
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
+**Location:** `LICENSE.txt:11`
+**Confidence:** 70%
 
 **Message:** Scope Creep
 

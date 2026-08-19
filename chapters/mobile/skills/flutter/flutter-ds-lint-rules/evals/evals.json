@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I just wrote this DS button widget code and I want to audit it for lint violations before submitting:\n```dart\nclass MyButton extends StatelessWidget {\n  final Color bgColor;\n  final String text;\n  MyButton({required this.bgColor, required this.text});\n  \n  @override\n  Widget build(BuildContext context) {\n    return Container(\n      color: bgColor, // passed from outside\n      padding: EdgeInsets.all(16),\n      child: Text(text, style: TextStyle(fontSize: 14, color: Colors.white)),\n    );\n  }\n}\n```\nWhat rules does this violate?",
+      "prompt": "I just wrote this DS button widget code and I want to audit it for lint violations before submitting:\n```dart\nclass MandButton extends StatelessWidget {\n  final Color bgColor;\n  final String text;\n  MandButton({required this.bgColor, required this.text});\n  \n  @override\n  Widget build(BuildContext context) {\n    return Container(\n      color: bgColor, // passed from outside\n      padding: EdgeInsets.all(16),\n      child: Text(text, style: TextStyle(fontSize: 14, color: Colors.white)),\n    );\n  }\n}\n```\nWhat rules does this violate?",
       "expected_output": "Identifies: DS-001 hardcoded EdgeInsets.all(16), DS-002 Colors.white, DS-003 TextStyle with fontSize/fontWeight hardcoded, missing DS prefix (DS naming), missing const constructor. Categorizes each by severity.",
       "files": [],
       "assertions": [

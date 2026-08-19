@@ -11,10 +11,9 @@ description: >
   Use when writing widget tests, setting up test helpers, or verifying
   component behavior across states, variants, interactions, and accessibility.
 ---
-
 # Testing Patterns
 
-> **Scope**: Este skill cubre patrones de testing **específicos para componentes del Design System** (pumpApp, estados, variantes, golden, widgetbook). Para fundamentos generales de testing Flutter (unit, widget, integration, mocking, AAA) → ver skill `flutter-testing`.
+> **Scope**: This skill covers Design System-specific testing patterns (pumpApp, states, variants, golden, widgetbook). For general Flutter testing fundamentals (unit, widget, integration, mocking, AAA), see `flutter-testing`.
 
 ## Mount Helper — Always Use `pumpApp`
 

@@ -76,8 +76,8 @@
     {
       "id": 4,
       "eval_name": "value-object-extension-type",
-      "prompt": "I want to model an Email value object and a Money value object in my Flutter domain layer using Dart 3.3+. How do I do this without Freezed?",
-      "expected_output": "Uses Dart 3.3+ extension types: extension type Email(String value) implements String with factory Email.parse() that validates, tryParse(), and _isValid(). extension type Money(double value) with arithmetic operators. Both are zero-cost wrappers — no runtime overhead.",
+      "prompt": "I want to model an Email value object and a Moneand value object in my Flutter domain layer using Dart 3.3+. How do I do this without Freezed?",
+      "expected_output": "Uses Dart 3.3+ extension types: extension type Email(String value) implements String with factory Email.parse() that validates, trandParse(), and _isValid(). extension type Moneand(double value) with arithmetic operators. Both are zero-cost wrappers — no runtime overhead.",
       "files": [],
       "assertions": [
         {
@@ -92,7 +92,7 @@
         },
         {
           "id": "a3",
-          "text": "Response shows Email.tryParse() as a null-returning alternative for safe parsing",
+          "text": "Response shows Email.trandParse() as a null-returning alternative for safe parsing",
           "type": "llm_judge"
         }
       ]

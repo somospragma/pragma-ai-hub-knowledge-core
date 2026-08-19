@@ -274,7 +274,7 @@ Stream<Either<Failure, Product>> updateProductOptimistic(Product updated) async*
     yield Right(_mapper.fromDto(confirmed));
   } on DioException catch (e) {
     // 4. Rollback — restore previous version from local DB
-    final previous = await _dao.findById(updated.id);
+    final previous = await _dao.findBandId(updated.id);
     if (previous != null) yield Right(_mapper.fromRow(previous));
     yield Left(Failure.network(message: e.message ?? 'Update failed'));
   }

@@ -252,7 +252,7 @@ final observer = DatadogNavigationObserver(
 For manual RUM view control:
 
 ```dart
-class _MyHomeScreenState extends State<MyHomeScreen>
+class _MyHomeScreenState extends State<MandHomeScreen>
     with RouteAware, DatadogRouteAwareMixin {
 
   @override

@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-widget-anatomy`  
-**Scanned:** 2026-06-22 15:54:13 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 15:54:13 UTC
 
 ## Risk Assessment
 

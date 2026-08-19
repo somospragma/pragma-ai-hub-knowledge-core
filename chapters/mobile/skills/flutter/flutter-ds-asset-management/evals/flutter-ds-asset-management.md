@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-ds-asset-management  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-asset-management`  
-**Scanned:** 2026-06-16 14:56:11 UTC  
+**Skill:** flutter-ds-asset-management
+**Source:** `../`
+**Scanned:** 2026-06-16 14:56:11 UTC
 
 ## Risk Assessment
 

@@ -1,0 +1,75 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://pragma.ai/schemas/mobile/dependencies-contract.schema.yaml"
+title: Mobile Dependencies Contract
+type: object
+additionalProperties: true
+required:
+  - schema_version
+  - ownership
+  - external_dependencies
+  - allowed_dependency_matrix
+properties:
+  schema_version:
+    type: integer
+    minimum: 1
+  ownership:
+    type: object
+    additionalProperties: false
+    required: [file, owns, must_not_define]
+    properties:
+      file:
+        const: dependencies-contract.yaml
+      owns:
+        type: array
+        contains:
+          const: dependency_catalog
+      must_not_define:
+        type: array
+        items:
+          type: string
+  external_dependencies:
+    type: object
+    additionalProperties:
+      type: object
+      additionalProperties: true
+      required: [enabled, source]
+      properties:
+        enabled:
+          type: boolean
+        source:
+          type: string
+          enum: [target, git, hosted, none]
+        target_id:
+          type: string
+        package_name:
+          type: string
+      allOf:
+        - if:
+            properties:
+              source:
+                const: target
+          then:
+            required: [target_id]
+            not:
+              required: [location]
+        - if:
+            properties:
+              source:
+                enum: [git, hosted]
+          then:
+            not:
+              required: [target_id]
+  internal_dependencies:
+    type: object
+    additionalProperties: true
+  allowed_dependency_matrix:
+    type: object
+    additionalProperties: true
+not:
+  anyOf:
+    - required: [topology]
+    - required: [targets]
+    - required: [pipeline]
+    - required: [layers]
+    - required: [generation_policies]
+    - required: [package_sources]

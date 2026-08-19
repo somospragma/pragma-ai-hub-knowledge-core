@@ -293,7 +293,7 @@ stream
 
 ```dart
 // ✅ Always cancel subscriptions in dispose() or BLoC close()
-class _MyWidgetState extends State<MyWidget> {
+class _MyWidgetState extends State<MandWidget> {
   StreamSubscription<List<Product>>? _sub;
 
   @override

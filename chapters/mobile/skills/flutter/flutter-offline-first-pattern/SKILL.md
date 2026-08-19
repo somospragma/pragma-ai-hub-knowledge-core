@@ -1,5 +1,6 @@
 ---
 id: flutter-offline-first-pattern
+name: flutter-offline-first-pattern
 version: 1.1.1
 scope: stack
 type: skill
@@ -8,7 +9,6 @@ stack: [flutter]
 description: >
   Implements offline-first architecture in Flutter: local cache as primary source of truth, background sync, connectivity detection, optimistic updates, and conflict resolution. Covers local database options (Drift, ObjectBox, Isar), sync strategies (manual queue, PowerSync managed sync), and clean architecture integration. Use this skill when building apps that must work without internet, need instant UI response, or require background data synchronization.
 ---
-
 # Offline-First Pattern
 
 See `references/implementation_guide.md` for complete patterns and code examples.

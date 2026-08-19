@@ -24,7 +24,7 @@ flutter build apk --release --split-per-abi
 flutter build ipa --release
 ```
 
-### Analyze size breakdown
+### Analyze the size breakdown
 
 ```bash
 # Generates app-size-analysis.json with a full breakdown by package/file

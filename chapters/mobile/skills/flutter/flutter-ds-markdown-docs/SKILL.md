@@ -11,7 +11,6 @@ description: >
   Use when generating README files for organisms, documenting component
   APIs, writing usage examples, or creating component catalogs.
 ---
-
 # Markdown Documentation
 
 ## When to Generate

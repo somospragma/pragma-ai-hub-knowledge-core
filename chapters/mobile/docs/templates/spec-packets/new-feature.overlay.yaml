@@ -1,0 +1,70 @@
+workflow: new-feature
+entry_agent: feature-builder
+base_spec_level: full
+purpose: Generate a complete feature across domain, data, presentation, wiring, mandatory automated tests and optional documentation.
+required_inputs:
+  - feature_name
+  - description
+optional_inputs:
+  - figma_url
+  - figma_scope
+  - api_contract
+  - entity_name
+  - fields
+  - api_endpoints
+  - user_story
+  - ui_components
+  - sequence_diagram
+  - target_location
+  - package_name
+  - workspace_root
+  - golden_tests
+  - documentation
+  - evidence_mode
+required_external_access:
+  figma_mcp:
+    required_when_input_exists: figma_url
+    preflight_agent: figma-analyzer
+    evidence: evidence/figma-mcp-preflight.md
+required_agents:
+  - feature-builder
+  - ds-orchestrator
+  - code-auditor
+  - test-engineer
+  - delivery-manager
+conditional_agents:
+  figma_url:
+    - figma-analyzer
+  golden_tests:
+    - golden-test-engineer
+artifact_groups:
+  - ds_components
+  - scaffold
+  - domain
+  - data
+  - presentation
+  - wiring
+  - unit_tests
+  - widget_tests
+  - integration_tests
+  - golden_tests
+  - docs
+  - audit
+  - delivery
+required_human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+notes:
+  - Unit, widget and integration tests are mandatory and must pass before audit and delivery.
+  - Golden tests run only when golden_tests=true; otherwise their skipped_by_input state must be recorded.
+  - Documentation runs only when documentation=true; otherwise its skipped_by_input state must be recorded.
+  - When documentation=true, project documentation must be represented as artifact_plan.planned[group=docs].
+  - feature-builder prefers Figma preflight and analysis through figma-analyzer when figma_url is provided.
+  - When figma_url is provided, figma_scope defaults to view. Use component_inventory only when the linked Figma content is intentionally not a screen this feature implements.
+  - When figma_scope=view, every visible icon, image, illustration, logo, and image-fill source must be downloaded into source-assets/figma with node id, format and SHA-256 before approval. visual_manifest and layout_manifest must resolve exact text, hierarchy/order, bounds, layout, four-corner radii and border width; the required fidelity report allows at most 1 dp geometry delta, 2% global pixel difference and 4% regional pixel difference.
+  - When figma_scope=component_inventory, Figma analysis remains limited to the DS inventory and does not require a screen-level layout manifest or pixel comparison.
+  - Native delegation is optional: feature-builder owns every mandatory phase and executes a specialist role contract when execution_capabilities.subagent_delegation=unavailable.
+  - Unit, widget, and integration tests are never skipped because a test-engineer subagent is unavailable.
+  - Delivery proposes branch, commit and PR text unless explicit git or gh permissions are granted.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

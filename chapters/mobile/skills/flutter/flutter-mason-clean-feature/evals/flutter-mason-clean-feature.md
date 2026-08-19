@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-mason-clean-feature  
-**Source:** `chapters/mobile/skills/flutter/flutter-mason-clean-feature`  
-**Scanned:** 2026-06-03 17:43:25 UTC  
+**Skill:** flutter-mason-clean-feature
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:25 UTC
 
 ## Risk Assessment
 
@@ -26,8 +26,8 @@
 
 ### 🟢 LOW: EA3
 
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
+**Location:** `LICENSE.txt:11`
+**Confidence:** 70%
 
 **Message:** Scope Creep
 
@@ -37,8 +37,8 @@
 
 ### 🟢 LOW: EA3
 
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
+**Location:** `LICENSE.txt:11`
+**Confidence:** 70%
 
 **Message:** Scope Creep
 

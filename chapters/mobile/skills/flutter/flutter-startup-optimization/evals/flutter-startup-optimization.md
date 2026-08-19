@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-startup-optimization  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-startup-optimization`  
-**Scanned:** 2026-06-16 15:27:45 UTC  
+**Skill:** flutter-startup-optimization
+**Source:** `../`
+**Scanned:** 2026-06-16 15:27:45 UTC
 
 ## Risk Assessment
 

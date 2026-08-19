@@ -12,7 +12,6 @@ license: Complete terms in LICENSE.txt
 metadata:
   category: productivity
 ---
-
 # Coding Standards
 
 ## Quick Reference
@@ -153,7 +152,7 @@ class ConfigDefaults {
 class UserEntity {
   final String id;
   final String name;
-  
+
   const UserEntity({required this.id, required this.name});
 }
 
@@ -161,7 +160,7 @@ class UserEntity {
 class UserRepository {
   late final UserLocalDataSource _localSource;
   late final UserRemoteDataSource _remoteSource;
-  
+
   void initialize() {
     _localSource = UserLocalDataSourceImpl(database);
     _remoteSource = UserRemoteDataSourceImpl(httpClient);
@@ -237,7 +236,7 @@ Dart uses underscore `_` prefix for private visibility. Naming follows standard 
 class UserRepository {
   late final UserRemoteDataSource _remoteSource;
   late final UserLocalDataSource _localSource;
-  
+
   void _initialize() { }
   String _formatName(String raw) => raw.trim();
 }
@@ -385,9 +384,9 @@ Entities should extend `Equatable` for shallow equality:
 class UserEntity extends Equatable {
   final String id;
   final String name;
-  
+
   const UserEntity({required this.id, required this.name});
-  
+
   @override
   List<Object> get props => [id, name];
 }

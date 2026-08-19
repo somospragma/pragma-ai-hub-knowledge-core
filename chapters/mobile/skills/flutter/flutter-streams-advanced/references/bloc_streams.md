@@ -356,7 +356,7 @@ void main() {
     );
 
     blocTest<SearchBloc, SearchState>(
-      'only last query is processed when typing fast',
+      'only the last query is processed when typing quickly',
       build: () {
         when(() => mockRepo.search('dart')).thenAnswer(
           (_) async => Right([SearchResult(id: '2', title: 'Dart')]),

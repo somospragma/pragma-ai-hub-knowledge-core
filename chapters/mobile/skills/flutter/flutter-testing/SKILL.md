@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-testing
 description: >
-  Defines how to write tests in Flutter- unit tests, widget tests, integration tests, golden tests, mutation tests, and native plugin testing. Use this skill when asking 'how do I test this?', 'how do I mock a dependency?', 'how do I write a BLoC test?', 'how do I test a widget?', 'how do I test a plugin?', or when implementing any test from scratch. For coverage thresholds, CI enforcement, and lcov reports, see flutter-test-coverage-strategy. Stack: flutter_test, bloc_test, mocktail, integration_test, fake_async.
+  Defines how to write tests in Flutter: unit tests, widget tests, integration tests, golden tests, mutation tests, and native plugin testing. Use this skill when asking 'how do I test this?', 'how do I mock a dependency?', 'how do I write a BLoC test?', 'how do I test a widget?', 'how do I test a plugin?', or when implementing any test from scratch. For coverage thresholds, CI enforcement, and lcov reports, see flutter-test-coverage-strategy. Stack: flutter_test, bloc_test, mocktail, integration_test, fake_async.
 ---
-
 # Flutter Testing
 
 ## Scope of This Skill
@@ -44,7 +43,7 @@ dev_dependencies:
       ▲▲▲  Unit Tests          (60–70%)  — UseCases, Repos, Mappers, BLoCs
 ```
 
-Golden tests and mutation tests are complementary — they do not replace the pyramid.
+Golden tests and mutation tests are complementary — they do not replace the testing pyramid.
 
 ---
 

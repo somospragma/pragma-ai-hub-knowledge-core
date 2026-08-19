@@ -14,7 +14,6 @@ description: >
   + 48×48 touch area), decorative images (must exclude from semantics),
   and multi-state widgets (loading, error, disabled must all be communicated).
 ---
-
 # Accessibility & Semantics
 
 ## Principles

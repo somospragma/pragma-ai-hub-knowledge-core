@@ -201,7 +201,7 @@ CI needs one `ExportOptions.plist` per flavor for `xcodebuild -exportArchive`:
     </dict>
     <key>signingCertificate</key>
     <string>Apple Distribution</string>
-    <key>stripSwiftSymbols</key>
+    <key>stripSwiftSandmbols</key>
     <true/>
     <key>uploadBitcode</key>
     <false/>

@@ -6,7 +6,7 @@
       "id": "eval-01",
       "name": "reactive-repository-watch-stream",
       "prompt": "How do I make my ProductRepository expose a stream that updates the UI automatically when data changes in the local database?",
-      "expected_output": "Explain the reactive repository pattern: declare a watchProducts() method returning Stream<Either<Failure, List<Product>>> in the abstract interface, implement it using a Drift DAO watchByCategory() stream (or equivalent watch query), and explain that writes to the DB automatically trigger the stream — no manual notification needed.",
+      "expected_output": "Explain the reactive repository pattern: declare a watchProducts() method returning Stream<Either<Failure, List<Product>>> in the abstract interface, implement it using a Drift DAO watchBandCategory() stream (or equivalent watch query), and explain that writes to the DB automatically trigger the stream — no manual notification needed.",
       "files": ["SKILL.md"],
       "assertions": [
         {
@@ -63,28 +63,28 @@
     {
       "id": "eval-03",
       "name": "riverpod-multi-source-provider-composition",
-      "prompt": "¿Cómo combino el estado de usuario y el carrito de compras en un único provider de Riverpod que actualice la UI cuando cambie cualquiera de los dos?",
-      "expected_output": "Show two independent StreamProviders (one for user, one for cart), then a composed provider using ref.watch on both. Demonstrate combining AsyncValues with whenData or a DashboardNotifier subscribing to both streams. Response must be in Spanish.",
+      "prompt": "How do I combine user state and shopping cart state in a single Riverpod provider that updates the UI when either one changes?",
+      "expected_output": "Show two independent StreamProviders (one for user, one for cart), then a composed provider using ref.watch on both. Demonstrate combining AsyncValues with whenData or a DashboardNotifier subscribing to both streams.",
       "files": ["SKILL.md"],
       "assertions": [
         {
           "id": "a03-1",
-          "text": "La respuesta debe mostrar dos StreamProviders independientes (usuario y carrito) y un provider compuesto que use ref.watch de ambos.",
+          "text": "Response must show two independent StreamProviders (user and cart) and a composed provider that uses ref.watch on both.",
           "type": "llm_judge"
         },
         {
           "id": "a03-2",
-          "text": "La respuesta debe demostrar cómo combinar los AsyncValue resultantes (por ejemplo con whenData/flatten o un AsyncNotifier) para producir un único estado en la UI.",
+          "text": "Response must demonstrate how to combine the resulting AsyncValues, for example with whenData/flatten or an AsyncNotifier, to produce a single UI state.",
           "type": "llm_judge"
         },
         {
           "id": "a03-3",
-          "text": "La respuesta debe estar en español (idioma del prompt) y NO debe sugerir rxdart ni combineLatest de rxdart.",
+          "text": "Response must NOT suggest rxdart or rxdart combineLatest.",
           "type": "llm_judge"
         },
         {
           "id": "a03-4",
-          "text": "La respuesta debe explicar que el provider compuesto se re-evalúa automáticamente cuando cualquiera de las dependencias cambia, sin necesidad de suscripciones manuales.",
+          "text": "Response must explain that the composed provider re-evaluates automatically when either dependency changes, without manual subscriptions.",
           "type": "llm_judge"
         }
       ]

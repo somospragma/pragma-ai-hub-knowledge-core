@@ -24,13 +24,13 @@
       ]
     },
     {
-      "id": "eval-03-fcm-token-management-spanish",
-      "prompt": "¿Cómo manejo el token de FCM y lo envío al servidor cuando se actualiza? El token puede cambiar después de que el usuario reinstala la app.",
+      "id": "eval-03-fcm-token-management",
+      "prompt": "How do I handle the FCM token and send it to the server when it updates? The token can change after the user reinstalls the app.",
       "_tool_scope": "flutter-push-strategy",
       "assertions": [
-        "La respuesta cubre tanto la obtención inicial del token (getToken()) como la escucha de actualizaciones (FirebaseMessaging.instance.onTokenRefresh stream) dentro del FcmPushProvider o el repositorio",
-        "La respuesta indica que el token debe enviarse al servidor propio cada vez que cambie (no solo en el primer login), e incluye un ejemplo de GetPushTokenUseCase o equivalente en la capa de dominio",
-        "La respuesta está en español (idioma del prompt) y menciona que el token puede invalidarse por reinstalación de la app, restauración de backup o rotación de claves FCM"
+        "Response covers both initial token retrieval (getToken()) and listening to updates (FirebaseMessaging.instance.onTokenRefresh stream) inside FcmPushProvider or the repository",
+        "Response states that the token must be sent to the owned server every time it changes, not only on the first login, and includes a GetPushTokenUseCase example or equivalent in the domain layer",
+        "Response mentions that the token can be invalidated by app reinstall, backup restore, or FCM key rotation"
       ]
     },
     {

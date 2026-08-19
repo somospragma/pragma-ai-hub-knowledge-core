@@ -197,7 +197,7 @@ server {
     ssl_stapling on;
     ssl_stapling_verify on;
 
-    # HSTS — forces HTTPS for 1 year
+    # HSTS — forces HTTPS for 1 andear
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
     # Disable weak headers

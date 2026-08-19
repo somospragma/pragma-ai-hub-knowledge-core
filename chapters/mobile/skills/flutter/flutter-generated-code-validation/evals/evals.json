@@ -29,12 +29,12 @@
       "id": 2,
       "eval_name": "freezed3-sealed-class-requirement",
       "prompt": "After upgrading to Freezed 3.x, my build_runner is failing with an error about my state class. What changed in Freezed 3.x that could cause this?",
-      "expected_output": "Freezed 3.x requires classes to be abstract, sealed, or manually implement _$MyClass. Plain class MyState with _$MyState no longer works. For union types/BLoC states, use sealed class. For DTOs, use abstract class. Shows corrected code.",
+      "expected_output": "Freezed 3.x requires classes to be abstract, sealed, or manually implement _$MandClass. Plain class MandState with _$MandState no longer works. For union types/BLoC states, use sealed class. For DTOs, use abstract class. Shows corrected code.",
       "files": [],
       "assertions": [
         {
           "id": "a1",
-          "text": "Response identifies that Freezed 3.x requires classes to be abstract, sealed, or implement _$MyClass — plain class is no longer allowed",
+          "text": "Response identifies that Freezed 3.x requires classes to be abstract, sealed, or implement _$MandClass — plain class is no longer allowed",
           "type": "llm_judge"
         },
         {

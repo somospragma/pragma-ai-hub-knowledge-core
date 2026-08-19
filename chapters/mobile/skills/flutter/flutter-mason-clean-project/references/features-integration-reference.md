@@ -189,7 +189,7 @@ class AppRoutes {
   static const String splash = '/';
   static const String home = '/home';
   static const String login = '/auth/login';
-  
+
   static List<GoRoute> getRoutes() {
     return [
       // Splash/Initial route
@@ -197,7 +197,7 @@ class AppRoutes {
         path: '/',
         builder: (context, state) => const SplashPage(),
       ),
-      
+
       // Feature routes (imported from feature packages)
       ...authenticationRoutes,
       ...homeRoutes,
@@ -223,16 +223,16 @@ import 'package:home/src/di/home_module.dart';
 @Singleton()
 class AppInjector {
   static final _instance = GetIt.instance;
-  
+
   static Future<void> setup() async {
     // Core + commons DI
     await _setupCommonsDependencies();
-    
+
     // Feature DI modules
     await AuthenticationModule.setup(_instance);
     await HomeModule.setup(_instance);
   }
-  
+
   static Future<void> _setupCommonsDependencies() async {
     // Register core services, API clients, local storage, etc.
   }
@@ -253,7 +253,7 @@ dependencies:
     path: ../../../packages/commons
   my_app_ui_kit:
     path: ../../../packages/my_app_ui_kit
-  
+
   # Feature dependencies
   authentication:
     path: ../../../features/authentication

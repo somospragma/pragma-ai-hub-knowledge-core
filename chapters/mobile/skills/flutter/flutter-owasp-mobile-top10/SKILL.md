@@ -1,5 +1,6 @@
 ---
 id: flutter-owasp-mobile-top10
+name: flutter-owasp-mobile-top10
 version: 2.1.1
 scope: stack
 type: skill
@@ -12,9 +13,8 @@ description: >
   authentication, storage, network calls, cryptography, or authorization. Triggers on
   storing tokens, HTTP calls, handling user data, login/logout, or any security-sensitive
   operation. Reference: OWASP Mobile App Security project (mas.owasp.org), 2024 edition.
-  Stack- flutter_secure_storage 10.x, Dart 3.8+ / Flutter 3.32+.
+  Stack: flutter_secure_storage 10.x, Dart 3.8+ / Flutter 3.32+.
 ---
-
 # OWASP Mobile Top 10 — Flutter Audit
 
 Complete security checklist M1–M10.

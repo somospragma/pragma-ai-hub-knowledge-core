@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-environments`  
-**Scanned:** 2026-06-22 17:26:14 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 17:26:14 UTC
 
 ## Risk Assessment
 
@@ -28,8 +28,8 @@
 
 ### 🟢 LOW: SQP-2
 
-**Location:** `references/android_setup.md:186–208`  
-**Confidence:** 70%  
+**Location:** `references/android_setup.md:186–208`
+**Confidence:** 70%
 
 **Message:** The documentation provides a template for managing sensitive keystore credentials via a `key.properties` file. While it correctly notes that the file should be 'gitignored', it fails to provide critical security warnings regarding the high impact of keystore compromise. If a developer mistakenly commits this file or if the CI/CD environment is misconfigured, an attacker could gain the ability to sign malicious updates for the application, leading to a complete takeover of the app's identity on the Play Store. Furthermore, it does not warn against using weak, default passwords (like `dev_store_password`) which are present in the example.
 

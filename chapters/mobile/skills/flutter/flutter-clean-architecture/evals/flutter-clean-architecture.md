@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-clean-architecture  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-clean-architecture`  
-**Scanned:** 2026-06-16 13:45:35 UTC  
+**Skill:** flutter-clean-architecture
+**Source:** `../`
+**Scanned:** 2026-06-16 13:45:35 UTC
 
 ## Risk Assessment
 

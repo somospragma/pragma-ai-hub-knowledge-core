@@ -181,7 +181,7 @@ AnimatedBuilder(
 
 ## 8. Excessive RepaintBoundary (or Missing Where Needed)
 
-**Symptom (too many):** High GPU memory usage, compositing overhead.  
+**Symptom (too many):** High GPU memory usage, compositing overhead.
 **Symptom (too few):** Large areas flash in `debugRepaintRainbowEnabled`.
 
 ```dart

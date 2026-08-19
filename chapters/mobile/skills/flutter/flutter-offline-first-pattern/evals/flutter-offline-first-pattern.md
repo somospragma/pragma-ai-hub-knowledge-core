@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-offline-first-pattern`  
-**Scanned:** 2026-06-03 17:43:37 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:37 UTC
 
 ## Risk Assessment
 

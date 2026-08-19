@@ -1,4 +1,4 @@
-# Versioning Guide — Conventional Commits + Melos 7.5.1
+# Versioning Guide — Conventional Commits + Melos 7+
 
 ## Conventional Commits Format
 
@@ -154,7 +154,8 @@ Melos generates a `CHANGELOG.md` per package following the [Keep a Changelog](ht
 
 ## Workspace CHANGELOG.md
 
-When `workspaceChangelog: true` is set in `melos.yaml`, a root-level `CHANGELOG.md`
+When `melos.command.version.workspaceChangelog: true` is set in the root
+`pubspec.yaml`, a root-level `CHANGELOG.md`
 aggregates all package changes:
 
 ```markdown
@@ -199,7 +200,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Install Melos
-        run: dart pub global activate melos 7.5.1
+        run: dart pub global activate melos 8.0.0
 
       - name: Bootstrap
         run: melos bootstrap
@@ -218,7 +219,7 @@ jobs:
 
 ## Versioning Strategy Decision
 
-| Strategy | When to use | melos.yaml setting |
+| Strategy | When to use | root `pubspec.yaml` Melos setting |
 |---|---|---|
 | **Independent** (default) | Each package has its own version | Default behavior |
 | **Locked** | All packages share the same version | `melos version --all` |

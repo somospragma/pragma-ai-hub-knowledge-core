@@ -1,0 +1,154 @@
+schema_version: 1
+schema_ref: schemas/project-config.schema.yaml
+
+ownership:
+  file: project.config.yaml
+  owns:
+    - project_identity
+    - workspace
+    - topology
+    - melos_topology
+    - targets
+    - active_target_defaults
+    - pipeline
+    - naming
+    - tokens
+    - testing
+    - figma
+  must_not_define:
+    - layer_rules
+    - generation_policies
+    - architecture_constraints
+    - dependency_catalog
+    - package_sources
+    - allowed_dependency_matrix
+
+project:
+  name: "Mobile App"
+  package_name: "my_app"
+  repository: "org/my-app"
+  repository_local_path: "."
+  ds_prefix: "DS"
+
+workspace:
+  roots:
+    - id: "ide_workspace"
+      path: "{{WORKSPACE_ROOT}}"
+      source: "workspace_root" # workspace_root | vscode_workspace | user_hint
+
+topology:
+  repo_mode: "single_repo" # single_repo | monorepo_melos | multi_repo
+  feature_location_mode: "lib_only" # lib_only | hybrid_lib_and_packages | packages_only | feature_per_repo
+  shared_core_mode: "none" # none | external_core_package
+  ds_mode: "external_ds_package" # internal_ds_package | external_ds_package | none
+  melos:
+    enabled: false
+    root: "." # resolved absolute path in generated configuration
+    config_source: "none" # none | legacy_yaml | root_pubspec
+    config_path: "" # resolved absolute path: melos.yaml legacy or pubspec.yaml Melos 7+
+    workspace_mode: "none" # none | legacy_melos | dart_pub_workspace
+
+targets:
+  registry:
+    app:
+      kind: "app" # app | design_system | core | feature | package | docs
+      location_strategy: "single_repo" # single_repo | melos_package | workspace_repo | external_repo
+      repo_root: "."
+      package_path: "."
+      root: "."
+      package_name: "my_app"
+      melos_scope: "my_app"
+      executable_signals:
+        - "lib/main.dart"
+        - "android"
+        - "ios"
+      structure:
+        features_path: "lib/src/features"
+        views_path: "lib/src/presentation/views"
+        view_widgets_path: "lib/src/presentation/widgets"
+        widgetbook_screens_path: "widgetbook"
+    design_system:
+      kind: "design_system"
+      location_strategy: "workspace_repo"
+      repo_root: "{{DESIGN_SYSTEM_REPO_ROOT_OR_EMPTY}}"
+      package_path: "."
+      root: "{{DESIGN_SYSTEM_ROOT_OR_EMPTY}}"
+      package_name: "design_system"
+      structure:
+        atoms_path: "lib/src/atoms"
+        molecules_path: "lib/src/molecules"
+        organisms_path: "lib/src/organisms"
+        tokens_path: "lib/src/tokens"
+        theme_path: "lib/src/theme"
+        barrel_file: "lib/design_system.dart"
+        widgetbook_components_path: "widgetbook"
+    core:
+      kind: "core"
+      location_strategy: "workspace_repo"
+      repo_root: "{{CORE_REPO_ROOT_OR_EMPTY}}"
+      package_path: "."
+      root: "{{CORE_ROOT_OR_EMPTY}}"
+      package_name: "app_core"
+    project_docs:
+      kind: "docs"
+      location_strategy: "single_repo"
+      repo_root: "."
+      package_path: "."
+      root: "."
+      package_name: "project_docs"
+
+active_target_defaults:
+  app: "app"
+  design_system: "design_system"
+  core: "core"
+  feature: "app"
+  docs: "project_docs"
+
+tokens:
+  access_method: "context_extension" # context_extension | theme_of
+  theme_light_class: "DSThemeLight"
+  theme_dark_class: "DSThemeDark"
+  catalog_path: "CATALOG.md"
+
+testing:
+  pump_helper: "pumpApp"
+  pump_helper_import: "../../helpers/pump_app.dart"
+  golden_framework: "alchemist"
+  golden_tag: "golden"
+  test_naming: "should [verb] when [condition]"
+
+architecture:
+  mermaid_doc_path: ".sopp/config/architecture.md"
+  additional_mermaid_paths: []
+  contract_path: ".sopp/config/architecture-contract.yaml"
+
+dependencies:
+  contract_path: ".sopp/config/dependencies-contract.yaml"
+
+figma:
+  mcp_enabled: true
+  mcp_fallback: "blocked_input" # blocked_input | manual | error
+  mcp_max_retries: 3
+  auto_export_assets: true
+  asset_export_format: "svg"
+
+pipeline:
+  output_dir: ".sopp/flow_result"
+  log_file: "pipeline_log.md"
+  spec_file: "pipeline-report.md"
+  default_execution_mode: "propose_then_apply"
+  max_audit_retries: 3
+  deterministic_mode: true
+  enforce_phase_contracts: true
+  stop_on_missing_artifacts: true
+  artifact_path_strategy: "target_id_relative" # target_id_relative only
+
+naming:
+  branch_prefix: "feat/ds-"
+  view_branch_prefix: "feat/app-"
+  commit_types:
+    feature: "feat"
+    test: "test"
+    docs: "docs"
+    fix: "fix"
+    refactor: "refactor"

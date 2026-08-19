@@ -370,7 +370,7 @@ Git installation is **your system administrator's responsibility**. This skill c
 
 2. **Alternative**: Consult official documentation
    - macOS: https://git-scm.com/download/mac
-   - Linux: https://git-scm.com/download/linux  
+   - Linux: https://git-scm.com/download/linux
    - Windows: https://git-scm.com/download/win
 
 3. **After Git is installed**, verify it works:
@@ -379,7 +379,7 @@ Git installation is **your system administrator's responsibility**. This skill c
    git --version
    ```
 
-**Why we recommend contacting your admin**: 
+**Why we recommend contacting your admin**:
 - System package managers require elevated privileges
 - Your organization likely has specific security policies
 - Admins ensure proper audit trails and compliance

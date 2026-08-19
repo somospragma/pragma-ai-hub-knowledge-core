@@ -7,13 +7,12 @@ chapter: mobile
 stack: [flutter]
 tags: [archetype, flutter, mobile, mason, clean architecture, monorepo, design system, project generation]
 name: flutter-mason-clean-project
-description: > 
+description: >
   Create Flutter applications using Mason's flutter_clean_project brick. Use this skill when bootstrapping a new Flutter monorepo with Clean Architecture, multiple apps, design system integration, and automated project structure generation. Guides you through configuration (colors, typography, fonts), project generation, and initial feature setup—applicable to any organization.
 license: Complete terms in LICENSE.txt
 metadata:
   category: productivity
 ---
-
 # Flutter Clean Project Skill
 
 ## Quick Overview
@@ -128,8 +127,7 @@ my_project/
 │   └── l10n/                      # Localization
 ├── features/                      # (empty, for flutter_clean_feature)
 ├── docs/                          # Project documentation
-├── melos.yaml                     # Monorepo configuration
-└── pubspec.yaml                   # Workspace root
+└── pubspec.yaml                   # Workspace root and Melos 7+ configuration
 ```
 
 Open `apps/my_app/` to start developing.

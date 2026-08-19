@@ -9,7 +9,6 @@ name: flutter-permissions
 description: >
   Handles runtime permissions in Flutter with permission_handler 11.x: request at point of use, rationale dialogs, settings redirect, and platform manifest configuration. Includes store policy constraints: Google Play (April 2026 location/contacts policy, Android 17 Contact Picker requirement), App Store (usage description strings, Podfile macros), and AppGallery (standard Android permissions). Use this skill when requesting camera, location, microphone, contacts, notifications, storage, or any sensitive permission.
 ---
-
 # Runtime Permissions
 
 See the reference files for complete patterns and code examples.

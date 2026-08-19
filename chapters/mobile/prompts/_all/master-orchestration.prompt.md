@@ -1,103 +1,165 @@
 ---
 id: master-orchestration
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt maestro para ejecutar el pipeline completo Figma → Flutter DS de forma   determinista. Usar cuando la entrada del
+description: >
+  Shared phase-sequencing prompt for functional Mobile SDD workflows. Use it only from a workflow controller after bootstrap has completed.
 ---
+# Master Pipeline (Deterministic)
 
-# Pipeline Maestro (Determinista)
+## Objective
 
-## Objetivo
+Execute the pipeline in strict order, with required gates per topology,
+architecture and contracts, using a single route of artifacts per execution.
+This prompt does not control `/bootstrap-workspace`; that workflow is owned only
+by `@workspace-discovery` and `workspace-discovery.prompt.md`.
 
-Ejecutar el pipeline en orden estricto, con gates obligatorios por topología,
-arquitectura y contratos, usando una única ruta de artefactos por ejecución.
+## Required Pre-Execution
 
-## Pre-ejecución obligatoria
-
-1. Si workflow=`/bootstrap-workspace`:
-   - no exigir `project.config.yaml`.
-   - delegar a `@workspace-discovery` con `workspace-discovery.prompt.md`.
-   - exigir checkpoint humano para aplicar cambios.
-   - al finalizar, recomendar `/new-view` o `/new-component`.
-2. Para cualquier otro workflow, leer `PROJECT_CONFIG_BOOT_PATH=.copilot/config/project.config.yaml`.
-   - Si falta: `blocked_input` con `CONFIG_PROJECT_CONFIG_MISSING`.
-3. Para workflows distintos de `/bootstrap-workspace`, usar
-   `PROJECT_CONFIG_BOOT_PATH` solo para obtener `PROJECT_ROOT` y luego fijar
-   `PROJECT_CONFIG_PATH={PROJECT_ROOT}/.copilot/config/project.config.yaml`
-   como ruta canónica de configuración.
-   - Si `PROJECT_CONFIG_PATH` canónica no existe: `blocked_input` con
-     `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`.
-4. Para workflows distintos de `/bootstrap-workspace`, resolver constantes:
+1. Receive `PROJECT_ROOT` and `PROJECT_CONFIG_PATH` from the workflow
+   controller after its canonical configuration gate. Do not rediscover
+   configuration from the current directory and never use tool-specific KB
+   folders as a runtime-state fallback.
+2. Require the final `.sopp/config` triplet to be valid and owned by
+   `PROJECT_ROOT`. If it is missing, partial, invalid, or ambiguous, return the
+   matching `CONFIG_*` blocker without creating pipeline outputs.
+3. Resolve constants:
    - `PROJECT_ROOT = project.repository_local_path` (fallback `"."`)
    - `TOPOLOGY_REPO_MODE = topology.repo_mode` (fallback `single_repo`)
    - `TOPOLOGY_FEATURE_LOCATION_MODE = topology.feature_location_mode` (fallback `lib_only`)
    - `TOPOLOGY_SHARED_CORE_MODE = topology.shared_core_mode` (fallback `none`)
    - `TOPOLOGY_DS_MODE = topology.ds_mode` (fallback `external_ds_package`)
-   - `TARGET_PACKAGE_NAME = targets.target_package_name` (fallback `project.package_name`)
-   - `TARGET_PACKAGE_PATH = targets.target_package_path` (fallback `"."`)
-   - `TARGET_FEATURE_ROOT = targets.feature_root` (fallback `lib/src/features`)
-   - `TARGET_ROOT`:
-     - `single_repo` -> `{PROJECT_ROOT}`
-     - `monorepo_melos` -> `{PROJECT_ROOT}/{TARGET_PACKAGE_PATH}`
-     - `multi_repo` -> `{PROJECT_ROOT}`
-   - `PIPELINE_ROOT = {TARGET_ROOT}/{pipeline.output_dir}`
+   - `TARGET_REGISTRY = targets.registry`
+   - `APP_TARGET_ID = workflow-resolved app target` (for `/new-view`, use
+     `inputs.target_id` when present, otherwise
+     `active_target_defaults.app_target_id`, falling back to
+     `active_target_defaults.app`)
+   - `DESIGN_SYSTEM_TARGET_ID = active_target_defaults.design_system_target_id`
+     (fallback `active_target_defaults.design_system`)
+   - `SPEC_PACKET_OWNER_TARGET_ID = workflow-resolved target before Phase 0`.
+     It is immutable for the run and is not the same concept as
+     `ACTIVE_TARGET_ID`.
+   - `SPEC_PACKET_OWNER_ROOT = targets.registry[SPEC_PACKET_OWNER_TARGET_ID].root`
+   - `ACTIVE_TARGET_ID` per implementation phase
+   - `ACTIVE_TARGET_ROOT = targets.registry[ACTIVE_TARGET_ID].root`
+   - `ALLOWED_ARTIFACT_ROOTS = targets.registry.*.root`
+   - `PIPELINE_ROOT = {SPEC_PACKET_OWNER_ROOT}/{pipeline.output_dir}`
    - `PIPELINE_LOG_PATH = {PIPELINE_ROOT}/{pipeline.log_file}`
    - `PIPELINE_SPEC_PATH = {PIPELINE_ROOT}/{pipeline.spec_file}`
-   - `WIDGETBOOK_COMPONENTS_ROOT = structure.widgetbook_components_path` (fallback `structure.widgetbook_path`)
-   - `WIDGETBOOK_SCREENS_ROOT = structure.widgetbook_screens_path` (fallback `structure.widgetbook_path`)
+   - `WIDGETBOOK_COMPONENTS_ROOT = targets.registry[DESIGN_SYSTEM_TARGET_ID].structure.widgetbook_components_path` (fallback `widgetbook`)
+   - `WIDGETBOOK_SCREENS_ROOT = targets.registry[APP_TARGET_ID].structure.widgetbook_screens_path` (fallback `widgetbook`)
    - `ARCHITECTURE_MERMAID_PATH = {PROJECT_ROOT}/{architecture.mermaid_doc_path}`
    - `ARCHITECTURE_CONTRACT_PATH = {PROJECT_ROOT}/{architecture.contract_path}`
-   - `DEPENDENCIES_CONTRACT_PATH = {PROJECT_ROOT}/{dependencies.contract_path}` (fallback `.copilot/config/DEPENDENCIES-CONTRACT.yaml`)
-   - `REQUIRE_ARCHITECTURE_CONTRACT_FOR_NEW_VIEW = architecture.require_contract_for_new_view`
-   - `MELOS_ENABLED = monorepo.melos_enabled`
-   - `MELOS_ROOT = {PROJECT_ROOT}/{monorepo.melos_root}`
-   - `MELOS_TARGET_SCOPE = monorepo.target_scope`
-   - `GENERATION_SCOPE = pipeline.generation_scope` (fallback `presentation_only`)
-   - `CONTRACTS_POLICY = pipeline.contracts_policy` (fallback `optional`)
+   - `DEPENDENCIES_CONTRACT_PATH = {PROJECT_ROOT}/{dependencies.contract_path}` (fallback `.sopp/config/dependencies-contract.yaml`)
+   - `REQUIRE_ARCHITECTURE_CONTRACT_FOR_NEW_VIEW = architecture_contract.generation_policies.view_generation.require_architecture_contract`
+   - `MELOS_ENABLED = topology.melos.enabled`
+   - `MELOS_ROOT = topology.melos.root` (resolved absolute path)
+   - `MELOS_CONFIG_PATH = topology.melos.config_path` (resolved absolute path)
+   - `MELOS_TARGET_SCOPE = targets.registry.{ACTIVE_TARGET_ID}.melos_scope`
+   - `GENERATION_SCOPE = architecture_contract.generation_policies.default_generation_scope` (fallback `presentation_only`)
+   - `CONTRACTS_POLICY = architecture_contract.generation_policies.contracts_policy.default` (fallback `optional`)
    - `DETERMINISTIC_MODE = pipeline.deterministic_mode`
    - `ENFORCE_PHASE_CONTRACTS = pipeline.enforce_phase_contracts`
    - `STOP_ON_MISSING_ARTIFACTS = pipeline.stop_on_missing_artifacts`
-5. Para workflows distintos de `/bootstrap-workspace`, crear `PIPELINE_LOG_PATH` y `PIPELINE_SPEC_PATH` si no existen.
-6. Para workflows distintos de `/bootstrap-workspace`, aplicar Gate 0 - Topology Gate:
-   - Validar `TOPOLOGY_REPO_MODE` en `single_repo | monorepo_melos | multi_repo`.
-   - Exigir `PROJECT_ROOT` y `TARGET_ROOT` accesibles.
-   - Si `monorepo_melos`: exigir `MELOS_ENABLED=true`, `MELOS_ROOT/melos.yaml`,
-     `MELOS_TARGET_SCOPE` y `TARGET_PACKAGE_PATH` válido.
-   - Si `TOPOLOGY_SHARED_CORE_MODE=external_core_package`: exigir
+   - `EVIDENCE_MODE = invocation.evidence_mode` (default `minimal`; allowed
+     `minimal | standard`)
+4. Resolve `SPEC_PACKET_OWNER_TARGET_ID` before creating any packet, log or
+   report. The target must exist in `TARGET_REGISTRY` and its root must be
+   accessible. Create `PIPELINE_LOG_PATH` and `PIPELINE_SPEC_PATH` only after
+   the canonical configuration gate succeeds.
+5. Apply Gate 0 - Topology Gate:
+   - Validate `TOPOLOGY_REPO_MODE` in `single_repo | monorepo_melos | multi_repo`.
+   - Require `PROJECT_ROOT`, `SPEC_PACKET_OWNER_TARGET_ID`,
+     `SPEC_PACKET_OWNER_ROOT`, `ACTIVE_TARGET_ID` and `ACTIVE_TARGET_ROOT`
+     accessible.
+   - If `monorepo_melos`: require `MELOS_ENABLED=true`, non-empty
+     `MELOS_CONFIG_PATH`, `MELOS_TARGET_SCOPE` and `TARGET_PACKAGE_PATH`; run
+     `docs/scripts/melos_workspace.rb resolve` and require `ok=true`.
+   - If `TOPOLOGY_SHARED_CORE_MODE=external_core_package`: require
      `external_dependencies.shared_core.enabled=true`.
-7. Para workflows distintos de `/bootstrap-workspace`, aplicar Gate 0.5 - App Repo Ownership Gate:
-   - Exigir `PROJECT_CONFIG_BOOT_PATH` existente.
-   - Exigir `PROJECT_CONFIG_PATH` canónica en `{PROJECT_ROOT}/.copilot/config/project.config.yaml`.
-   - En `single_repo | multi_repo`: exigir señal de app ejecutable en `PROJECT_ROOT`
-     (`lib/main.dart` o `lib/main_*.dart` o `android/` o `ios/`).
-   - En `monorepo_melos`: exigir `melos.yaml`, package target válido y vetar package
-     objetivo DS/core/shared.
-   - Si `PROJECT_ROOT` o `TARGET_PACKAGE_NAME` parecen librería (`design_system`,
-     `ui_kit`, `shared`, `core`, `common`) y no hay señal de app ejecutable, bloquear.
-   - Usar códigos: `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`,
+6. Apply Gate 0.5 - App Repo Ownership Gate:
+   - Require `PROJECT_CONFIG_PATH` canonical in `{PROJECT_ROOT}/.sopp/config/project.config.yaml`.
+   - In `single_repo | multi_repo`: require signal app executable in `PROJECT_ROOT`
+     (`lib/main.dart` or `lib/main_*.dart` or `android/` or `ios/`).
+   - In `monorepo_melos`: require a passing Melos resolver result, a valid package
+     target and reject a DS/core/shared target.
+   - If `PROJECT_ROOT` or `TARGET_PACKAGE_NAME` look like a library (`design_system`,
+     `ui_kit`, `shared`, `core`, `common`) and there is no executable app signal, block.
+   - Use codes: `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`,
      `CONFIG_PROJECT_ROOT_POINTS_TO_LIBRARY`,
      `CONFIG_APP_EXECUTABLE_SIGNAL_MISSING`.
-8. Para `/new-view`, aplicar Gate 1 - Architecture Gate:
-   - Si `REQUIRE_ARCHITECTURE_CONTRACT_FOR_NEW_VIEW=true`, exigir
+8. For `/new-view`, apply Gate 1 - Architecture Gate:
+   - If `REQUIRE_ARCHITECTURE_CONTRACT_FOR_NEW_VIEW=true`, require
      `ARCHITECTURE_CONTRACT_PATH`.
-   - Tratar `ARCHITECTURE_MERMAID_PATH` como referencia opcional.
-9. Para `/new-view`, aplicar Gate 2 - Contracts Policy Gate:
-   - `CONTRACTS_POLICY=optional`: continuar sin bloquear.
-   - `CONTRACTS_POLICY=generate`: crear/actualizar contratos mínimos en spec
-     antes de `Fase 3b`.
-   - `CONTRACTS_POLICY=required`: exigir referencias de contratos domain/data
-     existentes antes de `Fase 3b`.
-10. Si falla un gate, detener con `blocked_input` y razón explícita.
-11. Determinar workflow:
+   - Treat `ARCHITECTURE_MERMAID_PATH` as an optional reference.
+9. For `/new-view`, apply Gate 2 - Contracts Policy Gate:
+   - `CONTRACTS_POLICY=optional`: continue without block.
+   - `CONTRACTS_POLICY=generate`: create/update contracts minimum in spec
+     before `Phase 3b`.
+   - `CONTRACTS_POLICY=required`: require references of contracts domain/data
+     existing before `Phase 3b`.
+10. If it fails a gate, stop with `blocked_input` and explicit reason.
+10. Treat the initial functional invocation as plan-only. Require a Mobile Spec
+    Packet before any implementation:
+   - `SPEC_PACKET_ROOT = {PIPELINE_ROOT}/specs`
+   - `SPEC_PACKET_PATH = {SPEC_PACKET_ROOT}/{workflow_slug}`
+   - files required: `spec.yaml`, `context.json`, `review.md`,
+     `evidence/validation-report.md`.
+   - `spec.yaml` must validate against
+     `../docs/templates/schemas/mobile-spec.schema.yaml`.
+   - `execution_mode=propose_then_apply`.
+   - `evidence_mode=EVIDENCE_MODE`.
+   - `review.md` always in Spanish.
+   - validate with `mobile-sdd-spec-validation`.
+   - Do not derive `SPEC_PACKET_ROOT`, `SPEC_PACKET_PATH`,
+     `PIPELINE_LOG_PATH` or `PIPELINE_SPEC_PATH` from `ACTIVE_TARGET_ROOT`.
+     Changing the active target for an implementation phase must never move
+     packet state or evidence.
+12. Assign `spec_level` per workflow:
+   - `mini`: `/new-component`, `/refactor-component`, `/fix-pr-comments`
+   - `standard`: `/new-view`
+   - `full`: `/new-feature`, `/refactor-feature`, `/test-plan`
+12. Require initial human approval of the Spec Packet in a later human turn:
+   - do not generate code, tests, or changes before
+     `context.json.status=approved_for_execution` and
+     `context.json.checkpoints.initial_spec.status=approved`.
+   - in `standard` and `full`, require checkpoints per layer/stage.
+   - the handoffs must send `spec_ref`, `context_ref`, `phase` and
+     `read_sections`, no complete content of the spec.
+   - the response that presents `review.md` must end; it cannot continue into
+     a code-producing phase in the same response.
+13. Require permissions per agent:
+   - if a phase writes files, executes commands, or calls external tools,
+     `spec.yaml.agent_permissions.<agent>` must allow it.
+   - if the permission does not exist or does not cover the action, stop with
+     `blocked_input` and record the missing.
+   - Native subagent delegation is an optimization. When
+     `execution_capabilities.subagent_delegation=unavailable`, the workflow
+     controller executes the documented specialist role contract itself; it
+     must not skip a mandatory phase. Use
+     `fallback_policy=delegate_or_controller_executes`.
+14. Require Figma MCP preflight for Figma-driven workflows:
+   - `/new-component`
+   - `/new-view`
+   - `/new-feature` only if it has `figma_url`
+   - block if `external_access.figma_mcp.status` is not `verified`.
+   - require every visible icon, image, illustration, logo, and image-fill
+     source to be downloaded into `{SPEC_PACKET_PATH}/source-assets/figma/`
+     with node id, format and SHA-256. Do not accept a screenshot, URL, or
+     similar local/DS resource as a replacement.
+15. Define workflow:
    - `/bootstrap-workspace`
    - `/new-component`
    - `/new-view`
    - `/refactor-component`
    - `/fix-pr-comments`
+   - `/new-feature`
+   - `/refactor-feature`
+   - `/test-plan`
 
-## Códigos de bloqueo estándar
+## Standard Blocking Codes
 
 - `BOOTSTRAP_WORKSPACE_ROOT_MISSING`
 - `BOOTSTRAP_SCAN_ROOTS_EMPTY`
@@ -123,125 +185,203 @@ arquitectura y contratos, usando una única ruta de artefactos por ejecución.
 - `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`
 - `CONFIG_PROJECT_ROOT_POINTS_TO_LIBRARY`
 - `CONFIG_APP_EXECUTABLE_SIGNAL_MISSING`
+- `CONFIG_SPEC_PACKET_INVALID`
+- `CONFIG_SPEC_PACKET_OWNER_INVALID`
+- `CONFIG_SPEC_PACKET_ROOT_MISMATCH`
+- `CONFIG_SPEC_NOT_APPROVED`
 
-## Contrato de orquestación
+## Orchestration Contract
 
-- No avanzar de fase sin validar output obligatorio de la fase previa.
-- Si una fase devuelve `blocked_input`, detener pipeline inmediatamente.
-- Registrar cada fase en `PIPELINE_LOG_PATH`.
-- Actualizar `pipeline_state` en `PIPELINE_SPEC_PATH` tras cada fase.
-- Si una fase es condicional (`si aplica`), registrar `skipped` con razón.
-- Mantener handoffs silenciosos y completos.
+- Do not advance to the next phase without validating the required output of the previous phase.
+- If a phase returns `blocked_input`, stop the pipeline immediately.
+- Record each phase in `PIPELINE_LOG_PATH`.
+- Keep `SPEC_PACKET_OWNER_TARGET_ID`, `SPEC_PACKET_OWNER_ROOT`,
+  `SPEC_PACKET_PATH`, `PIPELINE_LOG_PATH` and `PIPELINE_SPEC_PATH` immutable
+  for the run. Only `ACTIVE_TARGET_ID` and `ACTIVE_TARGET_ROOT` may change by
+  phase.
+- Update `context.json` and `spec.yaml` after each functional phase.
+- Update `PIPELINE_SPEC_PATH` only as the cumulative human report.
+- Update `context.json` of the Mobile Spec Packet after each functional phase.
+- Record every phase in `context.json.phase_results` with a compact status,
+  summary and references. This state is mandatory in both evidence modes.
+- If a phase is conditional (`if applicable`), record `skipped` with reason.
+- Keep handoffs silent, complete and reference-based.
+- Include the resolved `evidence_mode` scalar in every handoff.
+- `minimal` writes only gate evidence: validation, required Figma preflight,
+  required human decisions, audit, executed tests, enabled optional stages and
+  delivery. Record all other completed phases in `context.json.phase_results`
+  instead of creating narrative evidence files.
+- `standard` additionally writes phase analysis, inventory, planning, codegen,
+  Widgetbook and detailed checkpoint reports.
+- Do not use `PIPELINE_SPEC_PATH` as the machine source when there is
+  `spec_context`.
 
-## Flujo por workflow
+## Workflow Flow
 
-### A) `/bootstrap-workspace`
+### `/new-component`
 
-1. Fase B1 → `@workspace-discovery` (`workspace-discovery.prompt.md`) con `APPLY_MODE=propose_only`.
-   - generar propuestas en `<APP_REPO_ROOT>/.copilot/config/bootstrap` para:
-     `project.config.yaml`, `ARCHITECTURE-CONTRACT.yaml`,
-     `DEPENDENCIES-CONTRACT.yaml`.
-2. Checkpoint humano obligatorio:
-   "He generado la propuesta de configuración del workspace. ¿Apruebas aplicar los cambios con backup?"
-3. Si usuario aprueba:
-   - Fase B2 → `@workspace-discovery` (`workspace-discovery.prompt.md`) con `APPLY_MODE=apply_with_backup`.
-   - Fase B3 → validación post-apply.
-4. Si usuario no aprueba:
-   - finalizar en modo `propose_only`.
+1. Phase 0 → create Mobile Spec Packet `mini`.
+2. Phase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → update spec with visual analysis, texts, constraints and assets.
+3. Phase 2 → `@component-planner` (`atomic-inventory.prompt.md`) → update inventory, DAG and DS artifact plan.
+4. Phase 2.5 → `@component-architect` → update technical plan and success criteria.
+5. Phase 2.7 → validate Spec Packet and ask human approval required.
+6. Phase 3 → `@widget-developer` (`codegen-atom/molecule/organism`) with a compact handoff.
+7. Phase 3.5 → `@code-auditor` → audits against `spec_ref` (loop up to `pipeline.max_audit_retries`).
+8. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
+9. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) only when
+   `golden_tests=true`; otherwise record `skipped_by_input`.
+10. Phase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
+11. Phase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → final evidence and human report.
 
-### B) `/new-component`
+### `/new-view`
 
-1. Fase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → escribe `§1` (incluye `§1.3b` y `§1.3c` si hay anotaciones Development/vectores).
-2. Fase 2 → `@component-planner` (`atomic-inventory.prompt.md`) → escribe `§2` y `§3`.
-3. Fase 2.5 → `@component-architect` → escribe `§4`.
-4. Checkpoint humano (si `pipeline.human_checkpoint = true`).
-5. Fase 3 → `@widget-developer` (`codegen-atom/molecule/organism`) → código DS.
-6. Fase 3.5 → `@code-auditor` → escribe `§5` (loop hasta `pipeline.max_audit_retries`).
-7. Fase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
-8. Fase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`).
-9. Fase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
-10. Fase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → escribe `§7`.
+1. Gate architecture and contracts policy.
+2. Phase 0 → create Mobile Spec Packet `standard`.
+3. Phase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → update spec with visual analysis, states, texts, constraints, assets, `visual_manifest` and `layout_manifest`.
+4. Phase 2 → `@component-planner` (`atomic-inventory.prompt.md`) → update inventory DS vs App, DAG and artifacts.
+5. Phase 2.5 → `@component-architect` → update architecture view and technical plan.
+6. Phase 2.6 (only `CONTRACTS_POLICY=generate`) → add minimal contracts to the spec.
+7. Phase 2.7 → validate Spec Packet and ask human approval required.
+8. Phase 3a → `@widget-developer` (`codegen-atom/molecule/organism`) → DS components with a compact handoff.
+9. Phase 3a.5 → `@code-auditor` → audits DS against `spec_ref`.
+10. A human checkpoint is required after the DS layer.
+11. Phase 3b → `@widget-developer` (`codegen-view.prompt.md`) → view app with handoff compact.
+12. Phase 3b.5 → `@code-auditor` → reconciles the generated app view against
+    `visual_manifest` and `layout_manifest`, including crop, exact icons,
+    typography, screen chrome, hierarchy/order, geometry and shape values.
+13. A human checkpoint is required after the app view. When visual verification
+    is required, present Figma and Flutter rendering references before tests.
+14. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
+15. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) only when
+    `golden_tests=true`; otherwise record `skipped_by_input`.
+16. Phase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
+17. Phase 4d → `@test-engineer` (`MODE=VIEW_WIDGET_TESTS`).
+18. Phase 4e → `@golden-test-engineer` (`MODE=VIEW_GOLDEN_TESTS`) only when
+    `golden_tests=true`; otherwise reuse the recorded `skipped_by_input` outcome.
+19. Phase 4f → `@widgetbook-developer` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`).
+20. Phase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → final evidence and human report.
 
-### C) `/new-view`
+### `/refactor-component`
 
-1. Gate de arquitectura y política de contratos.
-2. Fase 1 → `@figma-analyzer` (`figma-analysis.prompt.md`) → `§1` + `§1.4b` + `§1.3b` + `§1.3c` (si hay anotaciones Development/vectores).
-3. Fase 2 → `@component-planner` (`atomic-inventory.prompt.md`) → `§2` + `§3` (DS vs App).
-4. Fase 2.5 → `@component-architect` → `§4` (incluye arquitectura de vista).
-5. Fase 2.6 (solo `CONTRACTS_POLICY=generate`) → `@component-architect` agrega contratos mínimos en `§4.C`.
-6. Checkpoint humano (si aplica).
-7. Fase 3a → `@widget-developer` (`codegen-atom/molecule/organism`) → componentes DS.
-8. Fase 3a.5 → `@code-auditor` → audita DS (`§5`).
-9. Fase 3b → `@widget-developer` (`codegen-view.prompt.md`) → vista app.
-10. Fase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
-11. Fase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`).
-12. Fase 4c → `@widgetbook-developer` (`MODE=DS_WIDGETBOOK`).
-13. Fase 4d → `@test-engineer` (`MODE=VIEW_WIDGET_TESTS`).
-14. Fase 4e → `@golden-test-engineer` (`MODE=VIEW_GOLDEN_TESTS`).
-15. Fase 4f → `@widgetbook-developer` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`).
-16. Fase 5 → `@delivery-manager` (`delivery-review.prompt.md`) → `§7`.
+1. Phase 0 → create Mobile Spec Packet `mini`.
+2. Phase 1 → `@component-planner` → update the spec with impact, current state and plan.
+3. Phase 2 → `@component-architect` → update technical plan and criteria.
+4. Phase 2.5 → validate Spec Packet and ask human approval required.
+5. Phase 3 → `@widget-developer` → applies the refactor with a compact handoff.
+6. Phase 3.5 → `@code-auditor` → audits against `spec_ref`.
+7. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
+8. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) if visual impact.
+9. Phase 5 → `@delivery-manager` → final evidence and human report.
 
-### D) `/refactor-component`
+### `/fix-pr-comments`
 
-1. Fase 1 → `@component-planner` → escribe `§2` y `§3` (impacto + plan).
-2. Fase 2 → `@component-architect` → escribe `§4`.
-3. Checkpoint humano (si aplica).
-4. Fase 3 → `@widget-developer` → aplica refactor.
-5. Fase 3.5 → `@code-auditor` → escribe `§5`.
-6. Fase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`).
-7. Fase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) si impacto visual.
-8. Fase 5 → `@delivery-manager` → escribe `§7`.
+1. Phase 0 → create Mobile Spec Packet `mini`.
+2. Phase 1 → `@component-planner` → update spec with inventory comment-to-action.
+3. Phase 1.5 → validate Spec Packet and ask human approval required.
+4. Phase 2 → `@widget-developer` → applies fixes with a compact handoff.
+5. Phase 3 → `@code-auditor` → checks comment-to-change coverage against `spec_ref`.
+6. Phase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`) if functional impact.
+7. Phase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) if visual impact.
+8. Phase 5 → `@delivery-manager` → final evidence and human report.
 
-### E) `/fix-pr-comments`
+### `/new-feature`
 
-1. Fase 1 → `@component-planner` → requiere comentarios PR; escribe plan en `§2`.
-2. Fase 2 → `@widget-developer` → aplica correcciones de código.
-3. Fase 3 → `@code-auditor` → cobertura comentario→cambio en `§5`.
-4. Fase 4a → `@test-engineer` (`MODE=DS_WIDGET_TESTS`) si impacto funcional.
-5. Fase 4b → `@golden-test-engineer` (`MODE=DS_GOLDEN_TESTS`) si impacto visual.
-6. Fase 5 → `@delivery-manager` → `§7`.
+1. Phase S0 → `@feature-builder` creates Mobile Spec Packet `full`.
+2. Phase 0 → conditional UI/DS inventory; prefer the specialist role and use
+   controller fallback only with the required target/MCP permissions.
+3. Phase 1 → scaffold with handoff compact and evidence.
+4. Phase 1.5 → API contract analysis; update `spec.yaml.contracts`.
+5. Phase 2 → Domain; human checkpoint required.
+6. Phase 3 → Data; human checkpoint required.
+7. Phase 4 → Presentation; human checkpoint required.
+8. Phase 5 → wiring and validation.
+9. Phase 6a → `test-engineer` role (`MODE=FEATURE_UNIT_TESTS`); required and
+   owned by `@feature-builder` if delegation is unavailable.
+10. Phase 6b → `test-engineer` role (`MODE=FEATURE_WIDGET_TESTS`); required
+    and owned by `@feature-builder` if delegation is unavailable.
+11. Phase 6c → `test-engineer` role (`MODE=FEATURE_INTEGRATION_TESTS`); required
+    and owned by `@feature-builder` if delegation is unavailable.
+12. Phase 6d → `@golden-test-engineer` (`MODE=FEATURE_GOLDEN_TESTS`) only
+    when `golden_tests=true`; otherwise record `skipped_by_input`.
+13. Phase 7 → `@code-auditor` audits implementation and required test evidence.
+14. Human checkpoint → final build review; required.
+15. Phase 8 → project documentation only when `documentation=true`; otherwise
+    record `skipped_by_input`.
+16. Phase 9 → `@delivery-manager` validates all required evidence and emits the
+    final delivery report.
 
-## Checkpoint humano
+### `/refactor-feature`
 
-Cuando aplique en workflows funcionales (`/new-component`, `/new-view`, `/refactor-component`), presentar:
+1. Phase S0 → `@refactoring-advisor` creates Mobile Spec Packet `full`.
+2. Phase 1 → current-state analysis; update `current_state`.
+3. Phase 2 → impact and risks; update `impact_analysis`.
+4. Phase 3 → plan atomic; update `refactoring_plan`.
+5. Phase 4 → required human-readable review in `review.md`.
+6. Phase 5 → iterative execution with compact handoffs and required checkpoints.
+7. Phase 6 → tests.
+8. Phase 7 → audit against `spec_ref`.
+9. Phase 8 -> report and documentation.
 
-1. `§1` análisis.
-2. `§2`/`§3` inventario + DAG.
-3. `§4` plan técnico.
+### `/test-plan`
 
-Pregunta exacta:
+1. Phase S0 → `@test-coverage-engineer` creates Mobile Spec Packet `full`.
+2. Phase 1 → inventory of coverage; update `coverage_inventory`.
+3. Phase 2 → test plan; required human-readable review.
+4. Phase 3 → test generation with a compact handoff.
+5. Phase 4 → execution and validation.
+6. Phase 5 → report in `docs/testing/` and final evidence.
 
-"He completado análisis, inventario y plan técnico. ¿Apruebas continuar a implementación?"
+## Human checkpoint
 
-No continuar hasta recibir aprobación explícita.
+For functional workflows, the first checkpoint is always Mobile Spec Packet
+approval. Present `review.md` in Spanish, not the complete YAML.
 
-Para `/bootstrap-workspace`, usar solo la pregunta de apply de bootstrap y no
-pedir aprobación sobre `§1..§4`.
+For `mini` (`/new-component`, `/refactor-component`, `/fix-pr-comments`),
+this checkpoint enables implementation.
 
-## Handoff estándar (obligatorio)
+For `standard` and `full`, in addition to the initial checkpoint, request
+layer/stage checkpoints according to the workflow:
 
-Cada delegación incluye:
+- `/new-view`: after DS and after the app view, before its tests. The latter
+  includes the required layout and Figma fidelity report.
+- `/new-feature` with `figma_scope=view`: its Presentation checkpoint includes
+  the same required layout and Figma fidelity report before wiring or tests.
+- `/new-feature`: after Domain, Data and Presentation.
+- `/refactor-feature`: after architectural or contract steps.
+- `/test-plan`: before generation of tests.
+
+Base question:
+
+"I prepared the spec and success criteria. Do you approve continuing with the next stage?"
+
+Do not continue until receiving explicit approval and recording it in `context.json`.
+
+## Handoff standard (required)
+
+Each delegation includes:
 
 - `workflow`
-- `phase_id` y `phase_name`
-- `mode` (si el prompt de fase es multi-modo)
-- `scope` (si el agente de fase lo requiere)
+- `phase_id` and `phase_name`
+- `mode` (if the phase prompt is multi-mode)
+- `scope` (if the phase agent requires it)
 - `project_root`
 - `topology` (`repo_mode`, `feature_location_mode`, `shared_core_mode`, `ds_mode`)
 - `target` (`package_name`, `package_path`, `target_root`, `feature_root`)
 - `execution_context` (`melos_enabled`, `melos_root`, `target_scope`)
 - `contracts_context` (`generation_scope`, `contracts_policy`)
-- `architecture_refs` (`ARCHITECTURE_CONTRACT_PATH`, `ARCHITECTURE_MERMAID_PATH` opcional)
-- `workspace_context` (`workspace_root`, `workspace_file`, `apply_mode`, `expected_app_repo_root`, `expected_app_repo_name`, `expected_app_package`, `expected_ds_package`, `expected_core_package`, `expected_repo_mode`) para `/bootstrap-workspace`
+- `architecture_refs` (`ARCHITECTURE_CONTRACT_PATH`, `ARCHITECTURE_MERMAID_PATH` optional)
+- `spec_context` (`spec_ref`, `context_ref`, `review_ref`, `spec_level`, `phase`, `read_sections`) for functional workflows
 - `input_refs`
 - `expected_output`
 - `output_paths` (`PIPELINE_SPEC_PATH`, `PIPELINE_LOG_PATH`)
 
-Si falta alguno obligatorio para el workflow actual, no delegar.
+If any required field for the current workflow is missing, do not delegate.
 
-## Reglas
+## Rules
 
-- No programar ni auditar directamente; siempre delegar.
-- Incluir `project_root` y `target_root` en todos los handoffs.
-- En `/new-view`, incluir siempre `architecture_refs`.
-- Si hay error o bloqueo, registrar en bitácora y detener.
+- Do not code or audit directly; always delegate.
+- Include `project_root` and `target_root` in all handoffs.
+- In `/new-view`, include always `architecture_refs`.
+- In functional workflows, do not include complete specs in handoffs; use
+  `spec_context`.
+- If there are errors or blocks, record in log and stop.

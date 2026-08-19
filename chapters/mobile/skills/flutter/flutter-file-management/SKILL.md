@@ -9,7 +9,6 @@ name: flutter-file-management
 description: >
   Handles file operations in Flutter: pick, read/write, download with progress, upload, share, and manage app storage directories. Includes OWASP MASVS-STORAGE security requirements: internal-only storage for sensitive files, path traversal prevention, MIME validation, and no sensitive data in external/shared storage. Use this skill when implementing file picker, document download, file upload, file sharing, or any local file I/O.
 ---
-
 # File Management
 
 See the reference files for complete patterns and code examples.

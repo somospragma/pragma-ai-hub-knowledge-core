@@ -61,16 +61,16 @@ import '../entities/user_entity.dart';
 abstract class UserRepository {
   /// Fetch single user by ID
   Future<Result<UserEntity, Exception>> getUser(String id);
-  
+
   /// Fetch all users (paginated)
   Future<Result<List<UserEntity>, Exception>> getUsers({
     int page = 0,
     int limit = 20,
   });
-  
+
   /// Update user profile
   Future<Result<UserEntity, Exception>> updateUser(UserEntity user);
-  
+
   /// Delete user
   Future<Result<bool, Exception>> deleteUser(String id);
 }
@@ -89,7 +89,7 @@ import '../entities/user_entity.dart';
 import '../repositories/user_repository.dart';
 
 @LazySingleton()
-class GetUserUseCase 
+class GetUserUseCase
     extends BaseUseCase<String, Result<UserEntity, Exception>> {
   const GetUserUseCase({required this.repository});
 
@@ -119,7 +119,7 @@ class GetUsersRequest extends Equatable {
 }
 
 @LazySingleton()
-class GetUsersUseCase 
+class GetUsersUseCase
     extends BaseUseCase<GetUsersRequest, Result<List<UserEntity>, Exception>> {
   const GetUsersUseCase({required this.repository});
 
@@ -136,7 +136,7 @@ class GetUsersUseCase
 
 // lib/src/domain/usecases/update_user_usecase.dart
 @LazySingleton()
-class UpdateUserUseCase 
+class UpdateUserUseCase
     extends BaseUseCase<UserEntity, Result<UserEntity, Exception>> {
   const UpdateUserUseCase({required this.repository});
 
@@ -150,7 +150,7 @@ class UpdateUserUseCase
 
 // lib/src/domain/usecases/delete_user_usecase.dart
 @LazySingleton()
-class DeleteUserUseCase 
+class DeleteUserUseCase
     extends BaseUseCase<String, Result<bool, Exception>> {
   const DeleteUserUseCase({required this.repository});
 
@@ -389,14 +389,14 @@ class UserRepositoryImpl extends BaseRepository implements UserRepository {
   Future<Result<UserEntity, Exception>> getUser(String id) async {
     // Try local first
     final localResult = await localDataSource.getUser(id);
-    
+
     if (localResult is Success) {
       return Success(mapper.from(response: localResult.value));
     }
 
     // Fall back to remote
     final remoteResult = await remoteDataSource.getUser(id);
-    
+
     return remoteResult.fold(
       (model) async {
         // Cache locally
@@ -416,7 +416,7 @@ class UserRepositoryImpl extends BaseRepository implements UserRepository {
       page: page,
       limit: limit,
     );
-    
+
     return remoteResult.fold(
       (models) async {
         return Success(mapper.fromList(models).toList());
@@ -429,7 +429,7 @@ class UserRepositoryImpl extends BaseRepository implements UserRepository {
   Future<Result<UserEntity, Exception>> updateUser(UserEntity user) async {
     final model = mapper.toModel(user);
     final remoteResult = await remoteDataSource.updateUser(model);
-    
+
     return remoteResult.fold(
       (model) async {
         await localDataSource.updateUser(model);

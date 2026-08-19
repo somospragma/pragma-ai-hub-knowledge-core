@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-owasp-mobile-top10`  
-**Scanned:** 2026-06-03 17:43:39 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:39 UTC
 
 ## Risk Assessment
 
@@ -37,8 +37,8 @@
 
 ### 🟡 MEDIUM: E1
 
-**Location:** `SKILL.md:268`  
-**Confidence:** 50%  
+**Location:** `SKILL.md:268`
+**Confidence:** 50%
 
 **Message:** External Transmission
 
@@ -48,8 +48,8 @@
 
 ### 🟡 MEDIUM: E1
 
-**Location:** `references/m2-storage.md:176`  
-**Confidence:** 50%  
+**Location:** `references/m2-storage.md:176`
+**Confidence:** 50%
 
 **Message:** External Transmission
 
@@ -59,8 +59,8 @@
 
 ### 🟡 MEDIUM: E1
 
-**Location:** `references/m4-authentication.md:35`  
-**Confidence:** 50%  
+**Location:** `references/m4-authentication.md:35`
+**Confidence:** 50%
 
 **Message:** External Transmission
 
@@ -70,8 +70,8 @@
 
 ### 🟡 MEDIUM: E1
 
-**Location:** `references/m6-authorization.md:41`  
-**Confidence:** 50%  
+**Location:** `references/m6-authorization.md:41`
+**Confidence:** 50%
 
 **Message:** External Transmission
 
@@ -81,8 +81,8 @@
 
 ### 🟡 MEDIUM: E1
 
-**Location:** `references/m9-reverse-engineering.md:157`  
-**Confidence:** 50%  
+**Location:** `references/m9-reverse-engineering.md:157`
+**Confidence:** 50%
 
 **Message:** External Transmission
 
@@ -92,8 +92,8 @@
 
 ### 🟡 MEDIUM: EA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:99`  
-**Confidence:** 85%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:99`
+**Confidence:** 85%
 
 **Message:** Autonomous Decision Making
 
@@ -103,8 +103,8 @@
 
 ### 🟡 MEDIUM: EA2
 
-**Location:** `references/owasp_masvs_checklist.md:185`  
-**Confidence:** 75%  
+**Location:** `references/owasp_masvs_checklist.md:185`
+**Confidence:** 75%
 
 **Message:** Autonomous Decision Making
 
@@ -114,8 +114,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/m2-storage.md:25`  
-**Confidence:** 70%  
+**Location:** `references/m2-storage.md:25`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -125,8 +125,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/m2-storage.md:53`  
-**Confidence:** 70%  
+**Location:** `references/m2-storage.md:53`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -136,8 +136,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/m4-authentication.md:77`  
-**Confidence:** 70%  
+**Location:** `references/m4-authentication.md:77`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -147,8 +147,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/owasp_masvs_checklist.md:16`  
-**Confidence:** 70%  
+**Location:** `references/owasp_masvs_checklist.md:16`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -158,8 +158,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/owasp_masvs_checklist.md:41`  
-**Confidence:** 70%  
+**Location:** `references/owasp_masvs_checklist.md:41`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -169,8 +169,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/owasp_masvs_checklist.md:50`  
-**Confidence:** 70%  
+**Location:** `references/owasp_masvs_checklist.md:50`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -180,8 +180,8 @@
 
 ### 🔴 HIGH: PE3
 
-**Location:** `references/owasp_masvs_checklist.md:69`  
-**Confidence:** 70%  
+**Location:** `references/owasp_masvs_checklist.md:69`
+**Confidence:** 70%
 
 **Message:** Credential Access
 
@@ -191,8 +191,8 @@
 
 ### 🔴 HIGH: P2
 
-**Location:** `SKILL.md:276`  
-**Confidence:** 70%  
+**Location:** `SKILL.md:276`
+**Confidence:** 70%
 
 **Message:** Hidden Instructions
 
@@ -202,8 +202,8 @@
 
 ### 🔴 HIGH: P2
 
-**Location:** `references/m1-platform.md:40`  
-**Confidence:** 70%  
+**Location:** `references/m1-platform.md:40`
+**Confidence:** 70%
 
 **Message:** Hidden Instructions
 
@@ -213,8 +213,8 @@
 
 ### 🔴 HIGH: P2
 
-**Location:** `references/m3-communication.md:43`  
-**Confidence:** 70%  
+**Location:** `references/m3-communication.md:43`
+**Confidence:** 70%
 
 **Message:** Hidden Instructions
 
@@ -224,8 +224,8 @@
 
 ### 🔴 HIGH: P2
 
-**Location:** `references/m3-communication.md:87`  
-**Confidence:** 70%  
+**Location:** `references/m3-communication.md:87`
+**Confidence:** 70%
 
 **Message:** Hidden Instructions
 
@@ -235,8 +235,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `SKILL.md:261`  
-**Confidence:** 75%  
+**Location:** `SKILL.md:261`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -246,8 +246,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:231`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:231`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -257,8 +257,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:242`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:242`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -268,8 +268,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:253`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:253`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -279,8 +279,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:264`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:264`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -290,8 +290,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:275`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:275`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -301,8 +301,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:286`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:286`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -312,8 +312,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:297`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:297`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -323,8 +323,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:308`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:308`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -334,8 +334,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:319`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:319`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -345,8 +345,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:330`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:330`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -356,8 +356,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:341`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:341`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -367,8 +367,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:352`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:352`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -378,8 +378,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:363`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:363`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -389,8 +389,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:374`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:374`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -400,8 +400,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:385`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:385`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -411,8 +411,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:396`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:396`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -422,8 +422,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `evals/flutter-owasp-mobile-top10.md:407`  
-**Confidence:** 75%  
+**Location:** `evals/flutter-owasp-mobile-top10.md:407`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -433,8 +433,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/m1-platform.md:114`  
-**Confidence:** 75%  
+**Location:** `references/m1-platform.md:114`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -444,8 +444,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/m1-platform.md:116`  
-**Confidence:** 75%  
+**Location:** `references/m1-platform.md:116`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -455,8 +455,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/m1-platform.md:263`  
-**Confidence:** 75%  
+**Location:** `references/m1-platform.md:263`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -466,8 +466,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/m1-platform.md:288`  
-**Confidence:** 75%  
+**Location:** `references/m1-platform.md:288`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -477,8 +477,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/m3-communication.md:11`  
-**Confidence:** 75%  
+**Location:** `references/m3-communication.md:11`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -488,8 +488,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/m5-cryptography.md:218`  
-**Confidence:** 75%  
+**Location:** `references/m5-cryptography.md:218`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -499,8 +499,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/owasp_scan_script.md:34`  
-**Confidence:** 75%  
+**Location:** `references/owasp_scan_script.md:34`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -510,8 +510,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/owasp_scan_script.md:129`  
-**Confidence:** 75%  
+**Location:** `references/owasp_scan_script.md:129`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -521,8 +521,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/owasp_scan_script.md:130`  
-**Confidence:** 75%  
+**Location:** `references/owasp_scan_script.md:130`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -532,8 +532,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/quick-reference.md:40`  
-**Confidence:** 75%  
+**Location:** `references/quick-reference.md:40`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -543,8 +543,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/quick-reference.md:41`  
-**Confidence:** 75%  
+**Location:** `references/quick-reference.md:41`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -554,8 +554,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/quick-reference.md:117`  
-**Confidence:** 75%  
+**Location:** `references/quick-reference.md:117`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -565,8 +565,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/quick-reference.md:232`  
-**Confidence:** 75%  
+**Location:** `references/quick-reference.md:232`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -576,8 +576,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `scripts/owasp_scan.sh:23`  
-**Confidence:** 75%  
+**Location:** `scripts/owasp_scan.sh:23`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -587,8 +587,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `scripts/owasp_scan.sh:114`  
-**Confidence:** 75%  
+**Location:** `scripts/owasp_scan.sh:114`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -598,8 +598,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `scripts/owasp_scan.sh:115`  
-**Confidence:** 75%  
+**Location:** `scripts/owasp_scan.sh:115`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 
@@ -609,8 +609,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `SKILL.md:143`  
-**Confidence:** 80%  
+**Location:** `SKILL.md:143`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -620,8 +620,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `SKILL.md:143`  
-**Confidence:** 80%  
+**Location:** `SKILL.md:143`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -631,8 +631,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/m10-extraneous.md:69`  
-**Confidence:** 80%  
+**Location:** `references/m10-extraneous.md:69`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -642,8 +642,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/m10-extraneous.md:69`  
-**Confidence:** 80%  
+**Location:** `references/m10-extraneous.md:69`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -653,8 +653,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/owasp_masvs_checklist.md:72`  
-**Confidence:** 80%  
+**Location:** `references/owasp_masvs_checklist.md:72`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -664,8 +664,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/owasp_masvs_checklist.md:72`  
-**Confidence:** 80%  
+**Location:** `references/owasp_masvs_checklist.md:72`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -675,8 +675,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/owasp_masvs_checklist.md:78`  
-**Confidence:** 80%  
+**Location:** `references/owasp_masvs_checklist.md:78`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -686,8 +686,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/owasp_masvs_checklist.md:78`  
-**Confidence:** 80%  
+**Location:** `references/owasp_masvs_checklist.md:78`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -697,8 +697,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/owasp_scan_script.md:80`  
-**Confidence:** 80%  
+**Location:** `references/owasp_scan_script.md:80`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -708,8 +708,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/owasp_scan_script.md:80`  
-**Confidence:** 80%  
+**Location:** `references/owasp_scan_script.md:80`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -719,8 +719,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/quick-reference.md:81`  
-**Confidence:** 80%  
+**Location:** `references/quick-reference.md:81`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -730,8 +730,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `references/quick-reference.md:81`  
-**Confidence:** 80%  
+**Location:** `references/quick-reference.md:81`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -741,8 +741,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `scripts/owasp_scan.sh:67`  
-**Confidence:** 80%  
+**Location:** `scripts/owasp_scan.sh:67`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 
@@ -752,8 +752,8 @@
 
 ### 🟡 MEDIUM: TM3
 
-**Location:** `scripts/owasp_scan.sh:67`  
-**Confidence:** 80%  
+**Location:** `scripts/owasp_scan.sh:67`
+**Confidence:** 80%
 
 **Message:** Unsafe Defaults
 

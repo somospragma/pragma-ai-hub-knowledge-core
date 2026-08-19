@@ -1,0 +1,186 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "https://pragma.ai/schemas/mobile/bootstrap-spec.schema.yaml"
+title: Bootstrap Spec Packet
+type: object
+additionalProperties: true
+required:
+  - schema_version
+  - workflow
+  - mode
+  - evidence_mode
+  - status
+  - inputs
+  - resolved
+  - contracts
+  - validation
+properties:
+  schema_version:
+    type: integer
+    minimum: 1
+  workflow:
+    type: string
+    const: bootstrap-workspace
+  mode:
+    type: string
+    enum: [propose_then_apply]
+  evidence_mode:
+    type: string
+    enum: [minimal, standard]
+    default: minimal
+  status:
+    type: string
+    enum: [proposed, applied, blocked_input]
+  inputs:
+    type: object
+    additionalProperties: true
+    required: [workspace_root]
+    properties:
+      workspace_root:
+        type: string
+      workspace_file:
+        type: [string, "null"]
+  resolved:
+    type: object
+    additionalProperties: true
+    required:
+      - app_repo_root
+      - repo_mode
+      - target_registry
+    properties:
+      app_repo_root:
+        type: string
+      repo_mode:
+        type: string
+        enum: [single_repo, monorepo_melos, multi_repo]
+      target_package_path:
+        type: string
+      target_root:
+        type: string
+      melos:
+        type: object
+        additionalProperties: false
+        required: [enabled, root, config_source, config_path]
+        properties:
+          enabled:
+            type: boolean
+          root:
+            type: string
+          config_source:
+            type: string
+            enum: [legacy_yaml, root_pubspec]
+          config_path:
+            type: string
+      workspace_roots:
+        type: array
+        items:
+          type: string
+      target_registry:
+        type: object
+        minProperties: 1
+        additionalProperties:
+          type: object
+          additionalProperties: true
+          required: [kind, location_strategy, root]
+          properties:
+            kind:
+              type: string
+            location_strategy:
+              type: string
+            repo_root:
+              type: string
+            package_path:
+              type: string
+            root:
+              type: string
+            package_name:
+              type: string
+            melos_scope:
+              type: string
+  contracts:
+    type: object
+    additionalProperties: false
+    required:
+      - project_config
+      - architecture_contract
+      - dependencies_contract
+    properties:
+      project_config:
+        $ref: "#/$defs/proposed_contract"
+      architecture_contract:
+        $ref: "#/$defs/proposed_contract"
+      dependencies_contract:
+        $ref: "#/$defs/proposed_contract"
+  validation:
+    type: object
+    additionalProperties: true
+    required:
+      - schema_valid
+      - app_root_has_executable_signal
+      - no_dependency_root_selected
+      - target_registry_paths_resolved
+      - no_contract_drift_detected
+    properties:
+      schema_valid:
+        type: boolean
+      app_root_has_executable_signal:
+        type: boolean
+      no_dependency_root_selected:
+        type: boolean
+      target_registry_paths_resolved:
+        type: boolean
+      no_contract_drift_detected:
+        type: boolean
+      melos_workspace_valid:
+        type: boolean
+allOf:
+  - if:
+      properties:
+        resolved:
+          properties:
+            repo_mode:
+              const: monorepo_melos
+          required: [repo_mode]
+      required: [resolved]
+    then:
+      properties:
+        resolved:
+          required: [melos]
+          properties:
+            melos:
+              properties:
+                enabled:
+                  const: true
+$defs:
+  proposed_contract:
+    type: object
+    additionalProperties: false
+    required: [output, schema_ref, owns]
+    properties:
+      output:
+        type: string
+      schema_ref:
+        type: string
+      owns:
+        type: array
+        minItems: 1
+        items:
+          type: string
+allOf:
+  - if:
+      properties:
+        status:
+          const: applied
+    then:
+      properties:
+        validation:
+          properties:
+            schema_valid:
+              const: true
+            app_root_has_executable_signal:
+              const: true
+            no_dependency_root_selected:
+              const: true
+            target_registry_paths_resolved:
+              const: true
+            no_contract_drift_detected:
+              const: true

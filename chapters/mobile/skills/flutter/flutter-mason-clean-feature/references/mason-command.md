@@ -202,16 +202,16 @@ See SKILL.md for complete integration workflow.
 
 ## Troubleshooting
 
-**Error**: `mason make` not found  
+**Error**: `mason make` not found
 **Solution**: Install Mason: `dart pub global activate mason_cli`
 
-**Error**: Brick not found  
+**Error**: Brick not found
 **Solution**: Add brick: `mason add -g flutter_clean_feature --git-url git@github.com:somospragma/pragma-mason-bricks.git --git-path bricks/flutter_clean_feature --git-ref develop`
 
-**Error**: Invalid config file  
+**Error**: Invalid config file
 **Solution**: Ensure JSON is valid and all required variables are present. Run without `-c` flag to see which variables are missing.
 
-**Error**: Output directory doesn't exist  
+**Error**: Output directory doesn't exist
 **Solution**: Mason creates the feature directory but not parent folders. Create parent folder manually: `mkdir -p ./features`
 
 ## Best Practices

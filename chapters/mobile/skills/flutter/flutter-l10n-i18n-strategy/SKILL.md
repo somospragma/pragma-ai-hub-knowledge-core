@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-l10n-i18n-strategy
 description: >
-  Implements advanced localization (l10n) and internationalization (i18n) in Flutter-type-safe translations with slang, official gen-l10n with ARB files, plurals, gender, date/number/currency formatting with intl, RTL layout support, dynamic locale switching, locale persistence, and translation workflow at scale. Use this skill when adding multi-language support, handling plurals or gender, formatting dates/currencies per locale, supporting RTL languages (Arabic, Hebrew, Persian), managing translation files, or setting up a translation CI pipeline.
+  Implements advanced localization (l10n) and internationalization (i18n) in Flutter: type-safe translations with slang, official gen-l10n with ARB files, plurals, gender, date/number/currency formatting with intl, RTL layout support, dynamic locale switching, locale persistence, and translation workflow at scale. Use this skill when adding multi-language support, handling plurals or gender, formatting dates/currencies per locale, supporting RTL languages (Arabic, Hebrew, Persian), managing translation files, or setting up a translation CI pipeline.
 ---
-
 # Localization Strategy
 
 See the reference files for complete patterns and code examples.

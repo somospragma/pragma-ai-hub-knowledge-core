@@ -35,7 +35,7 @@ Each frame has two bars:
 - **UI thread** (top) — Dart build + layout
 - **Raster thread** (bottom) — GPU compositing
 
-If only the raster bar is red → look for `saveLayer`, `BackdropFilter`, large `ClipRRect`.  
+If only the raster bar is red → look for `saveLayer`, `BackdropFilter`, large `ClipRRect`.
 If only the UI bar is red → look for expensive `build()`, excessive rebuilds, heavy computation.
 
 ### Flame Chart Navigation

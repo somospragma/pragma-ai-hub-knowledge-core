@@ -9,7 +9,6 @@ name: flutter-firebase-analytics
 description: >
   Implements analytics event tracking and user properties in Flutter using Firebase Analytics as the primary provider. Uses a Strategy + Adapter pattern so the analytics provider can be swapped (Firebase → Mixpanel → Amplitude → custom) without touching domain or presentation layers. Covers screen tracking via go_router observer, custom events, user properties, and consent management.
 ---
-
 # Analytics Strategy
 
 See the reference files for complete patterns and code examples.

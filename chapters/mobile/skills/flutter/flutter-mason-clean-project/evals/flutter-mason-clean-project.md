@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-mason-clean-project  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-mason-clean-project`  
-**Scanned:** 2026-06-23 00:22:57 UTC  
+**Skill:** flutter-mason-clean-project
+**Source:** `../`
+**Scanned:** 2026-06-23 00:22:57 UTC
 
 ## Risk Assessment
 

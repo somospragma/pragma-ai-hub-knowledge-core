@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-release-automation  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-release-automation`  
-**Scanned:** 2026-06-16 16:02:51 UTC  
+**Skill:** flutter-release-automation
+**Source:** `../`
+**Scanned:** 2026-06-16 16:02:51 UTC
 
 ## Risk Assessment
 
@@ -29,8 +29,8 @@
 
 ### 🟡 MEDIUM: SQP-2
 
-**Location:** `references/jenkins.md:389–393`  
-**Confidence:** 80%  
+**Location:** `references/jenkins.md:389–393`
+**Confidence:** 80%
 
 **Message:** The use of `sed -i` to modify `pubspec.yaml` is a standard practice in CI/CD pipelines to automate version bumping (e.g., appending the build number). While it is a 'destructive' modification to the file on the local workspace, it is not a security vulnerability in the context of a transient CI runner. However, if this script were run on a developer's local machine or a persistent server without a clean workspace, it would modify source code unexpectedly.
 

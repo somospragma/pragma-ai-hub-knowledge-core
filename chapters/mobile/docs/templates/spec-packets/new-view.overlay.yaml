@@ -1,0 +1,61 @@
+workflow: new-view
+entry_agent: ds-orchestrator
+base_spec_level: standard
+purpose: Generate a Flutter app view from Figma with required DS/App split.
+required_inputs:
+  - view_name
+  - figma_url
+  - user_story
+optional_inputs:
+  - project_root
+  - user_story_path
+  - route_name
+  - target_id
+  - golden_tests
+  - evidence_mode
+spec_packet_owner:
+  target_resolution: input.target_id_or_active_target_defaults.app_target_id
+  fallback_key: active_target_defaults.app
+  required_kind: app
+  immutable_across_phases: true
+required_external_access:
+  figma_mcp:
+    required: true
+    preflight_agent: figma-analyzer
+    evidence: evidence/figma-mcp-preflight.md
+required_agents:
+  - ds-orchestrator
+  - figma-analyzer
+  - component-planner
+  - component-architect
+  - widget-developer
+  - code-auditor
+  - test-engineer
+  - widgetbook-developer
+  - delivery-manager
+conditional_agents:
+  golden_tests:
+    - golden-test-engineer
+artifact_groups:
+  - ds_components
+  - app_view
+  - tests
+  - golden_tests
+  - widgetbook
+  - audit
+  - delivery
+required_human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+notes:
+  - The Spec Packet is owned by the resolved app target for the whole run.
+  - DS artifacts target design_system; app view artifacts target the resolved app target.
+  - The DS checkpoint must be approved before app view generation starts.
+  - Every visible icon, image, illustration, logo, and image-fill source must be downloaded from Figma into source-assets/figma with its node id, format and SHA-256 before approval.
+  - The initial plan must reconcile visual_manifest and layout_manifest: cropped assets use source SVGs with explicit transforms, DS icons require an exact match and an archived Figma export, typography must map to exact tokens and registered project fonts, and every visible node must retain its parent-child order, bounds, layout, four-corner radii and border width.
+  - Visible bottom navigation must resolve to existing_app_shell, view_scaffold, or not_present before approval.
+  - The app-view checkpoint requires evidence/figma-fidelity-report.json. Geometry allows at most 1 dp delta, global pixel difference at most 2%, and regional pixel difference at most 4%; text, hierarchy/order, asset identity and declared shape values are exact invariants.
+  - DS and view widget tests remain mandatory; both golden stages run only when golden_tests=true.
+  - When golden_tests=false, record golden_tests as skipped_by_input.
+  - evidence_mode defaults to minimal; standard retains detailed phase reports.

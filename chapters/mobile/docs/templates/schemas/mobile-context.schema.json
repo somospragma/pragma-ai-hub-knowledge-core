@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pragma.ai/schemas/mobile/mobile-context.schema.json",
+  "title": "Mobile Spec Packet Context",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "run_id",
+    "workflow",
+    "spec_level",
+    "workflow_controller",
+    "packet_owner_target_id",
+    "packet_root",
+    "status",
+    "current_phase",
+    "checkpoints",
+    "completed_phases",
+    "phase_results",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "minimum": 1 },
+    "schema_ref": { "type": "string" },
+    "run_id": { "type": "string" },
+    "workflow": {
+      "type": "string",
+      "enum": [
+        "new-component",
+        "new-view",
+        "new-feature",
+        "refactor-component",
+        "refactor-feature",
+        "test-plan",
+        "fix-pr-comments"
+      ]
+    },
+    "spec_level": { "type": "string", "enum": ["mini", "standard", "full"] },
+    "workflow_controller": { "type": "string", "minLength": 1 },
+    "packet_owner_target_id": { "type": "string", "minLength": 1 },
+    "packet_root": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "proposed",
+        "pending_human_review",
+        "approved_for_execution",
+        "completed",
+        "blocked_input"
+      ]
+    },
+    "current_phase": { "type": "string", "minLength": 1 },
+    "checkpoints": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/checkpoint" }
+    },
+    "pending_human_review": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["kind", "review_ref"],
+      "properties": {
+        "kind": { "type": "string", "minLength": 1 },
+        "review_ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "completed_phases": { "type": "array", "items": { "type": "string" } },
+    "phase_results": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/phase_result" }
+    },
+    "artifacts": { "type": "object" }
+  },
+  "$defs": {
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["required", "phase", "status", "decision_ref"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "phase": { "type": "string", "minLength": 1 },
+        "status": { "type": "string", "enum": ["pending", "approved", "changes_requested", "adjustment_proposed", "revision_authorized", "stale", "skipped"] },
+        "decision_ref": { "type": "string", "minLength": 1 },
+        "artifact_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "approval_ref": { "type": "string", "minLength": 1 },
+        "approved_at": { "type": "string", "format": "date-time" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "change_request_ref": { "type": "string", "minLength": 1 },
+        "proposal_ref": { "type": "string", "minLength": 1 },
+        "proposal_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "authorization_ref": { "type": "string", "minLength": 1 },
+        "approval_challenge": { "type": "string", "pattern": "^[a-f0-9]{8}$" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "approved" } }, "required": ["status"] },
+          "then": { "required": ["artifact_hash", "approval_ref", "approved_at"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "changes_requested" } }, "required": ["status"] },
+          "then": { "required": ["change_request_ref"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "adjustment_proposed" } }, "required": ["status"] },
+          "then": { "required": ["proposal_ref", "proposal_hash"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "revision_authorized" } }, "required": ["status"] },
+          "then": { "required": ["proposal_ref", "proposal_hash", "authorization_ref"] }
+        }
+      ]
+    },
+    "phase_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "summary", "refs"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["completed", "skipped_by_input", "blocked_input", "failed"]
+        },
+        "summary": { "type": "string", "maxLength": 280 },
+        "refs": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "type": "string" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "pending_human_review" } },
+        "required": ["status"]
+      },
+      "then": { "required": ["pending_human_review"] }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "approved_for_execution" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "checkpoints": {
+            "required": ["initial_spec"],
+            "properties": {
+              "initial_spec": {
+                "properties": { "status": { "const": "approved" } },
+                "required": ["status"]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

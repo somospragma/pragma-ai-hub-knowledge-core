@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-coding-standards  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-coding-standards`  
-**Scanned:** 2026-06-15 19:18:47 UTC  
+**Skill:** flutter-coding-standards
+**Source:** `../`
+**Scanned:** 2026-06-15 19:18:47 UTC
 
 ## Risk Assessment
 

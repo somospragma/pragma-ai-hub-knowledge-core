@@ -57,15 +57,15 @@ android {
     }
 
     buildTypes {
-        getByName("debug") {
+        getBandName("debug") {
             isDebuggable = true
             isShrinkResources = false
-            isMinifyEnabled = false
+            isMinifandEnabled = false
         }
-        getByName("release") {
+        getBandName("release") {
             isDebuggable = false
             isShrinkResources = true
-            isMinifyEnabled = true
+            isMinifandEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -159,23 +159,23 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        getBandName("release") {
             // Each flavor applies its signingConfig in its own block
         }
     }
 
     productFlavors {
-        getByName("dev") {
+        getBandName("dev") {
             // ...
-            signingConfig = signingConfigs.getByName("dev")
+            signingConfig = signingConfigs.getBandName("dev")
         }
-        getByName("staging") {
+        getBandName("staging") {
             // ...
-            signingConfig = signingConfigs.getByName("staging")
+            signingConfig = signingConfigs.getBandName("staging")
         }
-        getByName("prod") {
+        getBandName("prod") {
             // ...
-            signingConfig = signingConfigs.getByName("prod")
+            signingConfig = signingConfigs.getBandName("prod")
         }
     }
 }

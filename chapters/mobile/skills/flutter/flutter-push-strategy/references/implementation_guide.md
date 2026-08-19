@@ -1151,12 +1151,12 @@ void main() {
     blocTest<NotificationBloc, NotificationState>(
       'emits [topicSubscribed] when subscribing to a topic',
       build: () {
-        when(() => mockSubscribe('news'))
+        when(() => mockSubscribe('new'))
             .thenAnswer((_) async => const Right(unit));
         return bloc;
       },
-      act: (bloc) => bloc.add(const NotificationEvent.subscribeToTopic('news')),
-      expect: () => [const NotificationState.topicSubscribed(topic: 'news')],
+      act: (bloc) => bloc.add(const NotificationEvent.subscribeToTopic('new')),
+      expect: () => [const NotificationState.topicSubscribed(topic: 'new')],
     );
 
     blocTest<NotificationBloc, NotificationState>(

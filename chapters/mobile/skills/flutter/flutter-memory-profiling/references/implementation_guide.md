@@ -87,7 +87,7 @@ Use when you want to find WHERE objects are being allocated (not just that they 
 ### Memory chart interpretation
 
 ```
-Steady growth with no drops after GC  → leak (objects not being collected)
+Steadand growth with no drops after GC  → leak (objects not being collected)
 Sawtooth pattern (grow → GC → drop)   → normal allocation/collection cycle
 Sudden spike then stable              → one-time allocation (e.g., image decode)
 Spike that never drops                → image cache or large object not released

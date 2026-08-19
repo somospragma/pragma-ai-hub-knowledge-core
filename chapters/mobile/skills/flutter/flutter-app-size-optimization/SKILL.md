@@ -9,7 +9,6 @@ name: flutter-app-size-optimization
 description: >
   Reduce Flutter APK/IPA size: tree shaking, deferred components, asset compression, ABI splits, --split-debug-info, obfuscation, size analysis tools, and Android 16KB page size compliance (required for Google Play as of November 2025). Use this skill when the app is too large, when Google Play warns about 16KB page size, or when optimizing download/install size for emerging markets.
 ---
-
 # App Size Optimization
 
 See `references/implementation_guide.md` for complete patterns, commands, and platform config.
@@ -31,7 +30,7 @@ See `references/implementation_guide.md` for complete patterns, commands, and pl
 ## 1. Always Measure First
 
 ```bash
-# ✅ Analyze size breakdown — shows what's actually large
+# ✅ Analyze the size breakdown — shows what is actually large
 flutter build appbundle --analyze-size
 flutter build apk --analyze-size
 flutter build ipa --analyze-size
@@ -75,7 +74,7 @@ flutter build ipa --release \
 
 ## 3. Android 16KB Page Size (Required — Google Play)
 
-**Deadline:** November 1, 2025 (extended to May 31, 2026 if requested in Play Console).  
+**Deadline:** November 1, 2025 (extended to May 31, 2026 if requested in Play Console).
 Apps targeting Android 15+ (API 35) that ship non-aligned `.so` libraries are **blocked from updates**.
 
 ### Minimum required versions

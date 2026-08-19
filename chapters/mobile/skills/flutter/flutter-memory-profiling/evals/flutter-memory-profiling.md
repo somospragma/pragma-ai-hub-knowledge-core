@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `chapters/mobile/skills/flutter/flutter-memory-profiling`  
-**Scanned:** 2026-06-03 17:43:32 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:32 UTC
 
 ## Risk Assessment
 

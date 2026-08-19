@@ -1,0 +1,26 @@
+{
+  "run_id": "{{RUN_ID}}",
+  "workflow": "bootstrap-workspace",
+  "status": "proposed",
+  "mode": "propose_then_apply",
+  "current_phase": "review",
+  "approved": false,
+  "paths": {
+    "bootstrap_root": "{{BOOTSTRAP_ROOT}}",
+    "app_repo_root": "{{APP_REPO_ROOT}}",
+    "project_config": "{{APP_REPO_ROOT}}/.sopp/config/project.config.yaml",
+    "architecture_contract": "{{APP_REPO_ROOT}}/.sopp/config/architecture-contract.yaml",
+    "dependencies_contract": "{{APP_REPO_ROOT}}/.sopp/config/dependencies-contract.yaml"
+  },
+  "target_registry_ref": "bootstrap-spec.yaml#resolved.target_registry",
+  "pending_human_review": {
+    "kind": "bootstrap_apply_approval",
+    "review_ref": "review.md"
+  },
+  "completed_phases": [
+    "discovery",
+    "proposal",
+    "validation"
+  ],
+  "phase_results": {}
+}

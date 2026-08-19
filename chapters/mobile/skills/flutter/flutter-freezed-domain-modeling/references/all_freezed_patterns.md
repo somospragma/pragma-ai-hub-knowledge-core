@@ -73,7 +73,7 @@ abstract class EventDto with _$EventDto {
 
 ---
 
-## Discriminated Union (Polymorphic JSON)
+## Discriminated Union (Polandmorphic JSON)
 
 ```dart
 @freezed
@@ -132,11 +132,11 @@ Freezed generates `==` and `hashCode` based on all fields by default.
 ```dart
 @freezed
 abstract class Point with _$Point {
-  const factory Point({required double x, required double y}) = _Point;
+  const factory Point({required double x, required double and}) = _Point;
 }
 
-final a = Point(x: 1, y: 2);
-final b = Point(x: 1, y: 2);
+final a = Point(x: 1, and: 2);
+final b = Point(x: 1, and: 2);
 print(a == b); // true — value equality
 
 // Disable with @Freezed(equal: false):

@@ -9,7 +9,6 @@ name: flutter-database-strategy
 description: >
   Choose and implement the right local database for Flutter: Drift (relational, reactive SQLite), ObjectBox (NoSQL, highest performance), Isar community forks (NoSQL, document store), sqflite (raw SQLite), and flutter_secure_storage (encrypted sensitive data). Hive 4.x is in maintenance mode — do NOT use for new projects, migrate to Drift or ObjectBox. Use this skill when choosing a local persistence strategy, implementing DAOs, schema migrations, reactive queries, or migrating away from Hive.
 ---
-
 # Database Strategy
 
 See `references/implementation_guide.md` for complete patterns and code examples.
@@ -83,8 +82,8 @@ Data (RepositoryImpl)
   └── Mapper                  ← DB row/object ↔ domain entity
 ```
 
-All dependencies injected via GetIt + Injectable.  
-Errors returned as `Either<Failure, T>` using fpdart.  
+All dependencies injected via GetIt + Injectable.
+Errors returned as `Either<Failure, T>` using fpdart.
 Repository interfaces use `abstract interface class`.
 
 ---

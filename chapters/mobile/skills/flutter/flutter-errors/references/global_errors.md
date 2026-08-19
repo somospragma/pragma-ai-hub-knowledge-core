@@ -164,7 +164,7 @@ ErrorWidget.builder = (FlutterErrorDetails details) {
               Text(
                 details.exceptionAsString(),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: Colors.green),
               ),
           ],
         ),

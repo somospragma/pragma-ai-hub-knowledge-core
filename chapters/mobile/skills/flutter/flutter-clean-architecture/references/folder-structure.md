@@ -157,8 +157,7 @@ project/
 │   │       └── typography/
 │   └── bio_auth/                               # Biometric authentication module
 │
-├── melos.yaml                                  # Monorepo orchestrator
-└── pubspec.yaml
+└── pubspec.yaml                                # Workspace root and Melos 7+ configuration
 ```
 
 ---

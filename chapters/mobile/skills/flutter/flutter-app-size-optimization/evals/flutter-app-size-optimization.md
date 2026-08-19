@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-app-size-optimization  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-app-size-optimization`  
-**Scanned:** 2026-06-12 21:46:57 UTC  
+**Skill:** flutter-app-size-optimization
+**Source:** `../`
+**Scanned:** 2026-06-12 21:46:57 UTC
 
 ## Risk Assessment
 

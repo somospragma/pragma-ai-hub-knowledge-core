@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 /// Description of organism — complete UI section.
 ///
-/// Fulfills HU: [reference].
+/// Fulfills user story: [reference].
 ///
 /// Usage example:
 /// ```dart

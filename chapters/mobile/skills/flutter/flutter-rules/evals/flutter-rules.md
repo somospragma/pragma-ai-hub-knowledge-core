@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-rules  
-**Source:** `chapters/mobile/skills/flutter/flutter-rules`  
-**Scanned:** 2026-06-03 17:43:55 UTC  
+**Skill:** flutter-rules
+**Source:** `../`
+**Scanned:** 2026-06-03 17:43:55 UTC
 
 ## Risk Assessment
 
@@ -31,8 +31,8 @@
 
 ### 🟢 LOW: EA3
 
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
+**Location:** `LICENSE.txt:11`
+**Confidence:** 70%
 
 **Message:** Scope Creep
 
@@ -42,8 +42,8 @@
 
 ### 🟢 LOW: EA3
 
-**Location:** `LICENSE.txt:11`  
-**Confidence:** 70%  
+**Location:** `LICENSE.txt:11`
+**Confidence:** 70%
 
 **Message:** Scope Creep
 
@@ -53,8 +53,8 @@
 
 ### 🟡 MEDIUM: RA2
 
-**Location:** `references/monorepo.md:76`  
-**Confidence:** 75%  
+**Location:** `references/monorepo.md:76`
+**Confidence:** 75%
 
 **Message:** Session Persistence
 

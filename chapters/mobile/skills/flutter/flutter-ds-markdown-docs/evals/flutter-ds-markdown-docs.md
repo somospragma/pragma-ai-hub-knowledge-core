@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-markdown-docs`  
-**Scanned:** 2026-06-22 14:58:26 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 14:58:26 UTC
 
 ## Risk Assessment
 

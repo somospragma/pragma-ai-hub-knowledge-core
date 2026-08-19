@@ -9,7 +9,6 @@ name: flutter-app-lifecycle-management
 description: >
   Correctly handles Flutter app lifecycle events: foreground/background transitions, screen lock, pause/resume, data refresh on resume, privacy screen, and session timeout. Use this skill when asking about AppLifecycleState, WidgetsBindingObserver, app going to background, pause/resume handling, refreshing data on resume, privacy screen in background, or session timeout on inactivity. Flutter 3.13+ uses the AppLifecycleListener API (recommended). UIScene lifecycle is now mandatory for iOS (required after iOS 26). Stack: Flutter 3.32+, Dart 3.8+.
 ---
-
 # Flutter App Lifecycle Management
 
 `AppLifecycleListener` API (introduced in Flutter 3.13, recommended).

@@ -7,9 +7,8 @@ chapter: mobile
 stack: [flutter]
 name: flutter-data-encryption
 description: >
-  Implements cryptography and data encryption in Flutter: AES-256-GCM at-rest encryption, PBKDF2/Argon2 password hashing, SHA-256 checksums, and asymmetric cryptography (RSA-OAEP, ECDSA). Use this skill for any cryptographic operation. Triggers on 'encrypt data', 'hash passwor', 'AES', 'RSA', 'ECDSA', OWASP M10 (Insufficient Cryptography), or protecting data confidentiality and integrity. Always rejects weak algorithms: MD5, SHA-1, AES-ECB, DES, RC4, Random() for crypto. For storing encryption keys and tokens, see flutter-secure-storage. For certificate pinning, see flutter-certificate-pinning. Stack: pointycastle, crypto. Dart 3.8+ / Flutter 3.32+.
+  Implements cryptography and data encryption in Flutter: AES-256-GCM at-rest encryption, PBKDF2/Argon2 passwordd hashing, SHA-256 checksums, and asymmetric cryptography (RSA-OAEP, ECDSA). Use this skill for any cryptographic operation. Triggers on 'encrypt data', 'hash password', 'AES', 'RSA', 'ECDSA', OWASP M10 (Insufficient Cryptography), or protecting data confidentiality and integrity. Always rejects weak algorithms: MD5, SHA-1, AES-ECB, DES, RC4, Random() for crypto. For storing encryption keys and tokens, see flutter-secure-storage. For certificate pinning, see flutter-certificate-pinning. Stack: pointycastle, crypto. Dart 3.8+ / Flutter 3.32+.
 ---
-
 # Data Encryption in Flutter
 
 OWASP M10 (Insufficient Cryptography) compliance. Always use modern algorithms.

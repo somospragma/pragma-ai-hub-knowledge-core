@@ -11,13 +11,12 @@ description: >
   Use when downloading assets from Figma, optimizing SVGs, registering
   resources in centralized classes, or referencing assets in widget code.
 ---
-
 # Asset Management
 
 ## Asset Types
 
-> Las rutas `assets/...` de este documento son rutas del proyecto Flutter
-> objetivo (paquete/app), no rutas internas del skill.
+> The `assets/...` paths in this document are paths inside the Flutter target
+> (package/app), not internal skill paths.
 
 | Type | Format | Location | Registry |
 |------|--------|----------|----------|
@@ -28,7 +27,11 @@ description: >
 ## Process
 
 ### 1. Download
-- Export from Figma as SVG (preferred)
+- Export every visible source asset from Figma MCP before implementation
+- Archive the original under `{SPEC_PACKET_PATH}/source-assets/figma/` with its
+  node id, format and SHA-256 before copying it to the runtime target
+- Export as SVG when the source is vector; use a Figma-provided raster format
+  only when required
 - Name: `snake_case` descriptive (e.g., `icon_close.svg`)
 
 ### 2. Optimize (SVG)
@@ -39,6 +42,11 @@ svgo input.svg -o output.svg --multipass
 - No heavy inline styles
 - Correct viewbox
 - Optimized paths
+
+Do not optimize or rewrite an archived Figma source that participates in a
+deterministic workflow. Runtime files must remain byte-identical to the archive
+unless a human-approved, separately audited transformation is explicitly added
+to the spec.
 
 ### 3. Register
 ```dart

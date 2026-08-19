@@ -1,0 +1,370 @@
+schema_version: 1
+schema_ref: ../schemas/mobile-spec.schema.yaml
+workflow: "{{WORKFLOW}}"
+spec_level: standard
+execution_mode: propose_then_apply
+evidence_mode: minimal
+status: proposed
+language:
+  review_documents: es
+inputs: {}
+external_access:
+  figma_mcp:
+    required: false
+    status: not_required
+    checks: []
+    evidence: ""
+agent_permissions:
+  ds-orchestrator:
+    can_read:
+      - inputs
+      - external_access.figma_mcp
+      - human_review
+      - artifact_plan
+      - success_criteria
+      - evidence
+      - visual_manifest
+      - layout_manifest
+    can_write:
+      spec_sections:
+        - status
+        - external_access.figma_mcp
+        - design_source
+        - literal_texts
+        - layout_constraints
+        - assets
+        - visual_manifest
+        - layout_manifest
+        - view_states
+        - navigation
+        - human_review
+        - handoffs
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.phase_results
+        - context.json.artifacts
+      evidence:
+        - evidence/ds-layer-checkpoint.md
+        - evidence/figma-analysis.md
+        - evidence/figma-mcp-preflight.md
+      packet_paths:
+        - source-assets/figma
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools:
+      - figma_mcp
+    evidence_required:
+      - evidence/ds-layer-checkpoint.md
+  figma-analyzer:
+    can_read:
+      - inputs.figma_url
+      - external_access.figma_mcp
+      - read_sections
+    can_write:
+      spec_sections:
+        - design_source
+        - literal_texts
+        - layout_constraints
+        - assets
+        - visual_manifest
+        - layout_manifest
+        - view_states
+        - navigation
+      packet_paths:
+        - source-assets/figma
+      evidence:
+        - evidence/figma-analysis.md
+        - evidence/figma-mcp-preflight.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools:
+      - figma_mcp
+    evidence_required:
+      - evidence/figma-mcp-preflight.md
+  component-planner:
+    can_read:
+      - read_sections
+      - design_source
+      - literal_texts
+      - layout_constraints
+      - assets
+      - source-assets/figma
+      - visual_manifest
+      - layout_manifest
+    can_write:
+      spec_sections:
+        - canonical_spec
+        - inventory
+        - dag
+        - technical_plan
+        - artifact_plan.planned
+      evidence:
+        - evidence/planning-report.md
+    can_create_files: false
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/planning-report.md
+  component-architect:
+    can_read:
+      - read_sections
+      - canonical_spec
+      - inventory
+      - dag
+      - design_source
+      - literal_texts
+      - layout_constraints
+      - assets
+      - source-assets/figma
+      - visual_manifest
+      - layout_manifest
+    can_write:
+      spec_sections:
+        - contracts
+        - constraints
+        - technical_plan
+        - artifact_plan.planned
+        - visual_manifest
+        - layout_manifest
+      evidence:
+        - evidence/architecture-report.md
+    can_create_files: false
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/architecture-report.md
+  widget-developer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - source-assets/figma
+      - visual_manifest
+      - layout_manifest
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.artifacts
+      evidence:
+        - evidence/codegen-report.md
+        - evidence/visual-verification.md
+        - evidence/figma-fidelity-report.json
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/codegen-report.md
+  code-auditor:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - assets
+      - source-assets/figma
+      - visual_manifest
+      - layout_manifest
+      - success_criteria
+    can_write:
+      spec_sections:
+        - status
+      evidence:
+        - evidence/audit-report.md
+        - evidence/figma-fidelity-report.json
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/audit-report.md
+  test-engineer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - visual_manifest
+      - layout_manifest
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.artifacts
+      evidence:
+        - evidence/widget-tests.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/widget-tests.md
+  golden-test-engineer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - visual_manifest
+      - layout_manifest
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      context_sections:
+        - context.json.status
+        - context.json.current_phase
+        - context.json.checkpoints
+        - context.json.completed_phases
+        - context.json.artifacts
+      evidence:
+        - evidence/golden-tests.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/golden-tests.md
+  widgetbook-developer:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - visual_manifest
+      - layout_manifest
+      - success_criteria
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets:
+        - "{{ACTIVE_TARGET_ID}}"
+      evidence:
+        - evidence/widgetbook-report.md
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/widgetbook-report.md
+  delivery-manager:
+    can_read:
+      - read_sections
+      - artifact_plan.planned
+      - visual_manifest
+      - layout_manifest
+      - success_criteria
+    can_write:
+      evidence:
+        - evidence/delivery-report.md
+    can_create_files: true
+    can_modify_files: false
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required:
+      - evidence/delivery-report.md
+human_review:
+  initial_spec_approval: required
+  layer_checkpoints: required
+  stage_checkpoints: required
+  last_decision: pending
+design_source: {}
+literal_texts: []
+layout_constraints: []
+assets: []
+visual_manifest:
+  reference_screenshot:
+    node_id: "{{FIGMA_NODE_ID}}"
+    status: blocked_input
+    reference: ""
+  assets: []
+  icons: []
+  typography: []
+  screen_chrome:
+    bottom_navigation:
+      figma_visible: false
+      ownership: not_present
+      verification: pending_analysis
+  reconciliation:
+    visible_element_count: 0
+    resolved_element_count: 0
+    unresolved_ids: []
+    status: pending
+    visual_verification_required: false
+layout_manifest:
+  root_node_id: "{{FIGMA_NODE_ID}}"
+  viewport:
+    width: 0
+    height: 0
+    device_pixel_ratio: 1
+  nodes: []
+  reconciliation:
+    visible_node_count: 0
+    resolved_node_count: 0
+    unresolved_ids: []
+    order_verified: false
+    status: pending
+  tolerances:
+    geometry_dp: 1
+    global_pixel_diff_percent: 2
+    regional_pixel_diff_percent: 4
+view_states:
+  loading: {}
+  empty: {}
+  error: {}
+  populated: {}
+canonical_spec: {}
+inventory: {}
+dag: {}
+contracts:
+  minimal_domain_data: {}
+  text_overflow: {}
+  technical_vectors: {}
+  asset_rendering: {}
+  icon_mapping: {}
+  typography_mapping: {}
+  screen_chrome: {}
+constraints:
+  compatibility: {}
+technical_plan: {}
+artifact_plan:
+  path_strategy: target_id_relative
+  planned: []
+success_criteria:
+  - id: "{{CRITERION_ID}}"
+    description: "{{CRITERION_DESCRIPTION}}"
+    evidence:
+      - "{{EVIDENCE_PATH}}"
+handoffs:
+  - phase: ds_codegen
+    agent: widget-developer
+    read_sections:
+      - canonical_spec
+      - inventory
+      - dag
+      - technical_plan
+      - artifact_plan
+      - contracts.text_overflow
+      - contracts.technical_vectors
+      - visual_manifest
+      - layout_manifest
+      - success_criteria
+  - phase: app_view_codegen
+    agent: widget-developer
+    read_sections:
+      - view_states
+      - contracts.minimal_domain_data
+      - contracts.text_overflow
+      - contracts.technical_vectors
+      - visual_manifest
+      - layout_manifest
+      - technical_plan
+      - artifact_plan
+      - success_criteria

@@ -9,7 +9,6 @@ name: flutter-biometrics
 description: >
   Implements biometric authentication (Face ID, fingerprint) in Flutter using local_auth 2.x for login and re-authentication of sensitive operations. Covers the correct security pattern: biometrics gate access to a token stored in flutter_secure_storage — they never replace the token. Includes MASVS-AUTH compliance, fallback to PIN/passcode, lockout handling, and passkeys (FIDO2) as the modern alternative. Use this skill when implementing biometric login, re-authentication before sensitive operations (payments, account deletion), or passkey-based login.
 ---
-
 # Biometric Authentication
 
 See the reference files for complete patterns and code examples.

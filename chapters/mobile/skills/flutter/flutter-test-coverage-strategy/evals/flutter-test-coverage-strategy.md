@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-test-coverage-strategy  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-test-coverage-strategy`  
-**Scanned:** 2026-06-16 15:21:44 UTC  
+**Skill:** flutter-test-coverage-strategy
+**Source:** `../`
+**Scanned:** 2026-06-16 15:21:44 UTC
 
 ## Risk Assessment
 

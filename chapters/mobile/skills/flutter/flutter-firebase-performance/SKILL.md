@@ -9,7 +9,6 @@ name: flutter-firebase-performance
 description: >
   Monitors Flutter app performance in real time: custom traces, HTTP monitoring, startup time, and screen rendering. Firebase Performance is the primary provider, with a Strategy + Adapter pattern to swap to Sentry, Datadog, or custom providers. Use this skill when instrumenting critical user flows, tracking API latency, measuring cold start time, or setting up performance regression alerts.
 ---
-
 # Performance Monitoring
 
 See the reference files for complete patterns and code examples.

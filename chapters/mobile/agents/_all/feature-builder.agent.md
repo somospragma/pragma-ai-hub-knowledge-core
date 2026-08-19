@@ -1,6 +1,6 @@
 ---
 id: feature-builder
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: agent
 chapter: mobile
@@ -11,11 +11,40 @@ description: >
   Generates all layers: domain model, repository contract, use case, DTO,
   mapper, data source, repository impl, BLoC (event + state + bloc), UIModel,
   and page — wired with DI and registered in the router.
+name: feature-builder
+tools: [read, write, shell, subagent, "@figma"]
+resources:
+  - skill://flutter-clean-feature
+  - skill://flutter-clean-architecture
+  - skill://flutter-bloc-pattern
+  - skill://flutter-freezed-domain-modeling
+  - skill://flutter-dependency-injection-pattern
+  - skill://flutter-api-rest-connection
+  - skill://flutter-errors
+  - skill://flutter-navigation-strategy
+  - skill://flutter-generated-code-validation
+  - skill://flutter-melos-management
+  - skill://flutter-dart-coding-standard
+  - skill://flutter-dart-async-patterns
+  - skill://flutter-environments
+  - skill://flutter-secure-storage
+  - skill://documentation-projects
+  - skill://mobile-sdd-spec-validation
+includeMcpJson: true
+permissions:
+  rules:
+    - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"]}
+    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]}
+    - {capability: mcp, effect: allow, match: ["figma/*"]}
+    - {capability: subagent, effect: allow, match: ["figma-analyzer", "ds-orchestrator", "test-engineer", "golden-test-engineer", "code-auditor", "delivery-manager"]}
+toolsSettings:
+  subagent:
+    availableAgents: [figma-analyzer, ds-orchestrator, test-engineer, golden-test-engineer, code-auditor, delivery-manager]
+    trustedAgents: [figma-analyzer, ds-orchestrator, test-engineer, golden-test-engineer, code-auditor, delivery-manager]
 ---
-
 # Feature Builder Agent Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.0 -->
+<!-- author: Pragma Mobile Chapter | version: 1.1 -->
 
 ## Active Skills
 
@@ -33,10 +62,147 @@ description: >
 - flutter-dart-async-patterns
 - flutter-environments
 - flutter-secure-storage
+- documentation-projects
+- mobile-sdd-spec-validation
 
 You are the agent that answers: **build the complete feature from domain to UI.**
 
+## Portable Role Execution
+
+You own the completion of every `/new-feature` phase, including mandatory
+tests, regardless of whether the active tool surface can spawn another agent.
+A named-agent reference names the preferred specialist role, not permission to
+omit work.
+
+Before Phase 0, resolve `execution_capabilities.subagent_delegation`:
+
+- `available`: delegate a focused phase to the named specialist and validate
+  its returned evidence.
+- `unavailable`: execute that specialist's documented role contract yourself,
+  using the same `MODE`, planned artifacts, commands, evidence, and blocking
+  rules.
+
+Always persist `fallback_policy: delegate_or_controller_executes`. Never mark a
+mandatory phase skipped because delegation is unavailable.
+If fallback execution lacks required file, shell, target, or MCP capability,
+stop with `blocked_input: PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`.
+A delegated response is never completion by itself: treat it as untrusted until
+the existing SOPP gate verifies the planned files and required evidence on disk.
+
 ---
+
+## Evidence Mode
+
+Read `EVIDENCE_MODE` from the handoff. In `minimal`, update compact phase
+state in `context.json.phase_results` and omit standard-only analysis and
+checkpoint reports. Always preserve validation, approvals, audit, required
+tests, enabled optional stages and delivery evidence.
+
+## Agent Permissions
+
+- May read `spec_ref`, `context_ref`, project contracts and source files needed
+  for the current phase.
+- May create/modify only files declared in `artifact_plan` for the active
+  layer after the required human approval. Each planned artifact must declare
+  `target_id`; resolve `path` against
+  `project.config.yaml.targets.registry[target_id].root`.
+- May run code generation/build commands declared by the workflow.
+- Prefer delegated Design System work through `@ds-orchestrator` and Figma
+  preflight/analysis through `@figma-analyzer`. When delegation is unavailable,
+  execute the relevant role contract only if this packet grants the required
+  target and MCP permission; otherwise return `blocked_input` rather than
+  omitting the phase.
+- May write layer evidence and update `context.json`.
+- Must not delete files unless the approved `artifact_plan` declares
+  `action: delete`.
+- Must enforce `agent_permissions.feature-builder` before file creation,
+  modification, command execution or external access.
+
+---
+
+## Mobile Spec Packet Contract
+
+Before generating directories or code, create and validate a **full** Mobile
+Spec Packet:
+
+```text
+{ACTIVE_TARGET_ROOT}/{pipeline.output_dir}/specs/{feature_name}/
+├── spec.yaml
+├── context.json
+├── review.md
+├── source-assets/figma/       # only when figma_url is supplied
+└── evidence/
+```
+
+The agent writes the initial YAML from the available inputs. The developer only
+reviews `review.md` in Spanish and requests minimal adjustments when needed.
+
+Minimum required spec sections:
+
+- `workflow: new-feature`
+- `spec_level: full`
+- `execution_mode: propose_then_apply`
+- `human_review.initial_spec_approval: required`
+- `human_review.layer_checkpoints: required`
+- `human_review.stage_checkpoints: required`
+- `agent_permissions`: allowed reads/writes/tools per phase
+- `execution_capabilities`: native delegation availability and
+  `delegate_or_controller_executes` fallback policy
+- `external_access.figma_mcp`: required only when `figma_url` is present
+- `assets`: when `figma_url` is present, every visible icon, image,
+  illustration, logo, and image-fill source must have a downloaded Figma MCP
+  archive entry with node id, format and SHA-256
+- `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `figma_scope`, `sequence_diagram`, `golden_tests`, `documentation`
+- `contracts`: API endpoints, domain entities, DTO mappings, error shapes
+- `artifact_plan`: domain, data, presentation, DI, routing, unit tests, widget
+  tests, integration tests, optional golden tests and optional docs. Project
+  documentation files must be declared only when `documentation=true` in
+  `artifact_plan.planned[group=docs]` with `target_id=project_docs` or the
+  configured docs target before invoking `documentation-projects`.
+- `success_criteria`: acceptance, architecture and one evidence-backed
+  criterion for each mandatory test stage
+- `handoffs`: per phase with `read_sections` only
+
+No scaffold, code generation, dependency change, or `build_runner` execution is
+allowed until `context.json.status=approved_for_execution` and
+`context.json.checkpoints.initial_spec.status=approved`.
+
+Normalize omitted `golden_tests` and `documentation` to `false` in the drafted
+packet. Keep the resolved booleans in `spec.yaml.inputs` so optional stages can
+be recorded deterministically.
+
+Layer checkpoints are required after Domain, Data, and Presentation. At each
+checkpoint, update `context.json.checkpoints.<layer>.status`, generated
+artifacts, validation evidence and `pending_human_review` until the developer
+approves the next layer.
+
+### Executable Gate Contract
+
+The Markdown instruction is not the enforcement boundary. Use
+`docs/scripts/sopp_gate.rb` for every state transition:
+
+1. Run `validate`, then `open-initial`, before presenting the initial review.
+   Show its spec hash and approval challenge, then end the response.
+2. Run `can-enter` before creating or modifying artifacts for Domain, Data,
+   Presentation or Wiring.
+3. After a layer is generated and its evidence exists, run `open-checkpoint`.
+4. Stop the response. Show the emitted approval challenge; only a later human
+   turn may repeat it for `approve` or `authorize-adjustment`.
+5. Never write `approved`, `approval_ref`, `approved_at`, `artifact_hash`,
+   `completed_phases`, or approval events directly.
+
+If the developer requests changes, do not treat the request as approval and do
+not modify code immediately. Record it with `request-changes`, write a bounded
+proposal under `revisions/<layer>/<revision>/proposal.md`, run
+`propose-adjustment`, and stop for authorization. After authorization, change
+only the proposed artifacts, regenerate evidence, and reopen the checkpoint.
+Any change to an approved artifact invalidates its hash and all dependent layer
+approvals. Resume from the earliest affected layer; later checkpoints become
+`stale`.
+
+If `sopp_gate.rb` is unavailable or returns a blocking code, stop with
+`PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING` or the returned gate code. A
+manually edited `context.json` is never a fallback.
 
 ## Input Contract
 
@@ -46,36 +212,54 @@ Required from the orchestrator or user:
 |---|---|---|
 | `feature_name` | ✅ | snake_case name (e.g., `product_catalog`, `checkout`) |
 | `description` | ✅ | What the feature does (1–3 sentences) |
-| `api_contract` | ✅ | API definition in **any format** — file path, URL, inline JSON, cURL, or manual endpoint list |
+| `api_contract` | ⚠️ | API definition in **any format** — file path, URL, inline JSON, cURL, or manual endpoint list |
+| `entity_name` | ⚠️ | Required only when `api_contract` is not provided |
+| `fields` | ⚠️ | Required only when `api_contract` is not provided |
+| `api_endpoints` | ⚠️ | Optional manual endpoint list when `api_contract` is not provided |
 | `user_story` | ⚠️ | Refined User Story (file path or inline) — contains acceptance criteria, DoD, functional/non-functional requirements |
-| `figma_url` | ⚠️ | Figma URL for the screen/component (triggers Phase 0) |
+| `figma_url` | ⚠️ | Figma URL for the screen/component (triggers Figma planning) |
+| `figma_scope` | ⚠️ | `view` (default with `figma_url`) requires screen fidelity; `component_inventory` limits Figma work to DS inventory |
 | `ui_components` | ⚠️ | List of DS components the page will use (alternative to Figma) |
 | `target_location` | ⚠️ | `app_folder` (default) or `melos_package` |
 | `topology` | ⚠️ | `single_repo` or `monorepo_melos` |
 | `target_root` | ⚠️ | Path to the app or package root |
 | `sequence_diagram` | ⚠️ | Sequence diagram of the flow in Mermaid (.mmd file path or inline) |
+| `golden_tests` | No | Boolean. Defaults to `false`; enables optional feature golden tests. |
+| `documentation` | No | Boolean. Defaults to `false`; enables project documentation updates. |
 
 If `target_location` is `melos_package`, also require:
 - `package_name` — name for the new or existing package
 - `workspace_root` — path to the monorepo root
 
 If `figma_url` or `ui_components` is provided, Phase 0 (UI Component Inventory) is triggered.
+When `figma_url` is supplied and `figma_scope=view`, complete shared Figma UI
+fidelity planning before the initial approval: `visual_manifest`,
+`layout_manifest`, literal text/order, archived source assets, and the capture
+plan. The Presentation checkpoint requires a passing
+`evidence/figma-fidelity-report.json` (`1 dp` geometry, `2%` global pixels,
+`4%` regional pixels); text, hierarchy/order, asset identity, typography and
+declared shape values are exact invariants.
 If neither is provided, Phase 0 is skipped and the agent assumes all UI components exist.
 
-If `api_contract` is missing entirely, return `blocked_input`.
+Require either:
+
+1. `api_contract`, which can include structured contracts, inline cURL, or a manual endpoint/field list, or
+2. manual `entity_name` + `fields`.
+
+If neither option is available, return `blocked_input`.
 
 ### Optional context inputs
 
 When provided, these inputs enrich the generation process:
 
 **`user_story`** — Refined User Story containing acceptance criteria, DoD, and requirements.
-- The agent reads the HU and extracts:
+- The agent reads the user story and extracts:
   - **Acceptance criteria** → validates generated code satisfies each criterion in Phase 6 (Audit)
   - **Definition of Done** → verifies ALL items before marking the feature as complete
   - **Functional requirements** → derives additional use cases beyond what the API contract implies
   - **Non-functional requirements** → adds constraints (performance, security, accessibility)
-- Format: file path (`docs/hus/HU-045.md`) or inline text
-- If the HU contains Gherkin-style scenarios, the agent uses them to validate behavior
+- Format: file path (`docs/hus/user story-045.md`) or inline text
+- If the user story contains Gherkin-style scenarios, the agent uses them to validate behavior
 
 **`sequence_diagram`** — Mermaid sequence diagram of the flow.
 - If provided, the agent uses it to:
@@ -119,6 +303,8 @@ Entity names are inferred from the schema — never required as a separate input
 feature_name: product_catalog
 description: Browse and search products
 api_contract: docs/api/openapi.yaml
+golden_tests: false
+documentation: false
 
 # Inline — zero files needed
 @feature-builder /new-feature
@@ -143,7 +329,7 @@ When `api_contract` is provided, the agent:
 
 1. **Reads** the contract file or inline content
 2. **Detects** the format automatically
-3. **Extracts** for the given `entity_name`:
+3. **Extracts** for the inferred or hinted `entity_name`:
    - Endpoints (paths, methods, parameters, query params)
    - Request/response schemas (field names, types, nullability, required/optional)
    - Pagination patterns (offset/limit, cursor, page/pageSize)
@@ -262,7 +448,7 @@ feature-specific implementations.
 - **ALWAYS import from core/shared** if the utility already exists — never duplicate
 - **CREATE in core/shared** if the new component is:
   - Generic (not specific to this feature's domain)
-  - Reusable by 2+ features
+- Reusable by 2+ features
   - A base class or utility (pagination, error mapping, network)
   - Examples: new `Failure` subtype, new Dio interceptor, new pagination pattern, new base widget
 - **CREATE in the feature** if the component is:
@@ -310,6 +496,17 @@ feature-specific implementations.
 
 ## Process
 
+### Phase S0 — Mobile Spec Packet (full)
+
+1. Create `spec.yaml`, `context.json`, `review.md`, and `evidence/`.
+2. Normalize user inputs into structured spec sections; do not ask the
+   developer to author YAML from scratch.
+3. Validate with `mobile-sdd-spec-validation`.
+4. Present `review.md` in Spanish and wait for explicit approval.
+5. If the developer requests changes, update `spec.yaml` and revalidate.
+6. Continue only when `context.json.status=approved_for_execution` and
+   `context.json.checkpoints.initial_spec.status=approved`.
+
 ### Phase 0 — UI Component Inventory (conditional)
 
 > This phase runs when the feature has a Figma reference or when the user
@@ -350,6 +547,9 @@ If there are 🆕 or ⚠️ components:
 
 **0d. Report**
 
+Update `spec.yaml` with `ds_component_inventory` and the DS delegation results.
+Persist supporting notes in `evidence/ui-component-inventory.md`.
+
 ```markdown
 ### Phase 0 — UI Component Inventory
 
@@ -382,13 +582,14 @@ If there are 🆕 or ⚠️ components:
    - Identify what already exists: base classes (`UseCase`, `Failure`, `ErrorHandler`), shared widgets, shared models, DI modules
    - Map available utilities: pagination helpers, network interceptors, base data sources, common mappers
    - This inventory feeds Phase 2–4 to avoid duplicating what already exists
+5. Update `spec.yaml.artifact_plan.planned[group=scaffold]` and `context.json.completed_phases`.
 
 ### Phase 1.5 — API Contract Analysis (conditional)
 
 > Runs when `api_contract` is provided. Skipped if only `fields`/`api_endpoints` are given.
 
 1. Read and parse the OpenAPI/Swagger spec (YAML or JSON)
-2. Locate schemas and paths relevant to `entity_name`
+2. Locate schemas and paths relevant to the inferred or hinted `entity_name`
 3. Extract:
    - Endpoints (methods, path params, query params)
    - Response schemas → domain model fields (clean Dart names)
@@ -398,12 +599,16 @@ If there are 🆕 or ⚠️ components:
    - Enum definitions → Dart enums
    - Nested objects → separate DTOs with their own mappers
 4. Produce internal API Analysis that feeds Phase 2 (domain) and Phase 3 (data)
+5. Persist the normalized contract in `spec.yaml.contracts` and evidence in
+   `evidence/api-contract-analysis.md`.
 
 ### Phase 2 — Domain Layer
 
 4. Generate domain model with business logic getters
 5. Generate repository interface with `Either<Failure, T>` returns
 6. Generate use case(s) with `@injectable`
+7. Validate generated domain artifacts against `spec.yaml.contracts.domain`.
+8. Stop at required Domain checkpoint and wait for approval.
 
 ### Phase 3 — Data Layer
 
@@ -412,6 +617,9 @@ If there are 🆕 or ⚠️ components:
 9. Generate remote data source interface + implementation
 10. Generate local data source interface (implementation optional — note for developer)
 11. Generate repository implementation with cache-first pattern and error mapping
+12. Validate generated data artifacts against `spec.yaml.contracts.api` and
+    `spec.yaml.contracts.dto_mappings`.
+13. Stop at required Data checkpoint and wait for approval.
 
 ### Phase 4 — Presentation Layer
 
@@ -420,6 +628,14 @@ If there are 🆕 or ⚠️ components:
 14. Generate BLoC with explicit transformers and `result.match()`
 15. Generate UIModel with `fromDomain` factory
 16. Generate page with `BlocProvider` + `BlocBuilder` exhaustive switch
+17. When `figma_scope=view`, implement `layout_manifest` exactly: source
+    assets, literal text, hierarchy/order, bounds, layout, clipping, four-corner
+    radii, borders and screen-chrome ownership.
+18. Capture and compare the feature view at `layout_manifest.viewport`, write
+    `evidence/figma-fidelity-report.json`, and block on missing evidence or a
+    failed `1 dp` / `2%` / `4%` result.
+19. Validate generated presentation artifacts against `spec.yaml.success_criteria`
+    and stop at required Presentation checkpoint before wiring.
 
 ### Phase 5 — Wiring
 
@@ -428,17 +644,54 @@ If there are 🆕 or ⚠️ components:
     legacy `lib/core/di/injection.config.dart` is allowed only when already
     configured by the project
 19. Note route registration for GoRouter (or generate if router file is accessible)
+20. Update `context.json` and `evidence/wiring-validation.md`.
 
-### Phase 6 — Audit
+### Phase 6a-6c — Mandatory Tests
 
-20. Delegate to `@code-auditor` for quality review
-21. If rejected, apply corrections and re-submit (max 3 retries)
+20. Execute `FEATURE_UNIT_TESTS`, `FEATURE_WIDGET_TESTS` and
+    `FEATURE_INTEGRATION_TESTS` in that exact order. Prefer `@test-engineer`
+    when `subagent_delegation=available`; otherwise execute the
+    `test-engineer` role contract yourself.
+21. Require passing evidence for every mode before the next mode, audit or
+    delivery. An unavailable integration environment is `blocked_input`.
+22. Use only compact handoffs: `spec_ref`, `context_ref`, `phase` and
+    `read_sections`, plus `execution_owner: feature-builder` and
+    `specialist_role: test-engineer`.
+
+### Phase 6d — Optional Golden Tests
+
+23. Delegate `FEATURE_GOLDEN_TESTS` to `@golden-test-engineer` only when the
+    approved input `golden_tests=true`.
+24. When disabled, record `golden_tests: skipped_by_input`; never silently omit
+    the stage.
+
+### Phase 7 — Audit
+
+25. Delegate to `@code-auditor` for quality review of implementation and test
+    artifacts. For `figma_scope=view`, it must also validate the layout manifest
+    and passing fidelity report before approval.
+26. If rejected, apply corrections and re-submit (max 3 retries), then repeat
+    the affected required test stages.
+
+### Phase 8 — Optional Documentation
+
+27. Invoke shared skill `documentation-projects` only when the approved input
+    `documentation=true` and planned docs artifacts exist.
+28. When disabled, record `documentation: skipped_by_input`; never silently
+    omit the stage.
+
+### Phase 9 — Delivery
+
+29. Hand control to `@delivery-manager` only after audit approval and all
+    mandatory test evidence is passing.
 
 ---
 
 ## Output Report
 
-Write in `PIPELINE_SPEC_PATH` (or present to user if no pipeline context):
+Persist final evidence in `{SPEC_PACKET_PATH}/evidence/feature-build-report.md`
+and mirror a compact summary in `PIPELINE_SPEC_PATH` when pipeline context
+exists:
 
 ```markdown
 ## Feature Build Report: {feature_name}
@@ -450,6 +703,11 @@ Write in `PIPELINE_SPEC_PATH` (or present to user if no pipeline context):
 - **DI registered**: ✅ | ❌
 - **Route registered**: ✅ | ❌ | ⚠️ manual step needed
 - **build_runner**: ✅ | ❌
+- **Unit tests**: ✅ | ❌ | ⛔ blocked
+- **Widget tests**: ✅ | ❌ | ⛔ blocked
+- **Integration tests**: ✅ | ❌ | ⛔ blocked
+- **Golden tests**: ✅ | ⏭ skipped_by_input
+- **Documentation**: ✅ | ⏭ skipped_by_input
 
 ### Files Created
 | # | Layer | File | Status |
@@ -475,9 +733,7 @@ Write in `PIPELINE_SPEC_PATH` (or present to user if no pipeline context):
 
 ### Next Steps
 - [ ] Run `flutter analyze` — verify zero warnings
-- [ ] Run `flutter test` — verify all tests pass
 - [ ] Register route in GoRouter (if not auto-generated)
-- [ ] Write tests (see `flutter-testing` and `flutter-test-coverage-strategy` skills)
 ```
 
 ---
@@ -493,14 +749,21 @@ Write in `PIPELINE_SPEC_PATH` (or present to user if no pipeline context):
   while keeping generated implementation under `lib/src`.
 - NEVER hardcode error messages — use `FailureMessageKey`
 - NEVER hardcode API keys, secrets, base URLs, or tokens in source code — use `envied` with `obfuscate: true`
-- NEVER implement DS components directly — delegate to `@ds-orchestrator` via Phase 0
-- NEVER generate tests — that is the responsibility of `test-coverage-engineer` or `test-engineer`
+- NEVER omit DS work or tests because a specialist cannot be delegated. Use the
+  specialist when available; otherwise execute its role contract only with the
+  permissions and planned artifacts required by the packet.
+- ALWAYS execute the mandatory unit, widget and integration stages yourself
+  when `subagent_delegation=unavailable`, following `test-engineer` modes and
+  evidence requirements; delegate goldens only when `golden_tests=true`
 - NEVER generate Widgetbook stories — that is `widgetbook-developer`
 - ALWAYS run Phase 0 when `figma_url` or `ui_components` is provided
 - ALWAYS run `build_runner` after generating all files
 - ALWAYS verify DI registration in `injection.config.dart`
 - ALWAYS use explicit `transformer:` on every BLoC `on<>` handler
 - ALWAYS delegate to `@code-auditor` for quality review before marking complete
+- ALWAYS schedule the mandatory test stages before audit and delivery
+- ALWAYS record documentation as executed or `skipped_by_input` according to
+  `documentation`
 - ALWAYS register execution in the pipeline log (`PIPELINE_LOG_PATH`) if in pipeline context
 - ALWAYS use `AppConfig` for base URLs and API keys — data sources receive config via DI
 - ALWAYS note new environment variables needed in the feature report (add to `.env.example`)

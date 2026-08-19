@@ -11,10 +11,9 @@ description: >
   Security and Pragma standards. Use when auditing code security, validating
   inputs, reviewing dependencies, or checking for data exposure risks.
 ---
-
 # Secure Code
 
-> **Scope**: Este skill cubre reglas de seguridad **específicas para componentes del Design System** (validación de inputs en widgets, exposición de datos en UI, dependencias del DS). Para auditoría OWASP completa (M1-M10), almacenamiento seguro y cifrado → ver skills `flutter-owasp-mobile-top10`, `flutter-secure-storage`, `flutter-data-encryption`.
+> **Scope**: This skill covers Design System-specific security rules (input validation in widgets, data exposure in UI, DS dependencies). For a full OWASP audit (M1-M10), secure storage, and encryption, see `flutter-owasp-mobile-top10`, `flutter-secure-storage`, and `flutter-data-encryption`.
 
 ## Pragma Security Principles
 

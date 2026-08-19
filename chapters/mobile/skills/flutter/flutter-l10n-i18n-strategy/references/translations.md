@@ -930,7 +930,7 @@ flutter gen-l10n
 // lib/core/l10n/widgets/language_selector.dart
 static const _languages = [
   (locale: Locale('en'), label: 'English',   flag: '🇺🇸'),
-  (locale: Locale('es'), label: 'Español',   flag: '🇪🇸'),
+  (locale: Locale('es'), label: 'Spanish',   flag: '🇪🇸'),
   (locale: Locale('ar'), label: 'العربية',   flag: '🇸🇦'),
   (locale: Locale('fr'), label: 'Français',  flag: '🇫🇷'),  // ← add here
 ];

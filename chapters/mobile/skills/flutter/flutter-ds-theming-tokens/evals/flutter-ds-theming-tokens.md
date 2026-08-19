@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-theming-tokens`  
-**Scanned:** 2026-06-22 15:53:52 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 15:53:52 UTC
 
 ## Risk Assessment
 

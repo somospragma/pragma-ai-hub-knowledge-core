@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-figma-mcp
-version: 1.3.0
+version: 1.4.0
 scope: stack
 type: skill
 chapter: mobile
@@ -13,7 +13,6 @@ description: >
   and comparing implementation against design specs. Always activate when
   working with Figma URLs, extracting design tokens, or handling MCP unavailability.
 ---
-
 # Figma MCP Integration
 
 ## Critical Protocol: `blocked_input`
@@ -44,6 +43,37 @@ This enables agents to read design data directly instead of relying on manual
 descriptions or screenshots.
 
 ## Available MCP Tools
+
+### Preferred Capability Adapter
+
+Figma MCP tool names vary by client and server version. Discover the available
+capabilities first. Prefer the current focused tools below; use a legacy tool
+only when it returns equivalent structured data. Never silently omit a required
+fact because a legacy name is unavailable.
+
+### `get_metadata`
+Retrieves a sparse hierarchy with node ids, order, positions and sizes.
+
+**Use when:** Establishing the complete visible tree for a component or screen
+without loading unnecessary deep context.
+
+### `get_variable_defs`
+Retrieves variable and token definitions relevant to a target node.
+
+**Use when:** Resolving radius, spacing, typography and color variables before
+mapping values to project tokens.
+
+### `download_assets`
+Downloads source asset exports for selected nodes.
+
+**Use when:** Archiving visible icons, images, illustrations, logos and
+image-fills in the Spec Packet. Prefer it to expiring export URLs.
+
+### Legacy Equivalents
+
+`get_file`, `get_node`, `get_node_children`, `get_styles`, `get_components`,
+and `get_images` may be used only when the active server exposes them instead
+of an equivalent preferred capability.
 
 ### `get_file`
 Retrieves the full Figma file structure (pages, frames, components).
@@ -139,23 +169,23 @@ Output: Screenshot URL/reference for visual verification
 
 ### For a Single Component
 ```
-1. get_design_context(fileKey, nodeId) → guided changes + development annotations
-2. For each guided change: get_screenshot(change/node)
-3. get_node(nodeId) → full component tree
-4. Parse children recursively → build layer hierarchy
-5. For each child: extract type, properties, fills, strokes, effects, text, constraints
+1. get_metadata(fileKey, nodeId) → complete visible tree, ids, order and bounds
+2. get_design_context(fileKey, nodeId) → guided changes + development annotations
+3. get_variable_defs(fileKey, nodeId) → radius, spacing, typography and color variables
+4. For each guided change: get_screenshot(change/node)
+5. Deep-node adapter only for nodes that need missing detail
 6. Register literal visible text from TEXT nodes without rewriting
-7. Register layout constraints and overflow risks
-8. Map each property → DS token
+7. Build visual_manifest and layout_manifest
+8. Map each property → DS token and download each visible source asset
 ```
 
 ### For a Full Screen/Page
 ```
-1. get_file(fileKey) → discover pages
+1. get_metadata(fileKey, pageNodeId) → complete visible hierarchy, order and bounds
 2. get_design_context(fileKey, pageNodeId) → development annotations + guided changes
-3. For each guided change: get_screenshot(change/node)
-4. get_node(pageNodeId) → get screen frame
-5. get_node_children(frameId) → top-level sections
+3. get_variable_defs(fileKey, pageNodeId) → design values
+4. For each guided change: get_screenshot(change/node)
+5. Deep-node adapter only for top-level sections that require missing detail
 6. For each section:
    a. Classify: header, body, footer, navigation, etc.
    b. get_node(sectionId) → full section tree
@@ -196,6 +226,8 @@ Output: Screenshot URL/reference for visual verification
 | `effects[type=DROP_SHADOW]` | `node.effects` | `elevation` → ElevationToken |
 | `opacity` | `node.opacity` | `Opacity` widget |
 | `clipsContent` | `node.clipsContent` | `clipBehavior: Clip.antiAlias` |
+| `relativeTransform` / bounds | node transform + bounds | `Transform` + `Align` inside clip |
+| mask / clipping ancestor chain | parent traversal | `ClipRect`/`ClipPath` render contract |
 
 ### Text Properties
 | Figma Property | MCP Path | Flutter Mapping |
@@ -207,15 +239,52 @@ Output: Screenshot URL/reference for visual verification
 | `style.lineHeightPx` | `node.style.lineHeightPx` | `height` in TextStyle |
 | `style.textAlignHorizontal` | `node.style.textAlignHorizontal` | `TextAlign.*` |
 
+### Rendered Asset Fidelity
+
+When an SVG/image source is shown through a frame, mask, or non-default scale,
+the source file and its visible result are different things. Record both:
+
+1. the reusable source node and exported source asset;
+2. the first visible container, its clip/mask ancestor chain, source and
+   visible bounds, scale, translation, and alignment.
+
+Use the source asset directly only when all of it is visible. Otherwise the
+Flutter contract must use an explicit clip and transform. Do not export the
+enclosing Figma frame merely to preserve a crop: it flattens a reusable asset
+into one context-specific image.
+
+For icons, a Design System replacement is allowed only when it is an exact
+catalog match in geometry and intended visual treatment. Download and archive
+the Figma export for every visible icon, even when that exact DS icon is used;
+exported source provenance is required. Export the Figma SVG for runtime use
+when no exact match exists.
+
+### Source Asset Archive
+
+For every visible icon, image, illustration, logo, or image-fill source:
+
+1. call `download_assets` on the source node, never the enclosing presentation frame; use `get_images` only as a legacy equivalent;
+2. download the Figma result to `{SPEC_PACKET_PATH}/source-assets/figma/`;
+3. record source node id, format, archive path and SHA-256 in `spec.yaml.assets`;
+4. copy that archived file byte-for-byte to the planned runtime asset path after
+   approval.
+
+Do not treat a screenshot, a temporary export URL, a local look-alike, or a
+platform icon as an asset source. If any visible source cannot be downloaded,
+return `blocked_input: FIGMA_ASSET_DOWNLOAD_UNAVAILABLE`.
+
 ### Text Fidelity Rules
 
 - Use `characters` exactly as Figma returns it for visible UI text.
 - Preserve casing, accents, punctuation, line breaks that are visible in design,
   and intentional spacing.
 - Do not translate, correct, summarize, expand, or invent copy.
-- Layer names are not copy unless metadata/anotations explicitly say so.
+- Layer names are not copy unless metadata/annotations explicitly say so.
 - If a required state has no visible text in Figma, report a gap instead of
   inventing final copy.
+- Record Figma style id (or `inline:<node-id>`) for every visible text node and
+  verify the exact family and weight are registered by the project. Do not
+  substitute a close font; return `blocked_input: FIGMA_TYPOGRAPHY_UNAVAILABLE`.
 
 ### Overflow Risk Extraction
 
@@ -242,6 +311,10 @@ When analyzing a full screen (not just a component):
    - Bottom navigation / FAB
    - Drawers / sidebars
 
+   For bottom navigation, record the Figma node and visible selected state.
+   Ownership is resolved later against the application route shell: shared
+   shell, view scaffold, or not present.
+
 2. **Map each section to organisms**:
    - Each major section = 1 organism
    - Within organism: molecules and atoms
@@ -261,9 +334,9 @@ When analyzing a full screen (not just a component):
    - Infinite scroll / pagination
 
 6. **Document development annotations**:
-   - Alerts/messages conditionales
-   - Reglas de estado especiales
-   - Interacciones/callbacks no obvios en la UI estática
+   - Conditional alerts and messages
+   - Special state rules
+   - Non-obvious UI interactions and callbacks
 
 ## Figma URL Parsing
 
@@ -282,11 +355,11 @@ https://www.figma.com/design/{fileKey}/{fileName}?node-id={nodeId}
 | Node not found | Verify nodeId, try parent node |
 | Rate limit | Wait and retry (max 3 attempts) |
 | Large file timeout | Use `get_node_children` incrementally |
-| Missing properties | Mark as `❓ NO DISPONIBLE` in spec |
-| No MCP access | Mark `blocked_input` with faltantes y devolver control al orquestador |
-| `get_design_context` unavailable | Mark `blocked_input` para evitar omitir anotaciones Development |
+| Missing properties | Mark as `unavailable` in the spec |
+| No MCP access | Mark `blocked_input`, record the missing access, and return control to the workflow controller |
+| `get_design_context` unavailable | Mark `blocked_input` to avoid omitting Development annotations |
 | No Development annotations returned | Continue, mark `Development annotations: none` |
-| `get_screenshot` unavailable for guided changes | Mark `blocked_input` para no perder evidencia de cambios guiados |
+| `get_screenshot` unavailable for guided changes | Mark `blocked_input` to preserve evidence for guided changes |
 
 ## Checklist
 

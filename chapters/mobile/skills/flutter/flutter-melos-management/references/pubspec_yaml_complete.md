@@ -1,7 +1,8 @@
-# Root pubspec.yaml — Complete Annotated Reference (Melos 7.5.1)
+# Root pubspec.yaml — Complete Annotated Reference (Melos 7+)
 
-In Melos 7.x, there is no `melos.yaml`. All configuration lives in the root `pubspec.yaml`
-under the `melos:` key, alongside the `workspace:` list required by Dart pub workspaces.
+In Melos 7+, new workspaces configure Melos in the root `pubspec.yaml` under
+the `melos:` key, alongside the `workspace:` list required by Dart pub workspaces.
+`melos.yaml` remains a legacy Melos 6 configuration format.
 
 ```yaml
 # pubspec.yaml (workspace root)
@@ -10,11 +11,11 @@ description: Workspace root — not a publishable package.
 publish_to: none
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"   # Dart 3.6+ required for pub workspaces
+  sdk: ">=3.9.0 <4.0.0"   # Dart 3.9+ is the reliable baseline for pub workspaces
 
 # ─── Pub Workspaces ───────────────────────────────────────────────────────────
-# All packages must be listed explicitly — globs are not yet supported.
-# Each listed package must have `resolution: workspace` in its own pubspec.yaml.
+# Explicit package paths are clearest; current Melos also accepts workspace globs.
+# Each non-root package must have `resolution: workspace` in its own pubspec.yaml.
 workspace:
   - apps/app_mobile
   - apps/app_tablet
@@ -25,7 +26,7 @@ workspace:
   - packages/feature_checkout
 
 dev_dependencies:
-  melos: ^7.5.1
+  melos: ^8.0.0
 
 # ─── Melos Configuration ──────────────────────────────────────────────────────
 melos:
@@ -106,7 +107,7 @@ melos:
       run: echo "Internal setup"
       private: true
 
-    # ── Script with package filter options in yaml (7.x) ──────────────────────
+    # ── Script with package filter options in yaml (7+) ───────────────────────
 
     test:auth:
       run: melos exec -- "flutter test --coverage"
@@ -114,7 +115,7 @@ melos:
       packageFilters:
         scope: feature_auth
 
-    # ── Script groups (7.x) ────────────────────────────────────────────────────
+    # ── Script groups (7+) ─────────────────────────────────────────────────────
     # Run multiple scripts together: melos run quality
     groups:
       quality:
@@ -183,7 +184,7 @@ version: 0.1.0
 publish_to: none
 
 environment:
-  sdk: ">=3.8.0 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.32.0"
 
 # ← REQUIRED in every workspace package
@@ -220,10 +221,10 @@ dev_dependencies:
 
 ## Key Differences from Melos 6.x
 
-| Melos 6.x | Melos 7.x |
+| Melos 6.x | Melos 7+ |
 |---|---|
-| `melos.yaml` at root | No `melos.yaml` — config in root `pubspec.yaml` under `melos:` |
-| `packages:` glob in `melos.yaml` | `workspace:` list in root `pubspec.yaml` (no globs) |
+| `melos.yaml` at root | Root `pubspec.yaml` configuration under `melos:` |
+| `packages:` glob in `melos.yaml` | `workspace:` entries in root `pubspec.yaml` (explicit paths or supported globs) |
 | `pubspec_overrides.yaml` per package | `resolution: workspace` in each package |
 | `path: ../../packages/core` for local deps | `core: any` — workspace resolves it |
 | `melos bootstrap` creates overrides | `dart pub get` at root resolves everything |

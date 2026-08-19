@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-freezed-domain-modeling`  
-**Scanned:** 2026-06-22 23:11:43 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-22 23:11:43 UTC
 
 ## Risk Assessment
 

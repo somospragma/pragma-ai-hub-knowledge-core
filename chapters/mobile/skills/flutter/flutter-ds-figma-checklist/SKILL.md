@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-figma-checklist
-version: 1.3.0
+version: 1.4.0
 scope: stack
 type: skill
 chapter: mobile
@@ -13,7 +13,6 @@ description: >
   Always activate when fixing overflow errors, checking typography fidelity,
   reviewing color tokens, or verifying that a component matches a Figma design.
 ---
-
 # Figma Comparison Checklist
 
 ## 1. Design Context
@@ -21,14 +20,14 @@ description: >
 - [ ] `get_design_context` executed before deep analysis
 - [ ] Screenshot(s) for visual reference
 - [ ] `get_screenshot` captured for each guided change
-- [ ] Node metadata extracted (via Figma MCP `get_node` or manual inspection)
-- [ ] `get_styles` used to verify published token mappings (if MCP available)
-- [ ] MCP status documented: ✅ Acceso directo | ⚠️ Fallback manual
-- [ ] Development annotations documented (alerts, estados, reglas especiales)
+- [ ] Node metadata extracted with `get_metadata` (or an equivalent legacy adapter)
+- [ ] `get_variable_defs` used to verify published token mappings (if available)
+- [ ] MCP status documented: direct access | manual fallback
+- [ ] Development annotations documented (alerts, states, special rules)
 - [ ] Literal text contract extracted from visible TEXT nodes
 - [ ] Layout constraints and overflow-risk matrix extracted or warning recorded
 
-> Consulta skill `flutter-ds-figma-mcp` para detalles de herramientas MCP disponibles.
+> See `flutter-ds-figma-mcp` for details about the available MCP tools.
 
 ## 2. Variants & Properties
 - [ ] All Figma properties have a Flutter parameter
@@ -47,6 +46,8 @@ description: >
 
 ## 4. Typography
 - [ ] Each text uses correct typography token
+- [ ] Family and weight match the Figma style source and an exact registered
+      project font; no close-font fallback
 - [ ] Font size matches
 - [ ] Font weight matches (Regular=400, Medium=500, Bold=700)
 - [ ] `textAlign` matches
@@ -58,7 +59,7 @@ description: >
 ## 5. Spacing & Padding
 - [ ] Internal padding (top, right, bottom, left) matches tokens
 - [ ] Gap between each child pair matches
-- [ ] Symmetric vs asymmetric correct
+- [ ] Symmetric versus asymmetric spacing is correct
 - [ ] Desktop variant scales padding correctly (if applicable)
 
 ## 6. Sizes & Dimensions
@@ -69,6 +70,24 @@ description: >
 - [ ] Horizontal text layouts use `Flexible`/`Expanded` where needed
 - [ ] Scroll/SafeArea strategy prevents full-view overflow
 - [ ] Missing Figma constraints are warnings when mitigated, not blockers
+
+## 6a. Rendered Assets And Icons
+- [ ] Each visible asset maps its source node to its visible container
+- [ ] Every visible icon, image, illustration, logo, and image-fill source was
+      downloaded from Figma into `source-assets/figma/` with format and SHA-256
+- [ ] Cropped/masked/scaled assets use the source file plus explicit clip,
+      transform, and alignment; no enclosing-frame export is used as a shortcut
+- [ ] A DS icon is used only when its exact catalog match is declared and its
+      Figma source export remains archived
+- [ ] Otherwise, the archived Figma SVG is registered and rendered
+- [ ] Final runtime assets have the same checksum as their archived Figma source
+- [ ] The runtime result preserves source bounds versus visible bounds
+
+## 6c. Screen Chrome
+- [ ] Visible bottom navigation is classified as shared app shell, view-owned
+      scaffold, or not present
+- [ ] A shared shell is integrated without duplication
+- [ ] A view-owned navigation bar is rendered and covered by a widget test
 
 ## 6b. Overflow Safety
 
@@ -96,9 +115,16 @@ Row(
 // Text(productTitle, overflow: TextOverflow.ellipsis, maxLines: 1)
 ```
 
-## 7. Border Radius
-- [ ] Main container radius matches token
-- [ ] Internal elements' radius (chips, badges) correct
+## 7. Structure And Shape Fidelity
+- [ ] `layout_manifest` covers every visible structural node and leaf
+- [ ] Parent-child and sibling order match the Figma hierarchy exactly
+- [ ] Bounds, direction, alignment, padding, gap and clipping match the manifest
+- [ ] Main container radius matches each declared corner value
+- [ ] Internal elements' radii (chips, badges, cards, navigation) match each declared corner value
+- [ ] Border widths match; asymmetric radii are not simplified to a uniform value
+- [ ] Literal text, asset identity, typography and declared shape values are exact invariants
+- [ ] Capture comparison uses `layout_manifest.viewport`
+- [ ] Geometry delta is at most `1 dp`, global pixel difference at most `2%`, and regional pixel difference at most `4%`
 
 ## 8. Desktop vs Mobile
 - [ ] Widget accepts platform parameter (if applicable)
@@ -114,7 +140,7 @@ See [extended checklist](references/EXTENDED-CHECKLIST.md) for anatomy, states, 
 
 Always run these commands before closing any audit. They are non-optional.
 
-| Check | Command |
+| Check | Commy |
 |-------|---------|
 | Lint | `flutter analyze lib/src/{level}/{component}/` |
 | Tests | `flutter test test/{level}/{component}/` |

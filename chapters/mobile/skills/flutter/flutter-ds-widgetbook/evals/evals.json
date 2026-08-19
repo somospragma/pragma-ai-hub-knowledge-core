@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "I just finished building a DSButton atom with variant (primary/secondary/ghost) and size (sm/md/lg) enums, plus an onPressed callback. Create the Widgetbook use case for it as a DS component.",
-      "expected_output": "Creates use case with Playground use case using context.knobs.list for variant and size enums (with labelBuilder), boolean knob for enabled/disabled toggling onPressed, setCodePreview. Scope is DS_COMPONENTS. Uses developer.log not print. No color knobs.",
+      "expected_output": "Creates a Playground use case using context.knobs.list for variant and size enums (with labelBuilder), a boolean knob to toggle onPressed, and setCodePreview. Scope is DS_COMPONENTS. Uses developer.log instead of print. Does not add knobs for theme or color tokens.",
       "files": [],
       "assertions": [
         {
@@ -24,7 +24,7 @@
         },
         {
           "id": "a4",
-          "text": "Response does NOT add a knob for Color — colors come from theme/tokens only",
+          "text": "Response does NOT add knobs for theme or color tokens",
           "type": "llm_judge"
         }
       ]
@@ -54,7 +54,7 @@
     },
     {
       "id": 3,
-      "prompt": "After creating my Widgetbook use case file, what commands do I need to run to make it appear in Widgetbook?",
+      "prompt": "After creating my Widgetbook use case file, which commands do I need to run to make it appear in Widgetbook?",
       "expected_output": "First run dart analyze on the widgetbook path. Then run dart run build_runner build --delete-conflicting-outputs. Mentions NEVER use part '*.g.dart' in use_case files.",
       "files": [],
       "assertions": [

@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-ds-a11y-semantics  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-a11y-semantics`  
-**Scanned:** 2026-06-16 14:54:49 UTC  
+**Skill:** flutter-ds-a11y-semantics
+**Source:** `../`
+**Scanned:** 2026-06-16 14:54:49 UTC
 
 ## Risk Assessment
 

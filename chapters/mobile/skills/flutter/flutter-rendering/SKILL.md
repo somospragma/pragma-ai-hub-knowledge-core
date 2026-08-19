@@ -9,7 +9,6 @@ name: flutter-rendering
 description: >
   Optimizes Flutter rendering performance and eliminates UI jank. Use this skill when diagnosing slow scrolling, dropped frames, excessive widget rebuilds, expensive raster operations, or any Flutter performance bottleneck. Triggers on 'my app is janky', 'UI is slow', 'optimize rendering', 'reduce rebuilds', 'frame drops', 'RepaintBoundary', 'const widgets', 'Impeller', 'flutter DevTools profiling', 'list performance', or any question about Flutter 60/120fps targets. Covers Impeller renderer (default from Flutter 3.27), widget rebuild analysis, raster layer optimization, and DevTools CPU/GPU profiling workflow. Stack: Dart 3.3+ / Flutter 3.32+.
 ---
-
 # Flutter Rendering Performance
 
 **Rule #1: Always profile before optimizing. Never guess.**

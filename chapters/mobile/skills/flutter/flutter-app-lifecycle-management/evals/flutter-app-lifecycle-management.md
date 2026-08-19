@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-app-lifecycle-management  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-app-lifecycle-management`  
-**Scanned:** 2026-06-12 21:46:10 UTC  
+**Skill:** flutter-app-lifecycle-management
+**Source:** `../`
+**Scanned:** 2026-06-12 21:46:10 UTC
 
 ## Risk Assessment
 

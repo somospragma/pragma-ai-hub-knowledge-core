@@ -4,12 +4,12 @@ version: 1.0.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt to inventory existing components, classify reuse, and build the bottom-up creation DAG. Use it when the Figma analysis (§1) already exists and you need to decide what to reuse, what to extend, and what to create with `@component-planner`. Do not use it as the entrypoint of a complete task.
+description: >
+  Prompt to inventory existing components, classify reuse, and build the bottom-up creation DAG. Use when Figma analysis must become a canonical component inventory and generation order.
 ---
+# Atomic Inventory, Canonical Spec, And DAG
 
-# Atomic Inventory, Canonical Spec, and DAG
-
-## Reference skills
+## Reference Skills
 
 - flutter-ds-folder-structure
 - flutter-ds-naming-conventions
@@ -18,81 +18,93 @@ description: Prompt to inventory existing components, classify reuse, and build 
 - flutter-ds-asset-management
 - flutter-ds-responsive-layout
 
-## INSTRUCTION
+## Instruction
 
-From the Figma analysis (§1), generate the canonical specification of the
-component, inventory the repository, and create the creation plan.
+From the structured Figma analysis, generate the canonical component
+specification, inventory the repository, and create the generation plan. If
+`spec_context` is provided, read `spec_ref` first; `PIPELINE_SPEC_PATH` remains
+the human report.
 
-## PROCESS
+## SDD Contract
+
+When `spec_context` exists:
+
+- Read only `read_sections`.
+- Update `canonical_spec`, `inventory`, `dag`, `artifact_plan`, and `contracts`.
+- Record evidence in `{SPEC_PACKET_PATH}/evidence/planning-report.md`.
+- Do not copy the full analysis into handoffs.
+
+## Process
 
 ### Phase A: Canonical Specification
 
-1. **Normalize** every value in §1 to its exact DS token
-   - Check `flutter-ds-theming-tokens` and the project catalog
-   - If no token exists → ⚠️ ALERT (do not invent tokens)
+1. **Normalize** each value of `visual_analysis` to its exact token in the DS.
+   - Consult `flutter-ds-theming-tokens` and the project catalog.
+   - If there is no token, generate a clear alert and do not invent tokens.
 
-2. **Define props** of the component:
-   - Name: `{{DS_PREFIX}}[Name]` or descriptive per level
-   - Typed parameters with required/optional/defaults
-   - Enums: State, Variant, Size
-   - Typed callbacks
-   - Special behaviors from `§1.3b Development Annotations`
-   - Vectors contract from `§1.3c Vectors and Assets`
-   - Literal texts contract from `§1.1b Literal Texts`
-   - Safe layout contract from `§1.1c Layout, Constraints, and Overflow Risk`
-   - Do not invent additional copy or UX if not backed by Figma/metadata
+2. **Define props** for the component:
+   - Name: `{{DS_PREFIX}}[Name]` or a descriptive name according to level.
+   - Typed parameters with required, optional, and default values.
+   - Enums: State, Variant, Size.
+   - Typed callbacks.
+   - Special behaviors from `design_source.annotations`.
+   - Vector contract from `assets`.
+   - Literal text contract from `literal_texts`.
+   - Safe layout contract from `layout_constraints`.
+   - Do not invent copy or extra UX if Figma/metadata does not support it.
 
-3. **Write** §2 in `PIPELINE_SPEC_PATH`
+3. **Write** `canonical_spec` in `spec.yaml`.
 
 ### Phase B: Repository Inventory
 
-For EACH sub-component in the atomic decomposition:
+For each sub-component in the atomic decomposition:
 
-**4-step search:**
+**Search in 4 steps:**
 
-1. **Exact name**: `symbol:[ComponentName]` in the repo
-2. **Expected file**: path per `flutter-ds-folder-structure`
-3. **Functionality**: semantic search if steps 1-2 do not find it
-4. **Folder**: list files under `lib/[level]/[subfolder]/`
+1. **Exact name**: `symbol:[NameComponent]` in the repo.
+2. **Expected file**: path according to `flutter-ds-folder-structure`.
+3. **Functionality**: semantic search if steps 1-2 find nothing.
+4. **Folder**: list files in `lib/[level]/[subfolder]/`.
 
-**For each found:**
-- Read the full file
-- Extract: constructor, parameters, states, variants
+**For each match:**
+
+- Read the full file.
+- Extract constructor, parameters, states, and variants.
 - Classify:
-  - ✅ Compatible → reuse
-  - ⚠️ Partial → document what is missing
-  - ❌ Incompatible → create new
+  - Compatible: reuse.
+  - Partial: document what is missing.
+  - Incompatible: create new.
 
-**For each NOT found:**
-- 🆕 Mark as "To be created"
-- Assign atomic level
-- Propose path and name
+**For each missing component:**
+
+- Mark as "To create".
+- Assign atomic level.
+- Propose path and name.
 
 ### Phase C: Dependency DAG
 
-1. Infer dependencies between sub-components
+1. Infer dependencies between sub-components.
 2. Classify:
-   - `reuse` → existing component
-   - `separate` → new independent widget
-   - `inline` → private widget of the parent
-3. Generate strict bottom-up order
+   - `reuse`: existing component.
+   - `separate`: new independent widget.
+   - `inline`: private widget inside the parent.
+3. Generate a strict bottom-up order.
 
-### Phase D: Texts and Overflow
+### Phase D: Text And Overflow
 
-1. Propagate the texts from `§1.1b` without translating, correcting,
-   summarizing, or improving them.
-2. If a required state has no text from Figma, log a scope alert and debt;
-   do not turn a technical placeholder into final copy. For views, keep
-   `loading`, `empty`, `error`, and `populated` using the project's
-   standard fallback when Figma does not define them.
-3. Propagate risks from `§1.1c` and define mitigation per component/view.
-4. If detailed constraints are missing, do not block solely for that:
-   infer a conservative anti-overflow mitigation and flag the inference.
+1. Propagate `literal_texts` without translating, fixing, summarizing, or improving them.
+2. If a required state has no text from Figma, record a scope/debt alert; do not
+   turn technical placeholders into final copy. For views, keep `loading`,
+   `empty`, `error`, and `populated` using the project standard fallback when
+   Figma does not define the state.
+3. Propagate `layout_constraints` risks and define mitigation per component/view.
+4. If detailed constraints are missing, do not block for that reason alone:
+   infer conservative anti-overflow mitigation and mark the inference.
 
-## MANDATORY OUTPUT
+## Required Output
 
 ```markdown
-## §2 Canonical Specification: [ComponentName]
+## Canonical Specification: [NameComponent]
 
 ### Props
 | Parameter | Type | Required | Default | Token/Ref |
@@ -107,67 +119,67 @@ For EACH sub-component in the atomic decomposition:
 | Callback | Type | Description |
 |----------|------|-------------|
 
-### Special Behaviors (from §1.3b)
+### Special Behaviors
 | Rule/Annotation | UI Impact | Required Prop/State/Callback | Priority |
-|-----------------|-----------|------------------------------|----------|
+|------------------|------------|-------------------------------|----------|
 
-### View States and Fallbacks (only `/new-view`)
-| State | Source | Component/Widget | Copy | Standard fallback | Alert |
+### View States And Fallbacks (only `/new-view`)
+| State | Source | Component/Widget | Copy | Standard Fallback | Alert |
 |-------|--------|------------------|------|-------------------|-------|
 
-### Vectors Contract (from §1.3c)
-| Vector/Asset | UI Use | Strategy | Owner (DS/APP) | Path/Constant | Status |
-|--------------|--------|----------|----------------|---------------|--------|
+### Vector Contract
+| Vector/Asset | UI Use | Strategy | Owner (DS/APP) | Path/Constant | State |
+|--------------|--------|----------|----------------|---------------|-------|
 
-### Literal Texts Contract (from §1.1b)
-| Prop/Element | Exact Figma text | Node ID | Scope/State | Editable by agent |
+### Literal Text Contract
+| Prop/Element | Exact Figma Text | Node ID | Scope/State | Editable By Agent |
 |--------------|------------------|---------|-------------|-------------------|
 
-### Safe Layout Contract (from §1.1c)
-| Element | Overflow risk | Required mitigation | Inferred due to missing constraints | Severity |
-|---------|---------------|---------------------|-------------------------------------|----------|
+### Safe Layout Contract
+| Element | Overflow Risk | Required Mitigation | Inferred From Missing Constraints | Severity |
+|---------|---------------|---------------------|-----------------------------------|----------|
 
-## §3 Inventory and DAG
+## Inventory And DAG
 
-### ✅ Existing — Reuse
+### Existing - Reuse
 | Component | Level | Path | API |
 |-----------|-------|------|-----|
 
-### ⚠️ Existing — Need Extension
-| Component | Level | Path | What is missing | Proposed change |
-|-----------|-------|------|-----------------|-----------------|
+### Existing - Requires Extension
+| Component | Level | Path | Missing Capability | Proposed Change |
+|-----------|-------|------|--------------------|-----------------|
 
-### 🆕 Missing — Create
-| Component | Level | Proposed path | Strategy | Specs |
+### Missing - Create
+| Component | Level | Proposed Path | Strategy | Specs |
 |-----------|-------|---------------|----------|-------|
 
-### 🎯 Vectors/Assets Inventory
-| Vector/Asset | Final strategy | Reuses DS Icon | Asset to create/register | Location |
+### Vector/Asset Inventory
+| Vector/Asset | Final Strategy | Reuses DS Icon | Asset To Create/Register | Location |
 |--------------|----------------|----------------|--------------------------|----------|
 
-### 🧩 Texts and Overflow Inventory
-| Component/Widget | Literal texts used | Overflow mitigation | Alerts |
-|------------------|--------------------|---------------------|--------|
+### Text And Overflow Inventory
+| Component/Widget | Literal Text Used | Overflow Mitigation | Alerts |
+|------------------|-------------------|---------------------|--------|
 
 ### DAG
 [Dependency diagram]
 
-### 📋 Creation Order (bottom-up)
-1. [Atom 1] — no dependencies
-2. [Atom 2] — depends on Atom 1
-3. [Molecule 1] — depends on Atom 1, Atom 2
-4. [Organism] — depends on Molecule 1
+### Creation Order (bottom-up)
+1. [Atom 1] - no dependencies
+2. [Atom 2] - depends on Atom 1
+3. [Molecule 1] - depends on Atom 1, Atom 2
+4. [Organism] - depends on Molecule 1
 
-### ⚠️ Alerts
-- [ambiguities, conflicts, pending decisions]
+### Alerts
+- [ambiguities, conflicts, or pending decisions]
 ```
 
-## GOLDEN RULE
+## Golden Rule
 
 NEVER propose creating a component that already exists and is compatible.
-If there is doubt about compatibility, mark as ⚠️ Partial with detail.
-NEVER ignore `Development` annotations reported in `§1.3b`.
-NEVER ignore vectors reported in `§1.3c`.
-NEVER invent, translate, correct, or rewrite visible Figma texts.
-NEVER block solely due to incomplete constraints if you can mitigate
-overflow conservatively and report the alert.
+If compatibility is uncertain, mark it as Partial with details.
+NEVER ignore `Development` annotations reported in `design_source.annotations`.
+NEVER ignore vectors reported in `assets`.
+NEVER invent, translate, correct, or rewrite visible text from Figma.
+NEVER block only because constraints are incomplete if overflow can be mitigated
+conservatively and the alert can be reported.

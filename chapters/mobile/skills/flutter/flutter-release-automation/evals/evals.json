@@ -24,12 +24,12 @@
     },
     {
       "id": "eval-03-ios-fastlane-azure-devops",
-      "prompt": "¿Cómo configuro la firma de iOS en mi pipeline de Azure DevOps usando Fastlane match? No tenemos Mac agents propios.",
+      "prompt": "How do I configure iOS signing in my Azure DevOps pipeline using Fastlane match? We do not have our own Mac agents.",
       "_tool_scope": "flutter-release-automation",
       "assertions": [
-        "La respuesta indica usar vmImage: macos-latest como agente alojado por Microsoft para builds de iOS en Azure DevOps",
-        "La respuesta menciona configurar MATCH_PASSWORD y MATCH_GIT_URL como variables secretas en el Variable Group de Azure DevOps Library",
-        "La respuesta referencia references/fastlane_signing.md para el setup completo de Fastlane match, incluyendo Matchfile, Appfile y el lane release"
+        "Response indicates using vmImage: macos-latest as the Microsoft-hosted agent for iOS builds in Azure DevOps",
+        "Response mentions configuring MATCH_PASSWORD and MATCH_GIT_URL as secret variables in the Azure DevOps Library Variable Group",
+        "Response references references/fastlane_signing.md for the complete Fastlane match setup, including Matchfile, Appfile, and the release lane"
       ]
     },
     {
@@ -59,7 +59,7 @@
       "assertions": [
         "Response mentions the quality gate step in the pipeline that uses lcov to enforce an 80% coverage threshold and fails the build if coverage drops below it",
         "Response notes that detailed coverage configuration strategies (exclusions, per-package thresholds, reporting) are outside this skill's scope and references flutter-test-coverage-strategy for that",
-        "Response provides the essential snippet: flutter test --coverage followed by sudo apt-get install -y lcov and the lcov --summary check pattern"
+        "Response provides the essential snippet: flutter test --coverage followed by sudo apt-get install -and lcov and the lcov --summary check pattern"
       ]
     }
   ]

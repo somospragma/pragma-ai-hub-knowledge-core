@@ -1,0 +1,124 @@
+schema_version: 1
+schema_ref: ../../../../templates/schemas/mobile-spec.schema.yaml
+workflow: new-component
+spec_level: mini
+execution_mode: propose_then_apply
+evidence_mode: minimal
+status: proposed
+language:
+  review_documents: es
+inputs:
+  component_name: ds_status_badge
+  figma_url: https://figma.com/file/example?node-id=10-20
+  user_story: Show a transaction status in a list.
+  golden_tests: false
+external_access:
+  figma_mcp:
+    required: true
+    status: verified
+    checks:
+      - get_design_context
+      - get_screenshot
+    evidence: evidence/figma-mcp-preflight.md
+agent_permissions:
+  figma-analyzer:
+    can_read: [inputs.figma_url, read_sections]
+    can_write:
+      spec_sections: [design_source, literal_texts, layout_constraints, assets]
+      packet_paths: [source-assets/figma]
+      evidence: [evidence/figma-analysis.md]
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: [figma_mcp]
+    evidence_required: [evidence/figma-analysis.md]
+  widget-developer:
+    can_read:
+      - technical_plan
+      - artifact_plan.planned[group=ds_components]
+      - literal_texts
+      - layout_constraints
+      - contracts.text_overflow
+      - source-assets/figma
+    can_write:
+      generated_files_source: artifact_plan.planned
+      artifact_targets: [design_system]
+      context_sections: [context.json.artifacts]
+      evidence: [evidence/codegen-report.md]
+    can_create_files: true
+    can_modify_files: true
+    can_delete_files: false
+    can_call_external_tools: []
+    evidence_required: [evidence/codegen-report.md]
+human_review:
+  initial_spec_approval: required
+  layer_checkpoints: not_required
+  stage_checkpoints: not_required
+  last_decision: pending
+design_source:
+  type: figma
+  file_key: example
+  node_id: "10:20"
+literal_texts:
+  - id: txt_status_paid
+    text: Paid
+    source: figma
+    editable_by_agent: false
+layout_constraints:
+  - element: label
+    risk: long_status_text
+    mitigation: Flexible text with max intrinsic badge width
+assets: []
+canonical_spec:
+  component_class: DSStatusBadge
+  atomic_level: atom
+  variants: [success, warning, error, neutral]
+inventory:
+  existing_reuse: []
+  missing_ds_components:
+    - DSStatusBadge
+dag:
+  order:
+    - DSStatusBadge
+technical_plan:
+  summary: Create an atomic badge with semantic variants and external literal text.
+contracts:
+  text_overflow:
+    label: Do not truncate unless Figma defines maxLines.
+  technical_vectors: {}
+constraints:
+  compatibility:
+    public_api: additive_only
+artifact_plan:
+  planned:
+    - path: lib/src/atoms/badges/ds_status_badge.dart
+      target_id: design_system
+      action: create
+      owner: widget-developer
+      group: ds_components
+    - path: test/atoms/badges/ds_status_badge_test.dart
+      target_id: design_system
+      action: create
+      owner: test-engineer
+      group: tests
+success_criteria:
+  - id: SC-1
+    description: The badge renders success, warning, error and neutral variants.
+    evidence:
+      - evidence/widget-tests.md
+  - id: SC-2
+    description: No visible copy is invented beyond Figma.
+    evidence:
+      - evidence/audit-report.md
+handoffs:
+  - phase: codegen
+    agent: widget-developer
+    read_sections:
+      - canonical_spec
+      - technical_plan
+      - artifact_plan
+      - literal_texts
+      - layout_constraints
+      - contracts.text_overflow
+      - source-assets/figma
+      - success_criteria

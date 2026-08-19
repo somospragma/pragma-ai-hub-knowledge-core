@@ -316,7 +316,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   ) async {
     emit(const UserLoading());
     final result = await getUserUseCase.call(event.userId);
-    
+
     result.fold(
       (user) => emit(UserSuccess(user: user)),
       (error) => emit(UserError(message: error.message)),

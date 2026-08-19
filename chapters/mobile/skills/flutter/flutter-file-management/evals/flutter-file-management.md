@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-file-management  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-file-management`  
-**Scanned:** 2026-06-22 20:15:52 UTC  
+**Skill:** flutter-file-management
+**Source:** `../`
+**Scanned:** 2026-06-22 20:15:52 UTC
 
 ## Risk Assessment
 

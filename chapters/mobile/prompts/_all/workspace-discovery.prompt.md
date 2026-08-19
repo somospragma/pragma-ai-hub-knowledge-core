@@ -1,184 +1,260 @@
 ---
 id: workspace-discovery
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt para descubrir topología/rutas del workspace y proponer configuración   inicial determinista antes del pipeline f
+description: >
+  Prompt for discovering Flutter workspace topology, resolving target roots, and proposing deterministic bootstrap configuration. Use when bootstrap needs reproducible app, Design System, core, and documentation paths.
 ---
+# Workspace Bootstrap Discovery (Deterministic)
 
-# Bootstrap de Workspace (Determinista)
+## Objective
 
-## Objetivo
+Resolve reproducibly:
 
-Resolver de forma reproducible:
+1. where the target app repo is (`PROJECT_ROOT`)
+2. where external DS/core repos live locally, if they exist
+3. which topology applies (`single_repo | monorepo_melos | multi_repo`)
+4. how `project.config.yaml`, `architecture-contract.yaml`, and
+   `dependencies-contract.yaml` must be shaped
 
-1. dónde está el repo objetivo de app (`PROJECT_ROOT`)
-2. dónde viven DS/core externos (si existen localmente)
-3. qué topología aplica (`single_repo | monorepo_melos | multi_repo`)
-4. cómo deben quedar `project.config.yaml`, `ARCHITECTURE-CONTRACT.yaml` y
-   `DEPENDENCIES-CONTRACT.yaml`
-
-## Inputs obligatorios
+## Required Inputs
 
 - `WORKSPACE_ROOT`
-- `APPLY_MODE` (`propose_only` | `apply_with_backup`)
+- `APPLY_MODE` (`propose_then_apply` | `propose_only` | `apply_with_backup`)
 
-## Inputs opcionales
+## Optional Inputs
 
 - `WORKSPACE_FILE` (`*.code-workspace`)
 - hints:
-  - `EXPECTED_APP_REPO_ROOT` (ruta absoluta del repo app)
-  - `EXPECTED_APP_REPO_NAME` (nombre de carpeta del repo app)
+  - `EXPECTED_APP_REPO_ROOT` (absolute path to the app repo)
+  - `EXPECTED_APP_REPO_NAME` (folder name of the app repo)
   - `EXPECTED_APP_PACKAGE`
   - `EXPECTED_DS_PACKAGE`
   - `EXPECTED_CORE_PACKAGE`
   - `EXPECTED_REPO_MODE`
+  - `FORCE_RECONFIGURE` (`false` by default; `true` only for an intentional
+    repair/replacement proposal)
 
-## Salidas obligatorias
+## Required Outputs
 
-En `BOOTSTRAP_ROOT={APP_REPO_ROOT}/.copilot/config/bootstrap`:
+When B0 requires a proposal, generate in
+`BOOTSTRAP_ROOT={APP_REPO_ROOT}/.sopp/bootstrap/{run_id}`:
 
-1. `workspace_discovery_report.md`
-2. `proposed_project.config.yaml`
-3. `proposed_architecture-contract.yaml`
-4. `proposed_dependencies-contract.yaml`
-5. `bootstrap_pipeline_log.md`
+1. `bootstrap-spec.yaml`
+2. `context.json`
+3. `review.md`
+4. `proposed/project.config.yaml`
+5. `proposed/architecture-contract.yaml`
+6. `proposed/dependencies-contract.yaml`
+7. `evidence/workspace-discovery-report.md`
+8. `evidence/candidates.json`
+9. `evidence/validation-report.md`
+10. `evidence/drift-analysis.md`
 
-Si `APPLY_MODE=apply_with_backup` y existe aprobación del usuario:
+When B0 reuses a valid configuration, return only
+`reused_existing_config`, the resolved app root, and the three validated
+canonical paths. Do not create a bootstrap run directory.
 
-1. `<APP_REPO_ROOT>/.copilot/config/project.config.yaml`
-2. `<APP_REPO_ROOT>/.copilot/config/ARCHITECTURE-CONTRACT.yaml`
-3. `<APP_REPO_ROOT>/.copilot/config/DEPENDENCIES-CONTRACT.yaml`
-4. backups `.bak` de los 3 archivos (si existían)
+If `APPLY_MODE=apply_with_backup` and explicit user approval exists:
 
-## Secuencia obligatoria
+1. `<APP_REPO_ROOT>/.sopp/config/project.config.yaml`
+2. `<APP_REPO_ROOT>/.sopp/config/architecture-contract.yaml`
+3. `<APP_REPO_ROOT>/.sopp/config/dependencies-contract.yaml`
+4. `.bak` backups of the three files, if they existed
+5. `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}/apply-report.md`
 
-### Fase B1 — Resolver roots a escanear
+## Required Sequence
 
-1. Iniciar con `WORKSPACE_ROOT`.
-2. Si existe `WORKSPACE_FILE`, incluir `folders[].path`.
-3. Normalizar rutas absolutas y eliminar duplicados.
+### Phase B0 - Reuse Or Diagnose Existing Configuration
 
-Si no hay roots, bloquear con `BOOTSTRAP_SCAN_ROOTS_EMPTY`.
+Run this gate immediately after `APP_REPO_ROOT` is deterministically resolved.
+When the app root is not supplied explicitly, execute B1-B3 only to resolve it,
+then return to this gate before B4 creates any proposal. Inspect only the
+canonical final triplet in `<APP_REPO_ROOT>/.sopp/config/`.
 
-### Fase B2 — Descubrir candidatos
+1. If the complete triplet is valid, matches `APP_REPO_ROOT`, and resolves all
+   target roots, return `reused_existing_config` immediately. Do not create a
+   packet, proposal, backup, or configuration file.
+2. If it is partial, return `CONFIG_BOOTSTRAP_INCOMPLETE`.
+3. If it is complete but invalid/outdated, return
+   `CONFIG_BOOTSTRAP_CONFIG_INVALID`.
+4. Do not automatically repair either state. Continue only after an explicit
+   reinvocation with `FORCE_RECONFIGURE: true`.
+5. Ignore runtime-looking files under tool-specific KB folders completely as
+   configuration sources. Report their presence as ignored evidence and use
+   `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND` when no canonical triplet exists.
 
-Buscar por root:
+### Phase B1 - Resolve Roots To Scan
+
+1. Start with `WORKSPACE_ROOT`.
+2. If `WORKSPACE_FILE` exists, include `folders[].path`.
+3. Normalize absolute paths and remove duplicates.
+
+If there are no roots, block with `BOOTSTRAP_SCAN_ROOTS_EMPTY`.
+
+### Phase B2 - Discover Candidates
+
+Search each root for:
 
 1. `pubspec.yaml`
-2. `melos.yaml`
-3. señales de app ejecutable (`lib/main.dart`, `lib/main_*.dart`, `android/`, `ios/`)
-4. señales app canónicas (`lib/src/presentation`, `lib/src/features`)
-5. señales app legacy (`lib/presentation`, `lib/features`) solo para alertar
-   compatibilidad/migración
-6. señales DS canónicas (`lib/src/atoms`, `lib/src/molecules`,
-   `lib/src/organisms`)
-7. señales DS legacy (`lib/atoms`, `lib/molecules`, `lib/organisms`) solo para
-   alertar compatibilidad/migración
-8. señales shared/core (`core|shared|common` en nombre/path)
+2. Melos configuration candidates: legacy `melos.yaml`, or a root `pubspec.yaml`
+   with `workspace:` plus a Melos dependency or `melos:` section
+3. executable app signals (`lib/main.dart`, `lib/main_*.dart`, `android/`, `ios/`)
+4. canonical app signals (`lib/src/presentation`, `lib/src/features`)
+5. legacy app signals (`lib/presentation`, `lib/features`) only to alert
+   compatibility/migration risk
+6. canonical DS signals (`lib/src/atoms`, `lib/src/molecules`, `lib/src/organisms`)
+7. legacy DS signals (`lib/atoms`, `lib/molecules`, `lib/organisms`) only to
+   alert compatibility/migration risk
+8. shared/core signals (`core|shared|common` in name/path)
 
-Clasificar `APP_CANDIDATE`, `DS_CANDIDATE`, `CORE_CANDIDATE`, `MONOREPO_ROOT_CANDIDATE`.
+Classify `APP_CANDIDATE`, `DS_CANDIDATE`, `CORE_CANDIDATE`, and
+`MONOREPO_ROOT_CANDIDATE`.
 
-### Fase B3 — Inferir topología
+### Phase B3 - Infer Topology
 
-Reglas:
+Rules:
 
-1. `monorepo_melos`: hay `melos.yaml` y packages Flutter múltiples.
-2. `single_repo`: app aislada sin melos.
-3. `multi_repo`: app/features en repos separados, fuera de melos.
+1. `monorepo_melos`: the deterministic Melos resolver succeeds and multiple
+   Flutter packages are present.
+2. `single_repo`: isolated app without Melos.
+3. `multi_repo`: app/features live in separate repos outside Melos.
 
-Resolver:
+Resolve:
 
 - `APP_REPO_ROOT`
 - `topology.repo_mode`
 - `topology.feature_location_mode`
 - `topology.shared_core_mode`
-- `targets.target_package_name`
-- `targets.target_package_path`
-- `monorepo.*` (cuando aplique)
+- `workspace.roots`
+- `targets.registry`
+- `active_target_defaults`
 
-Regla de selección de root:
+Root Selection Rule:
 
-- `APP_REPO_ROOT` debe ser el repositorio de la app objetivo.
-- No escribir configuración final en repos de dependencias (DS/core) ni en el
-  root global del workspace.
-- Si llega `EXPECTED_APP_REPO_ROOT`, usarlo como pin estricto y validar que sea
-  app ejecutable; si no cumple, bloquear.
-- En `monorepo_melos`, `APP_REPO_ROOT` debe ser el repo del `melos.yaml` del
-  app monorepo.
-- Si hay empate o ambigüedad entre candidatos de app, bloquear y no aplicar.
+- `APP_REPO_ROOT` must be the repository for the target app.
+- Do not write final configuration in dependency repos (DS/core) or in the
+  global workspace root.
+- If `EXPECTED_APP_REPO_ROOT` is provided, use it as a strict pin and validate
+  that it is an executable app; block if it does not pass.
+- In `monorepo_melos`, `APP_REPO_ROOT` must be the repo containing the resolved
+  app Melos configuration.
+- If there is a tie or ambiguity between app candidates, block and do not apply.
 
-Orden de decisión obligatorio:
+Required decision order:
 
-1. `EXPECTED_APP_REPO_ROOT` válido -> gana.
-2. melos app repo válido -> gana.
-3. mejor candidato con señales de app ejecutable y sin señales DS/core.
-4. en conflicto -> `BOOTSTRAP_APP_REPO_AMBIGUOUS`.
+1. valid `EXPECTED_APP_REPO_ROOT` wins.
+2. valid Melos app repo wins.
+3. best candidate with executable app signals and without DS/core signals wins.
+4. conflict -> `BOOTSTRAP_APP_REPO_AMBIGUOUS`.
 
-### Fase B4 — Construir propuesta de configs
+### Phase B4 - Build Bootstrap Spec Packet + Config Proposal
 
-Reglas:
+Rules:
 
-1. `project.repository_local_path` debe ser absoluto y apuntar al app repo.
-2. `targets.target_package_path` debe quedar relativo a `APP_REPO_ROOT`.
-3. DS/core locales:
-   - `source=path`
-   - `location` absoluto
-4. DS/core remotos:
-   - `source=git`
-   - `location` owner/repo o URL
-5. Construir `proposed_architecture-contract.yaml` consistente con la topología
-   descubierta y apto para `/new-view`.
-6. Usar `lib/src` para defaults de código productivo:
-   - `targets.feature_root: lib/src/features`
-   - `structure.*_path` de DS bajo `lib/src`
-   - `presentation/domain/data` bajo `lib/src`
-7. Si se detecta estructura legacy fuera de `lib/src`, incluir alerta en
-   `workspace_discovery_report.md`; no cambiar defaults nuevos a legacy salvo
-   que el usuario lo pida explícitamente.
+1. `project.repository_local_path` must be absolute and point to the app repo.
+2. `targets.registry` must include resolved logical targets:
+   `app`, `design_system`, `core`, `project_docs`, and packaged features when
+   they exist. `project_docs` uses `kind=docs` and resolves documentation and
+   reports under `docs/`.
+3. Each target must declare `kind`, `location_strategy`, `repo_root`,
+   `package_path`, `root`, and `package_name` when applicable.
+4. Local DS/core/features are represented in dependencies as
+   `source=target` + `target_id`; physical paths are not duplicated in
+   `dependencies-contract.yaml`.
+5. Remote DS/core dependencies use `source=git|hosted` and do not declare local paths.
+6. Build `proposed/architecture-contract.yaml` consistently with the discovered
+   topology and make it suitable for `/new-view`.
+7. Each `proposed/*.yaml` must include `schema_version`, `schema_ref`, and an
+   `ownership` block:
+   - `project.config.yaml`: owns workspace roots, target registry, topology,
+     pipeline, target structure, naming, tokens, and testing.
+   - `architecture-contract.yaml`: owns layer rules, generation policies,
+     constraints, and domain/data contracts.
+   - `dependencies-contract.yaml`: owns the dependency catalog, imports,
+     dependency `target_id`, and the allowed matrix.
+8. Use `lib/src` as the default for production code:
+   - `targets.registry.app.structure.features_path: lib/src/features`
+   - DS `targets.registry.design_system.structure.*_path` entries under `lib/src`
+   - presentation/domain/data under `lib/src`
+9. If legacy structure is detected outside `lib/src`, include an alert in
+   `evidence/workspace-discovery-report.md`; do not change new-code defaults
+   to legacy paths unless the user explicitly requests it.
+10. Create `bootstrap-spec.yaml` with:
+    - `workflow: bootstrap-workspace`
+    - `mode: propose_then_apply`
+    - `status: proposed`
+    - received inputs
+    - resolved topology
+    - references to `proposed/*.yaml`
+    - `schema_ref` per proposed file
+    - ownership of each contract to prevent drift
+11. Create `review.md` in Spanish with a short summary for human approval.
+12. Create `context.json` with `run_id`, state, main paths, and pending approval.
+13. Create evidence in `evidence/`, separating discovery, candidates,
+    validation, and anti-drift analysis.
 
-### Fase B5 — Validación
+### Phase B5 - Validation
 
-1. `APP_REPO_ROOT` existe.
-2. Si melos, existe `melos.yaml` y `target_scope` no vacío.
-3. Si `source=path`, ruta existe.
-4. `.copilot/config/bootstrap` es escribible en app repo.
-5. contrato de arquitectura propuesto parseable.
-6. `APP_REPO_ROOT` no apunta a DS/core.
-7. existe señal de app ejecutable en `APP_REPO_ROOT` (o en package app target en melos).
+1. `APP_REPO_ROOT` exists.
+2. Each `targets.registry.*.root` exists.
+3. If a target uses `location_strategy=melos_package`, run
+   `docs/scripts/melos_workspace.rb resolve` with `repo_root` and
+   `package_path`; require `ok=true` and persist the returned source metadata.
+4. Local dependencies use `source=target` and an existing `target_id`.
+5. `.sopp/bootstrap/{run_id}` is writable in the app repo.
+6. The proposed architecture contract is parseable.
+7. `APP_REPO_ROOT` does not point to DS/core.
+8. The target `app` has an executable app signal.
+9. `BOOTSTRAP_ROOT={APP_REPO_ROOT}/.sopp/bootstrap/{run_id}` is writable.
+10. There are no anti-drift violations:
+    - `project.config.yaml` contains workspace roots, target registry, pipeline,
+      naming, tokens, and testing helpers. It does not contain layer rules or a
+      complete dependency catalog.
+    - `architecture-contract.yaml` contains layer rules, generation policies,
+      and architectural constraints. It does not contain physical topology,
+      targets, or pipeline paths.
+    - `dependencies-contract.yaml` contains the dependency catalog, imports,
+      dependency `target_id`, and the allowed matrix. It does not contain
+      physical topology, local physical paths, or layer rules.
 
-Si falla, bloquear con código explícito.
+If validation fails, block with an explicit code.
 
-### Fase B6 — Apply controlado
+### Phase B6 - Controlled Apply
 
-Solo con aprobación explícita del usuario:
+Only with explicit user approval:
 
-1. backup de archivos destino
-2. escribir definitivos
-3. registrar diff resumido
+1. reread `bootstrap-spec.yaml`, `context.json`, and `proposed/*.yaml`
+2. validate `status=proposed`
+3. back up destination files
+4. write final files
+5. record a summarized diff in `apply-report.md`
 
-Sin aprobación, terminar en `propose_only`.
+Without approval, finish in `propose_only`.
 
-Regla estricta de escritura:
+Strict Write Rule:
 
-- Con `APPLY_MODE=propose_only`, escribir únicamente en
-  `<APP_REPO_ROOT>/.copilot/config/bootstrap`.
-- No escribir archivos finales en `.copilot/config/*`.
+- With `APPLY_MODE=propose_then_apply` or `propose_only`, write only in
+  `<APP_REPO_ROOT>/.sopp/bootstrap/{run_id}`.
+- Do not write final files in `.sopp/config/*`.
 
-## Formato mínimo del reporte
+## Minimum Report Format
 
-`workspace_discovery_report.md` debe incluir:
+`review.md` must briefly include, in Spanish:
 
-1. **Resumen de topología propuesta**
-2. **Tabla de candidatos y confianza**
-3. **Rutas finales propuestas (app/ds/core)**
-4. **Decisiones de source (`path|git|hosted`)**
-5. **Validaciones ejecutadas**
-6. **Resultado (`propose_only` o `apply_with_backup`)**
-7. **Siguiente paso recomendado** (`@ds-orchestrator /new-view` o `/new-component`)
+1. **Topology proposal summary**
+2. **Final proposed paths (app/ds/core)**
+3. **Proposed files**
+4. **Ownership decisions between contracts**
+5. **Alerts**
+6. **Action required to apply**
 
-## Códigos de bloqueo
+`evidence/workspace-discovery-report.md` must include the complete table of
+candidates, confidence, executed validations, and the recommended next step.
+
+## Block Codes
 
 - `BOOTSTRAP_WORKSPACE_ROOT_MISSING`
 - `BOOTSTRAP_SCAN_ROOTS_EMPTY`
@@ -193,3 +269,6 @@ Regla estricta de escritura:
 - `BOOTSTRAP_ARCH_CONTRACT_PROPOSAL_INVALID`
 - `BOOTSTRAP_PATH_DEPENDENCY_MISSING`
 - `BOOTSTRAP_APPLY_NOT_APPROVED`
+- `CONFIG_BOOTSTRAP_INCOMPLETE`
+- `CONFIG_BOOTSTRAP_CONFIG_INVALID`
+- `CONFIG_NON_CANONICAL_TOOL_STATE_FOUND`

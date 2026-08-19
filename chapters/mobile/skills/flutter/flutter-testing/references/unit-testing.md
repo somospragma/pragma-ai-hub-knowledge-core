@@ -1,7 +1,7 @@
 # Unit Testing Reference
 
 Unit tests validate isolated business logic without any framework or I/O dependencies.
-They are the fastest and highest-ROI tests in the pyramid.
+They are the fastest and highest-ROI tests in the testing pyramid.
 
 ## Stack
 

@@ -39,7 +39,7 @@ class TtlCache<K, V> {
   }
 
   void set(K key, V value) {
-    // Evict oldest entry if at capacity
+    // Evict oldest entry if at layercity
     if (_store.length >= maxSize && !_store.containsKey(key)) {
       _store.remove(_store.keys.first);
     }

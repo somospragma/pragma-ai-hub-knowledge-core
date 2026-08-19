@@ -273,7 +273,7 @@ class LanguageSelector extends StatelessWidget {
 
   static const _languages = [
     (locale: Locale('en'), label: 'English', flag: '🇺🇸'),
-    (locale: Locale('es'), label: 'Español', flag: '🇪🇸'),
+    (locale: Locale('es'), label: 'Spanish', flag: '🇪🇸'),
     (locale: Locale('ar'), label: 'العربية', flag: '🇸🇦'),
     (locale: Locale('pt', 'BR'), label: 'Português', flag: '🇧🇷'),
   ];
@@ -332,7 +332,7 @@ that the UI handles non-ASCII characters and longer strings correctly.
 5. CI passes → PR can be merged
 
 Tools for translator collaboration:
-- Localizely (supports ARB, JSON, YAML)
+- Localized (supports ARB, JSON, YAML)
 - Phrase (supports ARB, JSON)
 - Crowdin (supports ARB, JSON, YAML)
 - POEditor (supports JSON)

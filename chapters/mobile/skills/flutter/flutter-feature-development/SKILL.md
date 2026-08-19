@@ -12,7 +12,6 @@ license: Complete terms in LICENSE.txt
 metadata:
   category: productivity
 ---
-
 # Feature Development
 
 This skill provides the complete process for developing a new feature from setup to completion. Features are self-contained, modular packages following Clean Architecture.
@@ -189,7 +188,7 @@ import '../entities/user_entity.dart';
 import '../repositories/user_repository.dart';
 
 @LazySingleton()
-class GetUserUseCase 
+class GetUserUseCase
     extends BaseUseCase<String, Result<UserEntity, Exception>> {
   const GetUserUseCase({required this.repository});
 
@@ -271,7 +270,7 @@ import '../../domain/entities/user_entity.dart';
 
 abstract class UserState extends Equatable {
   const UserState();
-  
+
   @override
   List<Object?> get props => [];
 }
@@ -287,7 +286,7 @@ class UserLoading extends UserState {
 class UserSuccess extends UserState {
   const UserSuccess({required this.user});
   final UserEntity user;
-  
+
   @override
   List<Object?> get props => [user];
 }
@@ -295,7 +294,7 @@ class UserSuccess extends UserState {
 class UserError extends UserState {
   const UserError({required this.message});
   final String message;
-  
+
   @override
   List<Object?> get props => [message];
 }
@@ -320,9 +319,9 @@ class UserCubit extends Cubit<UserState> {
 
   Future<void> fetchUser(String userId) async {
     emit(const UserLoading());
-    
+
     final result = await getUserUseCase.call(userId);
-    
+
     result.fold(
       (user) {
         log.debug('User loaded successfully');

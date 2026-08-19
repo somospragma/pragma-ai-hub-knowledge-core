@@ -12,7 +12,6 @@ license: Complete terms in LICENSE.txt
 metadata:
   category: productivity
 ---
-
 # Flutter Clean Feature with Mason
 
 Create modular, production-ready features for Flutter applications using the `flutter_clean_feature` Mason brick. This skill guides you through the complete workflow: from configuration and brick execution to feature integration and testing.
@@ -284,23 +283,23 @@ After generating the feature, ensure:
 
 ## Troubleshooting
 
-**Issue**: `mason make` command not found  
+**Issue**: `mason make` command not found
 **Solution**: Install Mason globally: `dart pub global activate mason_cli`
 
-**Issue**: Generated feature fails to compile due to missing dependencies (pubspec.yaml errors)  
+**Issue**: Generated feature fails to compile due to missing dependencies (pubspec.yaml errors)
 **Solution**: The brick assumes monorepo paths (`../../packages/...`, `../../shared/...`). Verify your actual monorepo structure matches these paths. Adjust paths in pubspec.yaml manually if your structure is different (e.g., using pub.dev packages instead).
 
-**Issue**: Post-generation warnings about workspace root, analysis_options.yaml, or melos setup  
+**Issue**: Post-generation warnings about workspace root, analysis_options.yaml, or melos setup
 **Solution**: These occur when running outside a complete Flutter monorepo. The feature structure is generated correctly. Ensure you're running the command in a proper monorepo root directory with a workspace pubspec.yaml.
 
-**Issue**: Build runner fails after feature generation  
+**Issue**: Build runner fails after feature generation
 **Solution**: Run `flutter pub get` in feature directory, then: `dart run build_runner clean && dart run build_runner build -d`. Ensure GetIt + Injectable are configured in your project.
 
-**Issue**: GetIt scope not found when running app  
+**Issue**: GetIt scope not found when running app
 **Solution**: Ensure the feature module is registered in your app's service_locator.dart with the correct ExternalModule declaration. See Phase 5 in the workflow.
 
-**Issue**: Feature routes not accessible from app  
+**Issue**: Feature routes not accessible from app
 **Solution**: Verify routes are correctly exported in `lib/{featureName}.dart` and properly added to your app's GoRouter configuration. Import the feature's route list: `...ProfileRoutes.routes`
 
-**Issue**: DI injection fails with "module not found" or similar errors  
+**Issue**: DI injection fails with "module not found" or similar errors
 **Solution**: After structural generation, ensure you run build_runner to generate code from @module and @lazySingleton annotations. This is a critical step that must not be skipped.

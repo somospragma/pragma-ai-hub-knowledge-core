@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** unknown  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-background-processing`  
-**Scanned:** 2026-06-15 18:59:53 UTC  
+**Skill:** unknown
+**Source:** `../`
+**Scanned:** 2026-06-15 18:59:53 UTC
 
 ## Risk Assessment
 

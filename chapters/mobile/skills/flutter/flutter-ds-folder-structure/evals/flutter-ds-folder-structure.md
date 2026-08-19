@@ -1,8 +1,8 @@
 # SkillSpector Security Report
 
-**Skill:** flutter-ds-folder-structure  
-**Source:** `/pragma-ai-hub-knowledge-core/chapters/mobile/skills/flutter/flutter-ds-folder-structure`  
-**Scanned:** 2026-06-16 15:06:42 UTC  
+**Skill:** flutter-ds-folder-structure
+**Source:** `../`
+**Scanned:** 2026-06-16 15:06:42 UTC
 
 ## Risk Assessment
 

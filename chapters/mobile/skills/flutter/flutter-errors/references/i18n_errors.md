@@ -199,7 +199,7 @@ output-dir: lib/core/l10n/generated
   "errorServerRequestTimeout": "El servidor tardó demasiado en responder.",
   "errorServerConflict": "Conflicto con el estado actual.",
   "errorServerGone": "Este recurso ya no está disponible.",
-  "errorServerPayloadTooLarge": "El archivo o datos son demasiado grandes.",
+  "errorServerPayloadTooLarge": "El archivo o los datos son demasiado grandes.",
   "errorServerUnsupportedMediaType": "Formato de archivo no soportado.",
   "errorServerUnprocessable": "Los datos enviados no son válidos.",
   "errorServerTooManyRequests": "Demasiadas solicitudes. Espera un momento.",

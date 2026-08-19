@@ -36,11 +36,11 @@ class UserEntity extends BaseEntity {
     required this.name,
     required this.email,
   });
-  
+
   final String id;
   final String name;
   final String email;
-  
+
   @override
   List<Object?> get props => [id, name, email];
 }
@@ -177,7 +177,7 @@ Future<Result<UserEntity, Exception>> getUser(
 /// before being returned to domain and presentation layers.
 class UserNotFoundException implements Exception {
   UserNotFoundException(this.userId);
-  
+
   /// The ID of the user that was not found.
   final String userId;
 
@@ -197,10 +197,10 @@ class UserNotFoundException implements Exception {
 enum UserRole {
   /// Full system access, can manage all resources.
   admin,
-  
+
   /// Can create and edit content.
   editor,
-  
+
   /// Read-only access to resources.
   viewer,
 }
@@ -226,7 +226,7 @@ void setName(String value) {
 void fetchUser() {
   // Get the user ID from the request
   var userId = request.params['id'];
-  
+
   // Call the use case
   var result = await useCase.call(userId);
 }

@@ -12,7 +12,6 @@ description: >
   deciding between compact and default layouts, or handling platform
   differences (mobile vs desktop).
 ---
-
 # Responsive Layout
 
 ## When to Apply

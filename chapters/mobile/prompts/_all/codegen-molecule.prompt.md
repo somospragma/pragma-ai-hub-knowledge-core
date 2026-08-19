@@ -4,12 +4,12 @@ version: 1.0.0
 scope: chapter
 type: prompt
 chapter: mobile
-description: Prompt para generar código Flutter de una molécula del Design System. Usar   cuando el componente compone 2+ átomos, el
+description: >
+  Prompt for generating Flutter code for a molecule-level Design System component. Use when the component composes multiple atoms and must propagate state, layout, tokens, and callbacks through child components.
 ---
+# Generation of Molecule Flutter
 
-# Generación de Molécula Flutter
-
-## Skills de referencia
+## Reference Skills
 
 - flutter-ds-theming-tokens
 - flutter-ds-component-template
@@ -18,53 +18,63 @@ description: Prompt para generar código Flutter de una molécula del Design Sys
 - flutter-ds-folder-structure
 - flutter-ds-widget-anatomy
 
-## INSTRUCCIÓN
+## Instruction
 
-Genera el código Flutter completo de una molécula del Design System,
-componiendo átomos existentes y/o recién creados.
+Generate the complete Flutter code for a molecule in the Design System,
+composing existing and/or newly created atoms.
 
-## INPUTS QUE RECIBIRÁS
+## SDD Contract
 
-1. Nombre de la molécula a crear
-2. Especificaciones visuales (de §1 y §2)
-3. Lista de átomos que compone (con paths e interfaces)
-4. Estados requeridos
-5. Path de destino
-6. Interfaz diseñada (de §4)
-7. Contrato de textos y overflow (`§4.B`), obligatorio en `/new-component` y
-   `/new-view`; puede declarar "sin textos/riesgos" si no aplica a la molécula
+When `spec_context` exists, read `spec_ref` and `context_ref` as machine
+sources. Use only `read_sections`, implement the artifacts declared in
+`artifact_plan`, record evidence in
+`{SPEC_PACKET_PATH}/evidence/codegen-report.md`, and treat `PIPELINE_SPEC_PATH`
+as the human report.
 
-## DIFERENCIAS VS ÁTOMO
+## Inputs You Will Receive
 
-Una molécula:
-- **IMPORTA y USA** átomos del DS (no recrea funcionalidad)
-- **DELEGA** propiedades visuales a los átomos hijos
-- **PROPAGA** estados a los átomos hijos cuando corresponde
-- **COMPONE** layout (Row, Column, Stack) para organizar átomos
-- **AGREGA** lógica de coordinación entre átomos
+1. Name of the molecule to create
+2. Visual specifications from `design_source` and `canonical_spec`
+3. List of atoms it composes (with paths and interfaces)
+4. Required states
+5. Destination path
+6. Interface designed from `technical_plan`
+7. Text and overflow contract (`contracts.text_overflow`), required in `/new-component` and
+   `/new-view`; can declare "without texts/risks" if it does not apply to the molecule
+8. In SDD mode, the same inputs come from `canonical_spec`,
+   `technical_plan`, `contracts` and `artifact_plan`
 
-## REGLAS ESPECÍFICAS
+## Differences From Atom
 
-### Comentarios en Código
+A molecule:
+- **IMPORTS and USES** atoms in the DS (no recreate functionality)
+- **DELEGATES** visual properties to child atoms
+- **PROPAGATES** states to child atoms when appropriate
+- **COMPOSES** layout (Row, Column, Stack) to organize atoms
+- **ADDS** coordination logic between atoms
 
-- Prohibidos comentarios inline, de bloque y Dartdoc por defecto.
-- Solo permitir comentario fundamental cuando no sea deducible del código
-  (ej: workaround temporal, restricción regulatoria o decisión crítica de interoperabilidad).
+## Specific Rules
 
-### Composición Correcta
+### Comments in Code
 
-> Los comentarios del snippet son didácticos y no deben copiarse en el código generado.
+- Comments are prohibited inline, block and Dartdoc by default.
+- Only allow a fundamental comment when the code cannot make the reason clear
+  (e.g. temporary workaround, regulatory restriction or critical decision of interoperability).
+
+### Correct Composition
+
+> Comments in this snippet are instructional and must not be copied into generated code.
 
 ```dart
-// ✅ CORRECTO — Usar átomos existentes del DS
+// CORRECT - Use existing atoms in the DS
 import 'package:{{package_name}}/atoms/text/{{ds_prefix_snake}}_text.dart';
 import 'package:{{package_name}}/atoms/indicators/{{ds_prefix_snake}}_badge.dart';
 
-// En build:
+// In build:
 {{DS_PREFIX}}Text(text: title, variant: {{DS_PREFIX}}TextVariant.titleMedium)
 {{DS_PREFIX}}Badge(label: badgeLabel, variant: {{DS_PREFIX}}BadgeVariant.info)
 
-// ❌ INCORRECTO — Recrear funcionalidad de un átomo
+// INCORRECT - Recreates atom functionality
 Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500))
 Container(
   padding: EdgeInsets.all(4),
@@ -73,10 +83,10 @@ Container(
 )
 ```
 
-### Propagación de Estados
+### State Propagation
 
 ```dart
-// Cuando la molécula está en loading, los átomos hijos también:
+// When the molecule is loading, child atoms are loading too:
 Widget _buildLoading(BuildContext context) {
   return Column(
     children: [
@@ -87,58 +97,59 @@ Widget _buildLoading(BuildContext context) {
 }
 ```
 
-### Parámetros
+### Parameters
 
 ```dart
-// ✅ CORRECTO — Parámetros de datos
+// CORRECT - Data parameters
 const {{DS_PREFIX}}CardHeader({
   required this.title,
   required this.subtitle,
-  this.badgeLabel,     // nullable = no se muestra
-  this.imageUrl,       // nullable = no se muestra
+  this.badgeLabel,     // nullable = hidden
+  this.imageUrl,       // nullable = hidden
 });
 
-// ❌ INCORRECTO — Pasar widgets directos
+// INCORRECT - Passing direct widgets
 const {{DS_PREFIX}}CardHeader({
   required this.titleWidget,
   required this.badgeWidget,
 });
 ```
 
-### Spacing entre Átomos
+### Spacing Between Atoms
 
 ```dart
-// ✅ Spacing con tokens
+// ✅ Spacing with tokens
 Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
     {{DS_PREFIX}}Text(text: title),
-    SizedBox(height: {{DS_PREFIX}}Spacing.xs),  // Token de spacing
+    SizedBox(height: {{DS_PREFIX}}Spacing.xs),  // Spacing token
     {{DS_PREFIX}}Text(text: subtitle),
   ],
 )
 ```
 
-### Textos y Overflow
+### Text And Overflow
 
-- Propagar textos literales a átomos hijos sin modificar copy.
-- No crear labels, helper text, placeholders ni CTAs no presentes en Figma.
-- En `Row`, envolver hijos textuales con `Flexible`/`Expanded` cuando compartan
-  espacio con iconos, badges, botones o valores dinámicos.
-- Usar `Wrap` solo cuando el contrato permita que el grupo horizontal salte de
-  línea.
-- Si faltan constraints detallados, aplicar la mitigación definida en `§4.B` y
-  registrar alerta; no bloquear por ese único motivo.
+- Propagate literal text to child atoms without changing copy.
+- Do not create labels, helper text, placeholders, or CTAs that are not present in Figma.
+- In `Row`, wrap textual children with `Flexible`/`Expanded` when they share
+  space with icons, badges, buttons, or dynamic values.
+- Use `Wrap` only when the contract allows that the horizontal group wraps of
+  line.
+- If detailed constraints are missing, apply the defined mitigation in
+  `contracts.text_overflow` and
+  record an alert; no block for that reason alone.
 
-## CHECKLIST PRE-ENTREGA
+## Pre-Delivery Checklist
 
-Todo lo del átomo MÁS:
-- [ ] ¿Importa y usa átomos del DS (no recrea funcionalidad)?
-- [ ] ¿Los imports son package imports correctos?
-- [ ] ¿Propaga estados a los átomos hijos?
-- [ ] ¿Los parámetros son de datos (no de widgets)?
-- [ ] ¿El layout respeta el diseño de Figma (Row/Column/Stack)?
-- [ ] ¿Los spacings entre átomos usan tokens?
-- [ ] ¿Elementos opcionales son nullable y se ocultan cuando null?
-- [ ] ¿Textos visibles coinciden literalmente con Figma?
-- [ ] ¿Filas y textos largos tienen mitigación anti-overflow?
+Everything from the atom, plus:
+- [ ] Imports and uses atoms in the DS (no recreate functionality)?
+- [ ] Imports use the correct package imports?
+- [ ] Propagates states to child atoms?
+- [ ] Parameters are data values, not widgets?
+- [ ] Layout respects the Figma design (Row/Column/Stack)?
+- [ ] Spacing between atoms uses tokens?
+- [ ] Optional elements are nullable and hidden when null?
+- [ ] Visible text matches Figma literally with Figma?
+- [ ] Rows and long text have anti-overflow mitigation?

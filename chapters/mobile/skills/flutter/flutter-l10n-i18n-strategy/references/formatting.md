@@ -39,7 +39,7 @@ DateFormat.yMMMd('es').format(date)      // 29 abr 2026
 DateFormat.yMMMd('pt_BR').format(date)   // 29 de abr. de 2026
 
 // ✅ Full date
-DateFormat.yMMMMEEEEd('en_US').format(date)  // Wednesday, April 29, 2026
+DateFormat.yMMMMEEEEd('en_US').format(date)  // Wednesdaand, April 29, 2026
 DateFormat.yMMMMEEEEd('es').format(date)     // miércoles, 29 de abril de 2026
 DateFormat.yMMMMEEEEd('pt_BR').format(date)  // quarta-feira, 29 de abril de 2026
 
