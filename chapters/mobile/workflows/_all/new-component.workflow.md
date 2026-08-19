@@ -18,13 +18,13 @@ description: >
 |---|---|
 | `workflow-id` | `new-component` |
 | `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
-| Step IDs | `topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`, `phase-0-spec-packet`, `phase-1-design-analysis`, `phase-2-spec-inventory-dag`, `phase-2-5-architecture-technical`, `phase-2-7-validation-human-review`, `phase-3-ds-code-generation`, `phase-3-5-quality-audit`, `phase-4a-widget-tests-ds`, `phase-4b-golden-tests-ds`, `phase-4c-widgetbook-ds`, `phase-5-delivery` |
+| Step IDs | `topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`, `phase-0-spec-packet`, `phase-1-design-analysis`, `phase-2-spec-inventory-dag`, `phase-2-1-architecture-technical`, `phase-2-2-validation-human-review`, `phase-3-ds-code-generation`, `phase-3-1-quality-audit`, `phase-4-1-widget-tests-ds`, `phase-4-2-golden-tests-ds`, `phase-4-3-widgetbook-ds`, `phase-5-delivery` |
 
 > **NON-NEGOTIABLE RULE:** Every `pragma-ai workflow ...` command in this document is **MANDATORY** to execute. The agent MUST run them — they are not suggestions or documentation.
 
 > Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document).
-> The **gap report only runs on steps that produce output files** (`--output-file`). In this workflow, the three pre-flight gates and `phase-2-7-validation-human-review` do not run a gap report.
-> `phase-4b-golden-tests-ds` is conditional on `golden_tests=true`; when `false`, the step is skipped and emits no telemetry (the workflow records `skipped_by_input` in its own artifacts).
+> The **gap report only runs on steps that produce output files** (`--output-file`). In this workflow, the three pre-flight gates and `phase-2-2-validation-human-review` do not run a gap report.
+> `phase-4-2-golden-tests-ds` is conditional on `golden_tests=true`; when `false`, the step is skipped and emits no telemetry (the workflow records `skipped_by_input` in its own artifacts).
 > Commands assume the shell's cwd is already the project root — no `cd` prefix is needed, and `--project-dir` only matters when running from elsewhere.
 
 ---
@@ -394,11 +394,11 @@ pragma-ai workflow report \
   --output-file "${SPEC_PACKET_PATH}/spec.yaml"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.5.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.1.
 
 ---
 
-### PHASE 2.5 — Architecture Technical
+### PHASE 2.1 — Architecture Technical
 
 > ⚡ **MANDATORY** — Report `started` when the step begins.
 
@@ -406,7 +406,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-2-5-architecture-technical \
+  --step-id phase-2-1-architecture-technical \
   --status started
 ```
 
@@ -421,16 +421,16 @@ Update in `spec.yaml` only `technical_plan`, `artifact_plan`,
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-2-5-architecture-technical \
+  --step-id phase-2-1-architecture-technical \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/spec.yaml"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.7.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.2.
 
 ---
 
-### PHASE 2.7 — Validation + Human Review
+### PHASE 2.2 — Validation + Human Review
 
 > ⚡ **MANDATORY** — Report `started` when the step begins.
 
@@ -438,7 +438,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-2-7-validation-human-review \
+  --step-id phase-2-2-validation-human-review \
   --status started
 ```
 
@@ -463,7 +463,7 @@ as approved.
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-2-7-validation-human-review \
+  --step-id phase-2-2-validation-human-review \
   --status failed
 ```
 > ❌ The workflow stops here.
@@ -474,11 +474,11 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-2-7-validation-human-review \
+  --step-id phase-2-2-validation-human-review \
   --status finished
 ```
 
-> **Stop here.** This is the **domain aggregate approval gate** for the whole planning set (PHASE 0 through PHASE 2.5). If the human requests changes to `design_source`, `literal_texts`, `assets`, `inventory`, `dag`, `technical_plan`, or `artifact_plan`, the flow must return to the phase that owns that section: report `re_started` on the affected earlier phase, apply changes, report `finished` again for that phase, re-run its gap report, and re-enter PHASE 2.7 (which itself gets `re_started` → `finished` again). Only when `context.json` marks the spec as approved may PHASE 3 begin. *(PHASE 2.7 produces no new output files — no gap report required.)*
+> **Stop here.** This is the **domain aggregate approval gate** for the whole planning set (PHASE 0 through PHASE 2.1). If the human requests changes to `design_source`, `literal_texts`, `assets`, `inventory`, `dag`, `technical_plan`, or `artifact_plan`, the flow must return to the phase that owns that section: report `re_started` on the affected earlier phase, apply changes, report `finished` again for that phase, re-run its gap report, and re-enter PHASE 2.2 (which itself gets `re_started` → `finished` again). Only when `context.json` marks the spec as approved may PHASE 3 begin. *(PHASE 2.2 produces no new output files — no gap report required.)*
 
 ---
 
@@ -536,11 +536,11 @@ pragma-ai workflow report \
   "${DS_FILE_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.5.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.1.
 
 ---
 
-### PHASE 3.5 — Quality Audit
+### PHASE 3.1 — Quality Audit
 
 > ⚡ **MANDATORY** — Report `started` when the step begins.
 
@@ -548,7 +548,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-3-5-quality-audit \
+  --step-id phase-3-1-quality-audit \
   --status started
 ```
 
@@ -566,7 +566,7 @@ runtime asset, an undeclared DS exact-icon mapping, or a substituted font.
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-3-5-quality-audit \
+  --step-id phase-3-1-quality-audit \
   --status failed
 ```
 > ❌ The workflow stops here.
@@ -577,16 +577,16 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-3-5-quality-audit \
+  --step-id phase-3-1-quality-audit \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/audit-report.md"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4a.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.1.
 
 ---
 
-### PHASE 4a — Widget Tests DS
+### PHASE 4.1 — Widget Tests DS
 
 > ⚡ **MANDATORY** — Report `started` when the step begins.
 
@@ -594,7 +594,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4a-widget-tests-ds \
+  --step-id phase-4-1-widget-tests-ds \
   --status started
 ```
 
@@ -620,7 +620,7 @@ read_sections:
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4a-widget-tests-ds \
+  --step-id phase-4-1-widget-tests-ds \
   --status failed
 ```
 > ❌ The workflow stops here — delivery cannot proceed without a passing `evidence/widget-tests.md`.
@@ -636,17 +636,17 @@ done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widget_tests") | .
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4a-widget-tests-ds \
+  --step-id phase-4-1-widget-tests-ds \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/widget-tests.md" \
   "${DS_TEST_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4b (only when `golden_tests=true`) or directly to PHASE 4c.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.2 (only when `golden_tests=true`) or directly to PHASE 4.3.
 
 ---
 
-### PHASE 4b — Golden Tests DS (conditional)
+### PHASE 4.2 — Golden Tests DS (conditional)
 
 > ⚡ **MANDATORY only when `golden_tests=true`.** When `golden_tests=false`, skip this phase entirely — do not emit `started`/`finished` for it. The workflow's own `skipped_by_input` record in `context.json`, `spec.yaml` and `PIPELINE_LOG_PATH` covers the skip.
 
@@ -656,7 +656,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4b-golden-tests-ds \
+  --step-id phase-4-2-golden-tests-ds \
   --status started
 ```
 
@@ -688,7 +688,7 @@ golden artifacts. Record `golden_tests: skipped_by_input` with
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4b-golden-tests-ds \
+  --step-id phase-4-2-golden-tests-ds \
   --status failed
 ```
 > ❌ The workflow stops here — delivery cannot proceed with a failing golden outcome when `golden_tests=true`.
@@ -704,17 +704,17 @@ done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_golden_tests") | .
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4b-golden-tests-ds \
+  --step-id phase-4-2-golden-tests-ds \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/golden-tests.md" \
   "${DS_GOLDEN_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4c.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.3.
 
 ---
 
-### PHASE 4c — Widgetbook DS
+### PHASE 4.3 — Widgetbook DS
 
 > ⚡ **MANDATORY** — Report `started` when the step begins.
 
@@ -722,7 +722,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4c-widgetbook-ds \
+  --step-id phase-4-3-widgetbook-ds \
   --status started
 ```
 
@@ -753,7 +753,7 @@ done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widgetbook") | .fi
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-component \
-  --step-id phase-4c-widgetbook-ds \
+  --step-id phase-4-3-widgetbook-ds \
   --status finished \
   "${DS_WIDGETBOOK_FLAGS[@]}"
 ```
@@ -839,7 +839,7 @@ Agent: I've completed [step name]. Do you approve the result?
 - **If edits are requested:** Apply the changes in place on the artifact, keep `finished` (the baseline is already captured), and re-present for approval. The gap report will capture those edits as the diff against the agent's first draft.
 - **If rejected:** Report `re_started`, regenerate the artifact from scratch, report `finished` again (recapturing the baseline), and restart the gate. Repeat until approved.
 
-> **PHASE 2.7 aggregate rejection.** When PHASE 2.7 hosts the plan-approval decision, a rejection of a specific planning section (design analysis, inventory/DAG, technical plan) must first replay the phase that owns that section: report `re_started` on the affected earlier phase (PHASE 1, PHASE 2, or PHASE 2.5), regenerate its output, report `finished` again with the same `--output-file` set, re-run that phase's gap report, and then report `re_started` → `finished` on PHASE 2.7 itself before re-entering this gate. Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
+> **PHASE 2.2 aggregate rejection.** When PHASE 2.2 hosts the plan-approval decision, a rejection of a specific planning section (design analysis, inventory/DAG, technical plan) must first replay the phase that owns that section: report `re_started` on the affected earlier phase (PHASE 1, PHASE 2, or PHASE 2.1), regenerate its output, report `finished` again with the same `--output-file` set, re-run that phase's gap report, and then report `re_started` → `finished` on PHASE 2.2 itself before re-entering this gate. Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
 
 > ⚡ **MANDATORY** — On rejection, example using `phase-3-ds-code-generation`:
 
@@ -874,8 +874,8 @@ pragma-ai workflow report \
 ## Gap calculation & reporting (per step)
 
 > ⚡ **MANDATORY only for steps with output files.** In this workflow:
-> `phase-0-spec-packet`, `phase-1-design-analysis`, `phase-2-spec-inventory-dag`, `phase-2-5-architecture-technical`, `phase-3-ds-code-generation`, `phase-3-5-quality-audit`, `phase-4a-widget-tests-ds`, `phase-4b-golden-tests-ds` (only when executed), `phase-4c-widgetbook-ds`, `phase-5-delivery`.
-> The three pre-flight gates (`topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`) and `phase-2-7-validation-human-review` do NOT run a gap report.
+> `phase-0-spec-packet`, `phase-1-design-analysis`, `phase-2-spec-inventory-dag`, `phase-2-1-architecture-technical`, `phase-3-ds-code-generation`, `phase-3-1-quality-audit`, `phase-4-1-widget-tests-ds`, `phase-4-2-golden-tests-ds` (only when executed), `phase-4-3-widgetbook-ds`, `phase-5-delivery`.
+> The three pre-flight gates (`topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`) and `phase-2-2-validation-human-review` do NOT run a gap report.
 
 > Run this immediately after the corresponding step's approval gate passes — not batched at the end of the workflow.
 
@@ -914,11 +914,11 @@ pragma-ai workflow status "$INSTANCE_ID"
 | Command | When |
 |---|---|
 | `pragma-ai workflow create --workflow-id new-component --user-story-id <id>` | At the start, once (Setup) |
-| `pragma-ai workflow report ... --step-id <step> --status started` | When each step begins (gates, PHASE 0–5; PHASE 4b only if `golden_tests=true`) |
-| `pragma-ai workflow report ... --step-id <step> --status finished` | On completion of `topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`, `phase-2-7-validation-human-review` (no `--output-file`) |
-| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of file-producing phases: `phase-0-spec-packet`, `phase-1-design-analysis`, `phase-2-spec-inventory-dag`, `phase-2-5-architecture-technical`, `phase-3-ds-code-generation`, `phase-3-5-quality-audit`, `phase-4a-widget-tests-ds`, `phase-4b-golden-tests-ds` (when executed), `phase-4c-widgetbook-ds`, `phase-5-delivery` |
-| `pragma-ai workflow report ... --step-id <step> --status failed` | When a gate blocks (`topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`), validation fails (`phase-2-7-validation-human-review`), the audit loop exhausts retries (`phase-3-5-quality-audit`), tests can't pass (`phase-4a-widget-tests-ds`, `phase-4b-golden-tests-ds`), or delivery preconditions fail (`phase-5-delivery`) — the workflow stops |
-| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 2.7 aggregate rejection) |
+| `pragma-ai workflow report ... --step-id <step> --status started` | When each step begins (gates, PHASE 0–5; PHASE 4.2 only if `golden_tests=true`) |
+| `pragma-ai workflow report ... --step-id <step> --status finished` | On completion of `topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`, `phase-2-2-validation-human-review` (no `--output-file`) |
+| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of file-producing phases: `phase-0-spec-packet`, `phase-1-design-analysis`, `phase-2-spec-inventory-dag`, `phase-2-1-architecture-technical`, `phase-3-ds-code-generation`, `phase-3-1-quality-audit`, `phase-4-1-widget-tests-ds`, `phase-4-2-golden-tests-ds` (when executed), `phase-4-3-widgetbook-ds`, `phase-5-delivery` |
+| `pragma-ai workflow report ... --step-id <step> --status failed` | When a gate blocks (`topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`), validation fails (`phase-2-2-validation-human-review`), the audit loop exhausts retries (`phase-3-1-quality-audit`), tests can't pass (`phase-4-1-widget-tests-ds`, `phase-4-2-golden-tests-ds`), or delivery preconditions fail (`phase-5-delivery`) — the workflow stops |
+| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 2.2 aggregate rejection) |
 | `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID" --step-id <step>` | Phase A: after the corresponding file-producing step is approved |
 | `pragma-ai workflow gap-report ... --submit --report-id <id> --summary "<text>"` | Phase B: immediately after Phase A, for the same step |
 | `pragma-ai workflow list --user-story-id "$USER_STORY_ID"` | Check overall progress (any time) |
