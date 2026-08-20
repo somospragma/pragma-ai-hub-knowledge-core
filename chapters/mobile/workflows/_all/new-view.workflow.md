@@ -30,7 +30,7 @@ It must not generate Flutter code, tests, assets, routes, Widgetbook files, or
 project configuration in that response.
 
 Only a later human turn that explicitly approves the pending packet may change
-`context.json` to `approved_for_execution` and unlock Phase 3a. Approval is
+`context.json` to `approved_for_execution` and unlock Phase 3.1. Approval is
 invalid when the packet lacks the required plan or when
 `checkpoints.initial_spec.status` is not `pending`.
 
@@ -137,7 +137,7 @@ Before writing any packet, log, report or Figma evidence:
 
 1. `optional`: continue.
 2. `generate`: generate contracts minimum in
-   `spec.yaml.contracts.minimal_domain_data` before Phase 3b.
+   `spec.yaml.contracts.minimal_domain_data` before Phase 3.4.
 3. `required`: block if referenced domain/data contracts are missing.
 
 If it fails a gate, finish with `blocked_input`.
@@ -241,7 +241,7 @@ The DS vs App separation must remain explicit in `inventory` and `artifact_plan`
 
 ---
 
-### PHASE 2.5 — Architecture Technical
+### PHASE 2.1 — Architecture Technical
 
 **Agent**: `@component-architect`
 
@@ -253,7 +253,7 @@ and `checkpoints`.
 
 ---
 
-### PHASE 2.6 — Contracts Minimum (only `CONTRACTS_POLICY=generate`)
+### PHASE 2.2 — Contracts Minimum (only `CONTRACTS_POLICY=generate`)
 
 **Agent**: `@component-architect`
 
@@ -261,7 +261,7 @@ Update in `spec.yaml` only `contracts.minimal_domain_data`.
 
 ---
 
-### PHASE 2.7 — Validation + Human Review
+### PHASE 2.3 — Validation + Human Review
 
 **Skill**: `mobile-sdd-spec-validation`
 
@@ -290,7 +290,7 @@ only in a later human turn with explicit approval of this pending packet.
 
 ---
 
-### PHASE 3a — Codegen of Components DS
+### PHASE 3.1 — Codegen of Components DS
 
 **Agent**: `@widget-developer`
 
@@ -320,7 +320,7 @@ read_sections:
 
 ---
 
-### PHASE 3a.5 — Audit of Components DS
+### PHASE 3.2 — Audit of Components DS
 
 **Agent**: `@code-auditor`
 
@@ -346,7 +346,7 @@ read_sections:
 
 ---
 
-### PHASE 3a.7 — Checkpoint Human of Layer DS
+### PHASE 3.3 — Checkpoint Human of Layer DS
 
 **Agent**: `@ds-orchestrator`
 
@@ -358,13 +358,13 @@ Present a compact review in Spanish before generating the app view:
 4. risks or fallbacks pending
 
 Wait for explicit approval. If the human requests adjustments, return to
-PHASE 3a or PHASE 3a.5 as applicable. Do not continue to PHASE 3b until
+PHASE 3.1 or PHASE 3.2 as applicable. Do not continue to PHASE 3.4 until
 `context.json.checkpoints.ds_layer.status=approved` and
 `context.json.status=approved_for_execution`.
 
 ---
 
-### PHASE 3b — Codegen of View App
+### PHASE 3.4 — Codegen of View App
 
 **Agent**: `@widget-developer`
 **Prompt**: `codegen-view.prompt.md`
@@ -400,7 +400,7 @@ Output:
 
 ---
 
-### PHASE 3b.5 — Audit of App View
+### PHASE 3.5 — Audit of App View
 
 **Agent**: `@code-auditor`
 
@@ -436,7 +436,7 @@ read_sections:
 
 ---
 
-### PHASE 3b.7 — Human Checkpoint of App View
+### PHASE 3.6 — Human Checkpoint of App View
 
 **Agent**: `@ds-orchestrator`
 
@@ -454,7 +454,7 @@ and `context.json.status=approved_for_execution`.
 
 ---
 
-### PHASE 4a — Tests of Components DS
+### PHASE 4.1 — Tests of Components DS
 
 **Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
@@ -473,7 +473,7 @@ read_sections:
 
 ---
 
-### PHASE 4b — Golden of Components DS (conditional)
+### PHASE 4.2 — Golden of Components DS (conditional)
 
 **Condition**: `golden_tests=true`.
 **Agent**: `@golden-test-engineer`
@@ -499,7 +499,7 @@ with `reason: golden_tests=false` in `context.json`, `spec.yaml` and
 
 ---
 
-### PHASE 4c — Widgetbook of Components DS
+### PHASE 4.3 — Widgetbook of Components DS
 
 **Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGETBOOK`)
@@ -519,7 +519,7 @@ read_sections:
 
 ---
 
-### PHASE 4d — Tests of View
+### PHASE 4.4 — Tests of View
 
 **Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=VIEW_WIDGET_TESTS`)
@@ -552,7 +552,7 @@ Minimum coverage:
 
 ---
 
-### PHASE 4e — Golden Tests of Complete View (conditional)
+### PHASE 4.5 — Golden Tests of Complete View (conditional)
 
 **Condition**: `golden_tests=true`.
 **Agent**: `@golden-test-engineer`
@@ -581,7 +581,7 @@ read_sections:
 ```
 
 When `golden_tests=false`, this phase is already represented by the single
-`golden_tests: skipped_by_input` outcome recorded in Phase 4b. Do not invoke
+`golden_tests: skipped_by_input` outcome recorded in Phase 4.2. Do not invoke
 the agent or create view golden artifacts.
 
 Minimum coverage:
@@ -594,7 +594,7 @@ Minimum coverage:
 
 ---
 
-### PHASE 4f — Widgetbook of Screen App
+### PHASE 4.6 — Widgetbook of Screen App
 
 **Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`)
