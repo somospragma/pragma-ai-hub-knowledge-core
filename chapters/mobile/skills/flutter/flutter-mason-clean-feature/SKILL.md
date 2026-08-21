@@ -1,6 +1,6 @@
 ---
 id: flutter-mason-clean-feature
-version: 2.0.0
+version: 2.0.1
 scope: stack
 type: skill
 chapter: mobile
@@ -160,7 +160,7 @@ import 'package:profile/profile.dart';
   ],
 )
 Future<void> configureDependencies() async {
-  final getIt = $initGetIt(getIt);
+  await $initGetIt(getIt);
   await initProfileScope(getIt);
 }
 ```

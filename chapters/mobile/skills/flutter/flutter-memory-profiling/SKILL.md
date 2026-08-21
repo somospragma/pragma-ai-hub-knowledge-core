@@ -1,7 +1,7 @@
 ---
 id: flutter-memory-profiling
 name: flutter-memory-profiling
-version: 1.1.0
+version: 1.1.1
 scope: stack
 type: skill
 chapter: mobile
@@ -39,10 +39,10 @@ flutter run --profile
 ```
 
 ```dart
-// Enable MemoryAllocations — required for leak_tracker to track Flutter objects
+// No special setup is required to profile memory in DevTools:
+// the framework dispatches object lifecycle events automatically in
+// debug and profile builds. Just run in profile mode and open the Memory tab.
 void main() {
-  // Enables Flutter framework object tracking (widgets, controllers, etc.)
-  WidgetsBinding.instance; // ensures binding is initialized
   runApp(const App());
 }
 ```
@@ -92,7 +92,11 @@ import 'package:leak_tracker_flutter_testing/leak_tracker_flutter_testing.dart';
 
 void main() {
   // Enable leak tracking globally for all tests in this file
-  LeakTesting.settings = LeakTesting.settings.withIgnoredAll();
+  LeakTesting.enable();
+  // Optional: capture creation/disposal stack traces for easier debugging
+  LeakTesting.settings = LeakTesting.settings
+      .withCreationStackTrace()
+      .withDisposalStackTrace();
 
   testWidgets('MyScreen disposes all resources', (tester) async {
     await tester.pumpWidget(const MaterialApp(home: MyScreen()));
