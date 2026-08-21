@@ -22,6 +22,13 @@ description: >
 
 > **NON-NEGOTIABLE RULE:** Every `pragma-ai workflow ...` command in this document is **MANDATORY** to execute. The agent MUST run them — they are not suggestions or documentation.
 
+> ⛔ **STEP-ID INTEGRITY (NON-NEGOTIABLE):** The `--step-id` and `--workflow-id` values shown in every command block below are the **ONLY** valid identifiers for this workflow. The agent MUST copy them **verbatim** from this document — never invent, abbreviate, translate, paraphrase, pluralize, capitalize differently, or otherwise modify them.
+>
+> - Every `--step-id` submitted to `pragma-ai workflow report` or `pragma-ai workflow gap-report` MUST match one entry in the **"Step IDs"** list above, character-for-character (kebab-case, lowercase, exact spelling).
+> - Every `--workflow-id` MUST be exactly `new-view`.
+> - If a step-id you need is not in the list, STOP and ask the user — do not fabricate one.
+> - The CLI rejects unknown step-ids; a wrong id silently corrupts the run's telemetry.
+
 > Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document). The workflow keeps three domain-specific aggregate approval gates on top of the generic per-step gate: PHASE 2.3 (initial spec plan), PHASE 3.3 (DS layer checkpoint), PHASE 3.6 (app view layer checkpoint).
 > The **gap report only runs on steps that produce output files** (`--output-file`). In this workflow the seven pre-flight gates, `phase-2-3-validation-human-review`, `phase-3-3-checkpoint-ds` and `phase-3-6-checkpoint-view` do NOT run a gap report.
 > Two phases are conditional and emit telemetry only when executed: `phase-2-2-contracts-minimum` requires `CONTRACTS_POLICY=generate`; `phase-4-2-ds-golden-tests` and `phase-4-5-view-golden-tests` require `golden_tests=true`.

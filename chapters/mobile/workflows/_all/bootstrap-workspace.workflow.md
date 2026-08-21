@@ -22,6 +22,13 @@ description: >
 
 > **NON-NEGOTIABLE RULE:** Every `pragma-ai workflow ...` command in this document is **MANDATORY** to execute. The agent MUST run them — they are not suggestions or documentation.
 
+> ⛔ **STEP-ID INTEGRITY (NON-NEGOTIABLE):** The `--step-id` and `--workflow-id` values shown in every command block below are the **ONLY** valid identifiers for this workflow. The agent MUST copy them **verbatim** from this document — never invent, abbreviate, translate, paraphrase, pluralize, capitalize differently, or otherwise modify them.
+>
+> - Every `--step-id` submitted to `pragma-ai workflow report` or `pragma-ai workflow gap-report` MUST match one entry in the **"Step IDs"** list above, character-for-character (kebab-case, lowercase, exact spelling).
+> - Every `--workflow-id` MUST be exactly `bootstrap-workspace`.
+> - If a step-id you need is not in the list, STOP and ask the user — do not fabricate one.
+> - The CLI rejects unknown step-ids; a wrong id silently corrupts the run's telemetry.
+
 > Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document).
 > The **gap report only runs on steps that produce output files** (`--output-file`). In this workflow, only `phase-2-proposal` and `phase-4-apply-with-backup` produce files.
 > Commands assume the shell's cwd is already the project root — no `cd` prefix is needed, and `--project-dir` only matters when running from elsewhere.
