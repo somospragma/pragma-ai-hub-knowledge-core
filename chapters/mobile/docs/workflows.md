@@ -416,16 +416,23 @@ and visual contracts.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `component_path` | Yes | Path to the DS component file or component folder. |
 | `refactor_goal` | No, recommended | Desired improvement or constraint. |
 | `compatibility_policy` | No | `additive_only`, `no_public_api_change` or `allow_public_api_change`. |
 
 ```text
 @ds-orchestrator /refactor-component
+hu_id: <user story id, e.g. US-12345>                       # required
 component_path: <lib/src/.../component_file.dart>           # required
 refactor_goal: <what should improve and why>                # optional, recommended
 compatibility_policy: <additive_only|no_public_api_change|allow_public_api_change> # optional
 ```
+
+`hu_id` is required so every refactor run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: approved refactor plan, scoped code changes, updated
 tests/goldens when needed, audit evidence and delivery summary.
