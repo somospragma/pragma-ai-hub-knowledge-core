@@ -485,6 +485,7 @@ Purpose: analyze an existing feature and generate or improve test coverage.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `feature_name` | Yes | Snake case feature name. |
 | `feature_path` | Yes | Path to feature source folder. |
 | `scope` | No | `full`, `domain`, `data` or `presentation`. |
@@ -495,6 +496,7 @@ Purpose: analyze an existing feature and generate or improve test coverage.
 
 ```text
 @test-coverage-engineer /test-plan
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required
 feature_path: <lib/src/features/feature_name>               # required
 scope: <full|domain|data|presentation>                      # optional, default full
@@ -503,6 +505,11 @@ topology: <single_repo|monorepo_melos|multi_repo>           # optional
 target_id: <target_id>                                      # optional
 target_root: <path/to/package-or-target-root>               # optional
 ```
+
+`hu_id` is required so every test-plan run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: coverage plan, generated tests where allowed, command/evidence
 summaries, known gaps and a docs/testing artifact.
