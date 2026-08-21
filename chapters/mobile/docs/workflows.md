@@ -188,6 +188,7 @@ Purpose: generate an app screen/view from Figma, including DS/App separation.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `view_name` | Yes | Snake case view name. |
 | `figma_url` | Yes | Figma URL with file key and node id. |
 | `user_story` | Yes | Inline user story or acceptance criteria. |
@@ -200,6 +201,7 @@ Purpose: generate an app screen/view from Figma, including DS/App separation.
 
 ```text
 @ds-orchestrator /new-view
+hu_id: <user story id, e.g. US-12345>                       # required
 view_name: <view_name>                                      # required, e.g. product_catalog_view
 figma_url: <https://www.figma.com/file/...?...node-id=...>  # required
 user_story: <user story or acceptance criteria>             # required
@@ -210,6 +212,11 @@ project_root: <absolute/path/to/app-repo>                    # optional; needed 
 golden_tests: <true|false>                                  # optional, default false
 evidence_mode: <minimal|standard>                            # optional, default minimal
 ```
+
+`hu_id` is required so every view build is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: app view code, DS component inventory, DS artifacts when
 needed, mandatory widget tests, optional goldens, Widgetbook screen use case

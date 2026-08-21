@@ -12,6 +12,58 @@ description: >
 ---
 # Workflow: New View/Screen from Figma
 
+## Telemetry — Workflow metadata
+
+| Field | Value |
+|---|---|
+| `workflow-id` | `new-view` |
+| `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
+| Step IDs | `gate-0-canonical-configuration`, `gate-0-1-topology`, `gate-0-2-spec-packet-ownership`, `gate-0-5-ownership-repo-app`, `gate-1-architecture`, `gate-2-contracts-policy`, `gate-3-figma-mcp`, `phase-0-spec-packet`, `phase-1-analysis-of-screen`, `phase-2-inventory-dag`, `phase-2-1-architecture-technical`, `phase-2-2-contracts-minimum`, `phase-2-3-validation-human-review`, `phase-3-1-codegen-ds`, `phase-3-2-audit-ds`, `phase-3-3-checkpoint-ds`, `phase-3-4-codegen-view`, `phase-3-5-audit-view`, `phase-3-6-checkpoint-view`, `phase-4-1-ds-widget-tests`, `phase-4-2-ds-golden-tests`, `phase-4-3-ds-widgetbook`, `phase-4-4-view-widget-tests`, `phase-4-5-view-golden-tests`, `phase-4-6-app-widgetbook`, `phase-5-delivery` |
+
+> **NON-NEGOTIABLE RULE:** Every `pragma-ai workflow ...` command in this document is **MANDATORY** to execute. The agent MUST run them — they are not suggestions or documentation.
+
+> Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document). The workflow keeps three domain-specific aggregate approval gates on top of the generic per-step gate: PHASE 2.3 (initial spec plan), PHASE 3.3 (DS layer checkpoint), PHASE 3.6 (app view layer checkpoint).
+> The **gap report only runs on steps that produce output files** (`--output-file`). In this workflow the seven pre-flight gates, `phase-2-3-validation-human-review`, `phase-3-3-checkpoint-ds` and `phase-3-6-checkpoint-view` do NOT run a gap report.
+> Two phases are conditional and emit telemetry only when executed: `phase-2-2-contracts-minimum` requires `CONTRACTS_POLICY=generate`; `phase-4-2-ds-golden-tests` and `phase-4-5-view-golden-tests` require `golden_tests=true`.
+> Commands assume the shell's cwd is already the project root — no `cd` prefix is needed, and `--project-dir` only matters when running from elsewhere.
+
+---
+
+## Setup — Mint the workflow instance
+
+> ⚡ **MANDATORY** — Always run this at the start, before any step.
+
+### Resolve user-story-id (mandatory)
+
+`hu_id` is a **required** invocation input for this workflow (see *User Inputs*), so the agent already has the user story identifier at the start. The agent MUST map it to `user-story-id` before running `workflow create`:
+
+1. **Invocation input (canonical):** Use the `hu_id` value provided in the invocation. This is the required path.
+2. **Fallback — Session context:** If `hu_id` was not supplied but a `user-story-id` is already available from a parent flow or another sub-workflow in this session, reuse it silently.
+3. **Fallback — Project file:** If neither of the above is available, read the ID from `output/.active-user-story` when it exists.
+4. **Last resort — Ask the user:** If no source yields an ID, ask explicitly and refuse to proceed without a value:
+
+```
+Kratos: To track progress I need the user-story-id.
+  What is the active user story? (e.g. US-12345, HU-678)
+```
+
+> Once resolved, the agent MUST persist the value to `output/.active-user-story` so downstream workflows inherit it automatically.
+
+```bash
+# 1. Take the required hu_id from the invocation and use it as user-story-id
+USER_STORY_ID="$hu_id"
+
+# 2. Persist for other workflows so they don't have to ask again
+echo "$USER_STORY_ID" > output/.active-user-story
+
+# 3. Mint the instance
+INSTANCE_ID=$(pragma-ai workflow create \
+  --workflow-id new-view \
+  --user-story-id "$USER_STORY_ID")
+```
+
+---
+
 ## Evidence Mode
 
 Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
@@ -75,6 +127,16 @@ with the canonical invocation instead of generating code.
 
 ### Gate 0 - Canonical Configuration
 
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-canonical-configuration \
+  --status started
+```
+
 Before any packet, log, Figma request, or code generation:
 
 1. Resolve `PROJECT_ROOT` from optional `project_root`, then the IDE workspace
@@ -88,7 +150,37 @@ Before any packet, log, Figma request, or code generation:
 5. If the triplet is missing, partial, invalid, or ambiguous, finish with
    `blocked_input`. Do not create a bootstrap proposal or write any YAML.
 
+> ⚡ **MANDATORY (conditional)** — If the triplet is missing, partial, invalid, or ambiguous:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-canonical-configuration \
+  --status failed
+```
+
+> ⚡ **MANDATORY (success path)** — Report `finished` on completion:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-canonical-configuration \
+  --status finished
+```
+
 ### Gate 0.1 - Topology
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-1-topology \
+  --status started
+```
 
 1. Validate `TOPOLOGY_REPO_MODE`.
 2. Validate roots (`PROJECT_ROOT`, `APP_TARGET_ID` and
@@ -96,7 +188,37 @@ Before any packet, log, Figma request, or code generation:
 3. In targets `location_strategy=melos_package`, resolve `repo_root` and
    `package_path` with `docs/scripts/melos_workspace.rb`; require `ok=true`.
 
+> ⚡ **MANDATORY (conditional)** — If any validation fails and the gate ends with `blocked_input`:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-1-topology \
+  --status failed
+```
+
+> ⚡ **MANDATORY (success path)** — Report `finished` on completion:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-1-topology \
+  --status finished
+```
+
 ### Gate 0.2 - Spec Packet Ownership
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-2-spec-packet-ownership \
+  --status started
+```
 
 Before writing any packet, log, report or Figma evidence:
 
@@ -112,7 +234,37 @@ Before writing any packet, log, report or Figma evidence:
    `CONFIG_SPEC_PACKET_ROOT_MISMATCH`. If the target is missing or is not an
    app, stop with `CONFIG_SPEC_PACKET_OWNER_INVALID`.
 
+> ⚡ **MANDATORY (conditional)** — If `CONFIG_SPEC_PACKET_ROOT_MISMATCH` or `CONFIG_SPEC_PACKET_OWNER_INVALID` triggers:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-2-spec-packet-ownership \
+  --status failed
+```
+
+> ⚡ **MANDATORY (success path)** — Report `finished` on completion:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-2-spec-packet-ownership \
+  --status finished
+```
+
 ### Gate 0.5 — Ownership of the Repo App
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-5-ownership-repo-app \
+  --status started
+```
 
 1. `project.config.yaml` must be the canonical config for the app repo:
    `{PROJECT_ROOT}/.sopp/config/project.config.yaml`.
@@ -127,13 +279,73 @@ Before writing any packet, log, report or Figma evidence:
    - `CONFIG_PROJECT_ROOT_POINTS_TO_LIBRARY`
    - `CONFIG_APP_EXECUTABLE_SIGNAL_MISSING`
 
+> ⚡ **MANDATORY (conditional)** — If any of the above blocking codes triggers:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-5-ownership-repo-app \
+  --status failed
+```
+
+> ⚡ **MANDATORY (success path)** — Report `finished` on completion:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-0-5-ownership-repo-app \
+  --status finished
+```
+
 ### Gate 1 — Architecture
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-1-architecture \
+  --status started
+```
 
 1. If `architecture_contract.generation_policies.view_generation.require_architecture_contract=true`, require
    `ARCHITECTURE_CONTRACT_PATH`.
 2. `architecture.md` is optional visual support.
 
+> ⚡ **MANDATORY (conditional)** — If the required `ARCHITECTURE_CONTRACT_PATH` is missing:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-1-architecture \
+  --status failed
+```
+
+> ⚡ **MANDATORY (success path)** — Report `finished` on completion:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-1-architecture \
+  --status finished
+```
+
 ### Gate 2 — Policy of contracts
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-2-contracts-policy \
+  --status started
+```
 
 1. `optional`: continue.
 2. `generate`: generate contracts minimum in
@@ -142,7 +354,37 @@ Before writing any packet, log, report or Figma evidence:
 
 If it fails a gate, finish with `blocked_input`.
 
+> ⚡ **MANDATORY (conditional)** — If `CONTRACTS_POLICY=required` and referenced domain/data contracts are missing:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-2-contracts-policy \
+  --status failed
+```
+
+> ⚡ **MANDATORY (success path)** — Report `finished` on completion:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-2-contracts-policy \
+  --status finished
+```
+
 ### Gate 3 — Figma MCP
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-3-figma-mcp \
+  --status started
+```
 
 Before PHASE 1, `@ds-orchestrator` prefers `@figma-analyzer` for Figma MCP
 preflight. When the active surface cannot delegate natively, it executes the
@@ -166,10 +408,35 @@ Minimum checklist:
 If it fails, update `spec.yaml.external_access.figma_mcp.status=blocked_input`,
 persist `evidence/figma-mcp-preflight.md` and finish with `blocked_input`.
 
+> ⚡ **MANDATORY (conditional)** — If preflight fails (persists `evidence/figma-mcp-preflight.md` and ends with `blocked_input` or `PLATFORM_CONTROLLER_ROLE_CAPABILITY_MISSING`):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-3-figma-mcp \
+  --status failed
+```
+
+> ⚡ **MANDATORY (success path)** — Report `finished` on completion (successful preflight produces no artifact — the diagnostic file is only written on failure, and the failure branch already reported `failed`):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id gate-3-figma-mcp \
+  --status finished
+```
+
 ## User Inputs
+
+`hu_id` is **required**: it identifies the user story this view belongs to and
+is mapped 1:1 to `user-story-id` for telemetry. If it is not supplied, the
+workflow refuses to start.
 
 ```text
 @ds-orchestrator /new-view
+hu_id: US-12345                                             [Required]
 view_name: product_catalog_view
 figma_url: https://www.figma.com/file/xxx/Screen?node-id=456
 user_story: [User story or acceptance criteria]
@@ -184,6 +451,16 @@ evidence_mode: minimal  [Optional; default minimal]
 ## Canonical Sequence
 
 ### PHASE 0 — Mobile Spec Packet (`standard`)
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-0-spec-packet \
+  --status started
+```
 
 **Agent**: `@ds-orchestrator`
 **Skill**: `mobile-sdd-spec-validation`
@@ -210,9 +487,35 @@ required. Must include `external_access.figma_mcp.required=true` and
 artifacts and golden success criteria only when it is `true`. Do not generate
 code in this phase.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with all four packet artifacts. Substitute `${SPEC_PACKET_PATH}` with the resolved run path:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-0-spec-packet \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
+  --output-file "${SPEC_PACKET_PATH}/context.json" \
+  --output-file "${SPEC_PACKET_PATH}/review.md" \
+  --output-file "${SPEC_PACKET_PATH}/evidence/validation-report.md"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 1.
+
 ---
 
 ### PHASE 1 — Analysis of Screen
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-1-analysis-of-screen \
+  --status started
+```
 
 **Preferred specialist role**: `@figma-analyzer`
 **Execution owner**: `@ds-orchestrator` when native delegation is unavailable
@@ -228,9 +531,40 @@ a screenshot, URL, existing local asset, or similar icon as a substitute.
 Persist evidence in `evidence/figma-analysis.md` and record phase in
 `PIPELINE_LOG_PATH`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with the updated spec, the analysis evidence, and every source asset archived under `source-assets/figma/`. Expand `${FIGMA_SOURCE_ASSETS[@]}` from the paths recorded in `spec.yaml.assets[].archive_path`:
+
+```bash
+# Build --output-file flags for every archived Figma source asset
+FIGMA_ASSET_FLAGS=()
+while IFS= read -r asset; do
+  FIGMA_ASSET_FLAGS+=(--output-file "$asset")
+done < <(yq -r '.assets[].archive_path' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-1-analysis-of-screen \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
+  --output-file "${SPEC_PACKET_PATH}/evidence/figma-analysis.md" \
+  "${FIGMA_ASSET_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.
+
 ---
 
 ### PHASE 2 — Extended Inventory + DAG
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-inventory-dag \
+  --status started
+```
 
 **Agent**: `@component-planner`
 **Prompt**: `atomic-inventory.prompt.md`
@@ -239,9 +573,32 @@ Update in `spec.yaml` only `canonical_spec`, `inventory`, `dag`,
 `artifact_plan.planned[group=ds_components]` and `artifact_plan.planned[group=app_view]`.
 The DS vs App separation must remain explicit in `inventory` and `artifact_plan`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished`. This phase updates `spec.yaml` in place — declare it as the output file so the gap report can diff this phase's contribution:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-inventory-dag \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.1.
+
 ---
 
 ### PHASE 2.1 — Architecture Technical
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-1-architecture-technical \
+  --status started
+```
 
 **Agent**: `@component-architect`
 
@@ -251,17 +608,65 @@ Update in `spec.yaml` only `technical_plan`, `artifact_plan`,
 `contracts.screen_chrome`, `visual_manifest`, `success_criteria`, `handoffs`
 and `checkpoints`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished`:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-1-architecture-technical \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.2 (only when `CONTRACTS_POLICY=generate`) or directly to PHASE 2.3.
+
 ---
 
 ### PHASE 2.2 — Contracts Minimum (only `CONTRACTS_POLICY=generate`)
+
+> ⚡ **MANDATORY only when `CONTRACTS_POLICY=generate`.** When the policy is `optional` or `required`, skip this phase entirely — do not emit `started`/`finished` for it.
+
+> ⚡ **MANDATORY (when executed)** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-2-contracts-minimum \
+  --status started
+```
 
 **Agent**: `@component-architect`
 
 Update in `spec.yaml` only `contracts.minimal_domain_data`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished`:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-2-contracts-minimum \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.3.
+
 ---
 
 ### PHASE 2.3 — Validation + Human Review
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-3-validation-human-review \
+  --status started
+```
 
 **Skill**: `mobile-sdd-spec-validation`
 
@@ -288,9 +693,42 @@ approved.
 The response that presents this review must end here. Code generation begins
 only in a later human turn with explicit approval of this pending packet.
 
+> ⚡ **MANDATORY (conditional)** — If the plan gate cannot be validated (schema/business failure that cannot be repaired in-review):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-3-validation-human-review \
+  --status failed
+```
+> ❌ The workflow stops here.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` once validation passes and the human review is presented (approval itself happens in the gate that follows):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-2-3-validation-human-review \
+  --status finished
+```
+
+> **Stop here.** This is the **domain aggregate approval gate** for the initial spec plan (PHASE 0 through PHASE 2.2). If the human requests changes to `design_source`, `literal_texts`, `assets`, `view_states`, `navigation`, `visual_manifest`, `layout_manifest`, `inventory`, `dag`, `technical_plan`, `contracts.minimal_domain_data`, or `artifact_plan`, the flow must return to the phase that owns that section: report `re_started` on the affected earlier phase, apply changes, report `finished` again for that phase, re-run its gap report, and re-enter PHASE 2.3 (which itself gets `re_started` → `finished` again). Only when `context.json.status=approved_for_execution` and `checkpoints.initial_spec.status=approved` may PHASE 3.1 begin. *(PHASE 2.3 produces no new output files — no gap report required.)*
+
 ---
 
 ### PHASE 3.1 — Codegen of Components DS
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-1-codegen-ds \
+  --status started
+```
 
 **Agent**: `@widget-developer`
 
@@ -318,9 +756,38 @@ read_sections:
   - success_criteria
 ```
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with one `--output-file` per `.dart` file declared in `artifact_plan.planned[group=ds_components]`. Paths must be relative to `--project-dir` (project root). Expand the array from the spec:
+
+```bash
+# Build --output-file flags from the artifact plan
+DS_FILE_FLAGS=()
+while IFS= read -r f; do
+  DS_FILE_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_components") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-1-codegen-ds \
+  --status finished \
+  "${DS_FILE_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.2.
+
 ---
 
 ### PHASE 3.2 — Audit of Components DS
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-2-audit-ds \
+  --status started
+```
 
 **Agent**: `@code-auditor`
 
@@ -344,9 +811,43 @@ read_sections:
   - success_criteria
 ```
 
+> ⚡ **MANDATORY (conditional)** — If the audit loop exceeds `pipeline.max_audit_retries` without passing:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-2-audit-ds \
+  --status failed
+```
+> ❌ The workflow stops here.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the DS audit evidence:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-2-audit-ds \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/ds-component-audit.md"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.3.
+
 ---
 
 ### PHASE 3.3 — Checkpoint Human of Layer DS
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-3-checkpoint-ds \
+  --status started
+```
 
 **Agent**: `@ds-orchestrator`
 
@@ -362,9 +863,31 @@ PHASE 3.1 or PHASE 3.2 as applicable. Do not continue to PHASE 3.4 until
 `context.json.checkpoints.ds_layer.status=approved` and
 `context.json.status=approved_for_execution`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` once the DS-layer review has been presented (approval itself happens in the gate that follows):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-3-checkpoint-ds \
+  --status finished
+```
+
+> **Stop here.** This is the **domain aggregate approval gate** for the DS layer (PHASE 3.1 and PHASE 3.2). On rejection of the DS layer, report `re_started` on the affected earlier phase (`phase-3-1-codegen-ds` or `phase-3-2-audit-ds`), regenerate, re-report `finished`, re-run that phase's gap report, and then report `re_started` → `finished` on `phase-3-3-checkpoint-ds` before re-entering this gate. Only when `context.json.checkpoints.ds_layer.status=approved` and `context.json.status=approved_for_execution` may PHASE 3.4 begin. *(PHASE 3.3 produces no new output files — no gap report required.)*
+
 ---
 
 ### PHASE 3.4 — Codegen of View App
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-4-codegen-view \
+  --status started
+```
 
 **Agent**: `@widget-developer`
 **Prompt**: `codegen-view.prompt.md`
@@ -398,9 +921,37 @@ Output:
 - View in `targets.registry[APP_TARGET_ID].structure.views_path`.
 - Private widgets in `targets.registry[APP_TARGET_ID].structure.view_widgets_path`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with one `--output-file` per file declared in `artifact_plan.planned[group=app_view]`. Expand the array from the spec:
+
+```bash
+APP_VIEW_FLAGS=()
+while IFS= read -r f; do
+  APP_VIEW_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="app_view") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-4-codegen-view \
+  --status finished \
+  "${APP_VIEW_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.5.
+
 ---
 
 ### PHASE 3.5 — Audit of App View
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-5-audit-view \
+  --status started
+```
 
 **Agent**: `@code-auditor`
 
@@ -434,9 +985,44 @@ read_sections:
   - success_criteria
 ```
 
+> ⚡ **MANDATORY (conditional)** — If the audit loop exceeds `pipeline.max_audit_retries` without passing, or an audit blocker (missing Figma archive, checksum mismatch, missing exact icon, unrecreated crop, unresolved typography, incorrect bottom-navigation ownership, `layout_manifest` geometry outside `1 dp`, incorrect corner radii/border width, or fidelity report over `2%` global / `4%` regional pixel difference) cannot be resolved:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-5-audit-view \
+  --status failed
+```
+> ❌ The workflow stops here.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the app-view audit evidence and the Figma fidelity report:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-5-audit-view \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/app-view-audit.md" \
+  --output-file "${SPEC_PACKET_PATH}/evidence/figma-fidelity-report.json"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.6.
+
 ---
 
 ### PHASE 3.6 — Human Checkpoint of App View
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-6-checkpoint-view \
+  --status started
+```
 
 **Agent**: `@ds-orchestrator`
 
@@ -452,9 +1038,42 @@ capture or comparison cannot be completed, stop with
 Do not continue until `context.json.checkpoints.app_view_layer.status=approved`
 and `context.json.status=approved_for_execution`.
 
+> ⚡ **MANDATORY (conditional)** — If capture or comparison cannot be completed (`FIGMA_FIDELITY_COMPARISON_UNAVAILABLE`):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-6-checkpoint-view \
+  --status failed
+```
+> ❌ The workflow stops here.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` once the app-view checkpoint review has been presented (approval itself happens in the gate that follows):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-6-checkpoint-view \
+  --status finished
+```
+
+> **Stop here.** This is the **domain aggregate approval gate** for the app view layer (PHASE 3.4 and PHASE 3.5). On rejection of the app view layer, report `re_started` on the affected earlier phase (`phase-3-4-codegen-view` or `phase-3-5-audit-view`), regenerate, re-report `finished`, re-run that phase's gap report, and then report `re_started` → `finished` on `phase-3-6-checkpoint-view` before re-entering this gate. Only when `context.json.checkpoints.app_view_layer.status=approved` and `context.json.status=approved_for_execution` may PHASE 4.1 begin. *(PHASE 3.6 produces no new output files — no gap report required.)*
+
 ---
 
 ### PHASE 4.1 — Tests of Components DS
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-1-ds-widget-tests \
+  --status started
+```
 
 **Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
@@ -471,9 +1090,51 @@ read_sections:
   - success_criteria
 ```
 
+> ⚡ **MANDATORY (conditional)** — Widget tests are required for delivery. If they cannot be made to pass:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-1-ds-widget-tests \
+  --status failed
+```
+> ❌ The workflow stops here — delivery cannot proceed without a passing `evidence/widget-tests.md`.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the generated test files and the widget-tests evidence. Expand the file array from `artifact_plan.planned[group=ds_widget_tests]`:
+
+```bash
+DS_TEST_FLAGS=()
+while IFS= read -r f; do
+  DS_TEST_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widget_tests") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-1-ds-widget-tests \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/widget-tests.md" \
+  "${DS_TEST_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.2 (only when `golden_tests=true`) or directly to PHASE 4.3.
+
 ---
 
 ### PHASE 4.2 — Golden of Components DS (conditional)
+
+> ⚡ **MANDATORY only when `golden_tests=true`.** When `golden_tests=false`, skip this phase entirely — do not emit `started`/`finished` for it. The workflow's own `skipped_by_input` record in `context.json`, `spec.yaml` and `PIPELINE_LOG_PATH` covers the skip.
+
+> ⚡ **MANDATORY (when executed)** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-2-ds-golden-tests \
+  --status started
+```
 
 **Condition**: `golden_tests=true`.
 **Agent**: `@golden-test-engineer`
@@ -497,9 +1158,49 @@ golden artifacts. Record the single run outcome `golden_tests: skipped_by_input`
 with `reason: golden_tests=false` in `context.json`, `spec.yaml` and
 `PIPELINE_LOG_PATH`.
 
+> ⚡ **MANDATORY (conditional)** — If DS golden tests were requested but cannot be made to pass:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-2-ds-golden-tests \
+  --status failed
+```
+> ❌ The workflow stops here — delivery cannot proceed with a failing golden outcome when `golden_tests=true`.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the generated DS golden files and the golden-tests evidence:
+
+```bash
+DS_GOLDEN_FLAGS=()
+while IFS= read -r f; do
+  DS_GOLDEN_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_golden_tests") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-2-ds-golden-tests \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/golden-tests.md" \
+  "${DS_GOLDEN_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.3.
+
 ---
 
 ### PHASE 4.3 — Widgetbook of Components DS
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-3-ds-widgetbook \
+  --status started
+```
 
 **Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGETBOOK`)
@@ -517,9 +1218,37 @@ read_sections:
   - success_criteria
 ```
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with the DS Widgetbook use-case files. Expand the file array from `artifact_plan.planned[group=ds_widgetbook]`:
+
+```bash
+DS_WIDGETBOOK_FLAGS=()
+while IFS= read -r f; do
+  DS_WIDGETBOOK_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widgetbook") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-3-ds-widgetbook \
+  --status finished \
+  "${DS_WIDGETBOOK_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.4.
+
 ---
 
 ### PHASE 4.4 — Tests of View
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-4-view-widget-tests \
+  --status started
+```
 
 **Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=VIEW_WIDGET_TESTS`)
@@ -550,9 +1279,51 @@ Minimum coverage:
 6. bottom-navigation ownership when applicable
 7. literal text and mitigation of overflow when applicable
 
+> ⚡ **MANDATORY (conditional)** — View widget tests are required for delivery. If they cannot be made to pass:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-4-view-widget-tests \
+  --status failed
+```
+> ❌ The workflow stops here — delivery cannot proceed without a passing `evidence/view-widget-tests.md`.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the generated view test files and the view-widget-tests evidence. Expand the file array from `artifact_plan.planned[group=view_widget_tests]`:
+
+```bash
+VIEW_TEST_FLAGS=()
+while IFS= read -r f; do
+  VIEW_TEST_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="view_widget_tests") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-4-view-widget-tests \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/view-widget-tests.md" \
+  "${VIEW_TEST_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.5 (only when `golden_tests=true`) or directly to PHASE 4.6.
+
 ---
 
 ### PHASE 4.5 — Golden Tests of Complete View (conditional)
+
+> ⚡ **MANDATORY only when `golden_tests=true`.** When `golden_tests=false`, skip this phase entirely — do not emit `started`/`finished` for it. The single `golden_tests: skipped_by_input` outcome recorded in Phase 4.2 already represents this decision.
+
+> ⚡ **MANDATORY (when executed)** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-5-view-golden-tests \
+  --status started
+```
 
 **Condition**: `golden_tests=true`.
 **Agent**: `@golden-test-engineer`
@@ -592,9 +1363,49 @@ Minimum coverage:
 5. `light/dark`
 6. compact viewport if overflow risk exists
 
+> ⚡ **MANDATORY (conditional)** — If view golden tests were requested but cannot be made to pass:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-5-view-golden-tests \
+  --status failed
+```
+> ❌ The workflow stops here — delivery cannot proceed with a failing view-golden outcome when `golden_tests=true`.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the generated view golden files and the view-golden-tests evidence:
+
+```bash
+VIEW_GOLDEN_FLAGS=()
+while IFS= read -r f; do
+  VIEW_GOLDEN_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="view_golden_tests") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-5-view-golden-tests \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/view-golden-tests.md" \
+  "${VIEW_GOLDEN_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.6.
+
 ---
 
 ### PHASE 4.6 — Widgetbook of Screen App
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-6-app-widgetbook \
+  --status started
+```
 
 **Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`)
@@ -623,9 +1434,37 @@ Minimum coverage:
 4. `Error` (if applicable)
 5. `Populated`
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with the app-screen Widgetbook use-case files. Expand the file array from `artifact_plan.planned[group=app_widgetbook]`:
+
+```bash
+APP_WIDGETBOOK_FLAGS=()
+while IFS= read -r f; do
+  APP_WIDGETBOOK_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="app_widgetbook") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-4-6-app-widgetbook \
+  --status finished \
+  "${APP_WIDGETBOOK_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 5.
+
 ---
 
 ### PHASE 5 — Delivery
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-5-delivery \
+  --status started
+```
 
 **Agent**: `@delivery-manager`
 **Prompt**: `delivery-review.prompt.md`
@@ -648,3 +1487,136 @@ Must:
    exact text/hierarchy/assets/typography/shape values, at most `1 dp`
    geometry delta, `2%` global pixel difference and `4%` regional pixel
    difference
+
+> ⚡ **MANDATORY (conditional)** — If any delivery precondition is not met (missing/failing DS or view widget tests, inconsistent golden outcome, incomplete visual/layout reconciliation, or failing fidelity report):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-5-delivery \
+  --status failed
+```
+> ❌ The workflow stops here.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the delivery report:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-5-delivery \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/delivery-report.md"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** — the workflow is complete.
+
+---
+
+## Human approval gate
+
+> ⚡ **MANDATORY** — Always runs after each `finished`. It cannot be skipped, and approval cannot be inferred from silence.
+
+At the end of each step, present the result and request **explicit** approval:
+
+```
+Agent: I've completed [step name]. Do you approve the result?
+  1. ✅ Approved — continue
+  2. ✏️ Edits — tell me what to change
+  3. ❌ Rejected — redo from scratch
+```
+
+- **If approved:** If the step produces files, proceed to the gap report and then to the next step. If it produces no files, proceed directly to the next step.
+- **If edits are requested:** Apply the changes in place on the artifact, keep `finished` (the baseline is already captured), and re-present for approval. The gap report will capture those edits as the diff against the agent's first draft.
+- **If rejected:** Report `re_started`, regenerate the artifact from scratch, report `finished` again (recapturing the baseline), and restart the gate. Repeat until approved.
+
+> **Three domain aggregate approval gates**, which layer on top of the per-step gate:
+> - **PHASE 2.3 (initial spec plan)** — approves the aggregate of PHASE 0, PHASE 1, PHASE 2, PHASE 2.1, and PHASE 2.2. On rejection of a specific section (design analysis, inventory/DAG, technical plan, minimal contracts), replay the owning phase (`re_started` → `finished` → gap report) and then re-report `re_started` → `finished` on PHASE 2.3 before re-entering this gate. Only when `checkpoints.initial_spec.status=approved` and `context.json.status=approved_for_execution` may PHASE 3.1 begin.
+> - **PHASE 3.3 (DS layer checkpoint)** — approves the aggregate of PHASE 3.1 and PHASE 3.2. Rejection replays `phase-3-1-codegen-ds` or `phase-3-2-audit-ds` and then PHASE 3.3 itself. Only when `checkpoints.ds_layer.status=approved` and `context.json.status=approved_for_execution` may PHASE 3.4 begin.
+> - **PHASE 3.6 (app view layer checkpoint)** — approves the aggregate of PHASE 3.4 and PHASE 3.5. Rejection replays `phase-3-4-codegen-view` or `phase-3-5-audit-view` and then PHASE 3.6 itself. Only when `checkpoints.app_view_layer.status=approved` and `context.json.status=approved_for_execution` may PHASE 4.1 begin.
+
+> Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
+
+> ⚡ **MANDATORY** — On rejection, example using `phase-3-4-codegen-view`:
+
+```bash
+# 1. Report re_started
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-4-codegen-view \
+  --status re_started
+
+# 2. ... regenerate the artifacts ...
+
+# 3. Report finished again (recaptures baseline; rebuild the same --output-file set as the original attempt)
+APP_VIEW_FLAGS=()
+while IFS= read -r f; do
+  APP_VIEW_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="app_view") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id new-view \
+  --step-id phase-3-4-codegen-view \
+  --status finished \
+  "${APP_VIEW_FLAGS[@]}"
+
+# 4. Restart the approval gate
+```
+
+---
+
+## Gap calculation & reporting (per step)
+
+> ⚡ **MANDATORY only for steps with output files.** In this workflow:
+> `phase-0-spec-packet`, `phase-1-analysis-of-screen`, `phase-2-inventory-dag`, `phase-2-1-architecture-technical`, `phase-2-2-contracts-minimum` (only when executed), `phase-3-1-codegen-ds`, `phase-3-2-audit-ds`, `phase-3-4-codegen-view`, `phase-3-5-audit-view`, `phase-4-1-ds-widget-tests`, `phase-4-2-ds-golden-tests` (only when executed), `phase-4-3-ds-widgetbook`, `phase-4-4-view-widget-tests`, `phase-4-5-view-golden-tests` (only when executed), `phase-4-6-app-widgetbook`, `phase-5-delivery`.
+> The seven pre-flight gates (`gate-0-canonical-configuration`, `gate-0-1-topology`, `gate-0-2-spec-packet-ownership`, `gate-0-5-ownership-repo-app`, `gate-1-architecture`, `gate-2-contracts-policy`, `gate-3-figma-mcp`) and the three human-review phases (`phase-2-3-validation-human-review`, `phase-3-3-checkpoint-ds`, `phase-3-6-checkpoint-view`) do NOT run a gap report.
+
+> Run this immediately after the corresponding step's approval gate passes — not batched at the end of the workflow.
+
+**Phase A — Generate the gap report:**
+```bash
+pragma-ai workflow gap-report \
+  --instance-id "$INSTANCE_ID" \
+  --step-id <step-id>
+```
+
+**Phase B — Submit the gap report interpretation:**
+```bash
+pragma-ai workflow gap-report \
+  --instance-id "$INSTANCE_ID" \
+  --step-id <step-id> \
+  --submit \
+  --report-id <report-id> \
+  --summary "<summary of the detected gap or 'no changes'>"
+```
+
+---
+
+## Progress reporting (instance-level)
+
+Use at any point to check overall state:
+
+```bash
+pragma-ai workflow list --user-story-id "$USER_STORY_ID"
+pragma-ai workflow status "$INSTANCE_ID"
+```
+
+---
+
+## Summary of commands for this workflow
+
+| Command | When |
+|---|---|
+| `pragma-ai workflow create --workflow-id new-view --user-story-id <id>` | At the start, once (Setup) |
+| `pragma-ai workflow report ... --step-id <step> --status started` | When each executed step begins (7 gates + PHASE 0–5; `phase-2-2-contracts-minimum` only if `CONTRACTS_POLICY=generate`; `phase-4-2-ds-golden-tests` and `phase-4-5-view-golden-tests` only if `golden_tests=true`) |
+| `pragma-ai workflow report ... --step-id <step> --status finished` | On completion of steps without output files: the seven gates and `phase-2-3-validation-human-review`, `phase-3-3-checkpoint-ds`, `phase-3-6-checkpoint-view` |
+| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of file-producing phases: `phase-0-spec-packet`, `phase-1-analysis-of-screen`, `phase-2-inventory-dag`, `phase-2-1-architecture-technical`, `phase-2-2-contracts-minimum` (when executed), `phase-3-1-codegen-ds`, `phase-3-2-audit-ds`, `phase-3-4-codegen-view`, `phase-3-5-audit-view`, `phase-4-1-ds-widget-tests`, `phase-4-2-ds-golden-tests` (when executed), `phase-4-3-ds-widgetbook`, `phase-4-4-view-widget-tests`, `phase-4-5-view-golden-tests` (when executed), `phase-4-6-app-widgetbook`, `phase-5-delivery` |
+| `pragma-ai workflow report ... --step-id <step> --status failed` | When a gate blocks with `blocked_input`, `phase-2-3-validation-human-review` cannot validate, an audit exhausts `pipeline.max_audit_retries` or hits an unresolvable blocker (`phase-3-2-audit-ds`, `phase-3-5-audit-view`), fidelity capture is unavailable (`phase-3-6-checkpoint-view`), tests can't pass (`phase-4-1-*`, `phase-4-2-*`, `phase-4-4-*`, `phase-4-5-*`), or delivery preconditions fail (`phase-5-delivery`) — the workflow stops |
+| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably at PHASE 2.3, PHASE 3.3, or PHASE 3.6 aggregate rejections) |
+| `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID" --step-id <step>` | Phase A: after the corresponding file-producing step is approved |
+| `pragma-ai workflow gap-report ... --submit --report-id <id> --summary "<text>"` | Phase B: immediately after Phase A, for the same step |
+| `pragma-ai workflow list --user-story-id "$USER_STORY_ID"` | Check overall progress (any time) |
+| `pragma-ai workflow status "$INSTANCE_ID"` | Check instance detail (any time) |
