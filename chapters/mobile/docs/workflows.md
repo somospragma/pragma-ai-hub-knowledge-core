@@ -279,6 +279,7 @@ strategies:
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `feature_name` | Yes | Snake case feature name. |
 | `description` | Yes | One to three sentences describing the feature. |
 | `api_contract` | Conditional | File path, URL, inline OpenAPI/GraphQL/JSON/cURL, or manual endpoint list. |
@@ -296,6 +297,13 @@ strategies:
 | `golden_tests` | No | Boolean, default `false`. Runs feature golden tests only when `true`. |
 | `documentation` | No | Boolean, default `false`. Updates project documentation only when `true`. |
 
+`hu_id` is required so every feature build is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again. It is required
+regardless of which input strategy (`api_contract` or manual `entity_name` +
+`fields`) is chosen below.
+
 When `figma_url` is present, `figma_scope` defaults to `view`. This runs the
 same screen-fidelity planning and Presentation checkpoint used by `/new-view`:
 Figma assets, `visual_manifest`, `layout_manifest`, exact text/order and the
@@ -307,6 +315,7 @@ With API contract:
 
 ```text
 @feature-builder /new-feature
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required, e.g. product_catalog
 description: <short feature description>                    # required
 api_contract: <path|url|inline contract>                    # required for this strategy
@@ -326,6 +335,7 @@ Without API contract:
 
 ```text
 @feature-builder /new-feature
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required
 description: <short feature description>                    # required
 entity_name: <DomainEntityName>                             # required without api_contract
