@@ -520,6 +520,7 @@ Purpose: address review comments without expanding scope.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `pr_comments_source.kind` | Yes | `pr_url`, `inline`, `exported_file` or `integration`. |
 | `pr_comments_source.value` | Yes | PR URL, inline comments, exported file path or integration id. |
 | `pr_comments_source.access_status` | Yes | `pending`, `available` or `blocked_input`. |
@@ -530,6 +531,7 @@ Purpose: address review comments without expanding scope.
 
 ```text
 @ds-orchestrator /fix-pr-comments
+hu_id: <user story id, e.g. US-12345>                       # required
 pr_comments_source:
   kind: <pr_url|inline|exported_file|integration>           # required
   value: <url|inline comments|path/to/comments.md|id>       # required
@@ -539,6 +541,11 @@ target_branch: <branch_name>                                # optional
 allow_git_commands: false                                   # optional, default false
 allow_gh_commands: false                                    # optional, default false
 ```
+
+`hu_id` is required so every PR-fix run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: comment inventory, approved fix plan, scoped code/test/doc
 changes, audit evidence and delivery summary. The workflow does not run `git`
