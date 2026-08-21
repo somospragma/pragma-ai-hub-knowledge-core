@@ -96,7 +96,7 @@ Required output: update `comment_inventory`, `correction_plan`,
 
 ---
 
-### PHASE 1.5 — Validation + Human Review
+### PHASE 1.1 — Validation + Human Review
 
 **Skill**: `mobile-sdd-spec-validation`
 
@@ -129,7 +129,7 @@ read_sections:
 
 Category coverage:
 - `[VISUAL]`, `[LOGIC]`, `[STYLE]` → Phase 2
-- `[TESTS]` → Phase 4a/4b
+- `[TESTS]` → Phase 4.1/4.2
 - `[DOCS]` → Phase 5
 
 ---
@@ -144,14 +144,14 @@ Category coverage:
 
 ---
 
-### PHASE 4a — Update Widget Tests (if functional impact)
+### PHASE 4.1 — Update Widget Tests (if functional impact)
 
 **Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
 
 ---
 
-### PHASE 4b — Update Golden Tests (if visual impact)
+### PHASE 4.2 — Update Golden Tests (if visual impact)
 
 **Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
