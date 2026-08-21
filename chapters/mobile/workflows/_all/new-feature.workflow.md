@@ -29,7 +29,7 @@ Use this workflow when:
 - The feature requires domain logic (entities, use cases, repositories)
 - The feature connects to a REST API or local database
 - The feature needs a BLoC with state management
-- The feature may need new DS components (detected in Phase 0)
+- The feature may need new DS components (detected in Phase 0.2)
 
 Do NOT use for:
 - DS component only (use `/new-component`)
@@ -157,7 +157,7 @@ api_contract: |
 
 ## Execution Sequence
 
-### PHASE S0 — Mobile Spec Packet (`full`)
+### PHASE 0 — Mobile Spec Packet (`full`)
 
 **Agent:** `@feature-builder`
 **Skill:** `mobile-sdd-spec-validation`
@@ -209,13 +209,13 @@ The full spec must include:
 - `execution_capabilities.subagent_delegation` and
   `fallback_policy=delegate_or_controller_executes`
 
-When `figma_scope=view`, execute PHASE S0.5 before validating the initial
+When `figma_scope=view`, execute PHASE 0.1 before validating the initial
 review. Validate the completed spec and wait for explicit approval before
 scaffold or code generation.
 
 ---
 
-### PHASE S0.5 — Shared Figma UI Fidelity Planning (conditional)
+### PHASE 0.1 — Shared Figma UI Fidelity Planning (conditional)
 
 **Condition:** `figma_url` is supplied and `figma_scope=view`.
 **Preferred specialist role:** `@figma-analyzer`.
@@ -233,13 +233,13 @@ or unresolved geometry blocks with `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
 
 ---
 
-### PHASE 0 — UI Component Inventory (conditional)
+### PHASE 0.2 — UI Component Inventory (conditional)
 
 **Condition:** `figma_url` or `ui_components` is provided.
 **Agent:** `@feature-builder`
 
 Steps:
-1. If `figma_url` is provided, reuse PHASE S0.5 analysis when
+1. If `figma_url` is provided, reuse PHASE 0.1 analysis when
    `figma_scope=view`; do not re-query or reinterpret Figma. For
    `component_inventory`, `@feature-builder` prefers Figma MCP preflight
    and screen analysis through `@figma-analyzer`. When native subagent
@@ -301,7 +301,7 @@ Persist scaffold evidence under `SPEC_PACKET_PATH/evidence/`.
 
 ---
 
-### PHASE 1.5 — API Contract Analysis (conditional)
+### PHASE 1.1 — API Contract Analysis (conditional)
 
 **Condition:** `api_contract` is provided (file, URL, or inline cURL in the prompt).
 **Agent:** `@feature-builder`
@@ -499,7 +499,7 @@ Persist build_runner, DI and route evidence under `SPEC_PACKET_PATH/evidence/`.
 
 ---
 
-### PHASE 6a — Unit Tests (required)
+### PHASE 6.1 — Unit Tests (required)
 
 **Preferred specialist role:** `@test-engineer`
 **Mode:** `FEATURE_UNIT_TESTS`
@@ -531,13 +531,13 @@ fail, record `blocked_input` or `failed` with command output and stop.
 
 ---
 
-### PHASE 6b — Widget Tests (required)
+### PHASE 6.2 — Widget Tests (required)
 
 **Preferred specialist role:** `@test-engineer`
 **Mode:** `FEATURE_WIDGET_TESTS`
 
 **Execution owner:** `@feature-builder`; use the same delegate-or-controller
-rule as Phase 6a.
+rule as Phase 6.1.
 
 Mandatory compact handoff:
 
@@ -561,13 +561,13 @@ Persist `evidence/widget-tests.md`, test paths, command and result in
 
 ---
 
-### PHASE 6c — Integration Tests (required)
+### PHASE 6.3 — Integration Tests (required)
 
 **Preferred specialist role:** `@test-engineer`
 **Mode:** `FEATURE_INTEGRATION_TESTS`
 
 **Execution owner:** `@feature-builder`; use the same delegate-or-controller
-rule as Phase 6a.
+rule as Phase 6.1.
 
 Mandatory compact handoff:
 
@@ -593,7 +593,7 @@ Do not audit or deliver a feature without passed integration-test evidence.
 
 ---
 
-### PHASE 6d — Golden Tests (conditional)
+### PHASE 6.4 — Golden Tests (conditional)
 
 **Condition:** `golden_tests=true`.
 **Agent:** `@golden-test-engineer`
@@ -776,7 +776,7 @@ After all phases:
 - **Golden tests**: ✅ passed | ⏭ skipped_by_input
 - **Documentation**: ✅ updated | 🆕 created | ⏭ skipped_by_input
 
-### Phase 0 — DS Components (if applicable)
+### Phase 0.2 — DS Components (if applicable)
 | Component | Status | Action |
 |---|---|---|
 
@@ -794,7 +794,7 @@ After all phases:
 
 - NEVER skip domain or data layers — always generate the full stack
 - NEVER proceed to scaffold/code generation before `review.md` is approved
-- NEVER proceed to Phase 1 if Phase 0 has unresolved `blocked_input`
+- NEVER proceed to Phase 1 if Phase 0.2 has unresolved `blocked_input`
 - NEVER generate files outside the root resolved by
   `artifact_plan.planned[].target_id`
 - NEVER call Figma MCP outside the Figma preflight role contract and its
