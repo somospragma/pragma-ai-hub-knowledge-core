@@ -443,6 +443,7 @@ Purpose: refactor an existing feature across architecture layers.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `feature_name` | Yes | Snake case feature name. |
 | `feature_path` | Yes | Path to feature source folder. |
 | `refactor_goal` | Yes | Refactor intent. |
@@ -456,6 +457,7 @@ Purpose: refactor an existing feature across architecture layers.
 
 ```text
 @refactoring-advisor /refactor-feature
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required
 feature_path: <lib/src/features/feature_name>               # required
 refactor_goal: <refactor intent>                            # required
@@ -467,6 +469,11 @@ sequence_diagram: <docs/diagrams/feature_flow.mmd>          # optional
 api_contract: <inline endpoint changes or contract path>    # optional
 can_delete_files: <true|false>                              # optional, default false
 ```
+
+`hu_id` is required so every refactor run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: risk analysis, approved refactor plan, layer-by-layer changes,
 tests, docs artifact and audit report. Delete operations require explicit

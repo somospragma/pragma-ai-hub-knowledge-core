@@ -12,6 +12,65 @@ description: >
 ---
 # Workflow: Refactor Feature (Evolutionary Improvement)
 
+## Telemetry — Workflow metadata
+
+| Field | Value |
+|---|---|
+| `workflow-id` | `refactor-feature` |
+| `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
+| Step IDs | `phase-0-spec-packet`, `phase-1-analysis`, `phase-2-impact-analysis`, `phase-3-refactoring-plan`, `phase-4-checkpoint`, `phase-5-execution`, `phase-6-tests`, `phase-7-audit`, `phase-8-report-and-documentation`, `phase-9-project-documentation-update` |
+
+> **NON-NEGOTIABLE RULE:** Every `pragma-ai workflow ...` command in this document is **MANDATORY** to execute. The agent MUST run them — they are not suggestions or documentation.
+
+> ⛔ **STEP-ID INTEGRITY (NON-NEGOTIABLE):** The `--step-id` and `--workflow-id` values shown in every command block below are the **ONLY** valid identifiers for this workflow. The agent MUST copy them **verbatim** from this document — never invent, abbreviate, translate, paraphrase, pluralize, capitalize differently, or otherwise modify them.
+>
+> - Every `--step-id` submitted to `pragma-ai workflow report` or `pragma-ai workflow gap-report` MUST match one entry in the **"Step IDs"** list above, character-for-character (kebab-case, lowercase, exact spelling).
+> - Every `--workflow-id` MUST be exactly `refactor-feature`.
+> - If a step-id you need is not in the list, STOP and ask the user — do not fabricate one.
+> - The CLI rejects unknown step-ids; a wrong id silently corrupts the run's telemetry.
+
+> Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document). PHASE 4 is the domain aggregate approval gate for the planning set (PHASE 0 through PHASE 3); PHASE 5 also has its own REQUIRED CHECKPOINT per architectural step, described in the phase body.
+> **The Topology gate is excluded from telemetry.** It runs before the workflow instance is minted and stops the run with `blocked_input` when it fails (no telemetry emitted).
+> The **gap report only runs on steps that produce output files** (`--output-file`). `phase-4-checkpoint` does NOT run a gap report.
+> Commands assume the shell's cwd is already the project root — no `cd` prefix is needed, and `--project-dir` only matters when running from elsewhere.
+
+---
+
+## Setup — Mint the workflow instance
+
+> ⚡ **MANDATORY** — Always run this at the start, before any step.
+
+### Resolve user-story-id (mandatory)
+
+`hu_id` is a **required** invocation input for this workflow (see *Inputs*), so the agent already has the user story identifier at the start. The agent MUST map it to `user-story-id` before running `workflow create`:
+
+1. **Invocation input (canonical):** Use the `hu_id` value provided in the invocation. This is the required path.
+2. **Fallback — Session context:** If `hu_id` was not supplied but a `user-story-id` is already available from a parent flow or another sub-workflow in this session, reuse it silently.
+3. **Fallback — Project file:** If neither of the above is available, read the ID from `output/.active-user-story` when it exists.
+4. **Last resort — Ask the user:** If no source yields an ID, ask explicitly and refuse to proceed without a value:
+
+```
+Kratos: To track progress I need the user-story-id.
+  What is the active user story? (e.g. US-12345, HU-678)
+```
+
+> Once resolved, the agent MUST persist the value to `output/.active-user-story` so downstream workflows inherit it automatically.
+
+```bash
+# 1. Take the required hu_id from the invocation and use it as user-story-id
+USER_STORY_ID="$hu_id"
+
+# 2. Persist for other workflows so they don't have to ask again
+echo "$USER_STORY_ID" > output/.active-user-story
+
+# 3. Mint the instance
+INSTANCE_ID=$(pragma-ai workflow create \
+  --workflow-id refactor-feature \
+  --user-story-id "$USER_STORY_ID")
+```
+
+---
+
 ## Evidence Mode
 
 Accept `evidence_mode: minimal | standard`; default to `minimal` and persist it
@@ -69,12 +128,19 @@ Do NOT use for:
 
 If any validation fails, terminate with `blocked_input`.
 
+> ℹ️ **The Topology gate is not tracked by telemetry.** It is pure domain validation and runs before the workflow instance is minted (or before its first tracked phase, at the agent's discretion). Its success is a precondition for PHASE 0; its failure with `blocked_input` stops the run entirely — no `pragma-ai workflow report` calls are emitted for it.
+
 ---
 
 ## Inputs
 
+`hu_id` is **required**: it identifies the user story this refactor belongs to
+and is mapped 1:1 to `user-story-id` for telemetry. If it is not supplied, the
+workflow refuses to start.
+
 ```text
 @refactoring-advisor /refactor-feature
+hu_id: US-12345
 feature_name: checkout
 feature_path: lib/src/features/checkout/
 refactor_goal: Split the CheckoutBloc into CartBloc and PaymentBloc, extract coupon validation to a use case
@@ -87,15 +153,19 @@ evidence_mode: minimal  (optional; default minimal)
 
 ### Input variations
 
+> Note: every variation below still requires `hu_id` as its first line, just like the main example above.
+
 ```text
 # Simple refactor (most common)
 @refactoring-advisor /refactor-feature
+hu_id: US-12345
 feature_name: checkout
 feature_path: lib/src/features/checkout/
 refactor_goal: The BLoC is too large, needs splitting
 
 # Package extraction
 @refactoring-advisor /refactor-feature
+hu_id: US-12345
 feature_name: payments
 feature_path: lib/src/features/payments/
 refactor_goal: Extract to a standalone Melos package
@@ -104,12 +174,14 @@ package_name: payments
 
 # Pattern update
 @refactoring-advisor /refactor-feature
+hu_id: US-12345
 feature_name: auth
 feature_path: lib/src/features/auth/
 refactor_goal: Replace dartz with fpdart, update Freezed to 3.x syntax
 
 # Add endpoint to existing feature
 @refactoring-advisor /refactor-feature
+hu_id: US-12345
 feature_name: products
 feature_path: lib/src/features/products/
 refactor_goal: Add DELETE /products/:id endpoint to existing feature
@@ -121,7 +193,17 @@ api_contract: |
 
 ## Execution Sequence
 
-### PHASE S0 — Mobile Spec Packet (`full`)
+### PHASE 0 — Mobile Spec Packet (`full`)
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-0-spec-packet \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 **Skill:** `mobile-sdd-spec-validation`
@@ -138,9 +220,35 @@ The initial spec records feature name, feature path, refactor goal, constraints,
 expected checkpoints, `agent_permissions` and success criteria. It is enriched
 by PHASE 1-3 before execution approval.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with all four packet artifacts. Substitute `${SPEC_PACKET_PATH}` with the resolved run path:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-0-spec-packet \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
+  --output-file "${SPEC_PACKET_PATH}/context.json" \
+  --output-file "${SPEC_PACKET_PATH}/review.md" \
+  --output-file "${SPEC_PACKET_PATH}/evidence/validation-report.md"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 1.
+
 ---
 
 ### PHASE 1 — Analysis
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-1-analysis \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 
@@ -167,9 +275,33 @@ Output: `evidence/refactoring-analysis.md`.
 Update `spec.yaml` sections `current_state`, `issues`, `test_inventory` and
 `dependency_graph`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with the analysis evidence and the updated spec:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-1-analysis \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/refactoring-analysis.md" \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.
+
 ---
 
 ### PHASE 2 — Impact Analysis
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-2-impact-analysis \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 
@@ -186,9 +318,32 @@ Steps:
 Output: update `spec.yaml` sections `impact_analysis`, `risk`,
 `breaking_changes` and `affected_artifacts`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with the updated spec:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-2-impact-analysis \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.
+
 ---
 
 ### PHASE 3 — Refactoring Plan
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-3-refactoring-plan \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 
@@ -221,9 +376,32 @@ If any planned artifact has `action: delete`, the spec must explicitly set
 human approval that enabled the destructive action. Without that elevation,
 delete actions remain blocked.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with the updated spec:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-3-refactoring-plan \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.
+
 ---
 
 ### PHASE 4 — Checkpoint (mandatory)
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-4-checkpoint \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 
@@ -240,9 +418,31 @@ Question:
 
 If the user requests changes to the plan, adjust and re-present.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` once the review has been presented (approval itself happens in the gate that follows):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-4-checkpoint \
+  --status finished
+```
+
+> **Stop here.** This is the **domain aggregate approval gate** for the planning set (PHASE 0 through PHASE 3). If the human requests changes to `current_state`, `issues`, `impact_analysis`, `risk`, `breaking_changes`, `refactoring_plan`, `execution_steps`, `success_criteria`, `handoffs`, or `artifact_plan`, the flow must return to the phase that owns that section: report `re_started` on the affected earlier phase (PHASE 1, PHASE 2, or PHASE 3), regenerate its output, report `finished` again with the same `--output-file` set, re-run that phase's gap report, and re-enter PHASE 4 (`re_started` → `finished` on `phase-4-checkpoint`). Only when the plan is explicitly approved may PHASE 5 begin. *(PHASE 4 produces no new output files — no gap report required.)*
+
 ---
 
 ### PHASE 5 — Execution (iterative)
+
+> ⚡ **MANDATORY** — Report `started` when the step begins (once, at the start of the iterative execution — not per plan step).
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-5-execution \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 Mandatory compact handoff per step:
@@ -293,9 +493,52 @@ approval before continuing.
 > You MUST continue to Phase 6 (tests), Phase 7 (audit), and Phase 8 (documentation).
 > The refactoring is incomplete without tests and the documentation file.
 
+> ⚡ **MANDATORY (conditional)** — If a step causes an unrecoverable compilation failure, an unrevertible test regression, or a plan-invalidating conflict that cannot be resolved by re-presenting the plan for adjustment:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-5-execution \
+  --status failed
+```
+> ❌ The workflow stops here.
+
+> ⚡ **MANDATORY (success path)** — Once every step in the approved plan has completed, report `finished` with every file declared in `artifact_plan.planned[]` (created, modified, moved or deleted). Expand the array from the spec:
+
+```bash
+# Build --output-file flags from the artifact plan (skip entries with action: delete
+# since deleted paths cannot be captured as a baseline; the delete itself is recorded
+# in spec.yaml + PIPELINE_LOG_PATH).
+REFACTOR_FILE_FLAGS=()
+while IFS= read -r f; do
+  REFACTOR_FILE_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.action != "delete") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-5-execution \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/context.json" \
+  "${REFACTOR_FILE_FLAGS[@]}"
+```
+
+> **Stop here.** The embedded **REQUIRED CHECKPOINT — After Each Architectural Step** applies per step during iteration; this outer approval gate applies once, at the end of PHASE 5, covering the full executed plan. Once approved, run this step's **gap report** and then continue to PHASE 6.
+
 ---
 
 ### PHASE 6 — Test Analysis & Coverage (mandatory)
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-6-tests \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 
@@ -331,9 +574,50 @@ Output: test files, `spec.yaml.success_criteria.tests` and
 `evidence/test-validation.md`.
 Persist test evidence under `SPEC_PACKET_PATH/evidence/`.
 
+> ⚡ **MANDATORY (conditional)** — If tests cannot be made to pass or the non-negotiable coverage targets (domain 95%, data 85%, BLoC 85%, pages 70%) cannot be met:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-6-tests \
+  --status failed
+```
+> ❌ The workflow stops here — the refactoring is incomplete without verified test coverage.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the generated/updated test files, the test-validation evidence, and the updated spec. Expand the test files from `artifact_plan.planned[group=unit_tests|widget_tests|integration_tests]`:
+
+```bash
+TEST_FILE_FLAGS=()
+while IFS= read -r f; do
+  TEST_FILE_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="unit_tests" or .group=="widget_tests" or .group=="integration_tests") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-6-tests \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/test-validation.md" \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
+  "${TEST_FILE_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 7.
+
 ---
 
 ### PHASE 7 — Audit
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-7-audit \
+  --status started
+```
 
 **Agent:** `@code-auditor`
 
@@ -357,15 +641,49 @@ Steps:
 Output: `evidence/audit-report.md` and a summary in the human report.
 Audit must explicitly verify modified code against `SPEC_PACKET_PATH/spec.yaml`.
 
+> ⚡ **MANDATORY (conditional)** — If the audit loop exceeds `pipeline.max_audit_retries` without passing, or hits an unresolvable blocker (new layer violation, dead code, unused DI registration, missing barrel export):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-7-audit \
+  --status failed
+```
+> ❌ The workflow stops here.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the audit evidence:
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-7-audit \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/audit-report.md"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 8.
+
 ---
 
 ### PHASE 8 — Report & Documentation
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-8-report-and-documentation \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor`
 
 Generate two outputs:
 
-#### 8a. Pipeline report
+#### 8.1. Pipeline report
 
 ```markdown
 ## Refactoring Report: {feature_name}
@@ -398,7 +716,7 @@ Generate two outputs:
 
 Output: human report summary.
 
-#### 8b. Refactoring documentation file (mandatory — FILE CREATION action)
+#### 8.2. Refactoring documentation file (mandatory — FILE CREATION action)
 
 > **CRITICAL: This is a FILE CREATION action, not just a report to the user.**
 > The agent MUST use the file creation tool to write this file to disk.
@@ -420,9 +738,32 @@ refactoring-advisor` and `group: docs`.
 
 Output: Documentation file created at `docs/refactoring/`.
 
+> ⚡ **MANDATORY (success path)** — Report `finished` with the refactoring documentation file. Substitute `${REFACTORING_DOC_PATH}` with the actual file created (relative to `--project-dir`, e.g. `docs/refactoring/checkout-refactoring-2026-05-08.md`):
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-8-report-and-documentation \
+  --status finished \
+  --output-file "${REFACTORING_DOC_PATH}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 9.
+
 ---
 
 ### PHASE 9 — Project Documentation Update (mandatory)
+
+> ⚡ **MANDATORY** — Report `started` when the step begins.
+
+```bash
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-9-project-documentation-update \
+  --status started
+```
 
 **Agent:** `@refactoring-advisor` using shared skill `documentation-projects`
 
@@ -460,6 +801,24 @@ Output: List of created/updated documents in `PIPELINE_LOG_PATH`.
 The shared skill internally orchestrates `doc-auditor`, `doc-interviewer`,
 `doc-generator` and `doc-validator`; the mobile workflow must not reference
 legacy generate-docs aliases.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with every project documentation file created or modified. Expand the array from `artifact_plan.planned[group=docs]`:
+
+```bash
+DOCS_FILE_FLAGS=()
+while IFS= read -r f; do
+  DOCS_FILE_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="docs") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-9-project-documentation-update \
+  --status finished \
+  "${DOCS_FILE_FLAGS[@]}"
+```
+
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** — the workflow is complete.
 
 ---
 
@@ -536,3 +895,112 @@ After all phases:
 - ALWAYS verify the documentation file exists on disk after creating it
 - ALWAYS update project documentation (7 documents) in Phase 9 using shared skill `documentation-projects`
 - If a step causes unexpected test failures, REVERT and reassess before continuing
+
+---
+
+## Human approval gate
+
+> ⚡ **MANDATORY** — Always runs after each `finished`. It cannot be skipped, and approval cannot be inferred from silence.
+
+At the end of each step, present the result and request **explicit** approval:
+
+```
+Agent: I've completed [step name]. Do you approve the result?
+  1. ✅ Approved — continue
+  2. ✏️ Edits — tell me what to change
+  3. ❌ Rejected — redo from scratch
+```
+
+- **If approved:** If the step produces files, proceed to the gap report and then to the next step. If it produces no files, proceed directly to the next step.
+- **If edits are requested:** Apply the changes in place on the artifact, keep `finished` (the baseline is already captured), and re-present for approval. The gap report will capture those edits as the diff against the agent's first draft.
+- **If rejected:** Report `re_started`, regenerate the artifact from scratch, report `finished` again (recapturing the baseline), and restart the gate. Repeat until approved.
+
+> **PHASE 4 aggregate rejection.** When PHASE 4 hosts the plan-approval decision, a rejection of a specific planning section (current state, issues, impact analysis, risk, breaking changes, refactoring plan, execution steps, success criteria, handoffs, artifact plan) must first replay the phase that owns that section: report `re_started` on the affected earlier phase (PHASE 1, PHASE 2, or PHASE 3), regenerate its output, report `finished` again with the same `--output-file` set, re-run that phase's gap report, and then report `re_started` → `finished` on PHASE 4 itself before re-entering this gate.
+
+> **PHASE 5 per-step revisions.** Inside PHASE 5, the embedded **REQUIRED CHECKPOINT — After Each Architectural Step** may reject a specific step or require plan adjustment. Handle this in domain (adjust and re-present the plan; if it invalidates earlier planning phases, cascade back to PHASE 1/2/3 via `re_started`). PHASE 5's outer `finished` is only reported once every step in the approved plan has executed successfully — not per step.
+
+> Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
+
+> ⚡ **MANDATORY** — On rejection, example using `phase-5-execution`:
+
+```bash
+# 1. Report re_started
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-5-execution \
+  --status re_started
+
+# 2. ... re-run the affected step(s) with the adjusted plan ...
+
+# 3. Report finished again (recaptures baseline; rebuild the same --output-file set as the original attempt)
+REFACTOR_FILE_FLAGS=()
+while IFS= read -r f; do
+  REFACTOR_FILE_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.action != "delete") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+pragma-ai workflow report \
+  --instance-id "$INSTANCE_ID" \
+  --workflow-id refactor-feature \
+  --step-id phase-5-execution \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/context.json" \
+  "${REFACTOR_FILE_FLAGS[@]}"
+
+# 4. Restart the approval gate
+```
+
+---
+
+## Gap calculation & reporting (per step)
+
+> ⚡ **MANDATORY only for steps with output files.** In this workflow:
+> `phase-0-spec-packet`, `phase-1-analysis`, `phase-2-impact-analysis`, `phase-3-refactoring-plan`, `phase-5-execution`, `phase-6-tests`, `phase-7-audit`, `phase-8-report-and-documentation`, `phase-9-project-documentation-update`.
+> `phase-4-checkpoint` does NOT run a gap report. The Topology gate is not tracked by telemetry at all.
+
+> Run this immediately after the corresponding step's approval gate passes — not batched at the end of the workflow.
+
+**Phase A — Generate the gap report:**
+```bash
+pragma-ai workflow gap-report \
+  --instance-id "$INSTANCE_ID" \
+  --step-id <step-id>
+```
+
+**Phase B — Submit the gap report interpretation:**
+```bash
+pragma-ai workflow gap-report \
+  --instance-id "$INSTANCE_ID" \
+  --step-id <step-id> \
+  --submit \
+  --report-id <report-id> \
+  --summary "<summary of the detected gap or 'no changes'>"
+```
+
+---
+
+## Progress reporting (instance-level)
+
+Use at any point to check overall state:
+
+```bash
+pragma-ai workflow list --user-story-id "$USER_STORY_ID"
+pragma-ai workflow status "$INSTANCE_ID"
+```
+
+---
+
+## Summary of commands for this workflow
+
+| Command | When |
+|---|---|
+| `pragma-ai workflow create --workflow-id refactor-feature --user-story-id <id>` | At the start, once (Setup) |
+| `pragma-ai workflow report ... --step-id <step> --status started` | When each phase begins (PHASE 0–9) |
+| `pragma-ai workflow report ... --step-id phase-4-checkpoint --status finished` | On completion of the aggregate planning-approval checkpoint (no `--output-file`) |
+| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of every file-producing phase: `phase-0-spec-packet`, `phase-1-analysis`, `phase-2-impact-analysis`, `phase-3-refactoring-plan`, `phase-5-execution`, `phase-6-tests`, `phase-7-audit`, `phase-8-report-and-documentation`, `phase-9-project-documentation-update` |
+| `pragma-ai workflow report ... --step-id <step> --status failed` | When `phase-5-execution` cannot recover from a compilation/regression, `phase-6-tests` can't pass or can't meet coverage targets, or `phase-7-audit` exhausts retries — the workflow stops |
+| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 4 aggregate rejection cascading back to PHASE 1/2/3, or PHASE 5 per-step revisions) |
+| `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID" --step-id <step>` | Phase A: after the corresponding file-producing step is approved |
+| `pragma-ai workflow gap-report ... --submit --report-id <id> --summary "<text>"` | Phase B: immediately after Phase A, for the same step |
+| `pragma-ai workflow list --user-story-id "$USER_STORY_ID"` | Check overall progress (any time) |
+| `pragma-ai workflow status "$INSTANCE_ID"` | Check instance detail (any time) |
