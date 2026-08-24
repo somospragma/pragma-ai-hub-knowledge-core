@@ -80,6 +80,7 @@ configuration files.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `HU_ID` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `WORKSPACE_ROOT` | Yes | Absolute path to the IDE/workspace root. |
 | `WORKSPACE_FILE` | No | Absolute path to `.code-workspace` when available. |
 | `EXPECTED_APP_REPO_ROOT` | No, recommended | Absolute path to the app repository that will own `.sopp/config`. |
@@ -92,6 +93,7 @@ configuration files.
 
 ```text
 @workspace-discovery /bootstrap-workspace
+HU_ID: <user story id, e.g. US-12345>                        # required
 WORKSPACE_ROOT: <absolute/path/to/workspace>                 # required
 WORKSPACE_FILE: <absolute/path/to/workspace.code-workspace>  # optional
 EXPECTED_APP_REPO_ROOT: <absolute/path/to/app-repo>          # optional, recommended
@@ -102,6 +104,11 @@ EXPECTED_REPO_MODE: <single_repo|monorepo_melos|multi_repo>  # optional
 APPLY_MODE: propose_then_apply                              # optional
 FORCE_RECONFIGURE: false                                    # optional; explicit repair/migration only
 ```
+
+`HU_ID` is required so every bootstrap run is linked to a user story from
+the start. The workflow maps `HU_ID` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 When a valid final `.sopp/config` triplet already exists for the resolved app
 repository, bootstrap returns `reused_existing_config` and creates no proposal.
@@ -148,6 +155,7 @@ from Figma.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `component_name` | Yes | Snake case component name, usually with DS intent but without file extension. |
 | `figma_url` | Yes | Figma URL with file key and node id. |
 | `user_story` | No | Inline acceptance context or short user need. |
@@ -157,6 +165,7 @@ from Figma.
 
 ```text
 @ds-orchestrator /new-component
+hu_id: <user story id, e.g. US-12345>                       # required
 component_name: <ds_component_name>                         # required, e.g. ds_status_badge
 figma_url: <https://www.figma.com/file/...?...node-id=...>  # required
 user_story: <short acceptance context>                      # optional
@@ -164,6 +173,11 @@ user_story_path: <docs/user-stories/story-123.md>           # optional
 atomic_hint: <atom|molecule|organism>                       # optional
 golden_tests: <true|false>                                  # optional, default false
 ```
+
+`hu_id` is required so every component build is linked to a user story from
+the start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: DS source files, tests, optional goldens, Widgetbook use case,
 audit evidence and delivery summary under the `design_system` target.
@@ -174,6 +188,7 @@ Purpose: generate an app screen/view from Figma, including DS/App separation.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `view_name` | Yes | Snake case view name. |
 | `figma_url` | Yes | Figma URL with file key and node id. |
 | `user_story` | Yes | Inline user story or acceptance criteria. |
@@ -186,6 +201,7 @@ Purpose: generate an app screen/view from Figma, including DS/App separation.
 
 ```text
 @ds-orchestrator /new-view
+hu_id: <user story id, e.g. US-12345>                       # required
 view_name: <view_name>                                      # required, e.g. product_catalog_view
 figma_url: <https://www.figma.com/file/...?...node-id=...>  # required
 user_story: <user story or acceptance criteria>             # required
@@ -196,6 +212,11 @@ project_root: <absolute/path/to/app-repo>                    # optional; needed 
 golden_tests: <true|false>                                  # optional, default false
 evidence_mode: <minimal|standard>                            # optional, default minimal
 ```
+
+`hu_id` is required so every view build is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: app view code, DS component inventory, DS artifacts when
 needed, mandatory widget tests, optional goldens, Widgetbook screen use case
@@ -258,6 +279,7 @@ strategies:
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `feature_name` | Yes | Snake case feature name. |
 | `description` | Yes | One to three sentences describing the feature. |
 | `api_contract` | Conditional | File path, URL, inline OpenAPI/GraphQL/JSON/cURL, or manual endpoint list. |
@@ -275,6 +297,13 @@ strategies:
 | `golden_tests` | No | Boolean, default `false`. Runs feature golden tests only when `true`. |
 | `documentation` | No | Boolean, default `false`. Updates project documentation only when `true`. |
 
+`hu_id` is required so every feature build is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again. It is required
+regardless of which input strategy (`api_contract` or manual `entity_name` +
+`fields`) is chosen below.
+
 When `figma_url` is present, `figma_scope` defaults to `view`. This runs the
 same screen-fidelity planning and Presentation checkpoint used by `/new-view`:
 Figma assets, `visual_manifest`, `layout_manifest`, exact text/order and the
@@ -286,6 +315,7 @@ With API contract:
 
 ```text
 @feature-builder /new-feature
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required, e.g. product_catalog
 description: <short feature description>                    # required
 api_contract: <path|url|inline contract>                    # required for this strategy
@@ -305,6 +335,7 @@ Without API contract:
 
 ```text
 @feature-builder /new-feature
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required
 description: <short feature description>                    # required
 entity_name: <DomainEntityName>                             # required without api_contract
@@ -385,16 +416,23 @@ and visual contracts.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `component_path` | Yes | Path to the DS component file or component folder. |
 | `refactor_goal` | No, recommended | Desired improvement or constraint. |
 | `compatibility_policy` | No | `additive_only`, `no_public_api_change` or `allow_public_api_change`. |
 
 ```text
 @ds-orchestrator /refactor-component
+hu_id: <user story id, e.g. US-12345>                       # required
 component_path: <lib/src/.../component_file.dart>           # required
 refactor_goal: <what should improve and why>                # optional, recommended
 compatibility_policy: <additive_only|no_public_api_change|allow_public_api_change> # optional
 ```
+
+`hu_id` is required so every refactor run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: approved refactor plan, scoped code changes, updated
 tests/goldens when needed, audit evidence and delivery summary.
@@ -405,6 +443,7 @@ Purpose: refactor an existing feature across architecture layers.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `feature_name` | Yes | Snake case feature name. |
 | `feature_path` | Yes | Path to feature source folder. |
 | `refactor_goal` | Yes | Refactor intent. |
@@ -418,6 +457,7 @@ Purpose: refactor an existing feature across architecture layers.
 
 ```text
 @refactoring-advisor /refactor-feature
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required
 feature_path: <lib/src/features/feature_name>               # required
 refactor_goal: <refactor intent>                            # required
@@ -430,6 +470,11 @@ api_contract: <inline endpoint changes or contract path>    # optional
 can_delete_files: <true|false>                              # optional, default false
 ```
 
+`hu_id` is required so every refactor run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
+
 Expected result: risk analysis, approved refactor plan, layer-by-layer changes,
 tests, docs artifact and audit report. Delete operations require explicit
 `can_delete_files: true`, an `action: delete` artifact and human approval.
@@ -440,6 +485,7 @@ Purpose: analyze an existing feature and generate or improve test coverage.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `feature_name` | Yes | Snake case feature name. |
 | `feature_path` | Yes | Path to feature source folder. |
 | `scope` | No | `full`, `domain`, `data` or `presentation`. |
@@ -450,6 +496,7 @@ Purpose: analyze an existing feature and generate or improve test coverage.
 
 ```text
 @test-coverage-engineer /test-plan
+hu_id: <user story id, e.g. US-12345>                       # required
 feature_name: <feature_name>                                # required
 feature_path: <lib/src/features/feature_name>               # required
 scope: <full|domain|data|presentation>                      # optional, default full
@@ -458,6 +505,11 @@ topology: <single_repo|monorepo_melos|multi_repo>           # optional
 target_id: <target_id>                                      # optional
 target_root: <path/to/package-or-target-root>               # optional
 ```
+
+`hu_id` is required so every test-plan run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: coverage plan, generated tests where allowed, command/evidence
 summaries, known gaps and a docs/testing artifact.
@@ -468,6 +520,7 @@ Purpose: address review comments without expanding scope.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `pr_comments_source.kind` | Yes | `pr_url`, `inline`, `exported_file` or `integration`. |
 | `pr_comments_source.value` | Yes | PR URL, inline comments, exported file path or integration id. |
 | `pr_comments_source.access_status` | Yes | `pending`, `available` or `blocked_input`. |
@@ -478,6 +531,7 @@ Purpose: address review comments without expanding scope.
 
 ```text
 @ds-orchestrator /fix-pr-comments
+hu_id: <user story id, e.g. US-12345>                       # required
 pr_comments_source:
   kind: <pr_url|inline|exported_file|integration>           # required
   value: <url|inline comments|path/to/comments.md|id>       # required
@@ -487,6 +541,11 @@ target_branch: <branch_name>                                # optional
 allow_git_commands: false                                   # optional, default false
 allow_gh_commands: false                                    # optional, default false
 ```
+
+`hu_id` is required so every PR-fix run is linked to a user story from the
+start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` so
+downstream workflows inherit it without asking again.
 
 Expected result: comment inventory, approved fix plan, scoped code/test/doc
 changes, audit evidence and delivery summary. The workflow does not run `git`
