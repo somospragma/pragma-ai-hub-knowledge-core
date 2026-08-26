@@ -128,6 +128,31 @@ Cada entrada de cierre lleva un bloque de pendientes, **reescrito** (no acumulad
 
 Las cuatro categorías importan por separado: "intentado y fallido" es lo que evita repetir el mismo callejón, y "esperando a un tercero" es lo que evita declarar bloqueada una entrega que solo está en cola.
 
+### Rotación: append-only no significa sin techo
+
+Una bitácora append-only crece sin límite, y este mismo protocolo obliga a leerla
+al abrir cada sesión. En una certificación larga eso se vuelve el gasto fijo más
+grande de la sesión: **medido, una bitácora de 93 KB —unos 26.000 tokens— releída
+en cada apertura**, además de todo lo demás.
+
+Rotar **no es** reescribir ni resumir, que es lo que el append-only prohíbe. Es
+**mover texto verbatim a otro archivo**:
+
+- El archivo activo `.evidence/session-log.md` tiene un **techo** (referencia:
+  unas 400 líneas). Al superarlo, las entradas más antiguas se **mueven tal cual**
+  a `.evidence/session-log-archive-{YYYYMMDD}.md`.
+- El activo conserva **la sesión en curso y la anterior completas**, más un índice
+  de una línea por sesión archivada: fecha, fases cubiertas, archivo.
+- **Nada se edita al mover.** Si hay que cambiar una palabra, no es rotación.
+
+**El ritual de apertura lee el activo, no el archivo.** El archivado se abre solo
+cuando hay una pregunta concreta que solo él contesta —"¿ya intentamos esto?"—, y
+se abre por búsqueda, no entero.
+
+Lo que **nunca** se rota son los `open_corrections` ni los pendientes: viven en
+`pipeline-state.json` y en el bloque de cierre del activo, que es donde el ritual
+de apertura los busca.
+
 ## Rituales de sesión
 
 Los rituales viven además en el steering `[[calidad-session-continuity-protocol]]`, que es lo que garantiza que se disparen aunque la sesión abra con una petición cualquiera y este skill no se cargue.
@@ -163,7 +188,8 @@ Las fases de mock/prototipo solo existen si `execution_target != real`. `executi
 - **NUNCA emitir el delivery gate con fases obligatorias en `pending`** — el gate lee esta traza (`[[calidad-delivery-gate-contract]]`).
 - La traza **no reemplaza** la evidencia: la referencia. Si el `evidence` apunta a un archivo que no existe, la fase no está `done`.
 - La traza se actualiza en el turno de la fase, no "al final": una traza reconstruida de memoria es ficción.
-- **NUNCA reescribir, resumir ni compactar la bitácora.** Es append-only por diseño: lo que se borra es justamente el detalle de lo ya intentado, que es lo que evita repetirlo.
+- **NUNCA reescribir, resumir ni compactar la bitácora.** Es append-only por diseño: lo que se borra es justamente el detalle de lo ya intentado, que es lo que evita repetirlo. Rotar sí está permitido, y es otra cosa: mover entradas verbatim a un archivo fechado, sin tocar una palabra.
+- **NUNCA leer el archivado en el ritual de apertura.** Se abre solo ante una pregunta concreta que solo él contesta, y por búsqueda.
 - **NUNCA empezar a trabajar sin el ritual de apertura** cuando el `output_path` ya existe. El delivery gate no se emite si la bitácora tiene menos entradas que fases marcadas `done`.
 
 ## Verificación

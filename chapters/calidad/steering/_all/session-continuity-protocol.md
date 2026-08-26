@@ -20,6 +20,31 @@ Toda sesión del Chapter Calidad empieza leyendo el pasado. **Aplica sin importa
 
 Si no existen, crearlos antes de trabajar. Si el usuario pide algo que contradice `next_action`, decirlo y dejar que él decida; no se descarta la traza en silencio.
 
+## Una certificación son varias sesiones cortas, no una larga
+
+La traza existe para que **cortar la sesión sea barato**. Una certificación
+completa en una sola sesión acumula contexto hasta que el resumidor automático
+empieza a descartar cosas, y lo primero que descarta es lo que se leyó al
+principio: las compuertas. Ese es el mecanismo por el que un agente incumple una
+regla que sí tenía delante en el turno 1.
+
+**Corta al terminar cada fase**, no cuando el contexto ya se te esté yendo:
+
+`diseño` → `generación` → `estabilización por plataforma`, una por sesión →
+`publicación`
+
+Señales de que la sesión ya debió cortarse, y cualquiera basta:
+
+- Estás **releyendo** un archivo que ya abriste en esta misma sesión.
+- No recuerdas una corrección del usuario sin volver a buscarla.
+- Te falta contexto para responder algo que ya se decidió aquí.
+
+Cuando aparezca alguna: **escribe la entrada de cierre con el punto exacto de
+retome y dilo**. Reconstruir desde una traza de 2 KB cuesta menos que seguir
+tirando de una sesión que ya perdió la mitad de lo que sabía. Continuar por
+inercia no ahorra: multiplica el costo de cada turno restante y degrada lo que se
+entrega.
+
 ## Lo que nunca debes hacer
 
 - **NUNCA** empezar a editar, generar o ejecutar sin haber leído la traza y la bitácora de un `output_path` que ya existe. Una sesión que arranca "donde cree que iba" repite fases y pierde correcciones ya pagadas.
