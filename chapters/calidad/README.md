@@ -522,6 +522,90 @@ No saltar pasos: el router protege contra la generación con inputs incompletos,
 
 **El contrato de entrega del Chapter incluye ejecución + verificación + auto-corrección.** Generar tests sin ejecutarlos es entrega incompleta. Anti-cheating maestro del chapter: tests en suites `@security`, `@contract`, `@compliance`, `@regulatory`, `@accessibility` NO se modifican por auto-corrección bajo ningún concepto. En brownfield, la auto-corrección NUNCA toca tests preexistentes.
 
+## Mimir — dónde vive el conocimiento de verdad
+
+**Mimir es la fuente de administración. Este repositorio es la fuente de autoría.**
+Se escribe aquí, se sincroniza a Mimir, y la CLI de pragma-ai lo baja a los IDEs
+desde Mimir. Nada llega a un IDE directamente desde este repo.
+
+### `_config/` es legado y no se usa
+
+`_config/ides.json`, `_config/asset-schemas.json`, `_config/taxonomy.json` y
+`_config/templates/` **ya no gobiernan nada**. Mimir administra los tipos, los
+scopes, la taxonomía y el mapeo a cada IDE.
+
+**No los edites para "arreglar" nada.** Si un asset aterriza mal en un IDE, o si
+un tipo o un campo no se acepta, es tema de Mimir o de la CLI: se reporta, no se
+parchea aquí. Lo único que este repositorio produce son assets.
+
+Se conservan como registro histórico de cómo estaba modelado el chapter antes de
+Mimir, y porque algún script de tooling todavía los lee para validar la fuente
+antes de sincronizar — nunca para decidir a dónde va nada.
+
+### Los cuatro niveles
+
+| Nivel | Dónde se escribe | A quién llega |
+|---|---|---|
+| **Chapter** | `chapters/calidad/` | Todas las cuentas |
+| **Stack** | `chapters/calidad/skills/{stack}/` | Los proyectos que usan ese stack |
+| **Cuenta** | `accounts/{cliente}/{chapter}/_cuenta/` | Todos los proyectos de esa cuenta |
+| **Proyecto** | `accounts/{cliente}/{chapter}/{proyecto}/` | Un solo proyecto de la cuenta |
+
+`accounts/` está **excluido del control de versiones** (`.git/info/exclude`): el
+core no lleva nombres de cliente. Por eso `chapters/` tiene que ser agnóstico —
+un nombre de cliente ahí viaja a todas las demás cuentas.
+
+### Sincronizar
+
+```bash
+export MIMIR_BASE_URL=https://api-mimir.pragma.com.co
+export MIMIR_TOKEN='Bearer …'        # Cognito, vida ~1h: pedir fresco cada sesión
+
+# Chapter: incremental contra el baseline de sync-state.json
+python3 migration/migrate_to_mimir.py --sync --dry-run
+python3 migration/migrate_to_mimir.py --sync
+
+# Cuenta: un destino por proyecto, cada uno con su propio estado
+python3 migration/sync_account.py --client <cliente> --chapter calidad \
+    --account <id> --frente <proyecto> --project <codigo> \
+    --project-folder <proyecto> --audit
+```
+
+Reglas que cuestan caro aprender por las malas:
+
+- **El `id` es la identidad.** Cambiarlo crea un documento nuevo y deja huérfano
+  al viejo. Mover un archivo con `git mv` sin tocar el `id` es una actualización.
+- **Ningún sync borra.** Lo que se retira de la fuente sigue en Mimir hasta que
+  alguien lo elimine a mano.
+- **`--only` nunca junto a `--prune`**: `--only` filtra la fuente, así que todo
+  lo demás aparece como huérfano y `--prune` lo borraría.
+- **Si un alta reporta error, el documento puede existir igualmente** sin quedar
+  registrado en el estado. Verificar por el UUID del mensaje de error antes de
+  reintentar, o se duplica.
+- **El listado de documentos va rezagado** respecto de los documentos reales. No
+  es la verdad: verificar por UUID.
+- **Los archivos de un bundle se quedan en *staging*** hasta el siguiente PUT del
+  documento. El script ya hace ese commit; si se sube algo a mano, hay que
+  hacerlo.
+- **El token es de super admin.** Nunca salir del alcance del chapter Calidad.
+
+### `applies_to_stacks`
+
+`_all/` significa «puede ir a todos los bundles», no «va a todos». Un asset de
+`_all/` puede declarar a qué stacks aplica:
+
+```yaml
+applies_to_stacks: [playwright, appium-core, appium-wdio, appium-serenity]
+```
+
+Sin el campo se instala en todos, que es el comportamiento correcto para lo
+verdaderamente transversal. Con él, deja de instalarse donde no aplica: un
+contrato de locators no existe en una suite de carga, y la auditoría SEO no
+tiene nada que hacer en un bundle de Appium.
+
+El criterio sale del «cuándo aplicar» del propio documento, no de una intuición.
+Si al escribirlo no puedes nombrar el stack donde **no** sirve, no lo acotes.
+
 ## Convenciones internas
 
 - **Frontmatter completo** sólo en assets accionables: `SKILL.md`, archivos `*.workflow.md`, archivos `*.prompt.md` y archivos de steering.
@@ -542,6 +626,8 @@ No saltar pasos: el router protege contra la generación con inputs incompletos,
 | Cross-cutting del chapter | `skills/_all/`, `workflows/_all/`, `prompts/_all/` | Aplica a **todos** los stacks. Viaja en todos los bundles. |
 | Stack de producto | `skills/{stack}/` | Es de una tecnología concreta y los stacks son **mutuamente excluyentes por proyecto**. |
 | Companion de familia | `skills/appium-core/` | Aplica a varios stacks de una misma familia pero **no a todos** los del chapter. Se instala aparte, junto al stack de producto. |
+| Cuenta | `accounts/{cliente}/{chapter}/_cuenta/` | Es del cliente, no del chapter, y vale para **todos** sus proyectos. Fuera de git. |
+| Proyecto | `accounts/{cliente}/{chapter}/{proyecto}/` | Vale para **un** repositorio del cliente. Su alcance va escrito en la primera línea del cuerpo, no en el frontmatter: el frontmatter no sobrevive a los IDEs que concatenan todo el steering en un archivo. |
 
 Las tres preguntas, en orden:
 
