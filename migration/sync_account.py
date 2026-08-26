@@ -17,21 +17,23 @@ confirmacion; ver la regla de alcance de super admin.
 Uso:
   export MIMIR_BASE_URL=https://api-mimir.pragma.com.co
   export MIMIR_TOKEN=...
-  # Persona Natural: sube _cuenta/ + pn/
   python3 migration/sync_account.py --client mercantil --chapter calidad \
-      --account 608 --frente pn --project SM0055 --project-folder pn --dry-run
-
-  # Persona Juridica: sube _cuenta/ + pj/  (mismo proyecto, otra ruta)
+      --account 608 --frente default --project SM0055 --audit
   python3 migration/sync_account.py --client mercantil --chapter calidad \
-      --account 608 --frente pj --project SM0055 --project-folder pj --dry-run
+      --account 608 --frente default --project SM0055 --sync
 
 Estructura de origen
 --------------------
-  accounts/<cliente>/<chapter>/_cuenta/   aplica a TODOS los proyectos
-  accounts/<cliente>/<chapter>/<proyecto>/ aplica solo a ese proyecto
+  accounts/<cliente>/<chapter>/_cuenta/    aplica a TODOS los proyectos de negocio
+  accounts/<cliente>/<chapter>/<proyecto>/ aplica solo a ese proyecto de negocio
 
-Cada documento declara su alcance en la PRIMERA linea de su cuerpo
-(`**Applies to: ...**`), no solo en el frontmatter, porque varios IDEs
+Un solo destino en Mimir
+------------------------
+La cuenta tiene UNA ruta de documentos —la de proyecto— y Mimir no ofrece un eje
+que separe los proyectos de negocio entre si (Persona Natural y Persona Juridica
+son el mismo proyecto de Mimir). Por eso todo sube junto y **la separacion vive
+en el texto**: cada documento declara su alcance en la PRIMERA linea de su
+cuerpo (`**Applies to: ...**`), no en el frontmatter, porque varios IDEs
 concatenan todo el steering en un unico archivo y el frontmatter no sobrevive.
 El script lo verifica y falla si falta.
 """
@@ -78,25 +80,18 @@ def parse_frontmatter(text: str) -> tuple[dict, str]:
 ACCOUNT_WIDE_DIR = "_cuenta"
 
 
-def discover(client: str, chapter: str, project: str) -> list[tuple[str, dict, str]]:
-    """Devuelve [(localId, frontmatter, body)] de lo que aplica a `project`.
+def discover(client: str, chapter: str) -> list[tuple[str, dict, str]]:
+    """Devuelve [(localId, frontmatter, body)] de TODO el conocimiento de la cuenta.
 
-    La cuenta tiene mas de un proyecto y sus arquetipos tomaron decisiones
-    opuestas a proposito, asi que subirlo todo a todos los proyectos hace que un
-    agente en un repositorio lea las reglas del otro. Se suben dos conjuntos:
-    lo de `_cuenta/`, que aplica a los dos, y lo de la carpeta del proyecto.
+    Mimir tiene un solo destino para esta cuenta —la ruta de proyecto— y no un eje
+    que separe los proyectos de negocio entre si. Por eso todo sube junto y **la
+    separacion vive en el texto**: cada documento declara su alcance en la primera
+    linea de su cuerpo. Esa linea es lo unico que sobrevive a los IDEs que
+    concatenan todo el steering en un archivo, donde el frontmatter se pierde.
     """
     base = REPO_ROOT / "accounts" / client / chapter
     if not base.is_dir():
         sys.exit(f"ERROR: no existe la carpeta fuente {base}")
-
-    folders = [base / ACCOUNT_WIDE_DIR, base / project]
-    faltantes = [d for d in folders if not d.is_dir()]
-    if faltantes:
-        sys.exit("ERROR: faltan carpetas de origen:\n  "
-                 + "\n  ".join(str(d) for d in faltantes)
-                 + f"\n  Estructura esperada: accounts/{client}/{chapter}/"
-                   f"{{{ACCOUNT_WIDE_DIR},<proyecto>}}/")
 
     sueltos = sorted(base.glob("*.md"))
     if sueltos:
@@ -105,20 +100,24 @@ def discover(client: str, chapter: str, project: str) -> list[tuple[str, dict, s
                  "carpeta de su proyecto:\n  "
                  + "\n  ".join(f.name for f in sueltos))
 
+    folders = [base / ACCOUNT_WIDE_DIR] + sorted(
+        d for d in base.iterdir() if d.is_dir() and d.name != ACCOUNT_WIDE_DIR)
+    if not (base / ACCOUNT_WIDE_DIR).is_dir():
+        sys.exit(f"ERROR: falta {base / ACCOUNT_WIDE_DIR}")
+
     out = []
     problemas = []
     for folder in folders:
         alcance = "account" if folder.name == ACCOUNT_WIDE_DIR else "project"
         for f in sorted(folder.glob("*.md")):
             fm, body = parse_frontmatter(f.read_text(encoding="utf-8"))
-            # El id es la clave del estado de sync y el destino de toda referencia
-            # cruzada. Derivarlo en silencio deja pasar un frontmatter que dice
-            # otra cosa, y entonces las referencias apuntan a un id que no existe.
+            # El id es la clave del estado y el destino de toda referencia cruzada.
+            # Derivarlo en silencio deja pasar un frontmatter que dice otra cosa.
             local_id = f"{client}-{chapter}-{f.stem}"
             declarado = fm.get("id")
             if declarado and declarado != local_id:
-                problemas.append(f"{folder.name}/{f.name}: id '{declarado}' no coincide "
-                                 f"con la convencion '<cliente>-<chapter>-<archivo>' "
+                problemas.append(f"{folder.name}/{f.name}: id '{declarado}' no sigue "
+                                 f"la convencion '<cliente>-<chapter>-<archivo>' "
                                  f"('{local_id}')")
             if not fm.get("title"):
                 problemas.append(f"{folder.name}/{f.name}: falta title")
@@ -132,12 +131,10 @@ def discover(client: str, chapter: str, project: str) -> list[tuple[str, dict, s
             if fm.get("scope") != alcance:
                 problemas.append(f"{folder.name}/{f.name}: scope debe ser "
                                  f"'{alcance}' por la carpeta en que vive")
-            if alcance == "project" and fm.get("project") != project:
+            if alcance == "project" and fm.get("project") != folder.name:
                 problemas.append(f"{folder.name}/{f.name}: project debe ser "
-                                 f"'{project}'")
-            # El discriminador vive en el CUERPO, no en el frontmatter: varios
-            # IDEs concatenan todo el steering en un unico archivo y el
-            # frontmatter no sobrevive. Sin esta linea, un agente no puede saber
+                                 f"'{folder.name}'")
+            # Sin esta linea, y con todo en un mismo destino, nada le dice al agente
             # de que proyecto esta leyendo.
             if "**Applies to:" not in body[:1200]:
                 problemas.append(f"{folder.name}/{f.name}: falta la linea de alcance "
@@ -148,7 +145,7 @@ def discover(client: str, chapter: str, project: str) -> list[tuple[str, dict, s
     return out
 
 
-def audit(assets, project_folder: str, docs_path: str) -> int:
+def audit(assets, docs_path: str) -> int:
     """Radiografia de lo que se subiria, antes de subirlo.
 
     El dry-run dice QUE documentos van. Esto dice cuanto pesan, cuales entran en
@@ -185,7 +182,7 @@ def audit(assets, project_folder: str, docs_path: str) -> int:
         if len(rel) >= 3:
             todos.add(f"{rel[0]}-{rel[1]}-{f.stem}")
 
-    fuera, otro_proyecto = {}, {}
+    fuera = {}
     for lid, fm, b in assets:
         for ref in _re.findall(r"\[\[([a-z0-9][a-z0-9-]*)\]\]", b):
             if ref.startswith(("calidad-", "backend-", "mobile-", "frontend-",
@@ -193,14 +190,9 @@ def audit(assets, project_folder: str, docs_path: str) -> int:
                 continue          # conocimiento de chapter: lo instala la CLI aparte
             if ref in ids:
                 continue
-            destino = otro_proyecto if ref in todos else fuera
-            destino.setdefault(ref, []).append(fm["title"])
+            fuera.setdefault(ref, []).append(fm["title"])
 
-    if otro_proyecto:
-        print(f"\n  {len(otro_proyecto)} referencia(s) al OTRO proyecto de la cuenta "
-              f"(esperado: se nombran para acotar el alcance, no viajan aqui):")
-        for ref, quien in sorted(otro_proyecto.items()):
-            print(f"      [[{ref}]]  citado por: {', '.join(sorted(set(quien))[:2])}")
+
     if fuera:
         hallazgos += 1
         print(f"\n  ! {len(fuera)} referencia(s) a un id que NO EXISTE en la cuenta:")
@@ -214,8 +206,9 @@ def audit(assets, project_folder: str, docs_path: str) -> int:
         cab = b[:1200]
         if "**Applies to:" not in cab:
             malos.append((fm["title"], "sin linea de alcance"))
-        elif fm.get("scope") == "project" and project_folder.upper() not in cab.upper():
-            malos.append((fm["title"], f"la linea de alcance no nombra a {project_folder.upper()}"))
+        elif fm.get("scope") == "project" and (fm.get("project") or "").upper() not in cab.upper():
+            malos.append((fm["title"], "la linea de alcance no nombra a "
+                          f"{(fm.get('project') or '?').upper()}"))
     if malos:
         hallazgos += 1
         print(f"\n  ! {len(malos)} documento(s) con el alcance mal declarado:")
@@ -242,7 +235,8 @@ def audit(assets, project_folder: str, docs_path: str) -> int:
     if cruzados:
         hallazgos += 1
         print(f"\n  ! {len(cruzados)} documento(s) de alcance de cuenta apuntan a uno "
-              f"de un solo proyecto (el puntero se rompe en el otro destino):")
+              f"de un solo proyecto (resuelve, pero manda al agente del otro "
+              f"proyecto a la regla equivocada):")
         for quien, ref, proy in cruzados:
             print(f"      {quien} -> [[{ref}]] (solo {proy.upper()})")
 
@@ -336,13 +330,9 @@ def main() -> int:
     ap.add_argument("--chapter", default="calidad")
     ap.add_argument("--account", required=True)
     ap.add_argument("--frente", default="default",
-                    help="Segmento de Mimir que separa PN de PJ dentro del mismo proyecto. "
-                         "El conocimiento de cada uno NO comparte ruta con el del otro.")
+                    help="Frente de Mimir. Hoy la cuenta solo tiene 'default'.")
     ap.add_argument("--project", required=True,
                     help="Codigo del proyecto en Mimir (no cambia entre PN y PJ)")
-    ap.add_argument("--project-folder", required=True,
-                    help="Carpeta de origen bajo accounts/<cliente>/<chapter>/: pn | pj. "
-                         "Se sube junto con todo lo de _cuenta/, que aplica a ambos.")
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--dry-run", action="store_true")
     g.add_argument("--audit", action="store_true",
@@ -357,40 +347,23 @@ def main() -> int:
     # Un documento de `_cuenta/` se sube a CADA destino y recibe un id remoto
     # distinto en cada uno. Un unico archivo de estado por cuenta los pisaria
     # entre si, asi que el estado se lleva por destino.
-    # El estado se lleva POR DESTINO: un documento de `_cuenta/` se sube a cada
-    # uno y recibe un id remoto distinto en cada uno.
+    # Un solo destino para toda la cuenta, asi que un solo archivo de estado.
     state_path = (REPO_ROOT / "migration" /
-                  f"sync-state-account-{args.client}-{args.chapter}"
-                  f"-{args.frente}-{args.project}.json")
-
-    # El conocimiento de cuenta anterior al reparto PN/PJ vive en el frente
-    # `default` y sigue ahi. Volver a subir contra ese frente con un estado
-    # vacio crearia un duplicado de cada documento en el Mimir del cliente, y
-    # este script no implementa borrado a proposito.
-    legacy_state = (REPO_ROOT / "migration" /
-                    f"sync-state-account-{args.client}-{args.chapter}.json")
-    if args.frente == "default" and legacy_state.exists() and not state_path.exists():
-        sys.exit(
-            f"ERROR: el frente 'default' ya tiene conocimiento sincronizado segun\n"
-            f"  {legacy_state.name}\n"
-            f"Subir ahi con el estado nuevo duplicaria cada documento.\n"
-            f"Usa un frente por proyecto: --frente {args.project_folder}\n"
-            f"El contenido viejo de 'default' se retira a mano cuando el nuevo este verificado."
-        )
+                  f"sync-state-account-{args.client}-{args.chapter}.json")
     state = json.loads(state_path.read_text()) if state_path.exists() else {}
 
-    assets = discover(args.client, args.chapter, args.project_folder)
+    assets = discover(args.client, args.chapter)
     if args.only:
         wanted = [s.strip() for s in args.only.split(",") if s.strip()]
         assets = [a for a in assets if any(w in a[0] for w in wanted)]
 
     print(f"=== cuenta {args.account} / frente {args.frente} / proyecto {args.project} ===")
-    print(f"fuente: accounts/{args.client}/{args.chapter}/"
-          f"{{_cuenta,{args.project_folder}}}/  ({len(assets)} documentos)")
+    print(f"fuente: accounts/{args.client}/{args.chapter}/  "
+          f"({len(assets)} documentos, todas las carpetas)")
     print(f"estado: {state_path.name}  ({len(state)} conocidos)\n")
 
     if args.audit:
-        return audit(assets, args.project_folder, docs_path)
+        return audit(assets, docs_path)
 
     if not args.sync:
         for local_id, fm, body in assets:
