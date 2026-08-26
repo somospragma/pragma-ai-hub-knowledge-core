@@ -4,6 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
+applies_to_stacks: [karate, playwright, appium-core, appium-wdio, appium-serenity]
 description: Convenciones de un arquetipo Cucumber multi-plataforma — catálogo de steps, sufijo de plataforma, tagging, estructura de archivos y propiedades verificables por análisis estático.
 tags: [cucumber, bdd, gherkin, steps, tagging, multiplataforma, convenciones]
 ---

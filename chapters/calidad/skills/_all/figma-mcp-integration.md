@@ -4,6 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
+applies_to_stacks: [playwright, appium-core, appium-wdio, appium-serenity]
 description: "Cómo consumir archivos de Figma como fuente UI: conexión vía MCP (server oficial remoto/desktop o Framelink con PAT), solicitud segura del token, setup guiado por IDE y fallback REST API. Un link público de Figma NO es consumible sin esto."
 tags: [figma, mcp, ui-source, pat, setup, playwright, appium, locator-map, design]
 ---

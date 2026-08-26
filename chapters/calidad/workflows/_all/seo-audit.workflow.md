@@ -4,6 +4,7 @@ version: 1.0.0
 scope: chapter
 type: workflow
 chapter: calidad
+applies_to_stacks: [playwright]
 description: "Workflow de auditoria SEO tecnica agnostica de stack para pruebas web (aplica a Playwright y futuros stacks web del chapter calidad)."
 tags: [seo, web, workflow, auditoria]
 ---

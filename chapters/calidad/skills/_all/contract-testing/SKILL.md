@@ -4,6 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
+applies_to_stacks: [karate]
 description: "Estrategia de contract testing: consumer-driven (Pact), schema-first (OpenAPI diff), provider-side (Spring Cloud Contract), y registry de esquemas."
 tags: [contract-testing, pact, spring-cloud-contract, openapi-diff, schema-registry, pactflow]
 ---

@@ -4,6 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
+applies_to_stacks: [playwright]
 description: "Auditoria SEO tecnica agnostica de stack para pruebas web del chapter calidad: cubre 8 dimensiones (tecnico, on-page, performance, schema, imagenes, sitemap, hreflang, accesibilidad) como references. Aplica a Playwright y futuros stacks web."
 tags: [seo, web, auditoria, transversal, all-stacks]
 ---

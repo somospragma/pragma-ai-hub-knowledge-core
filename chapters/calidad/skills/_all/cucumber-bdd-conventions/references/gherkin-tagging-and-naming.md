@@ -53,7 +53,7 @@ Debe contener tres cosas: qué se valida, en qué contexto, y contra qué plataf
 | Caso 3 recuperación | Validación de que el sistema envía el código OTP al correo registrado al recuperar contraseña en Web |
 | Test de mensajes de error | Validación de que se muestra el mensaje de credenciales inválidas tras un intento fallido en iOS |
 
-Si el arquetipo tiene un prefijo de convención propio (`PN-PR-Front-`, `E2E-`), se respeta el existente: la convención del cliente manda. Lo que no es negociable es la parte descriptiva.
+Si el arquetipo tiene un prefijo de convención propio (`E2E-`, `{CANAL}-{CAPA}-`), se respeta el existente: la convención del cliente manda. Lo que no es negociable es la parte descriptiva.
 
 ## Naming de steps: el texto debe describir lo que el código hace
 

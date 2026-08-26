@@ -4,6 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
+applies_to_stacks: [playwright, appium-core, appium-wdio, appium-serenity]
 description: "Política transversal de regresión visual para suites del chapter calidad: cuándo correr, gestión de baselines, manejo de dinamismo, match levels, tags y anti-patrones. Aplica a web (Playwright) y móvil (Appium); enlaza a la implementación por stack."
 tags: [visual-regression, screenshots, baselines, transversal, web, mobile, all-stacks, design-baseline]
 verification:

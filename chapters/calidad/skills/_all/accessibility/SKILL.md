@@ -4,6 +4,7 @@ version: 2.0.0
 scope: chapter
 type: skill
 chapter: calidad
+applies_to_stacks: [playwright, appium-core, appium-wdio, appium-serenity]
 description: "Accesibilidad transversal del chapter calidad: política y metodología de evaluación (WCAG 2.1/2.2 bajo principios POUR) tanto en revisión desde diseño (Product Designer) como en pruebas automatizadas (web/móvil), con marco normativo (foco banca/financiero LATAM), tipos de discapacidad, severidad, formato de hallazgo y estructura de reporte. Detalle por dimensión en references."
 tags: [accessibility, a11y, wcag, pour, transversal, design-review, banca, all-stacks]
 ---

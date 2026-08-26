@@ -4,6 +4,7 @@ version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
+applies_to_stacks: [playwright, appium-core, appium-wdio, appium-serenity]
 description: "Contrato de mapeo de identificadores/localizadores UI acordado entre QA y desarrollo, para construir pruebas front/mobile antes del desarrollo sin que fallen por drift de selectores cuando la app llegue."
 tags: [locators, ui, contract, shift-left, playwright, appium, testid, accessibility-id, figma]
 ---
