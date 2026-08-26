@@ -44,6 +44,8 @@ En greenfield sobre un repositorio existente (se agrega una suite nueva a un pro
 | **Datos y configuración** | archivos de datos de prueba, plantillas de variables de entorno, perfiles por ambiente | dónde viven los datos y cómo los cargan las pruebas existentes |
 | **Pasos difíciles ya resueltos** | utilidades de autenticación, generación o lectura del segundo factor y de claves dinámicas, clientes de base de datos del ambiente de pruebas, siembra de estado, buzones de correo o mensajería de prueba, descarga y comparación de archivos | **qué paso costoso ya está resuelto y cómo se invoca**. Es lo que decide si un escenario es automatizable; ver `[[calidad-automation-feasibility-assessment]]` |
 | **Recursos frágiles** | llamadas a APIs internas o no públicas, dependencias a interfaces no documentadas | se marcan **no reutilizables**, con la razón |
+| **Dónde mide calidad el proyecto** | configuración del analizador estático y de cobertura: qué rutas incluye y cuáles **excluye**, umbrales exigidos | **qué código cuenta y cuál no**. Decide dónde vale la pena escribir pruebas unitarias del propio arnés |
+| **Índice de lo reutilizable** | un catálogo de steps, pantallas y recorridos, si el repositorio lo genera | si existe, se lee **en vez** de recorrer los archivos de steps. Si no existe, se propone crearlo (ver abajo) |
 
 ## Salida obligatoria
 
@@ -75,6 +77,29 @@ En greenfield sobre un repositorio existente (se agrega una suite nueva a un pro
 3. **La convención del repositorio manda** sobre los defaults del chapter en todo lo que sea nomenclatura, etiquetas, rutas y estructura. Cuando el chapter y el repositorio difieren, gana el repositorio y la diferencia se reporta; introducir una convención nueva exige confirmación explícita del usuario.
 4. **El alcance del ejecutor se verifica, no se supone.** Antes de ejecutar, confirmar que los archivos generados quedan dentro de lo que el ejecutor carga. Un archivo fuera del alcance produce "no encontrado" o "indefinido" y parece un problema del test cuando es del ejecutor.
 5. **Los recursos marcados como frágiles no se usan** salvo instrucción explícita del usuario, y nunca se toman como patrón a replicar.
+6. **Una búsqueda sin resultados solo prueba algo si la búsqueda corrió.** Comprobar el código de salida antes de concluir ausencia: una salida vacía puede ser "no hay resultados" o puede ser "el comando falló". En campo, un `grep` con el glob sin comillas devolvió vacío y se leyó como "el recurso no existe"; existía, exactamente donde el mapa decía. **Nunca afirmes la inexistencia de un recurso que un documento del cliente afirma que existe sin haber buscado por dos caminos distintos.**
+7. **Toda fila que afirme una capacidad lleva o bien su invocación, o bien la ruta del artefacto que la implementa.** Una fila que dice "el repositorio resuelve X" sin decir dónde no es un mapa: es una pista. Para los runners la invocación sale del propio runner; para un script suelto hay que nombrarlo.
+
+## Cuando el descubrimiento cuesta más que la implementación
+
+En un arquetipo maduro el costo del agente **no está en escribir**: está en
+averiguar qué ya existe. Ese costo crece con el repositorio y **se paga entero en
+cada sesión**. Un caso medido: 331 archivos de steps para unos 450 casos de
+negocio — responder "¿ya está resuelto entrar al detalle de una tarjeta?" exigía
+abrir decenas de archivos.
+
+Si el repositorio no tiene un índice de lo reutilizable, **proponerlo es parte
+del hallazgo**, con estas tres propiedades, que son las que lo hacen funcionar:
+
+- **Generado del código**, no escrito a mano: no puede describir algo que no exista.
+- **Verificado en CI**: se regenera y se compara; si difiere, falla. Un índice
+  obsoleto es **peor que no tenerlo**, porque induce a reimplementar lo que ya está.
+- **Compacto**: si el índice es tan largo como el código, no ahorra nada. En un
+  arquetipo real, el catálogo más el protocolo de lectura suman unas 200 líneas y
+  sustituyen el recorrido del repositorio entero.
+
+El objetivo no es leer menos de lo necesario: es **no leer lo mismo dos veces ni
+leer lo que un índice ya resume**.
 
 ## Restricciones
 

@@ -43,6 +43,35 @@ Cada sonda se ejecuta y **se guarda su salida real**. Una sonda sin salida regis
 
 Cuando `execution_target` es `mock` o `hybrid`, las sondas apuntan al mock: debe estar levantado y responder antes de ejecutar. El blocker por mock caído es `mock_unavailable`, no `environment_blocked_*`.
 
+**Instalada no es lo mismo que utilizable.** En móvil, "el dispositivo está
+conectado y la app instalada" se lee a menudo como preflight suficiente, y no lo
+es: la sonda 4 —abrir la aplicación y confirmar la primera pantalla esperada, con
+su captura— es la que separa *saber que algo va mal* de *saber qué*. Cuarenta
+segundos de sonda convierten cinco escenarios rojos con cinco mensajes distintos
+en un solo mensaje al principio: *"la app no llega al login en este build"*.
+
+## Cambiar el artefacto bajo prueba estrena un camino que la suite no recorre
+
+Una suite que lleva meses ejecutándose contra una aplicación ya instalada **nunca
+ha recorrido la primera instalación**. Al subir un build nuevo, ese camino se
+estrena entero y con él tres cosas que ningún fallo nombra por su nombre:
+
+| Qué aparece | Cómo se manifiesta | Qué lo arregla |
+|---|---|---|
+| **Diálogos que solo se piden la primera vez** — notificaciones, cámara, ubicación | El error habla del botón que no encontró, no del diálogo que lo tapaba | Neutralizarlo **por el permiso concreto** |
+| **Arranque en frío mucho más lento** — el sistema optimiza la app al vuelo | El escenario se rinde *mientras la pantalla está llegando* | Margen, calibrado sobre el arranque en frío y no sobre la app ya instalada |
+| **La app no llega a primer plano** | La orden de activar responde bien y el aparato se queda en el lanzador | Comprobar y **reactivar**; esperar más no lo arregla |
+
+La distinción que un volcado de jerarquía resuelve de un vistazo: *¿la app
+tardó?* se arregla con margen. *¿la app está siquiera delante?* solo se arregla
+reintentando el arranque. Si lo que se ve es el lanzador, ningún timeout va a
+salvarlo.
+
+**Al neutralizar un diálogo de permisos, hacerlo por el permiso concreto.** Una
+capability que los concede todos apaga en silencio los escenarios que existen
+para verificar esos mismos diálogos, y el resultado es un verde que no prueba
+nada.
+
 ## Salida obligatoria
 
 `.evidence/preflight.json`:
@@ -71,7 +100,7 @@ Cuando `execution_target` es `mock` o `hybrid`, las sondas apuntan al mock: debe
 3. **La aplicación no instalada no es un supuesto: es un paso.** Instalar es una acción explícita, verificada con su propia sonda, no algo que "ya debería estar".
 4. **La captura inicial es obligatoria en front y móvil.** Es la prueba de que la corrida vio la aplicación. Sin ella no se puede afirmar después qué mostraba la pantalla.
 5. **Toda sonda fallida se reclasifica** según `[ver schema](./environment-blocker-evidence.md)`: el preflight distingue ambiente caído de aplicación ausente de configuración equivocada, y el blocker nombra la causa exacta.
-6. **El preflight se repite** si cambia el dispositivo, el ambiente o el destino a mitad de corrida. No se arrastra.
+6. **El preflight se repite** si cambia el dispositivo, el ambiente, el destino **o el artefacto bajo prueba** a mitad de corrida. No se arrastra. Un build nuevo invalida el preflight anterior tanto como un dispositivo nuevo.
 
 ## Restricciones
 

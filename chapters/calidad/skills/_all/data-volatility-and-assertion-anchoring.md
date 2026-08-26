@@ -44,6 +44,48 @@ Siempre que un texto vaya a convertirse en localizador o en valor esperado, en c
 
 Ante la duda, **volátil**. Reclasificar hacia arriba con evidencia es barato; descubrir la volatilidad en producción cuesta una corrida roja y un diagnóstico.
 
+## Anclas que desaparecen: la segunda pregunta, sobre el tiempo
+
+Las cuatro clases responden **qué** es el texto. Falta responder **cuánto dura**,
+y es una pregunta distinta: una etiqueta estática perfectamente clasificada sigue
+sin poder aserarse si la aplicación la retira sola a los tres segundos.
+
+**Un mensaje que la aplicación muestra y retira por su cuenta —banner, snackbar,
+toast, mensaje de validación temporal— no se puede aserar en un step posterior al
+que lo provoca.** Para cuando el `Then` mira, ya no está. Esto rompe una
+suposición que atraviesa todo el diseño de pasos Gherkin: que un `Then` puede
+consultar la pantalla que dejó el `When`.
+
+**El desenlace se captura en el instante en que ocurre** —dentro del mismo step
+que ejecuta la acción— y se guarda en el World. El step de aserción comprueba lo
+guardado, no la pantalla.
+
+### Cómo se reconoce
+
+| Síntoma | Qué parece | Qué es |
+|---|---|---|
+| Pasa en local y falla en la granja | Problema de entorno | El tiempo entre la acción y la consulta es mayor en la granja |
+| Pasa en un dispositivo y falla en otro | Dispositivo defectuoso | El dispositivo lento llega tarde a mirar |
+| El elemento "no existe" pero el selector es correcto | Locator roto | Se está preguntando después |
+
+**La prueba que los separa**: si la traza de comandos muestra el elemento
+**encontrado** en algún momento de la corrida, el selector está bien y el
+problema es *cuándo* se pregunta. Un locator roto nunca lo encuentra.
+
+### El corolario que costó un defecto falso
+
+Una evidencia recogida en el teardown es evidencia legítima del **final** del
+escenario y no prueba nada sobre un estado intermedio. En la sesión que originó
+esta sección se concluyó que la aplicación no mostraba un mensaje de error de
+validación, y se abrió un defecto: la aserción consultaba un banner ya
+desvanecido, y el volcado de jerarquía —tomado aún más tarde— mostraba la
+pantalla ya sin él. **Dos evidencias coincidentes, ambas tardías por la misma
+razón.** El vídeo de la sesión mostraba el mensaje apareciendo.
+
+Antes de afirmar que algo no se mostró: **¿de qué instante es esta evidencia, y
+es anterior o posterior al hecho que quiero afirmar?** Ver
+`[[calidad-failure-triage-and-classification]]`.
+
 ## Instrucción
 
 1. **Clasificar antes de escribir.** Para cada texto candidato a localizador o a valor esperado, asignar clase y dejarla registrada junto al locator map o al plan de escenarios.
@@ -78,6 +120,7 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 |---|---|---|
 | 1 | todo texto usado como localizador o como valor esperado fue clasificado y la clasificación quedó registrada | Bloqueado: hay localizadores o aserciones sobre texto sin clasificar. Anclar en contenido volátil produce una suite que falla por datos y no por defectos. |
 | 2 | ninguna aserción compara por valor literal un contenido clasificado como volátil | Bloqueado: hay aserciones sobre contenido que cambia en cada registro. Ese test va a fallar mañana sin que el SUT haya cambiado. |
+| 3 | ningún mensaje que la aplicación retira sola se asere en un step posterior al que lo provoca | Bloqueado: hay aserciones sobre anclas transitorias. Ese test pasa en el dispositivo rápido y falla en el lento, y el diagnóstico apuntará al entorno en vez de al diseño del step. |
 
 ## Cross-links
 

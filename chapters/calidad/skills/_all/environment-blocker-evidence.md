@@ -46,6 +46,41 @@ Lista cerrada (no inventar nuevas categorías; si una corrida no encaja, escalar
 | `environment_browser_install_missing` | Playwright no encuentra browser binary (falta `npx playwright install`). | `Executable doesn't exist at ...`/`browserType.launch: ...`. |
 | `environment_jdk_missing_or_wrong` | JDK ausente o versión incompatible (Karate exige 11/17, Appium exige 21). | `UnsupportedClassVersionError`, `java: command not found`, `mvn` aborta por toolchain. |
 
+## La carga de la prueba: esta es la clasificación que MÁS evidencia exige
+
+`environment_blocked_*` es la única categoría que **cancela el análisis
+posterior**: declararla significa "no interpretes estos resultados". Por eso es
+la que más tiene que costar demostrar, y no al revés. Un agente con prisa la
+elige precisamente porque lo exime de investigar.
+
+**Para declarar un bloqueo hay que demostrar que NINGUNA sesión llegó a tocar la
+aplicación.** Eso se demuestra en el reporte de la corrida —dispositivo y step de
+muerte por cada escenario— y **nunca grepeando el log**.
+
+| Lo que NO sirve como prueba | Por qué |
+|---|---|
+| Un `grep` que encuentra el mensaje de error en el log | Un log mezcla el WARN de un reintento con el error que sí mató la corrida |
+| Que todos los escenarios estén en rojo | Un locator obsoleto propio produce exactamente el mismo cuadro |
+| Un mensaje de la infraestructura del proveedor | Puede venir de un fallback que descartó candidatos antes de acertar con uno bueno |
+| Que el fallo "parezca" de ambiente | No es una categoría de impresión |
+
+**Un WARN de reintento no es un veredicto.** Caso medido: se declaró
+`environment_blocked_app_install` para siete escenarios de iOS porque el log
+decía `failed to install apps`. Eran los WARN del bucle de fallback de la granja
+descartando dos dispositivos por debajo del mínimo de versión de la app, antes de
+acertar con uno válido. El `report.json` —que nadie abrió— mostraba cada
+escenario corriendo en un dispositivo distinto, con la app instalada y
+funcionando, y muriendo todos en el mismo step por un **locator obsoleto
+nuestro**. La etiqueta dejó parada casi dos días una corrección de diez minutos.
+
+Antes de emitir el archivo, contesta estas tres por escrito:
+
+1. ¿En qué dispositivo o sesión murió **cada** escenario, según el reporte?
+2. ¿En qué step murió cada uno? Si todos mueren en el mismo step de la suite, el
+   problema es del step, no del ambiente.
+3. ¿Hay alguna captura o volcado que muestre la aplicación **funcionando** en
+   alguna de esas sesiones? Si la hay, no es un bloqueo.
+
 ## Antes de declarar un bloqueo: descartar la red del propio puesto
 
 Un bloqueo de entorno acusa a la infraestructura del cliente, así que exige descartar primero lo que está bajo control de quien diagnostica. Verificado en campo: se afirmó *"el ambiente de pruebas no está montando la aplicación"* y lo que ocurría era que **la conexión corporativa de la máquina local estaba apagada**. El commit que iba a dejar esa conclusión escrita se frenó por un aviso del usuario, no por el análisis.

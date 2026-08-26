@@ -1,6 +1,12 @@
 
 # Apps Flutter bajo Appium — y el prototipo de app pre-desarrollo
 
+> **Localización y gestos sobre Flutter viven en `[[calidad-flutter-locators-and-gestures]]`**,
+> que cubre las dos plataformas: identidad que cambia con el estado, campos
+> anidados, gestos por W3C Actions, renderizado perezoso y recorte de
+> coordenadas. Esta reference se queda con lo propio de Appium y con el
+> prototipo de app pre-desarrollo, que es un tema distinto.
+
 ## Qué ve Appium en una app Flutter (y por qué importa)
 
 Flutter no usa widgets nativos: dibuja su UI en un canvas propio. Lo que UiAutomator2 encuentra **no es la UI sino el árbol de semántica** que Flutter proyecta a la accesibilidad de Android. Consecuencias directas:

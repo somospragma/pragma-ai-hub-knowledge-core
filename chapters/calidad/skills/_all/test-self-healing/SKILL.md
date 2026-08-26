@@ -57,6 +57,14 @@ Combinar siempre con `[[calidad-chapter-perspective]]` (perspectiva del chapter)
 ## Restricciones
 
 - **NUNCA curar silenciosamente.** Todo healing genera log estructurado (paso 4) y, si supera el threshold (>3 healings/semana en un mismo test), abre ticket automático en el board del chapter.
+- **NUNCA reintentar una operación que muta el estado del sistema bajo prueba.** El healing existe para resolver **identificación de elementos**, no para repetir operaciones de negocio. Un reintento que consume un intento de un contador, genera una transacción, gasta un cupo, envía un código o quema una vigencia **altera el sujeto de la prueba**. Reintentar la **lectura** de un dato es inocuo; reintentar el **envío** cambia el criterio bajo prueba.
+
+  Caso medido: se añadió un mecanismo que reintentaba hasta 3 veces ante una pantalla de error. Esa pantalla era en realidad el rechazo del token, así que cada reintento consumía un intento real del contador de la aplicación. El escenario que verifica "se agotan los 3 intentos" habría gastado **nueve**, bloqueando la cuenta y contaminando todo lo que viniera detrás — incluidos los escenarios de tope de intentos y de reinicio del contador, que existen precisamente para verificar ese conteo.
+
+  Si un reintento sobre una operación mutante es inevitable, se **declara explícitamente** en el log de healing, se **acota el número**, y se comprueba que ningún escenario del feature dependa del conteo que ese reintento altera. Los guardrails clásicos están escritos sobre *no ocultar fallos*; este cubre el caso distinto de un mecanismo de resiliencia que corrompe el estado.
+
+- **NUNCA fijar a mano un umbral que depende de cuánto tarda una operación.** Un umbral temporal escrito a mano es una suposición sobre la velocidad del dispositivo, y en una granja el dispositivo cambia en cada corrida. Se **mide** la operación y se deriva el umbral de la medida. Caso medido: un lector exigía "al menos 20 segundos de vigencia restante" para leer 8 dígitos; en la granja esa lectura tardaba más, así que cada intento empezaba con margen aparente y terminaba pasada la rotación. Medir sale más barato que adivinar dos veces.
+
 - **NUNCA curar cambios de contrato del SUT.** Si un campo requerido fue eliminado, un endpoint movido, un status code cambió de `200` a `4xx`, o una pantalla mobile cambió de flujo, **es bug, no healing**. Reportar vía `[[calidad-failure-triage-and-classification]]`.
 - **NUNCA curar tests en producción sin auditoría.** El log de healings es parte de la evidencia del entregable (ver `[[calidad-test-evidence-and-traceability]]`); ocultarlo invalida la entrega.
 - **En Karate:** NUNCA convertir un `#string` requerido a `##string` para que pase. Esconde bug de contrato.

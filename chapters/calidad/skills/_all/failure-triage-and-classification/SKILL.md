@@ -34,6 +34,19 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
 
 ## Instrucción
 
+0. **Fechar la evidencia antes de leerla.** Para cada artefacto que vayas a usar,
+   contesta: **¿de qué instante es, y es anterior o posterior al hecho que quiero
+   afirmar?** Una evidencia posterior al hecho no lo refuta. Una captura tomada
+   en el teardown prueba cómo terminó el escenario y casi nada sobre un estado
+   intermedio; un volcado de jerarquía tomado al cerrar la sesión, menos todavía.
+
+   Y antes de tratar dos evidencias coincidentes como confirmación: **¿fallan por
+   la misma causa?** Varias evidencias tardías por la misma razón no se
+   corroboran entre sí — comparten el sesgo. En campo, dos de ellas sostuvieron
+   un defecto falso reportado al cliente sobre un mensaje que la aplicación sí
+   mostraba, y que ambas miraron demasiado tarde. Ver
+   `[[calidad-data-volatility-and-assertion-anchoring]]`.
+
 1. **Aislar el fallo y MIRAR la evidencia antes de teorizar.** Orden obligatorio: (1) screenshot del momento del fallo, (2) DOM/page source **parseado como árbol** —nunca deducir la topología de la indentación impresa—, (3) log del mock/backend (¿llegó la petición? ¿con qué body?), (4) recién entonces la hipótesis. Prohibido formular una segunda hipótesis sin haber completado 1-3: la evidencia suele estar generada y sin mirar. Recolectar además la evidencia mínima: `test_id`, mensaje de error completo, stack trace, screenshot/trace (Playwright/Appium), request/response (Karate/API), métricas y thresholds (K6), `environment context` (URL del SUT, branch, commit, runner, OS, browser/device). Sin esta evidencia el triage es opinión, no análisis. Ver `[[calidad-test-evidence-and-traceability]]` para el formato canónico.
 
 2. **Aplicar el protocolo de re-run para determinismo** — **re-ejecutando SOLO el test en cuestión**, aislado por nombre o tag (nunca la suite completa) descrito en `references/re-run-protocol-for-determinism.md`: re-ejecutar el test N veces (default N=3) en el **mismo entorno y con los mismos datos**. Resultado:
@@ -41,6 +54,19 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
    - 3/3 fallan con errores distintos → `flaky_high_variance` (race condition probable).
    - 1/3 o 2/3 fallan → `flaky`.
    - 0/3 fallan → `flaky` (transient en run 1).
+
+   **«Intermitente», «flaky» y «transitorio» son conclusiones cuantitativas.** No
+   se usan sin poder decir **cuántas veces de cuántas**. Si no has contado, no
+   tienes la clasificación: tienes una impresión, y construir encima —archivar
+   evidencia, cambiar la matriz de cobertura, añadir un mecanismo de
+   recuperación— multiplica el error.
+
+   Y busca el contraste que la repetición sola no da: **¿qué ocurre en el caso en
+   que NO debería ocurrir?** Si con entrada válida el fallo no aparece nunca y
+   con entrada inválida aparece siempre, no es intermitencia: es
+   **comportamiento**, y el test está mirando el sitio equivocado. En campo se
+   etiquetó como falla técnica intermitente del servicio lo que era el rechazo
+   del token; la medida, cuando por fin existió, salió 3 de 3.
 
 3. **Clasificar el patrón de fallo** contra el catálogo en `references/failure-pattern-catalog.md`. Las categorías canónicas son: bug real del SUT, test design issue, data state, environment, timing/sync, locator stale, infrastructure. Cada patrón del catálogo trae síntomas observables, causa probable, evidencia a recolectar y acción recomendada.
 
@@ -76,6 +102,8 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 2 | causa raíz declarada (bug SUT, test design, data state, ambiente, timing, locator stale, infra) antes de proponer fix | Bloqueado: triage no produjo causa raíz; auto-corrección sin causa raíz esconde bugs del SUT. |
 | 3 | fallos clasificados como bug del SUT NO pasan a self-correction; se escalan a humano con reporte | Bloqueado: se intentó auto-corregir un bug real del SUT — violación de anti-cheating. |
 | 4 | todo fallo clasificado como bug del SUT cumple las seis precondiciones de references/sut-defect-evidence-chain.md, empezando por preflight verde en esa misma corrida | Bloqueado: se declaró un defecto del SUT sin la cadena de evidencia completa. Ya ocurrió en campo reportar un defecto en una corrida donde la aplicación nunca se abrió. |
+| 5 | cada evidencia usada lleva declarado su instante de captura, y ninguna afirmación se apoya en evidencia posterior al hecho que afirma | Bloqueado: se está concluyendo desde evidencia tardía. Una captura de teardown no prueba un estado intermedio, y dos tardías por la misma razón no se corroboran. |
+| 6 | ninguna clasificación usa «intermitente», «flaky» o «transitorio» sin el conteo que la sostiene | Bloqueado: se etiquetó como intermitente algo que no se midió. Sin cuántas veces de cuántas, no hay clasificación. |
 
 ## Cross-links
 

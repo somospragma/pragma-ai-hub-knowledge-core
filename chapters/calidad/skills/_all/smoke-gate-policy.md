@@ -68,6 +68,7 @@ En cualquiera de los tres casos, antes de ejecutar se **verifica el conteo**: si
 - El smoke gate NO ejecuta suite completa; solo valida que el scaffold corre end-to-end. La suite completa se ejecuta como parte del paso de ejecución del `[[calidad-post-generation-protocol]]`.
 - El agente DEBE garantizar que existe al menos un test/feature/escenario etiquetado o nombrado de modo que el comando smoke lo encuentre. Si no existe, el smoke gate se considera "no provisto" y bloquea con `blocker: "smoke_gate_missing_scenario_<framework>"`.
 - Si el smoke gate falla por causa ambiental (WAF, DNS, device caído), el blocker se reclasifica como `environment_blocked_*` según `[ver schema](./environment-blocker-evidence.md)`.
+- **Retirar escenarios puede llevarse el gate por delante.** Tras eliminar o mover cualquier escenario de un feature, **contar** los que quedan con la etiqueta que forma el gate. Caso medido: se retiraron por redundantes los escenarios de un criterio de aceptación, y con ellos se fueron los únicos `@smoke` del feature — que pasó a tener **cero**, mientras features comparables tenían dos o tres. Nadie lo detectó: apareció de casualidad, semanas después, construyendo las etiquetas del CSV de importación. Si el borrado deja el feature sin gate, se repone en el camino central de la historia antes de cerrar, en todas las plataformas.
 
 ## Smoke gate contra mock (`execution_target: mock | hybrid`)
 
@@ -112,6 +113,7 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 1 | el filtro del gate matchea exactamente 1 escenario, verificado con el conteo ANTES de ejecutar | Bloqueado: el gate matchea un número de escenarios distinto de 1. Un tag compartido por varios deja de ser gate y pasa a ser suite parcial. |
 | 2 | en brownfield el gate reutiliza la taxonomía de etiquetas del proyecto; no se introdujo ningún tag nuevo sin confirmación explícita del usuario | Bloqueado: se introdujo una etiqueta de compuerta en un repositorio que ya tiene taxonomía propia. Verificado en campo: rompe la convención del equipo, rompe la trazabilidad hasta el ALM y el ejecutor puede componer el filtro de forma que el tag nuevo nunca encaje. |
 | 3 | el preflight de esa misma corrida está verde antes de ejecutar el gate | Bloqueado: un gate rojo contra un SUT que nunca se tocó no informa nada y arranca el diagnóstico sobre la causa equivocada. |
+| 4 | si en esta sesión se retiraron escenarios de algún feature, se contó que sobrevive al menos uno con la etiqueta del gate | Bloqueado: el feature quedó sin gate de humo. La eliminación se llevó por delante los escenarios que lo formaban y nada más lo va a detectar. |
 
 ## Cross-links
 

@@ -50,8 +50,34 @@ Activa este skill en paralelo con `[[calidad-karate-greenfield]]`, `[[calidad-ka
 6. **Anonimizar por columna** — Reglas por tipo de dato: cédulas, RUT, teléfono, email, dirección, tarjeta (Luhn-valid pero fake), IBAN. Ver `references/anonymization-pii.md`.
 7. **Catalogar datasets versionados** — Naming, almacenamiento (git LFS, DVC, S3 con tags), regeneración cuando cambia el esquema. Estrategia en `references/datasets-versioning.md`. Para perf, consideraciones específicas en `references/data-for-perf-testing.md`.
 
+## Un usuario de pruebas compartido es un recurso con estado, no un dato de configuración
+
+Un alias en un catálogo de usuarios **parece** configuración y se comporta como
+un recurso: tiene estado en el sistema bajo prueba, y ese estado cambia cuando un
+escenario lo usa.
+
+**Dos escenarios que comparten cuenta no pueden ejecutarse en paralelo.** Y una
+precondición que borra o reinicia el estado de la cuenta —desafiliar un token,
+limpiar un carrito, revocar una sesión— **deja la cuenta inservible para
+cualquier otro escenario mientras dura**.
+
+Caso medido: dos escenarios lanzados en paralelo para ganar tiempo, ambos con el
+mismo usuario. La precondición de uno borraba la afiliación del token para volver
+a crearla; el otro llegó al paso de desbloqueo justo dentro de esa ventana y
+falló por un estado que le fabricó su compañero. Lo caro no fue el rojo: fue que
+**parecía un hallazgo sobre la plataforma web** y estuvo a punto de reportarse
+como que el flujo web no pedía segundo factor.
+
+**Antes de paralelizar, listar qué recursos con estado comparten los escenarios.**
+Si comparten cuenta, paralelizar exige darle a cada corrida la suya. Y esto
+alcanza a los runners: un ejecutor multiplataforma que paralelice por defecto
+**no es utilizable** para un feature cuyos escenarios comparten la cuenta de
+pruebas, por más que sea el recurso recomendado. Verificarlo en
+`[[calidad-repo-capability-discovery]]` es parte del barrido, no un detalle.
+
 ## Restricciones
 
+- **NUNCA** paralelizar escenarios que comparten un usuario de pruebas, ni asumir que un runner no paraleliza porque el escenario "parece corto".
 - **NUNCA** usar datos productivos sin anonimización en ningún ambiente que no sea producción. Es una violación legal en LATAM y Estados Unidos bajo los marcos listados arriba y un riesgo reputacional grave.
 - **NUNCA** commitear datasets que contengan PII real, ni siquiera "para que sea más fácil reproducir un bug". Si un dataset llegó a la rama, debe purgarse del historial (`git filter-repo`) y se debe notificar al cliente.
 - **SIEMPRE** documentar la política de retención de los datasets sintéticos/anonimizados: por defecto se rotan cada release.

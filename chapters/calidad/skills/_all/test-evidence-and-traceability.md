@@ -121,6 +121,46 @@ Cada bloque se decodifica a su archivo y se abre. Los dos que siempre importan s
 
 Cuando el reporte no trae capturas del momento del fallo, eso es un hallazgo en sí mismo y se corrige antes de seguir diagnosticando: sin ellas, cada fallo cuesta una sesión de conjeturas.
 
+### Toda evidencia lleva su instante y su dispositivo
+
+Una captura sin marca de tiempo no se puede contrastar contra el hecho que se
+quiere afirmar, y una captura sin dispositivo no se puede atribuir. Las dos
+etiquetas son parte del artefacto, no metadatos opcionales — ver el paso 0 de
+`[[calidad-failure-triage-and-classification]]`.
+
+## Escenarios con más de un dispositivo o sesión
+
+Cuando un escenario maneja un dispositivo además del que está bajo prueba —un
+portador de semilla, un segundo navegador, una sesión de administración—, **toda**
+la instrumentación de diagnóstico los recorre todos y **etiqueta cada artefacto
+con cuál es**: capturas, volcados de jerarquía, vídeo y logs.
+
+El síntoma de no hacerlo es cruel: la evidencia muestra una pantalla impecable,
+porque es la del dispositivo que **no** falló. En campo, un volcado decía "el
+login está perfecto" mientras el fallo era exactamente que no aparecía el
+login… en el otro teléfono. Y las capturas seguían al driver principal, así que
+mostraban siempre el aparato equivocado.
+
+**Y se captura antes de cerrar las sesiones auxiliares.** Hay un detalle de orden
+que cuesta otra corrida descubrir: si el hook que cierra el dispositivo portador
+corre antes que el teardown que vuelca la evidencia, la evidencia del dispositivo
+auxiliar **no llega a generarse nunca**.
+
+## Un verde certifica el build que lo produjo
+
+Dos consecuencias, y las dos se anotan:
+
+1. **La cobertura no se hereda entre versiones del artefacto.** Todo resultado se
+   registra con la **versión del artefacto que lo produjo**. Al cambiar el build,
+   la cobertura acumulada vuelve a cero hasta reejecutar; el reflejo de
+   "revalidar solo lo rojo" deja en verde escenarios que ya no prueban nada.
+2. **Un step que atraviesa un estado sin aserarlo no protege ese estado.** Un
+   escenario que pasa por una pantalla intermedia relevante sin comprobar cuál es
+   tiene un verde compatible con la pantalla equivocada. **Un verde que no
+   distingue entre lo correcto y lo incorrecto no es cobertura.** Caso medido:
+   los escenarios de reinicio de contador pasaban por la pantalla de rechazo del
+   token sin verificar su contenido, y seguían verdes cuando el mensaje era otro.
+
 ## Cadena requisito → test → resultado → decisión
 
 1. **Requisito**: documentado en Jira/Confluence con ID estable (`HUT-123`, `RF-045`).
@@ -133,5 +173,7 @@ Cuando el reporte no trae capturas del momento del fallo, eso es un hallazgo en 
 - **NUNCA** entregar tests sin tags de trazabilidad: como mínimo `@user-story` o `@requirement`.
 - **NUNCA** desactivar reportes para "ahorrar tiempo de CI": son la única evidencia auditable.
 - **NUNCA** reportar "todo verde" si solo corrió `@smoke`. Documenta qué suite se ejecutó.
+- **NUNCA** registrar un resultado sin la versión del artefacto que lo produjo, ni heredar cobertura entre builds.
+- **NUNCA** instrumentar solo el dispositivo principal en un escenario que maneja varios: la foto tranquilizadora es la del que no importa.
 - En clientes con políticas de retención (compliance, auditoría externa, certificaciones ISO/SOC), los reportes y summaries deben **archivarse** (S3, artifactory, o equivalente) según política de retención del cliente.
 - Encadena con `[[calidad-route-test-generation]]` como paso final.
