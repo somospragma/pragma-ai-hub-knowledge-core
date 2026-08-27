@@ -1,6 +1,21 @@
+---
+id: serenity-wdio-test-data-management
+version: 1.0.0
+scope: stack
+type: skill
+chapter: calidad
+stack: [serenity-wdio]
+description: Patrones, convenciones y ejemplos de datos de prueba propios del arquetipo TypeScript + WebdriverIO v9 + Serenity/JS v3.31 + Cucumber 11. Complementa el skill transversal calidad-test-data-management.
+tags: [serenity-wdio, webdriverio, test-data, fixtures, cucumber]
+---
+
 # Test Data Management: serenity-wdio
 
 Material de referencia específico del arquetipo TypeScript + WebdriverIO v9 + Serenity/JS v3.31 + Cucumber 11. Complementa el Skill_All `calidad-test-data-management` aportando los patrones, convenciones y ejemplos de código propios de este stack.
+
+## Instrucción
+
+Aplica este skill al diseñar, cargar o persistir datos de prueba dentro de un proyecto `serenity-wdio`, en conjunto con `[[calidad-test-data-management]]` (que define la estrategia general de datos del chapter). Usa las secciones siguientes como catálogo de patrones concretos: estructura de carpetas por módulo, carga tipada de JSON desde TypeScript, parametrización con `Scenario Outline`, `DataTable` de Cucumber, generación dinámica (FakerAPI o `@faker-js/faker`), persistencia segura de outputs, manejo de datos sensibles y datos por ambiente. Antes de introducir un dataset nuevo, revisa el checklist de calidad al final de este documento y evita los anti-patrones listados.
 
 ---
 
