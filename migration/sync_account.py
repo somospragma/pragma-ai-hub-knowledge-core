@@ -56,6 +56,13 @@ FM_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
 # el OpenAPI de entrada/ esta desactualizado y no los lista).
 VALID_TYPES = {"decisions", "references", "limits", "skill", "steering", "workflow", "prompt"}
 
+# Stacks del chapter en Mimir. `stack` NO es metadata: es lo que decide si el
+# asset se descarga. Un proyecto que instala solo Karate no debe recibir el
+# conocimiento movil de la cuenta, y con todo en `default` lo recibe entero.
+VALID_STACKS = {"default", "karate", "k6", "playwright",
+                "appium", "appium-core", "appium-wdio", "appium-serenity",
+                "funcional"}
+
 
 def parse_frontmatter(text: str) -> tuple[dict, str]:
     m = FM_RE.match(text)
@@ -125,9 +132,13 @@ def discover(client: str, chapter: str) -> list[tuple[str, dict, str]]:
                 problemas.append(f"{folder.name}/{f.name}: type invalido ({fm.get('type')!r})")
             if fm.get("chapter") != chapter:
                 problemas.append(f"{folder.name}/{f.name}: chapter debe ser {chapter}")
-            if not fm.get("stack"):
+            stack = fm.get("stack")
+            if not stack:
                 problemas.append(f"{folder.name}/{f.name}: falta stack "
                                  "(el endpoint de cuenta lo exige)")
+            elif stack not in VALID_STACKS:
+                problemas.append(f"{folder.name}/{f.name}: stack '{stack}' no existe "
+                                 f"en el chapter ({'|'.join(sorted(VALID_STACKS))})")
             if fm.get("scope") != alcance:
                 problemas.append(f"{folder.name}/{f.name}: scope debe ser "
                                  f"'{alcance}' por la carpeta en que vive")
@@ -167,6 +178,21 @@ def audit(assets, docs_path: str) -> int:
         print(f"       {len(b.encode()):>7,}  {fm['title']}")
     print(f"  bajo demanda          : {bytes_off:>8,} bytes  "
           f"(~{bytes_off / 3.5:,.0f} tokens si se abriera todo)")
+
+    # Lo que recibe realmente un proyecto: `default` mas su propio stack.
+    from collections import defaultdict
+    por_stack = defaultdict(lambda: [0, 0])
+    for _, fm, b in assets:
+        e = por_stack[fm.get("stack", "?")]
+        e[0] += 1
+        e[1] += len(b.encode())
+    base_n, base_b = por_stack.get("default", [0, 0])
+    print(f"\n  reparto por stack (un proyecto recibe `default` + el suyo):")
+    for s in sorted(por_stack):
+        n, b = por_stack[s]
+        extra = "" if s == "default" else (
+            f"  -> un proyecto {s} recibe {base_n + n} docs, {base_b + b:,} B")
+        print(f"      {s:14} {n:>3} docs {b:>8,} B{extra}")
 
     hallazgos = 0
     ids = {lid for lid, _, _ in assets}

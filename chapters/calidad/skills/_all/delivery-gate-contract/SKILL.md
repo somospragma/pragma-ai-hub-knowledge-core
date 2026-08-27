@@ -125,6 +125,23 @@ delivery_gate:
   next_steps: []                        # acciones recomendadas al usuario
 ```
 
+## Un gate sin fixtures es una hipótesis
+
+**Todo gate se entrega con un caso que DEBE fallar y otro que DEBE pasar.** Sin
+eso no se sabe si el gate protege algo o solo estorba, y una regla que nadie ha
+visto fallar es una hipótesis sobre el comportamiento del código, no una
+verificación.
+
+No es teórico. Al escribir el test que ejercitaba un gate de siete reglas
+apareció un **falso positivo real**: el patrón que detecta identificadores sin
+sustituir llevaba la bandera de ignorar mayúsculas, así que rechazaba una
+etiqueta de servicio legítima. Nadie lo habría visto hasta que alguien creara esa
+etiqueta — y entonces el gate habría bloqueado un cambio correcto, que es la
+forma más rápida de que un equipo aprenda a saltárselo.
+
+La misma exigencia aplica a las comprobaciones de este contrato de cierre: si una
+condición no se puede violar a propósito en una prueba, no está verificando nada.
+
 ## Restricciones
 
 - Si falta cualquier campo obligatorio → entrega inválida.

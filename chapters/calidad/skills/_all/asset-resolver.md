@@ -141,7 +141,9 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-karate-brownfield]]` | `karate-brownfield` |
 | `[[calidad-karate-greenfield]]` | `karate-greenfield` |
 | `[[calidad-karate-run-and-tags]]` | `ejecucion-karate-y-semantica-de-tags` |
+| `[[calidad-karate-runtime-traps]]` | `karate-trampas-de-runtime-que-no-fallan` |
 | `[[calidad-mandatory-inputs-protocol]]` | `mandatory-inputs-protocol-contrato-de-entrada-antes-de-generar` |
+| `[[calidad-measure-before-proposing]]` | `medir-antes-de-proponer` |
 | `[[calidad-mobile-interactions]]` | `interacciones-y-aserciones-mobile` |
 | `[[calidad-mobile-locator-resolution]]` | `resolucion-de-locators-mobile` |
 | `[[calidad-pipeline-state-tracking]]` | `pipeline-state-tracking-la-traza-que-sobrevive-a-la-sesion` |

@@ -80,6 +80,26 @@ autorizacion_requerida:
 6. **Registro obligatorio**: cada escritura ejecutada se anota en la bitácora de sesión (`[[calidad-pipeline-state-tracking]]`) con la operación, quién autorizó, cuándo, y el resultado real — incluidos los identificadores creados, que son lo que permite deshacer.
 7. **Idempotencia antes de la ficha**: se consulta qué existe ya y el conteo de la ficha distingue nuevos de existentes. Un lote que duplicaría elementos se corrige antes de pedir autorización, no después.
 
+## Entender una herramienta que escribe, sin dejarla escribir
+
+Cuando haya que integrar una dependencia cuyos efectos son **escritura en el
+sistema del cliente** —un publicador de resultados, un creador de incidencias—,
+no hay que elegir entre leer su documentación y confiar, o ejecutarla y ver qué
+pasa. Hay una tercera vía, y casi siempre es posible:
+
+**Buscar sus costuras y ejercitarla en aislamiento.** Instanciar sus clases
+directamente, inyectar dobles inertes en las interfaces que producen los efectos,
+pasarle una entrada real y observar el payload que **habría** enviado.
+
+Verificado en campo sobre una herramienta que crea incidencias en el gestor del
+cliente y no se puede desactivar: el ejercicio convirtió tres afirmaciones
+heredadas en hechos comprobados y **corrigió una de ellas** — se creía que leía
+un campo de estado y en realidad lee un booleano y *emite* el estado. Esa
+diferencia decide si un resultado sube como aprobado o como fallido.
+
+Es más barato que descubrirlo en producción, y mucho más barato que descubrirlo
+en el ALM del cliente, donde no hay deshacer.
+
 ## Restricciones
 
 - **NUNCA** escribir en el ALM para "probar si funciona", "ver si tengo permisos" o "dejarlo listo". Toda escritura es intencional y autorizada.

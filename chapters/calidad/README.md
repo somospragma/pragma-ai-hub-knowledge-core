@@ -589,6 +589,27 @@ Reglas que cuestan caro aprender por las malas:
   hacerlo.
 - **El token es de super admin.** Nunca salir del alcance del chapter Calidad.
 
+### `stack` decide quién recibe cada asset
+
+**`stack` no es metadata: es lo que decide si el asset se descarga.** Un proyecto
+que instala el stack de Karate recibe el conocimiento de chapter de Karate **y el
+de cuenta de Karate**, y no recibe el de pruebas de front.
+
+Vale igual para `chapters/` y para `accounts/`. Poner todo en `default` —error
+que ya se cometió en la capa de cuenta— hace que cada proyecto se lleve el
+conocimiento de todos los demás: peso en cada turno y, peor, guía que no aplica.
+
+| `stack` | Quién lo recibe |
+|---|---|
+| `default` | Todos. Solo para lo que sirve con **cualquier** stack: enrutado, ALM, contrato de publicación |
+| `karate`, `k6`, `playwright`, `appium-wdio`, `appium-serenity` | Los proyectos que instalaron ese stack |
+| `appium-core` | Companion: viaja con cualquier stack de Appium |
+
+El campo es **de un solo valor**. Cuando algo aplica de verdad a varios stacks
+pero no a todos, se elige el que lo instala siempre (los repositorios E2E de una
+cuenta instalan `playwright` aunque también usen Appium) y se declara en el
+cuerpo a qué capa pertenece.
+
 ### `applies_to_stacks`
 
 `_all/` significa «puede ir a todos los bundles», no «va a todos». Un asset de
