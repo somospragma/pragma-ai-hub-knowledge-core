@@ -15,7 +15,7 @@ tags: [appium, mobile, interacciones, gestos, esperas, aserciones, agnostico]
 
 Cuando haya que **interactuar con la app o aseverar sobre ella** en una suite Appium, con cualquier cliente y en cualquier plataforma. Los comandos que hay debajo son del servidor Appium: el lenguaje solo cambia cómo se invocan.
 
-Pertenece al stack `appium-core`, que se instala junto al stack de producto. Antes de interactuar hay que tener el locator resuelto: ver `[[calidad-mobile-locator-resolution]]`.
+Pertenece al stack `appium-core`, que se instala junto al stack de producto (`appium-serenity` o `appium-wdio`); `serenity-wdio` no lo requiere, tiene su propio catálogo de interacciones mobile encapsulado en sus references. Antes de interactuar hay que tener el locator resuelto: ver `[[calidad-mobile-locator-resolution]]`.
 
 ## Lectura obligatoria
 
