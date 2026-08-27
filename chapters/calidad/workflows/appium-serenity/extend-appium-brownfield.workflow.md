@@ -13,7 +13,7 @@ tags: [appium, brownfield, workflow, mobile, screenplay, conventions]
 
 ## Cuándo usar
 
-Cuando `[[calidad-intent-detection]]` identifica una solicitud de automatización mobile Appium y `[[calidad-brownfield-vs-greenfield]]` la clasifica como **brownfield**: el usuario provee archivos de un proyecto Appium existente (Android o iOS) y solicita extenderlo. Para greenfield Android usar `[[calidad-generate-appium-screenplay-android]]`; para greenfield iOS, scaffold manual descrito en `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`.
+Cuando `[[calidad-intent-detection]]` identifica una solicitud de automatización mobile Appium sobre JVM y `[[calidad-brownfield-vs-greenfield]]` la clasifica como **brownfield**: el usuario provee archivos de un proyecto Appium JVM existente (Android o iOS) y solicita extenderlo. Para greenfield Android usar `[[calidad-generate-appium-screenplay-android]]`; para greenfield iOS en JVM, scaffold manual descrito en `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`. Si el equipo prefiere Node/TypeScript o necesita iOS automatizado de forma nativa (no manual), las rutas son `[[calidad-generate-appium-wdio-greenfield]]` (mobile-only) o `[[serenity-wdio-greenfield]]` (multiplataforma).
 
 ### Pre-flight (OBLIGATORIO)
 

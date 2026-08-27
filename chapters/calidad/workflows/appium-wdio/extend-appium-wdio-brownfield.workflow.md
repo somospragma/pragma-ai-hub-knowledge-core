@@ -13,7 +13,7 @@ tags: [appium, webdriverio, typescript, cucumber, brownfield, mobile]
 
 ## Cuándo usar este workflow
 
-Cuando el router `[[calidad-route-test-generation]]` resolvió intent mobile sobre stack Node/TypeScript y el `output_path` ya contiene un arquetipo. Es la ruta habitual con clientes que ya tienen suite: se agrega cobertura, no se reemplaza nada.
+Cuando el router `[[calidad-route-test-generation]]` resolvió intent mobile sobre stack Node/TypeScript y el `output_path` ya contiene un arquetipo Appium standalone (mobile-only) — no un arquetipo `serenity-wdio` multiplataforma, que aunque también es Node/WebdriverIO se extiende con `[[extend-serenity-wdio-brownfield]]`. Es la ruta habitual con clientes que ya tienen suite: se agrega cobertura, no se reemplaza nada.
 
 ## Pasos
 
