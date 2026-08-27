@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-widgetbook
-version: 2.5.0
+version: 2.6.0
 scope: stack
 type: skill
 chapter: mobile
@@ -10,9 +10,41 @@ description: >
   Widgetbook patterns for interactive documentation of Design System components
   and app screens in canonical `/new-view`. Use when creating or updating
   use cases, knobs, code preview, and build_runner generation with deterministic
-  scope selection.
+  scope selection. Includes cold-init detection and bootstrap when the
+  Widgetbook host project is not yet configured.
 ---
 # Widgetbook Patterns (Deterministic Scope)
+
+## Step -1 — Ensure Widgetbook is initialized (Preflight)
+
+Before choosing scope or generating any use case, verify that the Widgetbook host project exists and is wired up. Generating use cases against an uninitialized Widgetbook project produces files that will not compile or run.
+
+Widgetbook is considered initialized only when **all four** signals are true:
+
+1. `{WIDGETBOOK_ROOT}/pubspec.yaml` exists.
+2. It declares `widgetbook` and `widgetbook_annotation` as dependencies, plus `widgetbook_generator` and `build_runner` as dev dependencies.
+3. It declares the host app package as a `path:` dependency (or Melos workspace equivalent).
+4. `{WIDGETBOOK_ROOT}/lib/main.dart` (or its equivalent entry file) references `directories` produced by `widgetbook_generator` (an `import` or `part` of `main.directories.g.dart` or `widgetbook.directories.g.dart`).
+
+Resolve `WIDGETBOOK_ROOT` from `topology.repo_mode`:
+
+| `repo_mode` | `WIDGETBOOK_ROOT` |
+|---|---|
+| `single_repo` / `multi_repo` | Sibling of the app repo root: `<parent>/widgetbook_[appname]/` |
+| `monorepo_melos` | `<monorepo-root>/apps/widgetbook_[appname]/` (Single Widgetbook), or the package-owned Widgetbook path (Per-package Widgetbook) |
+
+`APPNAME` is `project.package_name` from `.sopp/config/project.config.yaml`.
+
+**If any signal is missing:**
+
+- For `single_repo` / `multi_repo`: run the full initialization sequence in `references/setup.md`.
+- For `monorepo_melos`: run the full initialization sequence in `references/monorepo.md`.
+
+Include every bootstrap-produced file in the phase's `--output-file` set so the workflow's gap report can diff it (see the "Bootstrap output files" section in each reference).
+
+If the initialization command itself fails, stop with `blocked_input` and surface the captured error. Do not proceed to Step 0.
+
+**If all four signals are present:** continue directly to Step 0.
 
 ## Step 0 — Define the scope first
 
@@ -95,6 +127,7 @@ dart run build_runner build --delete-conflicting-outputs
 
 ## Checklist
 
+- [ ] Step -1 preflight passed (Widgetbook initialized or just bootstrapped)
 - [ ] `WIDGETBOOK_SCOPE` defined (`DS_COMPONENTS` or `APP_SCREENS`)
 - [ ] File `*_use_case.dart` at the correct path for the scope
 - [ ] Required use cases covered for the scope
@@ -109,7 +142,8 @@ dart run build_runner build --delete-conflicting-outputs
 
 | Topic | File |
 |---|---|
-| Setup | `references/setup.md` |
+| Setup (cold init for `single_repo` / `multi_repo`) | `references/setup.md` |
+| Setup (cold init for `monorepo_melos`) | `references/monorepo.md` |
 | Project structure | `references/project_structure.md` |
 | Features guide | `references/features_guide.md` |
 | Variants guide | `references/variants_guide.md` |

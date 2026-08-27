@@ -1,6 +1,6 @@
 ---
 id: widgetbook-developer
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: agent
 chapter: mobile
@@ -91,6 +91,31 @@ If the handoff includes `spec_ref` and `context_ref`:
 4. Record evidence in `{SPEC_PACKET_PATH}/evidence/widgetbook.md`.
 5. Update `context.json` with generated use cases, build_runner command, and state.
 6. Update `PIPELINE_SPEC_PATH` only as the human report.
+
+## 0. Ensure Widgetbook host project exists (Preflight)
+
+Before creating any use case, execute Step -1 of the `flutter-ds-widgetbook`
+skill:
+
+1. Resolve `WIDGETBOOK_ROOT` from `topology.repo_mode`:
+   - `single_repo` / `multi_repo`: `<parent-of-app-root>/widgetbook_[appname]/`.
+   - `monorepo_melos`: `<monorepo-root>/apps/widgetbook_[appname]/` for Single
+     Widgetbook, or the package-owned path for Per-package Widgetbook.
+2. Verify the four initialization signals from the skill's Step -1
+   (`pubspec.yaml` exists, declares `widgetbook` + `widgetbook_annotation` +
+   dev deps, declares the app as `path:` dep or workspace member, and
+   `lib/main.dart` references generated `directories`).
+3. If any signal is missing, run the cold-init sequence from
+   `references/setup.md` (single/multi-repo) or `references/monorepo.md`
+   (`monorepo_melos`). Do not skip. Do not create use cases in an
+   uninitialized project.
+4. Record the bootstrap outcome in `{SPEC_PACKET_PATH}/evidence/widgetbook.md`:
+   detected mode, commands executed, resolved `WIDGETBOOK_ROOT`, files created.
+5. If any initialization command fails, return `blocked_input` with the
+   captured stdout/stderr; do not fall back to writing use cases.
+6. Include every bootstrapped file in the phase's `--output-file` set so the
+   workflow's gap report can diff it (see the "Bootstrap output files"
+   section of `references/setup.md` or `references/monorepo.md`).
 
 ## 1. Create Use Case File
 
@@ -217,6 +242,9 @@ Add evidence to the Spec Packet and mirror the report in `PIPELINE_SPEC_PATH`:
 
 ## Rules
 
+- ALWAYS run Step -1 of `flutter-ds-widgetbook` first. Generating use cases
+  in an uninitialized Widgetbook project is forbidden — bootstrap it (per
+  `references/setup.md` or `references/monorepo.md`) or return `blocked_input`.
 - NEVER implement the base widget UI; only create Widgetbook stories/use cases.
 - NEVER modify production component/screen source code.
 - NEVER add inline, block, or Dartdoc comments in use cases unless the reason is

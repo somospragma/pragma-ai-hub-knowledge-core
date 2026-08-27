@@ -1,6 +1,6 @@
 ---
 id: new-view
-version: 1.4.0
+version: 1.5.0
 scope: chapter
 type: workflow
 chapter: mobile
@@ -1217,6 +1217,8 @@ Required compact handoff:
 spec_ref: {SPEC_PACKET_PATH}/spec.yaml
 context_ref: {SPEC_PACKET_PATH}/context.json
 phase: ds_widgetbook
+preflight:
+  - ensure_widgetbook_initialized  # Step -1 of flutter-ds-widgetbook
 read_sections:
   - artifact_plan.planned[group=ds_components]
   - technical_plan
@@ -1225,13 +1227,43 @@ read_sections:
   - success_criteria
 ```
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the DS Widgetbook use-case files. Expand the file array from `artifact_plan.planned[group=ds_widgetbook]`:
+> **Preflight bootstrap.** Before generating any use case, `@widgetbook-developer`
+> runs Step -1 of the `flutter-ds-widgetbook` skill. When the Widgetbook host
+> project is not initialized, it executes the cold-init sequence from
+> `references/setup.md` (single/multi-repo) or `references/monorepo.md`
+> (`monorepo_melos`) and appends every bootstrapped file to the phase's
+> `--output-file` set. Typical bootstrap files (paths depend on repo mode; see
+> the "Bootstrap output files" section in each reference):
+>
+> - `widgetbook_[appname]/pubspec.yaml` (or `apps/widgetbook_[appname]/pubspec.yaml`)
+> - `widgetbook_[appname]/lib/main.dart`
+> - `widgetbook_[appname]/lib/main.directories.g.dart`
+> - `widgetbook_[appname]/lib/ui_system/.gitkeep`
+> - `widgetbook_[appname]/lib/features/.gitkeep`
+> - `widgetbook_[appname]/lib/shared/.gitkeep`
+> - Root `pubspec.yaml` and/or `melos.yaml` only when a monorepo workspace list was edited.
+>
+> If any initialization command fails, report `phase-4-3-ds-widgetbook` as
+> `failed` with the captured error and stop the workflow — do not fall back
+> to writing use cases against an uninitialized project.
+> The DS phase owns the first Widgetbook bootstrap; PHASE 4.6 must find the
+> project already initialized and only add screen use cases.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the DS Widgetbook use-case files **plus** any bootstrap files produced by Step -1. Expand the use-case array from `artifact_plan.planned[group=ds_widgetbook]` and, when Step -1 bootstrapped Widgetbook, append the bootstrap files reported by `@widgetbook-developer`:
 
 ```bash
 DS_WIDGETBOOK_FLAGS=()
 while IFS= read -r f; do
   DS_WIDGETBOOK_FLAGS+=(--output-file "$f")
 done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widgetbook") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+# Optional: append bootstrap files when Step -1 initialized Widgetbook.
+# The agent lists them in evidence/widgetbook.md under a "bootstrap_files" block.
+if [ -f "${SPEC_PACKET_PATH}/evidence/widgetbook.bootstrap-files.txt" ]; then
+  while IFS= read -r f; do
+    DS_WIDGETBOOK_FLAGS+=(--output-file "$f")
+  done < "${SPEC_PACKET_PATH}/evidence/widgetbook.bootstrap-files.txt"
+fi
 
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
@@ -1422,6 +1454,8 @@ Required compact handoff:
 spec_ref: {SPEC_PACKET_PATH}/spec.yaml
 context_ref: {SPEC_PACKET_PATH}/context.json
 phase: app_widgetbook
+preflight:
+  - ensure_widgetbook_initialized  # Step -1 of flutter-ds-widgetbook
 read_sections:
   - artifact_plan.planned[group=app_view]
   - technical_plan.view
@@ -1441,13 +1475,31 @@ Minimum coverage:
 4. `Error` (if applicable)
 5. `Populated`
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the app-screen Widgetbook use-case files. Expand the file array from `artifact_plan.planned[group=app_widgetbook]`:
+> **Preflight bootstrap.** `@widgetbook-developer` re-runs Step -1 of the
+> `flutter-ds-widgetbook` skill as a defensive check. In the normal flow the
+> DS phase (PHASE 4.3) already initialized Widgetbook, so this check must be a
+> no-op that only verifies the four signals. When PHASE 4.6 is entered in
+> isolation (rerun, `re_started`, or a workflow that skipped PHASE 4.3), the
+> bootstrap runs here and appends the bootstrap files reported by the agent to
+> the phase's `--output-file` set. A failing initialization reports
+> `phase-4-6-app-widgetbook` as `failed`; do not fall back to writing screen
+> use cases against an uninitialized project.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the app-screen Widgetbook use-case files **plus** any bootstrap files produced by Step -1 (usually empty here because PHASE 4.3 already initialized Widgetbook). Expand the file array from `artifact_plan.planned[group=app_widgetbook]`:
 
 ```bash
 APP_WIDGETBOOK_FLAGS=()
 while IFS= read -r f; do
   APP_WIDGETBOOK_FLAGS+=(--output-file "$f")
 done < <(yq -r '.artifact_plan.planned[] | select(.group=="app_widgetbook") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+# Optional: append bootstrap files when Step -1 initialized Widgetbook in
+# this phase (normally empty because PHASE 4.3 already handled it).
+if [ -f "${SPEC_PACKET_PATH}/evidence/widgetbook.bootstrap-files.txt" ]; then
+  while IFS= read -r f; do
+    APP_WIDGETBOOK_FLAGS+=(--output-file "$f")
+  done < "${SPEC_PACKET_PATH}/evidence/widgetbook.bootstrap-files.txt"
+fi
 
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
