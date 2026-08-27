@@ -27,6 +27,8 @@ Workflows que deben encadenar este workflow al cierre:
 - `[[calidad-generate-appium-screenplay-android]]`
 - `[[calidad-complete-deferred-locators]]`
 - `[[calidad-extend-appium-brownfield]]`
+- `[[calidad-generate-appium-wdio-greenfield]]`
+- `[[calidad-extend-appium-wdio-brownfield]]`
 - `[[generate-serenity-wdio-greenfield]]`
 - `[[extend-serenity-wdio-brownfield]]`
 
@@ -37,7 +39,7 @@ El workflow rector `[[calidad-route-test-generation]]` lo encadena automáticame
 Obligatorios:
 
 - `tests_path`: ruta al proyecto de tests recién generado/modificado.
-- `framework`: `karate` | `playwright` | `k6` | `appium` | `serenity-wdio`.
+- `framework`: `karate` | `playwright` | `k6` | `appium-serenity` | `appium-wdio` | `serenity-wdio`.
 - `mode`: `full` | `dry-run` | `scaffold-only` | `execute-only`.
 - `client_regulated` (boolean): si `true`, fuerza modo `dry-run` (ver `references/regulated-client-overrides.md` del skill).
 
@@ -57,7 +59,7 @@ Opcionales:
 
 ### Paso 2 — Salir temprano si `scaffold-only`
 
-- Reportar al humano los comandos de ejecución del framework correspondiente (`mvn test`, `npx playwright test`, `k6 run`, `./gradlew test`).
+- Reportar al humano los comandos de ejecución del framework correspondiente (`mvn test`, `npx playwright test`, `k6 run`, `./gradlew test`, `node ./scripts/run.mjs --mode=...`).
 - Estado final: `partial`.
 - Salir.
 
