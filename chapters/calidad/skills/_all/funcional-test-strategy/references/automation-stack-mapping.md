@@ -1,7 +1,7 @@
 
 # Mapeo de la estrategia a los stacks de automatización del chapter
 
-La estrategia decide QUÉ se automatiza y DÓNDE; los stacks ejecutan. Esta reference es el puente formal entre el stack funcional y los 4 de automatización.
+La estrategia decide QUÉ se automatiza y DÓNDE; los stacks ejecutan. Esta reference es el puente formal entre el stack funcional y los stacks de automatización.
 
 ## Matriz de decisión
 
@@ -10,7 +10,9 @@ La estrategia decide QUÉ se automatiza y DÓNDE; los stacks ejecutan. Esta refe
 | Reglas de negocio expuestas por API, contratos | Karate | Spec OpenAPI/Swagger/WSDL (con response schemas si pre-desarrollo) | Casos Gherkin de alto nivel → `.feature` casi literales |
 | SLAs de latencia/throughput, degradación | K6 | Spec + RNF/SLAs cuantificados | Los SLAs del plan/estrategia son los thresholds; escenarios de carga desde los flujos CRITICAL del risk map |
 | Flujos de usuario web, estados visibles | Playwright | Fuente UI (URL viva / Figma) + locator map si pre-desarrollo | Casos de flujo → specs; matrices pairwise → projects/parámetros |
-| Flujos en app Android | Appium | APK (o locator map + ejecución diferida) | Casos de flujo → features Screenplay |
+| Flujos en app Android (JVM, Screenplay/POM) | Appium Serenity | APK (o locator map + ejecución diferida) | Casos de flujo → features Screenplay |
+| Flujos mobile multi-plataforma en TypeScript | Appium WebdriverIO | APK/IPA (o locator map + ejecución diferida) | Casos de flujo → features cucumber-js |
+| Flujos web, web_movil, mobile (Android/iOS), desktop o api sobre un único arquetipo Cucumber | serenity-wdio | Fuente UI + locator map si pre-desarrollo (canales web/mobile/desktop); spec si canal api | Casos de flujo → features Gherkin multi-canal (`[[calidad-cucumber-bdd-conventions]]`) |
 | Capas transversales (a11y, seguridad, visual, SEO, contract) | vía [[calidad-transversal-capabilities]] | según capa | El risk map decide cuáles se activan con qué profundidad |
 | Lo no automatizable / exploratorio / UAT | manual | — | Charters y casos paso-a-paso ([[calidad-funcional-test-design]]) |
 

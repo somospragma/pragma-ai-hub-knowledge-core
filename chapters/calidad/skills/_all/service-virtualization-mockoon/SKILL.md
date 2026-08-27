@@ -12,12 +12,13 @@ tags: [mockoon, mock, service-virtualization, shift-left, openapi, soap, cli, de
 
 ## Cuándo aplicar
 
-Aplica cuando `[[calidad-sut-readiness-gate]]` resolvió `execution_target: mock | hybrid` y el mock requerido es a nivel de red/backend (API REST o SOAP). Cubre los cuatro stacks:
+Aplica cuando `[[calidad-sut-readiness-gate]]` resolvió `execution_target: mock | hybrid` y el mock requerido es a nivel de red/backend (API REST o SOAP). Cubre los stacks:
 
 - **Karate**: el mock es el SUT temporal; la suite completa corre contra él.
 - **K6**: el mock valida la construcción de los scripts (smoke 1:1); jamás métricas de carga.
 - **Playwright**: mock a nivel backend cuando `page.route()` no alcanza (webviews, tráfico que no pasa por el browser context, mock compartido con la suite Karate). `page.route()` sigue siendo la primera opción front-level — ver [[calidad-playwright-greenfield]] (consultar `references/execution-modes-live-mocked-hybrid.md` en su subfolder).
-- **Appium**: solo si el APK existe y permite override de base URL hacia el mock.
+- **Appium** (Serenity o WebdriverIO): solo si el APK existe y permite override de base URL hacia el mock.
+- **serenity-wdio**: mock a nivel backend para el canal `api`, o para `web`/`web_movil`/`movil` cuando el backend no está listo y el punto de configuración lo permite (mismo patrón que Playwright/Appium: mock compartido si aplica).
 
 **Por qué Mockoon**: open source MIT (todo lo necesario para CI es gratis; lo pago es Mockoon Cloud, que no se necesita), data file JSON único versionable en git, arranque directo desde OpenAPI, CRUD stateful con correlación de IDs, templating Faker con seed determinista, proxy mode para hybrid, CLI + Docker para CI. Alternativas solo en sus nichos: WireMock (verificación de invocaciones nativa, fault injection), Prism (validación estricta contra spec), MSW (front-end puro, inútil como SUT de red).
 

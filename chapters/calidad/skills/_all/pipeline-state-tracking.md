@@ -36,7 +36,7 @@ Pero la traza registra **fases**, no **historia**, y eso no alcanza. Verificado 
 - **Tras completar cada fase** del pipeline: actualizarla en el mismo turno en que la fase termina.
 - **Antes de emitir `[[calidad-delivery-gate-contract]]`**: el gate lee la traza y no se emite con fases obligatorias pendientes.
 
-Aplica a los 5 stacks (Karate, Playwright, K6, Appium, funcional); las fases cambian por ruta, el mecanismo no.
+Aplica a los stacks de automatización (Karate, Playwright, K6, Appium Serenity, Appium WebdriverIO, serenity-wdio) y a la ruta funcional; las fases cambian por ruta, el mecanismo no.
 
 ## Schema
 
@@ -167,7 +167,7 @@ Los rituales viven además en el steering `[[calidad-session-continuity-protocol
 
 | Ruta | Fases obligatorias |
 |---|---|
-| Automatización (los 4 stacks) | mandatory_inputs · [capability_map si brownfield] · sut_readiness_gate · strategy_approved · [mock_up · prototype_accepted si aplica] · scaffold_emitted · instrumentation_verified · preflight · smoke_gate · suite_executed · report_verified · triage_and_correction · executive_report · delivery_gate |
+| Automatización (todos los stacks) | mandatory_inputs · [capability_map si brownfield] · sut_readiness_gate · strategy_approved · [mock_up · prototype_accepted si aplica] · scaffold_emitted · instrumentation_verified · preflight · smoke_gate · suite_executed · report_verified · triage_and_correction · executive_report · delivery_gate |
 | Funcional | mandatory_inputs · insumos_analizados · [analysis · refinement_approved] o [design_traceability] o [strategy/plan_approved] · alm_write_confirmed · delivery_gate |
 
 Las fases de mock/prototipo solo existen si `execution_target != real`. `executive_report` se marca `skipped` con razón en modos `scaffold-only`/`dry-run`.

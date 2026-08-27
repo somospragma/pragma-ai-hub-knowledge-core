@@ -15,7 +15,7 @@ tags: [cucumber, bdd, gherkin, steps, tagging, multiplataforma, convenciones]
 
 Cuando el proyecto usa **Cucumber como orquestador único** de una suite que cubre varias plataformas o varios drivers a la vez: web y mobile, Android e iOS, teléfono y tablet, app nativa y navegador móvil. Es el caso de los arquetipos donde un solo `cucumber.config.js` (o `cucumber.json`, o el runner JVM equivalente) define perfiles por plataforma y todos comparten `features/`, hooks y World.
 
-Aplica sin importar qué librería mueve el driver debajo: Appium/WebdriverIO, Playwright usado como librería, Selenium o Karate. Lo que este skill gobierna es la **capa Cucumber**, que es la que se rompe primero cuando crecen las plataformas.
+Aplica sin importar qué librería mueve el driver debajo: Appium/WebdriverIO, Playwright usado como librería, Selenium, Karate o serenity-wdio (Cucumber 11 como orquestador único de sus cinco canales: web, web_movil, movil Android/iOS, desktop y api). Lo que este skill gobierna es la **capa Cucumber**, que es la que se rompe primero cuando crecen las plataformas.
 
 No aplica cuando el proyecto usa el runner nativo del framework (`@playwright/test` con `*.spec.ts`, Serenity con runner JUnit) y Gherkin no existe o es marginal. Para esos casos, las convenciones viven en el skill del stack correspondiente.
 
