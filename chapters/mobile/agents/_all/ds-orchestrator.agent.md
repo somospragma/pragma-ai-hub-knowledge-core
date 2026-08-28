@@ -787,3 +787,11 @@ executed (`skipped_by_input`).
   approval.
 - NEVER skip the aggregate approval gates listed in
   `Telemetry and Human Approval Gate`, even if `HUMAN_CHECKPOINT=false`.
+- ALWAYS load the corresponding workflow file into context before starting a
+  phase, and re-read that phase's **Response Contract** block (near the top of
+  the phase, marked `▶ Response Contract (non-negotiable)`). The Response
+  Contract binds the shape of your response for that phase. Do not summarize
+  or paraphrase the workflow doc; execute it.
+- ALWAYS end a phase response with the workflow's approval prompt block
+  (`He completado <PHASE> — <Name>. ¿Apruebas el resultado?` + the three
+  numbered options) verbatim, and yield. Do not continue past it.

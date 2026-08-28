@@ -767,3 +767,167 @@ exists:
 - ALWAYS register execution in the pipeline log (`PIPELINE_LOG_PATH`) if in pipeline context
 - ALWAYS use `AppConfig` for base URLs and API keys — data sources receive config via DI
 - ALWAYS note new environment variables needed in the feature report (add to `.env.example`)
+
+## Workflow Execution Contract (required)
+
+When this agent is the `entry_agent` of a workflow (`/new-feature`,
+`/refactor-feature`), it MUST honour the workflow's Response Contract on every
+phase. The Response Contract is embedded at the top of each phase in the
+workflow markdown as `▶ Response Contract (non-negotiable)` and binds the shape
+of the response.
+
+### Per-phase telemetry (non-negotiable)
+
+Every executed phase emits, exactly once per attempt:
+
+- `pragma-ai workflow report --status started` when the step begins (real shell
+  tool call — not narration).
+- `pragma-ai workflow report --status finished` on success, with one
+  `--output-file` flag per artifact declared in the phase's contract; or
+  `--status failed` on unrecoverable blocker (the workflow stops); or
+  `--status re_started` when the human rejects and the phase must be
+  regenerated.
+
+The `--step-id` and `--workflow-id` values are canonical: copy them
+character-for-character from the workflow's `Step IDs` list. Inventing,
+translating, abbreviating or paraphrasing them silently corrupts the run.
+
+Conditional phases (marked in the workflow with `only when <guard>`) run this
+full cycle only when their guard is true; otherwise skip the phase entirely
+and record `skipped_by_input` in `context.json`, `spec.yaml` and
+`PIPELINE_LOG_PATH`.
+
+### Per-phase human approval gate
+
+After every `finished`, present the workflow's approval prompt block in
+Spanish (`He completado <PHASE> — <Name>. ¿Apruebas el resultado?` plus the
+three numbered options: ✅ Aprobado / ✏️ Ediciones / ❌ Rechazado) VERBATIM as
+the last thing in the response, and yield. Silence is not approval.
+Continuing past the prompt without an explicit user answer is a workflow
+violation.
+
+### Aggregate approval checkpoints
+
+`/new-feature` and `/refactor-feature` layer aggregate gates on top of the
+per-step gate:
+
+| Workflow | Aggregate gate | Scope approved |
+|---|---|---|
+| `/new-feature` | Domain / Data / Presentation `sopp_gate` REQUIRED CHECKPOINT | The corresponding layer artifacts |
+| `/new-feature` | `checkpoint-final-build-review` | PHASE 0 → PHASE 7 |
+| `/refactor-feature` | `phase-4-checkpoint` | PHASE 0 → PHASE 3 |
+
+Aggregate gates never emit `--output-file` and never run a gap report; only
+their downstream file-producing phases do.
+
+### Gap report
+
+After every approved file-producing phase, run the two-phase gap report
+against the same `--step-id`:
+
+- **Phase A:** `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID"
+  --step-id <step-id>` to generate the diff report.
+- **Phase B:** `pragma-ai workflow gap-report ... --submit
+  --report-id <id> --summary "<summary or 'no changes'>"` to submit the
+  interpretation.
+
+Skip the gap report entirely on pre-flight gates, aggregate checkpoints
+(`checkpoint-final-build-review`, `phase-4-checkpoint`), and any step that
+ended `failed` or `skipped_by_input`.
+
+### Critical Rules (workflow discipline)
+
+- NEVER treat the workflow markdown as reference material — it is executable.
+  Every fenced `bash` block is a real shell tool call your agent MUST issue.
+- ALWAYS load the corresponding workflow file into context before starting a
+  phase, and re-read that phase's Response Contract block. Do not summarize
+  or paraphrase the workflow doc; execute it.
+- NEVER invent, translate, abbreviate, paraphrase, pluralize or re-case a
+  workflow step id. Copy it verbatim from the workflow's `Step IDs` table.
+- NEVER continue after a `finished` report without the explicit human answer
+  (Aprobado / Ediciones / Rechazado) at the per-step gate; silence is not
+  approval.
+- NEVER skip the aggregate approval gates listed above, even if a legacy
+  `HUMAN_CHECKPOINT` flag is set to false.
+
+## Workflow Execution Contract (required)
+
+When this agent is the `entry_agent` of a workflow (`/new-feature`,
+`/refactor-feature`), it MUST honour the workflow's Response Contract on every
+phase. The Response Contract is embedded at the top of each phase in the
+workflow markdown as `▶ Response Contract (non-negotiable)` and binds the shape
+of the response.
+
+### Per-phase telemetry (non-negotiable)
+
+Every executed phase emits, exactly once per attempt:
+
+- `pragma-ai workflow report --status started` when the step begins (real shell
+  tool call — not narration).
+- `pragma-ai workflow report --status finished` on success, with one
+  `--output-file` flag per artifact declared in the phase's contract; or
+  `--status failed` on unrecoverable blocker (the workflow stops); or
+  `--status re_started` when the human rejects and the phase must be
+  regenerated.
+
+The `--step-id` and `--workflow-id` values are canonical: copy them
+character-for-character from the workflow's `Step IDs` list. Inventing,
+translating, abbreviating or paraphrasing them silently corrupts the run.
+
+Conditional phases (marked in the workflow with `only when <guard>`) run this
+full cycle only when their guard is true; otherwise skip the phase entirely
+and record `skipped_by_input` in `context.json`, `spec.yaml` and
+`PIPELINE_LOG_PATH`.
+
+### Per-phase human approval gate
+
+After every `finished`, present the workflow's approval prompt block in
+Spanish (`He completado <PHASE> — <Name>. ¿Apruebas el resultado?` plus the
+three numbered options: ✅ Aprobado / ✏️ Ediciones / ❌ Rechazado) VERBATIM as
+the last thing in the response, and yield. Silence is not approval.
+Continuing past the prompt without an explicit user answer is a workflow
+violation.
+
+### Aggregate approval checkpoints
+
+`/new-feature` layers the following aggregate gates on top of the per-step
+gate, all enforced via `docs/scripts/sopp_gate.rb` where applicable:
+
+| Workflow | Aggregate gate | Scope approved |
+|---|---|---|
+| `/new-feature` | Domain / Data / Presentation `sopp_gate` REQUIRED CHECKPOINT | The corresponding layer artifacts |
+| `/new-feature` | `checkpoint-final-build-review` | PHASE 0 → PHASE 7 |
+| `/refactor-feature` | `phase-4-checkpoint` | PHASE 0 → PHASE 3 |
+
+Aggregate gates never emit `--output-file` and never run a gap report; only
+their downstream file-producing phases do.
+
+### Gap report
+
+After every approved file-producing phase, run the two-phase gap report
+against the same `--step-id`:
+
+- **Phase A:** `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID"
+  --step-id <step-id>` to generate the diff report.
+- **Phase B:** `pragma-ai workflow gap-report ... --submit
+  --report-id <id> --summary "<summary or 'no changes'>"` to submit the
+  interpretation.
+
+Skip the gap report entirely on pre-flight gates, aggregate checkpoints
+(`checkpoint-final-build-review`, `phase-4-checkpoint`), and any step that
+ended `failed` or `skipped_by_input`.
+
+### Critical Rules (workflow discipline)
+
+- NEVER treat the workflow markdown as reference material — it is executable.
+  Every fenced `bash` block is a real shell tool call your agent MUST issue.
+- ALWAYS load the corresponding workflow file into context before starting a
+  phase, and re-read that phase's Response Contract block. Do not summarize
+  or paraphrase the workflow doc; execute it.
+- NEVER invent, translate, abbreviate, paraphrase, pluralize or re-case a
+  workflow step id. Copy it verbatim from the workflow's `Step IDs` table.
+- NEVER continue after a `finished` report without the explicit human answer
+  (Aprobado / Ediciones / Rechazado) at the per-step gate; silence is not
+  approval.
+- NEVER skip the aggregate approval gates listed above, even if a legacy
+  `HUMAN_CHECKPOINT` flag is set to false.

@@ -1765,6 +1765,267 @@ def validate_language_policy(findings, cleared)
   end
 end
 
+# -----------------------------------------------------------------------------
+# Workflow Response Contract validation
+#
+# Every workflow markdown MUST declare, per phase, the telemetry calls
+# (`pragma-ai workflow report --status started` / `--status finished|failed`)
+# with valid `--step-id` and `--workflow-id`, plus the inline Response
+# Contract block and the Spanish approval prompt. The validator is analogous
+# to the sopp_gate and melos_workspace contract validators.
+# -----------------------------------------------------------------------------
+
+def workflow_step_ids_from_header(text)
+  match = text.match(/^\|\s*Step IDs\s*\|\s*(?<ids>.+?)\s*\|\s*$/)
+  return [] unless match
+
+  match[:ids].scan(/`([^`]+)`/).flatten
+end
+
+def workflow_phase_sections(text)
+  lines = text.lines
+  starts = []
+  in_fence = false
+
+  # First pass: locate real (top-level) headings that mark phases or gates.
+  # Ignore headings inside fenced code blocks (e.g. markdown examples nested
+  # inside ```markdown ... ``` fences).
+  lines.each_with_index do |line, idx|
+    if line.match?(/^```/)
+      in_fence = !in_fence
+      next
+    end
+    next if in_fence
+
+    match = line.match(/^(?<hashes>##+)\s+(?<title>.+?)\s*$/)
+    next unless match
+
+    hashes = match[:hashes]
+    title = match[:title]
+
+    is_phase_or_gate =
+      title.start_with?("PHASE ") ||
+      title.start_with?("Gate ") ||
+      title.start_with?("HUMAN CHECKPOINT") ||
+      (hashes.length == 2 && title.match?(/Gate\s+\(required\)$/))
+
+    next unless is_phase_or_gate
+
+    starts << { idx: idx, level: hashes.length, heading: title }
+  end
+
+  starts.each_with_index.map do |section, _i|
+    # Re-establish fence state at the section start, then walk forward looking
+    # for the next same-or-higher-level heading outside any fence.
+    fence = false
+    lines[0...section[:idx]].each do |l|
+      fence = !fence if l.match?(/^```/)
+    end
+
+    end_idx = lines.size
+    (section[:idx] + 1...lines.size).each do |j|
+      if lines[j].match?(/^```/)
+        fence = !fence
+        next
+      end
+      next if fence
+
+      m = lines[j].match(/^(?<hashes>##+)\s+/)
+      next unless m
+      if m[:hashes].length <= section[:level]
+        end_idx = j
+        break
+      end
+    end
+
+    {
+      heading: section[:heading],
+      body: lines[section[:idx]...end_idx].join,
+      start_line: section[:idx] + 1
+    }
+  end
+end
+
+def workflow_bash_report_calls(section_body)
+  calls = []
+  section_body.scan(/```bash\n(.*?)```/m).flatten.each do |block|
+    # Collapse `\` line continuations to a single logical line.
+    normalized = block.gsub(/\\\n\s*/, " ")
+    normalized.each_line do |line|
+      next unless line.match?(/pragma-ai\s+workflow\s+report/)
+
+      calls << {
+        step_id: line[/--step-id\s+(\S+)/, 1],
+        workflow_id: line[/--workflow-id\s+(\S+)/, 1],
+        status: line[/--status\s+(\S+)/, 1]
+      }
+    end
+  end
+  calls
+end
+
+# The approval prompt lives inside a fenced code block within an outer
+# blockquote, so each line is prefixed with `>` and inner whitespace. Match
+# with tolerance for zero or more `>` blockquote markers plus inner spacing.
+WORKFLOW_APPROVAL_PROMPT_MARKERS = [
+  /^\s*(?:>\s*)*He completado /,
+  /^\s*(?:>\s*)*1\.\s*✅ Aprobado — continuar/,
+  /^\s*(?:>\s*)*2\.\s*✏️ Ediciones — dime qué cambiar/,
+  /^\s*(?:>\s*)*3\.\s*❌ Rechazado — regenerar desde cero/
+].freeze
+
+def workflow_response_contract_present?(section_body)
+  head = section_body.lines.first(40).join
+  head.include?("▶ Response Contract (non-negotiable)")
+end
+
+def workflow_approval_prompt_present?(section_body)
+  WORKFLOW_APPROVAL_PROMPT_MARKERS.all? { |re| section_body.match?(re) }
+end
+
+def workflow_execute_now_before_started?(section_body)
+  lines = section_body.lines
+  lines.each_with_index do |line, idx|
+    next unless line.strip.start_with?("```bash")
+
+    close_idx = idx
+    (idx + 1...lines.size).each do |j|
+      if lines[j].strip == "```"
+        close_idx = j
+        break
+      end
+    end
+    block = lines[idx..close_idx].join
+    next unless block.include?("--status started")
+
+    window = lines[[idx - 8, 0].max...idx].join
+    return false unless window.include?("⚡ **EXECUTE NOW")
+  end
+  true
+end
+
+def validate_workflow_response_contract(findings, cleared)
+  required_sections = [
+    "## Workflow Execution Contract",
+    "## Instructions to the executing agent",
+    "## Response Contract Violations"
+  ]
+  legacy_residues = [
+    "NON-NEGOTIABLE RULE:",
+    "MANDATORY** — Report `started` when the step begins"
+  ]
+  issues = []
+
+  Dir["chapters/mobile/workflows/_all/*.workflow.md"].sort.each do |path|
+    workflow = File.basename(path, ".workflow.md")
+    text = File.read(path)
+    metadata = workflow_frontmatter(path)
+    workflow_id = metadata["id"]
+
+    required_sections.each do |header|
+      unless text.include?("\n#{header}\n") || text.start_with?("#{header}\n")
+        issues << "#{workflow}: missing required section #{header.inspect}"
+      end
+    end
+
+    legacy_residues.each do |residue|
+      issues << "#{workflow}: legacy residue found: #{residue.inspect}" if text.include?(residue)
+    end
+
+    declared_ids = workflow_step_ids_from_header(text)
+    if declared_ids.empty?
+      issues << "#{workflow}: could not parse the `Step IDs` row of the Telemetry metadata table"
+      next
+    end
+
+    sections = workflow_phase_sections(text)
+    if sections.empty?
+      issues << "#{workflow}: no PHASE / Gate / HUMAN CHECKPOINT sections detected"
+      next
+    end
+
+    seen_step_ids = []
+    sections.each do |section|
+      heading = section[:heading].strip
+      body = section[:body]
+      loc = "#{workflow}::'#{heading}' (line ~#{section[:start_line]})"
+
+      calls = workflow_bash_report_calls(body)
+      section_step_ids = calls.map { |c| c[:step_id] }.compact.uniq
+
+      # A section counts as a "tracked phase" only when it emits at least one
+      # pragma-ai workflow report call referencing a declared step-id. That
+      # captures every real PHASE / Gate step and excludes narrative gates
+      # like `HUMAN CHECKPOINT (Required)` in bootstrap-workspace or the
+      # `Gate — Topology (mandatory)` block that explicitly documents itself
+      # as not tracked by telemetry. Missing telemetry on a phase that
+      # SHOULD be tracked surfaces later via the orphan step-id check.
+      tracked = calls.any? && (section_step_ids & declared_ids).any?
+      unless tracked
+        section_step_ids.each { |id| seen_step_ids << id if declared_ids.include?(id) }
+        next
+      end
+
+      unless workflow_response_contract_present?(body)
+        issues << "#{loc}: missing '> ### ▶ Response Contract (non-negotiable)' block"
+      end
+
+      unless workflow_approval_prompt_present?(body)
+        issues << "#{loc}: missing Spanish approval prompt (all four canonical lines: 'He completado …', '✅ Aprobado — continuar', '✏️ Ediciones — dime qué cambiar', '❌ Rechazado — regenerar desde cero')"
+      end
+
+      started_calls = calls.select { |c| c[:status] == "started" }
+      terminal_calls = calls.select { |c| %w[finished failed re_started].include?(c[:status]) }
+
+      if started_calls.empty?
+        issues << "#{loc}: missing 'pragma-ai workflow report --status started' invocation"
+      end
+      if terminal_calls.empty?
+        issues << "#{loc}: missing terminal telemetry call (--status finished, failed or re_started)"
+      end
+
+      if section_step_ids.size > 1
+        issues << "#{loc}: multiple step-ids referenced in the same phase section: #{section_step_ids.join(', ')}"
+      end
+      section_step_ids.each do |id|
+        unless declared_ids.include?(id)
+          issues << "#{loc}: --step-id #{id.inspect} is not declared in the Step IDs table"
+        end
+        seen_step_ids << id
+      end
+
+      section_workflow_ids = calls.map { |c| c[:workflow_id] }.compact.uniq
+      section_workflow_ids.each do |wid|
+        unless wid == workflow_id
+          issues << "#{loc}: --workflow-id #{wid.inspect} does not match frontmatter id #{workflow_id.inspect}"
+        end
+      end
+
+      unless started_calls.empty? || workflow_execute_now_before_started?(body)
+        issues << "#{loc}: a '--status started' bash block is not preceded by the '⚡ **EXECUTE NOW**' marker"
+      end
+    end
+
+    (declared_ids - seen_step_ids).each do |orphan|
+      issues << "#{workflow}: declared Step ID #{orphan.inspect} has no phase section implementing it"
+    end
+  end
+
+  if issues.empty?
+    cleared << "Workflow Response Contracts and per-phase telemetry calls are complete for every phase"
+  else
+    add(
+      findings,
+      "CRITICAL",
+      "WORKFLOW_RESPONSE_CONTRACT_DRIFT",
+      "Workflow markdowns must declare Response Contract, telemetry calls and step-id integrity per phase",
+      issues.join("\n")
+    )
+  end
+rescue StandardError => e
+  add(findings, "CRITICAL", "WORKFLOW_RESPONSE_CONTRACT_ERROR", "Unable to validate workflow response contracts", e.message)
+end
+
 parse_all_structured_files(findings, cleared)
 validate_no_legacy_refs(findings, cleared)
 validate_no_source_root_refs(findings, cleared)
@@ -1779,6 +2040,7 @@ validate_platform_storage_boundary(findings, cleared)
 validate_examples_location(findings, cleared)
 validate_overlay_catalog(findings, cleared)
 validate_invocation_contracts(findings, cleared)
+validate_workflow_response_contract(findings, cleared)
 validate_semantics(findings, cleared)
 validate_language_policy(findings, cleared)
 
