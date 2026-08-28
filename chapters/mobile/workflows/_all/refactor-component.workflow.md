@@ -1,6 +1,6 @@
 ---
 id: refactor-component
-version: 1.3.0
+version: 1.3.1
 scope: chapter
 type: workflow
 chapter: mobile
@@ -18,7 +18,7 @@ description: >
 |---|---|
 | `workflow-id` | `refactor-component` |
 | `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
-| Step IDs | `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-2-5-validation-human-review`, `phase-3-apply-changes`, `phase-3-5-audit`, `phase-4a-widget-tests`, `phase-4b-golden-tests`, `phase-5-delivery` |
+| Step IDs | `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-2-1-validation-human-review`, `phase-3-apply-changes`, `phase-3-1-audit`, `phase-4-1-widget-tests`, `phase-4-2-golden-tests`, `phase-5-delivery` |
 
 > **NON-NEGOTIABLE RULE:** Every `pragma-ai workflow ...` command in this document is **MANDATORY** to execute. The agent MUST run them — they are not suggestions or documentation.
 
@@ -29,10 +29,10 @@ description: >
 > - If a step-id you need is not in the list, STOP and ask the user — do not fabricate one.
 > - The CLI rejects unknown step-ids; a wrong id silently corrupts the run's telemetry.
 
-> Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document). PHASE 2.5 is the domain aggregate approval gate for the planning set (PHASE 0 through PHASE 2).
+> Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document). PHASE 2.1 is the domain aggregate approval gate for the planning set (PHASE 0 through PHASE 2).
 > **The Topology gate is excluded from telemetry.** It runs before the workflow instance is minted and stops the run with `blocked_input` when it fails (no telemetry emitted).
-> The **gap report only runs on steps that produce output files** (`--output-file`). `phase-2-5-validation-human-review` does NOT run a gap report.
-> `phase-4b-golden-tests` is conditional: emit telemetry only when the plan/audit classifies the refactor as having visual impact. Otherwise skip the phase entirely.
+> The **gap report only runs on steps that produce output files** (`--output-file`). `phase-2-1-validation-human-review` does NOT run a gap report.
+> `phase-4-2-golden-tests` is conditional: emit telemetry only when the plan/audit classifies the refactor as having visual impact. Otherwise skip the phase entirely.
 > Commands assume the shell's cwd is already the project root — no `cd` prefix is needed, and `--project-dir` only matters when running from elsewhere.
 
 ---
@@ -233,7 +233,7 @@ pragma-ai workflow report \
   --output-file "${SPEC_PACKET_PATH}/spec.yaml"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.5.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.1.
 
 ---
 
@@ -333,7 +333,7 @@ pragma-ai workflow report \
   "${REFACTOR_FILE_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.5.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.1.
 
 ---
 
@@ -375,7 +375,7 @@ pragma-ai workflow report \
   --output-file "${SPEC_PACKET_PATH}/evidence/audit-report.md"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4a.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.1.
 
 ---
 
@@ -416,13 +416,13 @@ done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widget_tests") | .
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4a-widget-tests \
+  --step-id phase-4-1-widget-tests \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/widget-tests.md" \
   "${DS_TEST_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4b (only when the refactor has visual impact) or directly to PHASE 5.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.2 (only when the refactor has visual impact) or directly to PHASE 5.
 
 ---
 
@@ -465,7 +465,7 @@ done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_golden_tests") | .
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4b-golden-tests \
+  --step-id phase-4-2-golden-tests \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/golden-tests.md" \
   "${DS_GOLDEN_FLAGS[@]}"
@@ -553,7 +553,7 @@ Agent: I've completed [step name]. Do you approve the result?
 - **If edits are requested:** Apply the changes in place on the artifact, keep `finished` (the baseline is already captured), and re-present for approval. The gap report will capture those edits as the diff against the agent's first draft.
 - **If rejected:** Report `re_started`, regenerate the artifact from scratch, report `finished` again (recapturing the baseline), and restart the gate. Repeat until approved.
 
-> **PHASE 2.5 aggregate rejection.** When PHASE 2.5 hosts the plan-approval decision, a rejection of a specific planning section (current state, impact analysis, inventory, artifact plan, technical plan, success criteria, handoffs) must first replay the phase that owns that section: report `re_started` on the affected earlier phase (PHASE 1 or PHASE 2), regenerate its output, report `finished` again with the same `--output-file` set, re-run that phase's gap report, and then report `re_started` → `finished` on PHASE 2.5 itself before re-entering this gate. Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
+> **PHASE 2.1 aggregate rejection.** When PHASE 2.1 hosts the plan-approval decision, a rejection of a specific planning section (current state, impact analysis, inventory, artifact plan, technical plan, success criteria, handoffs) must first replay the phase that owns that section: report `re_started` on the affected earlier phase (PHASE 1 or PHASE 2), regenerate its output, report `finished` again with the same `--output-file` set, re-run that phase's gap report, and then report `re_started` → `finished` on PHASE 2.1 itself before re-entering this gate. Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
 
 > ⚡ **MANDATORY** — On rejection, example using `phase-3-apply-changes`:
 
@@ -588,8 +588,8 @@ pragma-ai workflow report \
 ## Gap calculation & reporting (per step)
 
 > ⚡ **MANDATORY only for steps with output files.** In this workflow:
-> `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-3-apply-changes`, `phase-3-5-audit`, `phase-4a-widget-tests`, `phase-4b-golden-tests` (only when executed), `phase-5-delivery`.
-> `phase-2-5-validation-human-review` does NOT run a gap report. The Topology gate is not tracked by telemetry at all.
+> `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-3-apply-changes`, `phase-3-1-audit`, `phase-4-1-widget-tests`, `phase-4-2-golden-tests` (only when executed), `phase-5-delivery`.
+> `phase-2-1-validation-human-review` does NOT run a gap report. The Topology gate is not tracked by telemetry at all.
 
 > Run this immediately after the corresponding step's approval gate passes — not batched at the end of the workflow.
 
@@ -628,11 +628,11 @@ pragma-ai workflow status "$INSTANCE_ID"
 | Command | When |
 |---|---|
 | `pragma-ai workflow create --workflow-id refactor-component --user-story-id <id>` | At the start, once (Setup) |
-| `pragma-ai workflow report ... --step-id <step> --status started` | When each executed phase begins (PHASE 0–5; `phase-4b-golden-tests` only when the refactor has visual impact) |
-| `pragma-ai workflow report ... --step-id phase-2-5-validation-human-review --status finished` | On completion of the validation + human review phase (no `--output-file`) |
-| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of file-producing phases: `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-3-apply-changes`, `phase-3-5-audit`, `phase-4a-widget-tests`, `phase-4b-golden-tests` (when executed), `phase-5-delivery` |
-| `pragma-ai workflow report ... --step-id <step> --status failed` | When `phase-2-5-validation-human-review` cannot validate, `phase-3-5-audit` hits an unresolvable blocker, widget/golden tests can't pass (`phase-4a-widget-tests`, `phase-4b-golden-tests`), or delivery preconditions fail (`phase-5-delivery`) — the workflow stops |
-| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 2.5 aggregate rejection) |
+| `pragma-ai workflow report ... --step-id <step> --status started` | When each executed phase begins (PHASE 0–5; `phase-4-2-golden-tests` only when the refactor has visual impact) |
+| `pragma-ai workflow report ... --step-id phase-2-1-validation-human-review --status finished` | On completion of the validation + human review phase (no `--output-file`) |
+| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of file-producing phases: `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-3-apply-changes`, `phase-3-1-audit`, `phase-4-1-widget-tests`, `phase-4-2-golden-tests` (when executed), `phase-5-delivery` |
+| `pragma-ai workflow report ... --step-id <step> --status failed` | When `phase-2-1-validation-human-review` cannot validate, `phase-3-1-audit` hits an unresolvable blocker, widget/golden tests can't pass (`phase-4-1-widget-tests`, `phase-4-2-golden-tests`), or delivery preconditions fail (`phase-5-delivery`) — the workflow stops |
+| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 2.1 aggregate rejection) |
 | `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID" --step-id <step>` | Phase A: after the corresponding file-producing step is approved |
 | `pragma-ai workflow gap-report ... --submit --report-id <id> --summary "<text>"` | Phase B: immediately after Phase A, for the same step |
 | `pragma-ai workflow list --user-story-id "$USER_STORY_ID"` | Check overall progress (any time) |
