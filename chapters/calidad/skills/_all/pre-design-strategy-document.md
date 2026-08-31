@@ -4,7 +4,7 @@ version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "STRATEGY.md design-doc obligatorio aprobado por el usuario ANTES de generar código de tests. Aplica a los 4 stacks en greenfield; delta-strategy en brownfield."
+description: "STRATEGY.md design-doc obligatorio aprobado por el usuario ANTES de generar código de tests. Aplica a los 5 stacks en greenfield; delta-strategy en brownfield."
 tags: [pre-design, strategy, mandatory, universal, gate]
 enforcement: mandatory
 ---
@@ -13,7 +13,7 @@ enforcement: mandatory
 
 Principio universal del chapter calidad: **NUNCA se genera código de tests sin un `STRATEGY.md` aprobado explícitamente por el usuario**. El `STRATEGY.md` es el design doc que precede a templates, scaffolds y prompts. El agente lo redacta a partir de los inputs mandatorios y del análisis del SUT, lo presenta al usuario, e itera hasta que el usuario emite la palabra "aprobado" (o equivalente).
 
-Aplica a los 4 stacks (Karate, Playwright, K6, Appium) en greenfield. En brownfield, el documento puede simplificarse a un "delta-strategy" focalizado en lo nuevo.
+Aplica a los 5 stacks (Karate, Playwright, K6, Appium, serenity-wdio) en greenfield. En brownfield, el documento puede simplificarse a un "delta-strategy" focalizado en lo nuevo.
 
 ## Reglas de operación
 
@@ -94,6 +94,7 @@ Esta sección la rellena el `STRATEGY.md` del stack específico:
 - Playwright: pages identificadas, `mock_mode`, priorities por página, mock_endpoints, auth strategy.
 - K6: 3 escenarios obligatorios (baseline / load / stress) + opt-in spike/soak, executor por escenario, workload, auth strategy.
 - Appium: capabilities, device matrix, screens identificadas, locator strategy (auto-discovery vs deferred), app_package / app_activity.
+- serenity-wdio: plataformas en scope (`web`, `web_movil`, `movil`, `desktop`, `api`), modos y configs correspondientes, capabilities (para mobile: Bundle ID / app_package verificado), locator strategy (`PageElement`+`By` para web, selectores string para mobile), Screenplay conventions (Tasks/Interactions/Questions), datos de prueba por módulo. En brownfield: delta-strategy enfocado en lo nuevo; no rediseñar infraestructura existente (`configs/`, `scripts/run.mjs`, `.env.*`).
 
 ## Regla anti-cheating
 

@@ -1,22 +1,22 @@
-# Mocking de dependencias
+# Mocking dependencies
 
-Catalogar un widget que tiene dependencias externas (providers, servicios, repositorios) requiere una estrategia explícita. Hay dos enfoques; elegir según el tipo de widget.
+Cataloging a widget that has external dependencies (providers, services, repositories) requires an explicit strategy. There are two approaches; choose based on the type of widget.
 
-## Cuándo usar cada enfoque
+## When to use each approach
 
-| Situación | Enfoque |
+| Situation | Approach |
 |---|---|
-| El widget recibe datos como parámetros pero internamente consulta un provider | **Extracción** — extraer la dependencia a un parámetro |
-| El widget es una *pantalla completa* que consume providers y no se puede refactorizar | **Mocking con librería** — inyectar el provider mockeado en el árbol |
-| El widget es un componente reutilizable simple | **Hardcodear valores** directo en el use case (sin provider) |
+| The widget receives data as parameters but internally reads a provider | **Extraction** — extract the dependency into a parameter |
+| The widget is a *full screen* that consumes providers and cannot be refactored | **Library mocking** — inject the mocked provider into the tree |
+| The widget is a simple reusable component | **Hardcode values** directly in the use case (no provider) |
 
 ---
 
-## Enfoque I: Extracción
+## Approach I: Extraction
 
-La forma más sencilla: extraer la dependencia al constructor del widget y pasarla directamente en el use case. Cambia el árbol del widget pero hace el componente más testeable y portable.
+The simplest way: extract the dependency into the widget's constructor and pass it directly in the use case. It changes the widget tree but makes the component more testable and portable.
 
-**Widget original (con dependencia interna):**
+**Original widget (with an internal dependency):**
 ```dart
 class UserTile extends StatelessWidget {
   @override
@@ -28,7 +28,7 @@ class UserTile extends StatelessWidget {
 }
 ```
 
-**Widget refactorizado (dependencia extraída):**
+**Refactored widget (dependency extracted):**
 ```dart
 class UserTile extends StatelessWidget {
   const UserTile({super.key, required this.user});
@@ -39,11 +39,11 @@ class UserTile extends StatelessWidget {
 }
 ```
 
-**Use case con extracción:**
+**Use case with extraction:**
 ```dart
 @UseCase(name: 'default', type: UserTile)
 Widget buildUserTileUseCase(BuildContext context) {
-  final user = context.knobs.string(label: 'user', initialValue: 'Ana García');
+  final user = context.knobs.string(label: 'user', initialValue: 'Ana Garcia');
 
   context.setCodePreview('''
 UserTile(
@@ -54,7 +54,7 @@ UserTile(
 }
 ```
 
-**Árbol resultante en Widgetbook:**
+**Resulting tree in Widgetbook:**
 ```
 WidgetbookApp
 └── UserTile
@@ -63,11 +63,11 @@ WidgetbookApp
 
 ---
 
-## Enfoque II: Mocking con librería (mocktail)
+## Approach II: Library mocking (mocktail)
 
-Cuando el widget es una pantalla completa que depende de providers y no es viable refactorizarla, inyectar el provider mockeado directamente en el árbol del use case.
+When the widget is a full screen that depends on providers and refactoring it is not feasible, inject the mocked provider directly into the use case tree.
 
-### Paso 1 — Agregar `mocktail` al `pubspec.yaml` del widgetbook
+### Step 1 — Add `mocktail` to the widgetbook's `pubspec.yaml`
 
 ```yaml
 dependencies:
@@ -75,9 +75,9 @@ dependencies:
   mocktail: ^1.0.0
 ```
 
-> `mocktail` va en `dependencies` (no `dev_dependencies`) porque el widgetbook completo es una herramienta de desarrollo; no se incluye en el build de producción de la app.
+> `mocktail` goes under `dependencies` (not `dev_dependencies`) because the entire widgetbook is a development tool; it is not included in the app's production build.
 
-### Paso 2 — Crear el mock y usarlo en el use case
+### Step 2 — Create the mock and use it in the use case
 
 ```dart
 import 'package:flutter/material.dart';
@@ -89,12 +89,12 @@ import 'package:my_app/features/home/home_screen.dart';
 import 'package:my_app/providers/user_provider.dart';
 import '../../../shared/code_preview_addon.dart';
 
-// Mock definido a nivel de archivo (fuera del use case)
+// Mock defined at file level (outside the use case)
 class MockUserProvider extends Mock implements UserProvider {}
 
 @UseCase(name: 'default', type: HomeScreen)
 Widget buildHomeScreenUseCase(BuildContext context) {
-  final userName = context.knobs.string(label: 'userName', initialValue: 'Ana García');
+  final userName = context.knobs.string(label: 'userName', initialValue: 'Ana Garcia');
   final isAuthenticated = context.knobs.boolean(label: 'isAuthenticated', initialValue: true);
 
   context.setCodePreview('''
@@ -112,10 +112,10 @@ HomeScreen()''');
 }
 ```
 
-**Árbol resultante en Widgetbook:**
+**Resulting tree in Widgetbook:**
 ```
 WidgetbookApp
-└── MockUserProvider     ← provider mockeado inyectado por el use case
+└── MockUserProvider     ← mocked provider injected by the use case
     └── HomeScreen
         └── Consumer<UserProvider>
             └── Text
@@ -123,9 +123,9 @@ WidgetbookApp
 
 ---
 
-## Mocking de múltiples dependencias
+## Mocking multiple dependencies
 
-Cuando una pantalla depende de varios providers, apilarlos con `MultiProvider`:
+When a screen depends on several providers, stack them with `MultiProvider`:
 
 ```dart
 class MockAuthProvider extends Mock implements AuthProvider {}
@@ -133,7 +133,7 @@ class MockCartProvider extends Mock implements CartProvider {}
 
 @UseCase(name: 'default', type: CheckoutScreen)
 Widget buildCheckoutScreenUseCase(BuildContext context) {
-  final userName = context.knobs.string(label: 'userName', initialValue: 'Carlos López');
+  final userName = context.knobs.string(label: 'userName', initialValue: 'Carlos Lopez');
   final itemCount = context.knobs.int.input(label: 'itemCount', initialValue: 3);
   final total = context.knobs.double.input(label: 'total', initialValue: 129.99);
 
@@ -165,16 +165,16 @@ CheckoutScreen()''');
 
 ---
 
-## Mocking de repositorios y servicios (sin provider)
+## Mocking repositories and services (no provider)
 
-Para widgets que inyectan repositorios o servicios directamente por constructor:
+For widgets that inject repositories or services directly through the constructor:
 
 ```dart
 class MockProductRepository extends Mock implements ProductRepository {}
 
 @UseCase(name: 'default', type: ProductDetailScreen)
 Widget buildProductDetailScreenUseCase(BuildContext context) {
-  final title = context.knobs.string(label: 'title', initialValue: 'Zapatillas Runner Pro');
+  final title = context.knobs.string(label: 'title', initialValue: 'Runner Pro Sneakers');
   final price = context.knobs.double.input(label: 'price', initialValue: 89.99);
 
   final repo = MockProductRepository();
@@ -197,11 +197,11 @@ ProductDetailScreen(
 
 ---
 
-## Reglas
+## Rules
 
-- Los mocks se declaran **a nivel de archivo**, fuera del método del use case, para que sean reutilizables entre variantes del mismo widget.
-- Usar `when(() => mock.property).thenReturn(value)` para stubear propiedades síncronas.
-- Usar `when(() => mock.method(any())).thenAnswer((_) async => value)` para métodos async.
-- Los valores stubeados **deben estar conectados a knobs** siempre que sean útiles para exploración interactiva.
-- Nunca depender del árbol real de la app ni de providers registrados globalmente — el use case debe ser completamente autónomo.
-- `mocktail` va en `dependencies` (no `dev_dependencies`) del `widgetbook_[appname]/pubspec.yaml`.
+- Mocks are declared **at file level**, outside the use case method, so they can be reused across variants of the same widget.
+- Use `when(() => mock.property).thenReturn(value)` to stub synchronous properties.
+- Use `when(() => mock.method(any())).thenAnswer((_) async => value)` for async methods.
+- Stubbed values **should be wired to knobs** whenever they are useful for interactive exploration.
+- Never depend on the app's real tree or on globally registered providers — the use case must be fully self-contained.
+- `mocktail` goes under `dependencies` (not `dev_dependencies`) in `widgetbook_[appname]/pubspec.yaml`.

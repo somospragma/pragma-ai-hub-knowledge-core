@@ -35,11 +35,11 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 | `intent`       | Obligatorio                                     | Texto en lenguaje natural que describe qué quiere el usuario                                      | Insumo de `[[calidad-intent-detection]]` para elegir framework                                               |
 | `project_name` | Obligatorio                                     | Nombre del proyecto en **kebab-case**                                                             | Nombre de carpetas, artefactos Maven/npm, identificadores en reportes                                        |
 | `output_path`  | Obligatorio                                     | Ruta **absoluta** del directorio donde se escriben los archivos                                   | Destino del streaming de archivos (`[[calidad-streaming-files-protocol]]`)                                   |
-| `spec`         | Obligatorio (Karate/K6)                         | **Contenido COMPLETO** del OpenAPI/Swagger/WSDL (no la ruta del archivo)                          | Input de `[[calidad-spec-validation]]`; fuente única para endpoints, schemas y auth                          |
-| `base_url`     | A veces obligatorio                             | Base URL del servicio                                                                             | Necesario si el spec **no** lo declara (algunos Swagger 2.0 sin `host`, WSDL sin `<soap:address>` accesible) |
+| `spec`         | Obligatorio (Karate/K6); `ui_source` o `base_url` obligatorio en serenity-wdio modo `web`/`api` | **Contenido COMPLETO** del OpenAPI/Swagger/WSDL (no la ruta del archivo) | Input de `[[calidad-spec-validation]]`; fuente única para endpoints, schemas y auth                          |
+| `base_url`     | A veces obligatorio                             | Base URL del servicio                                                                             | Necesario si el spec **no** lo declara (algunos Swagger 2.0 sin `host`, WSDL sin `<soap:address>` accesible); en serenity-wdio es la URL del SUT (`APP_URL` en `.env.web`) |
 | `user_story`   | Opcional (recomendado · obligatorio en Karate brownfield cuando el cliente impone convenciones cliente-específicas) | Historia de usuario (formato Gherkin libre o As-a/I-want/So-that) con criterios de aceptación   | Naming de escenarios, prioridad de endpoints, criterios negativos                                            |
 | `firma`        | Opcional (altamente recomendado)                | Documento técnico del servicio: reglas de negocio, ejemplos de datos reales, terminología, SLAs   | Enriquecimiento de payloads, escenarios `@negative`, vocabulario en nombres de escenarios                    |
-| `extra_params` | Opcional                                        | JSON con parámetros framework-specific                                                            | Ej.: `{"include_login_case": true}` para Appium, `{"thresholds": {"http_req_duration": "p(95)<500"}}` para K6 |
+| `extra_params` | Opcional                                        | JSON con parámetros framework-specific                                                            | Ej.: `{"include_login_case": true}` para Appium, `{"thresholds": {"http_req_duration": "p(95)<500"}}` para K6, `{"platform_context": "movil", "platform_name": "android"}` para serenity-wdio |
 | `sut_available` | Obligatorio (pregunta sí/parcial/no)           | ¿El desarrollo está desplegado y accesible?                                                       | Resuelve `execution_target: real | hybrid | mock` vía `[[calidad-sut-readiness-gate]]` (paso 1.5 del router)  |
 | `data_available` | Obligatorio (**no es sí/no**: matriz de suficiencia) | ¿Existen los datos **en el estado que exige cada escenario planificado**? | Resuelve `data_strategy: real \| synthetic` (`[[calidad-test-data-management]]`) y produce la lista de lo que el QA debe gestionar, con dueño y fecha |
 | `locator_map`  | Condicional (front/mobile; **obligatorio** si `execution_target != real`) | Mapeo acordado QA+dev de identificadores UI (`data-testid` / accessibility ids)  | Fuente única de selectores pre-desarrollo; formato y contrato en `[[calidad-ui-locator-map-contract]]`        |
@@ -114,6 +114,21 @@ Cruce con la `user_story` de esta tabla: si la HU entregada como input de automa
 Para proyectos K6, además de los inputs base de la tabla anterior, el agente DEBE completar el checklist K6-específico (perfil de carga por escenario, dependencias externas, disponibilidad objetivo, data de prueba, endpoint objetivo vs auxiliares, volumen esperado, restricciones de ambiente). Ver [[calidad-k6-greenfield]] (consultar `references/k6-discovery-checklist.md`).
 
 Sin este checklist, K6 no puede generar `options.stages` ni `options.thresholds` defendibles y debe degradar a `scaffold-only`.
+
+### serenity-wdio-specific inputs
+
+Para proyectos serenity-wdio, además de los inputs base, el agente DEBE recolectar los inputs adicionales según el `platform_context` declarado. Detalle completo en `[[serenity-wdio-greenfield]]` (reference `mandatory-inputs.md`).
+
+| Input adicional | Cuándo es obligatorio | Descripción |
+|---|---|---|
+| `platform_context` | Siempre | `web \| web_movil \| movil \| desktop \| api` — nunca asumir; preguntar si no está declarado |
+| `base_url` / `APP_URL` | Modo `web`, `web_movil`, `api` | URL del SUT; va a `.env.<modo>` |
+| `platform_name` | Modo `movil` | `android \| ios` |
+| `app` | Modo `movil` preferido | Ruta absoluta al binario (`.apk`, `.app`, `.ipa`); permite que Appium deduzca identificadores |
+| `app_package` + `app_activity` | Modo `movil` Android sin `app` | Verificar contra el binario real con `aapt`; nunca inventar |
+| `bundle_id` | Modo `movil` iOS sin `app` | Leer desde `Info.plist` con `PlistBuddy`; nunca inventar |
+
+**Regla crítica de serenity-wdio:** el `bundle_id` / `app_package` es la causa número uno de fallos al arrancar Appium. Si el usuario no provee la ruta al binario ni los identificadores verificados, bloquear y pedir antes de generar cualquier config `wdio.movil.*.conf.ts`.
 
 ## Overrides por convenciones cliente-específicas
 

@@ -4,7 +4,7 @@
 
 El Chapter Calidad de Pragma agrupa el conocimiento accionable para **QA automation para cualquier sistema bajo prueba — APIs, web, mobile, performance — sin presunción de sector o región**. Capacidades específicas (compliance, anonimización, mobile clouds) se activan según el contexto del cliente, no por defecto. Los assets de este chapter están diseñados para alimentar agentes que generan, extienden y operan suites de pruebas reales en producción.
 
-Cubre seis stacks de automatización:
+Cubre siete stacks de automatización:
 
 - **Karate** — API testing (REST/SOAP) sobre OpenAPI/Swagger/WSDL.
 - **Playwright** — E2E web testing y accesibilidad.
@@ -12,6 +12,7 @@ Cubre seis stacks de automatización:
 - **Appium Serenity** (`appium-serenity`) — Mobile sobre JVM: Serenity + Cucumber sobre Gradle, en patrón Screenplay o Page Object Model.
 - **Appium WebdriverIO** (`appium-wdio`) — Mobile multi-plataforma en TypeScript con cucumber-js: Android, iOS, tablets y navegador móvil, en local y en device farm.
 - **Appium Core** (`appium-core`) — El conocimiento mobile que **no depende del lenguaje**: resolución de locators, comportamiento de apps Flutter bajo Appium, catálogo de interacciones y auto-discovery de locators desde el binario.
+- **serenity-wdio** — Web, web_movil, mobile nativo (Android e iOS), desktop y API sobre un único arquetipo multiplataforma (TypeScript + WebdriverIO v9 + Serenity/JS + Cucumber 11).
 
 `appium-core` no es un stack que se elija: **acompaña** a cualquiera de los dos de producto y se instala aparte. Entre `appium-serenity` y `appium-wdio` decide el ecosistema del equipo, nunca la preferencia del agente: ver la desambiguación en `[[calidad-intent-detection]]`.
 
@@ -155,16 +156,58 @@ chapters/calidad/
 │   │       ├── SKILL.md
 │   │       └── references/{cobertura-comment-enforcement, contract-testing-match-patterns, encrypted-payloads, feature-design-dsl, file-location-constraint, metadata-emitter-karate, negative-coverage-formula, preflight, project-structure, smoke-gate-mvn, step-isolation-karate, templates}.md
 │   │
-│   └── playwright/
-│       ├── playwright-run-and-modes.md
-│       ├── playwright-brownfield/
+│   ├── playwright/
+│   │   ├── playwright-run-and-modes.md
+│   │   ├── playwright-brownfield/
+│   │   │   ├── SKILL.md
+│   │   │   └── references/{convention-detection, selector-update-strategy}.md
+│   │   ├── playwright-from-live-app/
+│   │   │   └── SKILL.md
+│   │   └── playwright-greenfield/
+│   │       ├── SKILL.md
+│   │       └── references/{accessibility-axe-wcag, auth-detection-rules, auth-storage-state, coherence-checks, contractual-checks-from-ui, coverage-formula, execution-modes-live-mocked-hybrid, fixtures-composition, front-prototype-recipe, interactive-design-prototype-source, metadata-emitter-playwright, mocks-page-route, page-object-model, playwright-config-strict-ts, playwright-native-tags-v142, preflight, project-structure, selector-priority, smoke-gate-playwright, step-isolation-playwright, templates, ui-source-priority, visual-regression, waits-policy}.md
+│   │
+│   └── serenity-wdio/
+│       ├── serenity-wdio-run-and-tags.md
+│       ├── references/serenity-wdio-test-data-management.md
+│       ├── serenity-wdio-greenfield/
 │       │   ├── SKILL.md
-│       │   └── references/{convention-detection, selector-update-strategy}.md
-│       ├── playwright-from-live-app/
-│       │   └── SKILL.md
-│       └── playwright-greenfield/
+│       │   └── references/{cucumber-tags, gates-and-evidence, mandatory-inputs,
+│       │                   metadata-emitter-serenity-wdio, platforms-and-scope,
+│       │                   preflight, project-structure, run-and-modes,
+│       │                   screenplay-conventions, smoke-gate-wdio,
+│       │                   step-isolation-serenity-wdio, templates/,
+│       │                   wdio-configs}.md
+│       ├── serenity-wdio-brownfield/
+│       │   ├── SKILL.md
+│       │   └── references/{anti-pattern-audit, convention-detection,
+│       │                   native-app-window-handles, prior-analysis,
+│       │                   selector-update-strategy}.md
+│       ├── serenity-wdio-screenplay-pattern/
+│       │   ├── SKILL.md
+│       │   └── references/{screenplay-api, screenplay-mobile, screenplay-web}.md
+│       ├── serenity-wdio-cucumber-gherkin/
+│       │   ├── SKILL.md
+│       │   └── references/{gherkin-features, step-definitions}.md
+│       ├── serenity-wdio-api-testing-rest/
+│       │   ├── SKILL.md
+│       │   └── references/{api-auth-y-estructura, api-questions-assertions,
+│       │                   api-requests}.md
+│       ├── serenity-wdio-webdriverio-handling/
+│       │   ├── SKILL.md
+│       │   └── references/{wdio-directo, wdio-encapsulado,
+│       │                   wdio-referencia-rapida}.md
+│       ├── serenity-wdio-test-execution-runner/
+│       │   ├── SKILL.md
+│       │   └── references/{diagnostico-ejecucion, env-variables,
+│       │                   orquestador-y-modos}.md
+│       ├── serenity-wdio-reporting/
+│       │   ├── SKILL.md
+│       │   └── references/{configuracion-reporters, lectura-de-fallos,
+│       │                   troubleshooting-reportes}.md
+│       └── serenity-wdio-troubleshooting/
 │           ├── SKILL.md
-│           └── references/{accessibility-axe-wcag, auth-detection-rules, auth-storage-state, coherence-checks, contractual-checks-from-ui, coverage-formula, execution-modes-live-mocked-hybrid, fixtures-composition, front-prototype-recipe, interactive-design-prototype-source, metadata-emitter-playwright, mocks-page-route, page-object-model, playwright-config-strict-ts, playwright-native-tags-v142, preflight, project-structure, selector-priority, smoke-gate-playwright, step-isolation-playwright, templates, ui-source-priority, visual-regression, waits-policy}.md
+│           └── references/{problemas-generales, problemas-mobile}.md
 │
 ├── workflows/
 │   ├── _all/
@@ -190,9 +233,13 @@ chapters/calidad/
 │   ├── karate/
 │   │   ├── extend-karate-brownfield.workflow.md
 │   │   └── generate-karate-greenfield.workflow.md
-│   └── playwright/
-│       ├── generate-playwright-greenfield.workflow.md
-│       └── update-playwright-brownfield.workflow.md
+│   ├── playwright/
+│   │   ├── generate-playwright-greenfield.workflow.md
+│   │   └── update-playwright-brownfield.workflow.md
+│   └── serenity-wdio/
+│       ├── complete-deferred-locators.workflow.md
+│       ├── extend-serenity-wdio-brownfield.workflow.md
+│       └── generate-serenity-wdio-greenfield.workflow.md
 │
 └── prompts/
     ├── _all/
@@ -214,12 +261,16 @@ chapters/calidad/
     │   ├── analyze-openapi-for-karate.prompt.md
     │   ├── generate-karate-feature.prompt.md
     │   └── generate-karate-match-schema.prompt.md
-    └── playwright/
-        ├── detect-pages-from-ui-source.prompt.md
-        ├── extract-pages-from-live-app.prompt.md
-        ├── generate-accessibility-suite.prompt.md
-        ├── generate-mock-handlers.prompt.md
-        └── generate-page-object.prompt.md
+    ├── playwright/
+    │   ├── detect-pages-from-ui-source.prompt.md
+    │   ├── extract-pages-from-live-app.prompt.md
+    │   ├── generate-accessibility-suite.prompt.md
+    │   ├── generate-mock-handlers.prompt.md
+    │   └── generate-page-object.prompt.md
+    └── serenity-wdio/
+        ├── generate-cucumber-feature.prompt.md
+        ├── generate-screenplay-task.prompt.md
+        └── validate-serenity-wdio-inputs.prompt.md
 ```
 
 ### Steering
@@ -388,6 +439,23 @@ Incluye references con la matriz de capabilities de cada plataforma —el bloque
 
 La capa Cucumber de este stack —catálogo de steps, sufijo de plataforma, tagging, propiedades verificables— no se duplica aquí: viene de `[[calidad-cucumber-bdd-conventions]]`.
 
+#### serenity-wdio (`skills/serenity-wdio/`)
+
+| Asset                                          | Capacidad                                                                                  |
+|------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `serenity-wdio-greenfield/SKILL.md`            | Genera proyecto TypeScript + WebdriverIO v9 + Serenity/JS v3 + Cucumber 11 multiplataforma (web, web_movil, movil Android/iOS, desktop, api) con Screenplay puro. |
+| `serenity-wdio-brownfield/SKILL.md`            | Extiende un proyecto serenity-wdio existente respetando convenciones detectadas, sin regenerar infraestructura. |
+| `serenity-wdio-screenplay-pattern/SKILL.md`    | Implementación Screenplay por canal: `PageElement`+`By` en web, selectores `string` encapsulados en mobile, `@serenity-js/rest` en api. |
+| `serenity-wdio-cucumber-gherkin/SKILL.md`      | Convenciones de `.feature` y step-definitions: tags de canal/suite/tipo, aislamiento por archivo de steps. |
+| `serenity-wdio-api-testing-rest/SKILL.md`      | Pruebas de API REST con `@serenity-js/rest`: `CallAnApi`, `Send`, `LastResponse`, `ChangeApiConfig`, autenticación. |
+| `serenity-wdio-webdriverio-handling/SKILL.md`  | Cuándo usar WebdriverIO directo vs encapsulado en Interactions; referencia rápida de comandos `browser.*`. |
+| `serenity-wdio-test-execution-runner/SKILL.md` | Diagnóstico de ejecución, variables de entorno y orquestador `scripts/run.mjs` por modo y plataforma. |
+| `serenity-wdio-reporting/SKILL.md`             | Configuración de reporters (Allure, Serenity BDD, cucumber JSON, video), lectura de fallos y troubleshooting de reportes. |
+| `serenity-wdio-troubleshooting/SKILL.md`       | Problemas generales y específicos de mobile nativo (window handles `NATIVE_APP`, contextos híbridos, selectores por plataforma). |
+| `serenity-wdio-run-and-tags.md`                | Comandos del orquestador `scripts/run.mjs` por `--mode`/`--platform`, mapeo a `.env.<modo>` y filtros de tags de Cucumber. |
+
+Incluye references para plataformas y alcance (diferenciación con el stack `appium`), inputs obligatorios, estructura de proyecto, configs WDIO por modo, convenciones Screenplay, tags de Cucumber, gates y evidencia, pre-flight por plataforma, `STRATEGY.md.tpl`, aislamiento de steps, smoke gate del orquestador y emisor de metadata.
+
 ### Workflows
 
 | Tipo                                   | Asset                                                                                  |
@@ -408,6 +476,9 @@ La capa Cucumber de este stack —catálogo de steps, sufijo de plataforma, tagg
 | Appium WebdriverIO greenfield          | `workflows/appium-wdio/generate-appium-wdio-greenfield.workflow.md`                    |
 | Appium WebdriverIO brownfield          | `workflows/appium-wdio/extend-appium-wdio-brownfield.workflow.md`                      |
 | Appium WebdriverIO — migrar selectores | `workflows/appium-wdio/migrate-selectors-to-testdata.workflow.md`                      |
+| serenity-wdio greenfield               | `workflows/serenity-wdio/generate-serenity-wdio-greenfield.workflow.md`                |
+| serenity-wdio brownfield                | `workflows/serenity-wdio/extend-serenity-wdio-brownfield.workflow.md`                 |
+| serenity-wdio locators                  | `workflows/serenity-wdio/complete-deferred-locators.workflow.md`                      |
 | Funcional — análisis/refinamiento      | `workflows/_all/analyze-and-refine-stories.workflow.md`                                |
 | Funcional — diseño de casos + ALM      | `workflows/_all/design-test-cases.workflow.md`                                         |
 | Funcional — estrategia y plan          | `workflows/_all/build-test-strategy-and-plan.workflow.md`                              |
@@ -421,7 +492,9 @@ La capa Cucumber de este stack —catálogo de steps, sufijo de plataforma, tagg
 | Karate     | `analyze-openapi-for-karate`, `generate-karate-feature`, `generate-karate-match-schema`                                    |
 | Playwright | `detect-pages-from-ui-source`, `generate-page-object`, `generate-accessibility-suite`, `generate-mock-handlers`            |
 | K6         | `extract-config-from-openapi`, `generate-k6-script`, `generate-utils-and-payloads`                                         |
-| Appium     | `validate-appium-inputs`, `generate-cucumber-feature-android`, `generate-screenplay-task`                                  |
+| Appium Serenity | `validate-appium-inputs`, `generate-cucumber-feature-android`, `generate-screenplay-task`                              |
+| Appium WebdriverIO | `validate-appium-wdio-inputs`                                                                                        |
+| serenity-wdio | `validate-serenity-wdio-inputs`, `generate-cucumber-feature`, `generate-screenplay-task`                                |
 
 ## Instalación y sync — cómo llegan los assets a tu IDE
 
@@ -433,13 +506,14 @@ pragma-ai login
 
 # 2. En la raíz del proyecto QA, inicializar el entorno (elegir el stack del proyecto)
 cd mi-proyecto-tests
-pragma-ai init --ide kiro --chapter calidad --stack karate     # API testing
+pragma-ai init --ide kiro --chapter calidad --stack karate        # API testing
 # o:
-pragma-ai init --ide kiro --chapter calidad --stack playwright # E2E web
-pragma-ai init --ide kiro --chapter calidad --stack k6         # performance
-pragma-ai init --ide kiro --chapter calidad --stack appium     # mobile Android
-pragma-ai init --ide kiro --chapter calidad --stack appium-wdio  # mobile TypeScript (WebdriverIO + cucumber-js)
-pragma-ai init --ide kiro --chapter calidad --stack appium-core  # compañero obligatorio de cualquier stack mobile
+pragma-ai init --ide kiro --chapter calidad --stack playwright   # E2E web
+pragma-ai init --ide kiro --chapter calidad --stack k6            # performance
+pragma-ai init --ide kiro --chapter calidad --stack appium-serenity # mobile Android/JVM (Java + Gradle + Serenity BDD)
+pragma-ai init --ide kiro --chapter calidad --stack appium-wdio   # mobile TypeScript (WebdriverIO + cucumber-js)
+pragma-ai init --ide kiro --chapter calidad --stack appium-core   # compañero obligatorio de cualquier stack mobile
+pragma-ai init --ide kiro --chapter calidad --stack serenity-wdio # web + web_movil + mobile Android/iOS + desktop + API (TypeScript + WebdriverIO)
 
 # 3. Verificar instalación
 pragma-ai status
@@ -451,7 +525,7 @@ pragma-ai update              # aplicar
 
 `init` crea `pragma.yaml` en la raíz del proyecto, descarga los assets del chapter Calidad para el stack indicado (más todos los skills cross-cutting de `_all/`) en el path nativo del IDE, agrega `.pragma/` al `.gitignore` e instala los hooks para telemetría. Detalle completo de la CLI en el manual de `pragma-ai`.
 
-**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium-serenity`, `appium-wdio` y `appium-core`. Los dos primeros stacks mobile son de producto y mutuamente excluyentes por proyecto; **`appium-core` acompaña a cualquiera de los dos y se instala aparte** (`init` una vez por stack). El trabajo **funcional** (análisis/refinamiento de HUs, diseño de casos, estrategia, planes, integración ALM) y las **convenciones Cucumber** no son stacks: son cross-cutting y llegan con cualquier `init`, sin pedirlos. Si la suite combina varios frameworks (APIs + UI + mobile en el mismo repositorio), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos de cada stack se suman sin conflicto. Un repositorio híbrido web y mobile necesita los dos stacks correspondientes, no uno.
+**Stacks soportados en el chapter:** `karate`, `playwright`, `k6`, `appium-serenity`, `appium-wdio`, `appium-core` y `serenity-wdio`. `appium-serenity` (Java + Gradle + Serenity BDD) y `appium-wdio` (TypeScript + WebdriverIO + cucumber-js) son los dos stacks mobile de producto, mutuamente excluyentes por proyecto; **`appium-core` acompaña a cualquiera de los dos y se instala aparte** (`init` una vez por stack). `serenity-wdio` (TypeScript + WebdriverIO v9 + Serenity/JS) es un stack independiente que cubre web, web_movil, mobile Android **e iOS**, desktop y API sobre un único arquetipo multiplataforma. El trabajo **funcional** (análisis/refinamiento de HUs, diseño de casos, estrategia, planes, integración ALM) y las **convenciones Cucumber** no son stacks: son cross-cutting y llegan con cualquier `init`, sin pedirlos. Si la suite combina varios frameworks (APIs + UI + mobile en el mismo repositorio), correr `init` una vez por stack — los assets `_all/` solo se descargan en la primera corrida y los específicos de cada stack se suman sin conflicto. Un repositorio híbrido web y mobile necesita los stacks correspondientes, no uno solo.
 
 **Multi-IDE** en el mismo proyecto: repetir `--ide`:
 
@@ -692,7 +766,7 @@ Esta sección muestra escenarios reales de un QA usando el Chapter Calidad desde
 > **Prerrequisito común a todos los ejemplos**: los assets ya están en `.kiro/` porque el QA corrió previamente:
 > ```bash
 > pragma-ai login   # una vez por máquina
-> pragma-ai init --ide kiro --chapter calidad --stack <karate|playwright|k6|appium>
+> pragma-ai init --ide kiro --chapter calidad --stack <karate|playwright|k6|appium-serenity|appium-wdio|serenity-wdio>
 > ```
 > El stack se elige según el framework del proyecto. Sin este paso, Kiro no tiene visibilidad de `[[calidad-route-test-generation]]`, `@karate-greenfield`, ni el resto de assets. Si los ejemplos se ejecutan desde otro IDE, ajustar el `--ide` (`claude-code`, `cursor`, `github-copilot`, `amazon-q-ide`, `amazon-q-cli`) y considerar la **Cobertura por IDE** arriba — los `prompt`-type no llegan a Claude Code ni Amazon Q (CLI).
 

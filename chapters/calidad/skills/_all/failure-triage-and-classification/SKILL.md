@@ -30,7 +30,7 @@ El triage también alimenta:
 - `[[calidad-test-data-management]]` cuando el patrón es `flaky + data state`.
 - El reporte al cliente cuando el patrón es `deterministic + bug del SUT`.
 
-Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Karate, K6, Pact y herramientas de visual regression.
+Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Karate, K6, serenity-wdio, Pact y herramientas de visual regression.
 
 ## Instrucción
 
@@ -47,7 +47,7 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
    mostraba, y que ambas miraron demasiado tarde. Ver
    `[[calidad-data-volatility-and-assertion-anchoring]]`.
 
-1. **Aislar el fallo y MIRAR la evidencia antes de teorizar.** Orden obligatorio: (1) screenshot del momento del fallo, (2) DOM/page source **parseado como árbol** —nunca deducir la topología de la indentación impresa—, (3) log del mock/backend (¿llegó la petición? ¿con qué body?), (4) recién entonces la hipótesis. Prohibido formular una segunda hipótesis sin haber completado 1-3: la evidencia suele estar generada y sin mirar. Recolectar además la evidencia mínima: `test_id`, mensaje de error completo, stack trace, screenshot/trace (Playwright/Appium), request/response (Karate/API), métricas y thresholds (K6), `environment context` (URL del SUT, branch, commit, runner, OS, browser/device). Sin esta evidencia el triage es opinión, no análisis. Ver `[[calidad-test-evidence-and-traceability]]` para el formato canónico.
+1. **Aislar el fallo y MIRAR la evidencia antes de teorizar.** Orden obligatorio: (1) screenshot del momento del fallo, (2) DOM/page source **parseado como árbol** —nunca deducir la topología de la indentación impresa—, (3) log del mock/backend (¿llegó la petición? ¿con qué body?), (4) recién entonces la hipótesis. Prohibido formular una segunda hipótesis sin haber completado 1-3: la evidencia suele estar generada y sin mirar. Recolectar además la evidencia mínima: `test_id`, mensaje de error completo, stack trace, screenshot/trace (Playwright/Appium/serenity-wdio web), logs de Appium + screenshot (mobile en Appium Serenity/WebdriverIO/serenity-wdio), request/response (Karate/API/serenity-wdio modo api), métricas y thresholds (K6), `environment context` (URL del SUT, branch, commit, runner, OS, browser/device; en serenity-wdio incluir `--mode` y `--platform`). Sin esta evidencia el triage es opinión, no análisis. Ver `[[calidad-test-evidence-and-traceability]]` para el formato canónico.
 
 2. **Aplicar el protocolo de re-run para determinismo** — **re-ejecutando SOLO el test en cuestión**, aislado por nombre o tag (nunca la suite completa) descrito en `references/re-run-protocol-for-determinism.md`: re-ejecutar el test N veces (default N=3) en el **mismo entorno y con los mismos datos**. Resultado:
    - 3/3 fallan con el mismo error → `deterministic`.

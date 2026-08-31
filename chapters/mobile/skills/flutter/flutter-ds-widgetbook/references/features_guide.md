@@ -1,109 +1,109 @@
-# Features — Catalogar Pantallas del Proyecto
+# Features — Catalog the Project's Screens
 
 ---
 
-## Tabla de contenidos
+## Table of contents
 
-1. [Cuándo catalogar una pantalla](#1-cuándo-catalogar-una-pantalla)
-2. [Analizar la pantalla antes de generar](#2-analizar-la-pantalla-antes-de-generar)
-3. [Aislar la pantalla de sus dependencias](#3-aislar-la-pantalla-de-sus-dependencias)
-4. [Variantes de pantalla — estados a cubrir](#4-variantes-de-pantalla--estados-a-cubrir)
-5. [Patrón completo de un feature use case](#5-patrón-completo-de-un-feature-use-case)
-6. [Ubicación de archivos](#6-ubicación-de-archivos)
-7. [Actualizar features existentes](#7-actualizar-features-existentes)
+1. [When to catalog a screen](#1-when-to-catalog-a-screen)
+2. [Analyze the screen before generating](#2-analyze-the-screen-before-generating)
+3. [Isolate the screen from its dependencies](#3-isolate-the-screen-from-its-dependencies)
+4. [Screen variants — states to cover](#4-screen-variants--states-to-cover)
+5. [Complete pattern of a feature use case](#5-complete-pattern-of-a-feature-use-case)
+6. [File location](#6-file-location)
+7. [Update existing features](#7-update-existing-features)
 
 ---
 
-## 1. Cuándo catalogar una pantalla
+## 1. When to catalog a screen
 
-| Situación | Acción |
+| Situation | Action |
 |---|---|
-| Se creó una nueva pantalla en el proyecto | Crear use case en `widgetbook_[appname]/lib/features/` |
-| Se modificó una pantalla existente (nuevos campos, estados, layout) | Actualizar el use case existente |
-| Se quiere documentar todas las pantallas del proyecto | Escanear `lib/features/` o `lib/screens/` y crear use cases faltantes |
-| El usuario pide "agrega esta pantalla al widgetbook" | Crear use case para esa pantalla |
+| A new screen was created in the project | Create a use case in `widgetbook_[appname]/lib/features/` |
+| An existing screen was modified (new fields, states, layout) | Update the existing use case |
+| You want to document every screen in the project | Scan `lib/features/` or `lib/screens/` and create the missing use cases |
+| The user asks "add this screen to the widgetbook" | Create a use case for that screen |
 
 ---
 
-## 2. Analizar la pantalla antes de generar
+## 2. Analyze the screen before generating
 
-Antes de escribir código, leer la pantalla completa e identificar:
+Before writing code, read the entire screen and identify:
 
-### 2.1 — Dependencias a mockear
+### 2.1 — Dependencies to mock
 
-| Tipo de dependencia | Qué buscar | Cómo mockear |
+| Dependency type | What to look for | How to mock it |
 |---|---|---|
-| **State management** | `Provider`, `Bloc`, `Cubit`, `Riverpod`, `GetX` | Wrapper con datos mock |
-| **Servicios/Repositorios** | Inyección de dependencias, `GetIt`, constructores | Instancia mock en el use case |
-| **Navegación** | `Navigator.push`, `GoRouter`, `AutoRoute` | Callbacks con `developer.log()` — no navegar |
-| **API/Network** | `http`, `dio`, llamadas a backend | Datos hardcodeados del dominio |
-| **Local storage** | `SharedPreferences`, `Hive`, `SQLite` | Datos mock inline |
-| **Auth** | Token, user session, permisos | Mock de usuario autenticado |
+| **State management** | `Provider`, `Bloc`, `Cubit`, `Riverpod`, `GetX` | Wrapper with mock data |
+| **Services/Repositories** | Dependency injection, `GetIt`, constructors | Mock instance in the use case |
+| **Navigation** | `Navigator.push`, `GoRouter`, `AutoRoute` | Callbacks with `developer.log()` — do not navigate |
+| **API/Network** | `http`, `dio`, backend calls | Hardcoded domain data |
+| **Local storage** | `SharedPreferences`, `Hive`, `SQLite` | Inline mock data |
+| **Auth** | Token, user session, permissions | Mock of an authenticated user |
 
-### 2.2 — Estados visibles de la pantalla
+### 2.2 — Visible screen states
 
-Identificar todos los estados que la pantalla puede mostrar:
+Identify every state the screen can display:
 
 ```
-¿Tiene estado de carga? → variante 'loading'
-¿Tiene estado vacío (sin datos)? → variante 'empty'
-¿Tiene estado de error? → variante 'error'
-¿Tiene estado de éxito/confirmación? → variante 'success'
-¿Tiene variante para usuario nuevo? → variante 'first_time'
-¿Tiene variante para usuario no autenticado? → variante 'logged_out'
-¿Tiene variante con datos completos? → variante 'default' (siempre)
+Does it have a loading state? → 'loading' variant
+Does it have an empty state (no data)? → 'empty' variant
+Does it have an error state? → 'error' variant
+Does it have a success/confirmation state? → 'success' variant
+Does it have a variant for a new user? → 'first_time' variant
+Does it have a variant for an unauthenticated user? → 'logged_out' variant
+Does it have a variant with complete data? → 'default' variant (always)
 ```
 
-### 2.3 — Parámetros configurables con knobs
+### 2.3 — Parameters configurable with knobs
 
-No todas las pantallas tienen parámetros explícitos como un componente.
-Identificar qué se puede controlar desde knobs:
+Not every screen has explicit parameters like a component does.
+Identify what can be controlled from knobs:
 
-- **Datos del usuario** (nombre, avatar, rol)
-- **Cantidad de items** en listas
-- **Estado de formularios** (vacío, con errores, completo)
-- **Flags de feature** (mostrar/ocultar secciones)
-- **Permisos** (admin vs usuario normal)
+- **User data** (name, avatar, role)
+- **Number of items** in lists
+- **Form state** (empty, with errors, complete)
+- **Feature flags** (show/hide sections)
+- **Permissions** (admin vs regular user)
 
 ---
 
-## 3. Aislar la pantalla de sus dependencias
+## 3. Isolate the screen from its dependencies
 
-**Regla fundamental:** la pantalla debe renderizarse de forma aislada en Widgetbook,
-sin depender del árbol de widgets real de la app, ni de navegación, ni de servicios remotos.
+**Core rule:** the screen must render in isolation in Widgetbook,
+without depending on the app's real widget tree, navigation, or remote services.
 
-### 3.1 — Patrón: wrapper de providers
+### 3.1 — Pattern: providers wrapper
 
 ```dart
-// Cuando la pantalla necesita providers del árbol
+// When the screen needs providers from the tree
 @UseCase(name: 'default', type: HomeScreen)
 Widget buildHomeScreenUseCase(BuildContext context) {
   final userName = context.knobs.string(
     label: 'userName',
-    initialValue: 'María García',
+    initialValue: 'Maria Garcia',
   );
 
-  // Mock de los providers que la pantalla necesita
+  // Mock the providers the screen needs
   return MockAppProviders(
-    user: User(name: userName, email: 'maria@ejemplo.com'),
+    user: User(name: userName, email: 'maria@example.com'),
     products: _mockProducts,
     child: const HomeScreen(),
   );
 }
 ```
 
-### 3.2 — Patrón: inyección por constructor
+### 3.2 — Pattern: constructor injection
 
 ```dart
-// Si la pantalla acepta datos por constructor (preferido)
+// If the screen accepts data via constructor (preferred)
 @UseCase(name: 'default', type: ProductDetailScreen)
 Widget buildProductDetailScreenUseCase(BuildContext context) {
   return ProductDetailScreen(
     product: Product(
       id: 'PRD-001',
-      name: context.knobs.string(label: 'productName', initialValue: 'Zapatillas Trail X3'),
+      name: context.knobs.string(label: 'productName', initialValue: 'Trail X3 Sneakers'),
       price: context.knobs.double.input(label: 'price', initialValue: 129.90),
-      description: 'Zapatillas de trail running con suela Vibram y amortiguación premium.',
+      description: 'Trail running shoes with a Vibram sole and premium cushioning.',
       imageUrl: 'https://picsum.photos/400/300?random=1',
       stock: context.knobs.int.slider(label: 'stock', initialValue: 15, min: 0, max: 100),
     ),
@@ -113,17 +113,17 @@ Widget buildProductDetailScreenUseCase(BuildContext context) {
 }
 ```
 
-### 3.3 — Patrón: reemplazar navegación con callbacks
+### 3.3 — Pattern: replace navigation with callbacks
 
 ```dart
-// ❌ No hacer — depende de navegación real
+// ❌ Don't — depends on real navigation
 onTap: () => Navigator.pushNamed(context, '/detail', arguments: item),
 
-// ✅ Hacer — developer.log descriptivo sin navegar
+// ✅ Do — descriptive developer.log without navigating
 onTap: () => developer.log('Navigate to detail: ${item.id} - ${item.name}'),
 ```
 
-### 3.4 — Patrón: mock de Bloc/Cubit
+### 3.4 — Pattern: Bloc/Cubit mock
 
 ```dart
 @UseCase(name: 'default', type: OrderListScreen)
@@ -162,7 +162,7 @@ Widget buildOrderListScreenEmptyUseCase(BuildContext context) {
 Widget buildOrderListScreenErrorUseCase(BuildContext context) {
   return BlocProvider<OrderListCubit>.value(
     value: MockOrderListCubit(
-      state: const OrderListState.error(message: 'No se pudieron cargar las órdenes'),
+      state: const OrderListState.error(message: 'Unable to load the orders'),
     ),
     child: const OrderListScreen(),
   );
@@ -171,62 +171,62 @@ Widget buildOrderListScreenErrorUseCase(BuildContext context) {
 
 ---
 
-## 4. Variantes de pantalla — estados a cubrir
+## 4. Screen variants — states to cover
 
-### Regla general para pantallas
+### General rule for screens
 
-| Estado | `name` sugerido | Cuándo incluirlo |
+| State | Suggested `name` | When to include it |
 |---|---|---|
-| Pantalla con datos completos | `'default'` | Siempre |
-| Cargando datos del servidor | `'loading'` | Si la pantalla tiene fetch inicial |
-| Sin datos / lista vacía | `'empty'` | Si la pantalla puede no tener contenido |
-| Error de carga / red | `'error'` | Si la pantalla maneja errores |
-| Formulario con errores de validación | `'validation_error'` | Si tiene formularios |
-| Usuario no autenticado | `'logged_out'` | Si tiene contenido condicional por auth |
-| Primera vez / onboarding | `'first_time'` | Si tiene flujo de primer uso |
-| Datos máximos / saturación | `'full'` | Si la UI puede saturarse con muchos datos |
+| Screen with complete data | `'default'` | Always |
+| Loading data from the server | `'loading'` | If the screen has an initial fetch |
+| No data / empty list | `'empty'` | If the screen may have no content |
+| Load / network error | `'error'` | If the screen handles errors |
+| Form with validation errors | `'validation_error'` | If it has forms |
+| Unauthenticated user | `'logged_out'` | If it has content conditioned by auth |
+| First time / onboarding | `'first_time'` | If it has a first-use flow |
+| Maximum data / saturation | `'full'` | If the UI can be saturated with lots of data |
 
-### Estrategia por tipo de pantalla
+### Strategy by screen type
 
-**Pantalla de listado (home, catálogo, historial):**
+**List screen (home, catalog, history):**
 ```
-default     → lista con 10-20 items con textos Figma o datos de dominio
+default     → list with 10-20 items using Figma copy or domain data
 loading     → skeleton / shimmer / spinner
-empty       → estado vacío con mensaje e ilustración
-error       → error de red con botón de retry
+empty       → empty state with a message and illustration
+error       → network error with a retry button
 ```
 
-**Pantalla de detalle (producto, perfil, orden):**
+**Detail screen (product, profile, order):**
 ```
-default     → todos los datos completos
-loading     → cargando datos del item
-error       → item no encontrado o error de red
-```
-
-**Pantalla de formulario (login, registro, checkout):**
-```
-default          → formulario vacío listo para llenar
-validation_error → campos con errores de validación visibles
-prefilled        → formulario con datos precargados (edición)
+default     → all data complete
+loading     → loading the item's data
+error       → item not found or network error
 ```
 
-**Pantalla de auth (login, registro, recuperar contraseña):**
+**Form screen (login, sign-up, checkout):**
 ```
-default     → formulario limpio
-error       → credenciales inválidas / error de servidor
-loading     → procesando autenticación
+default          → empty form ready to fill in
+validation_error → fields with visible validation errors
+prefilled        → form with preloaded data (editing)
 ```
 
-**Dashboard / pantalla principal:**
+**Auth screen (login, sign-up, password recovery):**
 ```
-default     → datos cargados con métricas/resumen
-loading     → cargando datos iniciales
-empty       → usuario nuevo sin actividad
+default     → clean form
+error       → invalid credentials / server error
+loading     → processing authentication
+```
+
+**Dashboard / main screen:**
+```
+default     → data loaded with metrics/summary
+loading     → loading initial data
+empty       → new user with no activity
 ```
 
 ---
 
-## 5. Patrón completo de un feature use case
+## 5. Complete pattern of a feature use case
 
 ```dart
 // widgetbook_[appname]/lib/features/auth/login_screen/login_screen.use_case.dart
@@ -257,7 +257,7 @@ LoginScreen(
 Widget buildLoginScreenErrorUseCase(BuildContext context) {
   final errorMessage = context.knobs.string(
     label: 'errorMessage',
-    initialValue: 'Credenciales inválidas. Verifica tu email y contraseña.',
+    initialValue: 'Invalid credentials. Check your email and password.',
   );
 
   context.setCodePreview('''
@@ -297,14 +297,14 @@ LoginScreen(
 
 ---
 
-## 6. Ubicación de archivos
+## 6. File location
 
-### Regla: espejar la estructura de features del proyecto principal
+### Rule: mirror the main project's feature structure
 
-Buscar la estructura de features en el proyecto principal y replicarla
-en `widgetbook_[appname]/lib/features/`:
+Look up the feature structure in the main project and replicate it
+in `widgetbook_[appname]/lib/features/`:
 
-**Proyecto principal:**
+**Main project:**
 ```
 lib/features/
 ├── auth/
@@ -316,11 +316,11 @@ lib/features/
     └── profile_screen.dart
 ```
 
-**Widgetbook (espejo):**
+**Widgetbook (mirror):**
 ```
 widgetbook_[appname]/lib/
-├── ui_system/          ← componentes (ver project_structure.md)
-├── features/           ← pantallas (espejar del proyecto)
+├── ui_system/          ← components (see project_structure.md)
+├── features/           ← screens (mirror the project)
 │   ├── auth/
 │   │   ├── login_screen/
 │   │   │   └── login_screen.use_case.dart
@@ -335,36 +335,36 @@ widgetbook_[appname]/lib/
 └── shared/
 ```
 
-### Detectar pantallas en el proyecto
+### Detect screens in the project
 
-Buscar archivos que terminen en `_screen.dart`, `_page.dart` o `_view.dart`
-en el proyecto principal:
+Look for files ending in `_screen.dart`, `_page.dart`, or `_view.dart`
+in the main project:
 
 ```
-lib/features/**/      → pantallas por feature
-lib/screens/          → carpeta plana de pantallas
-lib/pages/            → carpeta plana de páginas
-lib/presentation/     → capa de presentación (Clean Architecture)
+lib/features/**/      → screens by feature
+lib/screens/          → flat screens folder
+lib/pages/            → flat pages folder
+lib/presentation/     → presentation layer (Clean Architecture)
 ```
 
 ---
 
-## 7. Actualizar features existentes
+## 7. Update existing features
 
-Cuando una pantalla del proyecto cambia y ya tiene use case en Widgetbook:
+When a project screen changes and it already has a use case in Widgetbook:
 
-1. **Leer la pantalla actualizada** — identificar qué cambió: nuevos campos, estados, layout, dependencias.
-2. **Comparar con el use case existente** — verificar si los knobs, mocks y variantes siguen siendo correctos.
-3. **Actualizar lo necesario:**
-   - Nuevo parámetro → agregar knob o mock correspondiente
-   - Nuevo estado visual → agregar variante
-   - Dependencia eliminada → remover mock
-   - Cambio de modelo de datos → actualizar datos mock
-4. **Regenerar** — ejecutar `dart run build_runner build --delete-conflicting-outputs`
+1. **Read the updated screen** — identify what changed: new fields, states, layout, dependencies.
+2. **Compare it with the existing use case** — verify whether the knobs, mocks, and variants are still correct.
+3. **Update what's needed:**
+   - New parameter → add the corresponding knob or mock
+   - New visual state → add a variant
+   - Removed dependency → remove the mock
+   - Data model change → update the mock data
+4. **Regenerate** — run `dart run build_runner build --delete-conflicting-outputs`
 
-### Señales de que un use case necesita actualización
+### Signals that a use case needs updating
 
-- La pantalla tiene parámetros que no están en el use case
-- El use case usa modelos con campos que ya no existen
-- La pantalla tiene estados nuevos no cubiertos por variantes
-- Los providers/blocs del use case no coinciden con los actuales
+- The screen has parameters that are not in the use case
+- The use case uses models with fields that no longer exist
+- The screen has new states not covered by variants
+- The use case's providers/blocs no longer match the current ones

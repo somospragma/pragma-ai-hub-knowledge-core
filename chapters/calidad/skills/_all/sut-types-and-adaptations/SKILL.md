@@ -16,7 +16,7 @@ Aplica este skill **antes de elegir el framework de testing** para cualquier ent
 
 SUTs fuera de este alcance (desktop nativo, embedded, IoT, hardware-in-the-loop) están fuera del scope del Chapter Calidad — escalar para evaluación caso a caso.
 
-Activa este skill antes de `[[calidad-karate-greenfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]` o cualquier otro generador específico de framework, y combínalo con `[[calidad-chapter-perspective]]` y `[[calidad-context-determined-defaults]]`.
+Activa este skill antes de `[[calidad-karate-greenfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]`, `[[serenity-wdio-greenfield]]` o cualquier otro generador específico de framework, y combínalo con `[[calidad-chapter-perspective]]` y `[[calidad-context-determined-defaults]]`.
 
 ## Instrucción
 
@@ -38,16 +38,16 @@ Activa este skill antes de `[[calidad-karate-greenfield]]`, `[[calidad-playwrigh
 | Batch pipeline (Spark, Airflow) — alimenta data a web/mobile | Great Expectations + dbt tests | Pytest fixtures |
 | Streaming pipeline (Flink, Kinesis) — feed real-time a web/mobile | Flink Test Harness + Schema Registry | Custom integration tests |
 | ML inference service consumido por web/mobile | Karate (HTTP), Deepchecks (modelo), Locust/k6 (perf) | Adversarial (Foolbox/ART), drift (Evidently AI) |
-| Mobile native (iOS / Android) | Appium Screenplay | Detox (RN), Espresso, XCUITest |
-| Mobile hybrid (Cordova/Ionic, Capacitor) | Appium + Playwright (webview) | Detox |
-| SPA web (React, Angular, Vue) | Playwright | Karate (backend), k6 |
-| Monolito web server-rendered | Playwright | Karate (form/POST), k6 |
+| Mobile native (iOS / Android) | Appium Screenplay | serenity-wdio (modo `movil`, Appium/WebdriverIO), Detox (RN), Espresso, XCUITest |
+| Mobile hybrid (Cordova/Ionic, Capacitor) | Appium + Playwright (webview) | serenity-wdio (modo `web_movil`, WebView via WebdriverIO), Detox |
+| SPA web (React, Angular, Vue) | Playwright | serenity-wdio (modo `web`, Screenplay puro), Karate (backend), k6 |
+| Monolito web server-rendered | Playwright | serenity-wdio (modo `web`), Karate (form/POST), k6 |
 | Legacy SOAP/EJB (común en bancos LATAM en migración) | Karate (SOAP envelopes) | SoapUI legacy |
 
 ## Restricciones
 
 - **NO asumir REST como default**. Si el SUT es GraphQL, gRPC, event-driven, batch, streaming, ML o legacy SOAP, el flujo de generación cambia desde la elección de framework.
-- **NO mapear todo el chapter a Karate + Playwright + k6 + Appium** cuando el SUT es de otro tipo. Cada tipo tiene una pila reconocida; respétala aun si implica salir de los frameworks "estrella".
+- **NO mapear todo el chapter a Karate + Playwright + k6 + Appium** cuando el SUT es de otro tipo. Cada tipo tiene una pila reconocida; respétala aun si implica salir de los frameworks "estrella". serenity-wdio es complementario válido para SUTs web, mobile native y mobile híbrido — no para backends especializados (gRPC, Kafka, Spark, ML).
 - Cuando un complementario no aplica (p. ej. k6 sobre un batch pipeline), márcalo explícitamente como "no aplica" con la razón — no lo omitas en silencio.
 - Si el SUT mezcla tipos (p. ej. SPA web + gRPC backend + Kafka events), entrega una estrategia compuesta documentando cada ángulo por separado.
 - **SUTs fuera del alcance del Chapter** (desktop nativo, embedded, IoT, hardware-in-the-loop) no se cubren por defecto: escalar para evaluación caso a caso antes de comprometer entregable.

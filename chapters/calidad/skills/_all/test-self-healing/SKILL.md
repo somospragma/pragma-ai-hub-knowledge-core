@@ -28,6 +28,7 @@ Frameworks dentro del alcance del chapter para healing:
 - **Appium** (mobile native/híbrido Android/iOS): chain de `AppiumBy` con accessibility-id como primary, OSS Healenium para selectors legacy.
 - **Karate** (REST/GraphQL): schema-drift tolerance con `##type` y matchers permisivos controlados.
 - **K6** (perf): schema drift de response shape detectado vía `check()` con telemetría.
+- **serenity-wdio** (web + mobile + api): dos superficies de fragilidad distintas — web usa `PageElement` + `By` con fallback por estrategia de selector; mobile nativo usa selectores `string` con Accessibility ID como primary. El mecanismo canónico de resolución de locators diferidos está en `[[complete-deferred-locators]]`.
 
 **Fuera de scope** del chapter (y por tanto fuera de este skill): aplicaciones desktop nativas, sistemas embedded e IoT. Ver `[[calidad-sut-types-and-adaptations]]` para el alcance completo. Tampoco aplica a Pact ni a pruebas de contract, donde el healing es explícitamente anti-patrón (ver `references/over-healing-guardrails.md`).
 
@@ -44,6 +45,8 @@ Combinar siempre con `[[calidad-chapter-perspective]]` (perspectiva del chapter)
 3. **Aplicar multi-locator fallback en Page Objects** siguiendo orden de prioridad estricto:
    - Playwright: `getByTestId` → `getByRole` → `getByLabel` → `getByText` → CSS (último recurso).
    - Appium: `AppiumBy.accessibilityId` → `AppiumBy.id` → `AppiumBy.xpath` (xpath solo como último fallback, nunca primario).
+   - serenity-wdio web: `By.css('[data-testid]')` → `By.css('#id')` → `By.css('.clase')` → `By.xpath("//[@aria-label]")` → `By.xpath` simple (último recurso). Encapsular en `PageElement.located(By...).describedAs(...)`.
+   - serenity-wdio mobile: `'~accessibility-id'` → `'~testId'` → texto visible → XPath (nunca índices posicionales). Selector como `string` plano dentro de la Interaction; nunca `PageElement` en mobile.
    - Ver `references/multi-locator-fallback-pattern.md` para snippets y `references/healing-aware-page-object.md` para el patrón de inyección.
 
 3. **Aplicar schema-drift tolerance en assertions** con reglas estrictas: los campos opcionales del contrato deben permitirse ausentes (`##type` en Karate; `optional()` o `check()` permisivos en K6), pero **los campos requeridos jamás se relajan**. Ver `references/healing-strategies-by-framework.md` para la matriz por framework.
@@ -87,7 +90,7 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 
 ## Cross-links
 
-- `references/healing-strategies-by-framework.md` — matriz Playwright / Appium / Karate / K6.
+- `references/healing-strategies-by-framework.md` — matriz Playwright / Appium / Karate / K6 / serenity-wdio.
 - `references/multi-locator-fallback-pattern.md` — snippet `ResilientLocator` y equivalentes Java/Karate.
 - `references/llm-driven-selector-repair.md` — flujo de reparación con LLM y validación previa al commit.
 - `references/visual-ai-healing.md` — Applitools, Percy, Resemble.js; cuándo aplicar y cuándo no.
@@ -109,4 +112,6 @@ Cross-links con otros assets del chapter:
 - `[[calidad-playwright-greenfield]]`
 - `[[calidad-k6-greenfield]]`
 - `[[calidad-appium-screenplay-android]]`
+- `[[serenity-wdio-greenfield]]`
+- `[[serenity-wdio-brownfield]]`
 - `[[calidad-playwright-extract-pages-from-live-app-prompt]]`

@@ -1,36 +1,36 @@
 # Knobs Reference — Widgetbook 3.x
 
-Guía de selección de knobs por tipo de parámetro.
+Knob selection guide by parameter type.
 
 ---
 
-## Regla de selección rápida
+## Quick selection rule
 
-| Tipo de parámetro | Knob a usar |
+| Parameter type | Knob to use |
 |---|---|
-| `String` requerido | `context.knobs.string` |
-| `String?` opcional | `context.knobs.stringOrNull` |
-| `bool` requerido | `context.knobs.boolean` |
-| `bool?` opcional | `context.knobs.booleanOrNull` |
-| `int` acotado (progreso, tamaño) | `context.knobs.int.slider` |
-| `int` libre | `context.knobs.int.input` |
-| `double` entre 0.0 y 1.0 (opacidad) | `context.knobs.double.slider` |
-| `double` libre | `context.knobs.double.input` |
+| Required `String` | `context.knobs.string` |
+| Optional `String?` | `context.knobs.stringOrNull` |
+| Required `bool` | `context.knobs.boolean` |
+| Optional `bool?` | `context.knobs.booleanOrNull` |
+| Bounded `int` (progress, size) | `context.knobs.int.slider` |
+| Free `int` | `context.knobs.int.input` |
+| `double` between 0.0 and 1.0 (opacity) | `context.knobs.double.slider` |
+| Free `double` | `context.knobs.double.input` |
 | `Color` | `context.knobs.color` |
 | `Color?` | `context.knobs.colorOrNull` |
-| `enum` / lista de opciones | `context.knobs.list` |
+| `enum` / option list | `context.knobs.list` |
 | `DateTime` | `context.knobs.dateTime` |
 | `Duration` | `context.knobs.duration` |
-| `IconData` | `context.knobs.list` con `Icons.*` |
-| Asset image (`String` path PNG/JPEG) | Hardcodear path + assets declarados en pubspec |
-| SVG (`String` path) | Hardcodear path + assets declarados en pubspec |
-| `ImageProvider` | `NetworkImage` (catálogo) o `AssetImage` (si assets declarados) |
-| Objeto complejo | Hardcodear + `// TODO` |
-| Callback | `developer.log()` descriptivo |
+| `IconData` | `context.knobs.list` with `Icons.*` |
+| Asset image (`String` PNG/JPEG path) | Hardcode the path + assets declared in pubspec |
+| SVG (`String` path) | Hardcode the path + assets declared in pubspec |
+| `ImageProvider` | `NetworkImage` (catalog) or `AssetImage` (if assets declared) |
+| Complex object | Hardcode + `// TODO` |
+| Callback | Descriptive `developer.log()` |
 
 ---
 
-## API completa
+## Complete API
 
 ### String
 ```dart
@@ -46,7 +46,7 @@ context.knobs.booleanOrNull(label: 'showBadge', initialValue: null)
 
 ### Integer
 ```dart
-// Valor acotado con slider
+// Bounded value with slider
 context.knobs.int.slider(
   label: 'progress',
   initialValue: 50,
@@ -55,10 +55,10 @@ context.knobs.int.slider(
   divisions: 10,
 )
 
-// Valor libre con input
+// Free value with input
 context.knobs.int.input(label: 'itemCount', initialValue: 5)
 
-// Opcionales
+// Optional
 context.knobs.intOrNull.input(label: 'maxLines', initialValue: null)
 context.knobs.intOrNull.slider(
   label: 'steps',
@@ -71,7 +71,7 @@ context.knobs.intOrNull.slider(
 
 ### Double
 ```dart
-// Slider para valores entre 0.0 y 1.0
+// Slider for values between 0.0 and 1.0
 context.knobs.double.slider(
   label: 'opacity',
   initialValue: 1.0,
@@ -80,10 +80,10 @@ context.knobs.double.slider(
   divisions: 20,
 )
 
-// Input para valores libres
+// Input for free values
 context.knobs.double.input(label: 'elevation', initialValue: 4.0)
 
-// Opcionales
+// Optional
 context.knobs.doubleOrNull.input(label: 'borderWidth', initialValue: null)
 context.knobs.doubleOrNull.slider(
   label: 'scale',
@@ -100,7 +100,7 @@ context.knobs.color(label: 'backgroundColor', initialValue: Colors.blue)
 context.knobs.colorOrNull(label: 'borderColor', initialValue: null)
 ```
 
-### Lista / Enum
+### List / Enum
 ```dart
 context.knobs.list<TextAlign>(
   label: 'textAlign',
@@ -109,7 +109,7 @@ context.knobs.list<TextAlign>(
   labelBuilder: (value) => value.name,
 )
 
-// Enum parcial (no todos los valores)
+// Partial enum (not all values)
 context.knobs.list<ButtonSize>(
   label: 'size',
   initialOption: ButtonSize.medium,
@@ -138,19 +138,19 @@ context.knobs.duration(
 
 ---
 
-## Iconos e imágenes
+## Icons and images
 
-> **Requisito previo:** Para que cualquier asset (PNG, JPEG, SVG) se cargue correctamente
-> en Widgetbook, los paths deben estar declarados en `widgetbook_[appname]/pubspec.yaml`.
-> Ver `references/setup.md` § Assets — imágenes e iconos del proyecto.
+> **Prerequisite:** For any asset (PNG, JPEG, SVG) to load correctly
+> in Widgetbook, the paths must be declared in `widgetbook_[appname]/pubspec.yaml`.
+> See `references/setup.md` § Assets — project images and icons.
 
-### IconData — seleccionar icono con knob
+### IconData — select an icon with a knob
 
-`IconData` no tiene knob nativo: usar `context.knobs.list` con un conjunto curado
-de iconos relevantes para el componente. Nunca intentar exponer todos los `Icons.*`.
+`IconData` has no native knob: use `context.knobs.list` with a curated set
+of icons relevant to the component. Never try to expose every `Icons.*`.
 
 ```dart
-// Seleccionar entre iconos relevantes para el caso de uso
+// Select among icons relevant to the use case
 final icon = context.knobs.list<IconData>(
   label: 'icon',
   initialOption: Icons.star,
@@ -176,55 +176,55 @@ final icon = context.knobs.list<IconData>(
 );
 ```
 
-> **Seleccionar iconos del dominio:** Elegir los iconos que el widget realmente usará
-> en producción — no una lista genérica. Si el widget siempre muestra el mismo icono,
-> hardcodearlo directamente (`icon: Icons.arrow_forward`) sin knob.
+> **Select domain icons:** Choose the icons the widget will actually use
+> in production — not a generic list. If the widget always shows the same icon,
+> hardcode it directly (`icon: Icons.arrow_forward`) without a knob.
 
-### Widget icono — hardcodear sin knob
+### Icon widget — hardcode without a knob
 
-Si el parámetro es `Widget` y el widget siempre recibe un icono concreto:
+If the parameter is a `Widget` and the widget always receives a specific icon:
 
 ```dart
-// Parámetro: Widget? leadingIcon
+// Parameter: Widget? leadingIcon
 leadingIcon: const Icon(Icons.notifications, size: 24),
 
-// Parámetro: Widget? trailingIcon  
+// Parameter: Widget? trailingIcon  
 trailingIcon: const Icon(Icons.chevron_right, size: 20),
 ```
 
-### Asset PNG / JPEG — usar path con assets declarados
+### PNG / JPEG asset — use a path with declared assets
 
-Cuando el parámetro es un `String` con la ruta del asset:
+When the parameter is a `String` with the asset path:
 
 ```dart
-// Hardcodear un path real del proyecto
-// El asset DEBE estar declarado en widgetbook_[appname]/pubspec.yaml
+// Hardcode a real project path
+// The asset MUST be declared in widgetbook_[appname]/pubspec.yaml
 imagePath: 'assets/images/product_placeholder.png',
 
-// Si el componente acepta el Widget directamente:
+// If the component accepts the Widget directly:
 image: Image.asset(
   'assets/images/product_placeholder.png',
   fit: BoxFit.cover,
 ),
 ```
 
-### Asset SVG — usar path con assets declarados
+### SVG asset — use a path with declared assets
 
-Si el proyecto usa `flutter_svg`:
+If the project uses `flutter_svg`:
 
 ```dart
-// Hardcodear path del SVG real del proyecto
-// El asset DEBE estar declarado en widgetbook_[appname]/pubspec.yaml
+// Hardcode the path of a real project SVG
+// The asset MUST be declared in widgetbook_[appname]/pubspec.yaml
 iconPath: 'assets/icons/ic_home.svg',
 
-// Si el componente recibe el Widget directamente:
+// If the component receives the Widget directly:
 icon: SvgPicture.asset(
   'assets/icons/ic_home.svg',
   width: 24,
   height: 24,
 ),
 
-// Con knob para alternar entre varios SVGs del proyecto
+// With a knob to switch between several project SVGs
 final iconPath = context.knobs.list<String>(
   label: 'icon',
   initialOption: 'assets/icons/ic_home.svg',
@@ -239,16 +239,16 @@ final iconPath = context.knobs.list<String>(
 SvgPicture.asset(iconPath, width: 24, height: 24)
 ```
 
-### ImageProvider — preferir NetworkImage en el catálogo
+### ImageProvider — prefer NetworkImage in the catalog
 
-Cuando el parámetro es `ImageProvider` o `String` URL de red, usar `NetworkImage`
-para el catálogo: no requiere declarar assets y siempre muestra una imagen real.
+When the parameter is an `ImageProvider` or a `String` network URL, use `NetworkImage`
+for the catalog: it does not require declaring assets and always shows a real image.
 
 ```dart
-// NetworkImage — no requiere configurar assets
+// NetworkImage — does not require configuring assets
 avatarImage: const NetworkImage('https://picsum.photos/200'),
 
-// Con knob para cambiar entre variantes de imagen de red
+// With a knob to switch between network image variants
 final imageUrl = context.knobs.list<String>(
   label: 'image',
   initialOption: 'https://picsum.photos/400/300?random=1',
@@ -257,41 +257,41 @@ final imageUrl = context.knobs.list<String>(
     'https://picsum.photos/400/300?random=2',
     'https://picsum.photos/400/300?random=3',
   ],
-  labelBuilder: (url) => 'Imagen ${url.split('random=').last}',
+  labelBuilder: (url) => 'Image ${url.split('random=').last}',
 );
-// Uso:
+// Usage:
 Image.network(imageUrl, fit: BoxFit.cover)
 ```
 
-### Regla de decisión — ¿asset o network?
+### Decision rule — asset or network?
 
-| Situación | Estrategia |
+| Situation | Strategy |
 |---|---|
-| El componente carga imágenes desde URL (avatar, producto) | `NetworkImage` o `Image.network` |
-| El componente usa assets del proyecto (íconos, ilustraciones) | Asset path + declarar en pubspec |
-| El SVG es un ícono del design system | Asset path + declarar en pubspec |
-| Se quiere alternar entre múltiples imágenes con knob | `context.knobs.list<String>` con paths o URLs |
-| El parámetro es opcional (`ImageProvider?`) | `null` si no es relevante para la variante |
+| The component loads images from a URL (avatar, product) | `NetworkImage` or `Image.network` |
+| The component uses project assets (icons, illustrations) | Asset path + declare in pubspec |
+| The SVG is a design system icon | Asset path + declare in pubspec |
+| You want to switch between multiple images with a knob | `context.knobs.list<String>` with paths or URLs |
+| The parameter is optional (`ImageProvider?`) | `null` if it is not relevant to the variant |
 
-### Objeto complejo — hardcodear con TODO
+### Complex object — hardcode with a TODO
 ```dart
-// Cuando el tipo no es mappeable a un knob simple
+// When the type is not mappable to a simple knob
 final config = CardConfiguration(
   borderRadius: 12.0,
   elevation: 4.0,
   padding: const EdgeInsets.all(16),
-); // TODO: configurar CardConfiguration manualmente según necesidad
+); // TODO: configure CardConfiguration manually as needed
 ```
 
-### Callbacks — siempre con developer.log descriptivo
+### Callbacks — always with a descriptive developer.log
 ```dart
 // Simple
 onPressed: () => developer.log('Button pressed'),
 
-// Con dato
+// With data
 onChanged: (value) => developer.log('Value changed: $value'),
 
-// Con objeto
+// With an object
 onItemSelected: (item) => developer.log('Item selected: ${item.id} - ${item.name}'),
 
 // Async
@@ -302,37 +302,37 @@ onSave: () async {
 },
 ```
 
-### State management — mock provider con datos del dominio
+### State management — mock provider with domain data
 
-Los textos visibles del mock deben venir literalmente de Figma cuando existan.
-Si Figma no define un valor, usar datos del dominio real del proyecto y
-marcarlos como ejemplo; nunca inventar copy de interfaz ni usar valores
-genéricos como "test", "lorem ipsum" o datos placeholder.
+The mock's visible text must come literally from Figma when it exists.
+If Figma does not define a value, use data from the project's real domain and
+mark it as an example; never make up interface copy or use
+generic values such as "test", "lorem ipsum", or placeholder data.
 
 ```dart
-// ✅ Mock contextualizado al dominio (e-commerce)
+// ✅ Mock contextualized to the domain (e-commerce)
 @UseCase(name: 'with_data', type: OrderSummaryWidget)
 Widget buildOrderSummaryWidgetWithDataUseCase(BuildContext context) {
   return MockOrderProvider(
     order: Order(
       id: 'ORD-2024-1587',
-      customerName: 'María García López',
+      customerName: 'Maria Garcia Lopez',
       items: [
-        OrderItem(name: 'Camiseta Running Pro', quantity: 2, price: 49.99),
-        OrderItem(name: 'Zapatillas Trail X3', quantity: 1, price: 129.90),
+        OrderItem(name: 'Running Pro T-Shirt', quantity: 2, price: 49.99),
+        OrderItem(name: 'Trail X3 Sneakers', quantity: 1, price: 129.90),
       ],
       total: 229.88,
       status: OrderStatus.pending,
-    ), // TODO: ajustar campos según el modelo real del proyecto
+    ), // TODO: adjust the fields to the project's real model
     child: OrderSummaryWidget(
       onConfirm: () => developer.log('Order ORD-2024-1587 confirmed'),
     ),
   );
 }
 
-// ❌ Mock genérico — no hacer esto
+// ❌ Generic mock — do not do this
 return MockOrderProvider(
-  order: Order.mock(), // datos vacíos o placeholder
+  order: Order.mock(), // empty or placeholder data
   child: OrderSummaryWidget(onConfirm: () => developer.log('confirmed')),
 );
 ```

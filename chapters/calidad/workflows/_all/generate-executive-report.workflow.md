@@ -12,7 +12,7 @@ tags: [executive-report, workflow, post-corrida, stakeholders]
 
 ## Cuándo usar
 
-Como **último paso** de TODO workflow de generación del chapter (los 4 stacks Karate / Playwright / K6 / Appium, tanto greenfield como brownfield) cuando hubo ejecución real (`modo: full` o `execute-only`).
+Como **último paso** de TODO workflow de generación del chapter (Karate / Playwright / K6 / Appium Serenity / Appium WebdriverIO / serenity-wdio, tanto greenfield como brownfield) cuando hubo ejecución real (`modo: full` o `execute-only`).
 
 En `modo: scaffold-only` o `dry-run` se **omite** este workflow: no hay outputs técnicos que post-procesar. El `delivery_gate.evidence_persisted.executive_report` se reporta como `null` en esos modos, con `blocker: "execution_skipped"` documentado.
 
@@ -25,7 +25,7 @@ Este workflow encapsula la invocación del skill `[[calidad-executive-report-gen
 | `results_path` | Sí | Ruta a `results/<stack>/` con corridas timestamp. |
 | `strategy_md_path` | Recomendado | Ruta a `STRATEGY.md` para tabular SLAs declarados. Si no existe, el reporte se marca **parcial — sin SLAs**. |
 | `output_format` | No | `html` (default) / `pptx` / `doc` / `md`. Preguntar al usuario si no se provee. |
-| `framework` | Sí | `karate | playwright | k6 | appium`. Determina la plantilla específica del stack. |
+| `framework` | Sí | `karate | playwright | k6 | appium-serenity | appium-wdio | serenity-wdio`. Determina la plantilla específica del stack. |
 
 ## Pasos
 

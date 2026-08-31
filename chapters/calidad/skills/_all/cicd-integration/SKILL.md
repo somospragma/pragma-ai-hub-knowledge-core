@@ -4,8 +4,8 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Integración de las suites Karate, Playwright, K6 y Appium en pipelines Azure DevOps / GitHub Actions / GitLab CI con paralelización, gates de calidad y agregación de reportes."
-tags: [cicd, azure-devops, github-actions, gitlab-ci, sharding, gates, allure, reportportal]
+description: "Integración de las suites Karate, Playwright, K6, Appium y serenity-wdio en pipelines Azure DevOps / GitHub Actions / GitLab CI con paralelización, gates de calidad y agregación de reportes."
+tags: [cicd, azure-devops, github-actions, gitlab-ci, sharding, gates, allure, reportportal, serenity-wdio]
 ---
 
 # CI/CD Integration — Integración de Suites de Pruebas en Pipelines
@@ -21,13 +21,13 @@ Aplica este skill **cada vez que una suite generada debe correr en pipeline**, y
 
 Pragma trabaja predominantemente con **Azure DevOps Pipelines** como plataforma CI/CD primaria, pero los clientes pueden requerir **GitHub Actions** o **GitLab CI** según su stack interno. Este skill cubre las tres plataformas con paridad funcional.
 
-Activa este skill después de generar suites con `[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-playwright-brownfield]]`, `[[calidad-k6-greenfield]]` o `[[calidad-appium-screenplay-android]]`, y siempre en paralelo con `[[calidad-test-evidence-and-traceability]]` para asegurar que los reportes generados queden archivados como evidencia auditable.
+Activa este skill después de generar suites con `[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-playwright-brownfield]]`, `[[calidad-k6-greenfield]]`, `[[calidad-appium-screenplay-android]]`, `[[calidad-serenity-wdio-greenfield]]` o `[[calidad-serenity-wdio-brownfield]]`, y siempre en paralelo con `[[calidad-test-evidence-and-traceability]]` para asegurar que los reportes generados queden archivados como evidencia auditable.
 
 ## Instrucción
 
 1. **Definir el trigger** — Decide si la suite corre en `pr` (validación de PRs hacia `main`/`develop`), `push` (después de merge), `schedule` (nightly/cron), `release` (gate de despliegue) o `manual`/`workflow_dispatch`. Las suites de carga (K6) NUNCA deben correr en cada PR — solo nightly o manual. Snippets de triggers por plataforma en `references/azure-devops-pipeline-templates.md`, `references/github-actions-workflows.md`, `references/gitlab-ci-jobs.md`.
-2. **Seleccionar agente** — Linux para Karate/Playwright/K6 (más rápido y barato); Windows si la suite usa Edge legacy o componentes específicos de IIS; macOS para Appium iOS (obligatorio por Xcode). Pool self-hosted si el SUT está en red privada. Consideraciones en `references/azure-devops-pipeline-templates.md`.
-3. **Instalar tooling** — Cachear dependencias para reducir tiempos: JDK 17 + Maven (`~/.m2`) para Karate; Node 20 + `npm ci` (`~/.npm`) para Playwright; binario `k6` (descarga directa o imagen Docker `grafana/k6`); Appium Server + Android SDK / Xcode para mobile. Patrones de cache por plataforma documentados en cada template.
+2. **Seleccionar agente** — Linux para Karate/Playwright/K6/serenity-wdio (más rápido y barato); Windows si la suite usa Edge legacy o componentes específicos de IIS; macOS para Appium iOS (obligatorio por Xcode) y para serenity-wdio en modo `movil` iOS. Pool self-hosted si el SUT está en red privada. Consideraciones en `references/azure-devops-pipeline-templates.md`.
+3. **Instalar tooling** — Cachear dependencias para reducir tiempos: JDK 17 + Maven (`~/.m2`) para Karate; Node 20 + `npm ci` (`~/.npm`) para Playwright y serenity-wdio; binario `k6` (descarga directa o imagen Docker `grafana/k6`); Appium Server + Android SDK / Xcode para mobile. Para serenity-wdio en modo `movil`, añadir Appium Server + drivers (`uiautomator2` / `xcuitest`) al paso de instalación. Patrones de cache por plataforma documentados en cada template.
 4. **Ejecutar con paralelización** — Elige la estrategia de sharding apropiada por framework. Playwright soporta `--shard=i/n` nativo. Karate usa `karate.parallel` con threads. K6 NO se shardea (es la herramienta de carga; se distribuye VUs entre runners). Appium se paraleliza por device en grids cloud. Detalle en `references/sharding-and-parallelization.md`.
 5. **Publicar resultados como artifacts** — JUnit XML, HTML reports, screenshots, videos, traces, summaries K6. Usa `PublishTestResults@2` en Azure, `actions/upload-artifact@v4` en GitHub, `artifacts:` en GitLab. Retención mínima 30 días en PR, 90 días en nightly.
 6. **Agregar reportes** — Allure como dashboard por defecto (simple, ampliamente adoptado en Pragma). ReportPortal para clientes que requieren ML-based failure clustering e integración con Jira/ALM. Setup por tecnología en `references/allure-aggregation.md` y `references/rp-integration.md`.

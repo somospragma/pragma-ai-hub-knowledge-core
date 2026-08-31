@@ -5,8 +5,8 @@ scope: chapter
 type: skill
 chapter: calidad
 enforcement: mandatory
-description: "OBLIGATORIO. Post-procesa los outputs técnicos de los 4 stacks (Karate/Playwright/K6/Appium) y genera un reporte ejecutivo consolidado en Markdown convertible a HTML/PPTX/DOC con narrativa, comparación entre corridas, cumplimiento de SLAs y recomendaciones para stakeholders."
-tags: [executive-report, post-processing, stakeholders, html, pptx, doc, pandoc, narrative, mandatory]
+description: "OBLIGATORIO. Post-procesa los outputs técnicos de los stacks del chapter (Karate/Playwright/K6/Appium Serenity/Appium WebdriverIO/serenity-wdio) y genera un reporte ejecutivo consolidado en Markdown convertible a HTML/PPTX/DOC con narrativa, comparación entre corridas, cumplimiento de SLAs y recomendaciones para stakeholders."
+tags: [executive-report, post-processing, stakeholders, html, pptx, doc, pandoc, narrative, mandatory, serenity-wdio]
 verification:
   - check: "Lee múltiples corridas en results/ y produce 1 reporte consolidado"
     failure_message: "Bloqueado: sin reporte ejecutivo la entrega no es presentable a stakeholders"
@@ -20,7 +20,7 @@ verification:
 
 ## Cuándo aplicar
 
-Aplica este skill al final de toda generación de tests (todos los workflows greenfield y brownfield de los 4 stacks: Karate, Playwright, K6, Appium), una vez que la suite ha sido ejecutada (modo `full` o `execute-only`). En modo `scaffold-only` o `dry-run` no aplica, porque no hay outputs de ejecución que post-procesar.
+Aplica este skill al final de toda generación de tests (todos los workflows greenfield y brownfield de los 5 stacks: Karate, Playwright, K6, Appium, serenity-wdio), una vez que la suite ha sido ejecutada (modo `full` o `execute-only`). En modo `scaffold-only` o `dry-run` no aplica, porque no hay outputs de ejecución que post-procesar.
 
 El skill convierte los JSON, XML y reportes técnicos de cada stack en un informe ejecutivo presentable: un documento con narrativa en español, tablas de cumplimiento de SLAs, comparación entre corridas, fallos clasificados con causa raíz sugerida y recomendaciones concretas por rol (Dev / Infra / QA / PO).
 
@@ -38,6 +38,7 @@ Localiza y parsea los outputs primarios. La estructura exacta depende del stack:
 - **Playwright**: `results/playwright/<timestamp>/results.json` + `metadata.json` + reporte HTML (`playwright-report/index.html`) + traces. Ver `references/playwright-report-template.md`.
 - **K6**: `results/<scenario>/<timestamp>/summary.json` + `metadata.json` por cada escenario ejecutado (smoke, load, stress, spike, soak). Ver `references/k6-report-template.md`.
 - **Appium**: `results/appium/<timestamp>/serenity-results/` (JSON agregado de Serenity) + `metadata.json` + screenshots Serenity. Ver `references/appium-report-template.md`.
+- **serenity-wdio**: `results/serenity-wdio/<timestamp>/` con Allure results (`allure-results/`), Serenity BDD report (`serenity/`), Cucumber JSON (`cucumber/`), video (modo web) y `metadata.json`. Ver `references/serenity-wdio-report-template.md`.
 
 Si una corrida no tiene `metadata.json` (timestamp, commit, branch, environment), reportar como `corrida con metadata incompleta` en el reporte y continuar.
 
@@ -59,6 +60,7 @@ Agrupar resultados por unidad funcional según el stack:
 - Playwright: por HU (tag `@user-story:HUT-XXX`) y por página.
 - K6: por escenario K6 (smoke, load, stress, spike, soak) y por endpoint.
 - Appium: por feature y por device matrix.
+- serenity-wdio: por canal (`@web`, `@mobile`, `@api`) y por HU (tag `@user-story:HUT-XXX`); si hay múltiples modos ejecutados (`web`, `movil`, `api`), consolidar por canal primero y luego por HU.
 
 Calcular: pasados / totales, % éxito, duración, número de fallos.
 
@@ -93,6 +95,7 @@ Renderizar ``references/templates.md` (sección `report.md`)` rellenando los slo
 - Playwright → `references/playwright-report-template.md`.
 - K6 → `references/k6-report-template.md`.
 - Appium → `references/appium-report-template.md`.
+- serenity-wdio → `references/serenity-wdio-report-template.md`.
 
 ### Paso 7 — Convertir a formato final
 
@@ -137,6 +140,7 @@ References específicas del skill:
 - `references/playwright-report-template.md`
 - `references/k6-report-template.md`
 - `references/appium-report-template.md`
+- `references/serenity-wdio-report-template.md`
 - ``references/templates.md` (sección `report.md`)`
 - ``references/templates.md` (sección `report.html-style.css`)`
 

@@ -13,7 +13,7 @@ tags: [delivery-gate, contract, mandatory, universal, all-ides]
 
 ## Cuándo aplicar
 
-Siempre, al final de todo workflow de generación (greenfield o brownfield, los 4 frameworks). Es lo último que el agente emite antes del mensaje "listo".
+Siempre, al final de todo workflow de generación (greenfield o brownfield, los 5 frameworks). Es lo último que el agente emite antes del mensaje "listo".
 
 Aplica universalmente a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE, Amazon Q CLI). Sin este bloque, la entrega se considera incompleta.
 
@@ -43,7 +43,7 @@ delivery_gate:
   schema_version: "1.1"
   pipeline_state: ".evidence/pipeline-state.json"   # traza leída; cero fases obligatorias pendientes
   phases_pending: []                                # si no está vacío, esto NO es un cierre
-  framework: karate | playwright | k6 | appium
+  framework: karate | playwright | k6 | appium-serenity | appium-wdio | serenity-wdio
   mode: full | dry-run | scaffold-only | execute-only
   execution_target: real | mock | hybrid    # contra qué corrió la fase de ejecución (SUT readiness gate)
   certification: certified | pending_real_integration   # certified SOLO si execution_target: real

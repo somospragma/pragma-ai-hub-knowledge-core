@@ -1,6 +1,6 @@
 ---
 id: flutter-mason-clean-project
-version: 2.1.0
+version: 2.1.1
 scope: stack
 type: skill
 chapter: mobile
@@ -62,7 +62,7 @@ mason make flutter_clean_project -o /path/to/output
 ```bash
 mason make flutter_clean_project -o /path/to/output -c config.json
 # All variables read from JSON, no prompts
-# Note: the flag is -c (short), not --config-path
+# Note: the flag is -c (long form: --config-path)
 ```
 
 Create `config.json` starting from the brick's `config-example.json` or See [config-schema-reference.md](references/config-schema-reference.md) for complete schema with examples.
