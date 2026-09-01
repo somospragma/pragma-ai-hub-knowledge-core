@@ -1668,12 +1668,17 @@ read_sections:
 > `--output-file` set. Typical bootstrap files (paths depend on repo mode; see
 > the "Bootstrap output files" section in each reference):
 >
-> - `widgetbook_[appname]/pubspec.yaml` (or `apps/widgetbook_[appname]/pubspec.yaml`)
-> - `widgetbook_[appname]/lib/main.dart`
-> - `widgetbook_[appname]/lib/main.directories.g.dart`
-> - `widgetbook_[appname]/lib/ui_system/.gitkeep`
-> - `widgetbook_[appname]/lib/features/.gitkeep`
-> - `widgetbook_[appname]/lib/shared/.gitkeep`
+> Widgetbook is a nested Flutter project created with
+> `flutter create widgetbook --empty --platforms=android,ios,web` from the app
+> root, so files live under `<app-root>/widgetbook/` (single/multi-repo) or
+> `<host-package-path>/widgetbook/` in a monorepo:
+>
+> - `widgetbook/pubspec.yaml` (monorepo: `<host-package-path>/widgetbook/pubspec.yaml`)
+> - `widgetbook/lib/main.dart`
+> - `widgetbook/lib/main.directories.g.dart`
+> - `widgetbook/lib/ui_system/.gitkeep`
+> - `widgetbook/lib/features/.gitkeep`
+> - `widgetbook/lib/shared/.gitkeep`
 > - Root `pubspec.yaml` and/or `melos.yaml` only when a monorepo workspace list was edited.
 >
 > If any initialization command fails, report `phase-4-3-ds-widgetbook` as
