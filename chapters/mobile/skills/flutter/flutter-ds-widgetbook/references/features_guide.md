@@ -6,7 +6,7 @@ Use this guide when cataloging full screens or feature pages in Widgetbook.
 
 | Situation | Action |
 |---|---|
-| A new screen was created | Create a use case in `widgetbook_[appname]/lib/features/` |
+| A new screen was created | Create a use case in `widgetbook/lib/features/` |
 | An existing screen changed | Update the existing use case |
 | The screen has loading/empty/error/content states | Expose those states as knobs or use cases |
 
@@ -45,7 +45,7 @@ Use one of these strategies:
 Mirror the feature structure from the main project:
 
 ```text
-widgetbook_[appname]/lib/features/<feature>/<screen>.use_case.dart
+widgetbook/lib/features/<feature>/<screen>.use_case.dart
 ```
 
 Keep screen use cases out of `ui_system/`; those belong under `features/`.

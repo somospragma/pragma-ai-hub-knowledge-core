@@ -15,7 +15,7 @@ Use this reference to find components and screens that exist in the main project
 
 1. Scan UI System widgets in the main project.
 2. Scan screens/pages/views in the main project.
-3. Scan existing `*.use_case.dart` files in `widgetbook_[appname]/lib/ui_system` and `widgetbook_[appname]/lib/features`.
+3. Scan existing `*.use_case.dart` files in `widgetbook/lib/ui_system` and `widgetbook/lib/features`.
 4. Cross-check source widgets/screens against use cases.
 5. Present a coverage report before generating anything.
 6. Generate approved missing use cases.
@@ -29,7 +29,7 @@ find lib -name "*.dart" -path "*/widgets/*" -o          -name "*_widget.dart" -o
 
 find lib -name "*_screen.dart" -o          -name "*_page.dart" -o          -name "*_view.dart" | grep -v widgetbook | sort
 
-find widgetbook_[appname]/lib -name "*.use_case.dart" | sort
+find widgetbook/lib -name "*.use_case.dart" | sort
 ```
 
 ## Exclusions

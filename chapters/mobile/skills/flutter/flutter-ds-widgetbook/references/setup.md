@@ -4,45 +4,61 @@ Use this reference when Step -1 of `SKILL.md` detects that the Widgetbook host p
 
 For `monorepo_melos` repositories use `references/monorepo.md` instead.
 
+Widgetbook is created as a **nested** Flutter project inside the app repo root (`<app-root>/widgetbook/`), exactly as the official Widgetbook Quick Start prescribes. This is the only supported layout — do not create Widgetbook as a sibling directory.
+
 ## Detection
 
 Widgetbook is considered initialized only when **all four** signals are true:
 
 1. `{WIDGETBOOK_ROOT}/pubspec.yaml` exists.
 2. It declares `widgetbook` and `widgetbook_annotation` as dependencies, plus `widgetbook_generator` and `build_runner` as dev dependencies.
-3. It declares the host app package as a `path:` dependency.
+3. It declares the host app package as a `path:` dependency (`path: ../`).
 4. `{WIDGETBOOK_ROOT}/lib/main.dart` (or an equivalent entry file) references `directories` produced by `widgetbook_generator` (a `part`/`import` of `main.directories.g.dart` or `widgetbook.directories.g.dart`).
 
 If any signal is missing, run the initialization sequence below before generating use cases.
 
-## Naming
+## Naming and location
 
-- `APPNAME` is `project.package_name` from `.sopp/config/project.config.yaml`.
-- The Widgetbook project name follows `widgetbook_[appname]` in snake_case.
-- `WIDGETBOOK_ROOT` resolves to the sibling directory of the app repo root:
-  `<parent-of-app-root>/widgetbook_[appname]/`.
+- `APPNAME` is `project.package_name` from `.sopp/config/project.config.yaml`. It is the value used for the app package `path:` dependency, **not** for the Widgetbook directory name.
+- The Widgetbook project directory is literally named `widgetbook`.
+- `WIDGETBOOK_ROOT` resolves to `<app-root>/widgetbook/` — a subfolder inside the app repo root.
+
+The resulting layout matches the official guide:
+
+```text
+[appname]/
+├── pubspec.yaml
+├── lib/
+├── ...
+└── widgetbook/
+    ├── pubspec.yaml
+    ├── lib/
+    └── ...
+```
 
 ## Initialization sequence
 
-Run every command in this exact order. The working directory for **step 1** is the parent of the app repo root (so `flutter create` produces a sibling project). From **step 2** onwards, the working directory is `widgetbook_[appname]/`.
+Run every command in this exact order. The working directory for **step 1** is the **app repo root** (so `flutter create` produces the nested `widgetbook/` project). From **step 2** onwards, the working directory is `<app-root>/widgetbook/`.
 
-### 1. Create the empty Flutter project
+### 1. Create the empty Flutter project from the app root
 
 ```bash
-flutter create widgetbook_[appname] --empty
+flutter create widgetbook --empty --platforms=android,ios,web
 ```
+
+Run this command literally, from the root of the app project. The directory **must** be created by `flutter create` so it is a real Flutter project — never hand-create a plain folder named `widgetbook`. The `--platforms=android,ios,web` flag keeps the catalog scoped to the platforms actually used (web is what `flutter run -d chrome` targets).
 
 ### 2. Install Widgetbook dependencies
 
 ```bash
-cd widgetbook_[appname]
+cd widgetbook
 flutter pub add widgetbook widgetbook_annotation \
   dev:widgetbook_generator dev:build_runner
 ```
 
 ### 3. Add the host app as a `path:` dependency
 
-Edit `widgetbook_[appname]/pubspec.yaml` and add the app package under `dependencies:`. `[appname]` must match `project.package_name`:
+Edit `widgetbook/pubspec.yaml` and add the app package under `dependencies:`. `[appname]` must match `project.package_name`. Because Widgetbook is nested one level inside the app root, the path is `../`:
 
 ```yaml
 dependencies:
@@ -50,11 +66,11 @@ dependencies:
     path: ../
 ```
 
-If the DS lives in a separate local package that the catalog also documents, add it here as an additional `path:` entry.
+If the DS lives in a separate local package that the catalog also documents, add it here as an additional `path:` entry pointing at that package's location relative to `widgetbook/`.
 
 ### 4. Scaffold the entry point
 
-Create `widgetbook_[appname]/lib/main.dart`:
+Create `widgetbook/lib/main.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -86,7 +102,7 @@ class WidgetbookApp extends StatelessWidget {
 ### 5. Scaffold the folder structure
 
 ```text
-widgetbook_[appname]/lib/
+widgetbook/lib/
 ├── main.dart
 ├── ui_system/    # DS_COMPONENTS use cases
 ├── features/     # APP_SCREENS use cases
@@ -113,12 +129,12 @@ The catalog must open with no use cases and no runtime errors. Only after this s
 
 ## Assets
 
-Widgetbook is an independent Flutter project. Any asset used by a cataloged widget must **also** be declared in `widgetbook_[appname]/pubspec.yaml`, even when the app package is included as a `path:` dependency.
+Widgetbook is an independent Flutter project. Any asset used by a cataloged widget must **also** be declared in `widgetbook/pubspec.yaml`, even when the app package is included as a `path:` dependency.
 
 After editing assets or dependencies:
 
 ```bash
-cd widgetbook_[appname]
+cd widgetbook
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 ```
@@ -126,7 +142,7 @@ dart run build_runner build --delete-conflicting-outputs
 ## Regeneration after adding use cases
 
 ```bash
-cd widgetbook_[appname]
+cd widgetbook
 dart analyze lib/ui_system lib/features
 dart run build_runner build --delete-conflicting-outputs
 ```
@@ -145,12 +161,12 @@ UI System components must render over the same background color they would use i
 
 When Step -1 triggers this sequence during `phase-4-3-ds-widgetbook` (new-component) or `phase-4-3-ds-widgetbook` / `phase-4-6-app-widgetbook` (new-view), include the newly created files in the phase's `--output-file` set so the gap report can diff them:
 
-- `widgetbook_[appname]/pubspec.yaml`
-- `widgetbook_[appname]/lib/main.dart`
-- `widgetbook_[appname]/lib/main.directories.g.dart`
-- `widgetbook_[appname]/lib/ui_system/.gitkeep`
-- `widgetbook_[appname]/lib/features/.gitkeep`
-- `widgetbook_[appname]/lib/shared/.gitkeep`
+- `widgetbook/pubspec.yaml`
+- `widgetbook/lib/main.dart`
+- `widgetbook/lib/main.directories.g.dart`
+- `widgetbook/lib/ui_system/.gitkeep`
+- `widgetbook/lib/features/.gitkeep`
+- `widgetbook/lib/shared/.gitkeep`
 
 ## Source
 
