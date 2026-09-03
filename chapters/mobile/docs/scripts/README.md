@@ -23,6 +23,14 @@ Default checks:
 - Bootstrap anti-drift requirements.
 - Deterministic legacy and modern Melos workspace resolution.
 - Documentation target permissions.
+- **Workflow Response Contract integrity** — every workflow markdown must
+  declare the `Workflow Execution Contract`, `Instructions to the executing
+  agent` and `Response Contract Violations` sections, plus a per-phase
+  Response Contract block, the Spanish approval prompt, and matching
+  `pragma-ai workflow report` telemetry calls (`--status started` +
+  terminal) whose `--step-id` and `--workflow-id` values resolve against
+  the `Step IDs` table. Prevents runtime drift where a phase silently drops
+  its telemetry contract.
 
 Run the strict internal-language audit:
 
@@ -86,3 +94,21 @@ The JSON result reports `config_source`, target membership and a package scope.
 It exits with status 2 and a machine-readable error when the selected target is
 not a valid Melos package. It does not contact the network, run `pub get`, or
 require the `melos` executable.
+
+## `test_validate_workflow_response_contract.rb`
+
+Minitest suite for the workflow Response Contract validator helpers. It
+exercises `workflow_step_ids_from_header`, `workflow_phase_sections`,
+`workflow_bash_report_calls`, `workflow_response_contract_present?`,
+`workflow_approval_prompt_present?` and `workflow_execute_now_before_started?`
+against synthetic fixtures, plus a KB-integration test that runs
+`validate_workflow_response_contract` against the real workflow markdowns and
+fails if any finding is produced. Run it directly:
+
+```bash
+ruby chapters/mobile/docs/scripts/test_validate_workflow_response_contract.rb
+```
+
+Regression protection: whenever a workflow markdown is edited (or the
+validator helpers are refactored), this suite locks in that the eight mobile
+workflows continue to satisfy the Response Contract.

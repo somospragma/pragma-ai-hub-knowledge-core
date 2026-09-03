@@ -341,6 +341,81 @@ Validate that the project is ready for the canonical pipeline:
 - Use compact handoffs by reference (`bootstrap-spec.yaml`, `context.json`);
   never copy the full discovery between phases.
 
+## Workflow Execution Contract (required)
+
+When this agent is the `entry_agent` of `/bootstrap-workspace`, it MUST
+honour the workflow's Response Contract on every phase. The Response Contract
+is embedded at the top of each phase in `bootstrap-workspace.workflow.md` as
+`▶ Response Contract (non-negotiable)` and binds the shape of the response.
+
+### Per-phase telemetry (non-negotiable)
+
+Every executed phase emits, exactly once per attempt:
+
+- `pragma-ai workflow report --status started` when the step begins (real
+  shell tool call — not narration).
+- `pragma-ai workflow report --status finished` on success, with one
+  `--output-file` flag per artifact declared in the phase's contract (only
+  `phase-2-proposal` and `phase-4-apply-with-backup` produce files); or
+  `--status failed` on unrecoverable blocker (the workflow stops); or
+  `--status re_started` when the human rejects and the phase must be
+  regenerated.
+
+The `--step-id` and `--workflow-id` values are canonical: copy them
+character-for-character from the workflow's `Step IDs` list. `--workflow-id`
+MUST be exactly `bootstrap-workspace`. Inventing, translating, abbreviating
+or paraphrasing a step id silently corrupts the run.
+
+### Per-phase human approval gate
+
+After every `finished`, present the workflow's approval prompt block in
+Spanish (`He completado <PHASE> — <Name>. ¿Apruebas el resultado?` plus the
+three numbered options: ✅ Aprobado / ✏️ Ediciones / ❌ Rechazado) VERBATIM as
+the last thing in the response, and yield. Silence is not approval.
+Continuing past the prompt without an explicit user answer is a workflow
+violation.
+
+### Domain-specific checkpoint (HUMAN CHECKPOINT, Required)
+
+Between PHASE 3 and PHASE 4, the workflow requires the domain-specific
+**HUMAN CHECKPOINT (Required)** for `propose_then_apply`, in addition to the
+per-step approval gate. PHASE 4 MUST NOT emit `started` until the human has
+explicitly approved applying the proposal. On rejection, report `re_started`
+on `phase-2-proposal`, regenerate the proposal, re-report `finished` with the
+same `--output-file` set, and re-enter the checkpoint.
+
+### Gap report
+
+After every approved file-producing phase (only `phase-2-proposal` and
+`phase-4-apply-with-backup`), run the two-phase gap report against the same
+`--step-id`:
+
+- **Phase A:** `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID"
+  --step-id <step-id>` to generate the diff report.
+- **Phase B:** `pragma-ai workflow gap-report ... --submit
+  --report-id <id> --summary "<summary or 'no changes'>"` to submit the
+  interpretation.
+
+Skip the gap report entirely on `phase-0-reuse-or-diagnose`,
+`phase-1-discovery`, `phase-3-pre-apply-validation`, and
+`phase-5-post-bootstrap-validation` (they produce no files), and on any
+step that ended `failed`.
+
+### Critical Rules (workflow discipline)
+
+- NEVER treat the workflow markdown as reference material — it is executable.
+  Every fenced `bash` block is a real shell tool call your agent MUST issue.
+- ALWAYS load `bootstrap-workspace.workflow.md` into context before starting a
+  phase, and re-read that phase's Response Contract block. Do not summarize
+  or paraphrase the workflow doc; execute it.
+- NEVER invent, translate, abbreviate, paraphrase, pluralize or re-case a
+  workflow step id. Copy it verbatim from the workflow's `Step IDs` table.
+- NEVER continue after a `finished` report without the explicit human answer
+  (Aprobado / Ediciones / Rechazado) at the per-step gate; silence is not
+  approval.
+- NEVER start PHASE 4 before the domain-specific HUMAN CHECKPOINT (Required)
+  is explicitly approved by the user.
+
 ## Standard Blocking Codes
 
 - `BOOTSTRAP_WORKSPACE_ROOT_MISSING`

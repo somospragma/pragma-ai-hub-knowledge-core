@@ -1,6 +1,6 @@
 ---
 id: new-component
-version: 1.3.0
+version: 1.5.0
 scope: chapter
 type: workflow
 chapter: mobile
@@ -20,19 +20,32 @@ description: >
 | `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
 | Step IDs | `topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate`, `phase-0-spec-packet`, `phase-1-design-analysis`, `phase-2-spec-inventory-dag`, `phase-2-1-architecture-technical`, `phase-2-2-validation-human-review`, `phase-3-ds-code-generation`, `phase-3-1-quality-audit`, `phase-4-1-widget-tests-ds`, `phase-4-2-golden-tests-ds`, `phase-4-3-widgetbook-ds`, `phase-5-delivery` |
 
-> **NON-NEGOTIABLE RULE:** Every `pragma-ai workflow ...` command in this document is **MANDATORY** to execute. The agent MUST run them — they are not suggestions or documentation.
+## Workflow Execution Contract
 
-> ⛔ **STEP-ID INTEGRITY (NON-NEGOTIABLE):** The `--step-id` and `--workflow-id` values shown in every command block below are the **ONLY** valid identifiers for this workflow. The agent MUST copy them **verbatim** from this document — never invent, abbreviate, translate, paraphrase, pluralize, capitalize differently, or otherwise modify them.
->
-> - Every `--step-id` submitted to `pragma-ai workflow report` or `pragma-ai workflow gap-report` MUST match one entry in the **"Step IDs"** list above, character-for-character (kebab-case, lowercase, exact spelling).
-> - Every `--workflow-id` MUST be exactly `new-component`.
-> - If a step-id you need is not in the list, STOP and ask the user — do not fabricate one.
-> - The CLI rejects unknown step-ids; a wrong id silently corrupts the run's telemetry.
+**This document is not reference material — you are executing it.** Every fenced `bash` block is a real shell tool call your agent MUST issue. Do not paraphrase, summarize, describe, or narrate them; emit the exact command via your shell tool.
 
-> Each step ends with a **human approval gate** before the gap report (see *Human approval gate* at the end of this document).
-> The **gap report only runs on steps that produce output files** (`--output-file`). In this workflow, the three pre-flight gates and `phase-2-2-validation-human-review` do not run a gap report.
-> `phase-4-2-golden-tests-ds` is conditional on `golden_tests=true`; when `false`, the step is skipped and emits no telemetry (the workflow records `skipped_by_input` in its own artifacts).
-> Commands assume the shell's cwd is already the project root — no `cd` prefix is needed, and `--project-dir` only matters when running from elsewhere.
+The following rules bind every phase in this workflow and are enforced by the Response Contract embedded at the top of each phase:
+
+1. **Telemetry integrity.** Every executed step (the three pre-flight gates and every phase) emits exactly one `--status started` before its work and exactly one terminal status on completion — `--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when the human rejects and the phase must be regenerated — via `pragma-ai workflow report`. Skipping any of these is a workflow violation.
+2. **Step-id integrity.** The `--step-id` and `--workflow-id` values are the ONLY valid identifiers. Copy them **verbatim** from the `Step IDs` table above — never invent, translate, abbreviate, paraphrase, pluralize, or re-case them. `--workflow-id` MUST be exactly `new-component`. The CLI silently rejects unknown step-ids.
+3. **Human approval per phase.** After every `finished`, present the approval prompt block (Aprobado / Ediciones / Rechazado) VERBATIM as the last thing in your response and yield. Silence is not approval. `phase-2-2-validation-human-review` is the aggregate approval gate for the planning set (PHASE 0 through PHASE 2.1). See *Human approval gate* for the aggregate rejection replay protocol.
+4. **Gap report per file-producing phase.** After the human approves a phase that produced files (`--output-file`), run the two-phase gap report against the same step-id. The three pre-flight gates and `phase-2-2-validation-human-review` produce no files; do NOT run their gap report.
+5. **Conditional phases.** `phase-4-2-golden-tests-ds` is conditional on `golden_tests=true`. When `false`, skip the phase entirely — do not emit `started` or `finished`. Record the skip as `skipped_by_input` in `context.json`, `spec.yaml` and `PIPELINE_LOG_PATH`.
+6. **cwd assumption.** Commands assume the shell's cwd is the project root. `--project-dir` is only needed when running from elsewhere.
+
+Violating any of these rules is a Response Contract Violation (see the section of that name at the end of this document).
+
+## Instructions to the executing agent
+
+You are the workflow controller. Before every phase:
+
+1. **Load and read** this document into context (if not already loaded) and re-scan the phase's Response Contract at the top of that phase. The Response Contract binds the shape of your response.
+2. **Do not skip** any Response Contract step. Doing so is a workflow violation.
+3. **Do not begin** the phase's work until you have emitted its `--status started` command via your shell tool and it has returned.
+4. **Do not begin** the next phase until the human has explicitly answered the approval prompt with **1** (Aprobado), **2** (Ediciones), or **3** (Rechazado).
+5. **End your response** with the approval prompt block, verbatim, and yield. Do not add prose after it. Do not continue past it in the same response.
+
+Both `Human approval gate` and `Response Contract Violations` at the end of this document apply to every phase and are non-negotiable.
 
 ---
 
@@ -101,7 +114,26 @@ delivery result.
 
 ## Topology Gate (required)
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this gate MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Perform the validation checks described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success or `--status failed` on unrecoverable blocker) via a real shell tool call.
+> 4. This gate produces no output files — do NOT run the gap report.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin the next gate until the user replies.
+>
+> ```
+> He completado Topology Gate. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -145,7 +177,26 @@ pragma-ai workflow report \
 
 ## App Repo Ownership Gate (required)
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this gate MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Perform the validation checks described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success or `--status failed` on unrecoverable blocker) via a real shell tool call.
+> 4. This gate produces no output files — do NOT run the gap report.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin the next gate until the user replies.
+>
+> ```
+> He completado App Repo Ownership Gate. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -193,7 +244,26 @@ pragma-ai workflow report \
 
 ## Figma MCP Gate (required)
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this gate MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Perform the Figma MCP preflight described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success or `--status failed` on unrecoverable blocker) via a real shell tool call.
+> 4. On the success path this gate produces no output files — do NOT run the gap report. (On failure, the diagnostic file is captured by the `failed` branch and does not go through the gap report either.)
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 0 until the user replies.
+>
+> ```
+> He completado Figma MCP Gate. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -267,7 +337,26 @@ evidence_mode: minimal  [Optional; default minimal]
 
 ### PHASE 0 — Mobile Spec Packet (`mini`)
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 1 until the user replies.
+>
+> ```
+> He completado PHASE 0 — Mobile Spec Packet. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -328,7 +417,26 @@ pragma-ai workflow report \
 
 ### PHASE 1 — Design Analysis
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below, including downloading every visible Figma source asset.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2 until the user replies.
+>
+> ```
+> He completado PHASE 1 — Design Analysis. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -374,7 +482,26 @@ pragma-ai workflow report \
 
 ### PHASE 2 — Spec + Inventory + DAG
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2.1 until the user replies.
+>
+> ```
+> He completado PHASE 2 — Spec + Inventory + DAG. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -407,7 +534,26 @@ pragma-ai workflow report \
 
 ### PHASE 2.1 — Architecture Technical
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2.2 until the user replies.
+>
+> ```
+> He completado PHASE 2.1 — Architecture Technical. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -439,7 +585,26 @@ pragma-ai workflow report \
 
 ### PHASE 2.2 — Validation + Human Review
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call.
+> 4. This phase produces no output files — do NOT run the gap report.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. This is the aggregate planning gate: PHASE 3 may only begin after explicit approval.
+>
+> ```
+> He completado PHASE 2.2 — Validation + Human Review. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -491,7 +656,26 @@ pragma-ai workflow report \
 
 ### PHASE 3 — DS Code Generation
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below, generating atoms → molecules → organisms in order.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 3.1 until the user replies.
+>
+> ```
+> He completado PHASE 3 — DS Code Generation. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -549,7 +733,26 @@ pragma-ai workflow report \
 
 ### PHASE 3.1 — Quality Audit
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4.1 until the user replies.
+>
+> ```
+> He completado PHASE 3.1 — Quality Audit. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -595,7 +798,26 @@ pragma-ai workflow report \
 
 ### PHASE 4.1 — Widget Tests DS
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4.2 / 4.3 until the user replies.
+>
+> ```
+> He completado PHASE 4.1 — Widget Tests DS. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -655,9 +877,29 @@ pragma-ai workflow report \
 
 ### PHASE 4.2 — Golden Tests DS (conditional)
 
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. **Guard check.** Only proceed with this phase when `golden_tests=true`. If `golden_tests=false`, skip the phase entirely — do not emit `started` or `finished`. Record `skipped_by_input` in `context.json`, `spec.yaml` and `PIPELINE_LOG_PATH`.
+> 2. Emit the `--status started` command below as a real shell tool call.
+> 3. Do the work described under *Instructions* below.
+> 4. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4.3 until the user replies.
+>
+> ```
+> He completado PHASE 4.2 — Golden Tests DS. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 6 without a user reply is a workflow violation.
+
 > ⚡ **MANDATORY only when `golden_tests=true`.** When `golden_tests=false`, skip this phase entirely — do not emit `started`/`finished` for it. The workflow's own `skipped_by_input` record in `context.json`, `spec.yaml` and `PIPELINE_LOG_PATH` covers the skip.
 
-> ⚡ **MANDATORY (when executed)** — Report `started` when the step begins.
+> ⚡ **EXECUTE NOW (when executed)** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -723,7 +965,26 @@ pragma-ai workflow report \
 
 ### PHASE 4.3 — Widgetbook DS
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below — start with the Widgetbook cold-init preflight (Step -1 of the `flutter-ds-widgetbook` skill) if the host project is uninitialized.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below (use cases + any bootstrap files from Step -1).
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 5 until the user replies.
+>
+> ```
+> He completado PHASE 4.3 — Widgetbook DS. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -741,6 +1002,8 @@ Required compact handoff:
 spec_ref: {SPEC_PACKET_PATH}/spec.yaml
 context_ref: {SPEC_PACKET_PATH}/context.json
 phase: ds_widgetbook
+preflight:
+  - ensure_widgetbook_initialized  # Step -1 of flutter-ds-widgetbook
 read_sections:
   - artifact_plan.planned[group=ds_components]
   - technical_plan
@@ -749,13 +1012,46 @@ read_sections:
   - success_criteria
 ```
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the Widgetbook use-case files. Expand the file array from `artifact_plan.planned[group=ds_widgetbook]`:
+> **Preflight bootstrap.** Before generating any use case, `@widgetbook-developer`
+> runs Step -1 of the `flutter-ds-widgetbook` skill. When the Widgetbook host
+> project is not initialized, it executes the cold-init sequence from
+> `references/setup.md` (single/multi-repo) or `references/monorepo.md`
+> (`monorepo_melos`) and appends every bootstrapped file to the phase's
+> `--output-file` set. Typical bootstrap files (paths depend on repo mode; see
+> the "Bootstrap output files" section in each reference):
+>
+> Widgetbook is a nested Flutter project created with
+> `flutter create widgetbook --empty --platforms=android,ios,web` from the app
+> root, so files live under `<app-root>/widgetbook/` (single/multi-repo) or
+> `<host-package-path>/widgetbook/` in a monorepo:
+>
+> - `widgetbook/pubspec.yaml` (monorepo: `<host-package-path>/widgetbook/pubspec.yaml`)
+> - `widgetbook/lib/main.dart`
+> - `widgetbook/lib/main.directories.g.dart`
+> - `widgetbook/lib/ui_system/.gitkeep`
+> - `widgetbook/lib/features/.gitkeep`
+> - `widgetbook/lib/shared/.gitkeep`
+> - Root `pubspec.yaml` and/or `melos.yaml` only when a monorepo workspace list was edited.
+>
+> If any initialization command fails, report `phase-4-3-widgetbook-ds` as
+> `failed` with the captured error and stop the workflow — do not fall back
+> to writing use cases against an uninitialized project.
+
+> ⚡ **MANDATORY (success path)** — Report `finished` with the Widgetbook use-case files **plus** any bootstrap files produced by Step -1. Expand the use-case array from `artifact_plan.planned[group=ds_widgetbook]` and, when Step -1 bootstrapped Widgetbook, append the bootstrap files reported by `@widgetbook-developer`:
 
 ```bash
 DS_WIDGETBOOK_FLAGS=()
 while IFS= read -r f; do
   DS_WIDGETBOOK_FLAGS+=(--output-file "$f")
 done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widgetbook") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+# Optional: append bootstrap files when Step -1 initialized Widgetbook.
+# The agent lists them in evidence/widgetbook.md under a "bootstrap_files" block.
+if [ -f "${SPEC_PACKET_PATH}/evidence/widgetbook.bootstrap-files.txt" ]; then
+  while IFS= read -r f; do
+    DS_WIDGETBOOK_FLAGS+=(--output-file "$f")
+  done < "${SPEC_PACKET_PATH}/evidence/widgetbook.bootstrap-files.txt"
+fi
 
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
@@ -771,7 +1067,26 @@ pragma-ai workflow report \
 
 ### PHASE 5 — Delivery
 
-> ⚡ **MANDATORY** — Report `started` when the step begins.
+> ### ▶ Response Contract (non-negotiable)
+>
+> Your response for this phase MUST, in order:
+>
+> 1. Emit the `--status started` command below as a real shell tool call.
+> 2. Do the work described under *Instructions* below.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Once approved, the workflow is complete.
+>
+> ```
+> He completado PHASE 5 — Delivery. ¿Apruebas el resultado?
+>   1. ✅ Aprobado — continuar
+>   2. ✏️ Ediciones — dime qué cambiar
+>   3. ❌ Rechazado — regenerar desde cero
+> ```
+>
+> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+
+> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
 ```bash
 pragma-ai workflow report \
@@ -826,6 +1141,24 @@ pragma-ai workflow report \
   as executed or `skipped_by_input`.
 - Record each phase in `PIPELINE_LOG_PATH`.
 - If a phase does not apply, use `skipped` with an explicit reason.
+
+---
+
+## Response Contract Violations
+
+The following are workflow violations. If your response for a phase contains any of them, you have failed the workflow contract for that phase:
+
+- Omitting the `--status started` tool call before starting the phase's work.
+- Omitting the terminal status tool call (`--status finished`, `--status failed`, or `--status re_started`) at the end of the phase.
+- Emitting `--status finished` without every declared `--output-file` flag (spec, evidence, generated `.dart` files, tests, Widgetbook use cases + bootstrap files).
+- Using a `--step-id` or `--workflow-id` value that does not appear in the `Step IDs` table above, character-for-character.
+- Ending a phase response without the approval prompt block, or adding prose after it.
+- Starting the next phase's work before the user has explicitly answered the approval prompt.
+- Running the gap report on `topology-gate`, `app-repo-ownership-gate`, `figma-mcp-gate` (successful path) or `phase-2-2-validation-human-review` (they produce no files).
+- Emitting `started` or `finished` for `phase-4-2-golden-tests-ds` when `golden_tests=false`.
+- Reporting `phase-1-design-analysis --status finished` without the archived Figma source assets referenced by `spec.yaml.assets[].archive_path`.
+
+Report any violation immediately by stopping the workflow and asking the user how to proceed. Do not try to "correct" a missed emission after the fact; re-run the phase.
 
 ---
 

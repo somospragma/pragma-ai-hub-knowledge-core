@@ -5,7 +5,7 @@ Before generating a use case, detect the structure already used by the Widgetboo
 ## Required Roots
 
 ```text
-widgetbook_[appname]/lib/
+widgetbook/lib/
 ├── ui_system/
 ├── features/
 └── shared/
@@ -15,7 +15,7 @@ UI System components belong under `ui_system/`. Feature screens belong under `fe
 
 ## Legacy Migration
 
-If `atoms/`, `molecules/`, `organisms/`, `components/`, or `widgets/` are directly under `widgetbook_[appname]/lib/`, create `ui_system/` and move those folders inside it.
+If `atoms/`, `molecules/`, `organisms/`, `components/`, or `widgets/` are directly under `widgetbook/lib/`, create `ui_system/` and move those folders inside it.
 
 ## Classification
 
@@ -32,6 +32,6 @@ Use Atomic Design classification only for UI System components. Screens always s
 After adding use cases, run:
 
 ```bash
-cd widgetbook_[appname]
+cd widgetbook
 dart run build_runner build --delete-conflicting-outputs
 ```
