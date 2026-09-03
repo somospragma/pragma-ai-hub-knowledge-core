@@ -7,6 +7,8 @@ evidence_mode: minimal
 status: proposed
 language:
   review_documents: es
+domain_modeling:
+  mode: standard
 inputs:
   feature_name: payment_methods
   description: View and manage payment methods.

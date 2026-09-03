@@ -1,6 +1,6 @@
 ---
 id: feature-builder
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: agent
 chapter: mobile
@@ -18,6 +18,7 @@ resources:
   - skill://flutter-clean-architecture
   - skill://flutter-bloc-pattern
   - skill://flutter-freezed-domain-modeling
+  - skill://flutter-ddd-domain-modeling
   - skill://flutter-dependency-injection-pattern
   - skill://flutter-api-rest-connection
   - skill://flutter-errors
@@ -52,6 +53,7 @@ toolsSettings:
 - flutter-clean-architecture
 - flutter-bloc-pattern
 - flutter-freezed-domain-modeling
+- flutter-ddd-domain-modeling
 - flutter-dependency-injection-pattern
 - flutter-api-rest-connection
 - flutter-errors
@@ -97,6 +99,24 @@ Read `EVIDENCE_MODE` from the handoff. In `minimal`, update compact phase
 state in `context.json.phase_results` and omit standard-only analysis and
 checkpoint reports. Always preserve validation, approvals, audit, required
 tests, enabled optional stages and delivery evidence.
+
+## Domain Modeling Mode
+
+Resolve `domain_modeling` during Phase 0, before drafting the Mobile Spec
+Packet:
+
+- Omitted or `standard` → persist `domain_modeling.mode: standard` and apply
+  the existing Clean Architecture and Freezed domain-modeling contracts only.
+- `ddd` → apply `flutter-ddd-domain-modeling` in addition to those contracts.
+  Require `business_rules`, `domain_boundaries` and `server_authority`; draft
+  the complete `domain_modeling` section for the developer's initial approval.
+
+Do not silently choose DDD from an API schema or the number of entities. If the
+feature has clear DDD signals but the mode is omitted, explain the signals and
+ask the developer to select `standard` or `ddd`. Do not generate code while a
+selected DDD model is incomplete. The backend remains authoritative for
+authorization and cross-user consistency even when the client models local
+domain behavior.
 
 ## Agent Permissions
 
@@ -148,11 +168,14 @@ Minimum required spec sections:
 - `agent_permissions`: allowed reads/writes/tools per phase
 - `execution_capabilities`: native delegation availability and
   `delegate_or_controller_executes` fallback policy
+- `domain_modeling.mode`: `standard` by default; when `ddd`, the approved
+  bounded context, ubiquitous language, aggregates, invariants and
+  server-authority split
 - `external_access.figma_mcp`: required only when `figma_url` is present
 - `assets`: when `figma_url` is present, every visible icon, image,
   illustration, logo, and image-fill source must have a downloaded Figma MCP
   archive entry with node id, format and SHA-256
-- `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `figma_scope`, `sequence_diagram`, `golden_tests`, `documentation`
+- `inputs`: `feature_name`, `description`, `api_contract`, `entity_name`, `fields`, `api_endpoints`, `user_story`, `figma_url`, `figma_scope`, `sequence_diagram`, `golden_tests`, `documentation`; when `domain_modeling.mode=ddd`, also `business_rules`, `domain_boundaries` and `server_authority`
 - `contracts`: API endpoints, domain entities, DTO mappings, error shapes
 - `artifact_plan`: domain, data, presentation, DI, routing, unit tests, widget
   tests, integration tests, optional golden tests and optional docs. Project
@@ -226,6 +249,11 @@ Required from the orchestrator or user:
 | `sequence_diagram` | ⚠️ | Sequence diagram of the flow in Mermaid (.mmd file path or inline) |
 | `golden_tests` | No | Boolean. Defaults to `false`; enables optional feature golden tests. |
 | `documentation` | No | Boolean. Defaults to `false`; enables project documentation updates. |
+| `domain_modeling` | No | `standard` (default) or `ddd`. DDD is opt-in and supplements Clean Architecture. |
+| `business_rules` | Conditional | Required for `ddd`; inline rules or a path to the business-rule source. |
+| `domain_boundaries` | Conditional | Required for `ddd`; bounded-context responsibility and external boundaries. |
+| `server_authority` | Conditional | Required for `ddd`; which rules are local UX checks versus backend-authoritative. |
+| `offline_policy` | No | Optional for `ddd`; local mutation and reconciliation behavior. |
 
 If `target_location` is `melos_package`, also require:
 - `package_name` — name for the new or existing package
@@ -247,6 +275,12 @@ Require either:
 2. manual `entity_name` + `fields`.
 
 If neither option is available, return `blocked_input`.
+
+When `domain_modeling=ddd`, require `business_rules`, `domain_boundaries` and
+`server_authority` before drafting the initial review. The review must make the
+bounded context, ubiquitous language, aggregates, invariants and local/backend
+authority explicit. `offline_policy` is required only when the feature allows
+local mutation without immediate backend confirmation.
 
 ### Optional context inputs
 

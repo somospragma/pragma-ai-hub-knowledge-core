@@ -52,6 +52,38 @@ class SoppGateTest < Minitest::Test
     assert_includes err, "schema_ref does not exist"
   end
 
+  def test_rejects_ddd_packet_without_approved_domain_contract
+    spec = YAML.safe_load(File.read(spec_path), aliases: true)
+    spec["domain_modeling"] = { "mode" => "ddd" }
+    File.write(spec_path, YAML.dump(spec))
+
+    _out, err, status = run_gate("validate")
+
+    refute status.success?
+    assert_includes err, "DDD input business_rules is required"
+    assert_includes err, "DDD aggregates are required"
+  end
+
+  def test_accepts_complete_ddd_domain_contract
+    spec = YAML.safe_load(File.read(spec_path), aliases: true)
+    spec["inputs"].merge!(
+      "business_rules" => "Orders require at least one line before submission.",
+      "domain_boundaries" => "Checkout owns the local order draft.",
+      "server_authority" => "Backend confirms inventory and payment."
+    )
+    spec["domain_modeling"] = {
+      "mode" => "ddd",
+      "bounded_context" => "checkout",
+      "ubiquitous_language" => { "order" => "A shopper's draft purchase." },
+      "aggregates" => [{ "root" => "Order", "entities" => ["OrderLine"], "references_by_id" => ["CustomerId"] }],
+      "invariants" => ["An order needs one line before submission."],
+      "server_authority" => { "local" => ["order_has_lines"], "backend" => ["inventory_reservation"] }
+    }
+    File.write(spec_path, YAML.dump(spec))
+
+    assert_success run_gate("validate")
+  end
+
   def test_layer_cannot_advance_without_evidence_and_human_approval
     approve_initial
 
@@ -116,6 +148,7 @@ class SoppGateTest < Minitest::Test
       "execution_mode" => "propose_then_apply",
       "evidence_mode" => "minimal",
       "status" => "proposed",
+      "domain_modeling" => { "mode" => "standard" },
       "inputs" => { "feature_name" => "review", "description" => "Reviews" },
       "external_access" => {},
       "agent_permissions" => { "feature-builder" => {} },

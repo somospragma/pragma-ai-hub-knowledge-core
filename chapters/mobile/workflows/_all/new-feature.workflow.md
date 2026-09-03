@@ -1,6 +1,6 @@
 ---
 id: new-feature
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: workflow
 chapter: mobile
@@ -164,7 +164,30 @@ sequence_diagram: docs/diagrams/product_catalog_flow.mmd  (optional)
 golden_tests: false  (optional; default false)
 documentation: false  (optional; default false)
 evidence_mode: minimal  (optional; default minimal)
+domain_modeling: standard | ddd  (optional; default standard)
+business_rules: docs/domain/checkout-rules.md  (required when domain_modeling is ddd)
+domain_boundaries: Checkout owns the local order draft; catalog and payment are external.  (required when domain_modeling is ddd)
+server_authority: Backend confirms stock, final price and payment approval.  (required when domain_modeling is ddd)
+offline_policy: provisional mutations; refresh the order after backend confirmation.  (optional)
 ```
+
+### Domain modeling mode
+
+`domain_modeling` selects how the existing Clean Architecture domain layer is
+modeled:
+
+- `standard` (default) keeps the current entity, value-object, repository and
+  use-case flow. It requires no new inputs or artifacts.
+- `ddd` applies `flutter-ddd-domain-modeling` in addition to the current
+  skills. It requires `business_rules`, `domain_boundaries` and
+  `server_authority` before code generation.
+
+Do not infer `ddd` from an API schema alone. If the feature appears to have
+rich invariants, state transitions or offline mutations but the user did not
+choose a mode, explain the signals and request an explicit choice. In `ddd`
+mode, the initial review must approve the bounded context, ubiquitous language,
+aggregates, invariants and local-versus-backend authority. Without that model,
+stop with `blocked_input`.
 
 ### `api_contract` — Single field, any format
 
@@ -285,6 +308,12 @@ instead of writing YAML manually.
 Normalize omitted `golden_tests` and `documentation` inputs to `false` and
 persist both resolved booleans in `spec.yaml.inputs` before validation. An
 omitted option must never be interpreted as an unrecorded skip later.
+Normalize omitted `domain_modeling` to `standard` and persist it as
+`spec.yaml.domain_modeling.mode`. This default must preserve the existing
+Clean Architecture behavior and cannot require DDD inputs. When the mode is
+`ddd`, persist the approved bounded context, ubiquitous language, aggregates,
+invariants and authority split; require `business_rules`, `domain_boundaries`
+and `server_authority` in `spec.yaml.inputs`.
 When `figma_url` is supplied, normalize an omitted `figma_scope` to `view`.
 Use `component_inventory` only when the Figma link is intentionally not a
 screen the feature will implement.
@@ -293,6 +322,8 @@ The full spec must include:
 
 - requirements and success criteria
 - API/entity/domain analysis inputs
+- `domain_modeling.mode: standard`, or the complete approved DDD domain model
+  when `domain_modeling.mode=ddd`
 - layer plan: domain, data, presentation, wiring and mandatory tests
 - expected artifacts per layer
 - mandatory artifacts under `artifact_plan.planned[group=unit_tests]`,

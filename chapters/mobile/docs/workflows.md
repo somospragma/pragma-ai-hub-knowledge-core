@@ -296,6 +296,11 @@ strategies:
 | `workspace_root` | Conditional | Required when `target_location: melos_package` and the workspace is ambiguous. |
 | `golden_tests` | No | Boolean, default `false`. Runs feature golden tests only when `true`. |
 | `documentation` | No | Boolean, default `false`. Updates project documentation only when `true`. |
+| `domain_modeling` | No | `standard` (default) or `ddd`. `ddd` supplements, never replaces, the existing Clean Architecture flow. |
+| `business_rules` | Conditional | Required for `ddd`; inline business rules or a path to their source. |
+| `domain_boundaries` | Conditional | Required for `ddd`; the bounded-context responsibility and external limits. |
+| `server_authority` | Conditional | Required for `ddd`; local validation versus backend-authoritative decisions. |
+| `offline_policy` | No | Optional local mutation and reconciliation policy for a DDD feature. |
 
 `hu_id` is required so every feature build is linked to a user story from the
 start. The workflow maps `hu_id` directly to the `user-story-id` used by
@@ -310,6 +315,13 @@ Figma assets, `visual_manifest`, `layout_manifest`, exact text/order and the
 compact fidelity report. Select `component_inventory` only when the Figma link
 is not a screen that the feature must render; it avoids the screen comparison
 and retains only the DS-inventory analysis.
+
+`domain_modeling` defaults to `standard`, which preserves the existing domain,
+data and presentation flow. Select `ddd` only for a feature with an approved
+bounded context and meaningful business invariants. In that mode,
+`business_rules`, `domain_boundaries` and `server_authority` are required; the
+initial Spec Packet review records the ubiquitous language, aggregates,
+invariants and local/backend authority split before implementation begins.
 
 With API contract:
 
@@ -329,6 +341,11 @@ package_name: <package_name>                                # conditional
 workspace_root: <absolute/path/to/workspace>                # conditional
 golden_tests: <true|false>                                  # optional, default false
 documentation: <true|false>                                # optional, default false
+domain_modeling: <standard|ddd>                             # optional, default standard
+business_rules: <inline|path>                               # required only for ddd
+domain_boundaries: <inline|path>                            # required only for ddd
+server_authority: <inline|path>                             # required only for ddd
+offline_policy: <inline|path>                               # optional
 ```
 
 Without API contract:
@@ -352,6 +369,11 @@ ui_components: <DSComponentA, DSComponentB>                 # optional
 sequence_diagram: <docs/diagrams/feature_flow.mmd>          # optional
 golden_tests: <true|false>                                  # optional, default false
 documentation: <true|false>                                # optional, default false
+domain_modeling: <standard|ddd>                             # optional, default standard
+business_rules: <inline|path>                               # required only for ddd
+domain_boundaries: <inline|path>                            # required only for ddd
+server_authority: <inline|path>                             # required only for ddd
+offline_policy: <inline|path>                               # optional
 ```
 
 Expected result: domain entities, use cases, repository contracts, DTOs, data

@@ -1,7 +1,7 @@
 ---
 id: mobile-sdd-spec-validation
 name: mobile-sdd-spec-validation
-version: 1.4.0
+version: 1.5.0
 scope: chapter
 type: skill
 chapter: mobile
@@ -230,6 +230,31 @@ revision, regenerate validation evidence and calculate a new artifact hash.
 Return to `pending_human_review`; authorization to revise is not approval of the
 revised layer. If the proposal reaches an earlier layer, mark every dependent
 checkpoint `stale` and resume from the earliest affected layer.
+
+### `/new-feature` DDD Mode Gate
+
+`/new-feature` always declares `domain_modeling.mode`. An omitted mode is
+normalized to `standard`; it preserves the existing Clean Architecture flow and
+must not require DDD inputs, artifacts or tests.
+
+When `domain_modeling.mode=ddd`, before the initial review require:
+
+1. Non-empty `inputs.business_rules`, `inputs.domain_boundaries` and
+   `inputs.server_authority`.
+2. A non-empty `domain_modeling.bounded_context` and
+   `domain_modeling.ubiquitous_language`.
+3. At least one aggregate with a root, its internal entities and external
+   references represented by identifiers.
+4. At least one explicit invariant.
+5. A `domain_modeling.server_authority` split listing local checks and at
+   least one backend-authoritative decision.
+6. When an offline policy is declared, a permitted mutation mode and a concrete
+   reconciliation rule.
+
+The domain-model section is part of the initial human approval. An API DTO,
+OpenAPI schema or a BLoC state is not a substitute for a bounded context or a
+business invariant. If any required DDD item is missing, stop with
+`blocked_input`; do not generate Domain, Data or Presentation code.
 
 ### `/new-view` Plan Gate
 

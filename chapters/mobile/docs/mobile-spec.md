@@ -215,6 +215,19 @@ entries in `context.json.phase_results`, so later agents can resume without
 re-reading prose reports. `standard` additionally writes detailed analysis,
 inventory, planning, code-generation, Widgetbook and checkpoint reports.
 
+## Optional DDD Domain Modeling
+
+`/new-feature` declares `domain_modeling.mode`. The default is `standard`, so
+the existing Clean Architecture feature flow is unchanged. `ddd` is an opt-in
+mode for complex mobile domain behavior and additionally requires
+`business_rules`, `domain_boundaries` and `server_authority`.
+
+Before the initial human approval in DDD mode, the packet records its bounded
+context, ubiquitous language, aggregates, invariants and local-versus-backend
+authority. The mobile client may protect local behavior and offline state, but
+the backend remains authoritative for authorization and cross-user consistency.
+An API schema or DTO alone cannot satisfy this contract.
+
 ## Portable Role Execution
 
 `/new-feature` packets require `execution_capabilities`:
@@ -240,6 +253,7 @@ Every generated spec must include:
 - `workflow`
 - `spec_level`
 - `execution_mode`
+- `domain_modeling` (required for `/new-feature`; defaults to `standard`)
 - `inputs`
 - `evidence_mode`
 - `human_review`

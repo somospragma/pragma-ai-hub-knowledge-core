@@ -7,6 +7,8 @@ evidence_mode: minimal
 status: proposed
 language:
   review_documents: es
+domain_modeling:
+  mode: standard
 inputs: {}
 external_access:
   figma_mcp:
@@ -33,6 +35,7 @@ agent_permissions:
       - success_criteria
     can_write:
       spec_sections:
+        - domain_modeling
         - external_access.figma_mcp
         - design_source
         - literal_texts

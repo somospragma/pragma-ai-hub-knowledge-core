@@ -1012,6 +1012,31 @@ def validate_semantics(findings, cleared)
     end
   end
 
+  unless (new_feature_overlay["optional_inputs"] || []).include?("domain_modeling")
+    add(findings, "CRITICAL", "NEW_FEATURE_DDD_MODE_INPUT_MISSING", "new-feature overlay must declare optional domain_modeling")
+  end
+  ddd_supporting_inputs = %w[business_rules domain_boundaries server_authority offline_policy]
+  missing_ddd_inputs = ddd_supporting_inputs - (new_feature_overlay["optional_inputs"] || [])
+  unless missing_ddd_inputs.empty?
+    add(findings, "CRITICAL", "NEW_FEATURE_DDD_INPUTS_MISSING", "new-feature overlay must declare DDD supporting inputs", missing_ddd_inputs.join(", "))
+  end
+  ddd_mode_property = schema.dig("properties", "domain_modeling", "properties", "mode") || {}
+  unless ddd_mode_property["enum"] == %w[standard ddd] && ddd_mode_property["default"] == "standard"
+    add(findings, "CRITICAL", "DDD_MODE_SCHEMA_DRIFT", "mobile-spec schema must define standard and opt-in ddd modes")
+  end
+  ddd_rule = (schema["allOf"] || []).find do |rule|
+    rule.dig("if", "properties", "workflow", "const") == "new-feature" &&
+      rule.dig("if", "properties", "domain_modeling", "properties", "mode", "const") == "ddd"
+  end
+  expected_ddd_inputs = %w[business_rules domain_boundaries server_authority]
+  actual_ddd_inputs = ddd_rule&.dig("then", "properties", "inputs", "required") || []
+  required_domain_model_fields = %w[mode bounded_context ubiquitous_language aggregates invariants server_authority]
+  actual_domain_model_fields = ddd_rule&.dig("then", "properties", "domain_modeling", "required") || []
+  unless (expected_ddd_inputs - actual_ddd_inputs).empty? &&
+         (required_domain_model_fields - actual_domain_model_fields).empty?
+    add(findings, "CRITICAL", "DDD_REQUIRED_CONTRACT_DRIFT", "DDD packets must require business inputs and an approved domain model")
+  end
+
   execution_capability = schema.dig("properties", "execution_capabilities") || {}
   unless execution_capability.dig("properties", "subagent_delegation", "enum") == %w[pending available unavailable] &&
          execution_capability.dig("properties", "fallback_policy", "enum") == ["delegate_or_controller_executes"]
@@ -1044,6 +1069,15 @@ def validate_semantics(findings, cleared)
   end
 
   feature_builder = File.read("chapters/mobile/agents/_all/feature-builder.agent.md")
+  ddd_skill = "chapters/mobile/skills/flutter/flutter-ddd-domain-modeling/SKILL.md"
+  unless File.file?(ddd_skill) &&
+         feature_builder.include?("flutter-ddd-domain-modeling") &&
+         new_feature_workflow.include?("domain_modeling") &&
+         new_feature_workflow.include?("flutter-ddd-domain-modeling") &&
+         File.read("chapters/mobile/skills/_all/mobile-sdd-spec-validation/SKILL.md").include?("/new-feature` DDD Mode Gate") &&
+         File.read("chapters/mobile/docs/scripts/sopp_gate.rb").include?("validate_domain_modeling")
+    add(findings, "CRITICAL", "DDD_MOBILE_WIRING_DRIFT", "Mobile DDD mode must be available to feature-builder and guarded by workflow validation")
+  end
   portable_role_resources = {
     "new-feature-workflow" => new_feature_workflow,
     "feature-builder" => feature_builder,

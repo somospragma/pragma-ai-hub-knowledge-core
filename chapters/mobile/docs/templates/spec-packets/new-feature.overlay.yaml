@@ -21,6 +21,11 @@ optional_inputs:
   - golden_tests
   - documentation
   - evidence_mode
+  - domain_modeling
+  - business_rules
+  - domain_boundaries
+  - server_authority
+  - offline_policy
 required_external_access:
   figma_mcp:
     required_when_input_exists: figma_url
@@ -68,3 +73,4 @@ notes:
   - Unit, widget, and integration tests are never skipped because a test-engineer subagent is unavailable.
   - Delivery proposes branch, commit and PR text unless explicit git or gh permissions are granted.
   - evidence_mode defaults to minimal; standard retains detailed phase reports.
+  - domain_modeling defaults to standard. Only domain_modeling=ddd requires the DDD domain-model contract and its supporting business inputs.
