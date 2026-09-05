@@ -37,7 +37,7 @@ No son la misma y suelen confundirse, lo que produce diagnósticos falsos del ti
 
 **Regla:** cada capacidad se verifica con una operación real sobre un elemento desechable, se registra su resultado, y hasta entonces se declara `sin verificar`. La verificación **es una escritura** y pasa por `[[calidad-alm-write-authorization-gate]]`.
 
-## Las cinco etapas
+## Las seis etapas
 
 | # | Etapa | Qué produce |
 |---|---|---|
@@ -46,6 +46,7 @@ No son la misma y suelen confundirse, lo que produce diagnósticos falsos del ti
 | 3 | **Publicación** | casos existentes en el gestor de pruebas, con su tipo, su contenido y su ubicación |
 | 4 | **Sincronización de identificadores** | los identificadores escritos como etiquetas de trazabilidad en los archivos de escenarios |
 | 5 | **Ejecución y evidencias** | resultados y evidencias publicados contra el ciclo correspondiente |
+| 6 | **Estado del caso** | el caso movido al estado que su flujo de trabajo considera terminado |
 
 ## Escalonado por capacidad
 
@@ -81,11 +82,37 @@ Es el tramo que más se hace a mano y el que más silenciosamente rompe la traza
 
 **Verificación inversa, que es la matriz de trazabilidad real:** todo escenario con exactamente un identificador, y todo caso de la historia con exactamente un escenario. Lo que sobre o falte de cualquier lado se reporta.
 
+## Etapa 6 — Publicar un resultado no cambia el estado del caso
+
+La etapa que casi nadie sabe que existe, y por eso se cierran ciclos donde todo
+está verde y los casos siguen figurando como pendientes.
+
+**Subir un resultado deja la ejecución en su estado; el caso, no.** Son dos cosas
+distintas del gestor: el resultado vive en la corrida, y el caso tiene su propio
+flujo de trabajo. Que la corrida diga *pasó* no mueve el caso a *terminado*.
+
+Tres consecuencias:
+
+- **Es una escritura más**, y por tanto pasa por la ficha de
+  `[[calidad-alm-write-authorization-gate]]` como cualquier otra.
+- **Suele ir por un camino de acceso distinto** al del publicador de resultados.
+  Una cuenta puede tener una credencial para crear y publicar, y otra —la del
+  propio agente— para leer y transicionar. Cuál sirve para qué se resuelve en el
+  mapa de capacidades de la cuenta, no por analogía.
+- **Antes de transicionar, se leen las transiciones disponibles** desde el estado
+  actual: cuál lleva al estado terminado, si exige campos, y si es reversible.
+  Leerlas es gratis; ejecutarlas no. Una transición reversible baja mucho el
+  riesgo de la operación, y conviene decirlo en la ficha.
+
+Y la verificación, como en todas las demás: **por relectura del estado**, no por
+lo que devuelva la llamada.
+
 ## Restricciones
 
 - **NUNCA** publicar, sincronizar ni subir evidencias sin la ficha de `[[calidad-alm-write-authorization-gate]]`.
 - **NUNCA** declarar una capacidad disponible sin haberla probado, ni declararla ausente sin haberlo intentado. "Creemos que no tenemos permisos" no es un diagnóstico.
 - **NUNCA** escribir un identificador de trazabilidad por inferencia cuando el emparejamiento fue ambiguo.
+- **NUNCA** dar por terminado un caso porque su resultado salió verde. El estado del caso es una escritura aparte, y darlo por hecho deja el tablero del cliente diciendo que nada se hizo.
 - **NUNCA** dar el ciclo por cerrado con la verificación inversa en desequilibrio: casos huérfanos o escenarios sin identificador son deuda de trazabilidad, y se reportan aunque el resto haya salido bien.
 - Cada etapa completada se registra en `[[calidad-pipeline-state-tracking]]`.
 
