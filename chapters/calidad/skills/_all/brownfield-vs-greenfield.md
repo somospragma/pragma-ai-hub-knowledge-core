@@ -234,3 +234,46 @@ Caso real y frecuente: el cliente tiene una suite viva y quiere agregar pruebas 
 | **Prototipo de front/app** | **Normalmente NO**. Si la app ya existe y solo falta una pantalla, se difiere la ejecución de esos escenarios; un prototipo paralelo a una app real produce dos fuentes de verdad. Solo si el usuario lo pide explícitamente y se declara el riesgo. |
 
 Cierre: la corrida cierra con `execution_target: mock` y `certification: pending_real_integration` **para los tests nuevos**, sin alterar el estado de certificación de la suite preexistente.
+
+## Greenfield que hereda de un arquetipo hermano: la auditoría de herencia
+
+El caso intermedio y frecuente: se arranca un arquetipo **nuevo** partiendo del
+de otro segmento, otro producto u otra célula del mismo cliente. No es
+brownfield —no hay suite viva que respetar— pero tampoco es greenfield: hay un
+runtime del que se hereda, y **lo que se cree heredado y no lo está no da la cara
+hasta que falla en ejecución**.
+
+Un caso medido lo destapó así: tres capacidades se daban por heredadas y no
+estaban —la configuración de capabilities, el marcado de estado en la granja y el
+cierre de la aplicación además de la sesión—. Y el razonamiento que sigue es el
+que vale: *si eso se escapó, es razonable suponer que hay más.*
+
+**Se emite una auditoría de herencia, y se emite entera**: cada capacidad de
+infraestructura del arquetipo de origen clasificada en cuatro estados, con su
+porqué.
+
+| Estado | Qué significa |
+|---|---|
+| **Portado y verificado ejecutando** | Está, y se comprobó corriendo — no leyendo el archivo |
+| **Portado parcialmente** | Está la capacidad, falta una parte concreta, y la parte se nombra |
+| **No portado, a propósito** | Con el argumento. Casi siempre: *«su valor allá era sostener X, y acá X lo resuelve otra cosa; añadirlo sería complejidad sin problema que resolver»* |
+| **No portado todavía** | Depende de escenarios que aún no existen. Portarlo ahora sería adivinar; se porta con la primera historia que lo pida |
+
+Tres reglas que hacen la diferencia entre una auditoría útil y una lista:
+
+- **Los objetos de pantalla del origen no entran en la cuenta.** Son de
+  funcionalidades del otro producto y no aplican. Lo que se audita es **el
+  runtime que los sostiene**.
+- **«No portado» exige argumento, igual que «portado» exige ejecución.** Sin él,
+  la siguiente sesión lo lee como olvido y lo porta — que es cómo un arquetipo
+  nuevo hereda la complejidad que su hermano necesitaba y él no.
+- **Lo que queda pendiente de verdad se lista aparte**, y es lo que acota qué
+  escenarios se pueden escribir hoy. Lo importante de esa lista no es que sea
+  corta: es que **esté escrita** en vez de descubrirse historia por historia.
+
+Y la asimetría que hay que decir en voz alta cuando alguien proponga «alinear»
+los dos arquetipos: **el argumento de coste no es simétrico.** Migrar una suite
+de miles de escenarios es una reescritura; adoptar la misma decisión en un
+repositorio nuevo cuesta cero. Una regla escrita para el arquetipo grande, si no
+declara su alcance, hace que un agente intente «corregir» una arquitectura que se
+eligió a propósito en el pequeño.

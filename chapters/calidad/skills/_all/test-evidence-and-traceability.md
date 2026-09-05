@@ -161,6 +161,59 @@ Dos consecuencias, y las dos se anotan:
    los escenarios de reinicio de contador pasaban por la pantalla de rechazo del
    token sin verificar su contenido, y seguían verdes cuando el mensaje era otro.
 
+## La evidencia de una corrida roja la produce un finalizador, no el camino de éxito
+
+El modo de fallo más caro de toda esta capacidad: **la evidencia existe en las
+corridas verdes y falta justo en las rojas**, que son las únicas que hay que
+mirar.
+
+Ocurre porque el paso que aparta o consolida los artefactos se engancha a un
+gancho que **no corre cuando la tarea falla**. En local nadie lo nota, porque en
+local la corrida iba en verde. En la canalización, el reporte de la corrida
+fallida sencillamente no está, y la herramienta que lo publica dice que no
+encontró nada.
+
+| Síntoma | Causa | Arreglo |
+|---|---|---|
+| «0 archivos encontrados» solo en las corridas rojas | El paso que mueve los artefactos corre en el camino de éxito | Engancharlo como **finalizador**: corre haya pasado lo que haya pasado |
+| La tarea de publicación aborta antes de generar nada | Comprueba que el directorio de salida exista | Crearlo vacío junto con el otro |
+| Un fallo dice solo el nombre de la clase del ejecutor | El runner descarta el detalle de la excepción, que **es** el mensaje de cada escenario fallido | Configurar el formato completo de excepción; el detalle estaba ahí desde siempre |
+| La pestaña de pruebas dice «1 test, 1 failed» | El ejecutor reporta un único caso agregado | Emitir el XML por escenario, que el motor de pruebas ya sabe generar |
+
+**Que un pipeline en rojo diga qué falló y contra qué host** es una propiedad que
+se diseña, no una que se tiene. Y se verifica **forzando un rojo** — con una
+aserción imposible— y comprobando que el artefacto sale igual.
+
+> Cuidado con el volcado completo de peticiones y respuestas al log: útil para
+> un canario, inmanejable en una regresión. Va detrás de un interruptor.
+
+### El resumen tiene que ser autocontenido
+
+Un reporte HTML de varias páginas que carga hojas de estilo, scripts e iconos
+desde una carpeta hermana **no se puede enseñar dentro de la interfaz de la
+canalización**: se incrusta en un marco con política de contenido y llega sin
+estilos y con los enlaces rotos.
+
+Lo que sí viaja: un **único archivo** con el CSS incrustado y **cero peticiones a
+nada**, que se ve bien abierto desde el artefacto y también dentro del marco
+precisamente porque no carga recursos. Y, mejor aún, el mecanismo **nativo** de
+resumen de la canalización, que renderiza texto en la portada de la corrida sin
+depender de que un administrador instale una extensión.
+
+Y la advertencia de método: **antes de escribir un generador de reportes propio,
+buscar el empaquetado.** En un caso medido se sustituyeron 470 líneas de código
+propio por una tarea que ya existía; lo que se pierde es un formato a medida, lo
+que se gana es no mantenerlo. Es la misma señal de alarma de siempre: si cada
+iteración **añade** un artefacto en vez de quitar uno, el remedio se está
+persiguiendo en el sitio equivocado.
+
+### El resumen dice de dónde salió cada variable
+
+Es lo que permite contrastar por qué la misma petición devuelve un código desde
+una máquina y otro desde el agente. De las direcciones se guarda el valor; de lo
+demás **solo si llegó**, porque ahí hay claves y contraseñas y el resumen acaba
+publicado. Detalle en `[[calidad-execution-profile-and-config-provenance]]`.
+
 ## Cadena requisito → test → resultado → decisión
 
 1. **Requisito**: documentado en Jira/Confluence con ID estable (`HUT-123`, `RF-045`).

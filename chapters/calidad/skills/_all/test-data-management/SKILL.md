@@ -75,6 +75,85 @@ alcanza a los runners: un ejecutor multiplataforma que paralelice por defecto
 pruebas, por más que sea el recurso recomendado. Verificarlo en
 `[[calidad-repo-capability-discovery]]` es parte del barrido, no un detalle.
 
+## La procedencia del dato se escribe dentro del valor
+
+Un dato de prueba tiene dos preguntas: **qué forma tiene** y **de dónde sale**.
+La primera la resuelve la estructura del archivo; la segunda **la resuelve el
+propio valor**, para que el nombre de la variable y su respaldo queden en la
+misma línea y no en un archivo paralelo que hay que mantener sincronizado.
+
+```
+"ultimosDigitos":       "${TDC_PRINCIPAL:-6267}"
+"ultimosDigitos.local": "0000"
+```
+
+| Forma | Qué hace |
+|---|---|
+| `${VARIABLE}` | Solo la variable. Sin ella, falla **nombrándola** |
+| `${VARIABLE:-respaldo}` | La variable si viene; si no, el respaldo del repositorio |
+| valor literal | Siempre ese valor |
+| `<campo>.local` | Solo en el perfil simulado |
+
+Con esto, **que la canalización pise el valor del repositorio sale gratis**: la
+variable se busca en el entorno del proceso, que ya trae aplicada la precedencia
+de `[[calidad-execution-profile-and-config-provenance]]`, sin una línea de código
+para ello.
+
+### El respaldo simulado es una clave aparte, nunca el respaldo del `:-`
+
+Es la decisión menos obvia y la que más protege. Sería más compacto escribir
+`${TDC:-0000}` y que el valor sintético hiciera de respaldo — pero entonces **un
+perfil real al que le falte la variable usaría el dato sintético contra el
+ambiente real, en verde y sin avisar a nadie**.
+
+Al ser claves separadas, la resolución es **asimétrica a propósito**:
+
+- En el perfil simulado, si hay `.local` se usa y **no se mira el entorno**: el
+  sintético no puede viajar.
+- En los perfiles reales, las claves `.local` **no existen**: el dato real no se
+  contamina.
+
+Las dos mitades merecen comprobación propia, porque su fallo es silencioso — ver
+el criterio en `[[calidad-execution-profile-and-config-provenance]]`.
+
+### Un secreto no admite respaldo en el repositorio
+
+Todo dato admite respaldo salvo uno. Una contraseña real como respaldo es una
+**credencial versionada**: filtrada en cuanto alguien clone, y rotarla pasa a ser
+un cambio de código.
+
+```
+"clave":       "${BANCA_PASSWORD}"    ← real: el nombre, sin respaldo
+"clave.local": "Demo1234"             ← simulado: literal, porque es falso
+```
+
+Y esto se hace cumplir, no se pide: el gate rechaza un literal o un respaldo
+`:-` en cualquier campo cuyo nombre termine en `clave`, `password`, `secret`,
+`token`, `pin` o `apikey`, **salvo en su clave `.local`**. Bloquea solo el caso
+peligroso.
+
+> Detalle que decide si la regla sirve: la comparación va **con límites de
+> palabra**. Sin eso, un dato como `6267` salta dentro de `162679` y la regla se
+> vuelve ruido que alguien acaba desactivando.
+
+### Un sujeto, un archivo
+
+Cuando el dato de un usuario está repartido en tres archivos —su alias en uno,
+sus productos reales en otro, los sintéticos en un tercero— pasan tres cosas, y
+ninguna es de estilo: nada ata el producto a su dueño, los datos de negocio no
+admiten venir del ambiente, y los dos archivos hermanos hay que mantenerlos en
+paralelo estando idénticos en la mitad de sus campos.
+
+**Un archivo por sujeto, con todo lo suyo dentro.** Añadir un usuario es copiar
+un archivo. Los productos anidan como anidan en el negocio, a la profundidad que
+haga falta.
+
+Y los campos **se descubren del archivo, no se declaran en el código**: añadir un
+campo hace que exista tipado, que la verificación de ambiente empiece a pedir su
+variable —marcándola opcional si trae respaldo— y que el gate lo vigile dentro
+de los escenarios, sin tocar una línea de código. Un campo mal escrito falla al
+compilar, no en ejecución.
+
 ### La limpieza por hooks cubre los finales, no las interrupciones
 
 Los hooks de limpieza corren cuando el escenario **termina**, bien o mal. No
@@ -119,6 +198,9 @@ observar, eso es un hallazgo que se reporta, no algo que se supone.
 - **NUNCA** escribir la limpieza como un step del escenario. Un step posterior sólo corre si todos los anteriores pasaron, así que corre justo cuando no hace falta y se salta cuando sí. Va en el hook de ciclo de vida — ver `[[calidad-cucumber-bdd-conventions]]`.
 - **NUNCA** dar una limpieza por hecha porque la llamada devolvió un código de éxito.
 - **NUNCA** abandonar una corrida interrumpida sin restaurar el recurso compartido, ni cerrar la sesión sin decirlo.
+- **NUNCA** uses el respaldo del `:-` para el dato sintético: un perfil real sin la variable lo usaría contra el ambiente real, en verde.
+- **NUNCA** pongas un secreto real como respaldo en el repositorio. Es una credencial versionada.
+- **NUNCA** repartas el dato de un sujeto entre archivos hermanos que hay que mantener en paralelo.
 - Encadena con `[[calidad-test-evidence-and-traceability]]` para que el `seed`, el ID del dataset y la versión queden registrados en cada reporte.
 - Sigue `[[calidad-mandatory-inputs-protocol]]` para confirmar al inicio: ¿hay catálogo de datasets del cliente? ¿qué framework de anonimización usa? ¿qué políticas de retención aplican?
 - Con `data_strategy: synthetic` + mock de servicios: las aserciones de los tests validan contrato y reglas de negocio (formato, presencia, eco del request), NUNCA valores literales que solo existen en el dataset sintético del mock — de lo contrario el switchover a datos reales rompe la suite.
