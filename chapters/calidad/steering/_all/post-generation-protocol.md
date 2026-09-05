@@ -46,4 +46,4 @@ Aplica a los 5 IDEs soportados y a los 4 frameworks del chapter, tanto en greenf
 
 ## Cross-links
 
-`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-delivery-gate-contract]]`.
+`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-results-structure-universal]]` — la convención de carpetas donde aterriza `.evidence/`, `[[calidad-delivery-gate-contract]]`.

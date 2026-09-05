@@ -201,6 +201,7 @@ observar, eso es un hallazgo que se reporta, no algo que se supone.
 - **NUNCA** uses el respaldo del `:-` para el dato sintético: un perfil real sin la variable lo usaría contra el ambiente real, en verde.
 - **NUNCA** pongas un secreto real como respaldo en el repositorio. Es una credencial versionada.
 - **NUNCA** repartas el dato de un sujeto entre archivos hermanos que hay que mantener en paralelo.
+- Cuando varios escenarios compartan sesión además del dato, el contrato de reuso y reset es `[[calidad-session-reuse-and-isolation]]`: compartir sin verificar el reset produce fallos dependientes del orden, donde **el escenario que falla no es el que causó el problema**.
 - Encadena con `[[calidad-test-evidence-and-traceability]]` para que el `seed`, el ID del dataset y la versión queden registrados en cada reporte.
 - Sigue `[[calidad-mandatory-inputs-protocol]]` para confirmar al inicio: ¿hay catálogo de datasets del cliente? ¿qué framework de anonimización usa? ¿qué políticas de retención aplican?
 - Con `data_strategy: synthetic` + mock de servicios: las aserciones de los tests validan contrato y reglas de negocio (formato, presencia, eco del request), NUNCA valores literales que solo existen en el dataset sintético del mock — de lo contrario el switchover a datos reales rompe la suite.

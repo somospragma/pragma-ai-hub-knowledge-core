@@ -223,6 +223,8 @@ resultado posible. Ver `[[calidad-automation-feasibility-assessment]]`.
   en paralelo.
 - `[[calidad-automation-feasibility-assessment]]` — qué consume el `Then` de la
   precondición.
+- `[[calidad-session-reuse-and-isolation]]` — cuando la precondición cara es el
+  login, la salida no es acelerarlo sino pagarlo una sola vez.
 - `[[calidad-brownfield-vs-greenfield]]` — dónde termina lo que se puede cambiar.
 - `[[calidad-failure-triage-and-classification]]` — «pasa en local y falla en la
   granja» es un síntoma, no una causa.

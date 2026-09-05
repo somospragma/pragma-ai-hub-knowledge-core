@@ -50,7 +50,7 @@ Cada HU debe estar `ready|ready_with_warnings`: si no hay análisis previo, corr
 
 ### Fase 5 — Diseñar
 
-Aplicar `[[calidad-funcional-test-design]]`: técnicas declaradas por HU, casos en el formato del equipo (Gherkin español data-driven por default), prioridad del risk map, matriz CA↔casos al 100%. Persistir en `output_path/test-cases/{HU}/`. Status: casos por HU, distribución happy/negativo/borde, técnicas usadas. Confirmación del set (y de las actualizaciones de la fase 3) antes de publicar.
+Aplicar `[[calidad-funcional-test-design]]` — prompt de generación: `[[calidad-funcional-generate-test-cases-prompt]]`, que a su vez encadena con `[[calidad-funcional-analyze-story-prompt]]` cuando la HU llega sin analizar. Técnicas declaradas por HU, casos en el formato del equipo (Gherkin español data-driven por default), prioridad del risk map, matriz CA↔casos al 100%. Persistir en `output_path/test-cases/{HU}/`. Status: casos por HU, distribución happy/negativo/borde, técnicas usadas. Confirmación del set (y de las actualizaciones de la fase 3) antes de publicar.
 
 ### Fase 6 — Publicar y vincular (si `publish_target != local`)
 

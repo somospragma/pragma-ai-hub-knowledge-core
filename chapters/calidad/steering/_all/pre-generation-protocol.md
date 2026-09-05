@@ -46,4 +46,4 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 
 ## Cross-links
 
-`[[calidad-mandatory-inputs-protocol]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-test-execution-orchestration]]`, [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder), `[[calidad-business-driven-prioritization]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-generate-executive-report]]`.
+`[[calidad-mandatory-inputs-protocol]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-test-execution-orchestration]]`, [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder), `[[calidad-business-driven-prioritization]]`, `[[calidad-test-organization-by-scenario]]` — cómo se reparten los archivos cuando el alcance trae tres o más historias, `[[calidad-delivery-gate-contract]]`, `[[calidad-generate-executive-report]]`.

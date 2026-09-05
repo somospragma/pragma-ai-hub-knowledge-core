@@ -75,7 +75,7 @@ Antes de generar cualquier código, generar `STRATEGY.md` en el `output_path` se
 NUNCA generar código sin STRATEGY.md aprobado explícitamente.
 
 ### 3. Validar inputs
-Aplica las 5 reglas de [[calidad-appium-screenplay-android]] (consultar `references/mandatory-inputs-validation.md` en su subfolder). Si falla, abortar con el mensaje exacto.
+Aplica las 5 reglas de [[calidad-appium-screenplay-android]] (consultar `references/mandatory-inputs-validation.md` en su subfolder), con el prompt `[[calidad-appium-validate-inputs-prompt]]`. Si falla, abortar con el mensaje exacto.
 
 ### 4. Rechazar si no es Android
 Si `platform_name` (cuando viene) en minúsculas no es `"android"`, responder `"En Appium V2 solo se soporta Android."` ([[calidad-appium-screenplay-android]] (consultar `references/android-only-scope-rationale.md` en su subfolder)).
@@ -108,9 +108,13 @@ Mapear `user_story` y `test_cases` a items para escenarios `@proposed` (≤80 ch
 `build.gradle`, `settings.gradle`, `gradlew`, `gradlew.bat`, `gradle/wrapper/gradle-wrapper.properties`, `serenity.properties`, `android.conf`, `README.md` con las versiones inmutables de [[calidad-appium-screenplay-android]] (consultar `references/gradle-version-matrix.md` en su subfolder). NO redefinir `aggregate`/`reports`/`clean` ([[calidad-appium-screenplay-android]] (consultar `references/no-aggregate-collision.md` en su subfolder)).
 
 ### 8. Generar capa Screenplay
+Prompt de generación: `[[calidad-appium-generate-screenplay-task-prompt]]`.
+
 `LoginTask`, `AppIsResponsive`, `TapOn`, `LoginPage` bajo `co.com.pragma.*` siguiendo [[calidad-appium-screenplay-android]] (consultar `references/screenplay-layers.md` en su subfolder). Si el paso 5 eligió auto-discovery: inyectar selectores reales desde `.evidence/locators-discovered.json` (`[[calidad-appium-apk-auto-discovery]]`). Si eligió deferred o no había capacidades: aplicar deferred locators ([[calidad-appium-screenplay-android]] (consultar `references/deferred-locators-strategy.md` en su subfolder)).
 
 ### 9. Generar features
+Prompt de generación: `[[calidad-appium-generate-cucumber-feature-prompt]]`.
+
 2 escenarios `@android @smoke` siempre + `@android @proposed` por cada item de `user_story`/`test_cases`. Cumplir [[calidad-appium-screenplay-android]] (consultar `references/gherkin-syntax-rules.md` en su subfolder). Detalle en [[calidad-appium-screenplay-android]] (consultar `references/smoke-vs-proposed-scenarios.md` en su subfolder).
 
 ### 10. Ejecutar health-check

@@ -54,16 +54,18 @@ Aplica `[[calidad-spec-validation]]`. OpenAPI > 200 chars, WSDL > 100 chars, deb
 Service name kebab-case desde `info.title` (fallback: filename). `base_url` desde `servers[0].url` / `schemes+host+basePath` / `soap:address`. Variable de URL: camelCase + `Url`.
 
 ### 5. Inventario de endpoints y schemas
+El prompt `[[calidad-karate-analyze-openapi-prompt]]` hace este barrido y emite el inventario en el formato que consumen los pasos 6 a 8.
+
 Para cada path×method: required headers, body fields, response codes, enums, formatos. Convierte `components.schemas` o `definitions` a la notación match ([[calidad-karate-greenfield]] (consultar `references/contract-testing-match-patterns.md` en su subfolder)).
 
 ### 6. Decidir cobertura por endpoint
 Aplica [[calidad-karate-greenfield]] (consultar `references/negative-coverage-formula.md` en su subfolder). Declara el número objetivo de escenarios por endpoint ANTES de generar.
 
 ### 7. Generar features
-Invoca `[[calidad-karate-greenfield]]` paso 5. Usa los tipos y tags de `references/feature-design-dsl.md`. Si hay señales de cifrado, añade los escenarios de `references/encrypted-payloads.md`. Aplica `[[calidad-route-test-generation]]` para mapear endpoint → archivos.
+Prompt de generación: `[[calidad-karate-generate-feature-prompt]]`. Invoca `[[calidad-karate-greenfield]]` paso 5. Usa los tipos y tags de `references/feature-design-dsl.md`. Si hay señales de cifrado, añade los escenarios de `references/encrypted-payloads.md`. Aplica `[[calidad-route-test-generation]]` para mapear endpoint → archivos.
 
 ### 8. Generar schemas `-match.json`
-Uno por schema utilizado en respuestas. Respeta `#type` vs `##type`.
+Prompt de generación: `[[calidad-karate-generate-match-schema-prompt]]`. Uno por schema utilizado en respuestas. Respeta `#type` vs `##type`.
 
 ### 9. Generar infraestructura
 `pom.xml`, `karate-config.js`, `logback-test.xml`, `TestRunner.java` según `references/project-structure.md`. Versiones exactas: `karate-junit5` 1.4.1, `maven-surefire-plugin` 3.2.2. Bloque `<testResources>` obligatorio ([[calidad-karate-greenfield]] (consultar `references/file-location-constraint.md` en su subfolder)).

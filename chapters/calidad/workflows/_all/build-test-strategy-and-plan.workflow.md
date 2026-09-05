@@ -36,7 +36,7 @@ Aplicar `[[calidad-funcional-test-strategy]]`: niveles y frontera con lo unitari
 
 ### Paso 3 — Construir el plan (si `alcance != estrategia`)
 
-Aplicar `[[calidad-funcional-test-plan]]` con la profundidad de `nivel_plan`: estructura 29119-3 completa, riesgos producto+proyecto con dueño/mitigación/contingencia, criterios entrada/salida/suspensión medibles (valores fijados con el usuario), RTM como mecanismo declarado, cronograma con hitos verificables. Si `alcance = plan` y existe estrategia previa, referenciarla; si no existe, la sección 4 la construye en versión mínima con el mismo rigor del paso 2. Presentar y **esperar aprobación**.
+Aplicar `[[calidad-funcional-test-plan]]` —prompt de redacción: `[[calidad-funcional-generate-test-plan-prompt]]`— con la profundidad de `nivel_plan`: estructura 29119-3 completa, riesgos producto+proyecto con dueño/mitigación/contingencia, criterios entrada/salida/suspensión medibles (valores fijados con el usuario), RTM como mecanismo declarado, cronograma con hitos verificables. Si `alcance = plan` y existe estrategia previa, referenciarla; si no existe, la sección 4 la construye en versión mínima con el mismo rigor del paso 2. Presentar y **esperar aprobación**.
 
 ### Paso 4 — Publicar
 

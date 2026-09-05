@@ -230,3 +230,4 @@ publicado. Detalle en `[[calidad-execution-profile-and-config-provenance]]`.
 - **NUNCA** instrumentar solo el dispositivo principal en un escenario que maneja varios: la foto tranquilizadora es la del que no importa.
 - En clientes con políticas de retención (compliance, auditoría externa, certificaciones ISO/SOC), los reportes y summaries deben **archivarse** (S3, artifactory, o equivalente) según política de retención del cliente.
 - Encadena con `[[calidad-route-test-generation]]` como paso final.
+- **Dónde se escribe** cada artefacto de evidencia —la convención universal de carpetas por categoría y fecha— es `[[calidad-results-structure-universal]]`. Este skill dice qué capturar; ése, dónde dejarlo.

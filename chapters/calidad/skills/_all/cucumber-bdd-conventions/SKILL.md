@@ -48,6 +48,8 @@ Esto es exactamente el fallo que produce un agente generando features sin contex
    - `new-local` — no existe y es específico de esta épica. Va en la carpeta de la épica.
    - `new-shared` — no existe y aplica a más de una épica. Va en la carpeta compartida y **se registra en el catálogo** en el mismo cambio.
 4. **Aplicar el sufijo de plataforma** a todo step nuevo, sin excepción, según `references/platform-suffix-and-ambiguity.md`. Un step sin sufijo es un choque futuro garantizado.
+
+   Cuando el comportamiento es idéntico en varias plataformas, la salida no es duplicar la definición: es **una sola implementación con la plataforma como parámetro**, conservando un escenario por sistema operativo en el `.feature` —que es lo que el ALM necesita—. Ver `[[calidad-platform-parameterised-steps]]`.
 5. **Escribir el `.feature`** siguiendo `references/gherkin-tagging-and-naming.md`: exactamente un tag de plataforma por escenario, tag de browser cuando la plataforma es web, tag de story (real o placeholder), al menos un tag de tipo, y nombre de escenario autoexplicativo. El texto del step debe describir lo que su implementación realmente hace — un `Then` que dice "el sistema responde correctamente" mientras verifica un mensaje de error concreto es un defecto, no un matiz de estilo.
 6. **Ubicar los archivos** según `references/file-structure-conventions.md`. Los selectores nunca viven en el código de steps ni en los objetos de página o pantalla: van al archivo de test-data de la plataforma correspondiente.
 7. **Cablear hooks y World** según `references/hooks-and-world-contract.md` si la plataforma es nueva en el arquetipo. Un tag de plataforma sin hook que cree su driver produce escenarios que fallan en el primer step con un driver `undefined`.
