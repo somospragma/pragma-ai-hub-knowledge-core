@@ -100,3 +100,5 @@ veces.
 - `[[calidad-automation-feasibility-assessment]]` — qué se puede automatizar.
 - `[[calidad-failure-triage-and-classification]]` — medir antes de clasificar,
   la misma disciplina aplicada a un fallo.
+- `[[calidad-wait-cost-and-timeout-design]]` — la misma batería aplicada al reloj
+  de la corrida: dónde se va el tiempo dentro de un escenario.

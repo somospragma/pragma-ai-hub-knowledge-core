@@ -95,3 +95,4 @@ const results = await page.getByRole('listitem').count();
 - ``references/templates.md` (sección `package.json`)` — la regla ESLint vive aquí.
 - ``coherence-checks.md`` — auditoría de coherencia.
 - `[[calidad-post-generation-protocol]]` — la corrida de lint forma parte del post-protocolo.
+- `[[calidad-wait-cost-and-timeout-design]]` — los cinco temporizadores disfrazados y por qué el timeout del step supera sus esperas internas.

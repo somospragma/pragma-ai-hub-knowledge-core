@@ -175,6 +175,7 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-transversal-capabilities]]` | `deteccion-de-capacidades-transversales-complementarias` |
 | `[[calidad-ui-locator-map-contract]]` | `ui-locator-map-contract-identificadores-acordados-antes-del-desarrollo` |
 | `[[calidad-visual-regression]]` | `regresion-visual-politica-transversal-de-pruebas` |
+| `[[calidad-wait-cost-and-timeout-design]]` | `wait-cost-and-timeout-design-los-temporizadores-que-nadie-declaro` |
 
 ### Prompts
 

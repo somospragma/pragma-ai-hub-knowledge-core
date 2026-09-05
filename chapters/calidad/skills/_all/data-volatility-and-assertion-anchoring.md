@@ -124,4 +124,4 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 
 ## Cross-links
 
-`[[calidad-ui-locator-map-contract]]`, `[[calidad-figma-mcp-integration]]`, `[[calidad-test-data-management]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-visual-regression]]`, `[[calidad-sut-readiness-gate]]`.
+`[[calidad-ui-locator-map-contract]]`, `[[calidad-figma-mcp-integration]]`, `[[calidad-test-data-management]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-visual-regression]]`, `[[calidad-sut-readiness-gate]]`, `[[calidad-wait-cost-and-timeout-design]]` — el timeout del step decide si la evidencia del ancla transitoria llega a tiempo.

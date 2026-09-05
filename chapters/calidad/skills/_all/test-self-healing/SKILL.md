@@ -110,3 +110,4 @@ Cross-links con otros assets del chapter:
 - `[[calidad-k6-greenfield]]`
 - `[[calidad-appium-screenplay-android]]`
 - `[[calidad-playwright-extract-pages-from-live-app-prompt]]`
+- `[[calidad-wait-cost-and-timeout-design]]` — una lista de fallbacks se sondea en paralelo: en serie, cada fallback nuevo multiplica la latencia.
