@@ -65,6 +65,12 @@ Combinar siempre con `[[calidad-chapter-perspective]]` (perspectiva del chapter)
 
 - **NUNCA fijar a mano un umbral que depende de cuánto tarda una operación.** Un umbral temporal escrito a mano es una suposición sobre la velocidad del dispositivo, y en una granja el dispositivo cambia en cada corrida. Se **mide** la operación y se deriva el umbral de la medida. Caso medido: un lector exigía "al menos 20 segundos de vigencia restante" para leer 8 dígitos; en la granja esa lectura tardaba más, así que cada intento empezaba con margen aparente y terminaba pasada la rotación. Medir sale más barato que adivinar dos veces.
 
+- **El peaje se puede reintentar; el criterio no.** En una suite E2E buena parte de los pasos son **peaje** —login, navegación, preparación de estado— y no forman parte de lo que la historia certifica. Un fallo ahí no aporta información sobre el criterio: sólo ruido caro. Merecen resiliencia explícita, y esa resiliencia es de otra naturaleza que la que se le da al criterio bajo prueba. **Reintentar el peaje es higiene; reintentar el criterio sería falsear el resultado.**
+
+  El reintento del peaje se acota con dos garantías, o se convierte en una máscara: reintenta **sólo ante el fallo transitorio concreto** —un banner de servicio identificable, no cualquier error—, de modo que unas credenciales malas o un usuario bloqueado sigan fallando a la primera; y cada reintento queda en el log, con un mensaje final que dice explícitamente que fue un fallo del servicio atravesado y no del escenario.
+
+  Caso medido: un servicio de autenticación intermitente tumbó dos corridas seguidas de ~4 minutos, y en ambas el diagnóstico aparente señalaba a un selector que no tenía nada que ver.
+
 - **NUNCA curar cambios de contrato del SUT.** Si un campo requerido fue eliminado, un endpoint movido, un status code cambió de `200` a `4xx`, o una pantalla mobile cambió de flujo, **es bug, no healing**. Reportar vía `[[calidad-failure-triage-and-classification]]`.
 - **NUNCA curar tests en producción sin auditoría.** El log de healings es parte de la evidencia del entregable (ver `[[calidad-test-evidence-and-traceability]]`); ocultarlo invalida la entrega.
 - **En Karate:** NUNCA convertir un `#string` requerido a `##string` para que pase. Esconde bug de contrato.

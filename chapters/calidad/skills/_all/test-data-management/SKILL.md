@@ -75,6 +75,39 @@ alcanza a los runners: un ejecutor multiplataforma que paralelice por defecto
 pruebas, por más que sea el recurso recomendado. Verificarlo en
 `[[calidad-repo-capability-discovery]]` es parte del barrido, no un detalle.
 
+### La limpieza por hooks cubre los finales, no las interrupciones
+
+Los hooks de limpieza corren cuando el escenario **termina**, bien o mal. No
+corren cuando el proceso **muere**: una cancelación manual, un `SIGKILL` del
+runner, una sesión remota cerrada por inactividad o un timeout del orquestador
+dejan el recurso compartido exactamente como lo dejó el escenario a mitad.
+
+Y las interrupciones no son excepcionales. Caso medido: se abortó una corrida en
+vuelo a petición del usuario, y la cuenta quedó con el acceso bloqueado por
+intentos fallidos acumulados. **El daño es diferido y silencioso: no lo paga
+quien interrumpe, lo paga el siguiente que use la cuenta**, sin ninguna pista de
+por qué. Lo reportó un compañero dos días después.
+
+Dos obligaciones que se derivan:
+
+- **Toda suite con estado compartido lleva un comando de restauración explícito**
+  —un `restore` de un solo paso— que devuelva el recurso a su punto de partida
+  sin depender de que alguien recuerde cómo se hace ni tenga que escribir un
+  script suelto. Se documenta junto al catálogo de usuarios.
+- **Interrumpir una corrida obliga a restaurar a mano.** No es opcional ni se
+  deja para después: el estado compartido no tiene dueño.
+
+### Una limpieza que sólo comprueba que la llamada se hizo no es una limpieza
+
+Verificar que la petición se procesó —un código de estado correcto— no verifica
+que el estado quedó como debía. Caso medido: el endpoint de desbloqueo responde
+`200` con un campo en el cuerpo que indica si de verdad desbloqueó; un `200` con
+ese campo en falso habría pasado en silencio y la cuenta habría seguido
+bloqueada.
+
+**La limpieza comprueba el efecto, no la llamada.** Y si el efecto no se puede
+observar, eso es un hallazgo que se reporta, no algo que se supone.
+
 ## Restricciones
 
 - **NUNCA** paralelizar escenarios que comparten un usuario de pruebas, ni asumir que un runner no paraleliza porque el escenario "parece corto".
@@ -83,6 +116,9 @@ pruebas, por más que sea el recurso recomendado. Verificarlo en
 - **SIEMPRE** documentar la política de retención de los datasets sintéticos/anonimizados: por defecto se rotan cada release.
 - **SIEMPRE** usar seed fijo en CI (`FAKER_SEED=12345`) para garantizar reproducibilidad. Local puede usar seed aleatorio sólo si se loguea el seed usado para poder reproducir.
 - **NUNCA** mezclar cleanup transaccional con cleanup por API admin en la misma suite sin documentarlo: confunde la traza.
+- **NUNCA** escribir la limpieza como un step del escenario. Un step posterior sólo corre si todos los anteriores pasaron, así que corre justo cuando no hace falta y se salta cuando sí. Va en el hook de ciclo de vida — ver `[[calidad-cucumber-bdd-conventions]]`.
+- **NUNCA** dar una limpieza por hecha porque la llamada devolvió un código de éxito.
+- **NUNCA** abandonar una corrida interrumpida sin restaurar el recurso compartido, ni cerrar la sesión sin decirlo.
 - Encadena con `[[calidad-test-evidence-and-traceability]]` para que el `seed`, el ID del dataset y la versión queden registrados en cada reporte.
 - Sigue `[[calidad-mandatory-inputs-protocol]]` para confirmar al inicio: ¿hay catálogo de datasets del cliente? ¿qué framework de anonimización usa? ¿qué políticas de retención aplican?
 - Con `data_strategy: synthetic` + mock de servicios: las aserciones de los tests validan contrato y reglas de negocio (formato, presencia, eco del request), NUNCA valores literales que solo existen en el dataset sintético del mock — de lo contrario el switchover a datos reales rompe la suite.

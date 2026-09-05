@@ -73,6 +73,20 @@ Si el repositorio no lo resuelve, la segunda pregunta es al equipo del cliente: 
 
 En **greenfield** el barrido no aplica, pero la pregunta al equipo sí, y la clasificación es idéntica.
 
+### 3.1 Tres preguntas que retiran escenarios enteros del alcance
+
+El barrido de la sección anterior busca **cómo** hacer cada paso. Estas tres preguntan si el paso —o el escenario— hace falta. Cada una se llevó por delante escenarios de varios minutos en una certificación real.
+
+**¿Qué consume el `Then` de todo lo que hace el `Given`?** Un escenario que hereda la precondición de su vecino suele estar pagando por un estado que no usa. «Necesito llegar a la pantalla de ingreso manual» y «necesito un código válido» son requisitos muy distintos, y el mismo montaje caro los estaba satisfaciendo con el mismo martillo. Medido: tres escenarios pagaban ~170 s de preparación para generar un dato que después descartaban.
+
+> La respuesta se **verifica con un experimento corto, nunca se asume**. En el caso medido la hipótesis salía del texto del propio criterio de aceptación y era falsa: el texto de un criterio describe el comportamiento esperado del producto, **no la mecánica de cómo llevar al sistema a ese estado**. Un experimento de dos minutos la descartó; asumirla habría producido escenarios que pasan sin ejercitar lo que certifican — el peor resultado posible.
+
+**¿Puede algún escenario ya escrito pasar con este criterio incumplido?** Si la respuesta es no, el criterio ya está cubierto **por construcción** y un escenario dedicado sólo añade minutos. Mapear criterios a escenarios uno a uno es un buen punto de partida y una mala regla: un criterio queda cubierto cuando algún escenario **no puede pasar** sin que se cumpla, tenga o no un escenario con su nombre. La decisión se documenta en el propio feature, que es donde alguien va a buscar por qué falta.
+
+> Al retirar escenarios, comprobar qué se fue con ellos: en el caso medido los escenarios eliminados eran los únicos que llevaban la etiqueta del gate de humo, y la historia se quedó sin gate. Ver `[[calidad-smoke-gate-policy]]`.
+
+**¿Puede este flujo llegar siquiera al estado que el criterio describe?** Cuando un escenario no llega a verde tras varias iteraciones y **cada intento descubre un obstáculo distinto**, la pregunta deja de ser «¿por qué falla?». Un criterio puede ser inalcanzable por construcción desde el vehículo elegido — en el caso medido, la condición que el criterio exige deja la aplicación bloqueada antes de que el usuario alcance el flujo transaccional, y el bloqueo persiste entre sesiones. No era difícil de montar: era imposible por ese camino. Se excluye con su razón, y la razón la confirma quien conoce el producto.
+
 ### 4. Emitir el veredicto por escenario, antes de escribir nada
 
 ```markdown
@@ -120,4 +134,4 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 
 ## Cross-links
 
-`[[calidad-repo-capability-discovery]]`, `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-test-data-management]]`, `[[calidad-sut-readiness-gate]]`, `[[calidad-brownfield-vs-greenfield]]`, `[[calidad-alm-test-publishing-cycle]]`, `[[calidad-alm-write-authorization-gate]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-pipeline-state-tracking]]`, `[[calidad-pre-design-strategy-document]]`.
+`[[calidad-repo-capability-discovery]]`, `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-test-data-management]]`, `[[calidad-sut-readiness-gate]]`, `[[calidad-brownfield-vs-greenfield]]`, `[[calidad-alm-test-publishing-cycle]]`, `[[calidad-alm-write-authorization-gate]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-pipeline-state-tracking]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-smoke-gate-policy]]`, `[[calidad-wait-cost-and-timeout-design]]`.

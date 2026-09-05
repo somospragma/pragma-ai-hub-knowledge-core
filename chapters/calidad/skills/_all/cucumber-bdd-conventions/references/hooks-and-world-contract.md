@@ -79,6 +79,36 @@ Detalle de la instrumentación mobile en el skill del stack correspondiente.
 
 El teardown se ejecuta **siempre**, incluso cuando el escenario falló en el primer step, y su fallo nunca debe enmascarar el del escenario: todo va envuelto en captura de errores que registra pero no relanza.
 
+## La limpieza es responsabilidad del ciclo de vida, no un step
+
+Escribir la limpieza como último `Then` del escenario parece natural y es exactamente al revés de lo que hace falta:
+
+```gherkin
+Then el sistema muestra el mensaje de bloqueo en Android
+And se desbloquea el usuario para no contaminar los siguientes escenarios en Android   ← mal
+```
+
+**Un step posterior sólo corre si todos los anteriores pasaron.** O sea: la limpieza corre justo cuando el escenario fue bien —cuando menos falta hace— y se salta cuando reventó a mitad, que es justo cuando el estado puede haber quedado sucio. Observado en vivo: el escenario que bloquea una cuenta quedó rojo, su step de desbloqueo salió `skipped`, y el escenario siguiente falló en el login por un estado que no era suyo.
+
+Reglas:
+
+- **La limpieza va en un `After` con el tag del feature**, que corre pase lo que pase.
+- **Se aplica a todos los escenarios del feature**, no sólo al que ensucia: si la llamada es barata, así ningún escenario nuevo puede olvidarse.
+- **Su error se registra pero no se propaga.** Una limpieza que falla no debe teñir de rojo un escenario que pasó — pero tampoco puede desaparecer sin dejar rastro.
+- **Regla práctica de detección**: si el texto de un step empieza por «se limpia», «se restaura» o «se elimina … para no contaminar», está en el archivo equivocado.
+
+### Lo que ningún hook cubre: las interrupciones
+
+Una limpieza basada en hooks cubre **los finales, no las interrupciones**. Un proceso matado no ejecuta sus hooks, y las interrupciones no son excepcionales: una cancelación manual, una sesión remota cerrada por inactividad o un timeout del runner producen el mismo estado.
+
+El daño es diferido y silencioso — **no lo paga quien interrumpe, lo paga el siguiente que use ese recurso**, y sin ninguna pista de por qué. Ocurrió: una cuenta compartida quedó bloqueada tras abortar una corrida en vuelo, y lo reportó un compañero dos días después.
+
+Por eso toda suite con estado compartido necesita, además de sus hooks, **un comando de restauración explícito** que devuelva el recurso a su punto de partida sin depender de que alguien recuerde cómo se hace. Detalle en `[[calidad-test-data-management]]`.
+
+## El timeout del step es un tope, no la duración
+
+Un step cuyo `timeout` coincide con la espera que contiene se queda **sin voz**: el arnés lo mata justo cuando la espera interna vence, y el error explicativo que el propio código iba a lanzar nunca se ejecuta. Ver `[[calidad-wait-cost-and-timeout-design]]`.
+
 Orden: detener grabación → capturar evidencia de fallo → marcar estado en el grid remoto → cerrar sesión del driver. Cerrar la sesión primero deja sin evidencia justo el escenario que falló.
 
 Una sesión que no se cierra deja el dispositivo ocupado y hace fallar la corrida siguiente por falta de dispositivos disponibles. En ejecución con sesiones múltiples simultáneas se cierran todas, en paralelo, sin que el fallo de una impida cerrar la otra.

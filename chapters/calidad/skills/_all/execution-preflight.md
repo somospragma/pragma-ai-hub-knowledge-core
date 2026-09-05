@@ -72,6 +72,37 @@ capability que los concede todos apaga en silencio los escenarios que existen
 para verificar esos mismos diálogos, y el resultado es un verde que no prueba
 nada.
 
+**Y se vigila durante toda la espera, no antes de ella.** Un diálogo del sistema
+no está en pantalla en el primer milisegundo tras el arranque: aparece un
+instante después. Una comprobación previa llega antes que él, no encuentra nada,
+y a continuación se consumen treinta segundos esperando una pantalla que sí
+estaba ahí, simplemente tapada. El ciclo de espera alterna *«¿está el diálogo?
+descártalo»* con *«¿está la pantalla?»* hasta que ocurra uno de los dos. Lo que
+se interpone casi nunca estaba antes de mirar.
+
+## Una sonda en rojo no siempre es un bloqueo, y una en verde no autoriza a afirmarlo todo
+
+Las dos mitades del mismo error, y las dos salen caras.
+
+**Una sonda que no completa no dice que el destino no exista.** Una respuesta
+vacía de la sonda HTTP significa *«el cliente no completó la petición»*, no *«el
+host no está»*. En ambientes internos con certificados propios ese es el
+desenlace normal, y leerlo como caída deja parado trabajo que sí podía correr.
+Caso medido: la sonda devolvió vacío, se declaró la red caída, y el destino
+resolvía perfectamente — el certificado autofirmado del ingress era todo. Con la
+verificación de certificado relajada respondió con un código de error HTTP, que
+**es alcance confirmado**: cualquier respuesta del servidor prueba que se llegó.
+
+Regla: en ambientes internos, la sonda de alcance relaja la verificación de
+certificado. Si no, el propio preflight fabrica bloqueos inexistentes.
+
+**Y al revés: un preflight verde acota lo que se puede afirmar, no lo autoriza
+todo.** Demostrar que la corrida alcanza el ingress no demuestra que el servicio
+de autenticación responda. Un experimento que falla con el preflight en verde y
+un servicio dependiente caído queda `environment_blocked_*` y **sin resultado**;
+no se convierte en hallazgo. Ver `[[calidad-environment-blocker-evidence]]`,
+donde vive la carga de la prueba para declarar un bloqueo.
+
 ## Salida obligatoria
 
 `.evidence/preflight.json`:

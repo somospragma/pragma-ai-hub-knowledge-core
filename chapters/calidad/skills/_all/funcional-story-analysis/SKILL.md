@@ -37,6 +37,31 @@ Este SKILL es el índice; el método vive en `references/`. **Abrir estos ANTES 
 5. **Veredicto Definition of Ready** — `ready | ready_with_warnings | not_ready` con la lista exacta de lo que falta para `ready`. El umbral: ninguna HU con criterio INVEST `fail` o con criterios de aceptación no testables puede ser `ready`.
 6. **Emitir el reporte** — formato de `references/analysis-report-format.md`. Si la HU vino del ALM y el usuario lo aprueba, publicar el reporte como comentario del work item (`[[calidad-alm-mcp-integration]]`); nunca modificar la HU original desde este skill.
 
+### Un valor de negocio que gobierna una aserción se confirma con el PO
+
+Hay un tipo de vacío que la taxonomía no clasifica bien porque **no parece un
+vacío**: el criterio trae un número, la interfaz muestra un número, y los dos son
+distintos sin que nadie lo advierta.
+
+Caso medido: la historia decía *«vigencia configurable, por defecto 30
+segundos»*, y la pantalla mostraba *«el código cambiará en N segundos»* con un
+ciclo de unos 30 segundos. La vigencia real, confirmada por el PO, era de **cinco
+minutos**. Lo que se veía en pantalla era la **rotación** —cada cuánto se renueva
+el código visible—, no la **vigencia** —cuánto tiempo sigue siendo aceptado el
+código ya emitido—. Son cosas distintas y ninguna de las dos fuentes lo decía.
+
+La consecuencia fue un defecto de seguridad **falso** reportado al cliente: la
+prueba envió el código antes de que caducara y concluyó que el sistema aceptaba
+uno vencido. El error más caro posible, porque quema credibilidad y hace perder
+tiempo a desarrollo.
+
+Regla: **cuando un número de la historia va a gobernar una espera o una
+aserción, se confirma con quien conoce el producto.** Ni el valor por defecto que
+la historia menciona ni lo que la interfaz muestra son fuentes válidas — el
+primero suele ser un ejemplo, y el segundo suele estar midiendo otra cosa. Se
+registra como pregunta concreta al PO con las dos lecturas posibles, exactamente
+como cualquier otra ambigüedad de cuantificación.
+
 ## Restricciones
 
 - **Este skill NO reescribe la HU** — analiza y pregunta. La reescritura es de `[[calidad-funcional-story-refinement]]` y pasa por aprobación humana.

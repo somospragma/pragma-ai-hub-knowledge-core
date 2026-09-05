@@ -41,6 +41,33 @@ Este SKILL es el índice; el método vive en `references/`. **Abrir estos ANTES 
 5. **Alinear con la estrategia del equipo** — `references/bdd-atdd-alignment.md`: si el equipo trabaja BDD/ATDD, los casos SON los ejemplos ejecutables futuros (mismo Gherkin que consumirá la automatización); si es tradicional, formato paso | resultado esperado. Preguntar, no asumir.
 6. **Verificar la cobertura (quality gate del diseño)** — matriz CA→casos: cada criterio de aceptación con al menos un caso positivo y, donde aplique, negativo; cada caso traza a un CA o a una regla (casos huérfanos = alcance inventado, se eliminan o se justifica su regla). Cobertura < 100% de CA = diseño incompleto, no se entrega como terminado.
 
+### Cuando el criterio se certifica sobre un vehículo prestado
+
+Un criterio transversal —autenticación reforzada, control de intentos, bloqueo
+por reintentos— no tiene flujo propio: se certifica **atravesando otra
+transacción** que lo invoca. Y el diseño de la historia casi siempre está armado
+sobre una transacción distinta de la que finalmente se usa como vehículo.
+
+**El diseño de la historia da el criterio; el vehículo da el desenlace
+observable.** Lo que se verifica —que el código inválido se rechace, que al
+tercer intento se bloquee— es idéntico. **Cómo se manifiesta en pantalla, no.**
+Caso medido: la maqueta de la historia terminaba en una pantalla completa de
+bloqueo; el vehículo real devolvía al detalle del producto con un aviso distinto,
+en otro sitio y con otro texto. Las aserciones construidas desde la maqueta
+esperaban una pantalla que en ese vehículo **no existe**, y el fallo se leyó
+durante días como *«la aplicación no informa»*.
+
+Tres reglas al diseñar así:
+
+1. **Nombrar el vehículo en el caso**, junto al criterio. Quien lo ejecute o lo
+   automatice después necesita saber que el desenlace no sale de la maqueta.
+2. **El desenlace observable se toma del vehículo**, verificado contra la
+   aplicación real, no del diseño de la historia. Construir aserciones de
+   interfaz desde el diseño de otra transacción es tan arriesgado como inventar
+   el selector (`[[calidad-data-volatility-and-assertion-anchoring]]`).
+3. **Marcar como tales los elementos que sí pertenecen al flujo de la maqueta**,
+   para que nadie los reutilice aquí por error.
+
 ## Restricciones
 
 - **NUNCA diseñar desde la nada**: sin CA ni reglas escritas no hay diseño — hay adivinación. Devolver al análisis/refinamiento.

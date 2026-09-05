@@ -28,6 +28,18 @@ Feature: Login con contraseña - HU-24688
 
 Los tags de capacidades transversales (`@accessibility`, `@security`, `@visual`, `@contract`) se aplican según `[[calidad-transversal-capabilities]]` y son ortogonales a los anteriores.
 
+### Un mecanismo no es una plataforma
+
+La regla de «exactamente un tag de plataforma» se rompe casi siempre por la misma vía: **un detalle de cómo se ejecuta el escenario se cuela en el juego de plataformas.** Un escenario que necesita dos dispositivos —uno bajo prueba y otro que le provee un dato— acaba etiquetado `@android-ios`, y a partir de ahí el runner emite los resultados en una carpeta que **no corresponde a ninguna plataforma real**. Para saber cómo está Android hay que mirar en tres sitios, y la trazabilidad al ALM hereda la mentira.
+
+La pregunta que lo detecta: **¿esto que estoy tagueando es algo que el negocio reconoce, o es cómo lo estoy ejecutando?**
+
+- El escenario declara **la plataforma que certifica**, y sólo esa. Lo que se afirma ocurre ahí.
+- El segundo dispositivo, la sesión auxiliar o el driver extra son **una precondición**: los crea el `Given` que los necesita y los cierra un `After`. No llevan tag, ni perfil, ni carpeta de reporte.
+- Si el mecanismo cross-device **es** lo que se certifica —por ejemplo, que un dato viaje entre dos aparatos— entonces sí es negocio, y entonces el nombre del escenario ya lo dice. Un tag de mecanismo sigue sin hacer falta.
+
+Excepción legítima y frecuente: un escenario que se certifica en más de una plataforma a la vez lleva **los tags de esas plataformas**, no un tag compuesto. Mecanismo y plataformas van por separado.
+
 ## El placeholder de trazabilidad
 
 Un feature se escribe muchas veces **antes** de que exista el caso en el ALM. Prohibirlo bloquea el trabajo; permitirlo sin control deja escenarios sin trazabilidad para siempre. El acuerdo:

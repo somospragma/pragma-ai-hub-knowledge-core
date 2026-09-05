@@ -68,6 +68,16 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
    etiquetó como falla técnica intermitente del servicio lo que era el rechazo
    del token; la medida, cuando por fin existió, salió 3 de 3.
 
+2.1. **Contrastar la pantalla inesperada contra TODOS los criterios de la historia, no sólo contra el que está corriendo.** Una pantalla que no encaja en el escenario actual puede ser exactamente la que certifica otro. En campo se clasificó como defecto del SUT una pantalla de error que aparecía dentro de un escenario ajeno; era el comportamiento esperado de **otro** criterio de la misma historia —uno que estaba diferido por no poder provocarse— y la evidencia más difícil de conseguir del entregable estuvo a punto de tirarse.
+
+   Dos errores en uno, y conviene nombrarlos por separado: etiquetar como defecto lo que era comportamiento esperado, y dar por perdido lo que interrumpía el escenario en vez de preguntarse qué estaba demostrando.
+
+   Cuando resulte ser cobertura, **la distinción se reporta tal cual**: *evidenciado, no automatizado* nunca es lo mismo que *cubierto por la suite*.
+
+2.2. **Un código de estado no es un hecho de negocio.** Mapear un código de autorización a una semántica funcional —«403 significa que no había nada que borrar»— convierte cualquier fallo real en un no-op silencioso. En campo, un helper de limpieza escrito así no dejó el ambiente sucio una vez: lo dejó sucio **de forma acumulativa**, y el síntoma apareció corridas después, en otra fase y con otra cara.
+
+   Antes de derivar una conclusión funcional de un código de estado, sondear el mismo endpoint a mano y mirar el cuerpo de la respuesta. Y si el helper que debería explicar el fallo entrega ruido —cuerpos ilegibles, mensajes truncados—, eso es un hallazgo propio que alarga todos los triages siguientes: se reporta.
+
 3. **Clasificar el patrón de fallo** contra el catálogo en `references/failure-pattern-catalog.md`. Las categorías canónicas son: bug real del SUT, test design issue, data state, environment, timing/sync, locator stale, infrastructure. Cada patrón del catálogo trae síntomas observables, causa probable, evidencia a recolectar y acción recomendada.
 
 4. **Decidir acción** aplicando el árbol de decisión de `references/bug-vs-test-design-decision-tree.md`. Reglas resumidas:
@@ -90,6 +100,9 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
 - **El stability score se mide en runs reales del pipeline CI**, no en runs locales del agente. Runs locales no son representativos de la realidad de ejecución.
 - **Si el SUT está caído o degradado, suspender el triage** hasta restablecer el ambiente. NO marcar tests como flaky cuando la infraestructura del SUT está rota — es ruido que contamina las métricas de estabilidad.
 - **NUNCA** ejecutar el protocolo de re-run sobre tests de performance/K6**: re-correr K6 puede dejar el SUT en estado degradado y los resultados no son comparables run-a-run por la naturaleza del workload. Usar análisis manual de métricas.
+- **NUNCA** derivar una conclusión de negocio de un código de estado HTTP sin comprobarla por otra vía. Es la forma más rápida de convertir un fallo en silencio.
+- **NUNCA** conviertas en fatal una condición que la suite venía sobreviviendo, apoyándote en **una sola** observación. «Fallar ruidosamente» es la respuesta correcta *cuando se sabe qué significa el fallo*; con una observación no se sabe. La pregunta que falta es **¿qué pasa si mi interpretación es falsa?** — si la respuesta es «la suite entera deja de correr», la barra de evidencia sube mucho, y un aviso ruidoso que no bloquea da casi todo el valor con nada del riesgo. En campo, hacer fatal un código de estado malinterpretado dejó la suite roja por algo ajeno a lo que se certificaba.
+- **NUNCA** cambies un selector sin comprobar antes en la traza de comandos si **encontró algo**. Cambiar lo que funciona añade riesgo y, peor, consolida un diagnóstico falso: si la corrida siguiente pasa, el arreglo se le atribuye al selector.
 - **El triage es obligatorio antes de cualquier auto-corrección**. Saltarse este skill y pasar directo a `[[calidad-test-self-correction-loop]]` está prohibido por la política del chapter.
 
 ## Verificación
