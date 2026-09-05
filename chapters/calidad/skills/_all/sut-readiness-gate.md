@@ -97,4 +97,4 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 
 ## Cross-links
 
-`[[calidad-route-test-generation]]`, `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-service-virtualization-mockoon]]`, `[[calidad-ui-locator-map-contract]]`, `[[calidad-test-data-management]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-smoke-gate-policy]]`, `[[calidad-delivery-gate-contract]]`.
+`[[calidad-route-test-generation]]`, `[[calidad-mandatory-inputs-protocol]]`, `[[calidad-service-virtualization-mockoon]]`, `[[calidad-ui-locator-map-contract]]`, `[[calidad-test-data-management]]`, `[[calidad-pre-design-strategy-document]]`, `[[calidad-smoke-gate-policy]]`, `[[calidad-delivery-gate-contract]]`, `[[calidad-execution-profile-and-config-provenance]]` — cómo se declara y se comprueba contra qué corrió de verdad.

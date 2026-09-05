@@ -103,6 +103,10 @@ un servicio dependiente caído queda `environment_blocked_*` y **sin resultado**
 no se convierte en hallazgo. Ver `[[calidad-environment-blocker-evidence]]`,
 donde vive la carga de la prueba para declarar un bloqueo.
 
+> El preflight demuestra que la corrida **toca** un SUT. Cuál es, y comprobarlo
+> **después** contra lo que la corrida hizo de verdad, es
+> `[[calidad-execution-profile-and-config-provenance]]`.
+
 ## Salida obligatoria
 
 `.evidence/preflight.json`:

@@ -57,3 +57,5 @@ Activa este skill después de generar suites con `[[calidad-karate-greenfield]]`
 - `references/rp-integration.md`
 - `references/secrets-in-pipelines.md`
 - `references/mobile-cloud-providers.md`
+- `[[calidad-static-analysis-on-the-test-repo]]` — cuando el analizado es el propio repositorio de pruebas y no el SUT.
+- `[[calidad-execution-profile-and-config-provenance]]` — cómo entra la configuración del ambiente en cada job, y por qué no por un bloque de variables por paso.

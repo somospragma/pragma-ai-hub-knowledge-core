@@ -125,6 +125,7 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-environment-blocker-evidence]]` | `environment-blocker-evidence-schema-universal-evidenceexecution-statusjson` |
 | `[[calidad-execution-metadata-schema]]` | `execution-metadata-schema-iso-metadatajson-universal` |
 | `[[calidad-execution-preflight]]` | `execution-preflight-demostrar-que-la-corrida-toca-el-sut` |
+| `[[calidad-execution-profile-and-config-provenance]]` | `perfil-de-ejecucion-y-procedencia-de-la-configuracion` |
 | `[[calidad-executive-report-generator]]` | `executive-report-generator-reporte-ejecutivo-post-corrida-universal` |
 | `[[calidad-failure-triage-and-classification]]` | `failure-triage-and-classification-clasificacion-de-fallos-y-analisis-de-causa-ra` |
 | `[[calidad-figma-mcp-integration]]` | `figma-mcp-integration-consumir-disenos-de-figma-como-fuente-ui` |
@@ -162,6 +163,7 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-session-reuse-and-isolation]]` | `session-reuse-and-isolation-compartir-sin-arrastrar-estado` |
 | `[[calidad-smoke-gate-policy]]` | `smoke-gate-policy-universal-cross-stack` |
 | `[[calidad-spec-validation]]` | `spec-validation-validacion-de-contratos-antes-de-generar` |
+| `[[calidad-static-analysis-on-the-test-repo]]` | `analisis-estatico-sobre-el-propio-repositorio-de-pruebas` |
 | `[[calidad-step-isolation-pattern]]` | `step-isolation-pattern-aislamiento-de-metricas-y-criterios-por-step` |
 | `[[calidad-streaming-files-protocol]]` | `orden-de-scaffold-por-valor-entregado` |
 | `[[calidad-sut-readiness-gate]]` | `sut-readiness-gate-probar-antes-de-que-el-desarrollo-exista` |

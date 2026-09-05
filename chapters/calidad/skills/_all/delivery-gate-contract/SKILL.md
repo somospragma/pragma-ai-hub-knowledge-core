@@ -181,4 +181,4 @@ verification:
 
 ## Cross-links
 
-`[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-executive-report-generator]]`, `[[calidad-generate-executive-report]]`.
+`[[calidad-pre-generation-protocol]]`, `[[calidad-post-generation-protocol]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-test-evidence-and-traceability]]`, `[[calidad-executive-report-generator]]`, `[[calidad-generate-executive-report]]`, `[[calidad-static-analysis-on-the-test-repo]]` — pasar la puerta de calidad del cliente también es parte de la entrega, `[[calidad-execution-profile-and-config-provenance]]` — de qué depende que `execution_target` diga la verdad.
