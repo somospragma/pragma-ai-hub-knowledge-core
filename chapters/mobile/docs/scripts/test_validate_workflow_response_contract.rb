@@ -242,6 +242,36 @@ class WorkflowResponseContractHelpersTest < Minitest::Test
 
     refute workflow_execute_now_before_started?(body)
   end
+
+  def test_baseline_integrity_present_detects_canonical_marker
+    text = <<~MD
+      - **If edits are requested:** verify the baseline first.
+
+      > **Baseline integrity (mandatory).** A step's baseline is valid only when
+      > its `finished` was persisted in the same session that produced the draft.
+    MD
+
+    assert workflow_baseline_integrity_present?(text)
+  end
+
+  def test_baseline_integrity_absent_when_marker_missing
+    text = <<~MD
+      - **If edits are requested:** Apply the changes in place on the artifact,
+        keep `finished` (the baseline is already captured), and re-present.
+    MD
+
+    refute workflow_baseline_integrity_present?(text)
+  end
+
+  def test_legacy_gap_summary_residue_detected
+    text = %(  --summary "<summary of the detected gap or 'no changes'>"\n)
+    assert workflow_legacy_gap_summary_present?(text)
+  end
+
+  def test_legacy_gap_summary_absent_after_desambiguation
+    text = %(  --summary "<summary of the detected gap; use 'no edits after approval' only when the human approved without requesting edits>"\n)
+    refute workflow_legacy_gap_summary_present?(text)
+  end
 end
 
 class WorkflowResponseContractValidatorTest < Minitest::Test

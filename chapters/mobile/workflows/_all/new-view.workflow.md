@@ -2120,8 +2120,10 @@ Agent: I've completed [step name]. Do you approve the result?
 ```
 
 - **If approved:** If the step produces files, proceed to the gap report and then to the next step. If it produces no files, proceed directly to the next step.
-- **If edits are requested:** Apply the changes in place on the artifact, keep `finished` (the baseline is already captured), and re-present for approval. The gap report will capture those edits as the diff against the agent's first draft.
+- **If edits are requested:** First **verify the baseline is valid** before editing (see *Baseline integrity* below). Only when the baseline is confirmed valid, apply the changes in place on the artifact, keep `finished` (the baseline is already captured), and re-present for approval. The gap report will then capture those edits as the diff against the agent's first draft. If the baseline is missing, was captured late, or was reconstructed in a later session, do **not** edit in place: treat it as a rejection (regenerate to re-anchor a clean baseline) so the diff stays honest.
 - **If rejected:** Report `re_started`, regenerate the artifact from scratch, report `finished` again (recapturing the baseline), and restart the gate. Repeat until approved.
+
+> **Baseline integrity (mandatory).** A step's baseline is valid only when its `finished` was persisted in the same session/turn that produced the first draft, before any edit touched the artifact. Before applying edits, the controller MUST verify with `pragma-ai workflow status "$INSTANCE_ID"` that the step reports a persisted `finished`; if the CLI did not return success for that `finished`, the phase is not complete and the approval gate must not be presented. A baseline reconstructed in a later session, or pulled at gap-report time over an already-edited artifact, is **invalid**: a `No changes detected` result with a same-time "Baseline pulled" while edits were in fact requested is the signature of an invalid baseline. In that case do not `--submit` a false `no changes`; report `re_started`, regenerate to re-anchor a clean baseline, and restart the gate.
 
 > **Three domain aggregate approval gates**, which layer on top of the per-step gate:
 > - **PHASE 2.3 (initial spec plan)** — approves the aggregate of PHASE 0, PHASE 1, PHASE 2, PHASE 2.1, and PHASE 2.2. On rejection of a specific section (design analysis, inventory/DAG, technical plan, minimal contracts), replay the owning phase (`re_started` → `finished` → gap report) and then re-report `re_started` → `finished` on PHASE 2.3 before re-entering this gate. Only when `checkpoints.initial_spec.status=approved` and `context.json.status=approved_for_execution` may PHASE 3.1 begin.
@@ -2182,7 +2184,7 @@ pragma-ai workflow gap-report \
   --step-id <step-id> \
   --submit \
   --report-id <report-id> \
-  --summary "<summary of the detected gap or 'no changes'>"
+  --summary "<summary of the detected gap; use 'no edits after approval' only when the human approved without requesting edits — never report 'no changes' when edits were requested (that signals an invalid baseline; regenerate instead of submitting)>"
 ```
 
 ---

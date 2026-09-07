@@ -1917,6 +1917,26 @@ def workflow_approval_prompt_present?(section_body)
   WORKFLOW_APPROVAL_PROMPT_MARKERS.all? { |re| section_body.match?(re) }
 end
 
+# The Human approval gate must anchor the gap-report baseline to the step's
+# `finished` before any edit. This canonical marker guards against the
+# regression where the "edits requested" path re-presents for approval
+# assuming the baseline is captured, letting the gap report pull a late
+# baseline over an already-edited artifact and report a false "no changes".
+WORKFLOW_BASELINE_INTEGRITY_MARKER = "> **Baseline integrity (mandatory).**"
+
+# The pre-fix, ambiguous gap-report fase B summary placeholder. A bare
+# "no changes" cannot distinguish a legitimate no-edit approval from an
+# invalid late baseline, so its presence is a residue that must be gone.
+WORKFLOW_LEGACY_GAP_SUMMARY_RESIDUE = "--summary \"<summary of the detected gap or 'no changes'>\""
+
+def workflow_baseline_integrity_present?(text)
+  text.include?(WORKFLOW_BASELINE_INTEGRITY_MARKER)
+end
+
+def workflow_legacy_gap_summary_present?(text)
+  text.include?(WORKFLOW_LEGACY_GAP_SUMMARY_RESIDUE)
+end
+
 def workflow_execute_now_before_started?(section_body)
   lines = section_body.lines
   lines.each_with_index do |line, idx|
@@ -1964,6 +1984,14 @@ def validate_workflow_response_contract(findings, cleared)
 
     legacy_residues.each do |residue|
       issues << "#{workflow}: legacy residue found: #{residue.inspect}" if text.include?(residue)
+    end
+
+    unless workflow_baseline_integrity_present?(text)
+      issues << "#{workflow}: missing Human approval gate baseline-integrity clause (#{WORKFLOW_BASELINE_INTEGRITY_MARKER.inspect}) — the edits path must verify a persisted, same-session `finished` before editing so the gap report diffs against a valid baseline"
+    end
+
+    if workflow_legacy_gap_summary_present?(text)
+      issues << "#{workflow}: legacy ambiguous gap-report summary placeholder found (#{WORKFLOW_LEGACY_GAP_SUMMARY_RESIDUE.inspect}); a bare 'no changes' cannot distinguish a legitimate no-edit approval from an invalid late baseline"
     end
 
     declared_ids = workflow_step_ids_from_header(text)
