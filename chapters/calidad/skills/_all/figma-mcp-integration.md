@@ -1,6 +1,6 @@
 ---
 id: calidad-figma-mcp-integration
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -98,11 +98,43 @@ cada registro real. Aplicar `[[calidad-data-volatility-and-assertion-anchoring]]
 de convertir cualquier texto del diseño en localizador o en valor esperado. Rótulos,
 títulos y textos de botón son anclas válidas; el contenido no.
 
+## El diseño se contrasta contra la historia, no se lee en paralelo
+
+Extraer el diseño y leer la historia por separado deja fuera lo único que sólo aparece al cruzarlos: **dónde el diseño contradice a la historia, y qué exige el diseño que la historia no menciona**.
+
+Verificado en campo, y caro: el diseño de un flujo mostraba con toda claridad un nodo de decisión que validaba la autenticación reforzada **antes** de dejar avanzar. La historia no lo mencionaba. Nadie cruzó las dos fuentes. El camino feliz se quedó esperando en una carga infinita, se diagnosticó durante horas como servicio caído, se emitió un bloqueo de ambiente y se llegó a documentar un defecto. La causa era una precondición que el diseño declaraba desde el primer día.
+
+**Entregable obligatorio de la fase de insumos: una tabla de contraste**, no un resumen de cada fuente.
+
+| Criterio | Lo que dice la historia | Lo que muestra el diseño | Veredicto |
+|---|---|---|---|
+| Acceso a la operación | disponible en tres estados del producto | el menú sólo la muestra en dos | **Contradicción** — se pregunta antes de diseñar el caso |
+| Autenticación | no se menciona | nodo de decisión que la exige antes de avanzar | **Complemento** — es precondición de todo escenario del flujo |
+| Costo de la operación | importe con dos decimales | la pantalla lo pinta con uno | **Contradicción de copy** — manda lo verificado en la aplicación |
+
+Tres veredictos posibles y qué hace cada uno:
+
+- **Complemento** — el diseño aporta algo que la historia no dice. Se incorpora como criterio o como precondición, y se declara de dónde salió.
+- **Contradicción** — las dos fuentes dicen cosas distintas. **No se elige por cuenta propia**: se pregunta a quien define el producto, y la respuesta queda registrada. Mientras no haya respuesta, el escenario afectado no se da por diseñado.
+- **Silencio de ambas** — ni la historia ni el diseño cubren un caso que la implementación sí tiene. Es un hueco de cobertura y se reporta como tal.
+
+Las ramas del diseño que más veces quedan fuera de la historia, y que conviene buscar explícitamente: autenticación reforzada, estados de error del servicio, ausencia de fondos o de habilitación, y los estados previos que condicionan la entrada al flujo.
+
 ## Persistencia de los artefactos de diseño
 
 Lo que se consume de Figma **se persiste**. Si no, la siguiente sesión no tiene con qué
 comparar y volver a obtenerlo depende de que la conexión siga viva — que es justo lo que
 falla en entornos corporativos.
+
+Se persiste con **el identificador del nodo del que salió cada cosa**. Un copy sin nodo de
+origen no se puede volver a verificar cuando el diseño cambie, y un texto esperado que
+nadie puede rastrear termina defendiéndose de memoria. La regla mínima: cada rótulo,
+mensaje de éxito, mensaje de error y valor visible que vaya a convertirse en aserción
+queda registrado con su texto exacto y su nodo.
+
+Un error de campo que esto evita: se dio por buena, como si fuera de una corrida, una
+imagen que en realidad venía del diseño. El desenlace real nunca se había producido. Lo
+que viene del diseño se marca como tal y **no sustituye a la evidencia de ejecución**.
 
 Todo consumo escribe en `.evidence/design/`:
 

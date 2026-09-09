@@ -11,6 +11,26 @@ Playwright valida la capa de presentación. El insumo debe describir UI real. Es
 4. **User stories con flujos UI explícitos** — historias que enumeran páginas, acciones y transiciones.
 5. **Storybook / sistema de diseño existente** — componentes catalogados con sus rutas demo.
 
+## Dos preguntas distintas, dos jerarquías
+
+La lista de arriba responde bien a **"¿qué pantallas hay y cómo se navega?"**. Responde mal a la otra pregunta, que es de la que dependen los selectores: **"¿qué árbol publica este elemento?"**. Mezclarlas es lo que produce selectores inventados que pasan en el prototipo y se rompen el día del despliegue.
+
+| Pregunta | Jerarquía de fuentes |
+|---|---|
+| **Flujo y navegación** — qué pantallas hay, cómo se llega | app viva > prototipo interactivo > Figma > historia de usuario > Storybook |
+| **Estructura de un elemento** — qué árbol publica, qué rol, qué anidamiento | app viva > **design system / Storybook** > **repositorio de front** > Figma |
+
+Para la segunda, **el Figma es de las peores fuentes**: muestra píxeles y no dice nada del árbol. Y el design system pasa de último a primero, porque lo que el driver ve lo decide la implementación del componente, no el diseño visual.
+
+Verificado en campo, tres costes que salieron de confundir las dos jerarquías, y los tres eran detalle de componente: cada casilla de un grid de código de un solo uso tenía **dos campos anidados** y había que escribir en el interno; una opción de menú era texto estático y no botón; y un ícono de alternancia era un gráfico sin etiqueta accesible, localizable sólo por geometría. Ninguno se ve en un diseño; los tres estaban en el componente.
+
+### Design system y repositorio de front
+
+Dos fuentes que no estaban en la lista de arriba y que son de primer nivel para la estructura:
+
+- **Design system** — si el prototipo se construye con el mismo paquete que usa la app, publica la misma semántica por construcción. El prototipo **fija la misma versión** que publica la app; si derivan, vuelve la deriva por otra puerta. Se toma **como dependencia del proyecto generador**, nunca leyendo su código con el modelo.
+- **Repositorio de front** — para lo ya construido: identificadores declarados, componente de cada uno, grafo de rutas y puntos de llamada a servicios. Con dos límites que no se difuminan: se extrae **estructura, nunca comportamiento esperado** —derivar las aserciones del código es probar la implementación contra sí misma, y es anti-cheating—, y se extrae **con herramienta, por diferencias**, nunca leyendo el repositorio con el modelo. Ver `[[calidad-pre-development-artifacts-continuity]]`.
+
 ## Árbol de decisión
 
 ```

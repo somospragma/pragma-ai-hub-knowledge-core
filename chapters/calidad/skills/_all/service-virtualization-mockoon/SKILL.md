@@ -1,6 +1,6 @@
 ---
 id: calidad-service-virtualization-mockoon
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -46,10 +46,12 @@ Aplica cuando `[[calidad-sut-readiness-gate]]` resolvió `execution_target: mock
 - **NUNCA** enriquecer el mock con reglas de negocio que no estén en el spec, la firma o la user story: el mock refleja el contrato, no lo inventa.
 - **NUNCA** dejar el mock como dependencia permanente de la suite: el switchover a real es parte del contrato de entrega y se demuestra en `next_steps`.
 - **SIEMPRE** versionar el data file junto al proyecto de tests y regenerar/actualizar cuando el spec cambie (el mock desactualizado produce falsos verdes, el equivalente de un contrato drift silencioso).
-- En brownfield, el mock sirve solo a los tests nuevos de la corrida; tests preexistentes no se reapuntan ni se modifican.
+- En brownfield, el mock **no autoriza a tocar tests preexistentes**: no se reapuntan ni se modifican. Eso es distinto de reutilizarlo: el mock **sí se hereda entre historias** y se extiende de forma aditiva, porque el producto es el mismo. Ver `[[calidad-pre-development-artifacts-continuity]]`.
+- **NUNCA** editar a mano el archivo de entorno: es salida generada desde las fixtures y el contrato. Se versiona por reproducibilidad, como un archivo de bloqueo, pero quien lo edita lo convierte en fuente y hereda todo su mantenimiento.
 
 ## Cross-links
 
+- `[[calidad-pre-development-artifacts-continuity]]` — qué se conserva del mock entre historias y qué se regenera.
 - `references/mockoon-environment-file.md`
 - `references/openapi-to-mock.md`
 - `references/stateful-crud-and-data-buckets.md`

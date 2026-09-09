@@ -1,6 +1,6 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 1.4.0
+version: 1.6.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -20,6 +20,8 @@ verification:
     failure_message: "Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate."
   - check: "checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, derivado de los escenarios planificados (entidad + estado exigido), con validación cruzada contra el catálogo y con lo faltante comunicado al QA con dueño y fecha"
     failure_message: "Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto."
+  - check: "la matriz de cobertura de todas las plataformas del alcance quedó escrita en .evidence/coverage-declared.json y aprobada antes de generar código"
+    failure_message: "Bloqueado: se empezó a generar sin congelar la cobertura. Diseñar escenarios sobre la marcha deja criterios sin cubrir y los diseña con los insumos lejos."
 ---
 
 # Mandatory Inputs Protocol — Contrato de Entrada Antes de Generar
@@ -132,6 +134,26 @@ Cuando un cliente o proyecto necesite endurecer inputs:
 2. Apuntar el override en la tabla de arriba con: escenario, skill o asset que lo define, lista de inputs que se vuelven obligatorios.
 3. Si el override aplica también a la validación de spec o al flujo de generación, mencionarlo en el skill de framework, no acá: este documento sólo concentra el pointer.
 
+## La cobertura se congela antes de generar, y para todas las plataformas
+
+Diseñar los escenarios sobre la marcha —unos al principio, otros cuando toca la plataforma siguiente— tiene dos consecuencias, y las dos se pagan tarde.
+
+La primera es de **cobertura**: en una entrega larga, con el contexto ya degradado por cientos de intercambios, el agente da por terminada la historia porque ejecutó todo lo que había creado, sin recordar que quedaron criterios sin escenario. Verificado en campo, exactamente así.
+
+La segunda es de **calidad de diseño**: los escenarios que se diseñan al final se diseñan con los insumos lejos. La historia, el diseño y el contraste entre ambos están más frescos que nunca justo después de la fase de insumos; ese es el momento de decidir qué se prueba, no tres días después.
+
+**Entregable obligatorio antes de escribir una línea de código: la matriz de cobertura completa, para todas las plataformas del alcance, aprobada por la persona.**
+
+| Criterio | Plataformas | Escenario propuesto | Dato que exige | Reuso | Etiqueta |
+|---|---|---|---|---|---|
+
+Reglas de la matriz:
+
+- **Cubre todas las plataformas del alcance desde el inicio**, aunque se estabilicen en serie. Que la ejecución sea secuencial no obliga a que el diseño lo sea, y diseñar todo junto es lo que revela qué escenarios son el mismo caso en tres canales.
+- **Se vuelca al artefacto de pruebas como esqueletos** con etiqueta de pendiente. Un escenario que no existe como archivo no existe como compromiso.
+- **La cobertura se mide contra la matriz, no contra la memoria.** Al cierre de cada sesión y en la entrega, se compara lo declarado contra lo entregado y la diferencia se reporta. La comparación es determinista y la hace una herramienta del proyecto (`[[calidad-deterministic-work-to-tooling]]`); confiarla al recuerdo del agente es exactamente lo que produce historias cerradas con criterios sin cubrir.
+- **Todo cambio de alcance se refleja en la matriz** en el mismo turno en que se acuerda. Un criterio que sale del alcance sale de la matriz con su razón, no desaparece en silencio.
+
 ## Restricciones
 
 - **NUNCA proceder** sin los inputs obligatorios resueltos.
@@ -153,3 +175,4 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 4 | risk_map confirmado por usuario o default HIGH reportado explícitamente para revisión | Bloqueado: no se puede priorizar sin risk_map confirmado o default HIGH declarado al usuario. |
 | 5 | sut_available, data_available y (front/mobile) locator_map resueltos vía SUT readiness gate antes de validar spec | Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate. |
 | 6 | checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, derivado de los escenarios planificados (entidad + estado exigido), con validación cruzada contra el catálogo y con lo faltante comunicado al QA con dueño y fecha | Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto. |
+| 7 | la matriz de cobertura de todas las plataformas del alcance quedó escrita en .evidence/coverage-declared.json y aprobada antes de generar código | Bloqueado: se empezó a generar sin congelar la cobertura. Diseñar escenarios sobre la marcha deja criterios sin cubrir y los diseña con los insumos lejos. |

@@ -1,6 +1,6 @@
 ---
 id: calidad-ui-locator-map-contract
-version: 1.3.0
+version: 1.4.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -76,6 +76,16 @@ Preguntar por el mapa **no es un trámite**: la respuesta cambia el flujo. Si `e
 1. **Default: DETENER.** No se generan page objects, tasks ni tests de UI. Blocker `locator_map_missing`, status `partial`. Se ofrece al usuario la plantilla del mapa y la sesión de acuerdo con desarrollo como siguiente paso.
 2. **Override explícito (única excepción):** si el usuario, informado del riesgo, decide continuar sin mapa, debe confirmarlo con frase explícita. El flujo continúa con selectores inferidos y registra en el delivery gate `locator_map: waived` + el riesgo aceptado ("suite puede fallar íntegramente por drift de identificadores al llegar el desarrollo") en `blockers` o `next_steps`. El mensaje de cierre lo repite.
 3. **PROHIBIDO el camino intermedio observado en pruebas**: preguntar, no recibir mapa, y continuar en silencio generando reporte completo como si nada faltara. Eso invalida la entrega.
+
+## Cada entrada registra su componente y su procedencia
+
+Un mapa que sólo lleva identificadores sirve para localizar, pero no para generar ni para saber en qué confiar. Tres campos más por entrada, y los tres se ganan barato:
+
+- **Componente del design system** al que pertenece el identificador. Es lo que permite que un prototipo se **genere** publicando la misma estructura que la app real, en vez de aproximarla. Y convierte el mapa en el contrato de pantalla que comparten desarrollo y calidad: la misma lista desde la que se construye y desde la que se prueba.
+- **Procedencia** — cosechado del árbol de la app desplegada, extraído del repositorio de front, derivado del design system, o inferido del diseño. Un identificador inferido y uno cosechado no valen lo mismo y no deben parecerlo.
+- **Confianza** derivada de la procedencia. Lo inferido se verifica contra la aplicación real antes de darse por bueno; lo cosechado ya lo está.
+
+Con esos campos, la validación de deriva deja de ser un barrido y pasa a ser una comparación: sólo se revisan las entradas cuya procedencia sea inferida o cuya fuente haya cambiado. Ver `[[calidad-pre-development-artifacts-continuity]]`.
 
 ## Restricciones
 
