@@ -26,6 +26,86 @@ Y los ejes cross-cutting que aplican a todos los stacks:
 - **Contract testing** y validación de specs.
 - **Shift-left y mocking**: construir y validar pruebas antes de que el desarrollo exista — service virtualization con Mockoon, datos sintéticos deterministas, contrato de mapeo de locators UI, y prototipos opt-in de front (HTML) y de app mobile (en la misma tecnología de la app real, ej. Flutter con Semantics identifiers) para ejecutar la suite en browser/emulador pre-desarrollo. Los mocks validan la construcción del test; la certificación formal siempre corre contra integraciones reales vía switchover solo-configuración.
 
+## Flujo de trabajo — el mismo para los seis stacks
+
+La herramienta cambia; el recorrido no. Karate, Playwright, K6 y los tres de Appium
+producen artefactos distintos, pero atraviesan las mismas seis fases y las mismas
+compuertas. Este diagrama es el recorrido canónico: lo que un asset concreto aporta es
+**detalle dentro de una de estas cajas**, nunca una caja nueva.
+
+```mermaid
+flowchart TD
+    A["Historia, diseño y contexto"] --> B{"¿Insumos completos?"}
+    B -- no --> BX["Detenerse y pedirlos"]
+    BX --> A
+    B -- si --> C["Contraste historia ↔ diseño:<br/>complemento · contradicción · silencio"]
+    C --> D{"¿El sistema está desplegado?"}
+    D -- si --> D1["Objetivo: real"]
+    D -- no o parcial --> D2["Objetivo: mock y/o prototipo.<br/>Se hereda del manifiesto,<br/>no se reconstruye"]
+    D1 --> E["Cobertura congelada:<br/>todas las plataformas del alcance"]
+    D2 --> E
+    E --> G{"Aprobación humana"}
+    G --> H["Mapa de capacidades del repositorio"]
+
+    H --> I{"¿La capacidad ya existe?"}
+    I -- si --> J["Se usa"]
+    I -- no --> K["Se construye una vez,<br/>se documenta y se registra"]
+    J --> L["Generación:<br/>escenarios · steps · objetos · datos"]
+    K --> L
+    L --> M["Hermano estable:<br/>reutilizar el mecanismo que ya está en verde"]
+
+    M --> N["Auditoría en frío:<br/>secuencia de interacciones y paso más frágil"]
+    N --> O["Compilación · estilo · ensayo en seco"]
+    O --> P{"¿Compila, enlaza<br/>y resiste la lectura?"}
+    P -- no --> L
+    P -- si --> Q["Preflight"]
+
+    Q --> R["Gate 1:1 — un escenario primero"]
+    R --> S["Lotes por precondición.<br/>Se consume el veredicto acotado,<br/>nunca el registro crudo"]
+    S --> T{"¿Verde?"}
+    T -- si --> U["Archivar evidencia"]
+    T -- no --> V["Triage: clase de fallo"]
+
+    V --> W{"¿Es defecto del producto?"}
+    W -- si --> WX["Cadena de evidencia y escalado.<br/>El test NO se corrige"]
+    W -- no --> X{"¿Ya hubo dos intentos<br/>por la misma causa?"}
+    X -- no --> Y["Corrección"]
+    X -- si --> Z["Diagnóstico de fondo obligatorio:<br/>árbol real · gesto manual · homólogo estable"]
+    Z --> Z1{"¿Explica el fallo?"}
+    Z1 -- si --> Y
+    Z1 -- no --> Z2["Ficha de la persona:<br/>qué se ve en pantalla"]
+    Z2 --> Y
+    Y --> N
+
+    U --> AA["Propagación entre plataformas"]
+    AA --> AB["Cobertura declarada vs entregada"]
+    AB --> AC["Puerta de artefactos obligatorios"]
+    AC --> AD["Análisis estático del cliente, en local"]
+    AD --> AE["Publicación al ALM con autorización"]
+```
+
+### Las invariantes del recorrido
+
+Seis reglas que no dependen del stack, y que son las que el chapter hace exigibles:
+
+1. **Nada se genera sin insumos completos y cobertura aprobada.** El contraste entre la
+   historia y el diseño es entregable, no lectura: una precondición que el diseño declara
+   y la historia calla se paga entera en la fase de ejecución.
+2. **Lo determinista lo hace una herramienta.** Si el repositorio ya la tiene, se usa; si
+   no, se construye una vez y queda registrada. El modelo decide y corrige; los scripts
+   miden, ejecutan y resumen.
+3. **Se lee antes de correr.** La auditoría en frío y las comprobaciones sin ambiente
+   valen una fracción de la corrida que evitan.
+4. **La salida de una corrida no entra cruda al razonamiento.** Se consume un veredicto
+   acotado; los artefactos completos quedan en disco.
+5. **A los dos intentos se para de parchar.** El tercero solo se autoriza con diagnóstico
+   de fondo, y si este no explica el fallo, lo explica la persona.
+6. **Un fallo del producto no se corrige en el test.** Es la regla maestra anti-cheating
+   del chapter y no admite excepción por urgencia.
+
+Las dos bifurcaciones del inicio son las que más cambian el costo del resto: si el
+sistema está desplegado, y si la capacidad ya existe en el repositorio.
+
 ## Mapa de assets
 
 ### Estructura de carpetas y archivos
@@ -276,6 +356,10 @@ chapters/calidad/
 | `failure-triage-and-classification/SKILL.md` | Clasifica fallos como deterministic vs flaky y diagnostica causa raíz antes de proponer corrección.    |
 | `test-self-correction-loop/SKILL.md`   | Loop iterativo de auto-corrección con anti-cheating guardrails (max 3 iteraciones por default).              |
 | `test-self-healing/SKILL.md`           | Self-healing en runtime: multi-locator fallback, LLM-driven selector repair, visual AI healing.              |
+| `deterministic-work-to-tooling.md`     | **Lo determinista no lo hace el modelo: lo hace una herramienta del proyecto.** Test de cuatro condiciones, contrato de salida acotada, aritmética de amortización, catálogo mínimo de capacidades y las cuatro capas de exigibilidad — de las que solo entrada-obligatoria y puerta-que-bloquea garantizan algo. |
+| `cold-audit-before-execution.md`       | Antes de la primera corrida y después de cada corrección: recorrer la cadena e imprimir la secuencia de interacciones que hará sobre el dispositivo, y declarar el paso más frágil. La mayoría de los fallos se ven leyendo el código. |
+| `human-fix-request-protocol.md`        | Dónde entra el juicio de la persona una vez que lo determinista ya lo resuelven herramientas: ficha de corrección de seis campos, canal visual —el agente no puede abrir imágenes— y cuándo la corrida la lanza el QA. |
+| `wait-cost-and-timeout-design.md`      | Los cinco temporizadores disfrazados que nadie declara, el techo del step como red de seguridad y no como duración, el patrón de carrera que reemplaza a la espera fija por lo opcional, y la captura de desenlaces transitorios en el instante. |
 
 #### Transversales (seguridad, contratos, datos, CI)
 
@@ -288,6 +372,8 @@ chapters/calidad/
 | `sut-types-and-adaptations/SKILL.md`   | Adaptaciones por tipo de SUT (REST, GraphQL, gRPC, eventos, ML inference, serverless, SOAP/EJB, batch).      |
 | `test-data-management/SKILL.md`        | Builder/Factory/ObjectMother, datasets versionados, anonimización PII, data para perf, sintética. Ante ausencia de datos reales, sintéticos deterministas (Faker + seed) coherentes con los data buckets del mock. |
 | `service-virtualization-mockoon/SKILL.md` | Service virtualization con Mockoon para construir/validar pruebas sin backend desplegado: environment JSON versionable, mock desde OpenAPI, CRUD stateful con data buckets, SOAP/XML, proxy hybrid, CLI/Docker en CI y switchover mock → real solo-configuración. Bundle con 7 references. |
+| `pre-development-artifacts-continuity.md` | **Mocks y prototipos son activos del producto que crecen, no andamio de una historia.** Las tres capas —fuentes, proyecto generador, salida—, la frontera física entre lo generado y lo escrito, el manifiesto de estado que evita reanalizarlos, el refresco por diferencias desde lo ya desplegado, y por qué el empalme real↔prototipo depende de la tecnología de render. |
+| `static-analysis-on-the-test-repo.md`  | El repositorio de pruebas también pasa por la puerta de calidad del cliente: se corre en local antes del commit, no se descubre en el pipeline. |
 | `ui-locator-map-contract.md`           | Contrato QA+dev de identificadores UI (`data-testid` / accessibility ids) versionado en `locator-map.json`, para que las pruebas front/mobile construidas antes del desarrollo no fallen por drift de selectores; incluye validación de drift al llegar la app real y enforcement explícito (sin mapa no se generan page objects salvo waiver del usuario). |
 | `figma-mcp-integration.md`             | Consumo de Figma como fuente UI vía MCP (server oficial remoto con OAuth o Framelink con PAT) con setup guiado por IDE y fallback REST API; un link público de Figma no es consumible sin conexión autenticada. |
 | `alm-mcp-integration.md`               | Integración con Azure DevOps (`@azure-devops/mcp`) y Jira (Atlassian Remote MCP) vía MCP: traer HUs/work items/test plans y llevar test cases, estados, defectos y documentos, con setup guiado, gates de escritura, idempotencia y trazabilidad. Puerta ALM de todo el chapter. |

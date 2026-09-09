@@ -96,7 +96,20 @@ chapters/mobile/skills/flutter/flutter-bloc-pattern/
 
 **Reglas:**
 - El archivo principal se llama `{TYPE}.md` en mayúsculas: `SKILL.md`, `AGENT.md`, `WORKFLOW.md`, `PROMPT.md`, `STEERING.md`
-- Las subcarpetas pueden tener **cualquier nombre** (`references/`, `assets/`, `scripts/`, `examples/`, etc.)
+- **Las subcarpetas y sus extensiones NO son libres**: el registro de conocimiento valida el bundle contra un esquema fijo. Solo se aceptan tres directorios, sin anidar, y cada uno admite ciertas extensiones:
+
+  | Directorio | Extensiones admitidas | Para qué |
+  |---|---|---|
+  | `references/` | `.md`, `.mmd` | Documentos y diagramas de apoyo |
+  | `scripts/` | `.py`, `.sh`, `.js`, `.ts` | Ejecutables que se instalan con el asset |
+  | `assets/` | `.yaml`, `.dart`, `.md` | Datos y fragmentos de código de ejemplo |
+
+  Lo que no encaja **se reubica automáticamente** al publicar: un ejecutable puesto en
+  `references/` se mueve a `scripts/`, y una extensión no admitida se envuelve como `.md`
+  y depende del manifiesto de restauración para volver a su forma original al instalarse.
+  Funciona, pero es frágil: **conviene colocar cada archivo donde corresponde desde el
+  origen**. Un dato que un script deba leer se embebe en el propio script antes que
+  quedar como `.json` envuelto.
 - **Todos los archivos de la subcarpeta se entregan al pragmático** — no solo el `.md` principal
 - En el IDE del pragmático se escriben manteniendo la misma estructura de carpetas
 - Cada archivo se firma individualmente con HMAC-SHA256
@@ -181,7 +194,7 @@ description: Qué hace en una línea  # Recomendado
 | backend | `java-spring`, `java-webflux`, `node-express`, `node-lambda`, `dotnet` |
 | frontend | `react`, `angular` |
 | mobile | `flutter`, `android-native`, `apple-native` |
-| calidad | `karate`, `playwright`, `k6`, `appium` |
+| calidad | `karate`, `playwright`, `k6`, `appium-core`, `appium-serenity`, `appium-wdio` |
 | arquitectura | (sin stacks específicos) |
 
 ## Templates de assets
