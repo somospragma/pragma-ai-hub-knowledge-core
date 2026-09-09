@@ -8,5 +8,11 @@ accounts/
 salida/
 entrada/
 
+# Tooling de migracion: los scripts y el README se versionan.
+# El estado operativo y los reportes no: cambian en cada corrida y son regenerables.
+migration/sync-state*.json
+migration/id-map.json
+migration/report*.json
+
 __pycache__/
 *.pyc
