@@ -1,10 +1,16 @@
 ---
-id: component-planner
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: component-planner
+description: >
+  Converts Figma analysis into a canonical component specification, reuse inventory, atomic decomposition, and bottom-up creation DAG. Use when design extraction is complete and the workflow needs planning before architecture or code generation.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write]
 resources:
   - skill://flutter-ds-theming-tokens
@@ -19,8 +25,26 @@ permissions:
     - capability: fs_write
       effect: allow
       match: [".sopp/**", "**/.sopp/**"]
-description: >
-  Converts Figma analysis into a canonical component specification, reuse inventory, atomic decomposition, and bottom-up creation DAG. Use when design extraction is complete and the workflow needs planning before architecture or code generation.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools: [Read, Grep, Glob, Write(.sopp/**), Edit(.sopp/**)]
+skills:
+  - flutter-ds-theming-tokens
+  - flutter-ds-folder-structure
+  - flutter-ds-naming-conventions
+  - flutter-ds-atomic-hierarchy
+  - flutter-ds-asset-management
+  - flutter-ds-responsive-layout
+  - mobile-sdd-spec-validation
 ---
 # Component Planner Instructions
 

@@ -1,12 +1,16 @@
 ---
-id: ds-orchestrator
-version: 1.0.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
+name: ds-orchestrator
 description: >
   Workflow controller for Design System and Figma-driven mobile work. Use for new components, new views, component refactors and DS-scoped PR comment fixes with required human checkpoints.
-name: ds-orchestrator
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell, subagent, "@figma"]
 resources:
   - skill://flutter-ds-folder-structure
@@ -23,10 +27,34 @@ permissions:
     - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *"]}
     - {capability: mcp, effect: allow, match: ["figma/*"]}
     - {capability: subagent, effect: allow, match: ["figma-analyzer", "component-planner", "component-architect", "widget-developer", "test-engineer", "golden-test-engineer", "widgetbook-developer", "code-auditor", "delivery-manager"]}
-toolsSettings:
-  subagent:
-    availableAgents: [figma-analyzer, component-planner, component-architect, widget-developer, test-engineer, golden-test-engineer, widgetbook-developer, code-auditor, delivery-manager]
-    trustedAgents: [figma-analyzer, component-planner, component-architect, widget-developer, test-engineer, golden-test-engineer, widgetbook-developer, code-auditor, delivery-manager]
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute, agent, figma/*]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - mcp__figma
+  - Agent(figma-analyzer, component-planner, component-architect, widget-developer, test-engineer, golden-test-engineer, widgetbook-developer, code-auditor, delivery-manager)
+skills:
+  - flutter-ds-folder-structure
+  - flutter-ds-naming-conventions
+  - flutter-ds-responsive-layout
+  - flutter-ds-figma-mcp
+  - flutter-ds-figma-checklist
+  - flutter-ds-asset-management
+  - mobile-sdd-spec-validation
 ---
 # Design System Workflow Controller Instructions
 

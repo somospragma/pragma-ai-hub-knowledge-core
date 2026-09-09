@@ -49,7 +49,6 @@ def kiro_agent_profiles
       rules: [
         { "capability" => "subagent", "effect" => "allow", "match" => %w[workspace-discovery ds-orchestrator feature-builder refactoring-advisor test-coverage-engineer] }
       ],
-      delegates: %w[workspace-discovery ds-orchestrator feature-builder refactoring-advisor test-coverage-engineer]
     },
     "feature-builder" => {
       tools: ["read", "write", "shell", "subagent", "@figma"],
@@ -60,7 +59,6 @@ def kiro_agent_profiles
         { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer ds-orchestrator test-engineer golden-test-engineer code-auditor delivery-manager] }
       ],
-      delegates: %w[figma-analyzer ds-orchestrator test-engineer golden-test-engineer code-auditor delivery-manager]
     },
     "ds-orchestrator" => {
       tools: ["read", "write", "shell", "subagent", "@figma"],
@@ -71,7 +69,6 @@ def kiro_agent_profiles
         { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer component-planner component-architect widget-developer test-engineer golden-test-engineer widgetbook-developer code-auditor delivery-manager] }
       ],
-      delegates: %w[figma-analyzer component-planner component-architect widget-developer test-engineer golden-test-engineer widgetbook-developer code-auditor delivery-manager]
     },
     "refactoring-advisor" => {
       tools: %w[read write shell subagent],
@@ -80,7 +77,6 @@ def kiro_agent_profiles
         { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[code-auditor ds-orchestrator] }
       ],
-      delegates: %w[code-auditor ds-orchestrator]
     },
     "workspace-discovery" => {
       tools: %w[read write shell],
@@ -371,20 +367,6 @@ def validate_kiro_agent_profiles(findings, cleared)
     actual_rules = profile.dig("permissions", "rules") || []
     unless actual_rules == expected[:rules]
       errors << "#{agent_id}: permissions.rules differs from the least-privilege role matrix"
-    end
-
-    delegates = expected[:delegates]
-    actual_subagents = profile.dig("toolsSettings", "subagent")
-    if delegates
-      expected_subagents = {
-        "availableAgents" => delegates,
-        "trustedAgents" => delegates
-      }
-      unless actual_subagents == expected_subagents
-        errors << "#{agent_id}: availableAgents and trustedAgents must match its approved delegation list"
-      end
-    elsif actual_subagents
-      errors << "#{agent_id}: non-orchestrator profiles must not register subagents"
     end
 
     fs_write_rule = actual_rules.find { |rule| rule["capability"] == "fs_write" }

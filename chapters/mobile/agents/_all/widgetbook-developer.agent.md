@@ -1,10 +1,16 @@
 ---
-id: widgetbook-developer
-version: 2.0.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: widgetbook-developer
+description: >
+  Creates and updates Widgetbook use cases, stories, knobs, and catalog entries for Design System components or app screens. Use when generated UI needs interactive documentation and catalog coverage.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://flutter-ds-widgetbook
@@ -19,9 +25,45 @@ permissions:
       match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/widgetbook/**", "**/pubspec.yaml"]
     - capability: shell
       effect: allow
-      match: ["dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter create widgetbook *", "flutter pub get", "flutter pub add *", "flutter run -d chrome", "melos bootstrap", "melos exec *", "melos run *"]
-description: >
-  Creates and updates Widgetbook use cases, stories, knobs, and catalog entries for Design System components or app screens. Use when generated UI needs interactive documentation and catalog coverage.
+      match: ["dart format *", "dart analyze *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(lib/**)
+  - Edit(lib/**)
+  - Write(test/**)
+  - Edit(test/**)
+  - Write(widgetbook/**)
+  - Edit(widgetbook/**)
+  - Write(pubspec.yaml)
+  - Edit(pubspec.yaml)
+  - Bash(dart format:*)
+  - Bash(dart analyze:*)
+  - Bash(flutter analyze:*)
+  - Bash(flutter test:*)
+  - Bash(flutter pub get:*)
+  - Bash(melos exec:*)
+  - Bash(melos run:*)
+skills:
+  - flutter-ds-widgetbook
+  - flutter-ds-theming-tokens
+  - flutter-ds-naming-conventions
+  - flutter-ds-folder-structure
+  - mobile-sdd-spec-validation
 ---
 # Widgetbook Developer Instructions
 

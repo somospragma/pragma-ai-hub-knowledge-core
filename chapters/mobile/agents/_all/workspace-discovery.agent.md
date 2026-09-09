@@ -1,12 +1,16 @@
 ---
-id: workspace-discovery
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
+name: workspace-discovery
 description: >
   Discovers Flutter workspace topology and proposes deterministic bootstrap configuration. Use when project roots, target registry, Melos/multi-repo layout, or config files are missing or ambiguous before /new-view or /new-component.
-name: workspace-discovery
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://mobile-sdd-spec-validation
@@ -14,7 +18,35 @@ resources:
 permissions:
   rules:
     - {capability: fs_write, effect: allow, match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]}
-    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]}
+    - {capability: shell, effect: allow, match: ["ruby .claude/docs/scripts/melos_workspace.rb *", "ruby .claude/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]}
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/bootstrap/**)
+  - Edit(.sopp/bootstrap/**)
+  - Write(.sopp/config/**)
+  - Edit(.sopp/config/**)
+  - Bash(ruby .claude/docs/scripts/melos_workspace.rb:*)
+  - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - Bash(melos list:*)
+  - Bash(melos exec:*)
+  - Bash(dart pub get:*)
+  - Bash(flutter pub get:*)
+skills:
+  - mobile-sdd-spec-validation
+  - flutter-melos-management
 ---
 # Workspace Discovery Agent Instructions
 

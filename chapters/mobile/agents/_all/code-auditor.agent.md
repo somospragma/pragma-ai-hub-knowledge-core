@@ -1,10 +1,16 @@
 ---
-id: code-auditor
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: code-auditor
+description: >
+  Audits generated Flutter code against the approved spec, architecture contracts, Design System tokens, accessibility, security, lint rules, and test expectations. Use when a workflow needs an approve/reject decision with actionable correction feedback.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://flutter-ds-theming-tokens
@@ -27,8 +33,41 @@ permissions:
     - capability: shell
       effect: allow
       match: ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "melos exec *"]
-description: >
-  Audits generated Flutter code against the approved spec, architecture contracts, Design System tokens, accessibility, security, lint rules, and test expectations. Use when a workflow needs an approve/reject decision with actionable correction feedback.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Bash(dart analyze:*)
+  - Bash(dart test:*)
+  - Bash(flutter analyze:*)
+  - Bash(flutter test:*)
+  - Bash(melos exec:*)
+skills:
+  - flutter-ds-theming-tokens
+  - flutter-ds-lint-rules
+  - flutter-ds-naming-conventions
+  - flutter-ds-secure-code
+  - flutter-ds-widget-anatomy
+  - flutter-ds-figma-checklist
+  - flutter-ds-asset-management
+  - flutter-ds-responsive-layout
+  - flutter-owasp-mobile-top10
+  - flutter-dart-coding-standard
+  - flutter-errors
+  - mobile-sdd-spec-validation
 ---
 # Code Auditor Instructions
 

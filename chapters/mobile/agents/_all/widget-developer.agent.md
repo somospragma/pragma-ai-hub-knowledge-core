@@ -1,10 +1,16 @@
 ---
-id: widget-developer
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: widget-developer
+description: >
+  Implements pure Flutter widgets, Design System components, and presentation-layer views from an approved technical plan. Use when artifact paths, tokens, contracts, and success criteria are already defined.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://flutter-ds-theming-tokens
@@ -28,8 +34,52 @@ permissions:
     - capability: shell
       effect: allow
       match: ["dart format *", "dart analyze *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
-description: >
-  Implements pure Flutter widgets, Design System components, and presentation-layer views from an approved technical plan. Use when artifact paths, tokens, contracts, and success criteria are already defined.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(lib/**)
+  - Edit(lib/**)
+  - Write(assets/**)
+  - Edit(assets/**)
+  - Write(test/**)
+  - Edit(test/**)
+  - Write(pubspec.yaml)
+  - Edit(pubspec.yaml)
+  - Bash(dart format:*)
+  - Bash(dart analyze:*)
+  - Bash(flutter analyze:*)
+  - Bash(flutter test:*)
+  - Bash(flutter pub get:*)
+  - Bash(melos exec:*)
+  - Bash(melos run:*)
+skills:
+  - flutter-ds-theming-tokens
+  - flutter-ds-widget-anatomy
+  - flutter-ds-component-template
+  - flutter-ds-naming-conventions
+  - flutter-ds-responsive-layout
+  - flutter-ds-a11y-semantics
+  - flutter-ds-asset-management
+  - flutter-ds-lint-rules
+  - flutter-bloc-pattern
+  - flutter-errors
+  - flutter-dart-coding-standard
+  - flutter-freezed-domain-modeling
+  - mobile-sdd-spec-validation
 ---
 # Widget Developer Instructions
 

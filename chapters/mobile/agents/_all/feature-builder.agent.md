@@ -1,9 +1,8 @@
 ---
-id: feature-builder
-version: 1.2.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
+name: feature-builder
 description: >
   Feature builder agent. Use when the task is to create a complete feature
   following Clean Architecture (domain → data → presentation), add a feature
@@ -11,15 +10,20 @@ description: >
   Generates all layers: domain model, repository contract, use case, DTO,
   mapper, data source, repository impl, BLoC (event + state + bloc), UIModel,
   and page — wired with DI and registered in the router.
-name: feature-builder
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell, subagent, "@figma"]
 resources:
   - skill://flutter-clean-feature
   - skill://flutter-clean-architecture
   - skill://flutter-bloc-pattern
   - skill://flutter-freezed-domain-modeling
-  - skill://flutter-ddd-domain-modeling
   - skill://flutter-dependency-injection-pattern
+  - skill://flutter-ddd-domain-modeling
   - skill://flutter-api-rest-connection
   - skill://flutter-errors
   - skill://flutter-navigation-strategy
@@ -38,10 +42,72 @@ permissions:
     - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]}
     - {capability: mcp, effect: allow, match: ["figma/*"]}
     - {capability: subagent, effect: allow, match: ["figma-analyzer", "ds-orchestrator", "test-engineer", "golden-test-engineer", "code-auditor", "delivery-manager"]}
-toolsSettings:
-  subagent:
-    availableAgents: [figma-analyzer, ds-orchestrator, test-engineer, golden-test-engineer, code-auditor, delivery-manager]
-    trustedAgents: [figma-analyzer, ds-orchestrator, test-engineer, golden-test-engineer, code-auditor, delivery-manager]
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute, agent, figma/*]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(lib/**)
+  - Edit(lib/**)
+  - Write(test/**)
+  - Edit(test/**)
+  - Write(integration_test/**)
+  - Edit(integration_test/**)
+  - Write(assets/**)
+  - Edit(assets/**)
+  - Write(docs/**)
+  - Edit(docs/**)
+  - Write(pubspec.yaml)
+  - Edit(pubspec.yaml)
+  - Write(analysis_options.yaml)
+  - Edit(analysis_options.yaml)
+  - Write(l10n.yaml)
+  - Edit(l10n.yaml)
+  - Write(build.yaml)
+  - Edit(build.yaml)
+  - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - Bash(dart format:*)
+  - Bash(dart analyze:*)
+  - Bash(dart run build_runner:*)
+  - Bash(flutter analyze:*)
+  - Bash(flutter test:*)
+  - Bash(flutter pub get:*)
+  - Bash(flutter pub run build_runner:*)
+  - Bash(melos bootstrap:*)
+  - Bash(melos exec:*)
+  - Bash(melos run:*)
+  - mcp__figma
+  - Agent(figma-analyzer, ds-orchestrator, test-engineer, golden-test-engineer, code-auditor, delivery-manager)
+skills:
+  - flutter-clean-feature
+  - flutter-clean-architecture
+  - flutter-bloc-pattern
+  - flutter-freezed-domain-modeling
+  - flutter-dependency-injection-pattern
+  - flutter-ddd-domain-modeling
+  - flutter-api-rest-connection
+  - flutter-errors
+  - flutter-navigation-strategy
+  - flutter-generated-code-validation
+  - flutter-melos-management
+  - flutter-dart-coding-standard
+  - flutter-dart-async-patterns
+  - flutter-environments
+  - flutter-secure-storage
+  - documentation-projects
+  - mobile-sdd-spec-validation
 ---
 # Feature Builder Agent Instructions
 

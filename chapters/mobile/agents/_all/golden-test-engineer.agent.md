@@ -1,10 +1,16 @@
 ---
-id: golden-test-engineer
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: golden-test-engineer
+description: >
+  Generates and updates Flutter golden tests for visual regression coverage. Use when a workflow needs pixel-level validation across states, variants, themes, sizes, or Figma-driven visual expectations.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://flutter-ds-golden-testing
@@ -20,8 +26,40 @@ permissions:
     - capability: shell
       effect: allow
       match: ["dart test *", "flutter test *", "melos exec *"]
-description: >
-  Generates and updates Flutter golden tests for visual regression coverage. Use when a workflow needs pixel-level validation across states, variants, themes, sizes, or Figma-driven visual expectations.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(test/**)
+  - Edit(test/**)
+  - Write(integration_test/**)
+  - Edit(integration_test/**)
+  - Write(goldens/**)
+  - Edit(goldens/**)
+  - Write(test_assets/**)
+  - Edit(test_assets/**)
+  - Bash(dart test:*)
+  - Bash(flutter test:*)
+  - Bash(melos exec:*)
+skills:
+  - flutter-ds-golden-testing
+  - flutter-ds-theming-tokens
+  - flutter-ds-naming-conventions
+  - flutter-ds-folder-structure
+  - mobile-sdd-spec-validation
 ---
 # Golden Test Engineer Instructions
 

@@ -1,10 +1,16 @@
 ---
-id: test-coverage-engineer
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: test-coverage-engineer
+description: >
+  Analyzes, plans, and generates test coverage for an existing feature. Use when a feature path must be inventoried, missing coverage identified, tests generated, and a testing report produced under docs/testing/.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://flutter-testing
@@ -25,8 +31,49 @@ permissions:
     - capability: shell
       effect: allow
       match: ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
-description: >
-  Analyzes, plans, and generates test coverage for an existing feature. Use when a feature path must be inventoried, missing coverage identified, tests generated, and a testing report produced under docs/testing/.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(test/**)
+  - Edit(test/**)
+  - Write(integration_test/**)
+  - Edit(integration_test/**)
+  - Write(docs/**)
+  - Edit(docs/**)
+  - Write(pubspec.yaml)
+  - Edit(pubspec.yaml)
+  - Bash(dart analyze:*)
+  - Bash(dart test:*)
+  - Bash(flutter analyze:*)
+  - Bash(flutter test:*)
+  - Bash(flutter pub get:*)
+  - Bash(melos exec:*)
+  - Bash(melos run:*)
+skills:
+  - flutter-testing
+  - flutter-test-coverage-strategy
+  - flutter-bloc-pattern
+  - flutter-errors
+  - flutter-dart-async-patterns
+  - flutter-clean-feature
+  - flutter-clean-architecture
+  - flutter-freezed-domain-modeling
+  - flutter-dependency-injection-pattern
+  - mobile-sdd-spec-validation
 ---
 # Test Coverage Engineer Agent Instructions
 

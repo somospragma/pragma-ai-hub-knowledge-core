@@ -1,10 +1,18 @@
 ---
-id: figma-analyzer
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: figma-analyzer
+description: >
+  Specialist in extracting and analyzing design information from Figma. Use this
+  agent when the main task is to interpret a Figma component or screen, map
+  tokens, identify variants/states, and produce an actionable specification.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, "@figma"]
 resources:
   - skill://flutter-ds-figma-mcp
@@ -22,10 +30,25 @@ permissions:
     - capability: mcp
       effect: allow
       match: ["figma/*"]
-description: >
-  Specialist in extracting and analyzing design information from Figma. Use this
-  agent when the main task is to interpret a Figma component or screen, map
-  tokens, identify variants/states, and produce an actionable specification.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, figma/*]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools: [Read, Grep, Glob, Write(.sopp/**), Edit(.sopp/**), mcp__figma]
+skills:
+  - flutter-ds-figma-mcp
+  - flutter-ds-theming-tokens
+  - flutter-ds-figma-checklist
+  - flutter-ds-atomic-hierarchy
+  - flutter-ds-asset-management
+  - mobile-sdd-spec-validation
 ---
 # Figma Analyzer Instructions
 

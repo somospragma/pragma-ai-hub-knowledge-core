@@ -1,20 +1,36 @@
 ---
-id: mobile-orchestrator
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
+name: mobile-orchestrator
 description: >
   Global routing orchestrator for the Flutter mobile ecosystem. Use when the user intent spans multiple domains, is ambiguous, or needs delegation to a domain-specific orchestrator or agent. Does not execute code, generate files, or manage pipelines.
-name: mobile-orchestrator
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, subagent]
 permissions:
   rules:
     - {capability: subagent, effect: allow, match: ["workspace-discovery", "ds-orchestrator", "feature-builder", "refactoring-advisor", "test-coverage-engineer"]}
-toolsSettings:
-  subagent:
-    availableAgents: [workspace-discovery, ds-orchestrator, feature-builder, refactoring-advisor, test-coverage-engineer]
-    trustedAgents: [workspace-discovery, ds-orchestrator, feature-builder, refactoring-advisor, test-coverage-engineer]
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, agent]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Agent(workspace-discovery, ds-orchestrator, feature-builder, refactoring-advisor, test-coverage-engineer)
 ---
 # Mobile Orchestrator — Global Routing Agent
 

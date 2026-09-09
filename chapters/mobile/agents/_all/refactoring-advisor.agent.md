@@ -1,12 +1,16 @@
 ---
-id: refactoring-advisor
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
+name: refactoring-advisor
 description: >
   Analyzes and refactors existing Clean Architecture features or legacy feature code. Use to detect code smells, architecture violations, and complexity, then execute incremental refactors with required tests and refactoring documentation.
-name: refactoring-advisor
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell, subagent]
 resources:
   - skill://flutter-clean-architecture
@@ -30,10 +34,68 @@ permissions:
     - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"]}
     - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]}
     - {capability: subagent, effect: allow, match: ["code-auditor", "ds-orchestrator"]}
-toolsSettings:
-  subagent:
-    availableAgents: [code-auditor, ds-orchestrator]
-    trustedAgents: [code-auditor, ds-orchestrator]
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute, agent]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(lib/**)
+  - Edit(lib/**)
+  - Write(test/**)
+  - Edit(test/**)
+  - Write(integration_test/**)
+  - Edit(integration_test/**)
+  - Write(assets/**)
+  - Edit(assets/**)
+  - Write(docs/**)
+  - Edit(docs/**)
+  - Write(pubspec.yaml)
+  - Edit(pubspec.yaml)
+  - Write(analysis_options.yaml)
+  - Edit(analysis_options.yaml)
+  - Write(build.yaml)
+  - Edit(build.yaml)
+  - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - Bash(dart format:*)
+  - Bash(dart analyze:*)
+  - Bash(dart run build_runner:*)
+  - Bash(flutter analyze:*)
+  - Bash(flutter test:*)
+  - Bash(flutter pub get:*)
+  - Bash(flutter pub run build_runner:*)
+  - Bash(melos bootstrap:*)
+  - Bash(melos exec:*)
+  - Bash(melos run:*)
+  - Agent(code-auditor, ds-orchestrator)
+skills:
+  - flutter-clean-architecture
+  - flutter-clean-feature
+  - flutter-bloc-pattern
+  - flutter-freezed-domain-modeling
+  - flutter-dependency-injection-pattern
+  - flutter-dart-coding-standard
+  - flutter-dart-async-patterns
+  - flutter-generated-code-validation
+  - flutter-melos-management
+  - flutter-errors
+  - flutter-navigation-strategy
+  - flutter-testing
+  - flutter-test-coverage-strategy
+  - flutter-environments
+  - flutter-secure-storage
+  - mobile-sdd-spec-validation
 ---
 # Refactoring Advisor Agent Instructions
 

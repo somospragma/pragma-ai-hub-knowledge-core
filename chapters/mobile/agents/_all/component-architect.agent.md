@@ -1,10 +1,16 @@
 ---
-id: component-architect
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: component-architect
+description: >
+  Designs component and view implementation plans before code generation. Use when Figma analysis and planning are complete and the workflow needs interfaces, file structure, technical contracts, child component boundaries, or fragmentation decisions.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write]
 resources:
   - skill://flutter-ds-atomic-hierarchy
@@ -23,8 +29,30 @@ permissions:
     - capability: fs_write
       effect: allow
       match: [".sopp/**", "**/.sopp/**"]
-description: >
-  Designs component and view implementation plans before code generation. Use when Figma analysis and planning are complete and the workflow needs interfaces, file structure, technical contracts, child component boundaries, or fragmentation decisions.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools: [Read, Grep, Glob, Write(.sopp/**), Edit(.sopp/**)]
+skills:
+  - flutter-ds-atomic-hierarchy
+  - flutter-ds-naming-conventions
+  - flutter-ds-folder-structure
+  - flutter-ds-widget-anatomy
+  - flutter-ds-component-template
+  - flutter-ds-asset-management
+  - flutter-ds-responsive-layout
+  - flutter-bloc-pattern
+  - flutter-dependency-injection-pattern
+  - flutter-navigation-strategy
+  - mobile-sdd-spec-validation
 ---
 # Component Architect Instructions
 
