@@ -1,6 +1,6 @@
 ---
 id: calidad-cross-platform-learning-propagation
-version: 1.0.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -12,6 +12,8 @@ verification:
     failure_message: "Bloqueado: se arrancó una plataforma sin aplicar lo aprendido en las anteriores. Ese es el patrón que hace que el segundo canal cueste lo mismo que el primero."
   - check: "toda corrección aplicada quedó clasificada como compartida o específica de plataforma, con su razón"
     failure_message: "Bloqueado: hay correcciones sin clasificar. Sin la clasificación no se sabe qué propagar y se propaga todo o nada."
+  - check: "antes de escribir cada interacción nueva se consultó si existe un escenario en verde que toque la misma pantalla o componente, y la respuesta quedó citada en .evidence/platform-learnings.md"
+    failure_message: "Bloqueado: se escribió una interacción nueva sin comprobar si el mecanismo ya existía en verde. Reinventar lo que ya está demostrado es el desperdicio más caro y más evitable."
 ---
 
 # Cross-Platform Learning Propagation — Aprender una Vez, Aplicar en Todas
@@ -83,6 +85,24 @@ Cuando la duplicación entre plataformas es el origen del retrabajo, el agente l
 - **NUNCA** usar la propagación como excusa para modificar tests preexistentes de otras historias: el libro aplica a los tests de la entrega en curso.
 - El libro se arrastra entre sesiones junto con `[[calidad-pipeline-state-tracking]]` y se relee al abrir cada una.
 
+## El hermano estable: la consulta obligatoria antes de escribir una interacción
+
+El libro de aprendizajes resuelve la propagación **entre plataformas**. Falta la de dentro de una misma plataforma, que es la que más veces se salta y la que más barata sale de corregir.
+
+> **Antes de escribir cualquier interacción nueva, se busca si ya existe un escenario en verde que toque esa misma pantalla, ese mismo menú o ese mismo componente. Si existe, se reutiliza su mecanismo verbatim y se cita dónde está.**
+
+Verificado en campo: un flujo pulsaba un control de un menú de forma perfectamente estable; al automatizar el **control hermano del mismo menú**, en vez de repetir el mecanismo se inventó otro por coordenadas. Costó del orden de doscientos créditos de iteración llegar a la conclusión de que era el mismo control de al lado y se pulsaba igual.
+
+**La consulta no es un ejercicio de memoria: es una búsqueda determinista** sobre el repositorio —qué escenarios verdes tocan esta pantalla o este componente, y con qué mecanismo—. Por tanto la resuelve una herramienta del proyecto, no el recuerdo del agente, que es justo lo que falla cuando la sesión lleva doscientos mensajes. Si no existe, se construye una vez según `[[calidad-deterministic-work-to-tooling]]`.
+
+La consulta produce una de tres respuestas, y las tres se registran en el turno donde se escribe el código:
+
+1. **Existe y se reutiliza** — se cita el archivo y la línea del mecanismo reutilizado.
+2. **Existe pero no aplica** — se cita igual, y se justifica en una línea por qué no sirve. Esta es la respuesta que hay que sospechar: casi siempre el motivo real es que se prefería escribir algo nuevo.
+3. **No existe** — se declara, y lo que se escriba pasa a ser candidato a hermano estable de lo que venga después.
+
+Un mecanismo que ya está en verde tiene una propiedad que ningún diseño nuevo tiene por bueno que sea: **está demostrado contra la aplicación real**.
+
 ## Verificación
 
 Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
@@ -91,7 +111,8 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 |---|---|---|
 | 1 | antes de generar o ejecutar una plataforma nueva se revisó .evidence/platform-learnings.md y se emitió la lista de correcciones compartidas aplicadas | Bloqueado: se arrancó una plataforma sin aplicar lo aprendido en las anteriores. Ese es el patrón que hace que el segundo canal cueste lo mismo que el primero. |
 | 2 | toda corrección aplicada quedó clasificada como compartida o específica de plataforma, con su razón | Bloqueado: hay correcciones sin clasificar. Sin la clasificación no se sabe qué propagar y se propaga todo o nada. |
+| 3 | antes de escribir cada interacción nueva se consultó si existe un escenario en verde que toque la misma pantalla o componente, y la respuesta quedó citada en .evidence/platform-learnings.md | Bloqueado: se escribió una interacción nueva sin comprobar si el mecanismo ya existía en verde. Reinventar lo que ya está demostrado es el desperdicio más caro y más evitable. |
 
 ## Cross-links
 
-`[[calidad-repo-capability-discovery]]`, `[[calidad-pipeline-state-tracking]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-data-volatility-and-assertion-anchoring]]`, `[[calidad-cucumber-bdd-conventions]]`, `[[calidad-brownfield-vs-greenfield]]`, `[[calidad-failure-triage-and-classification]]`.
+`[[calidad-repo-capability-discovery]]`, `[[calidad-pipeline-state-tracking]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-data-volatility-and-assertion-anchoring]]`, `[[calidad-cucumber-bdd-conventions]]`, `[[calidad-brownfield-vs-greenfield]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-cold-audit-before-execution]]`, `[[calidad-human-fix-request-protocol]]`, `[[calidad-deterministic-work-to-tooling]]`.

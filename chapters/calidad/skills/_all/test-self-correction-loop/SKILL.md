@@ -1,6 +1,6 @@
 ---
 id: calidad-test-self-correction-loop
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -18,6 +18,10 @@ verification:
     failure_message: "Bloqueado: el loop se activó sin triage previo o sobre fallos clasificados como bug del SUT."
   - check: "cada iteración de corrección re-ejecutó SOLO el test corregido (aislado); la suite completa se corrió una vez al inicio para inventariar fallos y una vez al final como regresión"
     failure_message: "Bloqueado: se relanzó la suite completa dentro del ciclo de corrección. Cada iteración debe aislar el test que se está corrigiendo."
+  - check: "tras dos intentos fallidos sobre el mismo escenario se detuvo el parcheo y se emitió el diagnóstico de fondo con sus tres insumos (árbol real, gesto manual replicado, homólogo estable)"
+    failure_message: "Bloqueado: hubo un tercer intento sin diagnóstico de fondo. Parchar sin diagnosticar es lo que convierte un fallo en una cadena de veinte corridas."
+  - check: "ninguna re-ejecución volcó su salida cruda al razonamiento: se consumió el veredicto acotado de la herramienta del proyecto"
+    failure_message: "Bloqueado: se leyó el registro completo de una corrida. Lo determinista lo resuelve una herramienta y devuelve un veredicto."
 ---
 
 # Test Self-Correction Loop — Auto-corrección Controlada con Guardrails Anti-Cheating
@@ -54,6 +58,22 @@ Corolarios:
 - **Un fallo a la vez.** Si el inventario dio 5 fallos, se toma uno, se aísla, se corrige y se cierra antes de pasar al siguiente. Corregir cinco en paralelo y relanzar todo impide saber qué arregló qué (es la misma lógica de "una variable por iteración").
 - **Si el fallo aislado sigue rojo tras 3 iteraciones**, escala — no se lanza la suite "a ver si con otros datos pasa".
 - **La suite completa nunca es una herramienta de diagnóstico**: es inventario (paso 2) o confirmación (paso 5).
+
+## El corte a los dos intentos
+
+Las tres iteraciones son el techo, no el ritmo. **Dentro de ese techo hay un corte antes: a los dos intentos fallidos sobre el mismo escenario por la misma causa, se prohíbe un tercer parche.**
+
+La diferencia importa. Tres intentos "a ver si ahora sí" agotan el techo sin haber diagnosticado nada; dos intentos y un diagnóstico gastan el tercero sabiendo qué se corrige. Verificado en campo: escenarios que consumieron 28 y 25 corridas antes de encontrar una causa que era la misma —un gesto de desplazamiento demasiado brusco sobre una lista larga— y que se resolvió al primer intento cuando por fin se diagnosticó.
+
+Tras el segundo fallo, el tercer intento sólo se autoriza con un **diagnóstico de fondo** que contenga estos tres insumos, en este orden:
+
+1. **El árbol real en el momento del fallo.** Volcado, no supuesto, no recordado de otra corrida. Si la plataforma no expone el árbol, la capa semántica o el texto reconocido de la captura.
+2. **El gesto manual replicado.** Qué hace una persona con el dedo o el ratón para lograr eso mismo, escrito paso a paso **antes** de codificarlo. Este insumo es el que más veces resuelve el caso, y el que más se salta.
+3. **El homólogo estable.** Qué escenario ya verde toca esa misma pantalla o ese mismo componente, y con qué mecanismo. Ver `[[calidad-cross-platform-learning-propagation]]`.
+
+Si el diagnóstico no explica el fallo, **no se intenta un tercer parche**: se pide a la persona lo que falta —típicamente la lectura visual de la pantalla— por la vía de `[[calidad-human-fix-request-protocol]]`.
+
+**Señal de que hay que cortar aunque no se hayan agotado los intentos**: dos fallos consecutivos con motivos distintos sobre el mismo step. Eso no es un test frágil, es un diagnóstico equivocado.
 
 ## Modos de operación
 
@@ -122,7 +142,10 @@ Estas son las restricciones más críticas del chapter; cada una está justifica
 5. **Cada modificación aplicada debe quedar registrada en audit log** (`references/correction-audit-log.md`) con: archivo, líneas cambiadas, diff antes/después, razón, hash del SUT, evidencia que justificó el cambio, guardrails verificados. Sin audit log, el cambio es inválido y se revierte.
 6. **En `dry-run`, NO aplicar nada**: producir patch propuesto + justificación + evidencia para aprobación humana. Aplicar en `dry-run` rompe el contrato con clientes regulados.
 7. **Cliente regulado → modo obligatorio `dry-run`**. Default no negociable para HIPAA, SOX, PCI-DSS Level 1, FedRAMP y cualquier sector regulado equivalente. Ver `references/regulated-client-overrides.md`.
-8. **Cross-link mandatorio con `[[calidad-failure-triage-and-classification]]`** (input obligatorio del loop) y `[[calidad-test-self-healing]]` (healing es un tipo específico de auto-corrección que opera dentro de este mismo loop). Sin estos cruces el skill está incompleto.
+8. **NUNCA un tercer intento sin diagnóstico de fondo** (ver el corte a los dos intentos). Ajustar parámetros de un gesto, de una espera o de un selector "a ver si ahora sí" está prohibido a partir del tercer intento.
+9. **NUNCA leer el registro crudo de una corrida.** Lo determinista —ejecutar, resumir y clasificar por patrón— lo resuelve una herramienta del proyecto que devuelve un veredicto acotado (`[[calidad-deterministic-work-to-tooling]]`). El registro queda en disco y se abre de forma excepcional, con hipótesis declarada.
+10. **NUNCA volver a correr sin releer**: toda corrección se audita en frío antes de entregarse como lista, según `[[calidad-cold-audit-before-execution]]`.
+11. **Cross-link mandatorio con `[[calidad-failure-triage-and-classification]]`** (input obligatorio del loop) y `[[calidad-test-self-healing]]` (healing es un tipo específico de auto-corrección que opera dentro de este mismo loop). Sin estos cruces el skill está incompleto.
 
 ## Verificación
 
@@ -135,6 +158,8 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 3 | audit log persistido en .evidence/audit-log-<fecha>.md con diff por iteración y guardrail verificado | Bloqueado: no hay audit log de las correcciones; sin trazabilidad la auto-corrección es inválida. |
 | 4 | input de triage presente y clasificación distinta a bug del SUT antes de activar el loop | Bloqueado: el loop se activó sin triage previo o sobre fallos clasificados como bug del SUT. |
 | 5 | cada iteración de corrección re-ejecutó SOLO el test corregido (aislado); la suite completa se corrió una vez al inicio para inventariar fallos y una vez al final como regresión | Bloqueado: se relanzó la suite completa dentro del ciclo de corrección. Cada iteración debe aislar el test que se está corrigiendo. |
+| 6 | tras dos intentos fallidos sobre el mismo escenario se detuvo el parcheo y se emitió el diagnóstico de fondo con sus tres insumos (árbol real, gesto manual replicado, homólogo estable) | Bloqueado: hubo un tercer intento sin diagnóstico de fondo. Parchar sin diagnosticar es lo que convierte un fallo en una cadena de veinte corridas. |
+| 7 | ninguna re-ejecución volcó su salida cruda al razonamiento: se consumió el veredicto acotado de la herramienta del proyecto | Bloqueado: se leyó el registro completo de una corrida. Lo determinista lo resuelve una herramienta y devuelve un veredicto. |
 
 ## Cross-links
 
@@ -160,3 +185,6 @@ Cross-links con otros assets del chapter:
 - `[[calidad-k6-greenfield]]`
 - `[[calidad-appium-screenplay-android]]`
 - `[[calidad-test-self-correction-loop-workflow]]` (workflow)
+- `[[calidad-deterministic-work-to-tooling]]`
+- `[[calidad-human-fix-request-protocol]]`
+- `[[calidad-cold-audit-before-execution]]`

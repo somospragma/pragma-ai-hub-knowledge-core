@@ -1,6 +1,6 @@
 ---
 id: calidad-failure-triage-and-classification
-version: 1.1.0
+version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -16,6 +16,10 @@ verification:
     failure_message: "Bloqueado: se intentó auto-corregir un bug real del SUT — violación de anti-cheating."
   - check: "todo fallo clasificado como bug del SUT cumple las seis precondiciones de references/sut-defect-evidence-chain.md, empezando por preflight verde en esa misma corrida"
     failure_message: "Bloqueado: se declaró un defecto del SUT sin la cadena de evidencia completa. Ya ocurrió en campo reportar un defecto en una corrida donde la aplicación nunca se abrió."
+  - check: "cuando la entrega opera con persona en el ciclo, el triage partió de la ficha de corrección y no de la lectura del registro crudo por parte del agente"
+    failure_message: "Bloqueado: el agente volvió a leer el registro completo. Bajo persona en el ciclo el diagnóstico entra por la ficha; el registro queda en disco."
+  - check: "ningún escenario se archivó en verde sin que su aserción demostrara la señal sustantiva que certifica"
+    failure_message: "Bloqueado: hay un verde que no puede demostrar por qué pasó. Un escenario que no prueba su señal reporta pasa-sin-verificar, no verde."
 ---
 
 # Failure Triage and Classification — Clasificación de Fallos y Análisis de Causa Raíz antes de Corregir
@@ -92,6 +96,30 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
 
 6. **Aplicar el quarantine pattern** si corresponde, siguiendo `references/quarantine-pattern.md`: aislar en suite `@quarantine`, crear ticket de resolución con SLA, y **no bloquear el pipeline principal**. Quarantine sin ticket con SLA equivale a test muerto y está prohibido.
 
+## Triage con persona en el ciclo
+
+El triage tiene dos mitades y conviene no confundirlas. **Clasificar por patrón es determinista** —qué step falló, de qué clase es el error, qué evidencia lo acompaña— y por tanto lo resuelve una herramienta del proyecto que lee el reporte y devuelve un veredicto acotado (`[[calidad-deterministic-work-to-tooling]]`). **Declarar la causa raíz y decidir si es defecto del producto exige juicio**, y eso no se automatiza nunca.
+
+Cuando además la entrega opera bajo `[[calidad-human-fix-request-protocol]]`, la mitad con juicio se apoya en la **ficha de corrección** que la persona escribió tras mirar el reporte. En ningún caso el agente vuelve a leer el registro crudo.
+
+Tres consecuencias operativas:
+
+1. **El veredicto de la herramienta y la ficha son los dos insumos.** Uno aporta la clasificación mecánica; la otra, lo observado. Sus campos mapean uno a uno a lo que este skill exige: dónde falló, qué se observó, causa propuesta. Lo que falta —la clasificación determinista o intermitente, y la causa raíz confirmada— lo sigue produciendo el agente, contrastando la ficha contra el código.
+2. **La repetición para determinismo la hace el lote, no el agente.** El protocolo de re-ejecución no se convierte en corridas sueltas pedidas por el agente: se declara en el lote que la persona ejecuta. Un escenario que se sospecha intermitente se etiqueta para repetirse dentro de la siguiente tanda.
+3. **La ficha se audita, no se obedece.** Si el diagnóstico humano no cuadra con el código, se objeta con el motivo antes de tocar nada. Un diagnóstico equivocado aplicado con fidelidad cuesta lo mismo que no tener ninguno.
+
+## Los verdes que pasan por la razón equivocada
+
+Un fallo se nota; un **verde falso** no. Es el fallo más caro del triage porque se archiva como bueno y se descubre, si acaso, en producción.
+
+Verificado en campo: un escenario de seguridad daba verde comprobando que un dato sensible no aparecía en una petición **que no llevaba ese dato**. El patrón de captura era demasiado amplio y tomaba la primera llamada que coincidía —una consulta sin cuerpo— en vez de la que transportaba el dato. La aserción se cumplía trivialmente.
+
+La defensa no puede ser que alguien lea la traza de cada corrida. Tiene que estar **dentro del escenario**:
+
+- La aserción **exige la señal sustantiva**, no la ausencia de una señal negativa. "El dato no aparece" sólo vale si antes se demostró que se capturó el mensaje que debía llevarlo.
+- Si la señal no puede demostrarse, el escenario **no reporta verde**: reporta *pasa sin verificar* y no se archiva.
+- Toda aserción por ausencia lleva declarado, junto a ella, **qué presencia la hace válida**.
+
 ## Restricciones
 
 - **NUNCA** clasificar como "test design issue" sin haber verificado primero el comportamiento real del SUT. Lo que parece test mal escrito puede ser bug de regresión recién introducido.
@@ -103,6 +131,7 @@ Se aplica a todos los frameworks del alcance del chapter: Playwright, Appium, Ka
 - **NUNCA** derivar una conclusión de negocio de un código de estado HTTP sin comprobarla por otra vía. Es la forma más rápida de convertir un fallo en silencio.
 - **NUNCA** conviertas en fatal una condición que la suite venía sobreviviendo, apoyándote en **una sola** observación. «Fallar ruidosamente» es la respuesta correcta *cuando se sabe qué significa el fallo*; con una observación no se sabe. La pregunta que falta es **¿qué pasa si mi interpretación es falsa?** — si la respuesta es «la suite entera deja de correr», la barra de evidencia sube mucho, y un aviso ruidoso que no bloquea da casi todo el valor con nada del riesgo. En campo, hacer fatal un código de estado malinterpretado dejó la suite roja por algo ajeno a lo que se certificaba.
 - **NUNCA** cambies un selector sin comprobar antes en la traza de comandos si **encontró algo**. Cambiar lo que funciona añade riesgo y, peor, consolida un diagnóstico falso: si la corrida siguiente pasa, el arreglo se le atribuye al selector.
+- **NUNCA** archives un verde cuya aserción no pueda demostrar la señal que certifica. Una aserción por ausencia sin la presencia que la valida es un verde falso esperando a ser descubierto tarde.
 - **El triage es obligatorio antes de cualquier auto-corrección**. Saltarse este skill y pasar directo a `[[calidad-test-self-correction-loop]]` está prohibido por la política del chapter.
 
 ## Verificación
@@ -117,12 +146,16 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 4 | todo fallo clasificado como bug del SUT cumple las seis precondiciones de references/sut-defect-evidence-chain.md, empezando por preflight verde en esa misma corrida | Bloqueado: se declaró un defecto del SUT sin la cadena de evidencia completa. Ya ocurrió en campo reportar un defecto en una corrida donde la aplicación nunca se abrió. |
 | 5 | cada evidencia usada lleva declarado su instante de captura, y ninguna afirmación se apoya en evidencia posterior al hecho que afirma | Bloqueado: se está concluyendo desde evidencia tardía. Una captura de teardown no prueba un estado intermedio, y dos tardías por la misma razón no se corroboran. |
 | 6 | ninguna clasificación usa «intermitente», «flaky» o «transitorio» sin el conteo que la sostiene | Bloqueado: se etiquetó como intermitente algo que no se midió. Sin cuántas veces de cuántas, no hay clasificación. |
+| 7 | cuando la entrega opera con persona en el ciclo, el triage partió de la ficha de corrección y no de la lectura del registro crudo por parte del agente | Bloqueado: el agente volvió a leer el registro completo. Bajo persona en el ciclo el diagnóstico entra por la ficha; el registro queda en disco. |
+| 8 | ningún escenario se archivó en verde sin que su aserción demostrara la señal sustantiva que certifica | Bloqueado: hay un verde que no puede demostrar por qué pasó. Un escenario que no prueba su señal reporta pasa-sin-verificar, no verde. |
 
 ## Cross-links
 
 - `references/sut-defect-evidence-chain.md` — precondiciones obligatorias y descartes documentados antes de declarar un defecto del SUT, más el bloque de reporte que se emite.
 - `references/re-run-protocol-for-determinism.md` — protocolo de re-ejecución para distinguir deterministic vs flaky.
 - `references/failure-pattern-catalog.md` — catálogo de patrones de fallo con síntomas, causa y acción.
+- `[[calidad-human-fix-request-protocol]]` — de dónde llega el diagnóstico cuando la persona está en el ciclo.
+- `[[calidad-cold-audit-before-execution]]` — la lectura en frío que evita el fallo antes de que haya que triarlo.
 - `references/bug-vs-test-design-decision-tree.md` — árbol de decisión para decidir si corregir el test o reportar bug.
 - `references/stability-score-metric.md` — definición y cálculo del stability score.
 - `references/quarantine-pattern.md` — mecánica de quarantine con SLA y eliminación tras 30 días.
