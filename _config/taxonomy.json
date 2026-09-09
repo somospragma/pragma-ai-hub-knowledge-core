@@ -4,16 +4,24 @@
     "backend": {
       "platforms": {
         "java": {
-          "stacks": ["java-spring", "java-webflux"],
+          "stacks": [
+            "java-spring",
+            "java-webflux"
+          ],
           "detection": {
             "java-spring": {
-              "signals": ["pom.xml", "build.gradle"],
+              "signals": [
+                "pom.xml",
+                "build.gradle"
+              ],
               "excludes_signal": {
                 "file": "AndroidManifest.xml"
               }
             },
             "java-webflux": {
-              "signals": ["pom.xml"],
+              "signals": [
+                "pom.xml"
+              ],
               "requires_signal": {
                 "file": "pom.xml",
                 "contains": "spring-boot-starter-webflux"
@@ -22,24 +30,37 @@
           }
         },
         "node": {
-          "stacks": ["node-express", "node-lambda"],
+          "stacks": [
+            "node-express",
+            "node-lambda"
+          ],
           "detection": {
             "node-express": {
-              "signals": ["package.json"],
+              "signals": [
+                "package.json"
+              ],
               "excludes_signal": {
                 "file": "nest-cli.json"
               }
             },
             "node-lambda": {
-              "signals": ["package.json", "serverless.yml"]
+              "signals": [
+                "package.json",
+                "serverless.yml"
+              ]
             }
           }
         },
         "dotnet": {
-          "stacks": ["dotnet"],
+          "stacks": [
+            "dotnet"
+          ],
           "detection": {
             "dotnet": {
-              "signals": ["*.csproj", "*.sln"]
+              "signals": [
+                "*.csproj",
+                "*.sln"
+              ]
             }
           }
         }
@@ -48,27 +69,64 @@
     "calidad": {
       "platforms": {
         "automation": {
-          "stacks": ["karate", "playwright", "k6", "appium"],
+          "stacks": [
+            "karate",
+            "playwright",
+            "k6",
+            "appium-serenity",
+            "appium-core",
+            "appium-wdio"
+          ],
           "detection": {
             "karate": {
-              "signals": ["karate-config.js"]
+              "signals": [
+                "karate-config.js"
+              ]
             },
             "playwright": {
-              "signals": ["playwright.config.ts", "playwright.config.js"]
+              "signals": [
+                "playwright.config.ts",
+                "playwright.config.js",
+                "package.json"
+              ],
+              "requires_signal": {
+                "file": "package.json",
+                "contains": "playwright"
+              }
             },
             "k6": {
-              "signals": ["package.json"],
+              "signals": [
+                "package.json"
+              ],
               "requires_signal": {
                 "file": "package.json",
                 "contains": "k6 run"
               }
             },
-            "appium": {
-              "signals": ["build.gradle"],
+            "appium-wdio": {
+              "signals": [
+                "package.json"
+              ],
+              "requires_signal": {
+                "file": "package.json",
+                "contains": "webdriverio"
+              }
+            },
+            "appium-serenity": {
+              "signals": [
+                "build.gradle"
+              ],
               "requires_signal": {
                 "file": "build.gradle",
                 "contains": "appium-java-client"
               }
+            },
+            "appium-core": {
+              "signals": [
+                "package.json",
+                "build.gradle"
+              ],
+              "note": "companion: se instala junto a appium-serenity o appium-wdio, no se detecta solo"
             }
           }
         }
@@ -77,26 +135,40 @@
     "mobile": {
       "platforms": {
         "flutter": {
-          "stacks": ["flutter"],
+          "stacks": [
+            "flutter"
+          ],
           "detection": {
             "flutter": {
-              "signals": ["pubspec.yaml"]
+              "signals": [
+                "pubspec.yaml"
+              ]
             }
           }
         },
         "android": {
-          "stacks": ["android-native"],
+          "stacks": [
+            "android-native"
+          ],
           "detection": {
             "android-native": {
-              "signals": ["build.gradle", "AndroidManifest.xml"]
+              "signals": [
+                "build.gradle",
+                "AndroidManifest.xml"
+              ]
             }
           }
         },
         "apple": {
-          "stacks": ["apple-native"],
+          "stacks": [
+            "apple-native"
+          ],
           "detection": {
             "apple-native": {
-              "signals": ["*.xcodeproj", "Package.swift"]
+              "signals": [
+                "*.xcodeproj",
+                "Package.swift"
+              ]
             }
           }
         }
@@ -105,10 +177,14 @@
     "frontend": {
       "platforms": {
         "react": {
-          "stacks": ["react"],
+          "stacks": [
+            "react"
+          ],
           "detection": {
             "react": {
-              "signals": ["package.json"],
+              "signals": [
+                "package.json"
+              ],
               "requires_signal": {
                 "file": "package.json",
                 "contains": "react"
@@ -117,10 +193,14 @@
           }
         },
         "angular": {
-          "stacks": ["angular"],
+          "stacks": [
+            "angular"
+          ],
           "detection": {
             "angular": {
-              "signals": ["angular.json"]
+              "signals": [
+                "angular.json"
+              ]
             }
           }
         }
