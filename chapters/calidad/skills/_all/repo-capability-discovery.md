@@ -1,6 +1,6 @@
 ---
 id: calidad-repo-capability-discovery
-version: 1.0.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -80,6 +80,11 @@ En greenfield sobre un repositorio existente (se agrega una suite nueva a un pro
 6. **Una búsqueda sin resultados solo prueba algo si la búsqueda corrió.** Comprobar el código de salida antes de concluir ausencia: una salida vacía puede ser "no hay resultados" o puede ser "el comando falló". En campo, un `grep` con el glob sin comillas devolvió vacío y se leyó como "el recurso no existe"; existía, exactamente donde el mapa decía. **Nunca afirmes la inexistencia de un recurso que un documento del cliente afirma que existe sin haber buscado por dos caminos distintos.**
 7. **Toda fila que afirme una capacidad lleva o bien su invocación, o bien la ruta del artefacto que la implementa.** Una fila que dice "el repositorio resuelve X" sin decir dónde no es un mapa: es una pista. Para los runners la invocación sale del propio runner; para un script suelto hay que nombrarlo.
 
+8. **Si el repositorio provee un ejecutor por etiquetas o multiplataforma, se usa.** Estabilizar de a un escenario cuando existe un ejecutor de lotes multiplica el arranque, el login y las precondiciones por el número de escenarios. El mapa debe registrar explícitamente si ese ejecutor existe y cómo se invoca; si existe y no se usa, es un hallazgo que se justifica, no una preferencia.
+9. **Antes de escribir una interacción nueva, se busca el hermano estable.** Si ya hay un escenario en verde que toca esa misma pantalla, ese mismo menú o ese mismo componente, su mecanismo se reutiliza verbatim y se cita dónde está. Ver `[[calidad-cross-platform-learning-propagation]]`.
+
+10. **Un hueco de capacidad no se rodea a mano: se cierra.** Si el mapa demuestra que el proyecto **no** resuelve una tarea determinista y repetida, la respuesta correcta no es hacerla a mano cada vez, sino construir la herramienta, documentarla en el proyecto y devolverla a este mapa con su invocación. El procedimiento y sus guardarraíles están en `[[calidad-deterministic-work-to-tooling]]`.
+
 ## Cuando el descubrimiento cuesta más que la implementación
 
 En un arquetipo maduro el costo del agente **no está en escribir**: está en
@@ -119,5 +124,7 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 3 | ninguna operación se implementó a mano existiendo en el repositorio un recurso que ya la resuelve | Bloqueado: se reimplementó a mano algo que el repositorio ya provee. Eso es deuda nueva y trabajo duplicado. |
 
 ## Cross-links
+
+`[[calidad-deterministic-work-to-tooling]]` — qué hacer con los huecos que este mapa deja al descubierto.
 
 `[[calidad-brownfield-vs-greenfield]]`, `[[calidad-pre-generation-protocol]]`, `[[calidad-execution-preflight]]`, `[[calidad-test-execution-orchestration]]`, `[[calidad-smoke-gate-policy]]`, `[[calidad-cross-platform-learning-propagation]]`, `[[calidad-alm-test-publishing-cycle]]`, `[[calidad-pipeline-state-tracking]]`.

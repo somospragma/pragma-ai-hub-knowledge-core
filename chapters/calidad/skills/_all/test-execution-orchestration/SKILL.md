@@ -1,6 +1,6 @@
 ---
 id: calidad-test-execution-orchestration
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -53,6 +53,20 @@ Política por defecto:
 
 **Salidas de comandos largos a archivo**, y nunca diagnosticar sobre output de terminal truncado, entremezclado o reusado de una corrida anterior.
 
+### Se corre por lotes, no de a un escenario
+
+El punto 4 —aislar el test que se corrige— **no autoriza a estabilizar la entrega de a un escenario por corrida**. Son dos cosas distintas: aislar es para atribuir la mejora dentro de una corrección concreta; estabilizar de a uno es pagar el arranque, el login y las precondiciones tantas veces como escenarios haya.
+
+Si el repositorio provee un ejecutor por etiquetas o multiplataforma —comprobarlo con `[[calidad-repo-capability-discovery]]`, que es donde queda registrado—, **se usa**. Verificado en campo: una certificación de cincuenta casos se estabilizó escenario por escenario durante cinco días, con 214 corridas, teniendo el ejecutor por etiquetas disponible en el propio repositorio desde antes de empezar.
+
+El ciclo con lotes: se entrega un lote etiquetado, se corre entero, se revisa un reporte, se corrigen juntos todos los que fallaron, se vuelve a correr el lote. Un lote se define por lo que comparte precondición y usuario, no por lo que cabe en la pantalla.
+
+### La salida de una corrida no entra entera al razonamiento
+
+Un registro de corrida de una interfaz moderna pesa entre decenas y centenares de kilobytes. Leerlo completo tiene dos costes: el de leerlo, y el de que **se queda ocupando contexto durante el resto de la sesión** y se reenvía en cada paso posterior.
+
+Lo que se consume es un **veredicto acotado** —qué escenario, qué step falló, con qué clase de fallo, la firma de la pantalla en ese instante y las rutas de los artefactos—; el registro completo queda en disco y se abre sólo en modo de diagnóstico, una vez, con hipótesis declarada. Cuando la entrega opera con persona en el ciclo, ni siquiera eso: el diagnóstico entra por la ficha de `[[calidad-human-fix-request-protocol]]`.
+
 ## Instrucción
 
 1. **Resolver modo** según contexto del cliente y capacidad técnica del agente. Confirmar con `[[calidad-mandatory-inputs-protocol]]` si hay ambigüedad. Si se degrada a `scaffold-only`, registrar la razón.
@@ -86,6 +100,8 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 3 | resultados parseados a esquema común consumible por triage (calidad-failure-triage-and-classification) | Bloqueado: el output de ejecución no fue parseado al esquema común; triage no puede operar sobre datos crudos. |
 
 ## Cross-links
+
+`[[calidad-deterministic-work-to-tooling]]` — quién emite ese veredicto: una herramienta del proyecto, construida una vez. `[[calidad-human-fix-request-protocol]]` — dónde entra el juicio de la persona. `[[calidad-cold-audit-before-execution]]` — lo que se hace antes de gastar la primera corrida.
 
 - `references/execute-and-capture-by-framework.md`
 - `references/result-schema-common.md`
