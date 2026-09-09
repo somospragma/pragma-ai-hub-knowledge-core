@@ -12,6 +12,7 @@ Checks:
   5. References       - un bundle no cita references propias inexistentes
   6. Cadena del router- los eslabones de la certificacion de una historia existen
   7. Huerfanos        - todo workflow es invocado por algun asset
+  8. Alcanzabilidad   - todo asset se alcanza navegando [[id]] desde el steering
 
 Uso:
     python3 scripts/audit-chapter.py            # exit 1 si hay hallazgos
@@ -92,7 +93,8 @@ def main() -> int:
     archivos = sorted(SRC.rglob("*.md"))
     ids: dict[str, Path] = {}
     hallazgos: dict[str, list[str]] = {k: [] for k in
-        ["frontmatter", "coherencia", "links", "portabilidad", "references", "cadena", "huerfanos"]}
+        ["frontmatter", "coherencia", "links", "portabilidad", "references", "cadena", "huerfanos",
+         "alcanzables"]}
 
     # --- inventario de ids ---
     # Los assets de cuenta viven fuera de chapters/ pero se referencian con la
@@ -178,6 +180,37 @@ def main() -> int:
     for w in sorted(workflows - referenciados):
         hallazgos["huerfanos"].append(f"workflow '{w}' no lo invoca ningun asset")
 
+    # --- 8: alcanzable navegando desde el steering ---
+    # Un asset puede resolver sus links y aun asi no encontrarlo nadie. El agente
+    # arranca en el steering y navega por [[id]]; lo que no cuelga de ahi existe y
+    # no se usa. Los resolvedores se excluyen como FUENTE: son tabla de traduccion
+    # (listan todo), no un camino de descubrimiento.
+    RESOLVERS = {i for i in ids if i.endswith("-asset-resolver")}
+    salientes: dict[str, set[str]] = {}
+    raices: set[str] = set()
+    for aid, f in ids.items():
+        texto = f.read_text(encoding="utf-8")
+        fm = parse_fm(texto)
+        if fm.get("type") == "steering":
+            raices.add(aid)
+        salientes[aid] = set() if aid in RESOLVERS else {
+            r for r in WIKI.findall(texto) if r != aid and r in ids}
+    alcanzados = set(raices)
+    pila = list(raices)
+    while pila:
+        for hijo in salientes.get(pila.pop(), ()):
+            if hijo not in alcanzados:
+                alcanzados.add(hijo)
+                pila.append(hijo)
+    entrantes: dict[str, int] = {i: 0 for i in ids}
+    for aid, hijos in salientes.items():
+        for h in hijos:
+            entrantes[h] += 1
+    for aid in sorted(set(ids) - alcanzados - RESOLVERS):
+        motivo = "nadie lo enlaza" if not entrantes[aid] else "solo cuelga de otro inalcanzable"
+        hallazgos["alcanzables"].append(
+            f"'{aid}' no se alcanza navegando desde el steering ({motivo}): {ids[aid]}")
+
     # --- reporte ---
     total = sum(len(v) for v in hallazgos.values())
     print(f"=== Regresion del chapter Calidad — {len(ids)} assets ===\n")
@@ -189,6 +222,7 @@ def main() -> int:
         "references":   "References propias existen",
         "cadena":       "Cadena de certificacion completa",
         "huerfanos":    "Sin workflows huerfanos",
+        "alcanzables":  "Todo asset se alcanza desde el steering",
     }
     for clave, etiqueta in ETIQUETAS.items():
         items = hallazgos[clave]
