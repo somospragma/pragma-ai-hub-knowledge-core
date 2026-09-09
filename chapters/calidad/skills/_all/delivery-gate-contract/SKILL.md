@@ -1,12 +1,39 @@
 ---
 id: calidad-delivery-gate-contract
-version: 1.4.0
+version: 1.8.0
 scope: chapter
 type: skill
 chapter: calidad
 enforcement: mandatory
 description: "OBLIGATORIO. Contrato YAML que el agente DEBE emitir literalmente al final de toda generación, antes del mensaje de cierre. Sin este bloque, la entrega se considera incompleta. Universal a los 5 IDEs."
 tags: [delivery-gate, contract, mandatory, universal, all-ides]
+verification:
+  - check: "bloque delivery_gate emitido literalmente como último contenido antes del mensaje de cierre"
+    failure_message: "Bloqueado: la entrega no incluye el bloque YAML delivery_gate. Sin este contrato la entrega es inválida."
+  - check: "todos los campos obligatorios del schema rellenados (schema_version, framework, mode, status, inputs_confirmed, coverage, files_emitted, evidence_persisted)"
+    failure_message: "Bloqueado: el bloque delivery_gate tiene campos obligatorios vacíos o ausentes."
+  - check: "consistencia status vs execution.exit_code (success requiere exit_code 0 en modo full)"
+    failure_message: "Bloqueado: contradicción entre status declarado y exit_code reportado."
+  - check: "modo full sin ejecución real reporta status: partial con blocker execution_skipped"
+    failure_message: "Bloqueado: no se puede declarar success en modo full sin evidencia de ejecución."
+  - check: "bloque transversal_capabilities presente (detected/omitted); capas tejidas solo si confirmed_by_user"
+    failure_message: "Bloqueado: faltó evaluar/registrar las capacidades transversales complementarias (accesibilidad, SEO, seguridad, visual, contract, performance)."
+  - check: "execution_target declarado; si es mock o hybrid, certification: pending_real_integration + mock_evidence completo + switchover en next_steps"
+    failure_message: "Bloqueado: la corrida contra mock no declara la certificación pendiente o carece de evidencia del mock y plan de switchover."
+  - check: "si execution_target es mock o hybrid, el mensaje de cierre posterior al bloque YAML repite la advertencia de certificación pendiente"
+    failure_message: "Bloqueado: el cierre no advierte que los resultados contra mock no certifican el SUT. La advertencia al inicio del flujo no sustituye la del cierre."
+  - check: "pipeline-state.json leído y sin fases obligatorias pendientes; phases_pending vacío"
+    failure_message: "Bloqueado: hay fases del pipeline sin completar. Emitir el gate ahora sería declarar terminada una entrega incompleta."
+  - check: "cada blocker declarado incluye la evidencia del sondeo (comando ejecutado + salida) que lo comprueba"
+    failure_message: "Bloqueado: hay blockers afirmados sin sondear. Un bloqueo de ambiente supuesto ya cerró una entrega en falso."
+  - check: "si execution_target es mock/hybrid, mock_evidence.traffic_verified es true con evidencia del log del mock"
+    failure_message: "Bloqueado: no se demostró que el SUT consumiera el mock. Una suite verde contra un SUT que ignora el mock no valida el contrato."
+  - check: "el análisis estático del cliente corrió en local y pasó antes de cualquier commit, con su salida adjunta"
+    failure_message: "Bloqueado: se iba a commitear sin pasar la puerta de calidad del cliente. Descubrirlo en el pipeline cuesta un ciclo entero."
+  - check: "la cobertura declarada en la matriz de insumos se comparó contra la entregada, y la diferencia está reportada"
+    failure_message: "Bloqueado: no se comparó lo prometido contra lo entregado. Una entrega que se declara completa sin ese cruce ya cerró historias con criterios sin cubrir."
+  - check: "los artefactos obligatorios que los assets de la ruta prescriben existen en la evidencia, o su ausencia está justificada"
+    failure_message: "Bloqueado: faltan artefactos obligatorios. Un asset marcado obligatorio cuyo artefacto nunca se creó es una regla que no se cumplió y que nadie notó."
 ---
 
 # Delivery Gate Contract — Bloque YAML de Cierre Obligatorio
@@ -142,6 +169,28 @@ forma más rápida de que un equipo aprenda a saltárselo.
 La misma exigencia aplica a las comprobaciones de este contrato de cierre: si una
 condición no se puede violar a propósito en una prueba, no está verificando nada.
 
+## Antes del commit: la puerta de calidad del cliente y los artefactos prometidos
+
+Tres comprobaciones que no cuestan una corrida contra el sistema bajo prueba y que evitan un ciclo entero de reproceso.
+
+**1. El análisis estático del cliente se pasa en local, antes de commitear.** Si el cliente tiene una puerta de calidad, se corre contra ella desde la máquina, con las credenciales que ya viven en la configuración del repositorio, y **se pasa antes** de proponer el commit. Descubrir en el pipeline lo que se podía saber en local cuesta el ciclo completo. Detalle en `[[calidad-static-analysis-on-the-test-repo]]`. Casi siempre el repositorio ya tiene el comando y el gancho de pre-commit: se comprueba antes de construir nada. Si no lo tiene, el hueco se cierra construyéndolo una vez según `[[calidad-deterministic-work-to-tooling]]`, no repitiendo la comprobación a mano en cada entrega.
+
+**2. La cobertura declarada se compara contra la entregada.** La matriz congelada en la fase de insumos es el compromiso; la entrega es lo que hay. La diferencia se reporta explícitamente, aunque sea cero. Sin este cruce, "ejecuté todo lo que había" se confunde con "cubrí todo lo que había que cubrir", y ya cerró historias con criterios sin escenario.
+
+**3. Los artefactos obligatorios existen, y lo comprueba un comando que viene con el chapter.** Cada asset marcado como obligatorio prescribe artefactos. La comprobación **no es una autoevaluación del agente**: es un comando que verifica presencia y devuelve código de salida distinto de cero, enganchado al pre-commit del repositorio. Una obligación sostenida sólo por texto ya demostró no cumplirse.
+
+El comando **no hay que construirlo**: se instala con el chapter, en `scripts/` de este skill.
+
+```bash
+python3 <scripts-de-este-skill>/check-required-artifacts.py --evidence .evidence
+```
+
+Es autocontenido —un solo archivo, sin dependencias— y lleva dentro la lista de artefactos que los assets obligatorios exigen, con su condición de aplicación. Comprueba presencia, imprime qué falta, quién lo exige y para qué, y devuelve código de salida distinto de cero. Se engancha al `pre-commit` del repositorio, que es donde no se puede saltar.
+
+La lista no se mantiene a mano: la auditoría de la fuente del chapter la lee del propio script y falla si un asset obligatorio prescribe un artefacto que no está en ella. Así, añadir una obligación nueva y olvidarse de hacerla comprobable deja de ser posible. Ver `[[calidad-deterministic-work-to-tooling]]`, capas de exigibilidad.
+
+Esta última es la comprobación que más veces destapa el problema de fondo: en una certificación auditada, **seis de cada diez artefactos obligatorios prescritos por los assets no se habían creado**, y eran precisamente los que habrían evitado los gastos más caros de la entrega. Una regla obligatoria cuyo artefacto nadie verifica es una regla que no existe.
+
 ## Restricciones
 
 - Si falta cualquier campo obligatorio → entrega inválida.
@@ -153,31 +202,25 @@ condición no se puede violar a propósito en una prueba, no está verificando n
 - Resultados contra mock JAMÁS se presentan como certificación de integración, performance o seguridad del SUT (regla maestra de `[[calidad-sut-readiness-gate]]`).
 - **Advertencia de cierre obligatoria**: si `execution_target: mock | hybrid`, el mensaje final al usuario (el que sigue al bloque YAML) DEBE repetir en su primera línea: *"Resultados obtenidos contra mock: validan la construcción de la suite, NO certifican el SUT. Certificación pendiente de re-ejecución contra integraciones reales (ver plan de switchover)."* Decirlo solo al inicio del flujo no basta — el usuario que lee el cierre debe verla ahí (hallazgo de pruebas de campo).
 
-## Verification
+## Verificación
 
-```yaml
-verification:
-  - check: "bloque delivery_gate emitido literalmente como último contenido antes del mensaje de cierre"
-    failure_message: "Bloqueado: la entrega no incluye el bloque YAML delivery_gate. Sin este contrato la entrega es inválida."
-  - check: "todos los campos obligatorios del schema rellenados (schema_version, framework, mode, status, inputs_confirmed, coverage, files_emitted, evidence_persisted)"
-    failure_message: "Bloqueado: el bloque delivery_gate tiene campos obligatorios vacíos o ausentes."
-  - check: "consistencia status vs execution.exit_code (success requiere exit_code 0 en modo full)"
-    failure_message: "Bloqueado: contradicción entre status declarado y exit_code reportado."
-  - check: "modo full sin ejecución real reporta status: partial con blocker execution_skipped"
-    failure_message: "Bloqueado: no se puede declarar success en modo full sin evidencia de ejecución."
-  - check: "bloque transversal_capabilities presente (detected/omitted); capas tejidas solo si confirmed_by_user"
-    failure_message: "Bloqueado: faltó evaluar/registrar las capacidades transversales complementarias (accesibilidad, SEO, seguridad, visual, contract, performance)."
-  - check: "execution_target declarado; si es mock o hybrid, certification: pending_real_integration + mock_evidence completo + switchover en next_steps"
-    failure_message: "Bloqueado: la corrida contra mock no declara la certificación pendiente o carece de evidencia del mock y plan de switchover."
-  - check: "si execution_target es mock o hybrid, el mensaje de cierre posterior al bloque YAML repite la advertencia de certificación pendiente"
-    failure_message: "Bloqueado: el cierre no advierte que los resultados contra mock no certifican el SUT. La advertencia al inicio del flujo no sustituye la del cierre."
-  - check: "pipeline-state.json leído y sin fases obligatorias pendientes; phases_pending vacío"
-    failure_message: "Bloqueado: hay fases del pipeline sin completar. Emitir el gate ahora sería declarar terminada una entrega incompleta."
-  - check: "cada blocker declarado incluye la evidencia del sondeo (comando ejecutado + salida) que lo comprueba"
-    failure_message: "Bloqueado: hay blockers afirmados sin sondear. Un bloqueo de ambiente supuesto ya cerró una entrega en falso."
-  - check: "si execution_target es mock/hybrid, mock_evidence.traffic_verified es true con evidencia del log del mock"
-    failure_message: "Bloqueado: no se demostró que el SUT consumiera el mock. Una suite verde contra un SUT que ignora el mock no valida el contrato."
-```
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | bloque delivery_gate emitido literalmente como último contenido antes del mensaje de cierre | Bloqueado: la entrega no incluye el bloque YAML delivery_gate. Sin este contrato la entrega es inválida. |
+| 2 | todos los campos obligatorios del schema rellenados (schema_version, framework, mode, status, inputs_confirmed, coverage, files_emitted, evidence_persisted) | Bloqueado: el bloque delivery_gate tiene campos obligatorios vacíos o ausentes. |
+| 3 | consistencia status vs execution.exit_code (success requiere exit_code 0 en modo full) | Bloqueado: contradicción entre status declarado y exit_code reportado. |
+| 4 | modo full sin ejecución real reporta status: partial con blocker execution_skipped | Bloqueado: no se puede declarar success en modo full sin evidencia de ejecución. |
+| 5 | bloque transversal_capabilities presente (detected/omitted); capas tejidas solo si confirmed_by_user | Bloqueado: faltó evaluar/registrar las capacidades transversales complementarias (accesibilidad, SEO, seguridad, visual, contract, performance). |
+| 6 | execution_target declarado; si es mock o hybrid, certification: pending_real_integration + mock_evidence completo + switchover en next_steps | Bloqueado: la corrida contra mock no declara la certificación pendiente o carece de evidencia del mock y plan de switchover. |
+| 7 | si execution_target es mock o hybrid, el mensaje de cierre posterior al bloque YAML repite la advertencia de certificación pendiente | Bloqueado: el cierre no advierte que los resultados contra mock no certifican el SUT. La advertencia al inicio del flujo no sustituye la del cierre. |
+| 8 | pipeline-state.json leído y sin fases obligatorias pendientes; phases_pending vacío | Bloqueado: hay fases del pipeline sin completar. Emitir el gate ahora sería declarar terminada una entrega incompleta. |
+| 9 | cada blocker declarado incluye la evidencia del sondeo (comando ejecutado + salida) que lo comprueba | Bloqueado: hay blockers afirmados sin sondear. Un bloqueo de ambiente supuesto ya cerró una entrega en falso. |
+| 10 | si execution_target es mock/hybrid, mock_evidence.traffic_verified es true con evidencia del log del mock | Bloqueado: no se demostró que el SUT consumiera el mock. Una suite verde contra un SUT que ignora el mock no valida el contrato. |
+| 11 | el análisis estático del cliente corrió en local y pasó antes de cualquier commit, con su salida adjunta | Bloqueado: se iba a commitear sin pasar la puerta de calidad del cliente. Descubrirlo en el pipeline cuesta un ciclo entero. |
+| 12 | la cobertura declarada en la matriz de insumos se comparó contra la entregada, y la diferencia está reportada | Bloqueado: no se comparó lo prometido contra lo entregado. Una entrega que se declara completa sin ese cruce ya cerró historias con criterios sin cubrir. |
+| 13 | los artefactos obligatorios que los assets de la ruta prescriben existen en la evidencia, o su ausencia está justificada | Bloqueado: faltan artefactos obligatorios. Un asset marcado obligatorio cuyo artefacto nunca se creó es una regla que no se cumplió y que nadie notó. |
 
 ## Cross-links
 

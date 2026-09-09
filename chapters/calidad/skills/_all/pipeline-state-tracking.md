@@ -1,6 +1,6 @@
 ---
 id: calidad-pipeline-state-tracking
-version: 1.0.0
+version: 1.3.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -16,6 +16,10 @@ verification:
     failure_message: "Bloqueado: fase marcada done sin evidencia. Marcar done por haberlo intentado es falsear la traza."
   - check: "la bitácora tiene al menos una entrada por cada fase marcada done y por cada escritura ejecutada en el ALM"
     failure_message: "Bloqueado: hay fases o escrituras sin registro en la bitácora. Una traza sin historia no permite retomar ni auditar."
+  - check: "la sesión se cortó al cerrar bloque de trabajo y no por contexto agotado, y existe el índice de evidencia generado"
+    failure_message: "Bloqueado: la sesión se agotó en vez de renovarse. Un contexto que crece sin corte encarece cada turno restante y degrada lo que se entrega."
+  - check: "ninguna respuesta en la conversación reprodujo estado que ya vive en la traza o en la bitácora, ni volcados, listados largos o registros: en la conversación quedó el puntero"
+    failure_message: "Bloqueado: se escribió en la conversación algo que pertenece a disco. Cada carácter escrito ahí se reenvía en cada paso posterior de la sesión."
 ---
 
 # Pipeline State Tracking — La Traza que Sobrevive a la Sesión
@@ -163,6 +167,31 @@ Los rituales viven además en el steering `[[calidad-session-continuity-protocol
 
 **Límite honesto de este mecanismo.** La traza y la bitácora son **contexto, no configuración forzada**: dependen de que el agente decida leerlas. El respaldo real, donde el IDE lo soporte, es un **hook de inicio de sesión** que inyecte el estado sin depender de esa decisión. Mientras no exista, este protocolo lo hace probable; no lo hace seguro. Ya se verificó en campo que un mandato equivalente escrito solo como skill no se cumplió.
 
+## Presupuesto de contexto: la sesión se renueva, no se agota
+
+Una sesión que no se corta a propósito se corta cuando revienta, y siempre en el peor momento. Verificado en campo: una certificación de cinco días transcurrió en siete sesiones, **ninguna renovada por decisión**; el contexto medio por petición llegó a superar los cien mil tokens, de modo que un mensaje de tres palabras costaba lo mismo que uno de tres páginas.
+
+Tres reglas, y las tres son baratas:
+
+1. **Corte declarado.** La sesión se cierra al terminar un bloque de trabajo —una plataforma, un lote, una fase—, no cuando el contexto avisa. El cierre escribe la entrada de bitácora con el punto exacto de retome; la apertura siguiente lee eso y nada más.
+2. **La conversación lleva punteros; la traza vive en disco.** Todo lo que hoy se narra en prosa larga dentro del chat se escribe en la evidencia y en el chat queda la ruta. Cada carácter que el agente escribe en la conversación se vuelve a pagar en cada paso posterior de esa sesión.
+3. **Mapa de lectura.** Un índice de la evidencia —`.evidence/INDEX.md`— que diga qué archivo contiene qué y cuál hay que leer para retomar. Sin él, retomar significa releerlo todo, que es exactamente lo que el presupuesto no aguanta. **El índice se genera, no se escribe a mano**: listar y describir artefactos por convención de nombre es determinista, y un índice mantenido a mano se desactualiza en la segunda sesión (`[[calidad-deterministic-work-to-tooling]]`).
+
+### La otra mitad del presupuesto: lo que el agente escribe
+
+El presupuesto no lo consume sólo lo que entra: también lo que el agente **produce**. Medido en la certificación de referencia: 253 respuestas que suman 1.218.134 caracteres, unos 338 mil tokens. Y la distribución es lo revelador — **el 49 % de las respuestas concentra el 79 % del texto**, con una media de 4.815 caracteres y máximos por encima de 23.000.
+
+Cada uno de esos caracteres se paga dos veces: una al escribirlo, y otra —la cara— porque pasa a formar parte del contexto que se reenvía en **cada paso posterior de la sesión**. Una respuesta larga a media mañana se sigue pagando a media tarde.
+
+Cuatro reglas, y ninguna reduce lo que se dice, sólo dónde se dice:
+
+1. **Techo por respuesta.** Salvo que la respuesta *sea* el entregable pedido —una estrategia, un informe, un análisis solicitado—, no pasa de una pantalla. Lo que no quepa va a disco y en la conversación queda su puntero.
+2. **No narrar lo que ya está en disco.** Si el estado vive en la traza o en la bitácora, en la conversación va la referencia, no el contenido. Reproducir el estado completo en cada turno es duplicar el archivo dentro del contexto.
+3. **No devolver la instrucción reformulada.** Confirmar que se entendió es una línea, no un párrafo que repite lo que el usuario acaba de escribir.
+4. **Los listados largos van a archivo.** Una matriz de cincuenta filas o un inventario de artefactos se escriben en la evidencia; en la conversación va el conteo y la ruta.
+
+**Prohibido pegar volcados masivos en la conversación**: registros completos, árboles de diseño, catálogos enteros. Van a archivo y se pasa la ruta. En campo, un volcado de diseño pegado en el chat ocupó por sí solo más que la ventana de contexto disponible y forzó una compactación en medio de la fase más delicada de la entrega.
+
 ## Fases mínimas por ruta
 
 | Ruta | Fases obligatorias |
@@ -202,6 +231,8 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 2 | cada fase completada actualizó su entrada en pipeline-state.json con status, timestamp y evidencia verificable | Bloqueado: hay fases ejecutadas sin registrar en la traza. La traza desactualizada es peor que no tenerla. |
 | 3 | ninguna fase se marcó done sin la evidencia que su propio gate exige | Bloqueado: fase marcada done sin evidencia. Marcar done por haberlo intentado es falsear la traza. |
 | 4 | la bitácora tiene al menos una entrada por cada fase marcada done y por cada escritura ejecutada en el ALM | Bloqueado: hay fases o escrituras sin registro en la bitácora. Una traza sin historia no permite retomar ni auditar. |
+| 5 | la sesión se cortó al cerrar bloque de trabajo y no por contexto agotado, y existe el índice de evidencia generado | Bloqueado: la sesión se agotó en vez de renovarse. Un contexto que crece sin corte encarece cada turno restante y degrada lo que se entrega. |
+| 6 | ninguna respuesta en la conversación reprodujo estado que ya vive en la traza o en la bitácora, ni volcados, listados largos o registros: en la conversación quedó el puntero | Bloqueado: se escribió en la conversación algo que pertenece a disco. Cada carácter escrito ahí se reenvía en cada paso posterior de la sesión. |
 
 ## Cross-links
 

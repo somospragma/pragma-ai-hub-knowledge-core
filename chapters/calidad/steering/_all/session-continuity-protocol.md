@@ -1,6 +1,6 @@
 ---
 id: calidad-session-continuity-protocol
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: steering
 chapter: calidad
@@ -45,11 +45,20 @@ tirando de una sesión que ya perdió la mitad de lo que sabía. Continuar por
 inercia no ahorra: multiplica el costo de cada turno restante y degrada lo que se
 entrega.
 
+## El traspaso tiene techo, y no absorbe al anterior
+
+El resumen de traspaso se paga **dos veces**: al escribirlo en el cierre, y al reinyectarlo en la apertura de la sesión siguiente. Por eso su tamaño importa más que el de cualquier otro mensaje.
+
+Medido en la certificación de referencia: seis traspasos que suman 104.290 caracteres —unos 29 mil tokens— y que **crecen sesión a sesión**: 12.706 → 16.003 → 14.688 → 19.473 → 18.089 → 23.331. El patrón es inequívoco: cada traspaso **copiaba** al anterior en lugar de apuntar a la traza, así que el último arrastraba todo lo que había pasado en cinco días.
+
+La regla: el traspaso es **estado, siguiente acción y punteros**, y no supera una pantalla. Todo lo que necesite contarse en detalle ya está en la bitácora — se cita el archivo y la sección, no se copia. **Un traspaso que crece de una sesión a la siguiente es la señal de que se está copiando en vez de apuntando**, y se corta ahí mismo.
+
 ## Lo que nunca debes hacer
 
 - **NUNCA** empezar a editar, generar o ejecutar sin haber leído la traza y la bitácora de un `output_path` que ya existe. Una sesión que arranca "donde cree que iba" repite fases y pierde correcciones ya pagadas.
 - **NUNCA** reconstruir el estado de memoria ni del resumen automático de contexto: el resumen habla de archivos, no de proceso.
 - **NUNCA** cerrar sesión sin escribir la entrada de cierre con el punto exacto de retome.
 - **NUNCA** reescribir, resumir ni compactar la bitácora: es append-only.
+- **NUNCA** dejar que el traspaso de una sesión absorba al de la anterior. Se apunta a la bitácora, no se la copia; si el traspaso creció respecto al previo, se recorta antes de cerrar.
 
 **Nota de enforcement**: esto es contexto, no configuración forzada. Cuando el IDE lo permita, respaldarlo con un hook de inicio de sesión que inyecte la traza; el protocolo lo hace probable, el hook lo hace seguro.

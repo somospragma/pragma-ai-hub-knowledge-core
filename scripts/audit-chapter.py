@@ -94,7 +94,7 @@ def main() -> int:
     ids: dict[str, Path] = {}
     hallazgos: dict[str, list[str]] = {k: [] for k in
         ["frontmatter", "coherencia", "links", "portabilidad", "references", "cadena", "huerfanos",
-         "alcanzables"]}
+         "alcanzables", "artefactos"]}
 
     # --- inventario de ids ---
     # Los assets de cuenta viven fuera de chapters/ pero se referencian con la
@@ -112,6 +112,36 @@ def main() -> int:
             if fm["id"] in ids:
                 hallazgos["frontmatter"].append(f"id duplicado '{fm['id']}': {f} y {ids[fm['id']]}")
             ids[fm["id"]] = f
+
+    # --- 0: el manifiesto de la puerta cubre lo que los assets obligatorios exigen ---
+    # Un artefacto prescrito por un asset mandatory que no este en el manifiesto no
+    # lo comprueba nadie: es exactamente el fallo que costo la certificacion NT-24880.
+    MANIFIESTO = SRC / "skills/_all/delivery-gate-contract/scripts/check-required-artifacts.py"
+    EXENTOS = {  # nombre variable, ejemplo dentro del asset, o cubierto por otra entrada
+        ".evidence/audit-log-", ".evidence/execution-log-", ".evidence/execution-status-",
+        ".evidence/report-", ".evidence/session-log-archive-", ".evidence/.",
+        ".evidence/session-config.json", ".evidence/execution-status.json",
+        ".evidence/preflight/initial-screen.png", ".evidence/prototype-acceptance.json",
+        ".evidence/locators-discovered.json", ".evidence/audit-log-20260604.md",
+        ".evidence/execution-log-20260604.json",
+    }
+    if MANIFIESTO.is_file():
+        declarados = set(re.findall(r'"path":\s*"([^"]+)"', MANIFIESTO.read_text(encoding="utf-8")))
+        EV = re.compile(r"\.evidence/([A-Za-z0-9_./-]+)")
+        for f in archivos:
+            if not es_asset(f):
+                continue
+            txt = f.read_text(encoding="utf-8")
+            fm = parse_fm(txt)
+            if fm.get("enforcement") != "mandatory":
+                continue
+            for a in sorted({".evidence/" + x.rstrip("/") for x in EV.findall(txt)}):
+                if "{" in a or "<" in a or a in EXENTOS or a in declarados:
+                    continue
+                hallazgos["artefactos"].append(
+                    f"{fm.get('id')}: exige {a} y no esta en la lista de la puerta — nadie lo comprueba")
+    else:
+        hallazgos["artefactos"].append("falta el script de la puerta de artefactos obligatorios")
 
     # --- 1 y 2: frontmatter y coherencia carpeta/stack ---
     for f in archivos:
@@ -223,6 +253,7 @@ def main() -> int:
         "cadena":       "Cadena de certificacion completa",
         "huerfanos":    "Sin workflows huerfanos",
         "alcanzables":  "Todo asset se alcanza desde el steering",
+        "artefactos":   "Artefactos obligatorios cubiertos por la puerta",
     }
     for clave, etiqueta in ETIQUETAS.items():
         items = hallazgos[clave]
