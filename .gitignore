@@ -1,1 +1,12 @@
 .DS_STORE
+.DS_Store
+
+# Salida de build de bundles y material de trabajo: no es dominio versionable
+salida/
+entrada/
+
+# Tooling de migracion a Mimir: vive fuera del repo por instruccion propia
+migration/
+
+__pycache__/
+*.pyc
