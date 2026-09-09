@@ -1,6 +1,6 @@
 ---
 id: calidad-test-evidence-and-traceability
-version: 1.0.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -106,7 +106,27 @@ Verificado en campo, dos veredictos publicados y falsos que se cayeron al abrir 
 | "El backend respondió hace 37 s y la app sigue en login: es un rechazo silencioso" | El botón con el spinner girando: la aplicación seguía procesando, el entorno era lento |
 | "El escenario falla al buscar el elemento" | El escritorio del sistema con un diálogo del sistema operativo encima de la aplicación |
 
-**Regla dura: ningún diagnóstico se cierra sin haber mirado las capturas de la corrida que se está diagnosticando.** Aplica al reporte propio y al que llega de un pipeline ajeno. Cuando la captura contradice la hipótesis, gana la captura.
+**Regla dura: ningún diagnóstico se cierra sin haber incorporado lo que muestran las capturas de la corrida que se está diagnosticando.** Aplica al reporte propio y al que llega de un pipeline ajeno. Cuando la captura contradice la hipótesis, gana la captura.
+
+### El agente no puede abrir imágenes, y por eso la regla anterior necesita un mecanismo
+
+Esta es la parte que se omitía y que hacía la regla inaplicable. **Las herramientas de archivo de un agente devuelven texto: no abren binarios ni imágenes.** Una captura sólo entra a su razonamiento cuando una persona la adjunta a la conversación, por la vía multimodal. Verificado en campo, y de la forma más costosa: tras varias sesiones de conjeturas, la persona pegó la captura en el chat y el problema se resolvió en un turno.
+
+De ahí una consecuencia que hay que aceptar en vez de pelear: **"abre la imagen y mírala" no es una instrucción ejecutable por el agente.** Escribirla produce lo que produjo aquí — la regla se declara, no se cumple, y nadie entiende por qué.
+
+Las tres vías que sí funcionan, en orden de preferencia:
+
+1. **Extraer la información visual como texto en el instante del fallo.** Es la vía principal, no depende de nadie y **es trabajo de herramienta, no de razonamiento**: el finalizador de fallo emite el paquete siempre, igual, sin que nadie se acuerde de pedirlo. Si el proyecto no lo tiene, se construye una vez según `[[calidad-deterministic-work-to-tooling]]`. El finalizador que produce la evidencia de la corrida roja emite, junto a la captura: el árbol de accesibilidad o la capa semántica de ese instante, el **texto reconocido** de la imagen cuando el árbol no expone los rótulos, y la **geometría** de lo que hay en pantalla — qué elementos existen, en qué posición, cuáles caen dentro del marco visible y cuáles están montados pero sin renderizar. Con eso, el agente "ve" lo que necesita sin abrir un solo píxel.
+2. **La descripción de la persona.** Una línea —dónde quedó la pantalla y qué se veía— resuelve lo que el reconocimiento de texto no alcanza, sobre todo cuando la interfaz se dibuja sobre lienzo y no expone rótulos. Es un campo obligatorio de la ficha de `[[calidad-human-fix-request-protocol]]`.
+3. **La imagen pegada en la conversación.** Cuando las dos anteriores no explican el fallo, el agente **pide** la captura con una pregunta concreta en lugar de seguir iterando. Un turno de petición cuesta menos que una tanda de intentos a ciegas.
+
+**Firma de pantalla.** El resumen de una línea que hace legible todo lo anterior y que conviene emitir siempre:
+
+```
+home | 3 tarjetas visibles | "Ver más" de cuentas y=186 | "Ver más" de tarjetas y=566 | destino montado en y=0 (sin renderizar)
+```
+
+Esa sola línea es la que, en campo, distinguió entre "el elemento no existe" y "el elemento existe pero está fuera del render" — dos diagnósticos con correcciones opuestas.
 
 ### Cómo llegar a las imágenes cuando el reporte es un archivo único
 
@@ -117,9 +137,11 @@ Los reportes autocontenidos embeben las imágenes en base64 y pesan decenas de m
 grep -o 'data:image/[a-z]*;base64,[A-Za-z0-9+/=]*' reporte.html | head
 ```
 
-Cada bloque se decodifica a su archivo y se abre. Los dos que siempre importan son **la captura del step que falló** y **la del cierre del escenario**, segundos después: la diferencia entre ambas es la que revela si la aplicación avanzaba, si apareció una pantalla no contemplada o si quedó algo encima.
+Cada bloque se decodifica a su archivo. Los dos que siempre importan son **la captura del step que falló** y **la del cierre del escenario**, segundos después: la diferencia entre ambas es la que revela si la aplicación avanzaba, si apareció una pantalla no contemplada o si quedó algo encima. Extraerlas es trabajo del agente; **interpretarlas requiere alguna de las tres vías de arriba**, porque el archivo extraído sigue siendo una imagen.
 
 Cuando el reporte no trae capturas del momento del fallo, eso es un hallazgo en sí mismo y se corrige antes de seguir diagnosticando: sin ellas, cada fallo cuesta una sesión de conjeturas.
+
+Lo mismo vale, y con más fuerza, cuando el reporte trae la captura pero **no** su equivalente en texto: el paquete de evidencia está incompleto y se arregla antes de seguir. Una captura que nadie puede leer no es evidencia para quien tiene que diagnosticar.
 
 ### Toda evidencia lleva su instante y su dispositivo
 

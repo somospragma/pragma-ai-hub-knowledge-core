@@ -1,12 +1,17 @@
 ---
 id: calidad-flutter-locators-and-gestures
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: skill
 chapter: calidad
 applies_to_stacks: [playwright, appium-core, appium-wdio, appium-serenity]
-description: "Automatizar aplicaciones Flutter en móvil y en web: qué ve realmente el driver, por qué la identidad de un elemento cambia con su estado, gestos por W3C Actions, tecleo con foco previo, renderizado perezoso y recorte de coordenadas. Consultar ANTES de escribir el primer locator o gesto sobre una app Flutter."
+description: "OBLIGATORIO. Automatizar aplicaciones Flutter en móvil y en web: qué ve realmente el driver, por qué la identidad de un elemento cambia con su estado, gestos por W3C Actions, tecleo con foco previo, renderizado perezoso y recorte de coordenadas. Consultar ANTES de escribir el primer locator o gesto sobre una app Flutter."
 tags: [flutter, locators, gestos, accesibilidad, mobile, web, appium, playwright, mandatory]
+verification:
+  - check: "todo control se localiza por su rol de accesibilidad y se discrimina por su nombre accesible; ningún control se pulsa por coordenadas inventadas"
+    failure_message: "Bloqueado: se está pulsando un control con el mecanismo de leer un texto, o por coordenadas. En interfaces sobre lienzo eso produce esperas largas que no mencionan el selector o toques que no hacen nada."
+  - check: "antes de escribir el localizador de un control se comprobó si existe un hermano estable en verde en la misma pantalla o menú"
+    failure_message: "Bloqueado: se escribió un localizador nuevo teniendo uno demostrado al lado. Repetir el mecanismo que ya funciona cuesta un minuto; inventar otro ya costó doscientos créditos en campo."
 enforcement: mandatory
 ---
 
@@ -143,6 +148,20 @@ ahorra corridas.
 | El elemento existía y ahora no | Regresión de la app | El árbol se reconstruyó tras una respuesta del servidor |
 | Pasa en un dispositivo y falla en otro | Dispositivo defectuoso | Ancla transitoria; ver `[[calidad-data-volatility-and-assertion-anchoring]]` |
 
+## Un botón se localiza por su rol, no por su texto
+
+El error más repetido en interfaces dibujadas sobre lienzo, y se comete en las dos direcciones.
+
+**Primera dirección — tratar un botón como si fuera un texto.** Como los rótulos de la aplicación no están en el contenido del nodo sino en su etiqueta accesible, se aprende a buscar texto por etiqueta y se aplica el mismo truco a los controles. Entonces el localizador casa con el contenedor, con la etiqueta suelta o con un ancestro que no recibe el toque, y el resultado es una espera larga que no menciona el selector o un toque que no hace nada.
+
+**Segunda dirección — sobre-corregir.** Escarmentado de lo anterior, se abandona la coincidencia por texto en todos los controles y se pasa a pulsar por coordenadas calculadas. Verificado en campo: un flujo tenía un control de un menú perfectamente estabilizado y se empezó a trabajar el **control hermano del mismo menú**; en vez de repetir el mecanismo que ya funcionaba, se pulsó por coordenadas inventadas. Costó del orden de doscientos créditos llegar a la conclusión de que era el mismo control de al lado y se pulsaba igual.
+
+La regla que cubre las dos direcciones:
+
+> **Un control se localiza por su rol de accesibilidad y se discrimina por su nombre accesible. Un texto se localiza por su etiqueta. No se intercambian los mecanismos, y no se inventan coordenadas cuando existe un hermano estable.**
+
+Y antes de escribir el localizador de cualquier control, la pregunta obligatoria: **¿hay ya un control de esta misma pantalla o de este mismo menú que se pulse en verde?** Si lo hay, se repite su mecanismo verbatim. Ver `[[calidad-cross-platform-learning-propagation]]`.
+
 ## Lo que nunca debes hacer
 
 - **Nunca esperes `visible`** sobre un nodo semántico de Flutter en web: suelen
@@ -157,10 +176,24 @@ ahorra corridas.
   del viewport, y el toque cae al vacío sin lanzar error.
 - **Nunca ancles un selector a lo que aparece por foco, por hover o por respuesta
   del servidor.** Solo lo que existe en reposo sirve de ancla.
+- **Nunca pulses por coordenadas calculadas cuando existe un hermano estable.**
+  Si el control de al lado, en el mismo menú, ya se pulsa en verde, se repite ese
+  mecanismo. Inventar coordenadas es el camino largo hacia el mismo sitio.
+- **Nunca apliques a un control el mecanismo que aprendiste para leer un texto.**
+  Leer y pulsar son problemas distintos aunque la interfaz sea la misma.
 - **Nunca acoples un selector a la descripción de un dato.** Un selector que
   busca el texto de una fila funciona solo mientras la cuenta de prueba tenga esa
   descripción; con datos reales aparece otro texto. El rasgo estable de una fila
   es su estructura o su importe, no su contenido.
+
+## Verificación
+
+Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, comprobar cada punto. Si alguno no se cumple, se detiene y se reporta con el mensaje indicado.
+
+| # | Comprobación | Si no se cumple |
+|---|---|---|
+| 1 | todo control se localiza por su rol de accesibilidad y se discrimina por su nombre accesible; ningún control se pulsa por coordenadas inventadas | Bloqueado: se está pulsando un control con el mecanismo de leer un texto, o por coordenadas. En interfaces sobre lienzo eso produce esperas largas que no mencionan el selector o toques que no hacen nada. |
+| 2 | antes de escribir el localizador de un control se comprobó si existe un hermano estable en verde en la misma pantalla o menú | Bloqueado: se escribió un localizador nuevo teniendo uno demostrado al lado. Repetir el mecanismo que ya funciona cuesta un minuto; inventar otro ya costó doscientos créditos en campo. |
 
 ## Cross-links
 

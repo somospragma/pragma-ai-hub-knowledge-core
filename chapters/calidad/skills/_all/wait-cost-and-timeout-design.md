@@ -1,6 +1,6 @@
 ---
 id: calidad-wait-cost-and-timeout-design
-version: 1.0.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -148,6 +148,9 @@ problema es de ritmo.
 
 ## Cómo se inventaría, en vez de descubrirlos de a uno
 
+> Inventariar esperas y umbrales en un repositorio es una búsqueda determinista sobre archivos. Se resuelve con una herramienta del proyecto, que además permite repetir el inventario en cada entrega sin volver a pagarlo (`[[calidad-deterministic-work-to-tooling]]`).
+
+
 El barrido se emite **una vez y completo**, no cada vez que uno estorba:
 
 | Qué buscar | Qué es | Veredicto |
@@ -198,10 +201,40 @@ era falsa — el experimento la descartó en menos de dos minutos. Asumirla habr
 producido escenarios que pasan sin ejercitar lo que certifican, que es el peor
 resultado posible. Ver `[[calidad-automation-feasibility-assessment]]`.
 
+## El patrón que reemplaza al techo largo: preguntar por turnos
+
+Cuando una pantalla puede o no aparecer, la pregunta correcta no es "¿cuánto espero por ella?" sino "¿cuál de las dos llegó primero?".
+
+El antipatrón, y es el más extendido: se sabe que después de autenticarse aparece el inicio, pero que a veces se interpone un aviso. Se escribe "espero el aviso 15 segundos; si no aparece, pregunto por el inicio". **Cuando el aviso no sale —que es la mayoría de las veces— el escenario regala esos 15 segundos íntegros**, y los paga en cada corrida y en cada escenario.
+
+La forma correcta es una **carrera**: se pregunta por el aviso, se pregunta por el inicio, se repite en ciclo corto hasta un techo global. El primero que aparezca rompe el ciclo.
+
+```
+hasta agotar el techo GLOBAL (no uno por candidato):
+    ¿está el aviso?     -> sí: se atiende, se sigue esperando el inicio
+    ¿está el inicio?    -> sí: se rompe; el aviso no salió esta vez
+    pausa corta
+```
+
+Tres propiedades que lo hacen superior, y ninguna es opcional:
+
+1. **El coste es el del caso real, no el del peor caso.** Si el inicio aparece al segundo 1, se sigue en el segundo 1.
+2. **El techo es global, no por candidato.** Un techo por candidato reintroduce el problema multiplicado por el número de candidatos.
+3. **La consulta de cada candidato es barata.** Se pregunta por existencia, sin esperas internas. En sesiones remotas, sondear candidatos en serie con esperas propias cuesta más que el problema que resuelve.
+
+Aplica a todo lo que sea condicional: avisos de privacidad o de permisos, invitaciones a activar biometría, modales de estado del producto, banners de mantenimiento, y cualquier pantalla intermedia que dependa del estado de la cuenta.
+
+**Corolario para los desenlaces transitorios.** Un mensaje que aparece y desaparece no se espera: se **captura en el instante** en que se produce la acción que lo dispara, y se valida después sobre lo capturado. Esperarlo en la comprobación posterior es llegar tarde, y el síntoma —una comprobación que falla mientras la persona jura haber visto el mensaje— se confunde una y otra vez con un defecto.
+
 ## Restricciones
 
 - **NUNCA uses un techo largo para algo opcional.** Sobre algo que normalmente no
   aparece, el timeout **es** la duración.
+- **NUNCA esperes en serie por algo opcional cuando puedes preguntar por turnos.**
+  Si hay dos desenlaces posibles, se corre una carrera con techo global, no una
+  espera por cada uno.
+- **NUNCA valides un mensaje transitorio en la comprobación posterior.** Se
+  captura en el instante de la acción; lo que se valida es lo capturado.
 - **NUNCA invoques un predicado descartando su resultado.** O se lee el booleano,
   o se llama a una espera de verdad.
 - **NUNCA sondees una lista de candidatos en serie** contra un dispositivo o
