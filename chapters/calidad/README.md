@@ -729,6 +729,99 @@ tiene nada que hacer en un bundle de Appium.
 El criterio sale del «cuándo aplicar» del propio documento, no de una intuición.
 Si al escribirlo no puedes nombrar el stack donde **no** sirve, no lo acotes.
 
+## Cómo se crea un asset y cómo se audita
+
+El chapter le exige al agente que lo determinista lo resuelva una herramienta. Su propia
+gobernanza cumple lo mismo: **casi todo lo que sigue lo comprueba un script**, y lo que no,
+está dicho aquí para que se compruebe a mano.
+
+### 1. Anatomía
+
+Frontmatter con `id`, `version` (semver), `scope`, `type`, `chapter`, `description` y `tags`.
+Cuerpo con las secciones canónicas: **Problema que resuelve · Cuándo aplicar · Instrucción ·
+Restricciones · Verificación · Cross-links**. El problema va primero por una razón práctica:
+un asset que no puede nombrar el fallo concreto que evita casi siempre sobra.
+
+Y la regla que más se olvida: **la `description` es el disparador de carga**. Los IDEs
+anuncian nombre y descripción y cargan el asset cuando la tarea coincide. Una descripción
+vaga es un asset que no se carga nunca.
+
+### 2. Si el asset es obligatorio
+
+`enforcement` y `verification` **no viajan al registro de conocimiento**: existen sólo en este
+repositorio como metadato de auditoría. Por eso la obligatoriedad viaja por tres canales que
+sí llegan al consumidor, y los tres tienen que estar:
+
+| Canal | Qué debe cumplir |
+|---|---|
+| `description` | Empieza declarando la obligatoriedad |
+| `tags` | Incluye `mandatory` |
+| Cuerpo | Sección `## Verificación` con los mismos checks del frontmatter |
+
+### 3. Las cuatro capas de exigibilidad, y cuál elegir
+
+Sólo las dos primeras garantizan algo. Un asset obligatorio necesita al menos una:
+
+| Capa | Mecanismo | Cuándo usarla |
+|---|---|---|
+| **1. Entrada obligatoria** | La herramienta no funciona sin el artefacto porque lo necesita para operar | Siempre que se pueda: es la única que no se puede eludir |
+| **2. Puerta que bloquea** | El artefacto entra en `check-required-artifacts.py`, que comprueba existencia **y forma** | Cuando el asset produce un archivo |
+| **3. Eval de regresión** | Un escenario en `evals/evals.json` que reproduce el fallo real | Cuando el asset corrige algo que ya costó dinero |
+| **4. Texto** | Descripción, etiqueta y sección de verificación | Nunca sola |
+
+Si el asset **no produce artefacto**, se declara en el mapa `NO_ARTIFACT` del mismo script,
+con la razón y cómo se verifica en su lugar. La auditoría falla si un obligatorio no está en
+ninguna de las dos listas: así ninguno se queda sin capa por olvido.
+
+### 4. Enrutamiento por ámbito
+
+Alcanzable no es lo mismo que cargado. **Cada obligatorio lo invoca el nodo que gobierna su
+ámbito**, y el resolvedor no cuenta —es un índice, no un camino de descubrimiento—:
+
+| Ámbito | Quién lo invoca |
+|---|---|
+| Universal, aplica siempre | Un asset de `steering/`, que se carga sin que nadie lo pida |
+| De fase del recorrido | El workflow rector, en la fase que corresponde |
+| De stack | El skill greenfield o brownfield de ese stack |
+| Condicional a una tecnología o situación | El asset que detecta la condición |
+
+Y **no todo va al steering**: pesa unos 10 k tokens que se pagan en cada petición de cada
+sesión. Ahí van las fases y sus bloqueos; el detalle vive en el asset que la fase nombra.
+
+### 5. Verificar lo creado
+
+Tres comandos, en este orden. Ninguno pide argumentos.
+
+```bash
+python3 scripts/audit-chapter.py               # regresión sobre la fuente
+python3 scripts/audit-enforcement-coherence.py # obligatoriedad coherente en los tres canales
+python3 scripts/audit-kiro-bundles.py          # lo ya construido en salida/
+```
+
+Qué comprueba el primero, que es el que bloquea:
+
+| Comprobación | Qué significa un hallazgo |
+|---|---|
+| Frontmatter e ids únicos | Falta un campo requerido, o hay un id repetido |
+| Carpeta coincide con el stack declarado | El asset dice ser de un stack y vive en otro |
+| Referencias `[[id]]` resuelven | Hay un enlace a un asset que no existe |
+| Sin paths relativos fuera del bundle | Ese enlace se rompe al aplanar a los IDEs |
+| References propias existen | Un bundle cita una reference que no está |
+| Cadena de certificación completa | Desapareció un eslabón del recorrido; se corta en silencio |
+| Sin workflows huérfanos | Hay un workflow que nadie invoca |
+| Todo asset se alcanza desde el steering | Existe pero nadie llega a él |
+| **Artefactos obligatorios cubiertos** | Un obligatorio sin capa, o que prescribe un artefacto que la puerta no comprueba |
+
+### 6. Antes de publicar
+
+- Las tres auditorías en verde.
+- Si el asset toca conocimiento de cuenta o de proyecto: **clasificar antes de escribir**. Lo
+  de un proyecto no se escribe en el nivel de cuenta, y lo agnóstico no se escribe con
+  vocabulario de producto de un cliente.
+- Si corrige un fallo que ya ocurrió, **el asset lo nombra con su costo**. Un "verificado en
+  campo" con la cifra convence donde una recomendación no.
+- Versión subida según el alcance del cambio, y `CHANGELOG` si aplica.
+
 ## Convenciones internas
 
 - **Frontmatter completo** sólo en assets accionables: `SKILL.md`, archivos `*.workflow.md`, archivos `*.prompt.md` y archivos de steering.

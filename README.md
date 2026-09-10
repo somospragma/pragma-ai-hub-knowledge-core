@@ -167,11 +167,25 @@ type: skill                    # Ver tabla de tipos arriba
 chapter: backend               # Requerido si scope != global
 stack: [java-spring]           # Requerido si scope = stack
 tags: [pr, git]                # Opcional
-description: Qué hace en una línea  # Recomendado
+description: Qué hace en una línea  # NO es opcional en la práctica: ver abajo
+enforcement: mandatory         # Sólo si su incumplimiento invalida la entrega
+verification:                  # Obligatorio si enforcement: mandatory
+  - check: "qué debe poder comprobarse"
+    failure_message: "Bloqueado: por qué se detiene y qué se pierde si se sigue"
 ---
 
 ## Contenido del asset en markdown...
 ```
+
+**La `description` es el disparador de carga, no metadato.** Los IDEs con divulgación progresiva anuncian nombre y descripción, y **cargan el asset cuando la tarea coincide con su descripción**. Una descripción vaga es un asset que no se carga: escríbela pensando en qué frase del usuario debería traerlo al contexto.
+
+**Si el asset es obligatorio**, tres cosas dejan de ser opcionales, y las tres por la misma razón — `enforcement` y `verification` **no viajan al registro de conocimiento**, así que la obligatoriedad tiene que llegar al consumidor por otros canales:
+
+1. La `description` empieza declarándola.
+2. La etiqueta `mandatory` está entre los `tags`.
+3. El cuerpo lleva una sección `## Verificación` con los mismos checks del frontmatter.
+
+Y una cuarta que no es de formato sino de diseño: **todo obligatorio necesita una capa que lo haga exigible** — o produce un artefacto que una puerta comprueba, o declara por qué no lo produce. Un asset marcado obligatorio que nadie verifica es una regla que no existe; se midió que seis de cada diez artefactos obligatorios nunca llegaban a crearse. El procedimiento completo, con los comandos de auditoría, está en el README del chapter.
 
 ### 2. Ubicar el archivo en la carpeta correcta
 
