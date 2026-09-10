@@ -1,6 +1,6 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 1.6.0
+version: 2.0.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -22,6 +22,10 @@ verification:
     failure_message: "Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto."
   - check: "la matriz de cobertura de todas las plataformas del alcance quedó escrita en .evidence/coverage-declared.json y aprobada antes de generar código"
     failure_message: "Bloqueado: se empezó a generar sin congelar la cobertura. Diseñar escenarios sobre la marcha deja criterios sin cubrir y los diseña con los insumos lejos."
+  - check: "se emitió .evidence/input-sufficiency.json evaluando suficiencia y no solo presencia, con el hueco concreto por entrada incompleta"
+    failure_message: "Bloqueado: se dio un insumo por cubierto porque llegó. La historia llega casi siempre y casi nunca basta; sin dictamen por entrada, el agente descubre lo que falta ejecutando."
+  - check: "cada criterio de aceptación es verificable: condición observable, plataformas donde aplica, estado de entrada exigido y resultado observable con su copy exacto"
+    failure_message: "Bloqueado: hay criterios que no se pueden convertir en aserción sin consultar a una persona. Eso no es un criterio, es una intención, y se resuelve antes de generar."
 ---
 
 # Mandatory Inputs Protocol — Contrato de Entrada Antes de Generar
@@ -47,6 +51,48 @@ Aplica este skill **al inicio** de cualquier solicitud (paso 1 de `[[calidad-rou
 | `locator_map`  | Condicional (front/mobile; **obligatorio** si `execution_target != real`) | Mapeo acordado QA+dev de identificadores UI (`data-testid` / accessibility ids)  | Fuente única de selectores pre-desarrollo; formato y contrato en `[[calidad-ui-locator-map-contract]]`        |
 | `test_credentials` | Obligatorio cuando el flujo requiere autenticación | Usuario de prueba vigente y su contraseña                                    | Se cargan por el mecanismo del proyecto; **jamás literales en el código** ni escritas en evidencia            |
 | `test_data_entities` | Obligatorio cuando el escenario opera sobre entidades concretas | Los identificadores reales bajo prueba (cuenta, tarjeta, producto, contrato)  | Se validan contra el catálogo de datos del proyecto antes de generar                                          |
+
+## Presencia no es suficiencia
+
+La tabla de arriba dice **qué debe llegar**. No dice **qué debe contener**, y ahí está el hueco que más caro sale: en campo llegó la historia, se dio el insumo por cubierto, y el agente terminó descubriendo el recorrido ejecutando.
+
+> **La historia de usuario es obligatoria siempre, y casi nunca es suficiente por sí sola.**
+
+Por eso el gate no evalúa presencia sino **suficiencia, entrada por entrada**, y cuando algo falta **nombra la pieza, no el documento**. "El criterio 7 no es verificable: dice que el sistema responde correctamente y no dice qué ve la persona" es accionable en un mensaje. "Falta la historia" devuelve la pelota sin información.
+
+### Qué se espera de los criterios de aceptación
+
+Obligatorios para los tres frentes —web, móvil y backend—, y con contrato de verificabilidad. Cada criterio declara:
+
+| Campo | Por qué |
+|---|---|
+| **Condición observable**, no una cualidad | "Responde correctamente" no se convierte en aserción sin preguntarle a alguien |
+| **En qué plataformas aplica** | O "todas", pero dicho. Es lo que decide si hay uno o tres escenarios |
+| **El estado de entrada que exige** | El dato en qué condición; alimenta el checkpoint de datos de abajo |
+| **El resultado observable, con el copy exacto** si es texto | Sin copy exacto, la aserción se escribe de memoria y falla por formato |
+| **Qué queda fuera de alcance** | Un criterio sin frontera se interpreta ancho y se paga en escenarios que nadie pidió |
+
+Un criterio que no se puede convertir en aserción sin consultar a una persona no es un criterio: es una intención, y el gate lo reporta **por su número**.
+
+### Dos insumos propios del front
+
+Cuando la entrega es web o móvil, dos entradas más, cada una con su asset y su contrato:
+
+- **El recorrido funcional detallado** — `[[calidad-functional-flow-input]]`. Secuencia de pantallas, bifurcaciones **con la condición que las dispara**, pantallas intermitentes, desenlaces con su copy y su duración, y precondiciones. Puede vivir en la historia o aparte; lo que no puede es no existir.
+- **Las fuentes de interfaz** — `[[calidad-ui-source-contract]]`. `ui_source` no es una fuente sino una familia, y cada miembro responde una pregunta distinta: el diseño estático da el flujo y los copys pero no el árbol; el design system da el árbol pero no el flujo. Se declara **cuál cubre el eje de flujo y cuál el de estructura**.
+
+### El dictamen de suficiencia
+
+El resultado de esta fase es un artefacto, no una impresión: `.evidence/input-sufficiency.json`, con una fila por entrada y cuatro campos.
+
+| Campo | Contenido |
+|---|---|
+| **Qué se espera** | El contrato de esa entrada |
+| **Qué llegó** | Presente, parcial o ausente — y de qué fuente |
+| **Qué falta exactamente** | La pieza, no el documento |
+| **Qué pasa si no llega** | Detener · degradar con precio · pedir, y **de dónde puede venir** |
+
+Ese último campo es el que vuelve accionable el dictamen: no dice "falta el mapa de identificadores", dice "falta, y puede salir del repositorio de front, del design system o de un acuerdo con desarrollo". Y el precio de degradar no es retórico: sale del histórico de la cuenta. Ver `[[calidad-sut-readiness-gate]]`, que es quien emite el dictamen y quien registra el riesgo aceptado.
 
 ## Checkpoint de datos de prueba (antes del STRATEGY.md)
 
@@ -176,3 +222,5 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | 5 | sut_available, data_available y (front/mobile) locator_map resueltos vía SUT readiness gate antes de validar spec | Bloqueado: no se resolvió si el desarrollo/datos/mapeo de locators están disponibles. Aplicar el SUT readiness gate. |
 | 6 | checkpoint de datos de prueba emitido y confirmado por el usuario antes del STRATEGY.md, derivado de los escenarios planificados (entidad + estado exigido), con validación cruzada contra el catálogo y con lo faltante comunicado al QA con dueño y fecha | Bloqueado: no se confirmaron los datos de prueba concretos. Generar con datos sin confirmar produce una suite que falla por dato y no por defecto. |
 | 7 | la matriz de cobertura de todas las plataformas del alcance quedó escrita en .evidence/coverage-declared.json y aprobada antes de generar código | Bloqueado: se empezó a generar sin congelar la cobertura. Diseñar escenarios sobre la marcha deja criterios sin cubrir y los diseña con los insumos lejos. |
+| 8 | se emitió .evidence/input-sufficiency.json evaluando suficiencia y no solo presencia, con el hueco concreto por entrada incompleta | Bloqueado: se dio un insumo por cubierto porque llegó. La historia llega casi siempre y casi nunca basta; sin dictamen por entrada, el agente descubre lo que falta ejecutando. |
+| 9 | cada criterio de aceptación es verificable: condición observable, plataformas donde aplica, estado de entrada exigido y resultado observable con su copy exacto | Bloqueado: hay criterios que no se pueden convertir en aserción sin consultar a una persona. Eso no es un criterio, es una intención, y se resuelve antes de generar. |

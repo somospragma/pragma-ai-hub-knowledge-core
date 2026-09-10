@@ -7,7 +7,7 @@ de que nadie se acuerde. Autocontenido a proposito: un solo archivo, sin depende
 
     python3 check-required-artifacts.py [--evidence .evidence] [--when X] [--all]
 
-Condiciones: always, brownfield, multiplatform, executed, mock, delivery.
+Condiciones: always, front, brownfield, multiplatform, executed, mock, delivery.
 Se deducen de .evidence/pipeline-state.json cuando es posible; se fuerzan con --when.
 """
 from __future__ import annotations
@@ -21,6 +21,8 @@ REQUIRED = [
     {"path": ".evidence/session-log.md",        "when": "always",        "by": "calidad-pipeline-state-tracking",             "why": "bitacora append-only de la entrega"},
     {"path": ".evidence/INDEX.md",              "when": "always",        "by": "calidad-pipeline-state-tracking",             "why": "mapa de lectura: sin el, retomar significa releerlo todo"},
     {"path": ".evidence/strategy-approval.md",  "when": "always",        "by": "calidad-pre-design-strategy-document",        "why": "la aprobacion de estrategia es previa a generar"},
+    {"path": ".evidence/input-sufficiency.json", "when": "always",       "by": "calidad-sut-readiness-gate",                  "why": "dictamen de preparacion del sistema antes de gastar la primera corrida"},
+    {"path": ".evidence/functional-flow.md",    "when": "front",         "by": "calidad-functional-flow-input",               "why": "el recorrido es insumo; descubrirlo ejecutando es lo mas caro que hace un agente"},
     {"path": ".evidence/coverage-declared.json","when": "always",        "by": "calidad-mandatory-inputs-protocol",           "why": "cobertura congelada antes de generar; se mide contra ella al cierre"},
     {"path": ".evidence/repo-capability-map.md","when": "brownfield",    "by": "calidad-repo-capability-discovery",           "why": "sin mapa se reconstruye lo que el repositorio ya resuelve"},
     {"path": ".evidence/archetype-inventory.md","when": "brownfield",    "by": "calidad-chapter-entry-point",                 "why": "inventario del arquetipo del que se hereda"},
@@ -56,6 +58,8 @@ def condiciones(ev: Path, forzadas: set[str]) -> set[str]:
         plats = d.get("platforms") or d.get("plataformas") or []
         if isinstance(plats, list) and len(plats) > 1:
             c.add("multiplatform")
+        if any(k in blob for k in ("web", "android", "ios", "mobile", "playwright", "appium")):
+            c.add("front")
     return c
 
 

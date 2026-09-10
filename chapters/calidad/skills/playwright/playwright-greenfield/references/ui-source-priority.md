@@ -1,6 +1,12 @@
 
 # Fuentes válidas de información para Playwright
 
+> El contrato general de las fuentes de interfaz —qué es cada una, qué se espera de
+> ella, qué **no** puede dar, y la procedencia y confianza de lo que se extrae— vive en
+> `[[calidad-ui-source-contract]]`, que aplica igual a web y a móvil. Aquí queda lo
+> específico de Playwright: el árbol de decisión, la profundidad de extracción por
+> fuente y el enganche con el mapa de locators.
+
 Playwright valida la capa de presentación. El insumo debe describir UI real. Esta referencia documenta las 4 fuentes aceptadas, cuándo usar cada una y qué profundidad de extracción esperar.
 
 ## Las fuentes (en orden de preferencia)

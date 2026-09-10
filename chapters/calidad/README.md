@@ -314,7 +314,9 @@ chapters/calidad/
 
 | Asset                                  | Descripción                                                                                                  |
 |----------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| `mandatory-inputs-protocol.md`         | Inputs obligatorios y opcionales antes de generar pruebas (intent, project_name, spec, firma, user_story).   |
+| `mandatory-inputs-protocol.md`         | Contrato de entrada, y desde v2 **de suficiencia, no de presencia**: la historia es obligatoria siempre y casi nunca basta por si sola, asi que el gate evalua entrada por entrada y nombra la pieza que falta, no el documento. Incluye el contrato de verificabilidad de los criterios de aceptacion y el dictamen `input-sufficiency.json`. |
+| `functional-flow-input.md`             | **El recorrido funcional es insumo, no algo que se descubra ejecutando.** Obligatorio en front: secuencia de pantallas, bifurcaciones con la condicion que las dispara, pantallas intermitentes, desenlaces con su copy y su duracion, y precondiciones. Una compuerta no documentada ya produjo un diagnostico de servicio caido que era una precondicion. |
+| `ui-source-contract.md`                | Que es exactamente una fuente de interfaz y que se espera de cada una — aplicacion viva, design system, repositorio de front, prototipo, diseno estatico, catalogo de componentes — con lo que **no** puede dar. Dos ejes: flujo y estructura; una sola fuente casi nunca cubre los dos. Procedencia y confianza de todo lo extraido. |
 | `intent-detection.md`                  | Decide qué framework aplicar a partir del intent del usuario.                                                |
 | `spec-validation.md`                   | Valida OpenAPI 3.x, Swagger 2.0 y WSDL antes de generar; extrae endpoints, base URL, security schemes, enums. |
 | `brownfield-vs-greenfield.md`          | Distingue proyectos existentes vs nuevos y define qué se genera y qué no en cada modo.                       |
