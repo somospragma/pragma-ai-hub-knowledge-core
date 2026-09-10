@@ -68,6 +68,7 @@ CADENA = [
     ("ejecucion",                 "calidad-test-execution-orchestration"),
     ("auditoria en frio",         "calidad-cold-audit-before-execution"),
     ("correccion con persona",    "calidad-human-fix-request-protocol"),
+    ("verificacion fresca",       "calidad-fresh-context-verification"),
     ("triage de fallos",          "calidad-failure-triage-and-classification"),
     ("auto-correccion",           "calidad-test-self-correction-loop-workflow"),
     ("reporte ejecutivo",         "calidad-generate-executive-report"),
@@ -146,6 +147,20 @@ def main() -> int:
                     continue
                 hallazgos["artefactos"].append(
                     f"{fm.get('id')}: exige {a} y no esta en la lista de la puerta — nadie lo comprueba")
+        # ningun obligatorio se queda sin capa: o produce artefacto, o declara por que no
+        gate_txt = MANIFIESTO.read_text(encoding="utf-8")
+        con_art = set(re.findall(r'"by":\s*"([^"]+)"', gate_txt))
+        sin_art = set(re.findall(r'^\s*"(calidad-[a-z0-9-]+)":\s*"', gate_txt, re.M))
+        for f in archivos:
+            if not es_asset(f):
+                continue
+            fm = parse_fm(f.read_text(encoding="utf-8"))
+            if fm.get("enforcement") != "mandatory" or fm.get("type") == "steering":
+                continue
+            aid = fm.get("id")
+            if aid and aid not in con_art and aid not in sin_art:
+                hallazgos["artefactos"].append(
+                    f"{aid}: obligatorio sin capa de exigibilidad — ni produce artefacto ni declara por que no")
     else:
         hallazgos["artefactos"].append("falta el script de la puerta de artefactos obligatorios")
 

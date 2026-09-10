@@ -36,7 +36,36 @@ REQUIRED = [
     {"path": ".evidence/mock-verification.json","when": "mock",          "by": "calidad-pipeline-state-tracking",             "why": "evidencia de que el sistema consume el mock"},
     {"path": ".evidence/coverage-declared-vs-delivered.json", "when": "delivery", "by": "calidad-delivery-gate-contract",      "why": "lo prometido contra lo entregado"},
     {"path": ".evidence/generation-manifest.json","when": "delivery",    "by": "calidad-delivery-gate-contract",              "why": "que se genero contra que criterio"},
+    {"path": ".evidence/verification",          "when": "always",       "by": "calidad-fresh-context-verification",          "why": "lo que ninguna puerta puede comprobar lo revisa alguien sin el sesgo de quien lo hizo", "kind": "dir"},
+    # --- cierre A: los obligatorios que si producen artefacto ---
+    {"path": ".evidence/execution-status.json", "when": "executed",      "by": "calidad-environment-blocker-evidence",        "why": "un bloqueo de ambiente afirmado sin evidencia ya cerro una entrega en falso"},
+    {"path": ".evidence/session-config.json",   "when": "always",        "by": "calidad-post-generation-execution-prompt",    "why": "modo de operacion y presupuesto de sesion declarados, no supuestos"},
+    {"path": ".evidence/metadata.json",         "when": "executed",      "by": "calidad-execution-metadata-schema",           "why": "metadatos de la corrida: sin ellos un resultado no se puede atribuir"},
+    {"path": ".evidence/healing-log.jsonl",     "when": "executed",      "by": "calidad-test-self-healing",                   "why": "todo fallback de localizador deja rastro; sin el, el healing esconde deuda"},
+    {"path": ".evidence/triage",                "when": "executed",      "by": "calidad-failure-triage-and-classification",   "why": "clasificacion por fallo: sin ella la correccion arranca sin causa raiz", "kind": "dir"},
+    {"path": ".evidence/audit-log",             "when": "executed",      "by": "calidad-test-self-correction-loop",           "why": "diff y guardrail por iteracion; sin trazabilidad la auto-correccion es invalida", "kind": "dir"},
+    {"path": ".evidence/alm-authorizations.md", "when": "delivery",      "by": "calidad-alm-write-authorization-gate",        "why": "la ficha de autorizacion con conteo, antes de cada escritura en el ALM"},
+    {"path": ".evidence/alm-publication.json",  "when": "delivery",      "by": "calidad-alm-test-publishing-cycle",           "why": "que se publico y a que ciclo: el publicador imprime exito aunque la auth falle"},
+    {"path": ".evidence/executive-report.md",   "when": "delivery",      "by": "calidad-executive-report-generator",          "why": "el reporte ejecutivo de la corrida"},
+    {"path": ".evidence/locators-discovered.json","when": "front",       "by": "calidad-appium-apk-auto-discovery",           "why": "localizadores descubiertos del binario, no inferidos"},
 ]
+
+# Obligatorios que NO producen artefacto propio, con la razon y como se verifican.
+# La regresion del chapter exige que todo obligatorio este arriba o aqui: asi
+# ninguno se queda sin capa de exigibilidad por olvido.
+NO_ARTIFACT = {
+    "calidad-asset-resolver":                       "tabla de traduccion; se verifica con la resolucion de enlaces de la regresion",
+    "calidad-results-structure-universal":           "convencion de rutas; se verifica en la estructura de results/, no en un archivo",
+    "calidad-streaming-files-protocol":              "cubierto por generation-manifest.json",
+    "calidad-test-execution-orchestration":          "cubierto por preflight.json y el veredicto de corrida",
+    "calidad-smoke-gate-policy":                     "cubierto por la fase smoke_gate de pipeline-state.json",
+    "calidad-automation-feasibility-assessment":     "cubierto por coverage-declared.json: que se automatiza y que no",
+    "calidad-business-driven-prioritization":        "cubierto por coverage-declared.json: la prioridad por criterio",
+    "calidad-flutter-locators-and-gestures":         "doctrina de localizacion; se verifica por la procedencia en ui-sources.md y por eval",
+    "calidad-karate-runtime-traps":                  "doctrina de stack; se verifica por eval",
+    "calidad-data-volatility-and-assertion-anchoring":"doctrina de diseno de asercion; se verifica por eval",
+    "calidad-measure-before-proposing":              "doctrina de proceso: la medicion acompana la propuesta; se verifica por eval",
+}
 
 
 def condiciones(ev: Path, forzadas: set[str]) -> set[str]:

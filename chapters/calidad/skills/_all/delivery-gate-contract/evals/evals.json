@@ -1,0 +1,96 @@
+{
+  "skill_name": "calidad-mandatory-enforcement",
+  "_tool_scope": "This file is an evaluation definition — not executed as agent instructions. Assertions of type llm_judge are grading metadata, not tool grants. These evals exercise the mandatory assets of the Calidad chapter.",
+  "_purpose": "Cada escenario reproduce un fallo REAL y medido de la certificacion NT-24880. Si un eval pasa a rojo tras editar un asset, esa edicion deshizo una correccion que costo dinero. Son la red que impide la regresion silenciosa.",
+  "evals": [
+    {
+      "id": 1,
+      "_regression": "No se creo platform-learnings.md. El segundo canal repitio integro el descubrimiento del primero.",
+      "prompt": "Ya dejamos Android estable con 16 escenarios en verde. Arranca ahora con iOS para la misma historia.",
+      "expected_output": "Antes de la primera corrida de iOS, el agente revisa el libro de aprendizajes de la entrega, clasifica las correcciones de Android en compartidas y especificas de plataforma, y aplica TODAS las compartidas de una sola pasada. No empieza a correr escenarios de iOS para descubrir de nuevo lo ya resuelto.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {"id": "a1", "text": "Lee o crea .evidence/platform-learnings.md antes de ejecutar nada en iOS", "type": "contains"},
+        {"id": "a2", "text": "Clasifica las correcciones previas en compartidas y especificas, con su razon", "type": "llm_judge"},
+        {"id": "a3", "text": "Aplica las compartidas en una sola pasada, no corrida por corrida", "type": "llm_judge"},
+        {"id": "a4", "text": "NO lanza la primera corrida de iOS antes de haber propagado", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 2,
+      "_regression": "El repositorio tenia un ejecutor por etiquetas documentado y se estabilizo escenario por escenario: 214 corridas en cinco dias.",
+      "prompt": "Tengo 17 escenarios generados para esta historia. Estabilizalos.",
+      "expected_output": "El agente consulta primero el mapa de capacidades del repositorio, descubre si existe un ejecutor por etiquetas o multiplataforma y, si existe, lo usa para correr por lotes agrupados por precondicion y usuario. Si no existe, declara el hueco y lo construye o lo registra. No estabiliza de a un escenario por corrida.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {"id": "a1", "text": "Consulta el mapa de capacidades del repositorio antes de decidir como ejecutar", "type": "contains"},
+        {"id": "a2", "text": "Agrupa en lotes por precondicion o usuario compartido en vez de correr uno a uno", "type": "llm_judge"},
+        {"id": "a3", "text": "Si falta la capacidad, la registra en .evidence/tooling-gaps.md en vez de rodearla a mano", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 3,
+      "_regression": "Se ejecutaba para ver que pasaba. Ocho escenarios que llevaban dias fallando salieron verdes en una tanda tras la primera auditoria en frio.",
+      "prompt": "Ya escribi el escenario del camino feliz. Correlo a ver como va.",
+      "expected_output": "Antes de ejecutar, el agente recorre la cadena de steps e imprime la secuencia de interacciones que hara sobre el dispositivo o el navegador, con la estrategia de localizacion y la espera de cada paso, y declara cual paso es el mas fragil y por que. Solo despues lanza la corrida.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {"id": "a1", "text": "Imprime la secuencia de interacciones paso a paso antes de ejecutar", "type": "contains"},
+        {"id": "a2", "text": "Declara explicitamente cual paso es el mas fragil y por que", "type": "llm_judge"},
+        {"id": "a3", "text": "Detecta al menos un gesto sin ancla, una espera fija sobre algo opcional o una lectura tardia de algo transitorio si los hay", "type": "llm_judge"},
+        {"id": "a4", "text": "NO lanza la corrida antes de la lectura", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 4,
+      "_regression": "La cobertura no se congelo al inicio: tras 253 mensajes el agente dio la historia por terminada con criterios sin escenario.",
+      "prompt": "Esta historia tiene 24 criterios de aceptacion y hay que certificarla en web, Android e iOS. Empieza.",
+      "expected_output": "Antes de escribir codigo, el agente produce la matriz de cobertura completa —criterio por plataforma por escenario, con el dato que exige cada uno— para las tres plataformas a la vez, la persiste en .evidence/coverage-declared.json y pide aprobacion. No disena los escenarios de una plataforma y deja las otras para despues.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {"id": "a1", "text": "Produce la matriz de cobertura para las tres plataformas antes de generar codigo", "type": "contains"},
+        {"id": "a2", "text": "Persiste la matriz en .evidence/coverage-declared.json", "type": "contains"},
+        {"id": "a3", "text": "Pide aprobacion humana de la cobertura antes de continuar", "type": "llm_judge"},
+        {"id": "a4", "text": "NO empieza a generar escenarios de una sola plataforma dejando el resto sin disenar", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 5,
+      "_regression": "El diseno declaraba una compuerta de autenticacion que la historia callaba. Nadie cruzo las fuentes: horas de diagnostico, un bloqueo de ambiente y un defecto documentado que no era.",
+      "prompt": "Aqui tienes la historia de usuario y el enlace al diseno del flujo. La historia no menciona nada de autenticacion reforzada, pero el diseno tiene un nodo de decision que la exige antes de avanzar. Analiza los insumos.",
+      "expected_output": "El agente emite una tabla de contraste entre la historia y el diseno, marca la autenticacion como COMPLEMENTO —algo que el diseno aporta y la historia calla— y la incorpora como precondicion de todos los escenarios del flujo. No decide por su cuenta cual fuente manda cuando hay contradiccion: pregunta y registra la respuesta.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {"id": "a1", "text": "Emite una tabla de contraste historia contra diseno, no dos resumenes separados", "type": "contains"},
+        {"id": "a2", "text": "Clasifica el hallazgo como complemento, contradiccion o silencio de ambas", "type": "llm_judge"},
+        {"id": "a3", "text": "Incorpora la autenticacion como precondicion de los escenarios del flujo", "type": "llm_judge"},
+        {"id": "a4", "text": "Ante una contradiccion, pregunta en vez de elegir por su cuenta", "type": "llm_judge"}
+      ]
+    },
+    {
+      "id": 6,
+      "_regression": "Sin mapa de identificadores se predijeron selectores del diseno: ~80 creditos solo en reparaciones por selector adivinado.",
+      "prompt": "No tenemos mapa de identificadores acordado con desarrollo. Solo el diseno en Figma. Arranca igual.",
+      "expected_output": "El agente detiene el flujo con el bloqueo correspondiente, explica que sin mapa los selectores se infieren y fallaran por drift al llegar el desarrollo, y da la cifra de lo que costo la ultima vez. Si la persona confirma, continua: registra locator_map como waived con el riesgo aceptado y marca todos los identificadores inferidos con confianza baja para verificarlos contra la aplicacion real.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {"id": "a1", "text": "Detiene y explica el bloqueo antes de generar page objects", "type": "llm_judge"},
+        {"id": "a2", "text": "Acompana el waiver con lo que costo la ultima vez, no lo presenta como gratis", "type": "llm_judge"},
+        {"id": "a3", "text": "Si la persona confirma, continua en vez de vetar", "type": "llm_judge"},
+        {"id": "a4", "text": "Marca los identificadores inferidos con su procedencia y confianza baja", "type": "contains"}
+      ]
+    },
+    {
+      "id": 7,
+      "_regression": "Un escenario de seguridad daba verde comprobando que el dato sensible no aparecia en una peticion que no lo llevaba. La asercion se cumplia trivialmente.",
+      "prompt": "El escenario de encriptacion paso 3 de 3. El trazado capturo una peticion de consulta sin cuerpo y el PIN no aparece en ella. Archivalo como verde.",
+      "expected_output": "El agente NO lo archiva. Detecta que la asercion pasa por ausencia sobre un mensaje que nunca llevo el dato, lo reporta como pasa-sin-verificar, y corrige la captura para exigir la peticion con cuerpo donde el dato viaja de verdad.",
+      "files": ["SKILL.md"],
+      "assertions": [
+        {"id": "a1", "text": "NO archiva el escenario como verde", "type": "llm_judge"},
+        {"id": "a2", "text": "Identifica que es una asercion por ausencia sin la presencia que la valida", "type": "llm_judge"},
+        {"id": "a3", "text": "Exige capturar la peticion que si transporta el dato antes de dar por buena la asercion", "type": "llm_judge"}
+      ]
+    }
+  ]
+}

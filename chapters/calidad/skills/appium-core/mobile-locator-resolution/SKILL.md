@@ -1,6 +1,6 @@
 ---
 id: calidad-mobile-locator-resolution
-version: 1.0.0
+version: 1.1.0
 scope: stack
 type: skill
 chapter: calidad
@@ -18,6 +18,7 @@ Siempre que haya que **escribir o reparar un locator** en una suite Appium, en c
 Este bundle pertenece al stack `appium-core`, que se instala junto al stack de producto (`appium-serenity` o `appium-wdio`). Los stacks de producto aportan la sintaxis; este aporta el método.
 
 ## Lectura obligatoria
+Cuando la aplicación se dibuja sobre lienzo —Flutter y equivalentes—, lo que el driver ve **no es el DOM ni la jerarquía nativa**: es un árbol de semántica con sus propias reglas de localización y de gesto. `[[calidad-flutter-locators-and-gestures]]` es de lectura obligatoria **antes del primer localizador** en ese caso, no cuando los selectores ya fallan.
 
 | Reference | Para qué |
 |---|---|

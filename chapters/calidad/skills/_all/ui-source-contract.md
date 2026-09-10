@@ -48,6 +48,8 @@ Para la segunda, el diseño estático es de las peores fuentes: muestra píxeles
 | **Diseño estático** — Figma, maquetas | Copys, jerarquía visual, estados diseñados y las ramas del flujo | El árbol. Para estructura, la peor de la lista |
 | **Catálogo de componentes** — Storybook | Estructura por componente, con sus variantes | Flujo y navegación |
 
+Cuando la aplicación se dibuja sobre lienzo —Flutter y equivalentes—, la estructura que publica **no se parece al DOM ni a la jerarquía nativa**, y tiene sus propias reglas de localización y de gesto: `[[calidad-flutter-locators-and-gestures]]`, de lectura obligatoria antes del primer localizador en ese caso.
+
 ### 3. Una fuente casi nunca basta
 
 **`ui_source` no es una fuente: son las que hagan falta para cubrir los dos ejes**, y hay que **declarar cuál cubre cuál**. La combinación más frecuente en pre-desarrollo es diseño estático para el flujo y los copys, más design system para la estructura. Declararlo evita la pregunta que sale tarde: "¿de dónde sacaste ese selector?".

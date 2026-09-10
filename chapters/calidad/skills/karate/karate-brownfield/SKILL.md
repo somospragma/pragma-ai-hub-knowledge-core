@@ -19,6 +19,8 @@ Si el usuario no provee archivos del proyecto, no asumas: solicítalos o usa `[[
 
 ## Lectura obligatoria antes de tocar el proyecto
 
+- `[[calidad-karate-runtime-traps]]` — las trampas de runtime de este stack. Se leen **antes** de la primera corrida, no cuando ya fallaron.
+
 El conocimiento técnico del stack vive en el bundle **greenfield** del mismo stack; brownfield no lo duplica, lo consume. **Abrir antes de generar** y declarar cuáles se leyeron (traza en `[[calidad-pipeline-state-tracking]]`):
 
 | Reference | Para qué |

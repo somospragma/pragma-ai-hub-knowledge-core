@@ -5,7 +5,7 @@ scope: stack
 type: skill
 chapter: calidad
 stack: karate
-description: "Comportamientos de Karate que producen cobertura falsa o suites lentas sin causa aparente: un escenario sin aserción pasa aunque el servicio devuelva 500, el Background se re-ejecuta por escenario, sin -T corre a un hilo, y las funciones del config pierden su clausura. Consultar antes de escribir el primer feature y al diagnosticar una suite Karate."
+description: "OBLIGATORIO. Comportamientos de Karate que producen cobertura falsa o suites lentas sin causa aparente: un escenario sin aserción pasa aunque el servicio devuelva 500, el Background se re-ejecuta por escenario, sin -T corre a un hilo, y las funciones del config pierden su clausura. Consultar antes de escribir el primer feature y al diagnosticar una suite Karate."
 tags: [karate, aserciones, paralelismo, call-once, call-single, config, trampas, mandatory]
 enforcement: mandatory
 ---

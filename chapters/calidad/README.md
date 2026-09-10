@@ -26,6 +26,19 @@ Y los ejes cross-cutting que aplican a todos los stacks:
 - **Contract testing** y validación de specs.
 - **Shift-left y mocking**: construir y validar pruebas antes de que el desarrollo exista — service virtualization con Mockoon, datos sintéticos deterministas, contrato de mapeo de locators UI, y prototipos opt-in de front (HTML) y de app mobile (en la misma tecnología de la app real, ej. Flutter con Semantics identifiers) para ejecutar la suite en browser/emulador pre-desarrollo. Los mocks validan la construcción del test; la certificación formal siempre corre contra integraciones reales vía switchover solo-configuración.
 
+## Cómo se garantiza que el conocimiento se aplique
+
+Un asset que existe, es obligatorio y está bien escrito no se aplica solo: se midió que **seis de cada diez artefactos obligatorios nunca se crearon** en una certificación real. El chapter usa cuatro capas, y sólo las dos primeras garantizan algo:
+
+| Capa | Mecanismo | Cobertura hoy |
+|---|---|---|
+| **1. Entrada obligatoria** | La herramienta no funciona sin el artefacto porque lo necesita para operar | El ejecutor lee la cobertura, la corrección parte de la ficha |
+| **2. Puerta que bloquea** | `check-required-artifacts.py`, código de salida distinto de cero, enganchado al pre-commit | **36 de 36** obligatorios: 25 con artefacto, 11 con su razón declarada |
+| **3. Evals de regresión** | Siete escenarios que reproducen fallos reales y medidos | En `delivery-gate-contract/evals/` |
+| **4. Texto en el asset** | Descripción, etiqueta y sección de verificación | Sólo hace probable el cumplimiento |
+
+Y una regla de enrutamiento que impide que un obligatorio quede colgando: **cada uno lo invoca el nodo que gobierna su ámbito** — universal al steering, de fase al workflow, de stack al skill de ese stack, condicional a quien detecta la condición. La regresión de la fuente falla si alguno se queda sin capa o sin invocador.
+
 ## Flujo de trabajo — el mismo para los seis stacks
 
 La herramienta cambia; el recorrido no. Karate, Playwright, K6 y los tres de Appium
@@ -358,6 +371,7 @@ chapters/calidad/
 | `failure-triage-and-classification/SKILL.md` | Clasifica fallos como deterministic vs flaky y diagnostica causa raíz antes de proponer corrección.    |
 | `test-self-correction-loop/SKILL.md`   | Loop iterativo de auto-corrección con anti-cheating guardrails (max 3 iteraciones por default).              |
 | `test-self-healing/SKILL.md`           | Self-healing en runtime: multi-locator fallback, LLM-driven selector repair, visual AI healing.              |
+| `fresh-context-verification.md`        | **Lo que exige juicio no lo verifica quien lo hizo.** El patron de los sistemas que no fallan es generador, verificador con contexto limpio y puerta determinista; nosotros teniamos el primero y el tercero. Que se le manda —el artefacto y la pregunta— y que NO —la conversacion que lo produjo, porque heredaria su sesgo—. |
 | `deterministic-work-to-tooling.md`     | **Lo determinista no lo hace el modelo: lo hace una herramienta del proyecto.** Test de cuatro condiciones, contrato de salida acotada, aritmética de amortización, catálogo mínimo de capacidades y las cuatro capas de exigibilidad — de las que solo entrada-obligatoria y puerta-que-bloquea garantizan algo. |
 | `cold-audit-before-execution.md`       | Antes de la primera corrida y después de cada corrección: recorrer la cadena e imprimir la secuencia de interacciones que hará sobre el dispositivo, y declarar el paso más frágil. La mayoría de los fallos se ven leyendo el código. |
 | `human-fix-request-protocol.md`        | Dónde entra el juicio de la persona una vez que lo determinista ya lo resuelven herramientas: ficha de corrección de seis campos, canal visual —el agente no puede abrir imágenes— y cuándo la corrida la lanza el QA. |

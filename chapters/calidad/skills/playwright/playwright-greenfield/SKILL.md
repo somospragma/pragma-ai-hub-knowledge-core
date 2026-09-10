@@ -1,6 +1,6 @@
 ---
 id: calidad-playwright-greenfield
-version: 2.0.0
+version: 2.1.0
 scope: stack
 type: skill
 chapter: calidad
@@ -26,6 +26,7 @@ Antes de activar este skill: confirma intent con `[[calidad-intent-detection]]`,
 3. **User stories con flujos UI explícitos** — historias que enumeran páginas, transiciones y acciones (no historias que solo describen reglas de negocio).
 4. **Storybook o sistema de diseño existente** — componentes catalogados con sus rutas demo.
 ## Lectura obligatoria antes de generar
+Cuando la aplicación se dibuja sobre lienzo —Flutter y equivalentes—, lo que el driver ve **no es el DOM ni la jerarquía nativa**: es un árbol de semántica con sus propias reglas de localización y de gesto. `[[calidad-flutter-locators-and-gestures]]` es de lectura obligatoria **antes del primer localizador** en ese caso, no cuando los selectores ya fallan.
 
 Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/` (24 archivos). **Abrir estos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza de `[[calidad-pipeline-state-tracking]]`):
 

@@ -19,6 +19,8 @@ Antes de activar este skill, valida el spec con `[[calidad-spec-validation]]` y 
 
 ## Lectura obligatoria antes de generar
 
+- `[[calidad-karate-runtime-traps]]` — las trampas de runtime de este stack. Se leen **antes** de la primera corrida, no cuando ya fallaron.
+
 Este SKILL es el índice; el detalle que hace funcionar el proyecto vive en `references/` (12 archivos). **Abrir estos ANTES de emitir el primer archivo** y declarar en el turno cuáles se leyeron (queda en la traza de `[[calidad-pipeline-state-tracking]]`):
 
 | Reference | Para qué |

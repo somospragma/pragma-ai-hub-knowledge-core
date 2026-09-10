@@ -1,6 +1,6 @@
 ---
 id: calidad-delivery-gate-contract
-version: 1.8.0
+version: 1.9.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -176,6 +176,10 @@ Tres comprobaciones que no cuestan una corrida contra el sistema bajo prueba y q
 **1. El análisis estático del cliente se pasa en local, antes de commitear.** Si el cliente tiene una puerta de calidad, se corre contra ella desde la máquina, con las credenciales que ya viven en la configuración del repositorio, y **se pasa antes** de proponer el commit. Descubrir en el pipeline lo que se podía saber en local cuesta el ciclo completo. Detalle en `[[calidad-static-analysis-on-the-test-repo]]`. Casi siempre el repositorio ya tiene el comando y el gancho de pre-commit: se comprueba antes de construir nada. Si no lo tiene, el hueco se cierra construyéndolo una vez según `[[calidad-deterministic-work-to-tooling]]`, no repitiendo la comprobación a mano en cada entrega.
 
 **2. La cobertura declarada se compara contra la entregada.** La matriz congelada en la fase de insumos es el compromiso; la entrega es lo que hay. La diferencia se reporta explícitamente, aunque sea cero. Sin este cruce, "ejecuté todo lo que había" se confunde con "cubrí todo lo que había que cubrir", y ya cerró historias con criterios sin escenario.
+
+**0. La red que impide que todo esto se deshaga: los evals.** En `evals/evals.json` de este skill viven siete escenarios, y cada uno reproduce un fallo **real y medido** de una certificación auditada: no propagar entre plataformas, estabilizar de a un escenario teniendo el ejecutor por lotes, ejecutar sin leer la cadena, no congelar la cobertura, no contrastar historia y diseño, aceptar un waiver sin precio, y archivar un verde que pasa por ausencia.
+
+Si un eval pasa a rojo tras editar un asset, **esa edición deshizo una corrección que costó dinero**. Es la única forma de responder con datos —y no con teoría de grafos— si el conocimiento se aplica de verdad, y la única que detecta la regresión silenciosa dentro de seis meses.
 
 **3. Los artefactos obligatorios existen, y lo comprueba un comando que viene con el chapter.** Cada asset marcado como obligatorio prescribe artefactos. La comprobación **no es una autoevaluación del agente**: es un comando que verifica presencia y devuelve código de salida distinto de cero, enganchado al pre-commit del repositorio. Una obligación sostenida sólo por texto ya demostró no cumplirse.
 

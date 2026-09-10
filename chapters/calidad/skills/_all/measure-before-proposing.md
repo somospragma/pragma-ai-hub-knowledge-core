@@ -4,7 +4,7 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "Batería de mediciones sobre un repositorio de pruebas heredado antes de proponer cualquier cambio, y cómo cerrar una decisión de arquitectura con un banco de pruebas en vez de con una discusión. Consultar ANTES de emitir un diagnóstico o una propuesta sobre una suite que no escribiste."
+description: "OBLIGATORIO. Batería de mediciones sobre un repositorio de pruebas heredado antes de proponer cualquier cambio, y cómo cerrar una decisión de arquitectura con un banco de pruebas en vez de con una discusión. Consultar ANTES de emitir un diagnóstico o una propuesta sobre una suite que no escribiste."
 tags: [medicion, brownfield, diagnostico, arquitectura, banco-de-pruebas, mandatory]
 enforcement: mandatory
 ---
