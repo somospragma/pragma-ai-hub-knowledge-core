@@ -22,6 +22,8 @@ REQUIRED = [
     {"path": ".evidence/INDEX.md",              "when": "always",        "by": "calidad-pipeline-state-tracking",             "why": "mapa de lectura: sin el, retomar significa releerlo todo"},
     {"path": ".evidence/strategy-approval.md",  "when": "always",        "by": "calidad-pre-design-strategy-document",        "why": "la aprobacion de estrategia es previa a generar"},
     {"path": ".evidence/input-sufficiency.json", "when": "always",       "by": "calidad-sut-readiness-gate",                  "why": "dictamen de preparacion del sistema antes de gastar la primera corrida"},
+    {"path": ".evidence/tooling-gaps.md",       "when": "always",       "by": "calidad-deterministic-work-to-tooling",       "why": "que resuelve ya el proyecto y que hueco queda: es lo que abarata la historia siguiente"},
+    {"path": ".evidence/ui-sources.md",         "when": "front",        "by": "calidad-ui-source-contract",                  "why": "que fuente cubre el flujo y cual la estructura; una sola casi nunca cubre las dos"},
     {"path": ".evidence/functional-flow.md",    "when": "front",         "by": "calidad-functional-flow-input",               "why": "el recorrido es insumo; descubrirlo ejecutando es lo mas caro que hace un agente"},
     {"path": ".evidence/coverage-declared.json","when": "always",        "by": "calidad-mandatory-inputs-protocol",           "why": "cobertura congelada antes de generar; se mide contra ella al cierre"},
     {"path": ".evidence/repo-capability-map.md","when": "brownfield",    "by": "calidad-repo-capability-discovery",           "why": "sin mapa se reconstruye lo que el repositorio ya resuelve"},

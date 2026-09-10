@@ -8,7 +8,7 @@ description: "OBLIGATORIO para front (web y móvil). Qué es exactamente una fue
 tags: [insumos, front, web, mobile, ui-source, design-system, figma, locators, suficiencia, universal, mandatory]
 enforcement: mandatory
 verification:
-  - check: "las fuentes de interfaz están declaradas con qué eje cubre cada una —flujo o estructura— y ninguna se usa para el eje que no puede responder"
+  - check: "existe .evidence/ui-sources.md declarando qué eje cubre cada fuente —flujo o estructura— y ninguna se usa para el eje que no puede responder"
     failure_message: "Bloqueado: se está usando una fuente para lo que no puede dar. Un diseño estático no dice qué árbol publica un componente, y de ahí salen los selectores inventados que pasan contra el prototipo y se rompen el día del despliegue."
   - check: "todo identificador que llega al mapa lleva la fuente de la que salió y su confianza"
     failure_message: "Bloqueado: hay identificadores sin procedencia. Uno cosechado de la aplicación real y uno inferido de un diseño no valen lo mismo y no pueden parecerlo."
@@ -82,7 +82,7 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 
 | # | Comprobación | Si no se cumple |
 |---|---|---|
-| 1 | las fuentes de interfaz están declaradas con qué eje cubre cada una —flujo o estructura— y ninguna se usa para el eje que no puede responder | Bloqueado: se está usando una fuente para lo que no puede dar. Un diseño estático no dice qué árbol publica un componente, y de ahí salen los selectores inventados que pasan contra el prototipo y se rompen el día del despliegue. |
+| 1 | existe .evidence/ui-sources.md declarando qué eje cubre cada fuente —flujo o estructura— y ninguna se usa para el eje que no puede responder | Bloqueado: se está usando una fuente para lo que no puede dar. Un diseño estático no dice qué árbol publica un componente, y de ahí salen los selectores inventados que pasan contra el prototipo y se rompen el día del despliegue. |
 | 2 | todo identificador que llega al mapa lleva la fuente de la que salió y su confianza | Bloqueado: hay identificadores sin procedencia. Uno cosechado de la aplicación real y uno inferido de un diseño no valen lo mismo y no pueden parecerlo. |
 
 ## Cross-links

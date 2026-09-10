@@ -1,6 +1,6 @@
 ---
 id: calidad-execution-discipline-protocol
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: steering
 chapter: calidad
@@ -19,6 +19,12 @@ Este protocolo cubre el hueco de las sesiones que **abren pidiendo ejecutar**, d
 
 Si la entrega cubre varias plataformas, usar el ejecutor multiplataforma del repositorio cuando exista, y aplicar los aprendizajes compartidos antes de arrancar la siguiente (`[[calidad-cross-platform-learning-propagation]]`).
 
+3. **Leer la cadena antes de gastar la corrida** (`[[calidad-cold-audit-before-execution]]`): recorrer los steps e imprimir la secuencia de interacciones que hará sobre el dispositivo o el navegador, y declarar cuál paso es el más frágil. Se repite tras cada corrección. Un escenario no se entrega como listo para correr si no compila, no enlaza sus steps y no pasó esta lectura.
+
+4. **La salida de la corrida no entra cruda al razonamiento** (`[[calidad-deterministic-work-to-tooling]]`): se consume un veredicto acotado que emite una herramienta del proyecto; el registro completo queda en disco. Y se corre **por lotes**, no de a un escenario, cuando el repositorio provee un ejecutor por etiquetas.
+
+5. **Tras dos fallos por la misma causa se para de parchar** (`[[calidad-test-self-correction-loop]]`): el tercer intento exige diagnóstico de fondo con árbol real, gesto manual replicado y homólogo estable. Si ni así se explica, lo explica la persona por la ficha de `[[calidad-human-fix-request-protocol]]` — el agente no puede abrir imágenes, y pedir la captura cuesta un turno mientras adivinarla cuesta la tanda.
+
 ## Lo que nunca debes hacer
 
 - **NUNCA** inventar un comando de ejecución. Si no sale del repositorio ni lo confirmó el usuario, no se ejecuta.
@@ -26,3 +32,5 @@ Si la entrega cubre varias plataformas, usar el ejecutor multiplataforma del rep
 - **NUNCA** dar por pasada una sonda del preflight sin su salida: "el dispositivo está conectado" sin el listado es una suposición.
 - **NUNCA** interpretar resultados de una corrida con el preflight en rojo, y **NUNCA** clasificar un fallo como defecto del SUT sin preflight verde en esa misma corrida: si no está demostrado que la corrida tocó la aplicación, no hay nada que afirmar sobre ella.
 - **NUNCA** lanzar la suite completa para "ver qué más falla" mientras el gate de un escenario siga rojo.
+- **NUNCA** ejecutar sin haber leído antes la cadena de interacciones. La mayoría de los fallos de una corrida se ven leyendo el código, y una corrida cuesta órdenes de magnitud más que leerlo.
+- **NUNCA** ajustar parámetros de un gesto, de una espera o de un selector "a ver si ahora sí" a partir del tercer intento.

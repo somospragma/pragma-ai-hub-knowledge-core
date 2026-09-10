@@ -10,7 +10,7 @@ enforcement: mandatory
 verification:
   - check: "antes de resolver cualquier tarea determinista y repetida se consultó el mapa de capacidades del proyecto, y la respuesta (existe / no existe) quedó registrada"
     failure_message: "Bloqueado: se hizo a mano trabajo determinista sin comprobar si el proyecto ya lo resolvía. Ya ocurrió en campo estabilizar una certificación entera de a un escenario teniendo el ejecutor por lotes en el mismo repositorio."
-  - check: "toda herramienta construida quedó dentro del proyecto, documentada en su documentación y registrada en el mapa de capacidades con su invocación"
+  - check: "toda herramienta construida quedó dentro del proyecto, documentada y registrada con su invocación, y .evidence/tooling-gaps.md declara qué resuelve el proyecto y qué hueco queda"
     failure_message: "Bloqueado: hay una herramienta construida que la siguiente sesión no va a encontrar. Un script suelto que nadie registra se vuelve a escribir en la siguiente historia."
   - check: "la salida de cada herramienta es acotada y legible por máquina; ninguna vuelca su registro completo al razonamiento del agente"
     failure_message: "Bloqueado: una herramienta devuelve la salida cruda. El coste no es ejecutar: es que la salida entre al contexto y se reenvíe en cada paso posterior."
@@ -170,7 +170,7 @@ Asset de **cumplimiento obligatorio**. Antes de cerrar la fase que lo invoca, co
 | # | Comprobación | Si no se cumple |
 |---|---|---|
 | 1 | antes de resolver cualquier tarea determinista y repetida se consultó el mapa de capacidades del proyecto, y la respuesta (existe / no existe) quedó registrada | Bloqueado: se hizo a mano trabajo determinista sin comprobar si el proyecto ya lo resolvía. Ya ocurrió en campo estabilizar una certificación entera de a un escenario teniendo el ejecutor por lotes en el mismo repositorio. |
-| 2 | toda herramienta construida quedó dentro del proyecto, documentada en su documentación y registrada en el mapa de capacidades con su invocación | Bloqueado: hay una herramienta construida que la siguiente sesión no va a encontrar. Un script suelto que nadie registra se vuelve a escribir en la siguiente historia. |
+| 2 | toda herramienta construida quedó dentro del proyecto, documentada y registrada con su invocación, y .evidence/tooling-gaps.md declara qué resuelve el proyecto y qué hueco queda | Bloqueado: hay una herramienta construida que la siguiente sesión no va a encontrar. Un script suelto que nadie registra se vuelve a escribir en la siguiente historia. |
 | 3 | la salida de cada herramienta es acotada y legible por máquina; ninguna vuelca su registro completo al razonamiento del agente | Bloqueado: una herramienta devuelve la salida cruda. El coste no es ejecutar: es que la salida entre al contexto y se reenvíe en cada paso posterior. |
 | 4 | todo artefacto que un asset obligatorio exige es entrada de alguna herramienta o está cubierto por una puerta que bloquea; ninguno depende sólo de que el agente lo recuerde | Bloqueado: hay una obligación sostenida sólo por texto. Ya se midió que seis de cada diez artefactos obligatorios no se creaban y nadie lo notaba. Se convierte en entrada de herramienta o en puerta con código de salida. |
 

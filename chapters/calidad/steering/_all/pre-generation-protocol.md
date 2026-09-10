@@ -1,6 +1,6 @@
 ---
 id: calidad-pre-generation-protocol
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: steering
 chapter: calidad
@@ -25,6 +25,10 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 1.5. **Solo en brownfield — barrer el repositorio y emitir el inventario (BLOCKER)**: ejecutar `[[calidad-repo-capability-discovery]]` y emitir `.evidence/repo-capability-map.md` (qué scripts, runbook, taxonomía de etiquetas, alcance del ejecutor e integraciones ya existen), más `.evidence/archetype-inventory.md` con la tabla de clasificación de steps (`[[calidad-brownfield-vs-greenfield]]`). **Sin ambos artefactos mostrados al usuario no se genera nada.** De aquí salen los comandos de ejecución y la taxonomía real: prohibido inventarlos.
 
    Emitir también el **checkpoint de datos de prueba** con validación cruzada contra el catálogo del proyecto (`[[calidad-mandatory-inputs-protocol]]`) y esperar confirmación.
+
+1.6. **Dictaminar la preparación del sistema, no sólo la llegada de los insumos (BLOCKER)**: emitir `.evidence/input-sufficiency.json` con `[[calidad-sut-readiness-gate]]`. La historia llega casi siempre y casi nunca basta: se evalúa **suficiencia entrada por entrada** y, en lo que falte, se nombra la pieza —no el documento—, de dónde puede venir y qué cuesta seguir sin ella. En front son obligatorios además el recorrido funcional (`[[calidad-functional-flow-input]]`, `.evidence/functional-flow.md`) y la declaración de fuentes de interfaz con el eje que cubre cada una (`[[calidad-ui-source-contract]]`, `.evidence/ui-sources.md`). Si el usuario decide arrancar igual, se arranca: queda registrado como riesgo aceptado con su cifra.
+
+1.7. **Resolver lo determinista con herramientas del proyecto, no con el razonamiento (BLOCKER)**: aplicar `[[calidad-deterministic-work-to-tooling]]` y emitir `.evidence/tooling-gaps.md`. Lo que el repositorio ya resuelve se usa; lo que no, se construye una vez, se documenta y se registra. Un hueco que no se puede cerrar se declara con lo que costaría y lo que ahorraría. Y cuando el objetivo es mock o híbrido, se lee antes el manifiesto de `[[calidad-pre-development-artifacts-continuity]]`: qué se hereda y qué se añade, porque reconstruir lo que ya existía es el desperdicio más caro de ese modo.
 
 2. **Ejecutar el pre-flight check del stack** invocando la reference `preflight.md` del skill greenfield correspondiente. Si falla → reportar y **degradar a `scaffold-only`** con razón documentada; no continuar a generación full.
 
