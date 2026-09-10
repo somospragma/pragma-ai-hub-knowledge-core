@@ -1,6 +1,6 @@
 ---
 id: calidad-pre-generation-protocol
-version: 1.2.0
+version: 1.3.0
 scope: chapter
 type: steering
 chapter: calidad
@@ -18,7 +18,7 @@ Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE,
 
 ## Pasos del protocolo
 
-0. **Leer la traza del pipeline y la bitácora** — Si el `output_path` ya existe, leer `.evidence/pipeline-state.json` y `.evidence/session-log.md` (`[[calidad-pipeline-state-tracking]]`) y ejecutar el ritual de apertura antes de tocar nada: fase actual, siguiente acción, bloqueos y `open_corrections` reafirmadas. Si no existen, crearlos. Continuar por su `next_action`, no por lo que parezca urgente.
+0. **Abrir con el estado, no con la tarea** — Ejecutar el comando de estado de sesión (`emit-session-state.py` de `[[calidad-delivery-gate-contract]]`): imprime fase actual, siguiente acción, bloqueos vigentes y correcciones a reafirmar, leyendo la traza y la bitácora. Si no hay traza, se crea antes de tocar nada. **Se continúa por su siguiente acción, no por lo que parezca urgente.** Detalle del contrato de traza en `[[calidad-pipeline-state-tracking]]`.
 
 1. **Confirmar mandatory inputs** (todos obligatorios, ninguno se asume) y **leer COMPLETO cada insumo entregado**, emitiendo la tabla de extracción: qué se extrajo de cada uno y dónde se usará (`[[calidad-mandatory-inputs-protocol]]`). **Un insumo sin fila es un insumo ignorado.** Como mínimo: `intent`, `project_name` en kebab-case, `output_path` absoluto, la fuente principal del stack, el **modo** de operación, `user_story` y `firma` declarados aunque sean nulos, y `risk_map` confirmado. K6 añade su checklist propio.
 

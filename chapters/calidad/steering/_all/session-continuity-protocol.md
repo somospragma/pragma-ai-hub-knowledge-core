@@ -1,6 +1,6 @@
 ---
 id: calidad-session-continuity-protocol
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: steering
 chapter: calidad
@@ -61,4 +61,6 @@ La regla: el traspaso es **estado, siguiente acción y punteros**, y no supera u
 - **NUNCA** reescribir, resumir ni compactar la bitácora: es append-only.
 - **NUNCA** dejar que el traspaso de una sesión absorba al de la anterior. Se apunta a la bitácora, no se la copia; si el traspaso creció respecto al previo, se recorta antes de cerrar.
 
-**Nota de enforcement**: esto es contexto, no configuración forzada. Cuando el IDE lo permita, respaldarlo con un hook de inicio de sesión que inyecte la traza; el protocolo lo hace probable, el hook lo hace seguro.
+**El ritual de apertura no se describe, se ejecuta.** Componer el reporte de estado a partir de la traza es determinista: lo imprime `emit-session-state.py` (`[[calidad-delivery-gate-contract]]`). Lo que queda aquí es la disciplina que ningún comando puede dar — cuándo cortar, qué no hacer nunca, y que el traspaso no crezca.
+
+**Nota de enforcement**: esto es contexto, no configuración forzada. El respaldo real es un hook de inicio de sesión que ejecute ese comando sin depender de que el agente lo recuerde; el protocolo lo hace probable, el hook lo hace seguro.

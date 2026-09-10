@@ -1,6 +1,6 @@
 ---
 id: calidad-delivery-gate-contract
-version: 1.9.0
+version: 2.0.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -180,6 +180,17 @@ Tres comprobaciones que no cuestan una corrida contra el sistema bajo prueba y q
 **0. La red que impide que todo esto se deshaga: los evals.** En `evals/evals.json` de este skill viven siete escenarios, y cada uno reproduce un fallo **real y medido** de una certificación auditada: no propagar entre plataformas, estabilizar de a un escenario teniendo el ejecutor por lotes, ejecutar sin leer la cadena, no congelar la cobertura, no contrastar historia y diseño, aceptar un waiver sin precio, y archivar un verde que pasa por ausencia.
 
 Si un eval pasa a rojo tras editar un asset, **esa edición deshizo una corrección que costó dinero**. Es la única forma de responder con datos —y no con teoría de grafos— si el conocimiento se aplica de verdad, y la única que detecta la regresión silenciosa dentro de seis meses.
+
+**2.5. Lo determinista de nuestro propio proceso también sale del razonamiento.** El chapter le exige al agente convertir en herramienta todo trabajo determinista y repetido; su capa de dirección debe cumplir lo mismo. En `scripts/` de este skill viajan cuatro comandos, y ninguno hay que construirlo:
+
+| Comando | Qué deja de hacer el agente a mano |
+|---|---|
+| `check-required-artifacts.py` | Comprobar presencia **y forma** de los artefactos obligatorios |
+| `emit-session-state.py` | Leer la traza y la bitácora para componer el reporte de apertura |
+| `build-evidence-index.py` | Escribir y mantener el índice de evidencia |
+| `check-coverage-delivered.py` | Cruzar la cobertura declarada contra la entregada |
+
+El segundo merece el número: en una entrega auditada, componer la apertura exigía leer una bitácora de 246 KB — unos **72 k tokens por sesión**. El comando devuelve kilobyte y medio. Nadie debería gastar razonamiento en resumir un archivo que un script resume igual y sin equivocarse.
 
 **3. Los artefactos obligatorios existen, y lo comprueba un comando que viene con el chapter.** Cada asset marcado como obligatorio prescribe artefactos. La comprobación **no es una autoevaluación del agente**: es un comando que verifica presencia y devuelve código de salida distinto de cero, enganchado al pre-commit del repositorio. Una obligación sostenida sólo por texto ya demostró no cumplirse.
 

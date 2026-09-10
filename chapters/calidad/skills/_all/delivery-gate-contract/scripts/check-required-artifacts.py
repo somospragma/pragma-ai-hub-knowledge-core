@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Puerta de artefactos obligatorios del chapter Calidad.
 
+Comprueba EXISTENCIA y FORMA. Validar que un campo esta es determinista y no debe
+gastarse en razonamiento del agente; lo que exige juicio va al verificador con
+contexto limpio, no aqui.
+
 Comprueba que existan los artefactos que los assets OBLIGATORIOS exigen y devuelve 1
 si falta alguno, para engancharse a un pre-commit o a la puerta de entrega sin depender
 de que nadie se acuerde. Autocontenido a proposito: un solo archivo, sin dependencias.
@@ -68,6 +72,65 @@ NO_ARTIFACT = {
 }
 
 
+# Forma esperada de cada artefacto. La puerta valida ESTRUCTURA, no solo existencia:
+# comprobar que un campo esta es determinista y no debe gastarse en razonamiento del
+# agente. Lo que exige juicio —si un criterio es convertible en asercion— no esta aqui:
+# eso es del verificador con contexto limpio.
+#   json: claves requeridas en la raiz, o en cada elemento si es lista (usar "[]" al frente)
+#   md:   marcadores que deben aparecer en el texto
+SHAPE = {
+    ".evidence/pipeline-state.json":        {"json": ["phases"]},
+    ".evidence/input-sufficiency.json":     {"json": ["[]", "input", "expected", "got", "missing", "action"]},
+    ".evidence/coverage-declared.json":     {"json": ["[]", "criterio", "plataformas", "escenario"]},
+    ".evidence/mock-manifest.json":         {"json": ["units", "contract_version", "design_system_version", "front_revision"]},
+    ".evidence/preflight.json":             {"json": ["probes"]},
+    ".evidence/execution-status.json":      {"json": ["status"]},
+    ".evidence/metadata.json":              {"json": ["run_id"]},
+    ".evidence/alm-publication.json":       {"json": ["cycle", "published"]},
+    ".evidence/coverage-declared-vs-delivered.json": {"json": ["declared", "delivered", "difference"]},
+    ".evidence/functional-flow.md":         {"md": ["pantalla", "bifurcaci", "intermitente", "desenlace", "precondici"]},
+    ".evidence/ui-sources.md":              {"md": ["flujo", "estructura", "procedencia"]},
+    ".evidence/tooling-gaps.md":            {"md": ["existe", "falta"]},
+    ".evidence/platform-learnings.md":      {"md": ["compartida", "espec"]},
+    ".evidence/alm-authorizations.md":      {"md": ["conteo"]},
+}
+
+
+def valida_forma(art: dict) -> str | None:
+    """Devuelve el motivo si la forma no cumple; None si esta bien."""
+    reglas = SHAPE.get(art["path"])
+    if not reglas:
+        return None
+    ruta = Path(art["path"])
+    try:
+        txt = ruta.read_text(encoding="utf-8")
+    except Exception as e:
+        return f"no se pudo leer ({e.__class__.__name__})"
+    if "json" in reglas:
+        try:
+            d = json.loads(txt)
+        except Exception:
+            return "no es JSON valido"
+        req = list(reglas["json"])
+        if req and req[0] == "[]":
+            req = req[1:]
+            if not isinstance(d, list):
+                d = d.get("items") or d.get("entries") or d
+            if not isinstance(d, list) or not d:
+                return "se esperaba una lista con al menos un elemento"
+            faltan = sorted({k for k in req if any(k not in e for e in d if isinstance(e, dict))})
+        else:
+            faltan = sorted(k for k in req if k not in (d if isinstance(d, dict) else {}))
+        if faltan:
+            return "faltan campos: " + ", ".join(faltan)
+    if "md" in reglas:
+        low = txt.lower()
+        faltan = [k for k in reglas["md"] if k not in low]
+        if faltan:
+            return "el documento no cubre: " + ", ".join(faltan)
+    return None
+
+
 def condiciones(ev: Path, forzadas: set[str]) -> set[str]:
     c = {"always"} | forzadas
     st = ev / "pipeline-state.json"
@@ -113,16 +176,23 @@ def main() -> int:
             continue
         ruta = Path(art["path"])
         existe = ruta.is_dir() if art.get("kind") == "dir" else ruta.is_file()
-        ok, faltan = (ok + 1, faltan) if existe else (ok, faltan + [art])
+        if not existe:
+            faltan.append(dict(art, _motivo="no existe"))
+            continue
+        motivo = valida_forma(art)
+        if motivo:
+            faltan.append(dict(art, _motivo=motivo))
+        else:
+            ok += 1
 
     print(f"Condiciones activas: {', '.join(sorted(activas))}")
     print(f"Artefactos verificados: {ok + len(faltan)}  ·  presentes: {ok}  ·  faltan: {len(faltan)}")
     if not faltan:
         print("\nPUERTA VERDE.")
         return 0
-    print("\nPUERTA ROJA — faltan artefactos que un asset obligatorio exige:\n")
+    print("\nPUERTA ROJA — artefactos ausentes o con forma incompleta:\n")
     for art in faltan:
-        print(f"  {art['path']}\n      lo exige : {art['by']}\n      para que : {art['why']}\n")
+        print(f"  {art['path']}  [{art.get('_motivo','no existe')}]\n      lo exige : {art['by']}\n      para que : {art['why']}\n")
     print("Un artefacto obligatorio que nunca se crea es una regla que no existe.")
     return 1
 

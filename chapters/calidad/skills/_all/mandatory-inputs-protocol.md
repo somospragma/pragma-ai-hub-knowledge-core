@@ -1,6 +1,6 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 2.0.0
+version: 2.1.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -80,6 +80,12 @@ Cuando la entrega es web o móvil, dos entradas más, cada una con su asset y su
 
 - **El recorrido funcional detallado** — `[[calidad-functional-flow-input]]`. Secuencia de pantallas, bifurcaciones **con la condición que las dispara**, pantallas intermitentes, desenlaces con su copy y su duración, y precondiciones. Puede vivir en la historia o aparte; lo que no puede es no existir.
 - **Las fuentes de interfaz** — `[[calidad-ui-source-contract]]`. `ui_source` no es una fuente sino una familia, y cada miembro responde una pregunta distinta: el diseño estático da el flujo y los copys pero no el árbol; el design system da el árbol pero no el flujo. Se declara **cuál cubre el eje de flujo y cuál el de estructura**.
+
+### Lo que valida la máquina no lo razona el agente
+
+Buena parte de este contrato es **forma, no criterio**: que el nombre de proyecto cumpla su patrón, que la ruta de salida sea absoluta, que el spec llegue como contenido y no como ruta, que cada entrada del dictamen traiga sus campos. Eso lo comprueba la puerta —que valida estructura además de existencia— y **no debe gastarse en razonamiento**, igual que le exigimos al agente con las corridas.
+
+Lo que sí exige juicio y no puede validarse por esquema es una lista corta: si un criterio de aceptación se puede convertir en aserción, si una fuente responde el eje que se le pide, y si lo que falta bloquea o se acepta con precio. Eso va al verificador con contexto limpio (`[[calidad-fresh-context-verification]]`), no a la autoevaluación de quien acaba de escribirlo.
 
 ### El dictamen de suficiencia
 
