@@ -1,6 +1,6 @@
 ---
 id: calidad-route-test-generation
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: workflow
 chapter: calidad
@@ -78,6 +78,38 @@ Si el intent es **funcional**, el router bifurca aquí y delega directo — los 
 | Analizar / refinar HUs | `[[calidad-analyze-and-refine-stories]]` |
 | Diseñar casos de prueba de alto nivel (y publicarlos al ALM) | `[[calidad-design-test-cases]]` |
 | Estrategia y/o plan de pruebas | `[[calidad-build-test-strategy-and-plan]]` |
+| Analizar historias para poder probarlas y decir qué datos y accesos hacen falta | `[[calidad-analyze-stories-and-request-data]]` |
+
+#### Una generación NUNCA entra en la ruta de análisis
+
+Las dos rutas comparten insumo —las historias— y no se llaman entre sí. La bifurcación es
+excluyente y se decide **una sola vez**, aquí, por el intent:
+
+| El usuario pide | Ruta | Entregable |
+|---|---|---|
+| "automatiza esta funcionalidad", "genera los tests de esta historia" | **Generación**. Sigue en el paso 2.5 | Código de pruebas ejecutable |
+| "analiza estas historias", "qué datos hay que pedir", "qué necesitamos para certificar esto" | **Análisis**. Bifurca y sale | Dossier por historia y solicitud de datos |
+
+**Que a una generación le falten datos no la convierte en un análisis.** La solicitud de
+datos al cliente es trabajo **previo**, con un ciclo propio de días, y tomarla en medio de
+una generación detiene la entrega para hacer algo que no se resuelve en esta sesión ni en la
+siguiente. Lo que hace el router cuando la generación se topa con datos que faltan es lo que
+ya tenía:
+
+1. El gate de datos de `[[calidad-test-data-management]]` comunica al QA **qué estado falta,
+   con dueño y fecha** — hacia adentro, en el chat, no como documento formal.
+2. Si el dato depende del cliente, es un **bloqueo con fecha** que se reporta y se planifica;
+   el agente no abre por su cuenta una solicitud formal al cliente.
+3. Si la funcionalidad **nunca pasó por análisis**, se dice con esas palabras y se ofrece la
+   otra ruta como trabajo aparte. No se hace el análisis en mitad de la generación.
+
+Al revés también: **la ruta de análisis no genera código**. Sus pasos 2.5 a 7, los gates de
+ejecución y el contrato de smoke no le aplican, igual que al resto de la ruta funcional.
+
+**Marca en la traza.** La ruta de análisis escribe `"route": "analisis-y-datos"` en
+`.evidence/pipeline-state.json`, y es lo único que activa sus artefactos obligatorios en la
+puerta de `[[calidad-delivery-gate-contract]]`. Una generación nunca la escribe, así que
+nunca se le exigen. La condición se declara; no se deduce del nombre de la fase.
 
 Reglas de la ruta:
 

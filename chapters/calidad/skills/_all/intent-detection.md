@@ -53,6 +53,14 @@ Señales que **no** desambiguan por sí solas: "Appium", "mobile", "Android", "i
 
 **Repos híbridos web y mobile**: un mismo repositorio puede necesitar dos stacks a la vez —por ejemplo, navegador con Playwright y app nativa con Appium TypeScript, orquestados por un único cucumber-js—. En ese caso se entregan **ambos** bundles y las convenciones comunes de la capa Cucumber vienen de `[[calidad-cucumber-bdd-conventions]]`. No se fuerza un stack único ni se ignora la mitad del repositorio.
 
+**La palabra que decide: automatizar.** Antes de mirar cualquier otra señal, comprueba si el
+intent pide **producir pruebas ejecutables** sobre algo. Si lo pide —"automatiza", "genera
+los tests", "agrega escenarios", "extiende la suite"— la ruta es de **generación** y no entra
+en la de análisis, aunque el intent nombre historias, aunque falten datos y aunque nadie haya
+analizado nunca esa funcionalidad. Pedir datos al cliente es trabajo previo con un ciclo de
+días: no se toma en mitad de una generación. Lo que se hace en ese caso está en el paso de
+bifurcación de `[[calidad-route-test-generation]]`.
+
 **Desambiguación dentro de lo funcional**: las dos rutas funcionales parten de historias y
 terminan en cosas distintas. `[[calidad-analyze-and-refine-stories]]` **juzga la historia**
 —INVEST, calidad de criterios, Definition of Ready— y puede proponer reescribirla.
@@ -60,6 +68,11 @@ terminan en cosas distintas. `[[calidad-analyze-and-refine-stories]]` **juzga la
 Calidad necesita para poder probarla: el dossier por historia y la solicitud de datos. La
 pregunta que decide: ¿el entregable es un veredicto sobre la historia, o los insumos para
 trabajar sobre ella? Si la historia está rota, la primera va antes que la segunda.
+
+Y las tres rutas son **secuenciales en el tiempo, no alternativas dentro de una sesión**: se
+refina la historia, se analiza y se consiguen los datos, y **cuando los datos están** se
+automatiza. Un intent que llega en el tercer momento no retrocede a los dos anteriores por su
+cuenta: si algo de lo previo falta, se dice y se ofrece como trabajo aparte.
 
 **Desambiguación "pruebas funcionales"**: si el intent pide *generar/automatizar* pruebas funcionales de una API (hay spec, endpoints, "automatiza") → Karate. Si pide *diseñar, documentar o gestionar* — analizar HUs, escribir casos de alto nivel, plan, estrategia — → stack funcional. Ante la duda, la pregunta es: "¿el entregable es código de pruebas ejecutable, o documentos/casos en el ALM?". El camino natural completo es funcional primero (diseño) y automatización después (los casos diseñados alimentan a los stacks).
 

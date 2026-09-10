@@ -40,6 +40,13 @@ Antes de escribir la primera línea de cualquier análisis, diseño de casos o s
 datos que parta de historias. Es la primera compuerta de
 `[[calidad-analyze-stories-and-request-data]]`.
 
+> **No aplica a la ruta de generación.** Un intent de automatización no pasa por aquí,
+> aunque nombre historias y aunque falten datos: las dos rutas se excluyen y la bifurcación
+> la decide el router una sola vez (`[[calidad-route-test-generation]]`). Sus artefactos
+> obligatorios se activan solo con `"route": "analisis-y-datos"` en la traza, que únicamente
+> escribe el workflow de análisis.
+
+
 ## Instrucción
 
 ### 1. Las tres fuentes, y ninguna es opcional

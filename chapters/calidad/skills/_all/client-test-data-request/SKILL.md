@@ -38,14 +38,28 @@ prosa, cada uno de esos cambios costó reescribir el documento entero.
 
 ## Cuándo aplicar
 
-Siempre que el trabajo de calidad dependa de datos que solo el cliente puede habilitar:
-usuarios, productos, estados de sistema de origen, permisos de canal. Es decir, en toda
-certificación contra un ambiente real que no sea del propio equipo.
+**Solo dentro de la ruta de análisis** (`[[calidad-analyze-stories-and-request-data]]`), y
+después de tener las historias descargadas íntegras (`[[calidad-story-evidence-baseline]]`) y
+el análisis por historia (`[[calidad-story-quality-analysis-artifacts]]`): la solicitud se
+deriva de los criterios, no de la lectura general de un backlog.
 
-Se aplica **después** de tener las historias descargadas íntegras
-(`[[calidad-story-evidence-baseline]]`) y el análisis por historia
-(`[[calidad-story-quality-analysis-artifacts]]`), porque la solicitud se deriva de los
-criterios, no de la lectura general de un backlog.
+### Cuándo NO aplicar, que es lo que más se confunde
+
+**Una generación no abre una solicitud de datos.** Si a una automatización le faltan datos
+del cliente, esto no es lo que se invoca:
+
+| Situación | Qué se hace | Con qué |
+|---|---|---|
+| Automatizando, y falta un estado de dato | Se le dice al QA qué estado falta, con dueño y fecha, en el chat | `[[calidad-test-data-management]]` (`references/data-sufficiency-gate.md`) |
+| Automatizando, y el dato depende del cliente | Se declara **bloqueo con fecha**, se reporta y se planifica | `[[calidad-sut-readiness-gate]]`, delivery gate |
+| Automatizando algo que nunca se analizó | Se dice con esas palabras y se ofrece la ruta de análisis como trabajo aparte | `[[calidad-route-test-generation]]` |
+
+La diferencia no es de formato sino de **ciclo**: una solicitud formal al cliente tarda días
+y no se resuelve dentro de la sesión que la abrió. Tomarla en mitad de una generación detiene
+la entrega sin desbloquear nada. Es trabajo previo, y previo quiere decir antes.
+
+> Sus artefactos obligatorios se activan solo con `"route": "analisis-y-datos"` en la traza,
+> que únicamente escribe el workflow de análisis. Una generación nunca los ve exigidos.
 
 ## Lectura obligatoria antes de emitir
 

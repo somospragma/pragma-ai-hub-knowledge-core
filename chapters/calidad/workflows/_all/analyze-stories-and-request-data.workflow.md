@@ -1,6 +1,6 @@
 ---
 id: calidad-analyze-stories-and-request-data
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: workflow
 chapter: calidad
@@ -18,9 +18,23 @@ solicitud de datos", "qué necesitamos para certificar este alcance".
 
 No es `[[calidad-analyze-and-refine-stories]]`, que juzga la historia contra INVEST y la
 Definition of Ready y propone reescrituras. Éste da por buena la historia como está y
-produce lo que Calidad necesita para trabajar sobre ella. El camino natural es análisis
-funcional primero si la historia está rota, este workflow después, y la automatización al
-final.
+produce lo que Calidad necesita para trabajar sobre ella.
+
+## Cuándo NO usar
+
+**Cuando el intent es automatizar.** Este workflow es trabajo **previo** a que una
+funcionalidad entre en un flujo de automatización, y las dos rutas se excluyen: el router
+bifurca una sola vez y no vuelve (`[[calidad-route-test-generation]]`).
+
+Que a una generación le falten datos no la trae aquí. La solicitud formal al cliente tarda
+días y no se resuelve en la sesión que la abre; tomarla en mitad de una entrega la detiene
+sin desbloquear nada. Lo que hace una generación con datos que faltan es comunicarlo al QA
+con dueño y fecha (`[[calidad-test-data-management]]`) y, si depende del cliente, declararlo
+bloqueo con fecha. Si la funcionalidad nunca pasó por aquí, se dice y se ofrece este
+workflow como trabajo aparte.
+
+Los tres momentos son secuenciales: se refina la historia si está rota, se analiza y se
+consiguen los datos, y **cuando los datos están** se automatiza.
 
 ## Inputs
 
@@ -45,7 +59,13 @@ completo de la ruta está en `[[calidad-mandatory-inputs-protocol]]`.
 Si `output_path/.evidence/` ya existe, leer la traza y la bitácora y abrir la respuesta con
 fase, siguiente acción, bloqueos y correcciones vigentes
 (`[[calidad-session-continuity-protocol]]`, `[[calidad-pipeline-state-tracking]]`). Si no
-existen, se crean **antes** de tocar nada. En la sesión medida no se crearon hasta la tercera
+existen, se crean **antes** de tocar nada.
+
+La traza de esta ruta declara `"route": "analisis-y-datos"`. No es decorativo: es lo único
+que activa los artefactos obligatorios de esta fase en la puerta de
+`[[calidad-delivery-gate-contract]]`. Sin esa marca no se comprueban, y con ella puesta en
+una generación se exigirían artefactos que esa entrega no tiene por qué producir — por eso
+la escribe este workflow y ningún otro. En la sesión medida no se crearon hasta la tercera
 sesión, y las correcciones del usuario se reafirmaron de memoria.
 
 ### Paso 1 — Contrato de entrada
@@ -123,3 +143,4 @@ autorizada.
 - [ ] Cero derivables y cero ítems de otro dueño en la solicitud al cliente.
 - [ ] Escrituras al gestor: solo las autorizadas, con su ficha y su conteo.
 - [ ] Traza y bitácora al día, con el punto de retome escrito.
+- [ ] La traza declara `route: analisis-y-datos`, y no se generó una línea de código de pruebas.

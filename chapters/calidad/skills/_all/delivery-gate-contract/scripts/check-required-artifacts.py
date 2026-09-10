@@ -13,6 +13,11 @@ de que nadie se acuerde. Autocontenido a proposito: un solo archivo, sin depende
 
 Condiciones: always, analysis, front, brownfield, multiplatform, executed, mock, delivery.
 Se deducen de .evidence/pipeline-state.json cuando es posible; se fuerzan con --when.
+
+`analysis` es la excepcion: NO se deduce, se declara con `"route": "analisis-y-datos"`.
+Es la ruta previa a que exista codigo —analizar historias y pedir datos al cliente— y sus
+artefactos no tienen nada que ver con una generacion. Deducirla de un nombre de fase la
+activaba en cualquier automatizacion cuya primera fase se llama "diseno".
 """
 from __future__ import annotations
 import argparse, json, sys
@@ -156,16 +161,18 @@ def condiciones(ev: Path, forzadas: set[str]) -> set[str]:
             c.add("brownfield")
         if '"mock"' in blob or '"hybrid"' in blob:
             c.add("mock")
+        # La ruta de analisis se DECLARA, no se deduce. Deducirla del nombre de fase
+        # activaba sus artefactos en cualquier generacion cuya primera fase se llama
+        # "diseno", y la puerta acababa exigiendo una solicitud de datos al cliente en
+        # medio de una automatizacion. Solo la escribe el workflow de analisis.
+        ruta = str(d.get("route") or d.get("ruta") or "").lower()
+        if ruta in ("analisis-y-datos", "analysis-and-data"):
+            c.add("analysis")
         fases = {f.get("id"): f.get("status") for f in d.get("phases", []) if isinstance(f, dict)}
         if fases.get("smoke_gate") or fases.get("suite_executed"):
             c.add("executed")
         if fases.get("delivery_gate"):
             c.add("delivery")
-        # La fase de analisis es la unica que puede correr sin que exista codigo todavia:
-        # se deduce del nombre de fase, no de un artefacto de ejecucion.
-        fase = str(d.get("fase") or d.get("phase") or "").lower()
-        if "analisis" in fase or "diseno" in fase or "refinamiento" in blob or fases.get("analisis"):
-            c.add("analysis")
         plats = d.get("platforms") or d.get("plataformas") or []
         if isinstance(plats, list) and len(plats) > 1:
             c.add("multiplatform")
