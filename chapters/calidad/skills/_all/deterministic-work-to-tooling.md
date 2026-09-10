@@ -1,6 +1,6 @@
 ---
 id: calidad-deterministic-work-to-tooling
-version: 1.3.0
+version: 1.4.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -119,6 +119,29 @@ Y cuando la entrega es pre-desarrollo, cuatro más — ver `[[calidad-pre-develo
 La segunda merece énfasis porque es la que más se hace mal: **leer un repositorio de front con el modelo cuesta más que todo lo que ahorra**, y lo leído se sigue pagando el resto de la sesión. El extractor recorre; el agente lee el delta.
 
 Ninguna de las nueve requiere criterio. Las nueve se hacían a mano.
+
+Y cuando la entrega **empieza por historias y todavía no hay código** —analizar un alcance,
+decir qué datos hacen falta, pedirlos al cliente— hay cinco más. Ver
+`[[calidad-analyze-stories-and-request-data]]`:
+
+| Capacidad | Qué reemplaza | Veredicto que devuelve |
+|---|---|---|
+| **Normalizar las historias a disco** | transcribir cada historia a markdown, una por una | archivos escritos y dictamen de qué fuente falta en cuál |
+| **Armar el dossier de análisis** | escribir a mano la cabecera y la leyenda idénticas en decenas de archivos | rutas creadas, índice del lote, y qué queda por escribir con criterio |
+| **Inventariar criterios de aceptación** | releer cada historia para enumerarlos | una fila por criterio, con su historia y su origen |
+| **Cruzar criterios contra datos** | comprobar de memoria si cada caso tiene con qué ejecutarse | criterios sin dato, datos huérfanos, derivables colados. **Bloquea** |
+| **Renderizar la solicitud al cliente** | reescribir el documento entero por cada corrección de forma | el markdown emitido desde la fuente de datos |
+
+La aritmética de esta fase, medida en una sesión real de trece historias y 133.66 créditos:
+**el 37% se fue reescribiendo documentos que ya estaban en disco, sin consultar una sola
+fuente**, y otro tanto en transcripción mecánica. La causa raíz no era falta de conocimiento
+sino una decisión de formato — la solicitud se trataba como prosa, así que cada corrección
+obligaba a reescribirla entera. Declararla como datos y renderizarla convierte esos turnos
+en ediciones de una línea.
+
+Las dos últimas son además el ejemplo canónico del punto 7: **el renderizador no emite si el
+cruce no pasa**. La auditoría dejó de ser algo que una persona tenía que exigir —lo exigió
+dos veces, la segunda después del fallo— y pasó a ser una dependencia de la salida.
 
 ### 7. La forma fuerte: el artefacto es entrada de la herramienta, no una obligación que se comprueba
 

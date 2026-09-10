@@ -1,6 +1,6 @@
 ---
 id: calidad-mandatory-inputs-protocol
-version: 2.1.0
+version: 2.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -160,6 +160,20 @@ Reglas duras:
 ### Inputs para la ruta funcional
 
 Los intents funcionales (análisis/refinamiento de HUs, diseño de casos, estrategia/plan) NO usan la tabla de arriba: su contrato de entrada lo define cada workflow funcional (`[[calidad-analyze-and-refine-stories]]`, `[[calidad-design-test-cases]]`, `[[calidad-build-test-strategy-and-plan]]`). Común a los tres: `stories_source`/`contexto_fuente` (IDs o queries del ALM vía `[[calidad-alm-mcp-integration]]`, o el contenido pegado) y `output_path`. `spec`, `sut_available` y `locator_map` no aplican salvo que el flujo derive en automatización (re-entrada al router).
+
+**Que no usen la tabla de arriba no significa que no tengan contrato.** Durante mucho tiempo eso se leyó como que la ruta funcional no tenía compuerta de entrada, y el resultado fue que toda la maquinaria de suficiencia de este documento se quedó del lado de la automatización — mientras la fase que decide qué se va a poder probar arrancaba sin declarar nada.
+
+El contrato de `[[calidad-analyze-stories-and-request-data]]` —la ruta que va de las historias a la solicitud de datos— añade cinco entradas propias. Las cinco son las que faltaron en la sesión medida, y cada una produjo su turno de reproceso:
+
+| Input | Qué es | Lo que cuesta que falte |
+|---|---|---|
+| `fuentes_de_arquitectura` | Dónde vive la arquitectura de estos componentes **en esta cuenta**, o la declaración de que no existe | El agente la busca en la herramienta que suele funcionar en otros clientes. Un turno |
+| `mapa_de_capas` | Qué repositorio prueba qué capa en esta cuenta | La estrategia reparte los criterios por dónde se ven, no por dónde viven. Un turno |
+| `ambiente_objetivo` | A qué ambiente se refieren los datos | Una solicitud sin ambiente es una que alguien puede ejecutar en producción |
+| `audiencia_de_la_solicitud` | Quién recibe el documento y qué conoce | Se escribe para quien conoce las historias, y lo recibe quien no. Reescritura completa |
+| `capacidades_de_qa` | Qué puede provisionar el equipo por su cuenta en este producto | Se le piden al cliente datos que el equipo se crea solo. Dos turnos |
+
+Las cinco son **conocimiento de la cuenta**, no del chapter: se consultan antes de empezar. Si la cuenta no las tiene documentadas, preguntarlas una vez y registrarlas ahí es lo que hace que dejen de costar. Y aplica la misma regla que al resto del contrato: se evalúa **suficiencia**, y lo que falte se nombra por la pieza — "no sé qué repositorio prueba la capa de servicios" es accionable; "falta contexto" no.
 
 Cruce con la `user_story` de esta tabla: si la HU entregada como input de automatización está visiblemente rota (sin CA, ambigua), ofrecer el análisis funcional (`[[calidad-funcional-story-analysis]]`) ANTES de generar código — mejora el insumo en vez de generar sobre él.
 

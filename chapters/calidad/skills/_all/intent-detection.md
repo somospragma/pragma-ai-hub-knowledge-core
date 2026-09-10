@@ -1,6 +1,6 @@
 ---
 id: calidad-intent-detection
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -36,6 +36,7 @@ Esta skill decide **con qué framework** se generan las pruebas. La decisión de
 | Appium JVM (`appium-serenity`) | "mobile", "Android", "app", "Appium", "Screenplay mobile", "APK", "app_package", "app_activity", "Serenity", "Gradle" | "proyecto existente", "agregar escenarios", "ya tenemos suite mobile" | greenfield → `[[calidad-appium-screenplay-android]]` · brownfield → `[[calidad-appium-brownfield]]` |
 | Appium TypeScript (`appium-wdio`) | "mobile" + "TypeScript"/"WebdriverIO"/"WDIO"/"cucumber-js"/"Node", "iPad", "tablet", "web móvil", "app y navegador móvil" | "proyecto existente", "actualizar selectores", "agregar plataforma" | greenfield → `[[calidad-appium-wdio-greenfield]]` · brownfield → `[[calidad-appium-wdio-brownfield]]` |
 | Funcional  | "analizar historia", "HU", "INVEST", "criterios de aceptación", "refinamiento", "refinar", "casos de prueba" (diseño, no código), "test cases", "test plan", "plan de pruebas", "estrategia de pruebas", "matriz de trazabilidad", "Azure DevOps"/"Jira" como fuente de HUs | (no aplica greenfield/brownfield)                                 | análisis/refinamiento → `[[calidad-analyze-and-refine-stories]]` · diseño de casos → `[[calidad-design-test-cases]]` · estrategia/plan → `[[calidad-build-test-strategy-and-plan]]` |
+| Funcional (previo a automatizar) | "qué datos necesito", "qué datos y accesos solicitar", "solicitud de datos", "qué le pedimos al cliente/banco", "analiza estas HU para probarlas", "qué necesitamos para certificar este alcance" | (no aplica greenfield/brownfield) | `[[calidad-analyze-stories-and-request-data]]` |
 
 **Todo intent mobile requiere `appium-core`**, sea cual sea el stack de producto: ahí vive el conocimiento que no depende del lenguaje (resolución de locators, Flutter, catálogo de interacciones, auto-discovery de binario). No es un stack que el usuario elija: es el compañero obligatorio. Si no está instalado, decláralo como carencia antes de generar.
 
@@ -51,6 +52,14 @@ Esta skill decide **con qué framework** se generan las pruebas. La decisión de
 Señales que **no** desambiguan por sí solas: "Appium", "mobile", "Android", "iOS". Aparecen en los dos stacks.
 
 **Repos híbridos web y mobile**: un mismo repositorio puede necesitar dos stacks a la vez —por ejemplo, navegador con Playwright y app nativa con Appium TypeScript, orquestados por un único cucumber-js—. En ese caso se entregan **ambos** bundles y las convenciones comunes de la capa Cucumber vienen de `[[calidad-cucumber-bdd-conventions]]`. No se fuerza un stack único ni se ignora la mitad del repositorio.
+
+**Desambiguación dentro de lo funcional**: las dos rutas funcionales parten de historias y
+terminan en cosas distintas. `[[calidad-analyze-and-refine-stories]]` **juzga la historia**
+—INVEST, calidad de criterios, Definition of Ready— y puede proponer reescribirla.
+`[[calidad-analyze-stories-and-request-data]]` **da la historia por buena** y produce lo que
+Calidad necesita para poder probarla: el dossier por historia y la solicitud de datos. La
+pregunta que decide: ¿el entregable es un veredicto sobre la historia, o los insumos para
+trabajar sobre ella? Si la historia está rota, la primera va antes que la segunda.
 
 **Desambiguación "pruebas funcionales"**: si el intent pide *generar/automatizar* pruebas funcionales de una API (hay spec, endpoints, "automatiza") → Karate. Si pide *diseñar, documentar o gestionar* — analizar HUs, escribir casos de alto nivel, plan, estrategia — → stack funcional. Ante la duda, la pregunta es: "¿el entregable es código de pruebas ejecutable, o documentos/casos en el ALM?". El camino natural completo es funcional primero (diseño) y automatización después (los casos diseñados alimentan a los stacks).
 

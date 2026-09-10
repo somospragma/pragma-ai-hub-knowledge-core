@@ -1,6 +1,6 @@
 ---
 id: calidad-chapter-entry-point
-version: 1.0.0
+version: 1.1.0
 scope: chapter
 type: steering
 chapter: calidad
@@ -63,6 +63,12 @@ Cualquier solicitud de **generar pruebas**, sea cual sea el framework, entra por
 `[[calidad-route-test-generation]]`. Es el único punto de entrada de generación
 y decide stack, modo y cadena de workflows. No elijas el framework por tu cuenta.
 
+Cuando el trabajo **empieza por historias y no por código** —analizar un alcance, decir qué
+datos y accesos hacen falta, preparar la solicitud al cliente— el recorrido es
+`[[calidad-analyze-stories-and-request-data]]`, y produce la evidencia de la que después vive
+la generación. Analizar desde el resumen del ticket, o escribir la solicitud como prosa, son
+los dos fallos que más reproceso han costado en esa fase.
+
 ## Compuertas: la pregunta que hay que contestar antes de seguir
 
 Cada fila es un momento en el que **no se avanza sin contestar la pregunta**.
@@ -73,6 +79,10 @@ El documento de la derecha es donde está el procedimiento completo.
 |---|---|---|
 | Abrir sesión sobre un `output_path` con evidencia | ¿Dónde quedó el proceso y cuál es su `next_action`? | `[[calidad-pipeline-state-tracking]]` |
 | Antes del primer archivo | ¿Está cada insumo obligatorio presente y leído completo, con su fila en la tabla de extracción? | `[[calidad-mandatory-inputs-protocol]]` |
+| Antes de analizar una historia | ¿Está descargada íntegra, con sus dependencias y su arquitectura, o declarada la ausencia y dónde se buscó? | `[[calidad-story-evidence-baseline]]` |
+| Antes de escribir el análisis | ¿Existe la carpeta de esta historia con sus tres archivos, generada desde las plantillas? | `[[calidad-story-quality-analysis-artifacts]]` |
+| Antes de escribir cualquier duda, dato o bloqueo | ¿Quién lo resuelve, y por qué canal? | `[[calidad-responsibility-routing-of-blockers]]` |
+| Antes de emitir una solicitud de datos al cliente | ¿Tiene cada criterio un dato que lo habilite, o una justificación declarada de por qué no? | `[[calidad-client-test-data-request]]` |
 | Brownfield, antes de escribir | ¿Qué resuelve ya el repositorio, y dónde mide calidad? | `[[calidad-repo-capability-discovery]]` |
 | Antes de convertir un texto en localizador o aserción | ¿Este texto es estático, de formato invariante, volátil o dato controlado? | `[[calidad-data-volatility-and-assertion-anchoring]]` |
 | Antes de cualquier ejecución | ¿El preflight está verde y el comando salió del repositorio? | `[[calidad-execution-preflight]]` |

@@ -11,7 +11,7 @@ de que nadie se acuerde. Autocontenido a proposito: un solo archivo, sin depende
 
     python3 check-required-artifacts.py [--evidence .evidence] [--when X] [--all]
 
-Condiciones: always, front, brownfield, multiplatform, executed, mock, delivery.
+Condiciones: always, analysis, front, brownfield, multiplatform, executed, mock, delivery.
 Se deducen de .evidence/pipeline-state.json cuando es posible; se fuerzan con --when.
 """
 from __future__ import annotations
@@ -41,6 +41,14 @@ REQUIRED = [
     {"path": ".evidence/coverage-declared-vs-delivered.json", "when": "delivery", "by": "calidad-delivery-gate-contract",      "why": "lo prometido contra lo entregado"},
     {"path": ".evidence/generation-manifest.json","when": "delivery",    "by": "calidad-delivery-gate-contract",              "why": "que se genero contra que criterio"},
     {"path": ".evidence/verification",          "when": "always",       "by": "calidad-fresh-context-verification",          "why": "lo que ninguna puerta puede comprobar lo revisa alguien sin el sesgo de quien lo hizo", "kind": "dir"},
+    # --- fase de analisis: lo previo a que exista una linea de codigo ---
+    {"path": ".evidence/historias",             "when": "analysis",      "by": "calidad-story-evidence-baseline",             "why": "la historia integra: analizar desde el resumen del ticket obliga a rehacer el analisis", "kind": "dir"},
+    {"path": ".evidence/story-sources.json",    "when": "analysis",      "by": "calidad-story-evidence-baseline",             "why": "de que fuentes se alimenta cada historia, y cual falta con su razon"},
+    {"path": ".evidence/analisis",              "when": "analysis",      "by": "calidad-story-quality-analysis-artifacts",    "why": "un dossier por historia: dudas, estrategia y datos, autocontenidos", "kind": "dir"},
+    {"path": ".evidence/ca-inventory.json",     "when": "analysis",      "by": "calidad-client-test-data-request",            "why": "inventario de criterios: sin el, la cobertura de datos se audita de memoria"},
+    {"path": ".evidence/data-request.json",     "when": "analysis",      "by": "calidad-client-test-data-request",            "why": "la solicitud como datos; el markdown es salida, no fuente"},
+    {"path": ".evidence/data-coverage-audit.json","when": "analysis",    "by": "calidad-client-test-data-request",            "why": "el cruce criterio a dato que condiciona la emision de la solicitud"},
+    {"path": ".evidence/SOLICITUD-DATOS.md",    "when": "analysis",      "by": "calidad-client-test-data-request",            "why": "la solicitud emitida: el ticket es el canal, el repositorio es el registro"},
     # --- cierre A: los obligatorios que si producen artefacto ---
     {"path": ".evidence/execution-status.json", "when": "executed",      "by": "calidad-environment-blocker-evidence",        "why": "un bloqueo de ambiente afirmado sin evidencia ya cerro una entrega en falso"},
     {"path": ".evidence/session-config.json",   "when": "always",        "by": "calidad-post-generation-execution-prompt",    "why": "modo de operacion y presupuesto de sesion declarados, no supuestos"},
@@ -93,6 +101,10 @@ SHAPE = {
     ".evidence/tooling-gaps.md":            {"md": ["existe", "falta"]},
     ".evidence/platform-learnings.md":      {"md": ["compartida", "espec"]},
     ".evidence/alm-authorizations.md":      {"md": ["conteo"]},
+    ".evidence/story-sources.json":         {"json": ["[]", "hu", "archivo", "criterios", "completo"]},
+    ".evidence/ca-inventory.json":          {"json": ["[]", "hu", "ca", "texto"]},
+    ".evidence/data-request.json":          {"json": ["meta", "familias", "items", "fuera_de_la_solicitud"]},
+    ".evidence/data-coverage-audit.json":   {"json": ["status", "ca_total", "ca_con_dato"]},
 }
 
 
@@ -149,6 +161,11 @@ def condiciones(ev: Path, forzadas: set[str]) -> set[str]:
             c.add("executed")
         if fases.get("delivery_gate"):
             c.add("delivery")
+        # La fase de analisis es la unica que puede correr sin que exista codigo todavia:
+        # se deduce del nombre de fase, no de un artefacto de ejecucion.
+        fase = str(d.get("fase") or d.get("phase") or "").lower()
+        if "analisis" in fase or "diseno" in fase or "refinamiento" in blob or fases.get("analisis"):
+            c.add("analysis")
         plats = d.get("platforms") or d.get("plataformas") or []
         if isinstance(plats, list) and len(plats) > 1:
             c.add("multiplatform")

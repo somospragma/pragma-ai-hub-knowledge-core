@@ -131,6 +131,10 @@ def main() -> int:
         ".evidence/preflight/initial-screen.png", ".evidence/prototype-acceptance.json",
         ".evidence/locators-discovered.json", ".evidence/audit-log-20260604.md",
         ".evidence/execution-log-20260604.json",
+        # Solo existe cuando alguna historia del lote trae fuente de arquitectura. Que la
+        # haya, o por que no la hay, ya lo declara story-sources.json, que si esta en la
+        # lista: exigir la carpeta haria fallar en falso a un lote sin arquitectura escrita.
+        ".evidence/arquitectura",
     }
     if MANIFIESTO.is_file():
         declarados = set(re.findall(r'"path":\s*"([^"]+)"', MANIFIESTO.read_text(encoding="utf-8")))
