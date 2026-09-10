@@ -38,28 +38,45 @@ prosa, cada uno de esos cambios costó reescribir el documento entero.
 
 ## Cuándo aplicar
 
-**Solo dentro de la ruta de análisis** (`[[calidad-analyze-stories-and-request-data]]`), y
-después de tener las historias descargadas íntegras (`[[calidad-story-evidence-baseline]]`) y
-el análisis por historia (`[[calidad-story-quality-analysis-artifacts]]`): la solicitud se
-deriva de los criterios, no de la lectura general de un backlog.
+Cuando la fase de análisis determina que **algún criterio exige un dato que solo el cliente
+puede habilitar** — usuarios, productos, estados del sistema de origen, permisos de canal.
 
-### Cuándo NO aplicar, que es lo que más se confunde
+Eso ocurre en las dos rutas: en una corrida de solo análisis, y **también dentro de una
+generación**, porque una automatización determina qué dato exige cada criterio antes de
+escribir código. Lo que cambia no es si se hace, sino qué pasa después: en solo análisis la
+entrega termina aquí; en una generación la solicitud queda abierta y el trabajo sigue por la
+vía que corresponda.
 
-**Una generación no abre una solicitud de datos.** Si a una automatización le faltan datos
-del cliente, esto no es lo que se invoca:
+Se aplica después de tener las historias descargadas íntegras
+(`[[calidad-story-evidence-baseline]]`) y el análisis por historia
+(`[[calidad-story-quality-analysis-artifacts]]`): la solicitud se deriva de los criterios, no
+de la lectura general de un backlog.
 
-| Situación | Qué se hace | Con qué |
+### Cuándo NO aplicar
+
+- **Cuando ningún dato depende del cliente.** Si todo lo que hace falta lo levanta el equipo
+  —fixtures, simulación, configuración— no hay solicitud. Se declara `client_data_required:
+  false` en la traza, que es una decisión con rastro, y se sigue.
+- **Para hablar con el QA de la célula.** Decirle qué estado falta, con dueño y fecha, es
+  hacia adentro y va por el chat: eso es `[[calidad-test-data-management]]`, en su reference
+  de suficiencia de datos. Esto de aquí es el documento formal que sale hacia el cliente. Los
+  dos pueden convivir en la misma entrega y no se sustituyen.
+
+### Emitir la solicitud no detiene la generación, y sintetizar no la cierra
+
+La solicitud expone la necesidad; el gate decide qué se hace mientras llega:
+
+| Situación | Qué se hace | La solicitud |
 |---|---|---|
-| Automatizando, y falta un estado de dato | Se le dice al QA qué estado falta, con dueño y fecha, en el chat | `[[calidad-test-data-management]]` (`references/data-sufficiency-gate.md`) |
-| Automatizando, y el dato depende del cliente | Se declara **bloqueo con fecha**, se reporta y se planifica | `[[calidad-sut-readiness-gate]]`, delivery gate |
-| Automatizando algo que nunca se analizó | Se dice con esas palabras y se ofrece la ruta de análisis como trabajo aparte | `[[calidad-route-test-generation]]` |
+| Se ejecuta contra mock o híbrido | Se **sintetiza y se declara sintético**, con qué escenarios lo usan | **Sigue abierta**, con dueño y fecha |
+| Se ejecuta contra el sistema real | **Bloqueo con fecha**. Sintetizar contra software ya desarrollado es anti-cheating | Sigue abierta y es el camino crítico |
+| El dato llega | Se marca recibido en la fuente y se repunta el escenario | Se cierra ese ítem |
 
-La diferencia no es de formato sino de **ciclo**: una solicitud formal al cliente tarda días
-y no se resuelve dentro de la sesión que la abrió. Tomarla en mitad de una generación detiene
-la entrega sin desbloquear nada. Es trabajo previo, y previo quiere decir antes.
-
-> Sus artefactos obligatorios se activan solo con `"route": "analisis-y-datos"` en la traza,
-> que únicamente escribe el workflow de análisis. Una generación nunca los ve exigidos.
+**El dato sintético es temporal por definición.** La corrida contra mock valida la mecánica,
+no el producto, y cierra con `certification: pending_real_integration`. Mientras tanto el
+dato real se sigue gestionando en paralelo, porque conseguirlo tarda días y la prueba contra
+el sistema real lo va a exigir. Un ítem que nadie cerró y una síntesis que sobrevive en
+silencio producen lo mismo: una suite verde que nunca ejercitó el producto.
 
 ## Lectura obligatoria antes de emitir
 

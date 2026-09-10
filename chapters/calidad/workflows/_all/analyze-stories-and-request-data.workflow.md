@@ -1,6 +1,6 @@
 ---
 id: calidad-analyze-stories-and-request-data
-version: 1.1.0
+version: 1.2.0
 scope: chapter
 type: workflow
 chapter: calidad
@@ -20,21 +20,27 @@ No es `[[calidad-analyze-and-refine-stories]]`, que juzga la historia contra INV
 Definition of Ready y propone reescrituras. Éste da por buena la historia como está y
 produce lo que Calidad necesita para trabajar sobre ella.
 
-## Cuándo NO usar
+## Este workflow corre también dentro de una generación
 
-**Cuando el intent es automatizar.** Este workflow es trabajo **previo** a que una
-funcionalidad entre en un flujo de automatización, y las dos rutas se excluyen: el router
-bifurca una sola vez y no vuelve (`[[calidad-route-test-generation]]`).
+Sus pasos 2 a 6 son la **fase `analisis`** del recorrido de automatización
+(`[[calidad-pipeline-state-tracking]]`), no un trabajo distinto. Una generación los ejecuta
+antes de escribir código, o los hereda declarando de dónde si ya se hicieron. Automatizar sin
+haber determinado qué dato exige cada criterio es lo que produce suites que fallan por dato y
+parecen defectos.
 
-Que a una generación le falten datos no la trae aquí. La solicitud formal al cliente tarda
-días y no se resuelve en la sesión que la abre; tomarla en mitad de una entrega la detiene
-sin desbloquear nada. Lo que hace una generación con datos que faltan es comunicarlo al QA
-con dueño y fecha (`[[calidad-test-data-management]]`) y, si depende del cliente, declararlo
-bloqueo con fecha. Si la funcionalidad nunca pasó por aquí, se dice y se ofrece este
-workflow como trabajo aparte.
+Lo que cambia es **dónde se para**:
 
-Los tres momentos son secuenciales: se refina la historia si está rota, se analiza y se
-consiguen los datos, y **cuando los datos están** se automatiza.
+| El intent pide | Qué se hace | Dónde termina |
+|---|---|---|
+| Generar pruebas | Estos pasos y después el resto del router | Código ejecutable y su cierre |
+| Solo analizar, refinar, levantar dudas, decir qué datos hacen falta, armar la estrategia | **Solo estos pasos** | Dossier y solicitud. **Cero líneas de código** |
+
+**Un intent de solo análisis no continúa a generación.** No se emite código, no aplica el
+gate de smoke, no se piden `spec` ni el mapa de identificadores. Se entrega lo pedido y la
+automatización se ofrece como paso siguiente, que decide el usuario.
+
+Y la solicitud emitida **no detiene** a la generación que la abrió: queda con dueño y fecha
+mientras el trabajo sigue contra simulación, y se cierra cuando el dato llega. Ver el paso 6.
 
 ## Inputs
 
@@ -61,11 +67,15 @@ fase, siguiente acción, bloqueos y correcciones vigentes
 (`[[calidad-session-continuity-protocol]]`, `[[calidad-pipeline-state-tracking]]`). Si no
 existen, se crean **antes** de tocar nada.
 
-La traza de esta ruta declara `"route": "analisis-y-datos"`. No es decorativo: es lo único
-que activa los artefactos obligatorios de esta fase en la puerta de
-`[[calidad-delivery-gate-contract]]`. Sin esa marca no se comprueban, y con ella puesta en
-una generación se exigirían artefactos que esa entrega no tiene por qué producir — por eso
-la escribe este workflow y ningún otro. En la sesión medida no se crearon hasta la tercera
+Dos campos de la traza los lee la puerta de artefactos, y los dos **se declaran, nunca se
+deducen** (`[[calidad-pipeline-state-tracking]]`):
+
+- `"route": "analisis-y-datos"` — **solo** cuando el intent es de solo análisis. Le dice a la
+  puerta que esta entrega termina en el dossier y no en código. Una generación no lo escribe.
+- `"client_data_required": true | false` — lo responde el paso 4 de este workflow, corra
+  dentro de una generación o no, y es lo que activa los artefactos de la solicitud.
+  Declararlo `false` es una decisión con rastro; no declararlo cuando es cierto es falsear
+  la traza. En la sesión medida no se crearon hasta la tercera
 sesión, y las correcciones del usuario se reafirmaron de memoria.
 
 ### Paso 1 — Contrato de entrada
@@ -115,6 +125,13 @@ python3 <client-test-data-request>/scripts/render-data-request.py
 El renderizador **no emite** si la auditoría falla. Un criterio sin dato es un caso que no se
 va a poder ejecutar, y conseguir un dato en el ambiente de un cliente tarda días.
 
+**Emitirla no bloquea el trabajo que sigue, y sintetizar no la cierra.** Contra mock o
+híbrido el dato faltante se sintetiza y se declara sintético; contra el sistema real es un
+bloqueo con fecha y sintetizar sería anti-cheating. En los dos casos el ítem **sigue abierto**
+con dueño y fecha hasta que el dato llegue, y la entrega cierra con
+`certification: pending_real_integration` y la lista de lo que queda por validar
+(`[[calidad-test-data-management]]`, `[[calidad-sut-readiness-gate]]`).
+
 ### Paso 7 — Publicar y vincular, bajo ficha
 
 Solo con `write_back` y con la ficha de `[[calidad-alm-write-authorization-gate]]`:
@@ -143,4 +160,5 @@ autorizada.
 - [ ] Cero derivables y cero ítems de otro dueño en la solicitud al cliente.
 - [ ] Escrituras al gestor: solo las autorizadas, con su ficha y su conteo.
 - [ ] Traza y bitácora al día, con el punto de retome escrito.
-- [ ] La traza declara `route: analisis-y-datos`, y no se generó una línea de código de pruebas.
+- [ ] La traza declara `client_data_required`, y si el intent era de solo análisis también `route: analisis-y-datos` y no se generó una línea de código.
+- [ ] Todo dato sintetizado quedó declarado como sintético, con su ítem de la solicitud aún abierto y su dueño.

@@ -40,11 +40,15 @@ Antes de escribir la primera línea de cualquier análisis, diseño de casos o s
 datos que parta de historias. Es la primera compuerta de
 `[[calidad-analyze-stories-and-request-data]]`.
 
-> **No aplica a la ruta de generación.** Un intent de automatización no pasa por aquí,
-> aunque nombre historias y aunque falten datos: las dos rutas se excluyen y la bifurcación
-> la decide el router una sola vez (`[[calidad-route-test-generation]]`). Sus artefactos
-> obligatorios se activan solo con `"route": "analisis-y-datos"` en la traza, que únicamente
-> escribe el workflow de análisis.
+> **Aplica también dentro de una generación.** El análisis no es un paso previo opcional:
+> es una fase del recorrido de automatización (`[[calidad-pipeline-state-tracking]]`), y
+> automatizar sin haberla hecho produce suites que fallan por dato y parecen defectos. Si ya
+> se hizo en una entrega anterior, la fase se marca hecha con la evidencia heredada; lo que
+> no se hizo, se hace.
+>
+> Lo que **no** ocurre es lo contrario: un intent que pide solo análisis, dudas, datos o
+> estrategia **no continúa a generación**. Se entrega lo pedido y la automatización se
+> ofrece como paso siguiente, que decide el usuario.
 
 
 ## Instrucción

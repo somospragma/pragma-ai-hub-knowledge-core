@@ -1,6 +1,6 @@
 ---
 id: calidad-pipeline-state-tracking
-version: 1.3.0
+version: 1.4.0
 scope: chapter
 type: skill
 chapter: calidad
@@ -196,8 +196,26 @@ Cuatro reglas, y ninguna reduce lo que se dice, sólo dónde se dice:
 
 | Ruta | Fases obligatorias |
 |---|---|
-| Automatización (los 4 stacks) | mandatory_inputs · [capability_map si brownfield] · sut_readiness_gate · strategy_approved · [mock_up · prototype_accepted si aplica] · scaffold_emitted · instrumentation_verified · preflight · smoke_gate · suite_executed · report_verified · triage_and_correction · executive_report · delivery_gate |
+| Automatización (los 4 stacks) | mandatory_inputs · **analisis** · [capability_map si brownfield] · sut_readiness_gate · strategy_approved · [mock_up · prototype_accepted si aplica] · scaffold_emitted · instrumentation_verified · preflight · smoke_gate · suite_executed · report_verified · triage_and_correction · executive_report · delivery_gate |
 | Funcional | mandatory_inputs · insumos_analizados · [analysis · refinement_approved] o [design_traceability] o [strategy/plan_approved] · alm_write_confirmed · delivery_gate |
+| Solo análisis y datos | mandatory_inputs · **analisis** · [solicitud_datos_emitida si `client_data_required`] · [alm_write_confirmed si se publica] · delivery_gate. Declara `route: analisis-y-datos` |
+
+**`analisis` es fase obligatoria de la automatización, no un paso previo opcional.** Cubre
+evaluar la historia, levantar dudas y vacíos, y determinar qué dato exige cada criterio
+(`[[calidad-analyze-stories-and-request-data]]`). Automatizar sin haberlo hecho produce
+suites que fallan por dato y parecen defectos. Si el análisis ya se hizo en una entrega
+anterior, la fase se marca `done` con la evidencia heredada — se declara de dónde viene, no
+se omite.
+
+Dos campos de la cabecera los lee la puerta de artefactos y **se declaran, nunca se deducen**:
+
+| Campo | Cuándo | Qué activa |
+|---|---|---|
+| `"route": "analisis-y-datos"` | Solo en corridas de **solo análisis**, que terminan en el dossier y no en código | Los artefactos del dossier |
+| `"client_data_required": true \| false` | Lo responde la fase `analisis` en **cualquier ruta** | Los artefactos de la solicitud al cliente |
+
+`client_data_required: false` es una decisión que deja rastro. No declararlo cuando es cierto
+es falsear la traza, igual que marcar una fase `done` sin su evidencia.
 
 Las fases de mock/prototipo solo existen si `execution_target != real`. `executive_report` se marca `skipped` con razón en modos `scaffold-only`/`dry-run`.
 

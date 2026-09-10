@@ -11,13 +11,22 @@ de que nadie se acuerde. Autocontenido a proposito: un solo archivo, sin depende
 
     python3 check-required-artifacts.py [--evidence .evidence] [--when X] [--all]
 
-Condiciones: always, analysis, front, brownfield, multiplatform, executed, mock, delivery.
-Se deducen de .evidence/pipeline-state.json cuando es posible; se fuerzan con --when.
+Condiciones: always, analysis, client_data, front, brownfield, multiplatform, executed,
+mock, delivery. Se deducen de .evidence/pipeline-state.json cuando es posible; se fuerzan
+con --when.
 
-`analysis` es la excepcion: NO se deduce, se declara con `"route": "analisis-y-datos"`.
-Es la ruta previa a que exista codigo —analizar historias y pedir datos al cliente— y sus
-artefactos no tienen nada que ver con una generacion. Deducirla de un nombre de fase la
-activaba en cualquier automatizacion cuya primera fase se llama "diseno".
+Dos son la excepcion y NO se deducen, se declaran:
+
+  analysis     la fase de analisis corrio. Se activa con `"route": "analisis-y-datos"` (una
+               corrida de SOLO analisis) o con una fase `analisis` en `phases` (una
+               generacion que la incluye, que es lo normal: automatizar sin haber
+               determinado que dato exige cada criterio produce suites que fallan por dato).
+  client_data  esta entrega depende de datos que solo el cliente puede habilitar. Se activa
+               con `"client_data_required": true`, en cualquiera de las dos rutas.
+
+Deducir `analysis` del nombre de la fase ya fallo: la primera fase de una generacion se llama
+"diseno", y la puerta acabo exigiendo una solicitud dirigida al cliente en medio de una
+entrega de codigo.
 """
 from __future__ import annotations
 import argparse, json, sys
@@ -51,9 +60,9 @@ REQUIRED = [
     {"path": ".evidence/story-sources.json",    "when": "analysis",      "by": "calidad-story-evidence-baseline",             "why": "de que fuentes se alimenta cada historia, y cual falta con su razon"},
     {"path": ".evidence/analisis",              "when": "analysis",      "by": "calidad-story-quality-analysis-artifacts",    "why": "un dossier por historia: dudas, estrategia y datos, autocontenidos", "kind": "dir"},
     {"path": ".evidence/ca-inventory.json",     "when": "analysis",      "by": "calidad-client-test-data-request",            "why": "inventario de criterios: sin el, la cobertura de datos se audita de memoria"},
-    {"path": ".evidence/data-request.json",     "when": "analysis",      "by": "calidad-client-test-data-request",            "why": "la solicitud como datos; el markdown es salida, no fuente"},
-    {"path": ".evidence/data-coverage-audit.json","when": "analysis",    "by": "calidad-client-test-data-request",            "why": "el cruce criterio a dato que condiciona la emision de la solicitud"},
-    {"path": ".evidence/SOLICITUD-DATOS.md",    "when": "analysis",      "by": "calidad-client-test-data-request",            "why": "la solicitud emitida: el ticket es el canal, el repositorio es el registro"},
+    {"path": ".evidence/data-request.json",   "when": "client_data",      "by": "calidad-client-test-data-request",            "why": "la solicitud como datos; el markdown es salida, no fuente"},
+    {"path": ".evidence/data-coverage-audit.json","when": "client_data",    "by": "calidad-client-test-data-request",            "why": "el cruce criterio a dato que condiciona la emision de la solicitud"},
+    {"path": ".evidence/SOLICITUD-DATOS.md",    "when": "client_data",      "by": "calidad-client-test-data-request",            "why": "la solicitud emitida: el ticket es el canal, el repositorio es el registro"},
     # --- cierre A: los obligatorios que si producen artefacto ---
     {"path": ".evidence/execution-status.json", "when": "executed",      "by": "calidad-environment-blocker-evidence",        "why": "un bloqueo de ambiente afirmado sin evidencia ya cerro una entrega en falso"},
     {"path": ".evidence/session-config.json",   "when": "always",        "by": "calidad-post-generation-execution-prompt",    "why": "modo de operacion y presupuesto de sesion declarados, no supuestos"},
@@ -166,9 +175,12 @@ def condiciones(ev: Path, forzadas: set[str]) -> set[str]:
         # "diseno", y la puerta acababa exigiendo una solicitud de datos al cliente en
         # medio de una automatizacion. Solo la escribe el workflow de analisis.
         ruta = str(d.get("route") or d.get("ruta") or "").lower()
-        if ruta in ("analisis-y-datos", "analysis-and-data"):
-            c.add("analysis")
+        if d.get("client_data_required") is True:
+            c.add("client_data")
         fases = {f.get("id"): f.get("status") for f in d.get("phases", []) if isinstance(f, dict)}
+        if ruta in ("analisis-y-datos", "analysis-and-data") or \
+           any(k in fases for k in ("analisis", "analysis", "analisis_por_historia")):
+            c.add("analysis")
         if fases.get("smoke_gate") or fases.get("suite_executed"):
             c.add("executed")
         if fases.get("delivery_gate"):

@@ -69,13 +69,15 @@ datos y accesos hacen falta, preparar la solicitud al cliente— el recorrido es
 la generación. Analizar desde el resumen del ticket, o escribir la solicitud como prosa, son
 los dos fallos que más reproceso han costado en esa fase.
 
-**Las dos rutas se excluyen y no se llaman entre sí.** Se decide una vez, por el intent: si
-pide producir pruebas ejecutables, es generación; si pide entender qué hace falta para
-poder probar, es análisis. Que a una generación le falten datos **no** la convierte en
-análisis: la solicitud al cliente tarda días y es trabajo previo, así que se declara el
-bloqueo y se sigue, no se abre una solicitud en mitad de la entrega. Las cuatro compuertas de
-análisis de la tabla de abajo **solo aplican en esa ruta**, marcada en la traza con
-`"route": "analisis-y-datos"`.
+**La relación entre las dos es asimétrica.** El análisis es una **fase de** la generación,
+no una alternativa: una automatización evalúa la historia, determina qué dato exige cada
+criterio y expone la solicitud antes de escribir código. Lo que no ocurre es lo contrario —
+un intent que pide solo análisis, dudas, datos o estrategia **no continúa a generación**: se
+entrega lo pedido y la automatización se ofrece como paso siguiente.
+
+Que a una generación le falten datos del cliente no la detiene: la solicitud queda abierta
+con dueño y fecha mientras el trabajo sigue contra simulación, y **sintetizar la aplaza, no
+la cierra**. El detalle está en el paso de bifurcación de `[[calidad-route-test-generation]]`.
 
 ## Compuertas: la pregunta que hay que contestar antes de seguir
 
@@ -87,10 +89,10 @@ El documento de la derecha es donde está el procedimiento completo.
 |---|---|---|
 | Abrir sesión sobre un `output_path` con evidencia | ¿Dónde quedó el proceso y cuál es su `next_action`? | `[[calidad-pipeline-state-tracking]]` |
 | Antes del primer archivo | ¿Está cada insumo obligatorio presente y leído completo, con su fila en la tabla de extracción? | `[[calidad-mandatory-inputs-protocol]]` |
-| **Solo ruta de análisis** · antes de analizar una historia | ¿Está descargada íntegra, con sus dependencias y su arquitectura, o declarada la ausencia y dónde se buscó? | `[[calidad-story-evidence-baseline]]` |
-| **Solo ruta de análisis** · antes de escribir el análisis | ¿Existe la carpeta de esta historia con sus tres archivos, generada desde las plantillas? | `[[calidad-story-quality-analysis-artifacts]]` |
-| **Solo ruta de análisis** · antes de escribir una duda, dato o bloqueo | ¿Quién lo resuelve, y por qué canal? | `[[calidad-responsibility-routing-of-blockers]]` |
-| **Solo ruta de análisis** · antes de emitir una solicitud de datos al cliente | ¿Tiene cada criterio un dato que lo habilite, o una justificación declarada de por qué no? | `[[calidad-client-test-data-request]]` |
+| **Fase de análisis** · antes de analizar una historia | ¿Está descargada íntegra, con sus dependencias y su arquitectura, o declarada la ausencia y dónde se buscó? | `[[calidad-story-evidence-baseline]]` |
+| **Fase de análisis** · antes de escribir el análisis | ¿Existe la carpeta de esta historia con sus tres archivos, generada desde las plantillas? | `[[calidad-story-quality-analysis-artifacts]]` |
+| **Fase de análisis** · antes de escribir una duda, dato o bloqueo | ¿Quién lo resuelve, y por qué canal? | `[[calidad-responsibility-routing-of-blockers]]` |
+| **Si el dato depende del cliente** · antes de emitir la solicitud | ¿Tiene cada criterio un dato que lo habilite, o una justificación declarada de por qué no? | `[[calidad-client-test-data-request]]` |
 | Brownfield, antes de escribir | ¿Qué resuelve ya el repositorio, y dónde mide calidad? | `[[calidad-repo-capability-discovery]]` |
 | Antes de convertir un texto en localizador o aserción | ¿Este texto es estático, de formato invariante, volátil o dato controlado? | `[[calidad-data-volatility-and-assertion-anchoring]]` |
 | Antes de cualquier ejecución | ¿El preflight está verde y el comando salió del repositorio? | `[[calidad-execution-preflight]]` |

@@ -53,12 +53,21 @@ Señales que **no** desambiguan por sí solas: "Appium", "mobile", "Android", "i
 
 **Repos híbridos web y mobile**: un mismo repositorio puede necesitar dos stacks a la vez —por ejemplo, navegador con Playwright y app nativa con Appium TypeScript, orquestados por un único cucumber-js—. En ese caso se entregan **ambos** bundles y las convenciones comunes de la capa Cucumber vienen de `[[calidad-cucumber-bdd-conventions]]`. No se fuerza un stack único ni se ignora la mitad del repositorio.
 
-**La palabra que decide: automatizar.** Antes de mirar cualquier otra señal, comprueba si el
-intent pide **producir pruebas ejecutables** sobre algo. Si lo pide —"automatiza", "genera
-los tests", "agrega escenarios", "extiende la suite"— la ruta es de **generación** y no entra
-en la de análisis, aunque el intent nombre historias, aunque falten datos y aunque nadie haya
-analizado nunca esa funcionalidad. Pedir datos al cliente es trabajo previo con un ciclo de
-días: no se toma en mitad de una generación. Lo que se hace en ese caso está en el paso de
+**El intent decide dónde se para, no dónde se empieza.** Comprueba si pide **producir
+pruebas ejecutables** —"automatiza", "genera los tests", "agrega escenarios", "extiende la
+suite"— o solo entender qué hace falta para poder probar —"analiza estas historias", "levanta
+dudas", "qué datos y accesos necesitamos", "arma la estrategia"—.
+
+- Si pide **generar**: se hace **todo**, análisis incluido. Evaluar la historia, levantar
+  dudas y vacíos, determinar qué dato exige cada criterio, exponer la solicitud y decidir qué
+  hay, qué se sintetiza y qué se gestiona — y después el código. `analisis` es fase
+  obligatoria de esa ruta (`[[calidad-pipeline-state-tracking]]`), no un paso previo que se
+  salta. Si ya se hizo antes, se hereda declarando de dónde.
+- Si pide **solo analizar**: se para ahí. **No se emite una línea de código**, no aplica el
+  gate de smoke ni se piden `spec` o el mapa de identificadores. Se entrega lo pedido y la
+  automatización se ofrece como paso siguiente, que decide el usuario.
+
+La asimetría completa, y qué hace una generación con los datos que faltan, en el paso de
 bifurcación de `[[calidad-route-test-generation]]`.
 
 **Desambiguación dentro de lo funcional**: las dos rutas funcionales parten de historias y
@@ -69,10 +78,9 @@ Calidad necesita para poder probarla: el dossier por historia y la solicitud de 
 pregunta que decide: ¿el entregable es un veredicto sobre la historia, o los insumos para
 trabajar sobre ella? Si la historia está rota, la primera va antes que la segunda.
 
-Y las tres rutas son **secuenciales en el tiempo, no alternativas dentro de una sesión**: se
-refina la historia, se analiza y se consiguen los datos, y **cuando los datos están** se
-automatiza. Un intent que llega en el tercer momento no retrocede a los dos anteriores por su
-cuenta: si algo de lo previo falta, se dice y se ofrece como trabajo aparte.
+Las tres son **momentos de un mismo recorrido**, y un intent puede pedir uno o todos. Lo que
+nunca se hace es ir más lejos de lo que se pidió: quien pide un refinamiento no recibe una
+suite, y quien pide análisis no recibe código.
 
 **Desambiguación "pruebas funcionales"**: si el intent pide *generar/automatizar* pruebas funcionales de una API (hay spec, endpoints, "automatiza") → Karate. Si pide *diseñar, documentar o gestionar* — analizar HUs, escribir casos de alto nivel, plan, estrategia — → stack funcional. Ante la duda, la pregunta es: "¿el entregable es código de pruebas ejecutable, o documentos/casos en el ALM?". El camino natural completo es funcional primero (diseño) y automatización después (los casos diseñados alimentan a los stacks).
 
