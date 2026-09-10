@@ -76,6 +76,7 @@ Un asset con `references/` cuelga de su propia carpeta:
 | Referencia | Instalado como |
 |---|---|
 | `[[calidad-analyze-and-refine-stories]]` | `workflow-analizar-y-refinar-historias-de-usuario` |
+| `[[calidad-analyze-stories-and-request-data]]` | `workflow-analizar-historias-y-pedir-los-datos` |
 | `[[calidad-build-test-strategy-and-plan]]` | `workflow-construir-estrategia-y-plan-de-pruebas` |
 | `[[calidad-calibrate-k6-thresholds]]` | `calibrate-k6-thresholds-workflow` |
 | `[[calidad-complete-deferred-locators]]` | `workflow-completar-locators-diferidos` |
@@ -116,12 +117,15 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-brownfield-vs-greenfield]]` | `brownfield-vs-greenfield-reglas-de-generacion-por-modo` |
 | `[[calidad-business-driven-prioritization]]` | `business-driven-prioritization-prioridad-por-valor-de-negocio` |
 | `[[calidad-cicd-integration]]` | `cicd-integration-integracion-de-suites-de-pruebas-en-pipelines` |
+| `[[calidad-client-test-data-request]]` | `solicitud-de-datos-de-prueba-al-cliente` |
+| `[[calidad-cold-audit-before-execution]]` | `auditoria-en-frio-antes-de-ejecutar` |
 | `[[calidad-context-determined-defaults]]` | `context-determined-defaults-defaults-derivados-del-contexto-no-del-sector` |
 | `[[calidad-contract-testing]]` | `contract-testing-estrategia-de-contratos-entre-servicios` |
 | `[[calidad-cross-platform-learning-propagation]]` | `cross-platform-learning-propagation-aprender-una-vez-aplicar-en-todas` |
 | `[[calidad-cucumber-bdd-conventions]]` | `cucumber-bdd-convenciones-de-arquetipo-multi-plataforma` |
 | `[[calidad-data-volatility-and-assertion-anchoring]]` | `data-volatility-and-assertion-anchoring-que-texto-sirve-de-ancla` |
 | `[[calidad-delivery-gate-contract]]` | `delivery-gate-contract-bloque-yaml-de-cierre-obligatorio` |
+| `[[calidad-deterministic-work-to-tooling]]` | `lo-determinista-se-convierte-en-herramienta-del-proyecto` |
 | `[[calidad-environment-blocker-evidence]]` | `environment-blocker-evidence-schema-universal-evidenceexecution-statusjson` |
 | `[[calidad-execution-metadata-schema]]` | `execution-metadata-schema-iso-metadatajson-universal` |
 | `[[calidad-execution-preflight]]` | `execution-preflight-demostrar-que-la-corrida-toca-el-sut` |
@@ -130,11 +134,14 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-failure-triage-and-classification]]` | `failure-triage-and-classification-clasificacion-de-fallos-y-analisis-de-causa-ra` |
 | `[[calidad-figma-mcp-integration]]` | `figma-mcp-integration-consumir-disenos-de-figma-como-fuente-ui` |
 | `[[calidad-flutter-locators-and-gestures]]` | `flutter-localizacion-y-gestos-en-movil-y-web` |
+| `[[calidad-fresh-context-verification]]` | `verificacion-con-contexto-limpio` |
 | `[[calidad-funcional-story-analysis]]` | `story-analysis-analisis-riguroso-de-historias-de-usuario` |
 | `[[calidad-funcional-story-refinement]]` | `story-refinement-refinamiento-propuesto-decision-humana` |
 | `[[calidad-funcional-test-design]]` | `test-design-casos-de-prueba-de-alto-nivel-con-tecnicas-formales` |
 | `[[calidad-funcional-test-plan]]` | `test-plan-plan-de-pruebas-y-entregables-de-gestion` |
 | `[[calidad-funcional-test-strategy]]` | `test-strategy-estrategia-de-pruebas` |
+| `[[calidad-functional-flow-input]]` | `el-recorrido-funcional-como-insumo` |
+| `[[calidad-human-fix-request-protocol]]` | `protocolo-de-correccion-dirigida-por-la-persona` |
 | `[[calidad-intent-detection]]` | `intent-detection-seleccion-de-framework-de-automatizacion` |
 | `[[calidad-k6-brownfield]]` | `k6-brownfield` |
 | `[[calidad-k6-greenfield]]` | `k6-greenfield` |
@@ -155,7 +162,9 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-playwright-run-and-modes]]` | `modos-de-ejecucion-de-playwright` |
 | `[[calidad-post-generation-execution-prompt]]` | `post-generation-execution-prompt-confirmacion-universal-antes-de-smoke-gate` |
 | `[[calidad-pre-design-strategy-document]]` | `pre-design-strategymd-universal-antes-de-generar-codigo` |
+| `[[calidad-pre-development-artifacts-continuity]]` | `continuidad-de-los-artefactos-pre-desarrollo` |
 | `[[calidad-repo-capability-discovery]]` | `repo-capability-discovery-mirar-antes-de-construir` |
+| `[[calidad-responsibility-routing-of-blockers]]` | `enrutamiento-de-bloqueos-por-responsable` |
 | `[[calidad-results-structure-universal]]` | `results-structure-convencion-universal-resultscategoriafecha` |
 | `[[calidad-security-testing]]` | `security-testing-estrategia-de-pruebas-de-seguridad` |
 | `[[calidad-seo]]` | `seo-auditoria-tecnica-para-pruebas-web` |
@@ -165,6 +174,8 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-spec-validation]]` | `spec-validation-validacion-de-contratos-antes-de-generar` |
 | `[[calidad-static-analysis-on-the-test-repo]]` | `analisis-estatico-sobre-el-propio-repositorio-de-pruebas` |
 | `[[calidad-step-isolation-pattern]]` | `step-isolation-pattern-aislamiento-de-metricas-y-criterios-por-step` |
+| `[[calidad-story-evidence-baseline]]` | `base-de-evidencia-de-la-historia` |
+| `[[calidad-story-quality-analysis-artifacts]]` | `artefactos-del-analisis-de-calidad-por-historia` |
 | `[[calidad-streaming-files-protocol]]` | `orden-de-scaffold-por-valor-entregado` |
 | `[[calidad-sut-readiness-gate]]` | `sut-readiness-gate-probar-antes-de-que-el-desarrollo-exista` |
 | `[[calidad-sut-types-and-adaptations]]` | `sut-types-and-adaptations-catalogo-y-adaptacion-de-frameworks-por-tipo-de-sistem` |
@@ -176,6 +187,7 @@ Un asset con `references/` cuelga de su propia carpeta:
 | `[[calidad-test-self-healing]]` | `test-self-healing-estrategias-de-resiliencia-en-runtime-con-guardrails-anti-chea` |
 | `[[calidad-transversal-capabilities]]` | `deteccion-de-capacidades-transversales-complementarias` |
 | `[[calidad-ui-locator-map-contract]]` | `ui-locator-map-contract-identificadores-acordados-antes-del-desarrollo` |
+| `[[calidad-ui-source-contract]]` | `contrato-de-las-fuentes-de-interfaz` |
 | `[[calidad-visual-regression]]` | `regresion-visual-politica-transversal-de-pruebas` |
 | `[[calidad-wait-cost-and-timeout-design]]` | `wait-cost-and-timeout-design-los-temporizadores-que-nadie-declaro` |
 
