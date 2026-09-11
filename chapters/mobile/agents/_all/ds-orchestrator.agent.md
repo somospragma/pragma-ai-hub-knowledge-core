@@ -23,10 +23,18 @@ resources:
 includeMcpJson: true
 permissions:
   rules:
-    - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**"]}
-    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *"]}
-    - {capability: mcp, effect: allow, match: ["figma/*"]}
-    - {capability: subagent, effect: allow, match: ["figma-analyzer", "component-planner", "component-architect", "widget-developer", "test-engineer", "golden-test-engineer", "widgetbook-developer", "code-auditor", "delivery-manager"]}
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**"]
+    - capability: shell
+      effect: allow
+      match: ["ruby .kiro/docs/scripts/sopp_gate.rb *"]
+    - capability: mcp
+      effect: allow
+      match: ["figma/*"]
+    - capability: subagent
+      effect: allow
+      match: ["figma-analyzer", "component-planner", "component-architect", "widget-developer", "test-engineer", "golden-test-engineer", "widgetbook-developer", "code-auditor", "delivery-manager"]
 
 # ============================================================
 # GITHUB COPILOT

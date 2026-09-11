@@ -38,10 +38,18 @@ resources:
 includeMcpJson: true
 permissions:
   rules:
-    - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"]}
-    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]}
-    - {capability: mcp, effect: allow, match: ["figma/*"]}
-    - {capability: subagent, effect: allow, match: ["figma-analyzer", "ds-orchestrator", "test-engineer", "golden-test-engineer", "code-auditor", "delivery-manager"]}
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"]
+    - capability: shell
+      effect: allow
+      match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]
+    - capability: mcp
+      effect: allow
+      match: ["figma/*"]
+    - capability: subagent
+      effect: allow
+      match: ["figma-analyzer", "ds-orchestrator", "test-engineer", "golden-test-engineer", "code-auditor", "delivery-manager"]
 
 # ============================================================
 # GITHUB COPILOT

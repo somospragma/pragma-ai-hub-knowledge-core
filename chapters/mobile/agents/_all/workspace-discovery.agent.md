@@ -17,8 +17,12 @@ resources:
   - skill://flutter-melos-management
 permissions:
   rules:
-    - {capability: fs_write, effect: allow, match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]}
-    - {capability: shell, effect: allow, match: ["ruby .claude/docs/scripts/melos_workspace.rb *", "ruby .claude/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]}
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]
+    - capability: shell
+      effect: allow
+      match: ["ruby .claude/docs/scripts/melos_workspace.rb *", "ruby .claude/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]
 
 # ============================================================
 # GITHUB COPILOT

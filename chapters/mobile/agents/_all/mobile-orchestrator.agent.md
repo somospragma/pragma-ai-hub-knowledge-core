@@ -14,7 +14,9 @@ description: >
 tools: [read, subagent]
 permissions:
   rules:
-    - {capability: subagent, effect: allow, match: ["workspace-discovery", "ds-orchestrator", "feature-builder", "refactoring-advisor", "test-coverage-engineer"]}
+    - capability: subagent
+      effect: allow
+      match: ["workspace-discovery", "ds-orchestrator", "feature-builder", "refactoring-advisor", "test-coverage-engineer"]
 
 # ============================================================
 # GITHUB COPILOT

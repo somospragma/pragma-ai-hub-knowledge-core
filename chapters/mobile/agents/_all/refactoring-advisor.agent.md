@@ -31,9 +31,15 @@ resources:
   - skill://mobile-sdd-spec-validation
 permissions:
   rules:
-    - {capability: fs_write, effect: allow, match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"]}
-    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]}
-    - {capability: subagent, effect: allow, match: ["code-auditor", "ds-orchestrator"]}
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"]
+    - capability: shell
+      effect: allow
+      match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]
+    - capability: subagent
+      effect: allow
+      match: ["code-auditor", "ds-orchestrator"]
 
 # ============================================================
 # GITHUB COPILOT
