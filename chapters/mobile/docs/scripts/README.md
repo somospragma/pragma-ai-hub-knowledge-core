@@ -78,6 +78,27 @@ The command uses only Ruby standard-library packages and therefore does not
 consume AI tokens. Target roots are resolved from `spec.target_roots` or the
 nearest `.sopp/config/project.config.yaml`.
 
+## `validate_workflow_inputs.rb`
+
+Validates the explicit invocation inputs before a mobile workflow mints its
+telemetry instance. The workflow overlay is the source of required inputs. A
+value is rejected only when it is absent, `null`, empty or whitespace; this
+script does not impose identifier or URL formats.
+It uses only Ruby standard-library parsing and does not contact a model, MCP
+server or external service.
+
+```bash
+ruby docs/scripts/validate_workflow_inputs.rb \
+  --workflow-id new-feature \
+  --inputs-file /tmp/new-feature-inputs.yaml
+```
+
+The inputs file must contain only values supplied in the current invocation.
+It returns JSON and exits `0` when valid or `2` with `status=blocked_input` and
+the missing input names. `hu_id` must be supplied explicitly for every new
+workflow invocation; `output/.active-user-story` is persisted only after a
+successful preflight and is not a source of invocation inputs.
+
 ## `melos_workspace.rb`
 
 Read-only resolver for Melos package targets. It accepts legacy Melos 6
@@ -112,3 +133,11 @@ ruby chapters/mobile/docs/scripts/test_validate_workflow_response_contract.rb
 Regression protection: whenever a workflow markdown is edited (or the
 validator helpers are refactored), this suite locks in that the eight mobile
 workflows continue to satisfy the Response Contract.
+
+## `test_validate_workflow_inputs.rb`
+
+Minitest coverage for required, blank and conditional DDD inputs. Run it with:
+
+```bash
+ruby docs/scripts/test_validate_workflow_inputs.rb
+```

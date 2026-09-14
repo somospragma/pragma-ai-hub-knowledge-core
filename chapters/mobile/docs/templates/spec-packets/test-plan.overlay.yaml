@@ -3,6 +3,7 @@ entry_agent: test-coverage-engineer
 base_spec_level: full
 purpose: Generate or improve test coverage for an existing feature.
 required_inputs:
+  - hu_id
   - feature_name
   - feature_path
 optional_inputs:

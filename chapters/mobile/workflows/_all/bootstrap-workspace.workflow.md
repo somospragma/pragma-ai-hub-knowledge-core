@@ -17,7 +17,7 @@ description: >
 | Field | Value |
 |---|---|
 | `workflow-id` | `bootstrap-workspace` |
-| `user-story-id` | Value of the required `HU_ID` invocation input (e.g. `US-12345`, `HU-678`) |
+| `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
 | Step IDs | `phase-0-reuse-or-diagnose`, `phase-1-discovery`, `phase-2-proposal`, `phase-3-pre-apply-validation`, `phase-4-apply-with-backup`, `phase-5-post-bootstrap-validation` |
 
 ## Workflow Execution Contract
@@ -53,30 +53,29 @@ Both `Human approval gate` and `Response Contract Violations` at the end of this
 
 > ⚡ **MANDATORY** — Always run this at the start, before any step.
 
-### Resolve user-story-id (mandatory)
+### Input preflight (mandatory)
 
-`HU_ID` is a **required** invocation input for this workflow (see *User Inputs*), so the agent already has the user story identifier at the start. The agent MUST map it to `user-story-id` before running `workflow create`:
-
-1. **Invocation input (canonical):** Use the `HU_ID` value provided in the invocation. This is the required path.
-2. **Fallback — Session context:** If `HU_ID` was not supplied but a `user-story-id` is already available from a parent flow or another sub-workflow in this session, reuse it silently.
-3. **Fallback — Project file:** If neither of the above is available, read the ID from `output/.active-user-story` when it exists.
-4. **Last resort — Ask the user:** If no source yields an ID, ask explicitly and refuse to proceed without a value:
-
-```
-Kratos: To track progress I need the user-story-id.
-  What is the active user story? (e.g. US-12345, HU-678)
-```
-
-> Once resolved, the agent MUST persist the value to `output/.active-user-story` so downstream workflows inherit it automatically.
+Before any other action, build a temporary YAML or JSON object containing only
+the values explicitly supplied in this invocation and assign its path to
+`WORKFLOW_INPUTS_FILE`. Do **not** read session state or
+`output/.active-user-story` to complete a missing input. Run the preflight
+command below. If it exits with `blocked_input`, return its missing-input list
+to the user and stop; do not run `workflow create`. This local check must not
+use an MCP server, subagent or AI-assisted analysis.
 
 ```bash
-# 1. Take the required HU_ID from the invocation and use it as user-story-id
-USER_STORY_ID="$HU_ID"
+# Validate all required invocation inputs before creating an instance.
+ruby docs/scripts/validate_workflow_inputs.rb \
+  --workflow-id bootstrap-workspace \
+  --inputs-file "$WORKFLOW_INPUTS_FILE"
 
-# 2. Persist for other workflows so they don't have to ask again
+# The preflight succeeded; use the explicitly supplied hu_id for telemetry.
+USER_STORY_ID="$hu_id"
+
+# Persist only after a valid invocation has started.
 echo "$USER_STORY_ID" > output/.active-user-story
 
-# 3. Mint the instance
+# Mint the instance.
 INSTANCE_ID=$(pragma-ai workflow create \
   --workflow-id bootstrap-workspace \
   --user-story-id "$USER_STORY_ID")
@@ -114,13 +113,13 @@ only for an explicit migration or repair proposal.
 
 ## User Inputs
 
-`HU_ID` is **required**: it identifies the user story this bootstrap belongs to
+`hu_id` is **required**: it identifies the user story this bootstrap belongs to
 and is mapped 1:1 to `user-story-id` for telemetry. If it is not supplied, the
 workflow refuses to start.
 
 ```text
 @workspace-discovery /bootstrap-workspace
-HU_ID: US-12345                                             # required
+hu_id: US-12345                                             # required
 WORKSPACE_ROOT: /Users/user/dev/mobile-workspace
 WORKSPACE_FILE: /Users/user/dev/mobile-workspace/mobile.code-workspace
 EXPECTED_APP_REPO_ROOT: /Users/user/dev/mobile-workspace/mand-app-monorepo

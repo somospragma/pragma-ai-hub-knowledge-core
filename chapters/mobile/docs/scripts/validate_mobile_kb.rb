@@ -55,7 +55,7 @@ def kiro_agent_profiles
       include_mcp: true,
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
         { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer ds-orchestrator test-engineer golden-test-engineer code-auditor delivery-manager] }
       ],
@@ -65,7 +65,7 @@ def kiro_agent_profiles
       include_mcp: true,
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *"] },
         { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer component-planner component-architect widget-developer test-engineer golden-test-engineer widgetbook-developer code-auditor delivery-manager] }
       ],
@@ -74,7 +74,7 @@ def kiro_agent_profiles
       tools: %w[read write shell subagent],
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[code-auditor ds-orchestrator] }
       ],
     },
@@ -82,7 +82,7 @@ def kiro_agent_profiles
       tools: %w[read write shell],
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"] }
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"] }
       ]
     },
     "code-auditor" => {
@@ -123,7 +123,7 @@ def kiro_agent_profiles
       tools: %w[read write shell],
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/docs/**", "**/pubspec.yaml"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"] }
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"] }
       ]
     },
     "test-engineer" => {
@@ -586,7 +586,10 @@ def validate_invocation_contracts(findings, cleared)
     File.basename(path, ".agent.md")
   end
   docs = File.read("chapters/mobile/docs/workflows.md")
+  preflight_script = "chapters/mobile/docs/scripts/validate_workflow_inputs.rb"
   issues = []
+
+  issues << "input preflight script is missing" unless File.file?(preflight_script)
 
   Dir["chapters/mobile/workflows/_all/*.workflow.md"].each do |workflow_path|
     workflow = File.basename(workflow_path, ".workflow.md")
@@ -622,6 +625,9 @@ def validate_invocation_contracts(findings, cleared)
     unless (overlay["required_agents"] || []).include?(entry_agent)
       issues << "#{workflow}: overlay required_agents must include entry_agent"
     end
+    unless (overlay["required_inputs"] || []).include?("hu_id")
+      issues << "#{workflow}: overlay required_inputs must include hu_id"
+    end
 
     invocation = "@#{entry_agent} /#{workflow}"
     issues << "#{workflow}: workflow example must contain #{invocation}" unless text.include?(invocation)
@@ -636,6 +642,17 @@ def validate_invocation_contracts(findings, cleared)
     (overlay["required_inputs"] || []).each do |input|
       pattern = /^\s*#{Regexp.escape(input)}\s*:/i
       issues << "#{workflow}: User Inputs block omits required #{input}" unless block.match?(pattern)
+    end
+
+    preflight_index = text.index("### Input preflight (mandatory)")
+    create_index = text.index("pragma-ai workflow create")
+    unless preflight_index && create_index && preflight_index < create_index &&
+           text.include?("validate_workflow_inputs.rb")
+      issues << "#{workflow}: must run input preflight before workflow create"
+    end
+    if text.include?("Fallback — Session context") ||
+       text.include?("Fallback — Project file")
+      issues << "#{workflow}: must not resolve invocation inputs from session or output/.active-user-story"
     end
   end
 

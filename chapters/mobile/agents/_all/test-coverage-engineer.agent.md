@@ -30,7 +30,7 @@ permissions:
       match: [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/docs/**", "**/pubspec.yaml"]
     - capability: shell
       effect: allow
-      match: ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
+      match: ["ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"]
 
 # ============================================================
 # GITHUB COPILOT
@@ -57,6 +57,7 @@ tools:
   - Write(pubspec.yaml)
   - Edit(pubspec.yaml)
   - Bash(dart analyze:*)
+  - Bash(ruby .claude/docs/scripts/validate_workflow_inputs.rb:*)
   - Bash(dart test:*)
   - Bash(flutter analyze:*)
   - Bash(flutter test:*)

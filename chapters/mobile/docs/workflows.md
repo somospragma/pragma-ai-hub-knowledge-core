@@ -8,6 +8,11 @@ workflow-to-agent routing adapter.
 Each invocation below is copyable. Replace values between `<...>` and remove
 optional lines that do not apply.
 
+Before creating a workflow instance, the entry agent runs the input preflight.
+Every required field must be explicitly present in that invocation and contain
+a non-empty value. Session state and `output/.active-user-story` are never
+used to fill missing invocation inputs.
+
 ## Choose The Entry Point
 
 Invoke the entry agent shown for a known workflow. That agent is the workflow
@@ -80,7 +85,7 @@ configuration files.
 
 | Parameter | Required | Expected Value |
 |---|---:|---|
-| `HU_ID` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
+| `hu_id` | Yes | User story identifier used for telemetry correlation (e.g. `US-12345`, `HU-678`). Mapped to `user-story-id` in the workflow telemetry. |
 | `WORKSPACE_ROOT` | Yes | Absolute path to the IDE/workspace root. |
 | `WORKSPACE_FILE` | No | Absolute path to `.code-workspace` when available. |
 | `EXPECTED_APP_REPO_ROOT` | No, recommended | Absolute path to the app repository that will own `.sopp/config`. |
@@ -93,7 +98,7 @@ configuration files.
 
 ```text
 @workspace-discovery /bootstrap-workspace
-HU_ID: <user story id, e.g. US-12345>                        # required
+hu_id: <user story id, e.g. US-12345>                        # required
 WORKSPACE_ROOT: <absolute/path/to/workspace>                 # required
 WORKSPACE_FILE: <absolute/path/to/workspace.code-workspace>  # optional
 EXPECTED_APP_REPO_ROOT: <absolute/path/to/app-repo>          # optional, recommended
@@ -105,10 +110,10 @@ APPLY_MODE: propose_then_apply                              # optional
 FORCE_RECONFIGURE: false                                    # optional; explicit repair/migration only
 ```
 
-`HU_ID` is required so every bootstrap run is linked to a user story from
-the start. The workflow maps `HU_ID` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again.
+`hu_id` is required so every bootstrap run is linked to a user story from
+the start. The workflow maps `hu_id` directly to the `user-story-id` used by
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
 
 When a valid final `.sopp/config` triplet already exists for the resolved app
 repository, bootstrap returns `reused_existing_config` and creates no proposal.
@@ -176,8 +181,8 @@ golden_tests: <true|false>                                  # optional, default 
 
 `hu_id` is required so every component build is linked to a user story from
 the start. The workflow maps `hu_id` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again.
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
 
 Expected result: DS source files, tests, optional goldens, Widgetbook use case,
 audit evidence and delivery summary under the `design_system` target.
@@ -215,8 +220,8 @@ evidence_mode: <minimal|standard>                            # optional, default
 
 `hu_id` is required so every view build is linked to a user story from the
 start. The workflow maps `hu_id` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again.
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
 
 Expected result: app view code, DS component inventory, DS artifacts when
 needed, mandatory widget tests, optional goldens, Widgetbook screen use case
@@ -304,8 +309,9 @@ strategies:
 
 `hu_id` is required so every feature build is linked to a user story from the
 start. The workflow maps `hu_id` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again. It is required
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
+It is required
 regardless of which input strategy (`api_contract` or manual `entity_name` +
 `fields`) is chosen below.
 
@@ -453,8 +459,8 @@ compatibility_policy: <additive_only|no_public_api_change|allow_public_api_chang
 
 `hu_id` is required so every refactor run is linked to a user story from the
 start. The workflow maps `hu_id` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again.
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
 
 Expected result: approved refactor plan, scoped code changes, updated
 tests/goldens when needed, audit evidence and delivery summary.
@@ -494,8 +500,8 @@ can_delete_files: <true|false>                              # optional, default 
 
 `hu_id` is required so every refactor run is linked to a user story from the
 start. The workflow maps `hu_id` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again.
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
 
 Expected result: risk analysis, approved refactor plan, layer-by-layer changes,
 tests, docs artifact and audit report. Delete operations require explicit
@@ -530,8 +536,8 @@ target_root: <path/to/package-or-target-root>               # optional
 
 `hu_id` is required so every test-plan run is linked to a user story from the
 start. The workflow maps `hu_id` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again.
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
 
 Expected result: coverage plan, generated tests where allowed, command/evidence
 summaries, known gaps and a docs/testing artifact.
@@ -566,8 +572,8 @@ allow_gh_commands: false                                    # optional, default 
 
 `hu_id` is required so every PR-fix run is linked to a user story from the
 start. The workflow maps `hu_id` directly to the `user-story-id` used by
-`pragma-ai workflow create` and persists it to `output/.active-user-story` so
-downstream workflows inherit it without asking again.
+`pragma-ai workflow create` and persists it to `output/.active-user-story` for
+traceability. Every new workflow invocation must still provide its own `hu_id`.
 
 Expected result: comment inventory, approved fix plan, scoped code/test/doc
 changes, audit evidence and delivery summary. The workflow does not run `git`

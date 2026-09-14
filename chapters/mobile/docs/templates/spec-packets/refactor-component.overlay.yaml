@@ -3,6 +3,7 @@ entry_agent: ds-orchestrator
 base_spec_level: mini
 purpose: Refactor an existing Design System component without changing product feature code.
 required_inputs:
+  - hu_id
   - component_path
 optional_inputs:
   - evidence_mode

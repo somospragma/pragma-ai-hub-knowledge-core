@@ -28,7 +28,7 @@ permissions:
       match: [".sopp/**", "**/.sopp/**"]
     - capability: shell
       effect: allow
-      match: ["ruby .kiro/docs/scripts/sopp_gate.rb *"]
+      match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *"]
     - capability: mcp
       effect: allow
       match: ["figma/*"]
@@ -53,6 +53,7 @@ tools:
   - Write(.sopp/**)
   - Edit(.sopp/**)
   - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - Bash(ruby .claude/docs/scripts/validate_workflow_inputs.rb:*)
   - mcp__figma
   - Agent(figma-analyzer, component-planner, component-architect, widget-developer, test-engineer, golden-test-engineer, widgetbook-developer, code-auditor, delivery-manager)
 skills:

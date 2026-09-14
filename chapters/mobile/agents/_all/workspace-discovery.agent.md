@@ -22,7 +22,7 @@ permissions:
       match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]
     - capability: shell
       effect: allow
-      match: ["ruby .claude/docs/scripts/melos_workspace.rb *", "ruby .claude/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]
+      match: ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]
 
 # ============================================================
 # GITHUB COPILOT
@@ -44,6 +44,7 @@ tools:
   - Edit(.sopp/config/**)
   - Bash(ruby .claude/docs/scripts/melos_workspace.rb:*)
   - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - Bash(ruby .claude/docs/scripts/validate_workflow_inputs.rb:*)
   - Bash(melos list:*)
   - Bash(melos exec:*)
   - Bash(dart pub get:*)

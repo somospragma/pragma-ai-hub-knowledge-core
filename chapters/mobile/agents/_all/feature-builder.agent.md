@@ -43,7 +43,7 @@ permissions:
       match: [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"]
     - capability: shell
       effect: allow
-      match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]
+      match: ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"]
     - capability: mcp
       effect: allow
       match: ["figma/*"]
@@ -86,6 +86,7 @@ tools:
   - Write(build.yaml)
   - Edit(build.yaml)
   - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - Bash(ruby .claude/docs/scripts/validate_workflow_inputs.rb:*)
   - Bash(dart format:*)
   - Bash(dart analyze:*)
   - Bash(dart run build_runner:*)
