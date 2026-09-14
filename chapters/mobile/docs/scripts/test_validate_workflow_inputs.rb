@@ -40,6 +40,7 @@ class ValidateWorkflowInputsTest < Minitest::Test
     assert_equal 2, status.exitstatus
     assert_equal "blocked_input", result["status"]
     assert_equal %w[hu_id description], result["missing_inputs"]
+    assert_equal %w[ok status code workflow_id missing_inputs], result.keys
   end
 
   def test_requires_ddd_inputs_only_when_ddd_mode_is_selected

@@ -650,9 +650,19 @@ def validate_invocation_contracts(findings, cleared)
            text.include?("validate_workflow_inputs.rb")
       issues << "#{workflow}: must run input preflight before workflow create"
     end
+    first_bash_start = text.index("```bash")
+    first_bash_end = first_bash_start && text.index("```", first_bash_start + 3)
+    first_bash_block = first_bash_start && first_bash_end && text[first_bash_start...first_bash_end]
+    unless first_bash_start && preflight_index && first_bash_start > preflight_index &&
+           first_bash_block&.include?("validate_workflow_inputs.rb")
+      issues << "#{workflow}: input preflight must be the first executable command"
+    end
     if text.include?("Fallback — Session context") ||
        text.include?("Fallback — Project file")
       issues << "#{workflow}: must not resolve invocation inputs from session or output/.active-user-story"
+    end
+    unless text.include?("Never generate, guess, infer, autocomplete, derive\nor offer an example or alternative `hu_id`.")
+      issues << "#{workflow}: must not propose or infer hu_id values"
     end
   end
 

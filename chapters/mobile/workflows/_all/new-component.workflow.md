@@ -61,7 +61,11 @@ the values explicitly supplied in this invocation and assign its path to
 `output/.active-user-story` to complete a missing input. Run the preflight
 command below. If it exits with `blocked_input`, return its missing-input list
 to the user and stop; do not run `workflow create`. This local check must not
-use an MCP server, subagent or AI-assisted analysis.
+use an MCP server, subagent or AI-assisted analysis. It is the first executable
+workflow action: do not inspect the workspace, plan, emit telemetry or invoke
+any other tool before it succeeds. If `hu_id` is absent or blank, return only
+the `blocked_input` result. Never generate, guess, infer, autocomplete, derive
+or offer an example or alternative `hu_id`.
 
 ```bash
 # Validate all required invocation inputs before creating an instance.

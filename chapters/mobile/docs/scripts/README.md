@@ -97,7 +97,9 @@ The inputs file must contain only values supplied in the current invocation.
 It returns JSON and exits `0` when valid or `2` with `status=blocked_input` and
 the missing input names. `hu_id` must be supplied explicitly for every new
 workflow invocation; `output/.active-user-story` is persisted only after a
-successful preflight and is not a source of invocation inputs.
+successful preflight and is not a source of invocation inputs. When `hu_id` is
+missing, the result reports only the field name; it never suggests or derives a
+value.
 
 ## `melos_workspace.rb`
 
