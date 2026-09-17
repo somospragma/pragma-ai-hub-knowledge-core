@@ -159,7 +159,7 @@ UI System components must render over the same background color they would use i
 
 ## Bootstrap output files (for the workflow report)
 
-When Step -1 triggers this sequence during `phase-4-3-ds-widgetbook` (new-component) or `phase-4-3-ds-widgetbook` / `phase-4-6-app-widgetbook` (new-view), include the newly created files in the phase's `--output-file` set so the gap report can diff them:
+When Step -1 triggers this sequence during `phase-5-ds-widgetbook` (new-component) or `phase-5-ds-widgetbook` / `phase-6-ds-widgetbook` (new-view) or `phase-8-view-widgetbook`, include the newly created files in the phase's `--output-file` set so the gap report can diff them:
 
 - `widgetbook/pubspec.yaml`
 - `widgetbook/lib/main.dart`

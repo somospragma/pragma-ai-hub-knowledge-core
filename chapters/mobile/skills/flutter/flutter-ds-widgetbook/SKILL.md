@@ -19,13 +19,13 @@ description: >
 
 Before choosing scope or generating any use case, verify that the Widgetbook host project exists and is wired up. Generating use cases against an uninitialized Widgetbook project produces files that will not compile or run.
 
-Widgetbook is a **nested** Flutter project created with `flutter create widgetbook --empty --platforms=android,ios,web` from the app root, exactly as the official Widgetbook Quick Start prescribes. The result is `<app-root>/widgetbook/` — a subfolder inside the app project, **not** a sibling directory and **not** a hand-created plain folder.
+Widgetbook is a **nested** Flutter project created with `flutter create widgetbook --empty --platforms=android,ios,web` from the app root, exactly as the official Widgetbook Quick Start prescribes. The result is `<app-root>/widgetbook/` — a subfolder inside the app project, **not** a sibling directory and **not** a hand-created plain folder. This applies to `single_repo` / `multi_repo`; for `monorepo_melos` (Single Widgetbook, the default), Widgetbook is instead created as a **sibling** top-level project at the monorepo root — see `references/monorepo.md`.
 
 Widgetbook is considered initialized only when **all four** signals are true:
 
 1. `{WIDGETBOOK_ROOT}/pubspec.yaml` exists.
 2. It declares `widgetbook` and `widgetbook_annotation` as dependencies, plus `widgetbook_generator` and `build_runner` as dev dependencies.
-3. It declares the host app package as a `path:` dependency (`path: ../`, or Melos workspace equivalent).
+3. It declares the host app package as a `path:` or version dependency (`path: ../` for `single_repo`/`multi_repo`; a `path:` or version entry per cataloged package for `monorepo_melos`).
 4. `{WIDGETBOOK_ROOT}/lib/main.dart` (or its equivalent entry file) references `directories` produced by `widgetbook_generator` (an `import` or `part` of `main.directories.g.dart` or `widgetbook.directories.g.dart`).
 
 Resolve `WIDGETBOOK_ROOT` from `topology.repo_mode`:
@@ -33,11 +33,11 @@ Resolve `WIDGETBOOK_ROOT` from `topology.repo_mode`:
 | `repo_mode` | `WIDGETBOOK_ROOT` |
 |---|---|
 | `single_repo` / `multi_repo` | Nested inside the app repo root: `<app-root>/widgetbook/` |
-| `monorepo_melos` | Nested inside the host package: `<host-package-root>/widgetbook/` (Single Widgetbook), or nested inside each cataloged package (Per-package Widgetbook) |
+| `monorepo_melos` | Sibling top-level project at the monorepo root: `<monorepo-root>/widgetbook/` (Single Widgetbook, the default), or nested inside each cataloged package only when the user has explicitly requested Per-package Widgetbook |
 
-The Widgetbook directory is literally named `widgetbook`. `APPNAME` is `project.package_name` from `.sopp/config/project.config.yaml` — it names the app `path:` dependency, not the Widgetbook directory.
+The Widgetbook directory is literally named `widgetbook`. `APPNAME` is `project.package_name` from `.sopp/config/project.config.yaml` — it names the app `path:`/version dependency, not the Widgetbook directory.
 
-**If any signal is missing:** the project must be bootstrapped. The very first command is always, run literally from the app root (or the host package root in a monorepo):
+**If any signal is missing:** the project must be bootstrapped. The very first command is always, run literally from the app root (or the monorepo root for `monorepo_melos`):
 
 ```bash
 flutter create widgetbook --empty --platforms=android,ios,web
@@ -46,7 +46,7 @@ flutter create widgetbook --empty --platforms=android,ios,web
 Never satisfy the "missing project" case by hand-creating an empty folder named `widgetbook` or by writing files into a non-Flutter directory — the directory must be a real Flutter project produced by `flutter create`. Then continue with the full initialization sequence:
 
 - For `single_repo` / `multi_repo`: run the full initialization sequence in `references/setup.md`.
-- For `monorepo_melos`: run the full initialization sequence in `references/monorepo.md`.
+- For `monorepo_melos`: run the full initialization sequence in `references/monorepo.md` (Single Widgetbook, sibling at the monorepo root, is the default — do not ask the user to choose a strategy).
 
 Include every bootstrap-produced file in the phase's `--output-file` set so the workflow's gap report can diff it (see the "Bootstrap output files" section in each reference).
 
