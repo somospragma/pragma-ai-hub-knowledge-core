@@ -41,7 +41,7 @@ tools: [read, search, edit, figma/*]
 # CLAUDE CODE
 # https://code.claude.com/docs/en/sub-agents
 # ============================================================
-tools: [Read, Grep, Glob, Write(.sopp/**), Edit(.sopp/**), mcp__figma]
+tools: [ Read, Grep, Glob, Write(.sopp/**), Edit(.sopp/**), mcp__figma, mcp__claude_ai_Figma__get_metadata, mcp__claude_ai_Figma__get_design_context, mcp__claude_ai_Figma__get_screenshot, mcp__claude_ai_Figma__get_variable_defs, mcp__claude_ai_Figma__download_assets, mcp__claude_ai_Figma__whoami, Bash(curl:*) ]
 skills:
   - flutter-ds-figma-mcp
   - flutter-ds-theming-tokens
