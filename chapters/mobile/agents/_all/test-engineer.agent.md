@@ -64,7 +64,7 @@ skills:
 ---
 # Test Engineer Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.3 -->
+<!-- author: Pragma Mobile Chapter | version: 2.1.0 -->
 
 ## Active Skills
 
@@ -103,7 +103,7 @@ the workflow controller named in `execution_owner` executes these same rules
 directly under `fallback_policy: delegate_or_controller_executes`.
 
 - `DS_WIDGET_TESTS`: DS component widget tests.
-- `VIEW_WIDGET_TESTS`: app view tests for `/new-view` phase 4d.
+- `VIEW_WIDGET_TESTS`: app view tests for `/new-view`'s `phase-7-1-view-widget-tests`.
 - `FEATURE_UNIT_TESTS`: required unit tests for `/new-feature`.
 - `FEATURE_WIDGET_TESTS`: required feature widget tests for `/new-feature`.
 - `FEATURE_INTEGRATION_TESTS`: required feature integration tests for `/new-feature`.

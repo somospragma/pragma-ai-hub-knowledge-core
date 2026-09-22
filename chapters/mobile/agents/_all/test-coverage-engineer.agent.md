@@ -78,7 +78,7 @@ skills:
 ---
 # Test Coverage Engineer Agent Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.1 -->
+<!-- author: Pragma Mobile Chapter | version: 2.1.0 -->
 
 ## Active Skills
 
@@ -195,7 +195,13 @@ If `feature_path` does not exist or contains no Dart files, return `blocked_inpu
 
 ## Process
 
-### Phase S0 — Mobile Spec Packet (full)
+> The step-ids below are copied verbatim from `test-plan.workflow.md`'s
+> `Step IDs` table. Never narrate, header, or report telemetry against a
+> phase name that is not one of: `phase-0-plan-review`,
+> `phase-1-generate-and-validate`, `phase-2-testing-report`. The first two
+> merge several internal `Step N` sub-steps described below.
+
+### `phase-0-plan-review` — Step 1: Mobile Spec Packet (`full`)
 
 1. Create `spec.yaml`, `context.json`, `review.md`, and `evidence/`.
 2. Convert feature analysis into a structured testing spec; do not ask the
@@ -206,7 +212,7 @@ If `feature_path` does not exist or contains no Dart files, return `blocked_inpu
 6. Continue only when `context.json.status=approved_for_execution` and
    `context.json.checkpoints.initial_spec.status=approved`.
 
-### Phase 1 — Feature Analysis
+### `phase-0-plan-review` — Step 2: Feature Analysis
 
 1. Read all source files in `feature_path` recursively
 2. Classify each file by layer:
@@ -245,7 +251,7 @@ Status legend:
 - 🔄 **outdated** — test exists but uses wrong mocks/patterns (will be MODIFIED)
 - 🆕 **missing** — no test file exists (will be CREATED)
 
-### Phase 2 — Test Plan
+### `phase-0-plan-review` — Step 3: Test Plan
 
 1. For each missing or incomplete test, define:
    - Test file path
@@ -259,9 +265,16 @@ Status legend:
    - Pages last (UI verification)
 3. Present plan to user (if in interactive mode) or proceed directly (if in pipeline mode)
 4. Persist the plan in `spec.yaml.test_plan`, `spec.yaml.artifact_plan`, and
-   `review.md`; wait for approval before Phase 3.
+   `review.md`.
 
-### Phase 3 — Test Generation
+### `phase-0-plan-review` — Step 4: Checkpoint (Validation + Human Review)
+
+Present `review.md` (feature analysis + test plan) to the user in Spanish.
+This step's presentation is the aggregate approval gate for the whole merged
+planning phase (Steps 1–3 above). Wait for explicit approval before
+proceeding to `phase-1-generate-and-validate`.
+
+### `phase-1-generate-and-validate` — Step 1: Test Generation
 
 Generate tests following these patterns:
 
@@ -531,7 +544,7 @@ void main() {
 }
 ```
 
-### Phase 4 — Test Execution & Validation
+### `phase-1-generate-and-validate` — Step 2: Execution & Validation
 
 1. Run all generated tests:
    - `flutter test test/features/{feature_name}/`
@@ -543,12 +556,12 @@ void main() {
 5. If coverage is below target, generate additional test cases for uncovered branches
 
 > **IMPORTANT: After tests pass, you are NOT done.**
-> You MUST continue to Phase 5 (create the testing report file in docs/testing/).
+> You MUST continue to `phase-2-testing-report` (create the testing report file in docs/testing/).
 > Generating tests is only 80% of the work. The report file is the remaining 20%.
 > DO NOT report completion to the user without the report file on disk.
 > DO NOT say "done" or "complete" until `docs/testing/{feature_name}-testing-report-{date}.md` EXISTS.
 
-### Phase 5 — Testing Report (mandatory — FILE CREATION action)
+### `phase-2-testing-report` (mandatory — FILE CREATION action)
 
 > **CRITICAL: This is a FILE CREATION action. The agent MUST create this file
 > on disk. The test plan is NOT complete until this file exists.**

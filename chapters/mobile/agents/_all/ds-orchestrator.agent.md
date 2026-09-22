@@ -67,7 +67,7 @@ skills:
 ---
 # Design System Workflow Controller Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.10 -->
+<!-- author: Pragma Mobile Chapter | version: 2.1.0 -->
 
 ## Active Skills
 
@@ -476,128 +476,147 @@ telemetry + per-step human approval gate defined in
 
 ### `/new-component`
 
-Pre-flight gates (no `--output-file`, no gap report):
+Phases (all step-ids copied verbatim from the workflow's `Step IDs` table;
+none are legacy/invented names):
 
-1. `topology-gate` — validate `TOPOLOGY_REPO_MODE`, roots and that
-   `ACTIVE_TARGET_ID` is a `design_system` target.
-2. `app-repo-ownership-gate` — validate canonical config in the app repo and
-   executable app signals.
-3. `figma-mcp-gate` — delegate Figma MCP preflight to `@figma-analyzer`
-   (fallback: execute the role contract only when the packet grants the
-   required permissions).
-
-Phases:
-
-4. `phase-0-spec-packet` — `@ds-orchestrator` creates the Mobile Spec Packet
-   (`mini`) with `spec.yaml`, `context.json`, `review.md` and
-   `evidence/validation-report.md`.
-5. `phase-1-design-analysis` — `@figma-analyzer` updates `design_source`,
-   `literal_texts`, `layout_constraints`, `assets`, `success_criteria.visual`
-   and archives every visible Figma source under `source-assets/figma/`.
-6. `phase-2-spec-inventory-dag` — `@component-planner` updates
-   `canonical_spec`, `inventory`, `dag` and
-   `artifact_plan.planned[group=ds_components]`.
-7. `phase-2-1-architecture-technical` — `@component-architect` updates
-   `technical_plan`, `artifact_plan`, `contracts.text_overflow`,
-   `success_criteria` and `handoffs`.
-8. `phase-2-2-validation-human-review` — validate `spec.yaml` and present
-   `review.md`. Aggregate approval gate for PHASE 0 → PHASE 2.1.
-9. `phase-3-ds-code-generation` — `@widget-developer` generates DS code
-   bottom-up (atoms → molecules → organisms).
-10. `phase-3-1-quality-audit` — `@code-auditor` loops with
-    `@widget-developer` up to `pipeline.max_audit_retries` and writes
-    `evidence/audit-report.md`.
-11. `phase-4-1-widget-tests-ds` — `@test-engineer` with
-    `MODE=DS_WIDGET_TESTS`.
-12. `phase-4-2-golden-tests-ds` — `@golden-test-engineer` with
-    `MODE=DS_GOLDEN_TESTS`, only when `golden_tests=true`; otherwise skip
-    the phase entirely (no telemetry) and record `skipped_by_input`.
-13. `phase-4-3-widgetbook-ds` — `@widgetbook-developer` with
-    `MODE=DS_WIDGETBOOK`; owns the Widgetbook cold-init when applicable.
-14. `phase-5-delivery` — `@delivery-manager` writes
-    `evidence/delivery-report.md` and the human report.
+1. `phase-0-preflight-gates` — no `--output-file`, no gap report, but still
+   runs the full `started` → `finished`/`failed` → per-step approval cycle
+   (three checks in one telemetried step):
+   - Check 1 — Topology: validate `TOPOLOGY_REPO_MODE`, roots and that
+     `ACTIVE_TARGET_ID` is a `design_system` target.
+   - Check 2 — App Repo Ownership: validate canonical config in the app
+     repo and executable app signals.
+   - Check 3 — Figma MCP: delegate Figma MCP preflight to
+     `@figma-analyzer` (fallback: execute the role contract only when the
+     packet grants the required permissions).
+2. `phase-1-spec-design-analysis` — merges two steps under one step-id:
+   - Step 1 — Mobile Spec Packet: `@ds-orchestrator` creates the Mobile
+     Spec Packet (`mini`) with `spec.yaml`, `context.json`, `review.md` and
+     `evidence/validation-report.md`.
+   - Step 2 — Design Analysis: `@figma-analyzer` updates `design_source`,
+     `literal_texts`, `layout_constraints`, `assets`,
+     `success_criteria.visual` and archives every visible Figma source
+     under `source-assets/figma/`.
+3. `phase-2-planning` — merges three steps under one step-id:
+   - Step 1 — Spec + Inventory + DAG: `@component-planner` updates
+     `canonical_spec`, `inventory`, `dag` and
+     `artifact_plan.planned[group=ds_components]`.
+   - Step 2 — Architecture Technical: `@component-architect` updates
+     `technical_plan`, `artifact_plan`, `contracts.text_overflow`,
+     `success_criteria` and `handoffs`.
+   - Step 3 — Validation + Human Review: validate `spec.yaml` and present
+     `review.md`. This step's presentation is the aggregate approval gate
+     for the whole merged planning phase (Steps 1–2 above).
+4. `phase-3-code-generation` — merges two steps under one step-id:
+   - Step 1 — DS Code Generation: `@widget-developer` generates DS code
+     bottom-up (atoms → molecules → organisms).
+   - Step 2 — Quality Audit: `@code-auditor` loops with
+     `@widget-developer` up to `pipeline.max_audit_retries` and writes
+     `evidence/audit-report.md`.
+5. `phase-4-1-widget-tests-ds` — `@test-engineer` with
+   `MODE=DS_WIDGET_TESTS`.
+6. `phase-4-2-golden-tests-ds` — `@golden-test-engineer` with
+   `MODE=DS_GOLDEN_TESTS`, only when `golden_tests=true`; otherwise skip
+   the phase entirely (no telemetry) and record `skipped_by_input`.
+7. `phase-5-widgetbook-ds` — `@widgetbook-developer` with
+   `MODE=DS_WIDGETBOOK`; owns the Widgetbook cold-init when applicable.
+8. `phase-6-delivery` — `@delivery-manager` writes
+   `evidence/delivery-report.md` and the human report.
 
 ### `/new-view`
 
-Pre-flight gates (no `--output-file`, no gap report):
+Phases (all step-ids copied verbatim from the workflow's `Step IDs` table;
+none are legacy/invented names):
 
-1. `gate-0-canonical-configuration` — resolve and validate the `.sopp/config`
-   triplet in the app repo.
-2. `gate-0-1-topology` — validate `TOPOLOGY_REPO_MODE`, roots and Melos when
-   applicable.
-3. `gate-0-2-spec-packet-ownership` — resolve `APP_TARGET_ID` as the
-   immutable packet owner and verify that `SPEC_PACKET_PATH` lives inside
-   `SPEC_PACKET_OWNER_ROOT`.
-4. `gate-0-5-ownership-repo-app` — validate that `PROJECT_ROOT` is an app
-   repository and not a library.
-5. `gate-1-architecture` — require `ARCHITECTURE_CONTRACT_PATH` when
-   `require_architecture_contract=true`.
-6. `gate-2-contracts-policy` — `optional` continues; `generate` unlocks
-   `phase-2-2-contracts-minimum`; `required` blocks when referenced
-   domain/data contracts are missing.
-7. `gate-3-figma-mcp` — delegate Figma MCP preflight to `@figma-analyzer`
-   (fallback: execute the role contract only when the packet grants the
-   required permissions).
-
-Phases:
-
-8. `phase-0-spec-packet` — `@ds-orchestrator` creates the Mobile Spec Packet
-   (`standard`) and records `packet_owner_target_id` in `context.json`.
-9. `phase-1-analysis-of-screen` — `@figma-analyzer` (or the fallback role
-   contract) updates `design_source`, `literal_texts`, `layout_constraints`,
-   `view_states`, `navigation`, `assets`, `visual_manifest`,
-   `layout_manifest` and archives every visible Figma source under
-   `source-assets/figma/`.
-10. `phase-2-inventory-dag` — `@component-planner` updates
-    `canonical_spec`, `inventory`, `dag`,
-    `artifact_plan.planned[group=ds_components]` and
-    `artifact_plan.planned[group=app_view]`.
-11. `phase-2-1-architecture-technical` — `@component-architect` updates
-    `technical_plan`, `artifact_plan`, `contracts.text_overflow`,
-    `contracts.asset_rendering`, `contracts.icon_mapping`,
-    `contracts.typography_mapping`, `contracts.screen_chrome`,
-    `visual_manifest`, `success_criteria`, `handoffs` and `checkpoints`.
-12. `phase-2-2-contracts-minimum` — only when `CONTRACTS_POLICY=generate`;
-    `@component-architect` writes `contracts.minimal_domain_data`.
-13. `phase-2-3-validation-human-review` — validate the plan and present
-    `review.md`. Aggregate approval gate for PHASE 0 → PHASE 2.2. Only
-    `context.json.status=approved_for_execution` and
-    `checkpoints.initial_spec.status=approved` unlock PHASE 3.1.
-14. `phase-3-1-codegen-ds` — `@widget-developer` generates DS components
-    (atoms → molecules → organisms).
-15. `phase-3-2-audit-ds` — `@code-auditor` audits DS components and writes
-    `evidence/ds-component-audit.md`; loops with `@widget-developer` up to
-    `pipeline.max_audit_retries`.
-16. `phase-3-3-checkpoint-ds` — `@ds-orchestrator` presents the DS-layer
-    review in Spanish. Aggregate approval gate for PHASE 3.1 and PHASE 3.2.
-    Only `checkpoints.ds_layer.status=approved` and
-    `context.json.status=approved_for_execution` unlock PHASE 3.4.
-17. `phase-3-4-codegen-view` — `@widget-developer` generates the app view
-    and its private widgets with `codegen-view`.
-18. `phase-3-5-audit-view` — `@code-auditor` audits the app view, writes
-    `evidence/app-view-audit.md` and the required
-    `evidence/figma-fidelity-report.json`; loops with `@widget-developer` up
-    to `pipeline.max_audit_retries`.
-19. `phase-3-6-checkpoint-view` — `@ds-orchestrator` presents the app-view
-    review in Spanish, including the fidelity report. Aggregate approval
-    gate for PHASE 3.4 and PHASE 3.5. Only
-    `checkpoints.app_view_layer.status=approved` and
-    `context.json.status=approved_for_execution` unlock PHASE 4.1.
-20. `phase-4-1-ds-widget-tests` — `@test-engineer` with
-    `MODE=DS_WIDGET_TESTS`.
-21. `phase-4-2-ds-golden-tests` — `@golden-test-engineer` with
-    `MODE=DS_GOLDEN_TESTS`, only when `golden_tests=true`; otherwise skip
-    entirely (no telemetry) and record `skipped_by_input`.
-22. `phase-4-3-ds-widgetbook` — `@widgetbook-developer` with
-    `MODE=DS_WIDGETBOOK`; owns the Widgetbook cold-init when applicable.
-23. `phase-4-4-view-widget-tests` — `@test-engineer` with
-    `MODE=VIEW_WIDGET_TESTS`.
-24. `phase-4-5-view-golden-tests` — `@golden-test-engineer` with
-    `MODE=VIEW_GOLDEN_TESTS`, only when `golden_tests=true`; otherwise reuse
-    the recorded `skipped_by_input` outcome and skip entirely.
-25. `phase-4-6-app-widgetbook` — `@widgetbook-developer` with
+1. `phase-0-preflight-gates` — no `--output-file`, no gap report, but still
+   runs the full `started` → `finished`/`failed` → per-step approval cycle
+   (seven checks in one telemetried step, in order):
+   - Check 1 — Canonical Configuration: resolve and validate the
+     `.sopp/config` triplet in the app repo.
+   - Check 2 — Topology: validate `TOPOLOGY_REPO_MODE`, roots and Melos
+     when applicable.
+   - Check 3 — Spec Packet Ownership: resolve `APP_TARGET_ID` as the
+     immutable packet owner and verify that `SPEC_PACKET_PATH` lives
+     inside `SPEC_PACKET_OWNER_ROOT`.
+   - Check 4 — Ownership of the Repo App: validate that `PROJECT_ROOT` is
+     an app repository and not a library.
+   - Check 5 — Architecture: require `ARCHITECTURE_CONTRACT_PATH` when
+     `require_architecture_contract=true`.
+   - Check 6 — Policy of Contracts: `optional` continues; `generate`
+     unlocks `phase-2-planning`'s Step 3 (Contracts Minimum); `required`
+     blocks when referenced domain/data contracts are missing.
+   - Check 7 — Figma MCP: delegate Figma MCP preflight to
+     `@figma-analyzer` (fallback: execute the role contract only when the
+     packet grants the required permissions).
+2. `phase-1-spec-design-analysis` — merges two steps under one step-id:
+   - Step 1 — Mobile Spec Packet: `@ds-orchestrator` creates the Mobile
+     Spec Packet (`standard`) and records `packet_owner_target_id` in
+     `context.json`.
+   - Step 2 — Analysis of Screen: `@figma-analyzer` (or the fallback role
+     contract) updates `design_source`, `literal_texts`,
+     `layout_constraints`, `view_states`, `navigation`, `assets`,
+     `visual_manifest`, `layout_manifest` and archives every visible Figma
+     source under `source-assets/figma/`.
+3. `phase-2-planning` — merges up to four steps under one step-id:
+   - Step 1 — Extended Inventory + DAG: `@component-planner` updates
+     `canonical_spec`, `inventory`, `dag`,
+     `artifact_plan.planned[group=ds_components]` and
+     `artifact_plan.planned[group=app_view]`.
+   - Step 2 — Architecture Technical: `@component-architect` updates
+     `technical_plan`, `artifact_plan`, `contracts.text_overflow`,
+     `contracts.asset_rendering`, `contracts.icon_mapping`,
+     `contracts.typography_mapping`, `contracts.screen_chrome`,
+     `visual_manifest`, `success_criteria`, `handoffs` and `checkpoints`.
+   - Step 3 — Contracts Minimum (conditional): only when
+     `CONTRACTS_POLICY=generate`; `@component-architect` writes
+     `contracts.minimal_domain_data`.
+   - Step 4 — Validation + Human Review: validate the plan and present
+     `review.md`. This step's presentation is the aggregate approval gate
+     for the whole merged planning phase (Steps 1–3 above). Only
+     `context.json.status=approved_for_execution` and
+     `checkpoints.initial_spec.status=approved` unlock
+     `phase-3-ds-code-generation`.
+4. `phase-3-ds-code-generation` — merges three steps under one step-id:
+   - Step 1 — Codegen of Components DS: `@widget-developer` generates DS
+     components (atoms → molecules → organisms).
+   - Step 2 — Audit of Components DS: `@code-auditor` audits DS components
+     and writes `evidence/ds-component-audit.md`; loops with
+     `@widget-developer` up to `pipeline.max_audit_retries`.
+   - Step 3 — Checkpoint Human of Layer DS: `@ds-orchestrator` presents
+     the DS-layer review in Spanish. This step's presentation is the
+     domain aggregate approval gate for Steps 1–2 above (Codegen + Audit
+     of the DS layer). Only `checkpoints.ds_layer.status=approved` and
+     `context.json.status=approved_for_execution` unlock
+     `phase-4-view-code-generation`.
+5. `phase-4-view-code-generation` — merges three steps under one step-id:
+   - Step 1 — Codegen of View App: `@widget-developer` generates the app
+     view and its private widgets with `codegen-view`.
+   - Step 2 — Audit of App View: `@code-auditor` audits the app view,
+     writes `evidence/app-view-audit.md` and the required
+     `evidence/figma-fidelity-report.json`; loops with
+     `@widget-developer` up to `pipeline.max_audit_retries`.
+   - Step 3 — Human Checkpoint of App View: `@ds-orchestrator` presents
+     the app-view review in Spanish, including the fidelity report. This
+     step's presentation is the domain aggregate approval gate for Steps
+     1–2 above (Codegen + Audit of the app view). Only
+     `checkpoints.app_view_layer.status=approved` and
+     `context.json.status=approved_for_execution` unlock
+     `phase-5-1-ds-widget-tests`.
+6. `phase-5-1-ds-widget-tests` — `@test-engineer` with
+   `MODE=DS_WIDGET_TESTS`.
+7. `phase-5-2-ds-golden-tests` — `@golden-test-engineer` with
+   `MODE=DS_GOLDEN_TESTS`, only when `golden_tests=true`; otherwise skip
+   entirely (no telemetry) and record `skipped_by_input`.
+8. `phase-6-ds-widgetbook` — `@widgetbook-developer` with
+   `MODE=DS_WIDGETBOOK`; owns the Widgetbook cold-init when applicable.
+9. `phase-7-1-view-widget-tests` — `@test-engineer` with
+   `MODE=VIEW_WIDGET_TESTS`.
+10. `phase-7-2-view-golden-tests` — `@golden-test-engineer` with
+    `MODE=VIEW_GOLDEN_TESTS`, only when `golden_tests=true`; otherwise
+    reuse the recorded `skipped_by_input` outcome and skip entirely.
+11. `phase-8-view-widgetbook` — `@widgetbook-developer` with
     `MODE=APP_WIDGETBOOK_SCREENS` and `WIDGETBOOK_SCOPE=APP_SCREENS`.
-26. `phase-5-delivery` — `@delivery-manager` writes
+12. `phase-9-delivery` — `@delivery-manager` writes
     `evidence/delivery-report.md` and the human report.
 
 ### `/refactor-component`
@@ -605,26 +624,29 @@ Phases:
 Pre-flight (not tracked by telemetry): Topology gate. Its failure with
 `blocked_input` stops the run before the workflow instance is minted.
 
-Phases:
+Phases (all step-ids copied verbatim from the workflow's `Step IDs` table):
 
-1. `phase-0-spec-packet` — `@ds-orchestrator` creates the Mobile Spec Packet
-   (`mini`) recording the refactor target, intent and
-   `constraints.compatibility`.
-2. `phase-1-current-component-analysis` — `@component-planner` updates
-   `current_state`, `impact_analysis`, `inventory` and `artifact_plan`.
-3. `phase-2-technical-refactor-plan` — `@component-architect` updates
-   `technical_plan`, `success_criteria` and `handoffs`.
-4. `phase-2-1-validation-human-review` — validate `spec.yaml` and present
-   `review.md`. Aggregate approval gate for PHASE 0 → PHASE 2.
-5. `phase-3-apply-changes` — `@widget-developer` applies the refactor and
-   migration, preserving backward compatibility when viable.
-6. `phase-3-1-audit` — `@code-auditor` audits against `spec_ref` and writes
-   `evidence/audit-report.md`.
-7. `phase-4-1-widget-tests` — `@test-engineer` with `MODE=DS_WIDGET_TESTS`.
-8. `phase-4-2-golden-tests` — `@golden-test-engineer` with
+1. `phase-0-plan-review` — merges four steps under one step-id:
+   - Step 1 — Mobile Spec Packet (`mini`): `@ds-orchestrator` creates the
+     Mobile Spec Packet recording the refactor target, intent and
+     `constraints.compatibility`.
+   - Step 2 — Current Component Analysis: `@component-planner` updates
+     `current_state`, `impact_analysis`, `inventory` and `artifact_plan`.
+   - Step 3 — Technical Refactor Plan: `@component-architect` updates
+     `technical_plan`, `success_criteria` and `handoffs`.
+   - Step 4 — Validation + Human Review: validate `spec.yaml` and present
+     `review.md`. This step's presentation is the aggregate approval gate
+     for the whole merged planning phase (Steps 1–3 above).
+2. `phase-1-apply-audit` — merges two steps under one step-id:
+   - Step 1 — Apply Changes: `@widget-developer` applies the refactor and
+     migration, preserving backward compatibility when viable.
+   - Step 2 — Audit: `@code-auditor` audits against `spec_ref` and writes
+     `evidence/audit-report.md`.
+3. `phase-2-widget-tests` — `@test-engineer` with `MODE=DS_WIDGET_TESTS`.
+4. `phase-3-golden-tests` — `@golden-test-engineer` with
    `MODE=DS_GOLDEN_TESTS`, only when the plan/audit classifies the refactor
    as having visual impact; otherwise skip entirely (no telemetry).
-9. `phase-5-delivery` — `@delivery-manager` writes
+5. `phase-4-delivery` — `@delivery-manager` writes
    `evidence/delivery-report.md` and the human report.
 
 ### `/fix-pr-comments`
@@ -633,28 +655,32 @@ Pre-flight (not tracked by telemetry): Topology gate and the "accessible PR
 comments" precondition. A `blocked_input` on either stops the run before the
 workflow instance is minted.
 
-Phases:
+Phases (all step-ids copied verbatim from the workflow's `Step IDs` table):
 
-1. `phase-0-spec-packet` — `@ds-orchestrator` creates the Mobile Spec Packet
-   (`mini`) with the PR URL/source and the comment-to-action matrix seed.
-2. `phase-1-analyze-comments` — `@component-planner` classifies comments
-   (`[VISUAL] | [LOGIC] | [DOCS] | [TESTS] | [STYLE]`) and updates
-   `comment_inventory`, `correction_plan`, `artifact_plan` and
-   `success_criteria`.
-3. `phase-1-1-validation-human-review` — validate `spec.yaml` and present
-   `review.md`. Aggregate approval gate for PHASE 0 and PHASE 1.
-4. `phase-2-apply-code-fixes` — `@widget-developer` applies
-   `[VISUAL | LOGIC | STYLE]` fixes.
-5. `phase-3-audit-comment-coverage` — `@code-auditor` verifies the
-   comment-to-fix matrix, loops with `@widget-developer` when coverage is
-   missing and writes `evidence/audit-report.md`.
-6. `phase-4-1-widget-tests` — `@test-engineer` with `MODE=DS_WIDGET_TESTS`,
+1. `phase-0-plan-review` — merges three steps under one step-id:
+   - Step 1 — Mobile Spec Packet (`mini`): `@ds-orchestrator` creates the
+     Mobile Spec Packet with the PR URL/source and the comment-to-action
+     matrix seed.
+   - Step 2 — Analyze Comments And Build The Plan: `@component-planner`
+     classifies comments (`[VISUAL] | [LOGIC] | [DOCS] | [TESTS] | [STYLE]`)
+     and updates `comment_inventory`, `correction_plan`, `artifact_plan` and
+     `success_criteria`.
+   - Step 3 — Validation + Human Review: validate `spec.yaml` and present
+     `review.md`. This step's presentation is the aggregate approval gate
+     for the whole merged planning phase (Steps 1–2 above).
+2. `phase-1-apply-audit` — merges two steps under one step-id:
+   - Step 1 — Apply Code Fixes: `@widget-developer` applies
+     `[VISUAL | LOGIC | STYLE]` fixes.
+   - Step 2 — Audit Comment Coverage: `@code-auditor` verifies the
+     comment-to-fix matrix, loops with `@widget-developer` when coverage is
+     missing and writes `evidence/audit-report.md`.
+3. `phase-2-widget-tests` — `@test-engineer` with `MODE=DS_WIDGET_TESTS`,
    only when the plan/audit classifies fixes as having functional impact;
    otherwise skip entirely (no telemetry).
-7. `phase-4-2-golden-tests` — `@golden-test-engineer` with
+4. `phase-3-golden-tests` — `@golden-test-engineer` with
    `MODE=DS_GOLDEN_TESTS`, only when the plan/audit classifies fixes as
    having visual impact; otherwise skip entirely (no telemetry).
-8. `phase-5-delivery` — `@delivery-manager` applies `[DOCS]` fixes, writes
+5. `phase-4-delivery` — `@delivery-manager` applies `[DOCS]` fixes, writes
    `evidence/delivery-report.md` and the human report.
 
 ## Handoff standard (required)
@@ -765,12 +791,12 @@ gate:
 
 | Workflow | Aggregate gate | Scope approved | Unlocks |
 |---|---|---|---|
-| `/new-component` | `phase-2-2-validation-human-review` | PHASE 0 → PHASE 2.1 | PHASE 3 |
-| `/new-view` | `phase-2-3-validation-human-review` | PHASE 0 → PHASE 2.2 | PHASE 3.1 |
-| `/new-view` | `phase-3-3-checkpoint-ds` | PHASE 3.1 and PHASE 3.2 | PHASE 3.4 |
-| `/new-view` | `phase-3-6-checkpoint-view` | PHASE 3.4 and PHASE 3.5 | PHASE 4.1 |
-| `/refactor-component` | `phase-2-1-validation-human-review` | PHASE 0 → PHASE 2 | PHASE 3 |
-| `/fix-pr-comments` | `phase-1-1-validation-human-review` | PHASE 0 and PHASE 1 | PHASE 2 |
+| `/new-component` | `phase-2-planning` Step 3 (Validation + Human Review) | `phase-1-spec-design-analysis` and `phase-2-planning`'s own Steps 1–2 | `phase-3-code-generation` |
+| `/new-view` | `phase-2-planning` Step 4 (Validation + Human Review) | `phase-1-spec-design-analysis` and `phase-2-planning`'s own Steps 1–3 | `phase-3-ds-code-generation` |
+| `/new-view` | `phase-3-ds-code-generation` Step 3 (Checkpoint Human of Layer DS) | this phase's own Steps 1–2 (Codegen + Audit of DS) | `phase-4-view-code-generation` |
+| `/new-view` | `phase-4-view-code-generation` Step 3 (Human Checkpoint of App View) | this phase's own Steps 1–2 (Codegen + Audit of App View) | `phase-5-1-ds-widget-tests` |
+| `/refactor-component` | `phase-0-plan-review` Step 4 (Validation + Human Review) | this phase's own Steps 1–3 | `phase-1-apply-audit` |
+| `/fix-pr-comments` | `phase-0-plan-review` Step 3 (Validation + Human Review) | this phase's own Steps 1–2 | `phase-1-apply-audit` |
 
 Each aggregate gate must present `review.md` in Spanish covering the sections
 listed for that workflow in `Phase Gate (required)` and wait for explicit
@@ -808,10 +834,11 @@ executed (`skipped_by_input`).
 - A delegated response is not phase completion. Require the already-mandatory
   evidence and the applicable existing SOPP checkpoint before reporting success.
 - NEVER execute Figma MCP directly when native delegation is available.
-- ALWAYS prefer `@figma-analyzer` for Figma access (`phase-1-design-analysis`
-  in `/new-component`, `phase-1-analysis-of-screen` in `/new-view`). When
-  delegation is unavailable, execute only its bounded analysis role contract
-  and only with the explicit packet permissions listed above.
+- ALWAYS prefer `@figma-analyzer` for Figma access (`phase-1-spec-design-analysis`'s
+  Step 2 — Design Analysis in `/new-component`; `phase-1-spec-design-analysis`'s
+  Step 2 — Analysis of Screen in `/new-view`). When delegation is unavailable,
+  execute only its bounded analysis role contract and only with the explicit
+  packet permissions listed above.
 - ALWAYS respect the canonical order of gates and phases declared in
   `Phase Gate (required)`.
 - ALWAYS record log per phase.

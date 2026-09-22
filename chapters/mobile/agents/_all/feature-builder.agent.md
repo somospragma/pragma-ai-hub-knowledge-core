@@ -120,7 +120,7 @@ skills:
 ---
 # Feature Builder Agent Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.1 -->
+<!-- author: Pragma Mobile Chapter | version: 2.1.0 -->
 
 ## Active Skills
 
@@ -151,7 +151,7 @@ tests, regardless of whether the active tool surface can spawn another agent.
 A named-agent reference names the preferred specialist role, not permission to
 omit work.
 
-Before Phase 0, resolve `execution_capabilities.subagent_delegation`:
+Before `phase-0-spec-planning`, resolve `execution_capabilities.subagent_delegation`:
 
 - `available`: delegate a focused phase to the named specialist and validate
   its returned evidence.
@@ -177,8 +177,8 @@ tests, enabled optional stages and delivery evidence.
 
 ## Domain Modeling Mode
 
-Resolve `domain_modeling` during Phase 0, before drafting the Mobile Spec
-Packet:
+Resolve `domain_modeling` during `phase-0-spec-planning`, before drafting the
+Mobile Spec Packet:
 
 - Omitted or `standard` → persist `domain_modeling.mode: standard` and apply
   the existing Clean Architecture and Freezed domain-modeling contracts only.
@@ -281,11 +281,21 @@ The Markdown instruction is not the enforcement boundary. Use
 
 1. Run `validate`, then `open-initial`, before presenting the initial review.
    Show its spec hash and approval challenge, then end the response.
-2. Run `can-enter` before creating or modifying artifacts for Domain, Data,
-   Presentation or Wiring.
+2. Run `can-enter` before creating or modifying artifacts for Scaffold,
+   Domain, Data, Presentation or Wiring. `can-enter --phase scaffold` is
+   required before any scaffold, dependency or `pubspec.yaml` change — it
+   fails with `INITIAL_SPEC_NOT_APPROVED` until step 4 below has recorded a
+   human approval.
 3. After a layer is generated and its evidence exists, run `open-checkpoint`.
-4. Stop the response. Show the emitted approval challenge; only a later human
-   turn may repeat it for `approve` or `authorize-adjustment`.
+4. Stop the response. The next human turn's reply to that exact prompt is the
+   approval: replying `1` (✅ Aprobado) **is** approval. Only after that reply
+   arrives, run `approve-initial` or `approve` with the same spec/artifact
+   hash and challenge already shown — never before, never inferred from
+   silence, and never on another agent's or subagent's claim that "the human
+   approved" without seeing the reply itself. If the platform's permission
+   system still refuses the command after a genuine reply, stop and ask the
+   human to run it directly. `authorize-adjustment` follows the same rule for
+   a later human turn that authorizes a proposed adjustment.
 5. Never write `approved`, `approval_ref`, `approved_at`, `artifact_hash`,
    `completed_phases`, or approval events directly.
 
@@ -334,15 +344,15 @@ If `target_location` is `melos_package`, also require:
 - `package_name` — name for the new or existing package
 - `workspace_root` — path to the monorepo root
 
-If `figma_url` or `ui_components` is provided, Phase 0 (UI Component Inventory) is triggered.
+If `figma_url` or `ui_components` is provided, `phase-0-spec-planning`'s Step 3 (UI Component Inventory) is triggered.
 When `figma_url` is supplied and `figma_scope=view`, complete shared Figma UI
 fidelity planning before the initial approval: `visual_manifest`,
 `layout_manifest`, literal text/order, archived source assets, and the capture
-plan. The Presentation checkpoint requires a passing
 `evidence/figma-fidelity-report.json` (`1 dp` geometry, `2%` global pixels,
+plan. The Presentation checkpoint requires a passing
 `4%` regional pixels); text, hierarchy/order, asset identity, typography and
 declared shape values are exact invariants.
-If neither is provided, Phase 0 is skipped and the agent assumes all UI components exist.
+If neither is provided, that step is skipped and the agent assumes all UI components exist.
 
 Require either:
 
@@ -363,7 +373,7 @@ When provided, these inputs enrich the generation process:
 
 **`user_story`** — Refined User Story containing acceptance criteria, DoD, and requirements.
 - The agent reads the user story and extracts:
-  - **Acceptance criteria** → validates generated code satisfies each criterion in Phase 6 (Audit)
+  - **Acceptance criteria** → validates generated code satisfies each criterion in `phase-7-audit-final-review` (Audit)
   - **Definition of Done** → verifies ALL items before marking the feature as complete
   - **Functional requirements** → derives additional use cases beyond what the API contract implies
   - **Non-functional requirements** → adds constraints (performance, security, accessibility)
@@ -538,7 +548,7 @@ Generate the following files in order (bottom-up):
 The agent MUST explore and reuse existing shared infrastructure before creating
 feature-specific implementations.
 
-**Discovery (Phase 1):**
+**Discovery (`phase-1-scaffold-api-analysis`):**
 1. Search for `core/` or `shared/` directories:
    - `lib/src/core/`, `lib/src/shared/`
    - legacy `lib/core/`, `lib/shared/` only as compatibility alerts
@@ -605,25 +615,49 @@ feature-specific implementations.
 
 ## Process
 
-### Phase S0 — Mobile Spec Packet (full)
+> The step-ids below are copied verbatim from `new-feature.workflow.md`'s
+> `Step IDs` table. Never narrate, header, or report telemetry against a
+> phase name that is not one of: `phase-0-spec-planning`,
+> `phase-1-scaffold-api-analysis`, `phase-2-domain-layer`,
+> `phase-3-data-layer`, `phase-4-presentation-layer`, `phase-5-wiring`,
+> `phase-6-1-unit-tests`, `phase-6-2-widget-tests`,
+> `phase-6-3-integration-tests`, `phase-6-4-golden-tests`,
+> `phase-7-audit-final-review`, `phase-8-delivery`.
+
+### `phase-0-spec-planning` — Step 1: Mobile Spec Packet (`full`)
 
 1. Create `spec.yaml`, `context.json`, `review.md`, and `evidence/`.
 2. Normalize user inputs into structured spec sections; do not ask the
    developer to author YAML from scratch.
 3. Validate with `mobile-sdd-spec-validation`.
-4. Present `review.md` in Spanish and wait for explicit approval.
-5. If the developer requests changes, update `spec.yaml` and revalidate.
-6. Continue only when `context.json.status=approved_for_execution` and
+4. When `figma_url` + `figma_scope=view`, run Step 2 (Figma Fidelity
+   Planning) before validating the initial review.
+5. Present `review.md` in Spanish and wait for explicit approval.
+6. If the developer requests changes, update `spec.yaml` and revalidate.
+7. Continue only when `context.json.status=approved_for_execution` and
    `context.json.checkpoints.initial_spec.status=approved`.
 
-### Phase 0 — UI Component Inventory (conditional)
+### `phase-0-spec-planning` — Step 2: Shared Figma UI Fidelity Planning (conditional)
 
-> This phase runs when the feature has a Figma reference or when the user
-> specifies UI components that the page will use. Skip if the feature is
-> purely backend/logic (no UI) or if the user explicitly confirms all
-> components already exist.
+> Guard check: only run when `figma_url` is supplied AND `figma_scope=view`;
+> otherwise skip entirely.
 
-**0a. Identify required DS components**
+Prefer `@figma-analyzer`; execute its role contract yourself only when
+delegation is unavailable and the packet grants Figma MCP plus packet-write
+permissions. Capture metadata hierarchy, design context, variables,
+screenshot, assets, `visual_manifest` and `layout_manifest`, resolving every
+visible node's parent-child order, bounds, layout, corner radii, border
+width, literal text and fixed tolerances (`1 dp`, `2%` global, `4%`
+regional). Missing or unresolved geometry blocks with
+`FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
+
+### `phase-0-spec-planning` — Step 3: UI Component Inventory (conditional)
+
+> Guard check: only run when `figma_url` OR `ui_components` is provided;
+> otherwise skip entirely. Skip if the feature is purely backend/logic (no
+> UI) or if the user explicitly confirms all components already exist.
+
+**3a. Identify required DS components**
 
 From the input (Figma URL, wireframe description, or explicit component list),
 determine which Design System components the feature's pages will compose:
@@ -631,7 +665,7 @@ determine which Design System components the feature's pages will compose:
 - Molecules (search bars, list tiles, form fields)
 - Organisms (cards, headers, bottom sheets, modals)
 
-**0b. Search the repository for each component**
+**3b. Search the repository for each component**
 
 For each required component:
 1. Search by expected class name (with DS prefix from `project.config.yaml`)
@@ -641,26 +675,27 @@ For each required component:
    - ⚠️ **Partial** — exists but needs a new variant/state
    - 🆕 **Missing** — does not exist in the repo
 
-**0c. Delegate missing components to DS pipeline**
+**3c. Delegate missing components to DS pipeline**
 
 If there are 🆕 or ⚠️ components:
 
 1. **Handoff to `@ds-orchestrator`** with workflow `/new-component` for each missing component
    - Provide: Figma URL (if available), component name, expected level (atom/molecule/organism)
    - The DS pipeline handles: Figma analysis → planning → architecture → implementation → audit → testing → widgetbook
-2. **Wait** for DS pipeline completion before proceeding to Phase 1
+2. **Wait** for DS pipeline completion before proceeding to `phase-1-scaffold-api-analysis`
 3. If DS pipeline returns `blocked_input` (e.g., missing Figma access), register the block and present options to the user:
    - Provide the Figma URL and retry
    - Skip DS creation and proceed with placeholder widgets (mark as tech debt)
    - Cancel the feature build
 
-**0d. Report**
+**3d. Report**
 
-Update `spec.yaml` with `ds_component_inventory` and the DS delegation results.
-Persist supporting notes in `evidence/ui-component-inventory.md`.
+Update `spec.yaml` with `ui_inventory` and the DS delegation results in
+`dependencies.ds_pipeline`. Persist supporting notes in
+`evidence/ui-component-inventory.md`.
 
 ```markdown
-### Phase 0 — UI Component Inventory
+### UI Component Inventory
 
 | Component | Level | Status | Action |
 |---|---|---|---|
@@ -680,7 +715,7 @@ Persist supporting notes in `evidence/ui-component-inventory.md`.
 
 ---
 
-### Phase 1 — Scaffold
+### `phase-1-scaffold-api-analysis` — Step 1: Scaffold
 
 1. Determine target location (app folder vs Melos package)
 2. If Melos package: create `pubspec.yaml`, barrel export, update workspace list
@@ -690,10 +725,10 @@ Persist supporting notes in `evidence/ui-component-inventory.md`.
      `packages/shared/`; legacy `lib/core/` or `lib/shared/` are alerts only
    - Identify what already exists: base classes (`UseCase`, `Failure`, `ErrorHandler`), shared widgets, shared models, DI modules
    - Map available utilities: pagination helpers, network interceptors, base data sources, common mappers
-   - This inventory feeds Phase 2–4 to avoid duplicating what already exists
+   - This inventory feeds `phase-2-domain-layer` through `phase-4-presentation-layer` to avoid duplicating what already exists
 5. Update `spec.yaml.artifact_plan.planned[group=scaffold]` and `context.json.completed_phases`.
 
-### Phase 1.5 — API Contract Analysis (conditional)
+### `phase-1-scaffold-api-analysis` — Step 2: API Contract Analysis (conditional)
 
 > Runs when `api_contract` is provided. Skipped if only `fields`/`api_endpoints` are given.
 
@@ -707,92 +742,105 @@ Persist supporting notes in `evidence/ui-component-inventory.md`.
    - Error response structure
    - Enum definitions → Dart enums
    - Nested objects → separate DTOs with their own mappers
-4. Produce internal API Analysis that feeds Phase 2 (domain) and Phase 3 (data)
+4. Produce internal API Analysis that feeds `phase-2-domain-layer` and `phase-3-data-layer`
 5. Persist the normalized contract in `spec.yaml.contracts` and evidence in
    `evidence/api-contract-analysis.md`.
 
-### Phase 2 — Domain Layer
+### `phase-2-domain-layer`
 
-4. Generate domain model with business logic getters
-5. Generate repository interface with `Either<Failure, T>` returns
-6. Generate use case(s) with `@injectable`
-7. Validate generated domain artifacts against `spec.yaml.contracts.domain`.
-8. Stop at required Domain checkpoint and wait for approval.
+1. Generate domain model with business logic getters
+2. Generate repository interface with `Either<Failure, T>` returns
+3. Generate use case(s) with `@injectable`
+4. Validate generated domain artifacts against `spec.yaml.contracts.domain`.
+5. Stop at required Domain checkpoint and wait for approval.
 
-### Phase 3 — Data Layer
+### `phase-3-data-layer`
 
-7. Generate DTO with `@JsonKey` mappings for API field names
-8. Generate mapper with `fromModel` / `toModel` static methods
-9. Generate remote data source interface + implementation
-10. Generate local data source interface (implementation optional — note for developer)
-11. Generate repository implementation with cache-first pattern and error mapping
-12. Validate generated data artifacts against `spec.yaml.contracts.api` and
-    `spec.yaml.contracts.dto_mappings`.
-13. Stop at required Data checkpoint and wait for approval.
+1. Generate DTO with `@JsonKey` mappings for API field names
+2. Generate mapper with `fromModel` / `toModel` static methods
+3. Generate remote data source interface + implementation
+4. Generate local data source interface (implementation optional — note for developer)
+5. Generate repository implementation with cache-first pattern and error mapping
+6. Validate generated data artifacts against `spec.yaml.contracts.api` and
+   `spec.yaml.contracts.dto_mappings`.
+7. Stop at required Data checkpoint and wait for approval.
 
-### Phase 4 — Presentation Layer
+### `phase-4-presentation-layer`
 
-12. Generate event sealed class (one factory per user action)
-13. Generate state sealed class (initial, loading, success, error)
-14. Generate BLoC with explicit transformers and `result.match()`
-15. Generate UIModel with `fromDomain` factory
-16. Generate page with `BlocProvider` + `BlocBuilder` exhaustive switch
-17. When `figma_scope=view`, implement `layout_manifest` exactly: source
-    assets, literal text, hierarchy/order, bounds, layout, clipping, four-corner
-    radii, borders and screen-chrome ownership.
-18. Capture and compare the feature view at `layout_manifest.viewport`, write
-    `evidence/figma-fidelity-report.json`, and block on missing evidence or a
-    failed `1 dp` / `2%` / `4%` result.
-19. Validate generated presentation artifacts against `spec.yaml.success_criteria`
-    and stop at required Presentation checkpoint before wiring.
+1. Generate event sealed class (one factory per user action)
+2. Generate state sealed class (initial, loading, success, error)
+3. Generate BLoC with explicit transformers and `result.match()`
+4. Generate UIModel with `fromDomain` factory
+5. Generate page with `BlocProvider` + `BlocBuilder` exhaustive switch
+6. When `figma_scope=view`, implement `layout_manifest` exactly: source
+   assets, literal text, hierarchy/order, bounds, layout, clipping, four-corner
+   radii, borders and screen-chrome ownership.
+7. Capture and compare the feature view at `layout_manifest.viewport`, write
+   `evidence/figma-fidelity-report.json`, and block on missing evidence or a
+   failed `1 dp` / `2%` / `4%` result.
+8. Validate generated presentation artifacts against `spec.yaml.success_criteria`
+   and stop at required Presentation checkpoint before wiring.
 
-### Phase 5 — Wiring
+### `phase-5-wiring`
 
-17. Run `dart run build_runner build --delete-conflicting-outputs`
-18. Verify DI registration: search first in `lib/src/core/di/injection.config.dart`;
-    legacy `lib/core/di/injection.config.dart` is allowed only when already
-    configured by the project
-19. Note route registration for GoRouter (or generate if router file is accessible)
-20. Update `context.json` and `evidence/wiring-validation.md`.
+1. Run `dart run build_runner build --delete-conflicting-outputs`
+2. Verify DI registration: search first in `lib/src/core/di/injection.config.dart`;
+   legacy `lib/core/di/injection.config.dart` is allowed only when already
+   configured by the project
+3. Note route registration for GoRouter (or generate if router file is accessible)
+4. Update `context.json` and `evidence/wiring-validation.md`.
 
-### Phase 6a-6c — Mandatory Tests
+### `phase-6-1-unit-tests`, `phase-6-2-widget-tests`, `phase-6-3-integration-tests` (required, three separate step-ids)
 
-20. Execute `FEATURE_UNIT_TESTS`, `FEATURE_WIDGET_TESTS` and
-    `FEATURE_INTEGRATION_TESTS` in that exact order. Prefer `@test-engineer`
-    when `subagent_delegation=available`; otherwise execute the
-    `test-engineer` role contract yourself.
-21. Require passing evidence for every mode before the next mode, audit or
-    delivery. An unavailable integration environment is `blocked_input`.
-22. Use only compact handoffs: `spec_ref`, `context_ref`, `phase` and
-    `read_sections`, plus `execution_owner: feature-builder` and
-    `specialist_role: test-engineer`.
+1. Execute `FEATURE_UNIT_TESTS` (`phase-6-1-unit-tests`),
+   `FEATURE_WIDGET_TESTS` (`phase-6-2-widget-tests`) and
+   `FEATURE_INTEGRATION_TESTS` (`phase-6-3-integration-tests`) in that exact
+   order, each with its own `started`/`finished`/`failed` telemetry cycle and
+   its own per-step approval gate. Prefer `@test-engineer` when
+   `subagent_delegation=available`; otherwise execute the `test-engineer`
+   role contract yourself.
+2. Require passing evidence for every mode before the next mode, audit or
+   delivery. An unavailable integration environment is `blocked_input`.
+3. Use only compact handoffs: `spec_ref`, `context_ref`, `phase` and
+   `read_sections`, plus `execution_owner: feature-builder` and
+   `specialist_role: test-engineer`.
 
-### Phase 6d — Optional Golden Tests
+### `phase-6-4-golden-tests` (conditional)
 
-23. Delegate `FEATURE_GOLDEN_TESTS` to `@golden-test-engineer` only when the
-    approved input `golden_tests=true`.
-24. When disabled, record `golden_tests: skipped_by_input`; never silently omit
-    the stage.
+1. Delegate `FEATURE_GOLDEN_TESTS` to `@golden-test-engineer` only when the
+   approved input `golden_tests=true`.
+2. When disabled, record `golden_tests: skipped_by_input`; never silently omit
+   the stage.
 
-### Phase 7 — Audit
+### `phase-7-audit-final-review` — Step 1: Audit
 
-25. Delegate to `@code-auditor` for quality review of implementation and test
-    artifacts. For `figma_scope=view`, it must also validate the layout manifest
-    and passing fidelity report before approval.
-26. If rejected, apply corrections and re-submit (max 3 retries), then repeat
-    the affected required test stages.
+1. Delegate to `@code-auditor` for quality review of implementation and test
+   artifacts. For `figma_scope=view`, it must also validate the layout manifest
+   and passing fidelity report before approval.
+2. If rejected, apply corrections and re-submit (max
+   `pipeline.max_audit_retries`, default 3), then repeat the affected
+   required test stages.
 
-### Phase 8 — Optional Documentation
+### `phase-7-audit-final-review` — Step 2: Final Build Review
 
-27. Invoke shared skill `documentation-projects` only when the approved input
-    `documentation=true` and planned docs artifacts exist.
-28. When disabled, record `documentation: skipped_by_input`; never silently
-    omit the stage.
+1. Present to the developer: the feature build report (all files created),
+   DI registration status, route registration status, any manual steps
+   needed, and spec criteria covered with evidence paths.
+2. Wait for explicit approval. This step's presentation is the domain
+   aggregate approval gate for the full build
+   (`phase-0-spec-planning` through `phase-7-audit-final-review`).
 
-### Phase 9 — Delivery
+### `phase-8-delivery` — Step 1: Documentation (conditional)
 
-29. Hand control to `@delivery-manager` only after audit approval and all
-    mandatory test evidence is passing.
+1. Invoke shared skill `documentation-projects` only when the approved input
+   `documentation=true` and planned docs artifacts exist.
+2. When disabled, record `documentation: skipped_by_input`; never silently
+   omit the stage.
+
+### `phase-8-delivery` — Step 2: Delivery
+
+1. Hand control to `@delivery-manager` only after `phase-7-audit-final-review`
+   approval and all mandatory test evidence is passing.
 
 ---
 
@@ -865,7 +913,7 @@ exists:
   when `subagent_delegation=unavailable`, following `test-engineer` modes and
   evidence requirements; delegate goldens only when `golden_tests=true`
 - NEVER generate Widgetbook stories — that is `widgetbook-developer`
-- ALWAYS run Phase 0 when `figma_url` or `ui_components` is provided
+- ALWAYS run `phase-0-spec-planning`'s Step 3 (UI Component Inventory) when `figma_url` or `ui_components` is provided
 - ALWAYS run `build_runner` after generating all files
 - ALWAYS verify DI registration in `injection.config.dart`
 - ALWAYS use explicit `transformer:` on every BLoC `on<>` handler
@@ -923,8 +971,8 @@ per-step gate:
 | Workflow | Aggregate gate | Scope approved |
 |---|---|---|
 | `/new-feature` | Domain / Data / Presentation `sopp_gate` REQUIRED CHECKPOINT | The corresponding layer artifacts |
-| `/new-feature` | `checkpoint-final-build-review` | PHASE 0 → PHASE 7 |
-| `/refactor-feature` | `phase-4-checkpoint` | PHASE 0 → PHASE 3 |
+| `/new-feature` | `phase-7-audit-final-review` Step 2 (Final Build Review) | `phase-0-spec-planning` through `phase-6-4-golden-tests` |
+| `/refactor-feature` | `phase-0-plan-review` Step 5 (Checkpoint — Validation + Human Review) | this phase's own Steps 1–4 |
 
 Aggregate gates never emit `--output-file` and never run a gap report; only
 their downstream file-producing phases do.
@@ -941,7 +989,8 @@ against the same `--step-id`:
   interpretation.
 
 Skip the gap report entirely on pre-flight gates, aggregate checkpoints
-(`checkpoint-final-build-review`, `phase-4-checkpoint`), and any step that
+(`phase-7-audit-final-review`'s Final Build Review step,
+`phase-0-plan-review`'s Checkpoint step), and any step that
 ended `failed` or `skipped_by_input`.
 
 ### Critical Rules (workflow discipline)
@@ -1005,8 +1054,8 @@ gate, all enforced via `docs/scripts/sopp_gate.rb` where applicable:
 | Workflow | Aggregate gate | Scope approved |
 |---|---|---|
 | `/new-feature` | Domain / Data / Presentation `sopp_gate` REQUIRED CHECKPOINT | The corresponding layer artifacts |
-| `/new-feature` | `checkpoint-final-build-review` | PHASE 0 → PHASE 7 |
-| `/refactor-feature` | `phase-4-checkpoint` | PHASE 0 → PHASE 3 |
+| `/new-feature` | `phase-7-audit-final-review` Step 2 (Final Build Review) | `phase-0-spec-planning` through `phase-6-4-golden-tests` |
+| `/refactor-feature` | `phase-0-plan-review` Step 5 (Checkpoint — Validation + Human Review) | this phase's own Steps 1–4 |
 
 Aggregate gates never emit `--output-file` and never run a gap report; only
 their downstream file-producing phases do.
@@ -1023,7 +1072,8 @@ against the same `--step-id`:
   interpretation.
 
 Skip the gap report entirely on pre-flight gates, aggregate checkpoints
-(`checkpoint-final-build-review`, `phase-4-checkpoint`), and any step that
+(`phase-7-audit-final-review`'s Final Build Review step,
+`phase-0-plan-review`'s Checkpoint step), and any step that
 ended `failed` or `skipped_by_input`.
 
 ### Critical Rules (workflow discipline)
