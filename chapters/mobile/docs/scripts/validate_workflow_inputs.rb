@@ -5,8 +5,9 @@ require "json"
 require "optparse"
 require "yaml"
 
-ROOT = File.expand_path("../../../..", __dir__)
-OVERLAY_DIRECTORY = File.join(ROOT, "chapters/mobile/docs/templates/spec-packets")
+# `scripts/` and `templates/` are siblings under `docs/` in both the source
+# chapter and every exported tool directory (.claude, .github, .kiro).
+OVERLAY_DIRECTORY = File.expand_path("../templates/spec-packets", __dir__)
 
 def parse_options(argv)
   options = {}

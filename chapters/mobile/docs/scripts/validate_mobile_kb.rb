@@ -5,7 +5,11 @@ require "json"
 require "open3"
 require "yaml"
 
-ROOT = File.expand_path("../../../..", __dir__)
+SCRIPT_DOCS_ROOT = File.expand_path("..", __dir__)
+CHAPTER_ROOT = File.expand_path("..", SCRIPT_DOCS_ROOT)
+EXPORTED_PLATFORM_ROOTS = %w[.claude .github .kiro].freeze
+EXPORTED_LAYOUT = EXPORTED_PLATFORM_ROOTS.include?(File.basename(CHAPTER_ROOT))
+ROOT = EXPORTED_LAYOUT ? CHAPTER_ROOT : File.expand_path("../..", CHAPTER_ROOT)
 SPEC_PACKET_TEMPLATE_DIR = "chapters/mobile/docs/templates/spec-packets"
 OVERLAY_SUFFIX = ".overlay.yaml"
 Dir.chdir(ROOT)
@@ -2097,23 +2101,66 @@ rescue StandardError => e
   add(findings, "CRITICAL", "WORKFLOW_RESPONSE_CONTRACT_ERROR", "Unable to validate workflow response contracts", e.message)
 end
 
-parse_all_structured_files(findings, cleared)
-validate_no_legacy_refs(findings, cleared)
-validate_no_source_root_refs(findings, cleared)
-validate_references(findings, cleared)
-validate_kiro_skill_resources(findings, cleared)
-validate_kiro_agent_profiles(findings, cleared)
-validate_mobile_workflow_distribution(findings, cleared)
-validate_sopp_gate_contract(findings, cleared)
-validate_melos_workspace_contract(findings, cleared)
-validate_no_legacy_mobile_script_paths(findings, cleared)
-validate_platform_storage_boundary(findings, cleared)
-validate_examples_location(findings, cleared)
-validate_overlay_catalog(findings, cleared)
-validate_invocation_contracts(findings, cleared)
-validate_workflow_response_contract(findings, cleared)
-validate_semantics(findings, cleared)
-validate_language_policy(findings, cleared)
+def validate_exported_kb(findings, cleared)
+  issues = []
+  required_scripts = %w[
+    validate_mobile_kb.rb
+    validate_workflow_inputs.rb
+    sopp_gate.rb
+    melos_workspace.rb
+  ]
+
+  required_scripts.each do |script|
+    path = File.join("docs/scripts", script)
+    issues << "#{path}: missing from exported KB" unless File.file?(path)
+  end
+
+  overlays = Dir["docs/templates/spec-packets/*.overlay.yaml"]
+  issues << "docs/templates/spec-packets: no workflow input contracts were exported" if overlays.empty?
+
+  structured_files = Dir["**/*.{yaml,yml,json}"].select { |path| File.file?(path) }
+  structured_files.each do |path|
+    path.end_with?(".json") ? JSON.parse(File.read(path)) : read_yaml(path)
+  rescue StandardError => error
+    issues << "#{path}: cannot parse (#{error.message})"
+  end
+
+  validator_path = "docs/scripts/validate_mobile_kb.rb"
+  source_path_refs = Dir["**/*"].select { |path| File.file?(path) && path != validator_path }.map do |path|
+    "#{path}: contains chapters/mobile/" if File.read(path).include?("chapters/mobile/")
+  end.compact
+  issues.concat(source_path_refs)
+
+  if issues.empty?
+    cleared << "Exported #{File.basename(CHAPTER_ROOT)} KB has portable scripts, input contracts, and parseable structured assets"
+  else
+    add(findings, "CRITICAL", "EXPORTED_KB_INTEGRITY", "Exported KB is incomplete or still references the source layout", issues.join("\n"))
+  end
+rescue StandardError => error
+  add(findings, "CRITICAL", "EXPORTED_KB_VALIDATION_ERROR", "Unable to validate exported KB", error.message)
+end
+
+if EXPORTED_LAYOUT
+  validate_exported_kb(findings, cleared)
+else
+  parse_all_structured_files(findings, cleared)
+  validate_no_legacy_refs(findings, cleared)
+  validate_no_source_root_refs(findings, cleared)
+  validate_references(findings, cleared)
+  validate_kiro_skill_resources(findings, cleared)
+  validate_kiro_agent_profiles(findings, cleared)
+  validate_mobile_workflow_distribution(findings, cleared)
+  validate_sopp_gate_contract(findings, cleared)
+  validate_melos_workspace_contract(findings, cleared)
+  validate_no_legacy_mobile_script_paths(findings, cleared)
+  validate_platform_storage_boundary(findings, cleared)
+  validate_examples_location(findings, cleared)
+  validate_overlay_catalog(findings, cleared)
+  validate_invocation_contracts(findings, cleared)
+  validate_workflow_response_contract(findings, cleared)
+  validate_semantics(findings, cleared)
+  validate_language_policy(findings, cleared)
+end
 
 if findings.empty?
   puts "Mobile KB validation OK"

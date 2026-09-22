@@ -15,9 +15,9 @@ require "minitest/autorun"
 
 VALIDATOR_PATH = File.expand_path("validate_mobile_kb.rb", __dir__)
 VALIDATOR_SOURCE = File.read(VALIDATOR_PATH)
-# Anchor uniquely on the sequence of top-level invocations at the end of the
-# file (the definition of parse_all_structured_files appears earlier).
-MAIN_MARKER = "parse_all_structured_files(findings, cleared)\nvalidate_no_legacy_refs"
+# Anchor on the top-level mode switch. All validator helper definitions appear
+# before it; the branch itself performs the real KB validation.
+MAIN_MARKER = "if EXPORTED_LAYOUT\n"
 HELPERS_SOURCE = VALIDATOR_SOURCE.split(MAIN_MARKER, 2).first
 raise "cannot locate validator main marker" if HELPERS_SOURCE == VALIDATOR_SOURCE
 

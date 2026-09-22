@@ -5,6 +5,12 @@
 Local integrity checker for the mobile knowledge base. It is intentionally
 lightweight and does not require CI.
 
+When run from the source repository it performs the full chapter validation.
+When rendered under `.claude/`, `.github/` or `.kiro/`, it automatically runs
+the exported-KB integrity validation: required scripts and input contracts must
+exist, structured assets must parse, and no exported asset may retain a
+source-chapter-layout reference.
+
 Run the default validation:
 
 ```bash
