@@ -189,6 +189,7 @@ module SoppGate
       checkpoint(layer)["status"] = "approved"
       checkpoint(layer)["approval_ref"] = ref
       checkpoint(layer)["approved_at"] = now
+      reseal_initial_spec!
       context["status"] = "approved_for_execution"
       context["current_phase"] = NEXT_PHASE.fetch(layer)
       context["pending_human_review"] = nil
@@ -229,6 +230,7 @@ module SoppGate
     def assert_can_enter!(phase)
       validate!
       required = case phase
+                 when "scaffold" then "initial_spec"
                  when "domain_layer" then "initial_spec"
                  when "data_layer" then "domain"
                  when "presentation_layer" then "data"
@@ -246,6 +248,17 @@ module SoppGate
 
     def checkpoint(layer)
       context.fetch("checkpoints", {})[layer]
+    end
+
+    # A layer's human approval re-blesses whatever spec.yaml looks like right
+    # now, so the Phase 0 seal doesn't go stale from edits that were already
+    # reviewed and approved through this layer's own checkpoint.
+    def reseal_initial_spec!
+      cp = checkpoint("initial_spec")
+      return unless cp && cp["status"] == "approved"
+
+      cp["artifact_hash"] = "sha256:#{Digest::SHA256.file(@spec_path).hexdigest}"
+      cp["resealed_at"] = now
     end
 
     def now

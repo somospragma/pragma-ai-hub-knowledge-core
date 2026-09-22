@@ -84,6 +84,16 @@ class SoppGateTest < Minitest::Test
     assert_success run_gate("validate")
   end
 
+  def test_scaffold_blocked_until_initial_spec_approved
+    _out, err, status = run_gate("can-enter", "--phase", "scaffold")
+    refute status.success?
+    assert_includes err, "INITIAL_SPEC_NOT_APPROVED"
+
+    approve_initial
+
+    assert_success run_gate("can-enter", "--phase", "scaffold")
+  end
+
   def test_layer_cannot_advance_without_evidence_and_human_approval
     approve_initial
 

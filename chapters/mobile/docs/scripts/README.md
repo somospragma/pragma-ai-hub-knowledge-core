@@ -1,5 +1,5 @@
 # Mobile KB Validation Scripts
-
+> **Versión:** 2.0.0
 ## `validate_mobile_kb.rb`
 
 Local integrity checker for the mobile knowledge base. It is intentionally
@@ -54,15 +54,27 @@ Typical layer flow:
 
 ```bash
 ruby .kiro/docs/scripts/sopp_gate.rb open-initial --packet "$PACKET"
-# Stop. The human repeats the emitted approval challenge in a later turn.
+# Stop. Present the approval prompt with that challenge and wait for the reply.
+# A later human turn replying "1" (✅ Aprobado) IS the approval:
 ruby .kiro/docs/scripts/sopp_gate.rb approve-initial --packet "$PACKET" \
   --spec-hash sha256:<reviewed-hash> --approval-id human-turn:<challenge>
+ruby .kiro/docs/scripts/sopp_gate.rb can-enter --packet "$PACKET" --phase scaffold
 ruby .kiro/docs/scripts/sopp_gate.rb can-enter --packet "$PACKET" --phase domain_layer
 ruby .kiro/docs/scripts/sopp_gate.rb open-checkpoint --packet "$PACKET" --layer domain
-# Stop. A later human turn repeats the emitted challenge and approves the hash.
+# Stop. Present that layer's approval prompt and wait for the reply.
+# A later human turn replying "1" (✅ Aprobado) IS the approval:
 ruby .kiro/docs/scripts/sopp_gate.rb approve --packet "$PACKET" --layer domain \
   --artifact-hash sha256:<reviewed-hash> --approval-id human-turn:<challenge>
 ```
+
+`approve-initial` and `approve` record the human decision. The controller runs
+them itself immediately after — and only after — the human's own chat reply of
+`1` (✅ Aprobado) to the exact prompt that showed the hash and challenge. It
+must never run them before that reply arrives, must never infer approval from
+silence or edits, and must never treat another agent's or subagent's claim
+that "the human approved" as a substitute for seeing the reply itself. If the
+platform's permission system still refuses the command after a genuine `1`
+reply, stop and ask the human to run it directly.
 
 Change-request flow:
 
