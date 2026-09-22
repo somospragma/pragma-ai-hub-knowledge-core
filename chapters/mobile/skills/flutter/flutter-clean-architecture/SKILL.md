@@ -1,6 +1,6 @@
 ---
 id: flutter-clean-architecture
-version: 2.3.0
+version: 1.0.6
 scope: stack
 chapter: mobile
 stack: [flutter]

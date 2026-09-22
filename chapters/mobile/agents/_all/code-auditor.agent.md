@@ -71,7 +71,7 @@ skills:
 ---
 # Code Auditor Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.4 -->
+<!-- author: Pragma Mobile Chapter | version: 2.0.11 -->
 
 ## Active Skills
 

@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-folder-structure
-version: 1.4.0
+version: 1.0.1
 scope: stack
 type: skill
 chapter: mobile

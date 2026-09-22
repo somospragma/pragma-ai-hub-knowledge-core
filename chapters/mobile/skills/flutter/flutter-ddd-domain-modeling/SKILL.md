@@ -1,7 +1,7 @@
 ---
 id: flutter-ddd-domain-modeling
 name: flutter-ddd-domain-modeling
-version: 1.0.0
+version: 1.0.1
 scope: stack
 type: skill
 chapter: mobile

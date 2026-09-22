@@ -1,6 +1,6 @@
 ---
 id: flutter-mason-clean-project
-version: 2.1.1
+version: 1.0.4
 scope: stack
 type: skill
 chapter: mobile

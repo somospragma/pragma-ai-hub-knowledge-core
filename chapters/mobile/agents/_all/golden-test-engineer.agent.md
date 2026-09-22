@@ -63,7 +63,7 @@ skills:
 ---
 # Golden Test Engineer Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.3 -->
+<!-- author: Pragma Mobile Chapter | version: 1.0.4 -->
 
 ## Active Skills
 

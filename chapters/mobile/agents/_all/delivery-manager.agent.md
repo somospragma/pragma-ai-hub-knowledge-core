@@ -57,7 +57,7 @@ skills:
 ---
 # Delivery Manager Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.3 -->
+<!-- author: Pragma Mobile Chapter | version: 2.0.5 -->
 
 ## Active Skills
 

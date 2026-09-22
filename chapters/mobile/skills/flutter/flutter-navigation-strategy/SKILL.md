@@ -1,6 +1,6 @@
 ---
 id: flutter-navigation-strategy
-version: 2.3.0
+version: 1.0.3
 scope: stack
 type: skill
 chapter: mobile

@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-figma-checklist
-version: 1.4.0
+version: 1.0.13
 scope: stack
 type: skill
 chapter: mobile

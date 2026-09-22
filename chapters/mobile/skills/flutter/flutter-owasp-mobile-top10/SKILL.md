@@ -1,7 +1,7 @@
 ---
 id: flutter-owasp-mobile-top10
 name: flutter-owasp-mobile-top10
-version: 2.1.1
+version: 1.0.3
 scope: stack
 type: skill
 chapter: mobile

@@ -52,7 +52,7 @@ skills:
 ---
 # Figma Analyzer Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.4 -->
+<!-- author: Pragma Mobile Chapter | version: 2.0.6 -->
 
 ## Active Skills
 

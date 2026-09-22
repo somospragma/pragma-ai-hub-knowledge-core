@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-widgetbook
-version: 3.0.0
+version: 1.1.1
 scope: stack
 type: skill
 chapter: mobile

@@ -1,7 +1,7 @@
 ---
 id: flutter-clean-feature
 name: flutter-clean-feature
-version: 1.1.0
+version: 1.0.1
 scope: stack
 type: skill
 chapter: mobile

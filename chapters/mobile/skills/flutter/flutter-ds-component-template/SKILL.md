@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-component-template
-version: 1.3.0
+version: 1.0.6
 scope: stack
 type: skill
 chapter: mobile

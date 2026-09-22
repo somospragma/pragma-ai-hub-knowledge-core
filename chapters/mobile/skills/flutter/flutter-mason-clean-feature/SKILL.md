@@ -1,6 +1,6 @@
 ---
 id: flutter-mason-clean-feature
-version: 2.0.1
+version: 1.0.3
 scope: stack
 type: skill
 chapter: mobile

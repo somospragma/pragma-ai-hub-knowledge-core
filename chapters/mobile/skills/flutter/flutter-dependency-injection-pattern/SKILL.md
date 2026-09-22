@@ -1,6 +1,6 @@
 ---
 id: flutter-dependency-injection-pattern
-version: 2.2.0
+version: 1.0.7
 scope: stack
 type: skill
 chapter: mobile

@@ -1,7 +1,7 @@
 ---
 id: mobile-sdd-spec-validation
 name: mobile-sdd-spec-validation
-version: 1.5.0
+version: 1.0.2
 scope: chapter
 type: skill
 chapter: mobile

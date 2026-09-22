@@ -1,7 +1,7 @@
 ---
 id: flutter-freezed-domain-modeling
 name: flutter-freezed-domain-modeling
-version: 2.2.0
+version: 1.0.5
 scope: stack
 type: skill
 chapter: mobile

@@ -1,7 +1,7 @@
 ---
 id: flutter-api-rest-connection
 name: flutter-api-rest-connection
-version: 2.0.0
+version: 1.0.5
 scope: stack
 type: skill
 chapter: mobile

@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-testing-patterns
-version: 1.2.0
+version: 1.0.5
 scope: stack
 type: skill
 chapter: mobile

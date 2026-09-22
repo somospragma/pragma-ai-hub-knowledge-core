@@ -48,7 +48,7 @@ skills:
 ---
 # Component Planner Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.5 -->
+<!-- author: Pragma Mobile Chapter | version: 2.0.4 -->
 
 ## Active Skills
 

@@ -36,7 +36,7 @@ tools:
 ---
 # Mobile Orchestrator — Global Routing Agent
 
-<!-- author: Pragma Mobile Chapter | version: 1.1 -->
+<!-- author: Pragma Mobile Chapter | version: 2.0.4 -->
 
 ## Purpose
 
