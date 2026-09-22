@@ -1,6 +1,6 @@
 ---
 id: refactor-component
-version: 1.4.0
+version: 2.2.0
 scope: chapter
 type: workflow
 chapter: mobile
@@ -18,7 +18,7 @@ description: >
 |---|---|
 | `workflow-id` | `refactor-component` |
 | `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
-| Step IDs | `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-2-1-validation-human-review`, `phase-3-apply-changes`, `phase-3-1-audit`, `phase-4-1-widget-tests`, `phase-4-2-golden-tests`, `phase-5-delivery` |
+| Step IDs | `phase-0-plan-review`, `phase-1-apply-audit`, `phase-2-widget-tests`, `phase-3-golden-tests`, `phase-4-delivery` |
 
 ## Workflow Execution Contract
 
@@ -27,10 +27,10 @@ description: >
 The following rules bind every phase in this workflow and are enforced by the Response Contract embedded at the top of each phase:
 
 1. **Telemetry integrity.** Every executed phase emits exactly one `--status started` before its work and exactly one terminal status on completion — `--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when the human rejects and the phase must be regenerated — via `pragma-ai workflow report`. Skipping any of these is a workflow violation.
-2. **Step-id integrity.** The `--step-id` and `--workflow-id` values are the ONLY valid identifiers. Copy them **verbatim** from the `Step IDs` table above — never invent, translate, abbreviate, paraphrase, pluralize, or re-case them. `--workflow-id` MUST be exactly `refactor-component`. The CLI silently rejects unknown step-ids.
-3. **Human approval per phase.** After every `finished`, present the approval prompt block (Aprobado / Ediciones / Rechazado) VERBATIM as the last thing in your response and yield. Silence is not approval. PHASE 2.1 is the aggregate approval gate for the planning set (PHASE 0 through PHASE 2). See *Human approval gate* for the aggregate rejection replay protocol.
-4. **Gap report per file-producing phase.** After the human approves a phase that produced files (`--output-file`), run the two-phase gap report against the same step-id. `phase-2-1-validation-human-review` produces no files; do NOT run its gap report. The Topology gate is not tracked by telemetry at all.
-5. **Conditional phases.** `phase-4-2-golden-tests` is conditional: it emits telemetry only when the plan/audit classifies the refactor as having visual impact. Otherwise skip the phase entirely — do not emit `started` or `finished`.
+2. **Step-id and phase-name integrity.** The `--step-id` and `--workflow-id` values are the ONLY valid identifiers. Copy them **verbatim** from the `Step IDs` table above — never invent, translate, abbreviate, paraphrase, pluralize, or re-case them. `--workflow-id` MUST be exactly `refactor-component`. The CLI silently rejects unknown step-ids. This also governs every phase name you narrate, header, or put in an approval prompt: it MUST match, verbatim, a `### PHASE` header (or its embedded `#### Step`) tied to one of the `Step IDs` above. Never execute, narrate, or present a phase that is not in that table — including a phase from a previous version of this document, from memory, or from a different workflow. If a phase you are about to run does not appear there, stop and re-read the `Step IDs` table before continuing.
+3. **Human approval per phase.** After every `finished`, present the approval prompt block (Aprobado / Ediciones / Rechazado) VERBATIM as the last thing in your response and yield. Silence is not approval. `phase-0-plan-review` merges the spec packet, component analysis, technical plan, and validation/human-review into a single approval gate — see *Human approval gate* for the rejection replay protocol.
+4. **Gap report per file-producing phase.** After the human approves a phase that produced files (`--output-file`), run the two-phase gap report against the same step-id. Every step-id in this workflow produces files when executed — there is no file-less step. The Topology gate is not tracked by telemetry at all.
+5. **Conditional phases.** `phase-3-golden-tests` is conditional: it emits telemetry only when the plan/audit classifies the refactor as having visual impact. Otherwise skip the phase entirely — do not emit `started` or `finished`.
 6. **cwd assumption.** Commands assume the shell's cwd is the project root. `--project-dir` is only needed when running from elsewhere.
 
 Violating any of these rules is a Response Contract Violation (see the section of that name at the end of this document).
@@ -39,7 +39,7 @@ Violating any of these rules is a Response Contract Violation (see the section o
 
 You are the workflow controller. Before every phase:
 
-1. **Load and read** this document into context (if not already loaded) and re-scan the phase's Response Contract at the top of that phase. The Response Contract binds the shape of your response.
+1. **Load and read** this document into context (if not already loaded) and re-scan the phase's Response Contract at the top of that phase. The Response Contract binds the shape of your response. Before naming or running any phase, confirm it is listed verbatim in the `Step IDs` table above — do not rely on memory of a previous version of this workflow, a similar workflow, or general conventions.
 2. **Do not skip** any Response Contract step. Doing so is a workflow violation.
 3. **Do not begin** the phase's work until you have emitted its `--status started` command via your shell tool and it has returned.
 4. **Do not begin** the next phase until the human has explicitly answered the approval prompt with **1** (Aprobado), **2** (Ediciones), or **3** (Rechazado).
@@ -142,20 +142,20 @@ evidence_mode: minimal
 
 ## Execution Sequence
 
-### PHASE 0 — Mobile Spec Packet (`mini`)
+### PHASE 0 — Plan + Review
 
 > ### ▶ Response Contract (non-negotiable)
 >
 > Your response for this phase MUST, in order:
 >
 > 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
+> 2. Do the work described under *Instructions* below, in order: Step 1 — Mobile Spec Packet, Step 2 — Current Component Analysis, Step 3 — Technical Refactor Plan, Step 4 — Validation + Human Review.
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
 > 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 1 until the user replies.
 >
 > ```
-> He completado PHASE 0 — Mobile Spec Packet. ¿Apruebas el resultado?
+> He completado PHASE 0 — Plan + Review. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
@@ -169,9 +169,11 @@ evidence_mode: minimal
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-0-spec-packet \
+  --step-id phase-0-plan-review \
   --status started
 ```
+
+#### Step 1 — Mobile Spec Packet (`mini`)
 
 **Agent**: `@ds-orchestrator`
 **Skill**: `mobile-sdd-spec-validation`
@@ -189,156 +191,21 @@ in `constraints.compatibility`, success criteria,
 expected tests/goldens, permissions per agent and sections that each agent must
 read.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with all four packet artifacts. Substitute `${SPEC_PACKET_PATH}` with the resolved run path:
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-0-spec-packet \
-  --status finished \
-  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
-  --output-file "${SPEC_PACKET_PATH}/context.json" \
-  --output-file "${SPEC_PACKET_PATH}/review.md" \
-  --output-file "${SPEC_PACKET_PATH}/evidence/validation-report.md"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 1.
-
----
-
-### PHASE 1 — Current Component Analysis
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
-> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2 until the user replies.
->
-> ```
-> He completado PHASE 1 — Current Component Analysis. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
-
-> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-1-current-component-analysis \
-  --status started
-```
+#### Step 2 — Current Component Analysis
 
 **Agent**: `@component-planner`
 
 Required output: update in `spec.yaml` `current_state`,
 `impact_analysis`, `inventory` and `artifact_plan`.
 
-> ⚡ **MANDATORY (success path)** — Report `finished`. This phase updates `spec.yaml` in place — declare it as the output file so the gap report can diff this phase's contribution:
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-1-current-component-analysis \
-  --status finished \
-  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.
-
----
-
-### PHASE 2 — Technical Refactor Plan
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
-> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2.1 until the user replies.
->
-> ```
-> He completado PHASE 2 — Technical Refactor Plan. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
-
-> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-2-technical-refactor-plan \
-  --status started
-```
+#### Step 3 — Technical Refactor Plan
 
 **Agent**: `@component-architect`
 
 Required output: update in `spec.yaml` `technical_plan`,
 `success_criteria` and `handoffs`.
 
-> ⚡ **MANDATORY (success path)** — Report `finished`:
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-2-technical-refactor-plan \
-  --status finished \
-  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.1.
-
----
-
-### PHASE 2.1 — Validation + Human Review
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
-> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call.
-> 4. This phase produces no output files — do NOT run the gap report.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. This is the aggregate planning gate: PHASE 3 may only begin after explicit approval.
->
-> ```
-> He completado PHASE 2.1 — Validation + Human Review. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
-
-> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-2-1-validation-human-review \
-  --status started
-```
+#### Step 4 — Validation + Human Review
 
 **Skill**: `mobile-sdd-spec-validation`
 
@@ -348,8 +215,9 @@ Present:
 3. breaking changes, if any
 4. success criteria from `review.md`
 
-Wait for explicit approval. Do not apply changes until `context.json`
-marks the spec as approved.
+This step's presentation is the human decision point for the whole phase — do
+not apply changes before the approval prompt below has been explicitly
+answered.
 
 > ⚡ **MANDATORY (conditional)** — If the spec fails schema/business validation and cannot continue:
 
@@ -357,39 +225,43 @@ marks the spec as approved.
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-2-1-validation-human-review \
+  --step-id phase-0-plan-review \
   --status failed
 ```
 > ❌ The workflow stops here.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` once validation passes and the human review is presented (approval itself happens in the gate that follows):
+> ⚡ **MANDATORY (success path)** — Report `finished` with all four packet artifacts. Substitute `${SPEC_PACKET_PATH}` with the resolved run path:
 
 ```bash
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-2-1-validation-human-review \
-  --status finished
+  --step-id phase-0-plan-review \
+  --status finished \
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
+  --output-file "${SPEC_PACKET_PATH}/context.json" \
+  --output-file "${SPEC_PACKET_PATH}/review.md" \
+  --output-file "${SPEC_PACKET_PATH}/evidence/validation-report.md"
 ```
 
-> **Stop here.** This is the **domain aggregate approval gate** for the planning set (PHASE 0 through PHASE 2). If the human requests changes to `current_state`, `impact_analysis`, `inventory`, `artifact_plan`, `technical_plan`, `success_criteria` or `handoffs`, the flow must return to the phase that owns that section: report `re_started` on the affected earlier phase, apply changes, report `finished` again for that phase, re-run its gap report, and re-enter PHASE 2.1 (`re_started` → `finished` on `phase-2-1-validation-human-review`). Only when `context.json` marks the spec as approved may PHASE 3 begin. *(PHASE 2.1 produces no new output files — no gap report required.)*
+> **Stop here.** Get human approval (see *Human approval gate*). If the human requests edits to any section (`current_state`, `impact_analysis`, `inventory`, `artifact_plan`, `technical_plan`, `success_criteria`, or `handoffs`), regenerate the affected step in place, keep the same `--output-file` set, and re-present for approval — this phase owns all four steps, so no cross-step-id replay is needed. Once approved, run this step's **gap report** and then continue to PHASE 1.
 
 ---
 
-### PHASE 3 — Apply Changes
+### PHASE 1 — Apply + Audit Changes
 
 > ### ▶ Response Contract (non-negotiable)
 >
 > Your response for this phase MUST, in order:
 >
 > 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
+> 2. Do the work described under *Instructions* below, in order: Step 1 — Apply Changes, Step 2 — Audit.
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 3.1 until the user replies.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2 until the user replies.
 >
 > ```
-> He completado PHASE 3 — Apply Changes. ¿Apruebas el resultado?
+> He completado PHASE 1 — Apply + Audit Changes. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
@@ -403,9 +275,11 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-3-apply-changes \
+  --step-id phase-1-apply-audit \
   --status started
 ```
+
+#### Step 1 — Apply Changes
 
 **Agent**: `@widget-developer`
 Required compact handoff:
@@ -426,57 +300,7 @@ Rules:
 - If there are transition APIs, use `@Deprecated`.
 - Restrict changes to the resolved root for `artifact_plan.planned[].target_id`.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with one `--output-file` per file declared in `artifact_plan.planned[]`. Paths must be relative to `--project-dir` (project root). Expand the array from the spec:
-
-```bash
-# Build --output-file flags from the artifact plan
-REFACTOR_FILE_FLAGS=()
-while IFS= read -r f; do
-  REFACTOR_FILE_FLAGS+=(--output-file "$f")
-done < <(yq -r '.artifact_plan.planned[].file' "${SPEC_PACKET_PATH}/spec.yaml")
-
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-3-apply-changes \
-  --status finished \
-  "${REFACTOR_FILE_FLAGS[@]}"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3.1.
-
----
-
-### PHASE 3.1 — Audit
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
-> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4.1 until the user replies.
->
-> ```
-> He completado PHASE 3.1 — Audit. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
-
-> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id refactor-component \
-  --step-id phase-3-1-audit \
-  --status started
-```
+#### Step 2 — Audit
 
 **Agent**: `@code-auditor`
 
@@ -488,27 +312,34 @@ Required output: `evidence/audit-report.md` and a summary in the human report.
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-3-1-audit \
+  --step-id phase-1-apply-audit \
   --status failed
 ```
 > ❌ The workflow stops here.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the audit evidence:
+> ⚡ **MANDATORY (success path)** — Report `finished` with one `--output-file` per file declared in `artifact_plan.planned[]` plus the audit evidence. Paths must be relative to `--project-dir` (project root). Expand the array from the spec:
 
 ```bash
+# Build --output-file flags from the artifact plan
+REFACTOR_FILE_FLAGS=()
+while IFS= read -r f; do
+  REFACTOR_FILE_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[].file' "${SPEC_PACKET_PATH}/spec.yaml")
+
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-3-1-audit \
+  --step-id phase-1-apply-audit \
   --status finished \
-  --output-file "${SPEC_PACKET_PATH}/evidence/audit-report.md"
+  --output-file "${SPEC_PACKET_PATH}/evidence/audit-report.md" \
+  "${REFACTOR_FILE_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.1.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.
 
 ---
 
-### PHASE 4.1 — Update Widget Tests
+### PHASE 2 — Update Widget Tests
 
 > ### ▶ Response Contract (non-negotiable)
 >
@@ -518,10 +349,10 @@ pragma-ai workflow report \
 > 2. Do the work described under *Instructions* below.
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4.2 / 5 until the user replies.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 3 / 4 until the user replies.
 >
 > ```
-> He completado PHASE 4.1 — Update Widget Tests. ¿Apruebas el resultado?
+> He completado PHASE 2 — Update Widget Tests. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
@@ -535,7 +366,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4-1-widget-tests \
+  --step-id phase-2-widget-tests \
   --status started
 ```
 
@@ -548,7 +379,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4-1-widget-tests \
+  --step-id phase-2-widget-tests \
   --status failed
 ```
 > ❌ The workflow stops here — delivery cannot proceed without passing widget test evidence.
@@ -564,17 +395,17 @@ done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_widget_tests") | .
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4-1-widget-tests \
+  --step-id phase-2-widget-tests \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/widget-tests.md" \
   "${DS_TEST_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.2 (only when the refactor has visual impact) or directly to PHASE 5.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 3 (only when the refactor has visual impact) or directly to PHASE 4.
 
 ---
 
-### PHASE 4.2 — Update Golden Tests (if visual impact)
+### PHASE 3 — Update Golden Tests (if visual impact)
 
 > ### ▶ Response Contract (non-negotiable)
 >
@@ -585,10 +416,10 @@ pragma-ai workflow report \
 > 3. Do the work described under *Instructions* below.
 > 4. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 5 until the user replies.
+> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4 until the user replies.
 >
 > ```
-> He completado PHASE 4.2 — Update Golden Tests. ¿Apruebas el resultado?
+> He completado PHASE 3 — Update Golden Tests. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
@@ -604,7 +435,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4-2-golden-tests \
+  --step-id phase-3-golden-tests \
   --status started
 ```
 
@@ -617,7 +448,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4-2-golden-tests \
+  --step-id phase-3-golden-tests \
   --status failed
 ```
 > ❌ The workflow stops here — delivery cannot proceed with a failing golden outcome when visual impact is declared.
@@ -633,17 +464,17 @@ done < <(yq -r '.artifact_plan.planned[] | select(.group=="ds_golden_tests") | .
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-4-2-golden-tests \
+  --step-id phase-3-golden-tests \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/golden-tests.md" \
   "${DS_GOLDEN_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 5.
+> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 4.
 
 ---
 
-### PHASE 5 — Delivery
+### PHASE 4 — Delivery
 
 > ### ▶ Response Contract (non-negotiable)
 >
@@ -656,7 +487,7 @@ pragma-ai workflow report \
 > 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Once approved, the workflow is complete.
 >
 > ```
-> He completado PHASE 5 — Delivery. ¿Apruebas el resultado?
+> He completado PHASE 4 — Delivery. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
@@ -670,7 +501,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-5-delivery \
+  --step-id phase-4-delivery \
   --status started
 ```
 
@@ -684,7 +515,7 @@ Required output: `evidence/delivery-report.md` and a summary in the human report
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-5-delivery \
+  --step-id phase-4-delivery \
   --status failed
 ```
 > ❌ The workflow stops here.
@@ -695,7 +526,7 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-5-delivery \
+  --step-id phase-4-delivery \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/delivery-report.md"
 ```
@@ -729,12 +560,13 @@ The following are workflow violations. If your response for a phase contains any
 
 - Omitting the `--status started` tool call before starting the phase's work.
 - Omitting the terminal status tool call (`--status finished`, `--status failed`, or `--status re_started`) at the end of the phase.
-- Emitting `--status finished` without every declared `--output-file` flag (for `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-3-apply-changes`, `phase-3-1-audit`, `phase-4-1-widget-tests`, `phase-4-2-golden-tests`, `phase-5-delivery`).
+- Emitting `--status finished` without every declared `--output-file` flag (for `phase-0-plan-review`, `phase-1-apply-audit`, `phase-2-widget-tests`, `phase-3-golden-tests`, `phase-4-delivery`).
 - Using a `--step-id` or `--workflow-id` value that does not appear in the `Step IDs` table above, character-for-character.
+- Narrating, presenting, or executing a phase (in a header, approval prompt, or telemetry call) whose name does not correspond verbatim to an entry in the `Step IDs` table above — including a phase that existed in a previous version of this document.
 - Ending a phase response without the approval prompt block, or adding prose after it.
 - Starting the next phase's work before the user has explicitly answered the approval prompt.
-- Running the gap report on `phase-2-1-validation-human-review` (produces no files) or on the Topology gate (not telemetry-tracked).
-- Emitting `started` or `finished` for `phase-4-2-golden-tests` when the plan/audit did not classify the refactor as having visual impact.
+- Running the gap report on the Topology gate (not telemetry-tracked) — it is not a step-id and is never tracked by telemetry.
+- Emitting `started` or `finished` for `phase-3-golden-tests` when the plan/audit did not classify the refactor as having visual impact.
 
 Report any violation immediately by stopping the workflow and asking the user how to proceed. Do not try to "correct" a missed emission after the fact; re-run the phase.
 
@@ -759,19 +591,19 @@ Agent: I've completed [step name]. Do you approve the result?
 
 > **Baseline integrity (mandatory).** A step's baseline is valid only when its `finished` was persisted in the same session/turn that produced the first draft, before any edit touched the artifact. Before applying edits, the controller MUST verify with `pragma-ai workflow status "$INSTANCE_ID"` that the step reports a persisted `finished`; if the CLI did not return success for that `finished`, the phase is not complete and the approval gate must not be presented. A baseline reconstructed in a later session, or pulled at gap-report time over an already-edited artifact, is **invalid**: a `No changes detected` result with a same-time "Baseline pulled" while edits were in fact requested is the signature of an invalid baseline. In that case do not `--submit` a false `no changes`; report `re_started`, regenerate to re-anchor a clean baseline, and restart the gate.
 
-> **PHASE 2.1 aggregate rejection.** When PHASE 2.1 hosts the plan-approval decision, a rejection of a specific planning section (current state, impact analysis, inventory, artifact plan, technical plan, success criteria, handoffs) must first replay the phase that owns that section: report `re_started` on the affected earlier phase (PHASE 1 or PHASE 2), regenerate its output, report `finished` again with the same `--output-file` set, re-run that phase's gap report, and then report `re_started` → `finished` on PHASE 2.1 itself before re-entering this gate. Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
+> Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`.
 
-> ⚡ **MANDATORY** — On rejection, example using `phase-3-apply-changes`:
+> ⚡ **MANDATORY** — On rejection, example using `phase-1-apply-audit`:
 
 ```bash
 # 1. Report re_started
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-3-apply-changes \
+  --step-id phase-1-apply-audit \
   --status re_started
 
-# 2. ... regenerate the artifacts ...
+# 2. ... regenerate the artifacts and re-run the audit ...
 
 # 3. Report finished again (recaptures baseline; rebuild the same --output-file set as the original attempt)
 REFACTOR_FILE_FLAGS=()
@@ -782,8 +614,9 @@ done < <(yq -r '.artifact_plan.planned[].file' "${SPEC_PACKET_PATH}/spec.yaml")
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id refactor-component \
-  --step-id phase-3-apply-changes \
+  --step-id phase-1-apply-audit \
   --status finished \
+  --output-file "${SPEC_PACKET_PATH}/evidence/audit-report.md" \
   "${REFACTOR_FILE_FLAGS[@]}"
 
 # 4. Restart the approval gate
@@ -793,9 +626,8 @@ pragma-ai workflow report \
 
 ## Gap calculation & reporting (per step)
 
-> ⚡ **MANDATORY only for steps with output files.** In this workflow:
-> `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-3-apply-changes`, `phase-3-1-audit`, `phase-4-1-widget-tests`, `phase-4-2-golden-tests` (only when executed), `phase-5-delivery`.
-> `phase-2-1-validation-human-review` does NOT run a gap report. The Topology gate is not tracked by telemetry at all.
+> ⚡ **MANDATORY for every executed step.** All five step-ids in this workflow produce output files: `phase-0-plan-review`, `phase-1-apply-audit`, `phase-2-widget-tests`, `phase-3-golden-tests` (only when executed), `phase-4-delivery`.
+> The Topology gate is not tracked by telemetry at all and never runs a gap report.
 
 > Run this immediately after the corresponding step's approval gate passes — not batched at the end of the workflow.
 
@@ -834,12 +666,11 @@ pragma-ai workflow status "$INSTANCE_ID"
 | Command | When |
 |---|---|
 | `pragma-ai workflow create --workflow-id refactor-component --user-story-id <id>` | At the start, once (Setup) |
-| `pragma-ai workflow report ... --step-id <step> --status started` | When each executed phase begins (PHASE 0–5; `phase-4-2-golden-tests` only when the refactor has visual impact) |
-| `pragma-ai workflow report ... --step-id phase-2-1-validation-human-review --status finished` | On completion of the validation + human review phase (no `--output-file`) |
-| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of file-producing phases: `phase-0-spec-packet`, `phase-1-current-component-analysis`, `phase-2-technical-refactor-plan`, `phase-3-apply-changes`, `phase-3-1-audit`, `phase-4-1-widget-tests`, `phase-4-2-golden-tests` (when executed), `phase-5-delivery` |
-| `pragma-ai workflow report ... --step-id <step> --status failed` | When `phase-2-1-validation-human-review` cannot validate, `phase-3-1-audit` hits an unresolvable blocker, widget/golden tests can't pass (`phase-4-1-widget-tests`, `phase-4-2-golden-tests`), or delivery preconditions fail (`phase-5-delivery`) — the workflow stops |
-| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 2.1 aggregate rejection) |
-| `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID" --step-id <step>` | Phase A: after the corresponding file-producing step is approved |
+| `pragma-ai workflow report ... --step-id <step> --status started` | When each executed phase begins (PHASE 0, 1, 2, 4 always; `phase-3-golden-tests` only when the refactor has visual impact) |
+| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of any executed phase — all five step-ids produce output files: `phase-0-plan-review`, `phase-1-apply-audit`, `phase-2-widget-tests`, `phase-3-golden-tests` (when executed), `phase-4-delivery` |
+| `pragma-ai workflow report ... --step-id <step> --status failed` | When `phase-0-plan-review` cannot validate the spec, `phase-1-apply-audit` hits an unresolvable audit blocker, widget/golden tests can't pass (`phase-2-widget-tests`, `phase-3-golden-tests`), or delivery preconditions fail (`phase-4-delivery`) — the workflow stops |
+| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` |
+| `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID" --step-id <step>` | Phase A: after the corresponding step is approved |
 | `pragma-ai workflow gap-report ... --submit --report-id <id> --summary "<text>"` | Phase B: immediately after Phase A, for the same step |
 | `pragma-ai workflow list --user-story-id "$USER_STORY_ID"` | Check overall progress (any time) |
 | `pragma-ai workflow status "$INSTANCE_ID"` | Check instance detail (any time) |

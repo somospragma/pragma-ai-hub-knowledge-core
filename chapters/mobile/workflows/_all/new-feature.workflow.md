@@ -1,6 +1,6 @@
 ---
 id: new-feature
-version: 1.3.0
+version: 2.2.0
 scope: chapter
 type: workflow
 chapter: mobile
@@ -18,7 +18,7 @@ description: >
 |---|---|
 | `workflow-id` | `new-feature` |
 | `user-story-id` | Value of the required `hu_id` invocation input (e.g. `US-12345`, `HU-678`) |
-| Step IDs | `phase-0-spec-packet`, `phase-0-1-figma-fidelity-planning`, `phase-0-2-ui-component-inventory`, `phase-1-scaffold`, `phase-1-1-api-contract-analysis`, `phase-2-domain-layer`, `phase-3-data-layer`, `phase-4-presentation-layer`, `phase-5-wiring`, `phase-6-1-unit-tests`, `phase-6-2-widget-tests`, `phase-6-3-integration-tests`, `phase-6-4-golden-tests`, `phase-7-audit`, `checkpoint-final-build-review`, `phase-8-documentation`, `phase-9-delivery` |
+| Step IDs | `phase-0-spec-planning`, `phase-1-scaffold-api-analysis`, `phase-2-domain-layer`, `phase-3-data-layer`, `phase-4-presentation-layer`, `phase-5-wiring`, `phase-6-1-unit-tests`, `phase-6-2-widget-tests`, `phase-6-3-integration-tests`, `phase-6-4-golden-tests`, `phase-7-audit-final-review`, `phase-8-delivery` |
 
 ## Workflow Execution Contract
 
@@ -27,10 +27,10 @@ description: >
 The following rules bind every phase in this workflow and are enforced by the Response Contract embedded at the top of each phase:
 
 1. **Telemetry integrity.** Every executed phase emits exactly one `--status started` before its work and exactly one terminal status on completion — `--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when the human rejects and the phase must be regenerated — via `pragma-ai workflow report`. Skipping any of these is a workflow violation.
-2. **Step-id integrity.** The `--step-id` and `--workflow-id` values are the ONLY valid identifiers. Copy them **verbatim** from the `Step IDs` table above — never invent, translate, abbreviate, paraphrase, pluralize, or re-case them. `--workflow-id` MUST be exactly `new-feature`. The CLI silently rejects unknown step-ids.
-3. **Human approval per phase.** After every `finished`, present the approval prompt block (Aprobado / Ediciones / Rechazado) VERBATIM as the last thing in your response and yield. Silence is not approval. PHASE 2 / 3 / 4 have embedded REQUIRED CHECKPOINTs enforced via `sopp_gate.rb`; `checkpoint-final-build-review` is the aggregate final gate. See *Human approval gate* for the aggregate rejection replay protocol.
-4. **Gap report per file-producing phase.** After the human approves a phase that produced files (`--output-file`), run the two-phase gap report against the same step-id. `checkpoint-final-build-review` produces no files; do NOT run its gap report. The Topology gate is not tracked by telemetry at all.
-5. **Conditional phases.** Five phases are conditional and emit telemetry only when their guard is true: `phase-0-1-figma-fidelity-planning` (`figma_url` + `figma_scope=view`), `phase-0-2-ui-component-inventory` (`figma_url` or `ui_components`), `phase-1-1-api-contract-analysis` (`api_contract`), `phase-6-4-golden-tests` (`golden_tests=true`), `phase-8-documentation` (`documentation=true`). Otherwise skip entirely and record `skipped_by_input`.
+2. **Step-id and phase-name integrity.** The `--step-id` and `--workflow-id` values are the ONLY valid identifiers. Copy them **verbatim** from the `Step IDs` table above — never invent, translate, abbreviate, paraphrase, pluralize, or re-case them. `--workflow-id` MUST be exactly `new-feature`. The CLI silently rejects unknown step-ids. This also governs every phase name you narrate, header, or put in an approval prompt: it MUST match, verbatim, a `### PHASE` header (or its embedded `#### Step`) tied to one of the `Step IDs` above. Never execute, narrate, or present a phase that is not in that table — including a phase from a previous version of this document, from memory, or from a different workflow. If a phase you are about to run does not appear there, stop and re-read the `Step IDs` table before continuing.
+3. **Human approval per phase.** After every `finished`, present the approval prompt block (Aprobado / Ediciones / Rechazado) VERBATIM as the last thing in your response and yield. Silence is not approval. PHASE 2 / 3 / 4 have embedded REQUIRED CHECKPOINTs enforced via `sopp_gate.rb`; `phase-7-audit-final-review` embeds the aggregate final gate (audit + Final Build Review). See *Human approval gate* for the aggregate rejection replay protocol.
+4. **Gap report per file-producing phase.** After the human approves a phase that produced files (`--output-file`), run the two-phase gap report against the same step-id. Every step in the `Step IDs` table above produces files and requires a gap report. The Topology gate is not tracked by telemetry at all.
+5. **Conditional phases.** `phase-0-spec-planning` embeds two conditional sub-steps: Figma Fidelity Planning (`figma_url` + `figma_scope=view`) and UI Component Inventory (`figma_url` or `ui_components`). `phase-1-scaffold-api-analysis` embeds a conditional API Contract Analysis sub-step (`api_contract`). `phase-6-4-golden-tests` is fully conditional (`golden_tests=true`). `phase-8-delivery` embeds a conditional Documentation sub-step (`documentation=true`). When a guard is false, skip that portion entirely and record `skipped_by_input`; a fully-conditional phase with a false guard must not emit `started`/`finished` at all.
 6. **cwd assumption.** Commands assume the shell's cwd is the project root. `--project-dir` is only needed when running from elsewhere.
 
 Violating any of these rules is a Response Contract Violation (see the section of that name at the end of this document).
@@ -39,7 +39,7 @@ Violating any of these rules is a Response Contract Violation (see the section o
 
 You are the workflow controller. Before every phase:
 
-1. **Load and read** this document into context (if not already loaded) and re-scan the phase's Response Contract at the top of that phase. The Response Contract binds the shape of your response.
+1. **Load and read** this document into context (if not already loaded) and re-scan the phase's Response Contract at the top of that phase. The Response Contract binds the shape of your response. Before naming or running any phase, confirm it is listed verbatim in the `Step IDs` table above — do not rely on memory of a previous version of this workflow, a similar workflow, or general conventions.
 2. **Do not skip** any Response Contract step. Doing so is a workflow violation.
 3. **Do not begin** the phase's work until you have emitted its `--status started` command via your shell tool and it has returned.
 4. **Do not begin** the next phase until the human has explicitly answered the approval prompt with **1** (Aprobado), **2** (Ediciones), or **3** (Rechazado).
@@ -104,7 +104,7 @@ Use this workflow when:
 - The feature requires domain logic (entities, use cases, repositories)
 - The feature connects to a REST API or local database
 - The feature needs a BLoC with state management
-- The feature may need new DS components (detected in Phase 0.2)
+- The feature may need new DS components (detected in PHASE 0's UI Component Inventory sub-step)
 
 Do NOT use for:
 - DS component only (use `/new-component`)
@@ -262,26 +262,27 @@ api_contract: |
 
 ## Execution Sequence
 
-### PHASE 0 — Mobile Spec Packet (`full`)
+### PHASE 0 — Spec + Planning (`full`)
 
 > ### ▶ Response Contract (non-negotiable)
 >
 > Your response for this phase MUST, in order:
 >
 > 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
+> 2. Do the work described under *Instructions* below: create the Mobile Spec Packet, then run Shared Figma UI Fidelity Planning (only when `figma_url` + `figma_scope=view`), then run UI Component Inventory (only when `figma_url` or `ui_components`).
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin the next phase (PHASE 0.1 / 0.2 / 1) until the user replies.
+> 4. **Executable Phase Gate (mandatory).** Run `docs/scripts/sopp_gate.rb open-initial`. Show its emitted spec hash and approval challenge as part of the approval prompt below.
+> 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 1 until the user replies. Replying `1` (✅ Aprobado) to this exact prompt **is** the human approval: immediately after that reply, run `sopp_gate.rb approve-initial` with the spec hash and challenge shown above (see *Human approval gate*) before doing any PHASE 1 work.
 >
 > ```
-> He completado PHASE 0 — Mobile Spec Packet. ¿Apruebas el resultado?
+> He completado PHASE 0 — Spec + Planning. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
 > ```
 >
-> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+> Silence is not approval. Continuing past step 6 without a user reply is a workflow violation.
 
 > ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
@@ -289,9 +290,11 @@ api_contract: |
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-0-spec-packet \
+  --step-id phase-0-spec-planning \
   --status started
 ```
+
+#### Step 1 — Mobile Spec Packet
 
 **Agent:** `@feature-builder`
 **Skill:** `mobile-sdd-spec-validation`
@@ -351,61 +354,14 @@ The full spec must include:
 - `execution_capabilities.subagent_delegation` and
   `fallback_policy=delegate_or_controller_executes`
 
-When `figma_scope=view`, execute PHASE 0.1 before validating the initial
-review. Validate the completed spec and wait for explicit approval before
-scaffold or code generation.
+When `figma_scope=view`, execute Step 2 (Figma Fidelity Planning) before
+validating the initial review. Validate the completed spec and wait for
+explicit approval before scaffold or code generation.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with all four packet artifacts. Substitute `${SPEC_PACKET_PATH}` with the resolved run path:
+#### Step 2 — Shared Figma UI Fidelity Planning (conditional)
 
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-0-spec-packet \
-  --status finished \
-  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
-  --output-file "${SPEC_PACKET_PATH}/context.json" \
-  --output-file "${SPEC_PACKET_PATH}/review.md" \
-  --output-file "${SPEC_PACKET_PATH}/evidence/validation-report.md"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 0.1 (only when `figma_url` + `figma_scope=view`), PHASE 0.2 (only when `figma_url` or `ui_components`), or directly to PHASE 1.
-
----
-
-### PHASE 0.1 — Shared Figma UI Fidelity Planning (conditional)
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. **Guard check.** Only proceed with this phase when `figma_url` is supplied AND `figma_scope=view`. Otherwise skip the phase entirely — do not emit `started` or `finished`.
-> 2. Emit the `--status started` command below as a real shell tool call.
-> 3. Do the work described under *Instructions* below, including downloading every visible Figma source asset.
-> 4. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 0.2 / 1 until the user replies.
->
-> ```
-> He completado PHASE 0.1 — Shared Figma UI Fidelity Planning. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 6 without a user reply is a workflow violation.
-
-> ⚡ **MANDATORY only when `figma_url` is supplied AND `figma_scope=view`.** When the condition does not hold, skip this phase entirely — do not emit `started`/`finished` for it.
-
-> ⚡ **EXECUTE NOW (when executed)** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-0-1-figma-fidelity-planning \
-  --status started
-```
+**Guard check.** Only run this step when `figma_url` is supplied AND
+`figma_scope=view`. Otherwise skip it entirely.
 
 **Condition:** `figma_url` is supplied and `figma_scope=view`.
 **Preferred specialist role:** `@figma-analyzer`.
@@ -419,79 +375,16 @@ visible node's parent-child order, bounds, layout, corner radii, border width,
 literal text and fixed tolerances (`1 dp`, `2%` global, `4%` regional). Missing
 or unresolved geometry blocks with `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`.
 
-> ⚡ **MANDATORY (conditional)** — If Figma geometry cannot be resolved and the phase ends with `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`:
+#### Step 3 — UI Component Inventory (conditional)
 
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-0-1-figma-fidelity-planning \
-  --status failed
-```
-> ❌ The workflow stops here.
-
-> ⚡ **MANDATORY (success path)** — Report `finished` with the updated spec and every source asset archived under `source-assets/figma/`. Expand `${FIGMA_ASSET_FLAGS[@]}` from `spec.yaml.assets[].archive_path`:
-
-```bash
-FIGMA_ASSET_FLAGS=()
-while IFS= read -r asset; do
-  FIGMA_ASSET_FLAGS+=(--output-file "$asset")
-done < <(yq -r '.assets[].archive_path' "${SPEC_PACKET_PATH}/spec.yaml")
-
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-0-1-figma-fidelity-planning \
-  --status finished \
-  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
-  "${FIGMA_ASSET_FLAGS[@]}"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 0.2 (only when `figma_url` or `ui_components`) or directly to PHASE 1.
-
----
-
----
-
-### PHASE 0.2 — UI Component Inventory (conditional)
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. **Guard check.** Only proceed with this phase when `figma_url` OR `ui_components` is provided. Otherwise skip the phase entirely — do not emit `started` or `finished`.
-> 2. Emit the `--status started` command below as a real shell tool call.
-> 3. Do the work described under *Instructions* below.
-> 4. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 1 until the user replies.
->
-> ```
-> He completado PHASE 0.2 — UI Component Inventory. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 6 without a user reply is a workflow violation.
-
-> ⚡ **MANDATORY only when `figma_url` OR `ui_components` is provided.** When neither is supplied, skip this phase entirely — do not emit `started`/`finished` for it.
-
-> ⚡ **EXECUTE NOW (when executed)** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-0-2-ui-component-inventory \
-  --status started
-```
+**Guard check.** Only run this step when `figma_url` OR `ui_components` is
+provided. Otherwise skip it entirely.
 
 **Condition:** `figma_url` or `ui_components` is provided.
 **Agent:** `@feature-builder`
 
 Steps:
-1. If `figma_url` is provided, reuse PHASE 0.1 analysis when
+1. If `figma_url` is provided, reuse Step 2 analysis when
    `figma_scope=view`; do not re-query or reinterpret Figma. For
    `component_inventory`, `@feature-builder` prefers Figma MCP preflight
    and screen analysis through `@figma-analyzer`. When native subagent
@@ -519,67 +412,81 @@ Output: `evidence/ui-component-inventory.md`.
 Update `spec.yaml` sections `ui_inventory`, `artifact_plan.planned[group=ds_components]` and
 `dependencies.ds_pipeline`.
 
-**Skip condition:** No `figma_url` and no `ui_components` provided.
-
-> ⚡ **MANDATORY (conditional)** — If Figma MCP preflight fails (sets `spec.yaml.external_access.figma_mcp.status=blocked_input`) or a delegated DS pipeline returns `blocked_input` that cannot be resolved:
+> ⚡ **MANDATORY (conditional)** — If Figma geometry cannot be resolved (`FIGMA_LAYOUT_MANIFEST_INCOMPLETE`), Figma MCP preflight fails (sets `spec.yaml.external_access.figma_mcp.status=blocked_input`), or a delegated DS pipeline returns `blocked_input` that cannot be resolved:
 
 ```bash
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-0-2-ui-component-inventory \
+  --step-id phase-0-spec-planning \
   --status failed
 ```
 > ❌ The workflow stops here.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the inventory evidence, the updated spec, and (when Figma preflight ran) the preflight evidence plus any archived source assets. Expand `${FIGMA_ASSET_FLAGS[@]}` and `${FIGMA_PREFLIGHT_FLAGS[@]}` only when `figma_url` was supplied:
+> ⚡ **MANDATORY (success path)** — Report `finished` with all four packet artifacts plus, when executed, the Figma-planning outputs (updated spec + archived source assets) and the UI component inventory outputs (inventory evidence, updated spec, and — when `figma_url` was supplied — the preflight evidence and archived source assets). Substitute `${SPEC_PACKET_PATH}` with the resolved run path and expand the conditional flags only when their step ran:
 
 ```bash
-# Only when Figma preflight ran
+# Only when Step 2 (Figma Fidelity Planning) ran
 FIGMA_ASSET_FLAGS=()
-FIGMA_PREFLIGHT_FLAGS=()
-if [ -n "$figma_url" ]; then
+if [ "$figma_scope" = "view" ] && [ -n "$figma_url" ]; then
   while IFS= read -r asset; do
     FIGMA_ASSET_FLAGS+=(--output-file "$asset")
   done < <(yq -r '.assets[].archive_path' "${SPEC_PACKET_PATH}/spec.yaml")
-  FIGMA_PREFLIGHT_FLAGS+=(--output-file "${SPEC_PACKET_PATH}/evidence/figma-mcp-preflight.md")
+fi
+
+# Only when Step 3 (UI Component Inventory) ran
+INVENTORY_FLAGS=()
+FIGMA_PREFLIGHT_FLAGS=()
+if [ -n "$figma_url" ] || [ -n "$ui_components" ]; then
+  INVENTORY_FLAGS+=(--output-file "${SPEC_PACKET_PATH}/evidence/ui-component-inventory.md")
+  if [ -n "$figma_url" ]; then
+    FIGMA_PREFLIGHT_FLAGS+=(--output-file "${SPEC_PACKET_PATH}/evidence/figma-mcp-preflight.md")
+  fi
 fi
 
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-0-2-ui-component-inventory \
+  --step-id phase-0-spec-planning \
   --status finished \
-  --output-file "${SPEC_PACKET_PATH}/evidence/ui-component-inventory.md" \
   --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
-  "${FIGMA_PREFLIGHT_FLAGS[@]}" \
-  "${FIGMA_ASSET_FLAGS[@]}"
+  --output-file "${SPEC_PACKET_PATH}/context.json" \
+  --output-file "${SPEC_PACKET_PATH}/review.md" \
+  --output-file "${SPEC_PACKET_PATH}/evidence/validation-report.md" \
+  "${FIGMA_ASSET_FLAGS[@]}" \
+  "${INVENTORY_FLAGS[@]}" \
+  "${FIGMA_PREFLIGHT_FLAGS[@]}"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 1.
+> **Stop here.** Get human approval (see *Human approval gate*). The human's
+> reply of `1` (✅ Aprobado) is the approval: immediately run
+> `sopp_gate.rb approve-initial` for the challenge shown above before doing
+> any PHASE 1 work. Once approved, run this step's **gap report** and then
+> continue to PHASE 1.
 
 ---
 
-### PHASE 1 — Scaffold
+### PHASE 1 — Scaffold + API Contract Analysis
 
 > ### ▶ Response Contract (non-negotiable)
 >
 > Your response for this phase MUST, in order:
 >
 > 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
-> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 1.1 / 2 until the user replies.
+> 2. **Executable Phase Gate (mandatory).** Run `docs/scripts/sopp_gate.rb can-enter --phase scaffold`. If it is blocked (e.g. `INITIAL_SPEC_NOT_APPROVED`), stop immediately — do not scaffold, edit `pubspec.yaml`, or touch `spec.yaml` — and report the blocking code to the user instead.
+> 3. Do the work described under *Instructions* below: Scaffold, then API Contract Analysis (only when `api_contract` is provided).
+> 4. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2 until the user replies.
 >
 > ```
-> He completado PHASE 1 — Scaffold. ¿Apruebas el resultado?
+> He completado PHASE 1 — Scaffold + API Contract Analysis. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
 > ```
 >
-> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
+> Silence is not approval. Continuing past step 6 without a user reply is a workflow violation.
 
 > ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
 
@@ -587,9 +494,20 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-1-scaffold \
+  --step-id phase-1-scaffold-api-analysis \
   --status started
 ```
+
+#### Executable Phase Gate (mandatory)
+
+Run `docs/scripts/sopp_gate.rb can-enter --packet "$SPEC_PACKET_PATH" --phase scaffold`
+before touching any file. It fails with `INITIAL_SPEC_NOT_APPROVED` unless
+`approve-initial` already ran in PHASE 0, right after the human's `1` reply
+to that phase's approval prompt. A blocked gate stops the phase; report the
+code to the user and wait — do not scaffold, edit `pubspec.yaml`, or modify
+`spec.yaml` around it.
+
+#### Step 1 — Scaffold
 
 **Agent:** `@feature-builder`
 Mandatory compact handoff:
@@ -617,60 +535,11 @@ Steps:
 Output: Directory structure created, registered in `PIPELINE_LOG_PATH`.
 Persist scaffold evidence under `SPEC_PACKET_PATH/evidence/`.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the updated spec and every file declared in `artifact_plan.planned[group=scaffold]` (pubspec.yaml, barrel exports, workspace registrations, etc.):
+#### Step 2 — API Contract Analysis (conditional)
 
-```bash
-SCAFFOLD_FLAGS=()
-while IFS= read -r f; do
-  SCAFFOLD_FLAGS+=(--output-file "$f")
-done < <(yq -r '.artifact_plan.planned[] | select(.group=="scaffold") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
-
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-1-scaffold \
-  --status finished \
-  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
-  "${SCAFFOLD_FLAGS[@]}"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 1.1 (only when `api_contract` is provided) or directly to PHASE 2.
-
----
-
-### PHASE 1.1 — API Contract Analysis (conditional)
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. **Guard check.** Only proceed with this phase when `api_contract` is provided (file, URL, or inline cURL). Otherwise skip the phase entirely — do not emit `started` or `finished`.
-> 2. Emit the `--status started` command below as a real shell tool call.
-> 3. Do the work described under *Instructions* below.
-> 4. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 2 until the user replies.
->
-> ```
-> He completado PHASE 1.1 — API Contract Analysis. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 6 without a user reply is a workflow violation.
-
-> ⚡ **MANDATORY only when `api_contract` is provided** (file, URL, or inline cURL). When it is not supplied, skip this phase entirely — do not emit `started`/`finished` for it.
-
-> ⚡ **EXECUTE NOW (when executed)** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-1-1-api-contract-analysis \
-  --status started
-```
+**Guard check.** Only run this step when `api_contract` is provided (file,
+URL, or inline cURL). Otherwise skip it entirely — use `fields` and
+`api_endpoints` directly.
 
 **Condition:** `api_contract` is provided (file, URL, or inline cURL in the prompt).
 **Agent:** `@feature-builder`
@@ -696,18 +565,28 @@ Output: `evidence/api-contract-analysis.md`.
 Update `spec.yaml` sections `contracts.api`, `domain_model_plan`,
 `data_model_plan` and `use_case_plan`.
 
-**Skip condition:** No `api_contract` provided and no inline cURL — use `fields` and `api_endpoints` directly.
-
-> ⚡ **MANDATORY (success path)** — Report `finished` with the analysis evidence and the updated spec:
+> ⚡ **MANDATORY (success path)** — Report `finished` with the updated spec, every file declared in `artifact_plan.planned[group=scaffold]` (pubspec.yaml, barrel exports, workspace registrations, etc.), and — when Step 2 ran — the API contract analysis evidence:
 
 ```bash
+SCAFFOLD_FLAGS=()
+while IFS= read -r f; do
+  SCAFFOLD_FLAGS+=(--output-file "$f")
+done < <(yq -r '.artifact_plan.planned[] | select(.group=="scaffold") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+
+# Only when Step 2 (API Contract Analysis) ran
+API_ANALYSIS_FLAGS=()
+if [ -n "$api_contract" ]; then
+  API_ANALYSIS_FLAGS+=(--output-file "${SPEC_PACKET_PATH}/evidence/api-contract-analysis.md")
+fi
+
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-1-1-api-contract-analysis \
+  --step-id phase-1-scaffold-api-analysis \
   --status finished \
-  --output-file "${SPEC_PACKET_PATH}/evidence/api-contract-analysis.md" \
-  --output-file "${SPEC_PACKET_PATH}/spec.yaml"
+  --output-file "${SPEC_PACKET_PATH}/spec.yaml" \
+  "${SCAFFOLD_FLAGS[@]}" \
+  "${API_ANALYSIS_FLAGS[@]}"
 ```
 
 > **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 2.
@@ -724,7 +603,7 @@ pragma-ai workflow report \
 > 2. Run the `sopp_gate.rb` Executable Phase Gate (`open-initial` / `can-enter` / `open-checkpoint`) and do the work described under *Instructions* below, ending in the embedded REQUIRED CHECKPOINT — Domain Layer.
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 3 until the user replies AND the Domain-layer sopp_gate approval is recorded.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 3 until the user replies. Replying `1` (✅ Aprobado) to this exact prompt **is** the approval: immediately after that reply, run `approve` for the Domain-layer checkpoint with the hash/challenge shown in the REQUIRED CHECKPOINT below.
 >
 > ```
 > He completado PHASE 2 — Domain Layer. ¿Apruebas el resultado?
@@ -751,7 +630,11 @@ Before presenting the initial review, run `docs/scripts/sopp_gate.rb open-initia
 show its spec hash and approval challenge, and end the response. Before every
 code-producing phase, run `docs/scripts/sopp_gate.rb can-enter` for the
 target phase. After Domain, Data or Presentation generation and evidence, run
-`open-checkpoint` and end the response. The controller must never write an
+`open-checkpoint` and end the response. The human's `1` (✅ Aprobado) reply to
+that exact checkpoint prompt is what triggers the controller to run `approve`
+immediately, with the same hash and challenge shown — never before that reply
+arrives, never inferred from silence, and never from another agent's or
+subagent's claim that the human approved. The controller must never write an
 approval state directly or infer approval from the initial plan approval.
 
 If the human requests changes, remain in the current layer:
@@ -801,7 +684,10 @@ Present a compact Spanish review:
 3. criteria covered
 4. self-verification result
 
-Wait for explicit approval before PHASE 3.
+This review is informational only — do not ask for approval here. Report
+`--status finished` next, then close the response with the mandatory numbered
+approval prompt from step 5 (see *Human approval gate*); that prompt, not this
+checkpoint, is what gates PHASE 3.
 
 > ⚡ **MANDATORY (success path)** — Report `finished` with the generated domain files, the domain checkpoint evidence, and the updated context. Expand the array from `artifact_plan.planned[group=domain]`:
 
@@ -835,7 +721,7 @@ pragma-ai workflow report \
 > 2. Run the `sopp_gate.rb` Executable Phase Gate and do the work described under *Instructions* below, ending in the embedded REQUIRED CHECKPOINT — Data Layer.
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4 until the user replies AND the Data-layer sopp_gate approval is recorded.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 4 until the user replies. Replying `1` (✅ Aprobado) to this exact prompt **is** the approval: immediately after that reply, run `approve` for the Data-layer checkpoint with the hash/challenge shown in the REQUIRED CHECKPOINT below.
 >
 > ```
 > He completado PHASE 3 — Data Layer. ¿Apruebas el resultado?
@@ -888,7 +774,10 @@ Present a compact Spanish review:
 3. criteria covered
 4. self-verification result
 
-Wait for explicit approval before PHASE 4.
+This review is informational only — do not ask for approval here. Report
+`--status finished` next, then close the response with the mandatory numbered
+approval prompt from step 5 (see *Human approval gate*); that prompt, not this
+checkpoint, is what gates PHASE 4.
 
 > ⚡ **MANDATORY (success path)** — Report `finished` with the generated data files, the data checkpoint evidence, and the updated context. Expand the array from `artifact_plan.planned[group=data]`:
 
@@ -922,7 +811,7 @@ pragma-ai workflow report \
 > 2. Run the `sopp_gate.rb` Executable Phase Gate and do the work described under *Instructions* below, ending in the embedded REQUIRED CHECKPOINT — Presentation Layer. When `figma_scope=view`, write `evidence/figma-fidelity-report.json` before the checkpoint.
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 5 until the user replies AND the Presentation-layer sopp_gate approval is recorded.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 5 until the user replies. Replying `1` (✅ Aprobado) to this exact prompt **is** the approval: immediately after that reply, run `approve` for the Presentation-layer checkpoint with the hash/challenge shown in the REQUIRED CHECKPOINT below.
 >
 > ```
 > He completado PHASE 4 — Presentation Layer. ¿Apruebas el resultado?
@@ -988,7 +877,10 @@ Present a compact Spanish review:
 4. criteria covered
 5. self-verification result
 
-Wait for explicit approval before PHASE 5.
+This review is informational only — do not ask for approval here. Report
+`--status finished` next, then close the response with the mandatory numbered
+approval prompt from step 5 (see *Human approval gate*); that prompt, not this
+checkpoint, is what gates PHASE 5.
 
 > ⚡ **MANDATORY (conditional)** — When `figma_scope=view`, if the fidelity report exceeds tolerances and the phase stops with `FIGMA_FIDELITY_TOLERANCE_EXCEEDED`:
 
@@ -1439,20 +1331,20 @@ pragma-ai workflow report \
 
 ---
 
-### PHASE 7 — Audit
+### PHASE 7 — Audit + Final Build Review
 
 > ### ▶ Response Contract (non-negotiable)
 >
 > Your response for this phase MUST, in order:
 >
 > 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
+> 2. Do the work described under *Instructions* below: run the audit, then present the Final Build Review to the user.
 > 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
 > 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin the Final Build Review checkpoint until the user replies.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. This is the aggregate final gate: PHASE 8 may only begin after explicit approval.
 >
 > ```
-> He completado PHASE 7 — Audit. ¿Apruebas el resultado?
+> He completado PHASE 7 — Audit + Final Build Review. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
@@ -1466,9 +1358,11 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-7-audit \
+  --step-id phase-7-audit-final-review \
   --status started
 ```
+
+#### Step 1 — Audit
 
 **Agent:** `@code-auditor`
 
@@ -1496,46 +1390,57 @@ is a blocker (`FIGMA_LAYOUT_MANIFEST_INCOMPLETE` or
 
 Output: `evidence/audit-report.md` and a summary in the human report.
 
+#### Step 2 — Final Build Review
+
+Present to the developer:
+1. Feature build report (all files created)
+2. DI registration status
+3. Route registration status
+4. Any manual steps needed
+5. spec criteria covered and evidence paths
+
+Wait for explicit approval.
+
 > ⚡ **MANDATORY (conditional)** — If the audit loop exceeds `pipeline.max_audit_retries` without passing, or hits a fidelity blocker (`FIGMA_LAYOUT_MANIFEST_INCOMPLETE` or `FIGMA_FIDELITY_TOLERANCE_EXCEEDED`) that cannot be resolved:
 
 ```bash
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-7-audit \
+  --step-id phase-7-audit-final-review \
   --status failed
 ```
 > ❌ The workflow stops here.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the audit evidence:
+> ⚡ **MANDATORY (success path)** — Report `finished` with the audit evidence, once the Final Build Review has been presented:
 
 ```bash
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-7-audit \
+  --step-id phase-7-audit-final-review \
   --status finished \
   --output-file "${SPEC_PACKET_PATH}/evidence/audit-report.md"
 ```
 
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to the `HUMAN CHECKPOINT — Final Build Review`.
+> **Stop here.** This is the **domain aggregate approval gate** for the full build (PHASE 0 through PHASE 7). On rejection of a specific artifact or layer, follow the `sopp_gate.rb` revision protocol (see *Human approval gate*): report `re_started` on the affected earlier phase, apply the bounded revision, re-report `finished` with the same `--output-file` set, re-run that phase's gap report, and then re-enter this checkpoint (`re_started` → `finished` on `phase-7-audit-final-review`). Once approved, run this step's **gap report** and then continue to PHASE 8.
 
 ---
 
-### HUMAN CHECKPOINT — Final Build Review (required)
+### PHASE 8 — Documentation + Delivery
 
 > ### ▶ Response Contract (non-negotiable)
 >
 > Your response for this phase MUST, in order:
 >
 > 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below, presenting the full build report to the user.
-> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call.
-> 4. This phase produces no output files — do NOT run the gap report.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. This is the aggregate final gate: PHASE 8 (if `documentation=true`) or PHASE 9 may only begin after explicit approval.
+> 2. Do the work described under *Instructions* below: Documentation (only when `documentation=true`), then Delivery.
+> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
+> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
+> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Once approved, the workflow is complete.
 >
 > ```
-> He completado HUMAN CHECKPOINT — Final Build Review. ¿Apruebas el resultado?
+> He completado PHASE 8 — Documentation + Delivery. ¿Apruebas el resultado?
 >   1. ✅ Aprobado — continuar
 >   2. ✏️ Ediciones — dime qué cambiar
 >   3. ❌ Rechazado — regenerar desde cero
@@ -1549,66 +1454,15 @@ pragma-ai workflow report \
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id checkpoint-final-build-review \
+  --step-id phase-8-delivery \
   --status started
 ```
 
-Present to the developer:
-1. Feature build report (all files created)
-2. DI registration status
-3. Route registration status
-4. Any manual steps needed
-5. spec criteria covered and evidence paths
+#### Step 1 — Documentation (conditional)
 
-Wait for explicit approval.
-
-> ⚡ **MANDATORY (success path)** — Report `finished` once the review has been presented (approval itself happens in the gate that follows):
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id checkpoint-final-build-review \
-  --status finished
-```
-
-> **Stop here.** This is the **domain aggregate approval gate** for the full build (PHASE 0 through PHASE 7). On rejection of a specific artifact or layer, follow the `sopp_gate.rb` revision protocol (see *Human approval gate*): report `re_started` on the affected earlier phase, apply the bounded revision, re-report `finished` with the same `--output-file` set, re-run that phase's gap report, and then re-enter this checkpoint (`re_started` → `finished` on `checkpoint-final-build-review`). Only when the checkpoint is approved may PHASE 8 begin (when `documentation=true`) or PHASE 9 (when `documentation=false`). *(This step produces no output files — no gap report required.)*
-
----
-
-### PHASE 8 — Documentation (conditional)
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. **Guard check.** Only proceed with this phase when `documentation=true`. If `false`, skip the phase entirely — do not emit `started` or `finished`. Record `skipped_by_input` in `context.json`, `spec.yaml` and `PIPELINE_LOG_PATH`.
-> 2. Emit the `--status started` command below as a real shell tool call.
-> 3. Do the work described under *Instructions* below, invoking the `documentation-projects` shared skill.
-> 4. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 5. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 6. End your response with the block below **verbatim** and yield. Do not add prose after it. Do not begin PHASE 9 until the user replies.
->
-> ```
-> He completado PHASE 8 — Documentation. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 6 without a user reply is a workflow violation.
-
-> ⚡ **MANDATORY only when `documentation=true`.** When `documentation=false`, skip this phase entirely — do not emit `started`/`finished` for it. The workflow's own `skipped_by_input` record in `context.json`, `spec.yaml` and `PIPELINE_LOG_PATH` covers the skip.
-
-> ⚡ **EXECUTE NOW (when executed)** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-8-documentation \
-  --status started
-```
+**Guard check.** Only run this step when `documentation=true`. Otherwise skip
+it entirely; record `skipped_by_input` in `context.json`, `spec.yaml` and
+`PIPELINE_LOG_PATH`.
 
 **Agent:** `@feature-builder` using shared skill `documentation-projects`
 
@@ -1655,57 +1509,7 @@ When `documentation=false`, record `documentation: skipped_by_input` with
 `PIPELINE_LOG_PATH`. Do not modify project documentation or invoke the shared
 skill.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the documentation-report evidence and every generated/updated document. Expand the array from `artifact_plan.planned[group=docs]`:
-
-```bash
-DOCS_FILE_FLAGS=()
-while IFS= read -r f; do
-  DOCS_FILE_FLAGS+=(--output-file "$f")
-done < <(yq -r '.artifact_plan.planned[] | select(.group=="docs") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
-
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-8-documentation \
-  --status finished \
-  --output-file "${SPEC_PACKET_PATH}/evidence/documentation-report.md" \
-  "${DOCS_FILE_FLAGS[@]}"
-```
-
-> **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** and then continue to PHASE 9.
-
----
-
-### PHASE 9 — Delivery
-
-> ### ▶ Response Contract (non-negotiable)
->
-> Your response for this phase MUST, in order:
->
-> 1. Emit the `--status started` command below as a real shell tool call.
-> 2. Do the work described under *Instructions* below.
-> 3. Emit the terminal status command (`--status finished` on success, `--status failed` on unrecoverable blocker, or `--status re_started` when replaying after rejection) via a real shell tool call, with the exact `--output-file` set below.
-> 4. **File-producing phase.** After the human approves, emit the two gap-report commands (Phase A + Phase B) for this same `--step-id`.
-> 5. End your response with the block below **verbatim** and yield. Do not add prose after it. Once approved, the workflow is complete.
->
-> ```
-> He completado PHASE 9 — Delivery. ¿Apruebas el resultado?
->   1. ✅ Aprobado — continuar
->   2. ✏️ Ediciones — dime qué cambiar
->   3. ❌ Rechazado — regenerar desde cero
-> ```
->
-> Silence is not approval. Continuing past step 5 without a user reply is a workflow violation.
-
-> ⚡ **EXECUTE NOW** — Run the command below via your shell tool as your first action in this phase. Do not narrate; do not paraphrase.
-
-```bash
-pragma-ai workflow report \
-  --instance-id "$INSTANCE_ID" \
-  --workflow-id new-feature \
-  --step-id phase-9-delivery \
-  --status started
-```
+#### Step 2 — Delivery
 
 **Preferred specialist role:** `@delivery-manager`
 
@@ -1747,20 +1551,30 @@ user explicitly asks for it and the spec grants external tool permissions.
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-9-delivery \
+  --step-id phase-8-delivery \
   --status failed
 ```
 > ❌ The workflow stops here.
 
-> ⚡ **MANDATORY (success path)** — Report `finished` with the delivery report:
+> ⚡ **MANDATORY (success path)** — Report `finished` with the delivery report and — when Step 1 (Documentation) ran — the documentation-report evidence and every generated/updated document. Expand the array from `artifact_plan.planned[group=docs]`:
 
 ```bash
+# Only when Step 1 (Documentation) ran
+DOCS_FLAGS=()
+if [ "$documentation" = "true" ]; then
+  DOCS_FLAGS+=(--output-file "${SPEC_PACKET_PATH}/evidence/documentation-report.md")
+  while IFS= read -r f; do
+    DOCS_FLAGS+=(--output-file "$f")
+  done < <(yq -r '.artifact_plan.planned[] | select(.group=="docs") | .file' "${SPEC_PACKET_PATH}/spec.yaml")
+fi
+
 pragma-ai workflow report \
   --instance-id "$INSTANCE_ID" \
   --workflow-id new-feature \
-  --step-id phase-9-delivery \
+  --step-id phase-8-delivery \
   --status finished \
-  --output-file "${SPEC_PACKET_PATH}/evidence/delivery-report.md"
+  --output-file "${SPEC_PACKET_PATH}/evidence/delivery-report.md" \
+  "${DOCS_FLAGS[@]}"
 ```
 
 > **Stop here.** Get human approval (see *Human approval gate*). Once approved, run this step's **gap report** — the workflow is complete.
@@ -1806,7 +1620,7 @@ After all phases:
 - **Golden tests**: ✅ passed | ⏭ skipped_by_input
 - **Documentation**: ✅ updated | 🆕 created | ⏭ skipped_by_input
 
-### Phase 0.2 — DS Components (if applicable)
+### PHASE 0 — DS Components (if applicable)
 | Component | Status | Action |
 |---|---|---|
 
@@ -1824,7 +1638,18 @@ After all phases:
 
 - NEVER skip domain or data layers — always generate the full stack
 - NEVER proceed to scaffold/code generation before `review.md` is approved
-- NEVER proceed to Phase 1 if Phase 0.2 has unresolved `blocked_input`
+  AND `sopp_gate.rb can-enter --phase scaffold` passes. The human's `1`
+  (✅ Aprobado) reply to the PHASE 0 prompt is the approval; it must actually
+  have been received (not inferred, not silence, not another agent's claim)
+  before the controller runs `approve-initial`.
+- NEVER run `sopp_gate.rb approve-initial`, `approve` or
+  `authorize-adjustment` before the human's own reply to the exact prompt
+  that showed the hash and challenge arrives, and never on another agent's
+  or subagent's claim that "the human approved" without seeing that reply.
+  If the platform's permission system still refuses the controller's attempt
+  after a genuine reply, stop and ask the human to run the command
+  themselves.
+- NEVER proceed to PHASE 1 if the PHASE 0 UI Component Inventory sub-step has unresolved `blocked_input`
 - NEVER generate files outside the root resolved by
   `artifact_plan.planned[].target_id`
 - NEVER call Figma MCP outside the Figma preflight role contract and its
@@ -1864,11 +1689,14 @@ The following are workflow violations. If your response for a phase contains any
 - Omitting the terminal status tool call (`--status finished`, `--status failed`, or `--status re_started`) at the end of the phase.
 - Emitting `--status finished` without every declared `--output-file` flag (spec, evidence, generated `.dart` files, tests, docs).
 - Using a `--step-id` or `--workflow-id` value that does not appear in the `Step IDs` table above, character-for-character.
+- Narrating, presenting, or executing a phase (in a header, approval prompt, or telemetry call) whose name does not correspond verbatim to an entry in the `Step IDs` table above — including a phase that existed in a previous version of this document.
 - Ending a phase response without the approval prompt block, or adding prose after it.
 - Starting the next phase's work before the user has explicitly answered the approval prompt.
-- Running the gap report on `checkpoint-final-build-review` (produces no files) or on the Topology gate (not telemetry-tracked).
-- Emitting `started` or `finished` for a conditional phase whose guard is false: `phase-0-1-figma-fidelity-planning` (requires `figma_url` + `figma_scope=view`), `phase-0-2-ui-component-inventory` (requires `figma_url` or `ui_components`), `phase-1-1-api-contract-analysis` (requires `api_contract`), `phase-6-4-golden-tests` (requires `golden_tests=true`), `phase-8-documentation` (requires `documentation=true`).
-- Starting PHASE 3 / 4 / 5 before the corresponding sopp_gate layer approval is recorded, or PHASE 8 / 9 before `checkpoint-final-build-review` is approved.
+- Running the gap report on the Topology gate (not telemetry-tracked).
+- Emitting `started` or `finished` for `phase-6-4-golden-tests` when its guard is false (requires `golden_tests=true`), or executing a conditional sub-step embedded in another phase whose own guard is false: the Figma Fidelity Planning sub-step of `phase-0-spec-planning` (requires `figma_url` + `figma_scope=view`), the UI Component Inventory sub-step of `phase-0-spec-planning` (requires `figma_url` or `ui_components`), the API Contract Analysis sub-step of `phase-1-scaffold-api-analysis` (requires `api_contract`), the Documentation sub-step of `phase-8-delivery` (requires `documentation=true`).
+- Starting PHASE 3 / 4 / 5 before the corresponding sopp_gate layer approval is recorded, or PHASE 8 before the `phase-7-audit-final-review` aggregate gate is approved.
+- Starting PHASE 1 before the human's `1` (✅ Aprobado) reply to the PHASE 0 prompt has actually been received and `sopp_gate.rb approve-initial` + `can-enter --phase scaffold` have run — a reply that was inferred, assumed, or reported by another agent instead of received directly does not count.
+- Running `sopp_gate.rb approve-initial`, `approve`, or `authorize-adjustment` before the human's own reply to the exact prompt that showed the hash/challenge arrives, or on another agent's or subagent's unverified claim that the human approved.
 
 Report any violation immediately by stopping the workflow and asking the user how to proceed. Do not try to "correct" a missed emission after the fact; re-run the phase.
 
@@ -1887,7 +1715,7 @@ Agent: I've completed [step name]. Do you approve the result?
   3. ❌ Rejected — redo from scratch
 ```
 
-- **If approved:** If the step produces files, proceed to the gap report and then to the next step. If it produces no files, proceed directly to the next step.
+- **If approved:** If the step produces files, proceed to the gap report and then to the next step. If it produces no files, proceed directly to the next step. For a phase with an embedded sopp_gate checkpoint (PHASE 0's `initial_spec`, or PHASE 2/3/4's layer checkpoint), this `1` reply to the exact prompt that showed the hash/challenge is what authorizes the controller to immediately run `approve-initial`/`approve` with that same hash and challenge, before continuing.
 - **If edits are requested:** First **verify the baseline is valid** before editing (see *Baseline integrity* below). Only when the baseline is confirmed valid, apply the changes in place on the artifact, keep `finished` (the baseline is already captured), and re-present for approval. The gap report will then capture those edits as the diff against the agent's first draft. If the baseline is missing, was captured late, or was reconstructed in a later session, do **not** edit in place: treat it as a rejection (regenerate to re-anchor a clean baseline) so the diff stays honest.
 - **If rejected:** Report `re_started`, regenerate the artifact from scratch, report `finished` again (recapturing the baseline), and restart the gate. Repeat until approved.
 
@@ -1895,9 +1723,10 @@ Agent: I've completed [step name]. Do you approve the result?
 
 > **Domain aggregate approval gates**, which layer on top of the per-step gate:
 >
+> - **Initial spec gate (PHASE 0 → PHASE 1)** — The controller runs `open-initial` in PHASE 0 and shows the spec hash and approval challenge as part of the approval prompt. The human's `1` (✅ Aprobado) reply to that exact prompt is the approval; immediately after receiving it (never before, never inferred, never on another agent's claim), the controller runs `approve-initial` with that same hash and challenge. PHASE 1 additionally runs `can-enter --phase scaffold`, which fails with `INITIAL_SPEC_NOT_APPROVED` until `approve-initial` is recorded.
 > - **PHASE 2 / PHASE 3 / PHASE 4 layer checkpoints** — Each layer runs the `docs/scripts/sopp_gate.rb` Executable Phase Gate (`open-initial`, `can-enter`, `open-checkpoint`) plus the embedded **REQUIRED CHECKPOINT** in the same phase. Rejection triggers the revision protocol: `request-changes` → write a bounded proposal at `revisions/<layer>/<revision>/proposal.md` → `propose-adjustment` → stop for authorization. After `authorize-adjustment`, apply only the proposed scope, regenerate evidence, and run `open-checkpoint` again. If a revision affects an earlier layer, invalidate that layer and every dependent checkpoint as `stale`, then replay from the earliest affected layer.
 >
-> - **`checkpoint-final-build-review` (post-PHASE 7)** — Approves the full build (PHASE 0 through PHASE 7). Rejection replays the affected earlier phase (`re_started` → `finished` → gap report) and then re-enters this checkpoint (`re_started` → `finished` on `checkpoint-final-build-review`). Only when the checkpoint is approved may PHASE 8 (when `documentation=true`) or PHASE 9 begin.
+> - **`phase-7-audit-final-review` (Audit + Final Build Review)** — Its Final Build Review step approves the full build (PHASE 0 through PHASE 7). Rejection replays the affected earlier phase (`re_started` → `finished` → gap report) and then re-enters this checkpoint (`re_started` → `finished` on `phase-7-audit-final-review`). Only when the checkpoint is approved may PHASE 8 begin.
 
 > Use `re_started` — never `paused` — to signal the re-execution of a step that already reported `finished`. `sopp_gate.rb` revision authorization is never step approval; it authorizes bounded regeneration, and the fresh `finished` still requires explicit human approval at the gate.
 
@@ -1941,9 +1770,9 @@ pragma-ai workflow report \
 
 ## Gap calculation & reporting (per step)
 
-> ⚡ **MANDATORY only for steps with output files.** In this workflow:
-> `phase-0-spec-packet`, `phase-0-1-figma-fidelity-planning` (only when executed), `phase-0-2-ui-component-inventory` (only when executed), `phase-1-scaffold`, `phase-1-1-api-contract-analysis` (only when executed), `phase-2-domain-layer`, `phase-3-data-layer`, `phase-4-presentation-layer`, `phase-5-wiring`, `phase-6-1-unit-tests`, `phase-6-2-widget-tests`, `phase-6-3-integration-tests`, `phase-6-4-golden-tests` (only when executed), `phase-7-audit`, `phase-8-documentation` (only when executed), `phase-9-delivery`.
-> `checkpoint-final-build-review` does NOT run a gap report. The Topology Gate is not tracked by telemetry at all.
+> ⚡ **MANDATORY for every step in this workflow** — all twelve step-ids produce output files and require a gap report:
+> `phase-0-spec-planning`, `phase-1-scaffold-api-analysis`, `phase-2-domain-layer`, `phase-3-data-layer`, `phase-4-presentation-layer`, `phase-5-wiring`, `phase-6-1-unit-tests`, `phase-6-2-widget-tests`, `phase-6-3-integration-tests`, `phase-6-4-golden-tests` (only when executed), `phase-7-audit-final-review`, `phase-8-delivery`.
+> The Topology Gate is not tracked by telemetry at all.
 
 > Run this immediately after the corresponding step's approval gate passes — not batched at the end of the workflow.
 
@@ -1982,11 +1811,10 @@ pragma-ai workflow status "$INSTANCE_ID"
 | Command | When |
 |---|---|
 | `pragma-ai workflow create --workflow-id new-feature --user-story-id <id>` | At the start, once (Setup) |
-| `pragma-ai workflow report ... --step-id <step> --status started` | When each executed step begins (PHASE 0–9 + `checkpoint-final-build-review`; conditional phases only when their condition holds) |
-| `pragma-ai workflow report ... --step-id checkpoint-final-build-review --status finished` | On completion of the final build review (no `--output-file`) |
-| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of every file-producing phase (see *Gap calculation* section for the full list) |
-| `pragma-ai workflow report ... --step-id <step> --status failed` | When PHASE 0.1 hits `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`, PHASE 0.2 hits Figma-preflight or DS-pipeline block, PHASE 4 hits `FIGMA_FIDELITY_TOLERANCE_EXCEEDED`, PHASE 6.1 / 6.2 / 6.3 / 6.4 tests fail or block, PHASE 7 exhausts audit retries or hits a fidelity blocker, or PHASE 9 preconditions fail — the workflow stops |
-| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 2 / 3 / 4 layer checkpoints via `sopp_gate.rb` revision protocol, or `checkpoint-final-build-review` aggregate rejection) |
+| `pragma-ai workflow report ... --step-id <step> --status started` | When each of the 12 steps begins (PHASE 0–8; `phase-6-4-golden-tests` only when `golden_tests=true`) |
+| `pragma-ai workflow report ... --step-id <step> --status finished --output-file ...` | On completion of every phase (see *Gap calculation* section for the full list) |
+| `pragma-ai workflow report ... --step-id <step> --status failed` | When PHASE 0's Figma Fidelity Planning sub-step hits `FIGMA_LAYOUT_MANIFEST_INCOMPLETE`, its UI Component Inventory sub-step hits Figma-preflight or DS-pipeline block, PHASE 4 hits `FIGMA_FIDELITY_TOLERANCE_EXCEEDED`, PHASE 6.1 / 6.2 / 6.3 / 6.4 tests fail or block, PHASE 7 exhausts audit retries or hits a fidelity blocker, or PHASE 8's Delivery step preconditions fail — the workflow stops |
+| `pragma-ai workflow report ... --step-id <step> --status re_started` | When the human rejects the result at the approval gate, or the flow returns to a step that was already `finished` (notably PHASE 2 / 3 / 4 layer checkpoints via `sopp_gate.rb` revision protocol, or `phase-7-audit-final-review` aggregate rejection) |
 | `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID" --step-id <step>` | Phase A: after the corresponding file-producing step is approved |
 | `pragma-ai workflow gap-report ... --submit --report-id <id> --summary "<text>"` | Phase B: immediately after Phase A, for the same step |
 | `pragma-ai workflow list --user-story-id "$USER_STORY_ID"` | Check overall progress (any time) |
