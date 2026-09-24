@@ -1,4 +1,5 @@
 # Mobile Spec Packet
+> **Versión:** 2.0.0
 
 The Mobile Spec Packet is the executable source of truth for SDD workflows. It
 keeps agent execution deterministic without asking developers to author YAML
@@ -61,14 +62,24 @@ not by prose instructions or direct agent edits to `context.json`:
 
 1. `open-initial` validates the packet, hashes `spec.yaml`, creates an approval
    challenge and sets the initial review to `pending`.
-2. A later human turn repeats that challenge. `approve-initial` verifies the
-   exact spec hash and writes the structured approval record.
-3. `can-enter` must pass before a code-producing phase starts.
+2. A later human turn answers the approval prompt shown with that challenge.
+   Replying `1` (✅ Aprobado) to that exact prompt **is** the human approval.
+   Only after that reply arrives does the controller run `approve-initial`,
+   using the spec hash and challenge it already displayed, to verify the hash
+   and write the structured approval record. The controller must never run
+   `approve-initial` before that reply arrives, and must never treat another
+   agent's or subagent's claim that "the human approved" as a substitute for
+   seeing the reply itself.
+3. `can-enter` must pass before a code-producing phase starts, including
+   Scaffold (`--phase scaffold`), which requires `initial_spec` to be
+   `approved` exactly like `domain_layer` does.
 4. After Domain, Data or Presentation is generated, `open-checkpoint` requires
    its evidence, hashes every planned artifact and returns to
    `pending_human_review` with a new challenge.
-5. A later human turn may approve that exact hash. Only `approve` changes the
-   checkpoint to `approved` and enables the next phase.
+5. A later human turn answers that layer's approval prompt. Replying `1`
+   (✅ Aprobado) is the approval; the controller then runs `approve` with the
+   displayed hash and challenge to change the checkpoint to `approved` and
+   enable the next phase.
 6. A `blocked_input` or failed gate stops execution. Editing approval fields
    manually is never a fallback.
 
@@ -78,11 +89,14 @@ An approved checkpoint contains `decision_ref`, `artifact_hash`,
 `approval_challenge`, `approval_ref` and `approved_at`. If an approved artifact
 changes, its current hash no longer matches and the next `can-enter` fails.
 
-The challenge is a portable proof that approval occurred in a later
-interaction: the controller displays it and ends its response; the developer
-must repeat it in the next turn. It is not a cryptographic user identity. A
-platform-provided signed identity can strengthen it later, but absence of that
-capability cannot weaken the hash, evidence or separate-turn requirements.
+The challenge binds an approval to the exact artifact reviewed: the controller
+displays it alongside the approval prompt and ends its response. The human
+does not need to retype the challenge — replying `1` to that prompt in the
+next turn is the approval, and the controller supplies the same challenge
+value when it runs `approve-initial`/`approve` right after. It is not a
+cryptographic user identity. A platform-provided signed identity can
+strengthen it later, but absence of that capability cannot weaken the hash,
+evidence or separate-turn requirements.
 
 ### Deterministic Revision Loop
 
@@ -215,6 +229,19 @@ entries in `context.json.phase_results`, so later agents can resume without
 re-reading prose reports. `standard` additionally writes detailed analysis,
 inventory, planning, code-generation, Widgetbook and checkpoint reports.
 
+## Optional DDD Domain Modeling
+
+`/new-feature` declares `domain_modeling.mode`. The default is `standard`, so
+the existing Clean Architecture feature flow is unchanged. `ddd` is an opt-in
+mode for complex mobile domain behavior and additionally requires
+`business_rules`, `domain_boundaries` and `server_authority`.
+
+Before the initial human approval in DDD mode, the packet records its bounded
+context, ubiquitous language, aggregates, invariants and local-versus-backend
+authority. The mobile client may protect local behavior and offline state, but
+the backend remains authoritative for authorization and cross-user consistency.
+An API schema or DTO alone cannot satisfy this contract.
+
 ## Portable Role Execution
 
 `/new-feature` packets require `execution_capabilities`:
@@ -240,6 +267,7 @@ Every generated spec must include:
 - `workflow`
 - `spec_level`
 - `execution_mode`
+- `domain_modeling` (required for `/new-feature`; defaults to `standard`)
 - `inputs`
 - `evidence_mode`
 - `human_review`

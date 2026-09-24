@@ -3,6 +3,7 @@ entry_agent: refactoring-advisor
 base_spec_level: full
 purpose: Refactor an existing feature with risk analysis, staged execution and documentation.
 required_inputs:
+  - hu_id
   - feature_name
   - feature_path
   - refactor_goal

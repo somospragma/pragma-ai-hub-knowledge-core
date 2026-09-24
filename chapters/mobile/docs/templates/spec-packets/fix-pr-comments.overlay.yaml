@@ -3,6 +3,7 @@ entry_agent: ds-orchestrator
 base_spec_level: mini
 purpose: Resolve PR comments with traceable comment-to-action mapping.
 required_inputs:
+  - hu_id
   - pr_comments_source
 optional_inputs:
   - evidence_mode

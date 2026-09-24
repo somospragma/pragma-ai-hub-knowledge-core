@@ -3,6 +3,7 @@ entry_agent: ds-orchestrator
 base_spec_level: standard
 purpose: Generate a Flutter app view from Figma with required DS/App split.
 required_inputs:
+  - hu_id
   - view_name
   - figma_url
   - user_story

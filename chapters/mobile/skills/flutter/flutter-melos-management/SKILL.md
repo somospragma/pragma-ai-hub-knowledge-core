@@ -1,7 +1,7 @@
 ---
 id: flutter-melos-management
 name: flutter-melos-management
-version: 1.2.0
+version: 1.0.2
 scope: stack
 type: skill
 chapter: mobile

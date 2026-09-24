@@ -5,7 +5,11 @@ require "json"
 require "open3"
 require "yaml"
 
-ROOT = File.expand_path("../../../..", __dir__)
+SCRIPT_DOCS_ROOT = File.expand_path("..", __dir__)
+CHAPTER_ROOT = File.expand_path("..", SCRIPT_DOCS_ROOT)
+EXPORTED_PLATFORM_ROOTS = %w[.claude .github .kiro].freeze
+EXPORTED_LAYOUT = EXPORTED_PLATFORM_ROOTS.include?(File.basename(CHAPTER_ROOT))
+ROOT = EXPORTED_LAYOUT ? CHAPTER_ROOT : File.expand_path("../..", CHAPTER_ROOT)
 SPEC_PACKET_TEMPLATE_DIR = "chapters/mobile/docs/templates/spec-packets"
 OVERLAY_SUFFIX = ".overlay.yaml"
 Dir.chdir(ROOT)
@@ -49,44 +53,40 @@ def kiro_agent_profiles
       rules: [
         { "capability" => "subagent", "effect" => "allow", "match" => %w[workspace-discovery ds-orchestrator feature-builder refactoring-advisor test-coverage-engineer] }
       ],
-      delegates: %w[workspace-discovery ds-orchestrator feature-builder refactoring-advisor test-coverage-engineer]
     },
     "feature-builder" => {
       tools: ["read", "write", "shell", "subagent", "@figma"],
       include_mcp: true,
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/l10n.yaml", "**/build.yaml"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
         { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer ds-orchestrator test-engineer golden-test-engineer code-auditor delivery-manager] }
       ],
-      delegates: %w[figma-analyzer ds-orchestrator test-engineer golden-test-engineer code-auditor delivery-manager]
     },
     "ds-orchestrator" => {
       tools: ["read", "write", "shell", "subagent", "@figma"],
       include_mcp: true,
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *"] },
         { "capability" => "mcp", "effect" => "allow", "match" => ["figma/*"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[figma-analyzer component-planner component-architect widget-developer test-engineer golden-test-engineer widgetbook-developer code-auditor delivery-manager] }
       ],
-      delegates: %w[figma-analyzer component-planner component-architect widget-developer test-engineer golden-test-engineer widgetbook-developer code-auditor delivery-manager]
     },
     "refactoring-advisor" => {
       tools: %w[read write shell subagent],
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/lib/**", "**/test/**", "**/integration_test/**", "**/assets/**", "**/docs/**", "**/pubspec.yaml", "**/analysis_options.yaml", "**/build.yaml"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart format *", "dart analyze *", "dart run build_runner *", "flutter analyze *", "flutter test *", "flutter pub get", "flutter pub run build_runner *", "melos bootstrap", "melos exec *", "melos run *"] },
         { "capability" => "subagent", "effect" => "allow", "match" => %w[code-auditor ds-orchestrator] }
       ],
-      delegates: %w[code-auditor ds-orchestrator]
     },
     "workspace-discovery" => {
       tools: %w[read write shell],
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"] }
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"] }
       ]
     },
     "code-auditor" => {
@@ -127,7 +127,7 @@ def kiro_agent_profiles
       tools: %w[read write shell],
       rules: [
         { "capability" => "fs_write", "effect" => "allow", "match" => [".sopp/**", "**/.sopp/**", "**/test/**", "**/integration_test/**", "**/docs/**", "**/pubspec.yaml"] },
-        { "capability" => "shell", "effect" => "allow", "match" => ["dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"] }
+        { "capability" => "shell", "effect" => "allow", "match" => ["ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "dart analyze *", "dart test *", "flutter analyze *", "flutter test *", "flutter pub get", "melos exec *", "melos run *"] }
       ]
     },
     "test-engineer" => {
@@ -373,20 +373,6 @@ def validate_kiro_agent_profiles(findings, cleared)
       errors << "#{agent_id}: permissions.rules differs from the least-privilege role matrix"
     end
 
-    delegates = expected[:delegates]
-    actual_subagents = profile.dig("toolsSettings", "subagent")
-    if delegates
-      expected_subagents = {
-        "availableAgents" => delegates,
-        "trustedAgents" => delegates
-      }
-      unless actual_subagents == expected_subagents
-        errors << "#{agent_id}: availableAgents and trustedAgents must match its approved delegation list"
-      end
-    elsif actual_subagents
-      errors << "#{agent_id}: non-orchestrator profiles must not register subagents"
-    end
-
     fs_write_rule = actual_rules.find { |rule| rule["capability"] == "fs_write" }
     expected_fs_write_rule = expected[:rules].find { |rule| rule["capability"] == "fs_write" }
     nested_sopp_paths = Array(expected_fs_write_rule&.fetch("match", [])).grep(%r{\A\*\*/\.sopp/})
@@ -604,7 +590,10 @@ def validate_invocation_contracts(findings, cleared)
     File.basename(path, ".agent.md")
   end
   docs = File.read("chapters/mobile/docs/workflows.md")
+  preflight_script = "chapters/mobile/docs/scripts/validate_workflow_inputs.rb"
   issues = []
+
+  issues << "input preflight script is missing" unless File.file?(preflight_script)
 
   Dir["chapters/mobile/workflows/_all/*.workflow.md"].each do |workflow_path|
     workflow = File.basename(workflow_path, ".workflow.md")
@@ -640,6 +629,9 @@ def validate_invocation_contracts(findings, cleared)
     unless (overlay["required_agents"] || []).include?(entry_agent)
       issues << "#{workflow}: overlay required_agents must include entry_agent"
     end
+    unless (overlay["required_inputs"] || []).include?("hu_id")
+      issues << "#{workflow}: overlay required_inputs must include hu_id"
+    end
 
     invocation = "@#{entry_agent} /#{workflow}"
     issues << "#{workflow}: workflow example must contain #{invocation}" unless text.include?(invocation)
@@ -654,6 +646,27 @@ def validate_invocation_contracts(findings, cleared)
     (overlay["required_inputs"] || []).each do |input|
       pattern = /^\s*#{Regexp.escape(input)}\s*:/i
       issues << "#{workflow}: User Inputs block omits required #{input}" unless block.match?(pattern)
+    end
+
+    preflight_index = text.index("### Input preflight (mandatory)")
+    create_index = text.index("pragma-ai workflow create")
+    unless preflight_index && create_index && preflight_index < create_index &&
+           text.include?("validate_workflow_inputs.rb")
+      issues << "#{workflow}: must run input preflight before workflow create"
+    end
+    first_bash_start = text.index("```bash")
+    first_bash_end = first_bash_start && text.index("```", first_bash_start + 3)
+    first_bash_block = first_bash_start && first_bash_end && text[first_bash_start...first_bash_end]
+    unless first_bash_start && preflight_index && first_bash_start > preflight_index &&
+           first_bash_block&.include?("validate_workflow_inputs.rb")
+      issues << "#{workflow}: input preflight must be the first executable command"
+    end
+    if text.include?("Fallback — Session context") ||
+       text.include?("Fallback — Project file")
+      issues << "#{workflow}: must not resolve invocation inputs from session or output/.active-user-story"
+    end
+    unless text.include?("Never generate, guess, infer, autocomplete, derive\nor offer an example or alternative `hu_id`.")
+      issues << "#{workflow}: must not propose or infer hu_id values"
     end
   end
 
@@ -1012,6 +1025,31 @@ def validate_semantics(findings, cleared)
     end
   end
 
+  unless (new_feature_overlay["optional_inputs"] || []).include?("domain_modeling")
+    add(findings, "CRITICAL", "NEW_FEATURE_DDD_MODE_INPUT_MISSING", "new-feature overlay must declare optional domain_modeling")
+  end
+  ddd_supporting_inputs = %w[business_rules domain_boundaries server_authority offline_policy]
+  missing_ddd_inputs = ddd_supporting_inputs - (new_feature_overlay["optional_inputs"] || [])
+  unless missing_ddd_inputs.empty?
+    add(findings, "CRITICAL", "NEW_FEATURE_DDD_INPUTS_MISSING", "new-feature overlay must declare DDD supporting inputs", missing_ddd_inputs.join(", "))
+  end
+  ddd_mode_property = schema.dig("properties", "domain_modeling", "properties", "mode") || {}
+  unless ddd_mode_property["enum"] == %w[standard ddd] && ddd_mode_property["default"] == "standard"
+    add(findings, "CRITICAL", "DDD_MODE_SCHEMA_DRIFT", "mobile-spec schema must define standard and opt-in ddd modes")
+  end
+  ddd_rule = (schema["allOf"] || []).find do |rule|
+    rule.dig("if", "properties", "workflow", "const") == "new-feature" &&
+      rule.dig("if", "properties", "domain_modeling", "properties", "mode", "const") == "ddd"
+  end
+  expected_ddd_inputs = %w[business_rules domain_boundaries server_authority]
+  actual_ddd_inputs = ddd_rule&.dig("then", "properties", "inputs", "required") || []
+  required_domain_model_fields = %w[mode bounded_context ubiquitous_language aggregates invariants server_authority]
+  actual_domain_model_fields = ddd_rule&.dig("then", "properties", "domain_modeling", "required") || []
+  unless (expected_ddd_inputs - actual_ddd_inputs).empty? &&
+         (required_domain_model_fields - actual_domain_model_fields).empty?
+    add(findings, "CRITICAL", "DDD_REQUIRED_CONTRACT_DRIFT", "DDD packets must require business inputs and an approved domain model")
+  end
+
   execution_capability = schema.dig("properties", "execution_capabilities") || {}
   unless execution_capability.dig("properties", "subagent_delegation", "enum") == %w[pending available unavailable] &&
          execution_capability.dig("properties", "fallback_policy", "enum") == ["delegate_or_controller_executes"]
@@ -1044,6 +1082,15 @@ def validate_semantics(findings, cleared)
   end
 
   feature_builder = File.read("chapters/mobile/agents/_all/feature-builder.agent.md")
+  ddd_skill = "chapters/mobile/skills/flutter/flutter-ddd-domain-modeling/SKILL.md"
+  unless File.file?(ddd_skill) &&
+         feature_builder.include?("flutter-ddd-domain-modeling") &&
+         new_feature_workflow.include?("domain_modeling") &&
+         new_feature_workflow.include?("flutter-ddd-domain-modeling") &&
+         File.read("chapters/mobile/skills/_all/mobile-sdd-spec-validation/SKILL.md").include?("/new-feature` DDD Mode Gate") &&
+         File.read("chapters/mobile/docs/scripts/sopp_gate.rb").include?("validate_domain_modeling")
+    add(findings, "CRITICAL", "DDD_MOBILE_WIRING_DRIFT", "Mobile DDD mode must be available to feature-builder and guarded by workflow validation")
+  end
   portable_role_resources = {
     "new-feature-workflow" => new_feature_workflow,
     "feature-builder" => feature_builder,
@@ -1765,22 +1812,355 @@ def validate_language_policy(findings, cleared)
   end
 end
 
-parse_all_structured_files(findings, cleared)
-validate_no_legacy_refs(findings, cleared)
-validate_no_source_root_refs(findings, cleared)
-validate_references(findings, cleared)
-validate_kiro_skill_resources(findings, cleared)
-validate_kiro_agent_profiles(findings, cleared)
-validate_mobile_workflow_distribution(findings, cleared)
-validate_sopp_gate_contract(findings, cleared)
-validate_melos_workspace_contract(findings, cleared)
-validate_no_legacy_mobile_script_paths(findings, cleared)
-validate_platform_storage_boundary(findings, cleared)
-validate_examples_location(findings, cleared)
-validate_overlay_catalog(findings, cleared)
-validate_invocation_contracts(findings, cleared)
-validate_semantics(findings, cleared)
-validate_language_policy(findings, cleared)
+# -----------------------------------------------------------------------------
+# Workflow Response Contract validation
+#
+# Every workflow markdown MUST declare, per phase, the telemetry calls
+# (`pragma-ai workflow report --status started` / `--status finished|failed`)
+# with valid `--step-id` and `--workflow-id`, plus the inline Response
+# Contract block and the Spanish approval prompt. The validator is analogous
+# to the sopp_gate and melos_workspace contract validators.
+# -----------------------------------------------------------------------------
+
+def workflow_step_ids_from_header(text)
+  match = text.match(/^\|\s*Step IDs\s*\|\s*(?<ids>.+?)\s*\|\s*$/)
+  return [] unless match
+
+  match[:ids].scan(/`([^`]+)`/).flatten
+end
+
+def workflow_phase_sections(text)
+  lines = text.lines
+  starts = []
+  in_fence = false
+
+  # First pass: locate real (top-level) headings that mark phases or gates.
+  # Ignore headings inside fenced code blocks (e.g. markdown examples nested
+  # inside ```markdown ... ``` fences).
+  lines.each_with_index do |line, idx|
+    if line.match?(/^```/)
+      in_fence = !in_fence
+      next
+    end
+    next if in_fence
+
+    match = line.match(/^(?<hashes>##+)\s+(?<title>.+?)\s*$/)
+    next unless match
+
+    hashes = match[:hashes]
+    title = match[:title]
+
+    is_phase_or_gate =
+      title.start_with?("PHASE ") ||
+      title.start_with?("Gate ") ||
+      title.start_with?("HUMAN CHECKPOINT") ||
+      (hashes.length == 2 && title.match?(/Gate\s+\(required\)$/))
+
+    next unless is_phase_or_gate
+
+    starts << { idx: idx, level: hashes.length, heading: title }
+  end
+
+  starts.each_with_index.map do |section, _i|
+    # Re-establish fence state at the section start, then walk forward looking
+    # for the next same-or-higher-level heading outside any fence.
+    fence = false
+    lines[0...section[:idx]].each do |l|
+      fence = !fence if l.match?(/^```/)
+    end
+
+    end_idx = lines.size
+    (section[:idx] + 1...lines.size).each do |j|
+      if lines[j].match?(/^```/)
+        fence = !fence
+        next
+      end
+      next if fence
+
+      m = lines[j].match(/^(?<hashes>##+)\s+/)
+      next unless m
+      if m[:hashes].length <= section[:level]
+        end_idx = j
+        break
+      end
+    end
+
+    {
+      heading: section[:heading],
+      body: lines[section[:idx]...end_idx].join,
+      start_line: section[:idx] + 1
+    }
+  end
+end
+
+def workflow_bash_report_calls(section_body)
+  calls = []
+  section_body.scan(/```bash\n(.*?)```/m).flatten.each do |block|
+    # Collapse `\` line continuations to a single logical line.
+    normalized = block.gsub(/\\\n\s*/, " ")
+    normalized.each_line do |line|
+      next unless line.match?(/pragma-ai\s+workflow\s+report/)
+
+      calls << {
+        step_id: line[/--step-id\s+(\S+)/, 1],
+        workflow_id: line[/--workflow-id\s+(\S+)/, 1],
+        status: line[/--status\s+(\S+)/, 1]
+      }
+    end
+  end
+  calls
+end
+
+# The approval prompt lives inside a fenced code block within an outer
+# blockquote, so each line is prefixed with `>` and inner whitespace. Match
+# with tolerance for zero or more `>` blockquote markers plus inner spacing.
+WORKFLOW_APPROVAL_PROMPT_MARKERS = [
+  /^\s*(?:>\s*)*He completado /,
+  /^\s*(?:>\s*)*1\.\s*✅ Aprobado — continuar/,
+  /^\s*(?:>\s*)*2\.\s*✏️ Ediciones — dime qué cambiar/,
+  /^\s*(?:>\s*)*3\.\s*❌ Rechazado — regenerar desde cero/
+].freeze
+
+def workflow_response_contract_present?(section_body)
+  head = section_body.lines.first(40).join
+  head.include?("▶ Response Contract (non-negotiable)")
+end
+
+def workflow_approval_prompt_present?(section_body)
+  WORKFLOW_APPROVAL_PROMPT_MARKERS.all? { |re| section_body.match?(re) }
+end
+
+# The Human approval gate must anchor the gap-report baseline to the step's
+# `finished` before any edit. This canonical marker guards against the
+# regression where the "edits requested" path re-presents for approval
+# assuming the baseline is captured, letting the gap report pull a late
+# baseline over an already-edited artifact and report a false "no changes".
+WORKFLOW_BASELINE_INTEGRITY_MARKER = "> **Baseline integrity (mandatory).**"
+
+# The pre-fix, ambiguous gap-report fase B summary placeholder. A bare
+# "no changes" cannot distinguish a legitimate no-edit approval from an
+# invalid late baseline, so its presence is a residue that must be gone.
+WORKFLOW_LEGACY_GAP_SUMMARY_RESIDUE = "--summary \"<summary of the detected gap or 'no changes'>\""
+
+def workflow_baseline_integrity_present?(text)
+  text.include?(WORKFLOW_BASELINE_INTEGRITY_MARKER)
+end
+
+def workflow_legacy_gap_summary_present?(text)
+  text.include?(WORKFLOW_LEGACY_GAP_SUMMARY_RESIDUE)
+end
+
+def workflow_execute_now_before_started?(section_body)
+  lines = section_body.lines
+  lines.each_with_index do |line, idx|
+    next unless line.strip.start_with?("```bash")
+
+    close_idx = idx
+    (idx + 1...lines.size).each do |j|
+      if lines[j].strip == "```"
+        close_idx = j
+        break
+      end
+    end
+    block = lines[idx..close_idx].join
+    next unless block.include?("--status started")
+
+    window = lines[[idx - 8, 0].max...idx].join
+    return false unless window.include?("⚡ **EXECUTE NOW")
+  end
+  true
+end
+
+def validate_workflow_response_contract(findings, cleared)
+  required_sections = [
+    "## Workflow Execution Contract",
+    "## Instructions to the executing agent",
+    "## Response Contract Violations"
+  ]
+  legacy_residues = [
+    "NON-NEGOTIABLE RULE:",
+    "MANDATORY** — Report `started` when the step begins"
+  ]
+  issues = []
+
+  Dir["chapters/mobile/workflows/_all/*.workflow.md"].sort.each do |path|
+    workflow = File.basename(path, ".workflow.md")
+    text = File.read(path)
+    metadata = workflow_frontmatter(path)
+    workflow_id = metadata["id"]
+
+    required_sections.each do |header|
+      unless text.include?("\n#{header}\n") || text.start_with?("#{header}\n")
+        issues << "#{workflow}: missing required section #{header.inspect}"
+      end
+    end
+
+    legacy_residues.each do |residue|
+      issues << "#{workflow}: legacy residue found: #{residue.inspect}" if text.include?(residue)
+    end
+
+    unless workflow_baseline_integrity_present?(text)
+      issues << "#{workflow}: missing Human approval gate baseline-integrity clause (#{WORKFLOW_BASELINE_INTEGRITY_MARKER.inspect}) — the edits path must verify a persisted, same-session `finished` before editing so the gap report diffs against a valid baseline"
+    end
+
+    if workflow_legacy_gap_summary_present?(text)
+      issues << "#{workflow}: legacy ambiguous gap-report summary placeholder found (#{WORKFLOW_LEGACY_GAP_SUMMARY_RESIDUE.inspect}); a bare 'no changes' cannot distinguish a legitimate no-edit approval from an invalid late baseline"
+    end
+
+    declared_ids = workflow_step_ids_from_header(text)
+    if declared_ids.empty?
+      issues << "#{workflow}: could not parse the `Step IDs` row of the Telemetry metadata table"
+      next
+    end
+
+    sections = workflow_phase_sections(text)
+    if sections.empty?
+      issues << "#{workflow}: no PHASE / Gate / HUMAN CHECKPOINT sections detected"
+      next
+    end
+
+    seen_step_ids = []
+    sections.each do |section|
+      heading = section[:heading].strip
+      body = section[:body]
+      loc = "#{workflow}::'#{heading}' (line ~#{section[:start_line]})"
+
+      calls = workflow_bash_report_calls(body)
+      section_step_ids = calls.map { |c| c[:step_id] }.compact.uniq
+
+      # A section counts as a "tracked phase" only when it emits at least one
+      # pragma-ai workflow report call referencing a declared step-id. That
+      # captures every real PHASE / Gate step and excludes narrative gates
+      # like `HUMAN CHECKPOINT (Required)` in bootstrap-workspace or the
+      # `Gate — Topology (mandatory)` block that explicitly documents itself
+      # as not tracked by telemetry. Missing telemetry on a phase that
+      # SHOULD be tracked surfaces later via the orphan step-id check.
+      tracked = calls.any? && (section_step_ids & declared_ids).any?
+      unless tracked
+        section_step_ids.each { |id| seen_step_ids << id if declared_ids.include?(id) }
+        next
+      end
+
+      unless workflow_response_contract_present?(body)
+        issues << "#{loc}: missing '> ### ▶ Response Contract (non-negotiable)' block"
+      end
+
+      unless workflow_approval_prompt_present?(body)
+        issues << "#{loc}: missing Spanish approval prompt (all four canonical lines: 'He completado …', '✅ Aprobado — continuar', '✏️ Ediciones — dime qué cambiar', '❌ Rechazado — regenerar desde cero')"
+      end
+
+      started_calls = calls.select { |c| c[:status] == "started" }
+      terminal_calls = calls.select { |c| %w[finished failed re_started].include?(c[:status]) }
+
+      if started_calls.empty?
+        issues << "#{loc}: missing 'pragma-ai workflow report --status started' invocation"
+      end
+      if terminal_calls.empty?
+        issues << "#{loc}: missing terminal telemetry call (--status finished, failed or re_started)"
+      end
+
+      if section_step_ids.size > 1
+        issues << "#{loc}: multiple step-ids referenced in the same phase section: #{section_step_ids.join(', ')}"
+      end
+      section_step_ids.each do |id|
+        unless declared_ids.include?(id)
+          issues << "#{loc}: --step-id #{id.inspect} is not declared in the Step IDs table"
+        end
+        seen_step_ids << id
+      end
+
+      section_workflow_ids = calls.map { |c| c[:workflow_id] }.compact.uniq
+      section_workflow_ids.each do |wid|
+        unless wid == workflow_id
+          issues << "#{loc}: --workflow-id #{wid.inspect} does not match frontmatter id #{workflow_id.inspect}"
+        end
+      end
+
+      unless started_calls.empty? || workflow_execute_now_before_started?(body)
+        issues << "#{loc}: a '--status started' bash block is not preceded by the '⚡ **EXECUTE NOW**' marker"
+      end
+    end
+
+    (declared_ids - seen_step_ids).each do |orphan|
+      issues << "#{workflow}: declared Step ID #{orphan.inspect} has no phase section implementing it"
+    end
+  end
+
+  if issues.empty?
+    cleared << "Workflow Response Contracts and per-phase telemetry calls are complete for every phase"
+  else
+    add(
+      findings,
+      "CRITICAL",
+      "WORKFLOW_RESPONSE_CONTRACT_DRIFT",
+      "Workflow markdowns must declare Response Contract, telemetry calls and step-id integrity per phase",
+      issues.join("\n")
+    )
+  end
+rescue StandardError => e
+  add(findings, "CRITICAL", "WORKFLOW_RESPONSE_CONTRACT_ERROR", "Unable to validate workflow response contracts", e.message)
+end
+
+def validate_exported_kb(findings, cleared)
+  issues = []
+  required_scripts = %w[
+    validate_mobile_kb.rb
+    validate_workflow_inputs.rb
+    sopp_gate.rb
+    melos_workspace.rb
+  ]
+
+  required_scripts.each do |script|
+    path = File.join("docs/scripts", script)
+    issues << "#{path}: missing from exported KB" unless File.file?(path)
+  end
+
+  overlays = Dir["docs/templates/spec-packets/*.overlay.yaml"]
+  issues << "docs/templates/spec-packets: no workflow input contracts were exported" if overlays.empty?
+
+  structured_files = Dir["**/*.{yaml,yml,json}"].select { |path| File.file?(path) }
+  structured_files.each do |path|
+    path.end_with?(".json") ? JSON.parse(File.read(path)) : read_yaml(path)
+  rescue StandardError => error
+    issues << "#{path}: cannot parse (#{error.message})"
+  end
+
+  validator_path = "docs/scripts/validate_mobile_kb.rb"
+  source_path_refs = Dir["**/*"].select { |path| File.file?(path) && path != validator_path }.map do |path|
+    "#{path}: contains chapters/mobile/" if File.read(path).include?("chapters/mobile/")
+  end.compact
+  issues.concat(source_path_refs)
+
+  if issues.empty?
+    cleared << "Exported #{File.basename(CHAPTER_ROOT)} KB has portable scripts, input contracts, and parseable structured assets"
+  else
+    add(findings, "CRITICAL", "EXPORTED_KB_INTEGRITY", "Exported KB is incomplete or still references the source layout", issues.join("\n"))
+  end
+rescue StandardError => error
+  add(findings, "CRITICAL", "EXPORTED_KB_VALIDATION_ERROR", "Unable to validate exported KB", error.message)
+end
+
+if EXPORTED_LAYOUT
+  validate_exported_kb(findings, cleared)
+else
+  parse_all_structured_files(findings, cleared)
+  validate_no_legacy_refs(findings, cleared)
+  validate_no_source_root_refs(findings, cleared)
+  validate_references(findings, cleared)
+  validate_kiro_skill_resources(findings, cleared)
+  validate_kiro_agent_profiles(findings, cleared)
+  validate_mobile_workflow_distribution(findings, cleared)
+  validate_sopp_gate_contract(findings, cleared)
+  validate_melos_workspace_contract(findings, cleared)
+  validate_no_legacy_mobile_script_paths(findings, cleared)
+  validate_platform_storage_boundary(findings, cleared)
+  validate_examples_location(findings, cleared)
+  validate_overlay_catalog(findings, cleared)
+  validate_invocation_contracts(findings, cleared)
+  validate_workflow_response_contract(findings, cleared)
+  validate_semantics(findings, cleared)
+  validate_language_policy(findings, cleared)
+end
 
 if findings.empty?
   puts "Mobile KB validation OK"

@@ -1,6 +1,6 @@
 ---
 id: flutter-reactive-programming
-version: 1.1.0
+version: 1.0.5
 scope: stack
 type: skill
 chapter: mobile

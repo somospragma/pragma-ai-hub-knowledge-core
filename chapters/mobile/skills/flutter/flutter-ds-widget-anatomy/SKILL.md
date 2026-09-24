@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-widget-anatomy
-version: 1.3.0
+version: 1.0.4
 scope: stack
 type: skill
 chapter: mobile

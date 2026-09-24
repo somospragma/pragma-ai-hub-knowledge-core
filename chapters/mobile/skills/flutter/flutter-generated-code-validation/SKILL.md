@@ -1,6 +1,6 @@
 ---
 id: flutter-generated-code-validation
-version: 2.2.0
+version: 1.0.6
 scope: stack
 type: skill
 chapter: mobile

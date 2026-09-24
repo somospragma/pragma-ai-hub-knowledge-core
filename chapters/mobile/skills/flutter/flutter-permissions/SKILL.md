@@ -1,6 +1,6 @@
 ---
 id: flutter-permissions
-version: 1.2.0
+version: 1.0.7
 scope: stack
 type: skill
 chapter: mobile

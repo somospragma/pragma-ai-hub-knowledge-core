@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-responsive-layout
-version: 1.2.0
+version: 1.0.4
 scope: stack
 type: skill
 chapter: mobile

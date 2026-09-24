@@ -3,6 +3,7 @@ entry_agent: ds-orchestrator
 base_spec_level: mini
 purpose: Create or update a Design System component from Figma.
 required_inputs:
+  - hu_id
   - component_name
   - figma_url
 optional_inputs:

@@ -1,6 +1,6 @@
 ---
 id: test-generation
-version: 1.0.0
+version: 1.0.2
 scope: chapter
 type: prompt
 chapter: mobile

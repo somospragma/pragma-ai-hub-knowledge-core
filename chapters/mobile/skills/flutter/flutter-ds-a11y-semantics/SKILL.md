@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-a11y-semantics
-version: 1.2.0
+version: 1.0.1
 scope: stack
 type: skill
 chapter: mobile

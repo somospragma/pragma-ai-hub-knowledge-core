@@ -1,10 +1,16 @@
 ---
-id: test-engineer
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: test-engineer
+description: >
+  Generates and updates Flutter widget/unit tests for components and views. Use when a workflow needs behavior validation, state coverage, callback checks, and automated test evidence after code generation or refactoring.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://flutter-ds-testing-patterns
@@ -21,12 +27,44 @@ permissions:
     - capability: shell
       effect: allow
       match: ["dart test *", "flutter test *", "melos exec *", "melos run *"]
-description: >
-  Generates and updates Flutter widget/unit tests for components and views. Use when a workflow needs behavior validation, state coverage, callback checks, and automated test evidence after code generation or refactoring.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(test/**)
+  - Edit(test/**)
+  - Write(integration_test/**)
+  - Edit(integration_test/**)
+  - Write(test_assets/**)
+  - Edit(test_assets/**)
+  - Bash(dart test:*)
+  - Bash(flutter test:*)
+  - Bash(melos exec:*)
+  - Bash(melos run:*)
+skills:
+  - flutter-ds-testing-patterns
+  - flutter-ds-theming-tokens
+  - flutter-ds-naming-conventions
+  - flutter-ds-folder-structure
+  - flutter-testing
+  - mobile-sdd-spec-validation
 ---
 # Test Engineer Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.3 -->
+<!-- author: Pragma Mobile Chapter | version: 2.1.0 -->
 
 ## Active Skills
 
@@ -65,7 +103,7 @@ the workflow controller named in `execution_owner` executes these same rules
 directly under `fallback_policy: delegate_or_controller_executes`.
 
 - `DS_WIDGET_TESTS`: DS component widget tests.
-- `VIEW_WIDGET_TESTS`: app view tests for `/new-view` phase 4d.
+- `VIEW_WIDGET_TESTS`: app view tests for `/new-view`'s `phase-7-1-view-widget-tests`.
 - `FEATURE_UNIT_TESTS`: required unit tests for `/new-feature`.
 - `FEATURE_WIDGET_TESTS`: required feature widget tests for `/new-feature`.
 - `FEATURE_INTEGRATION_TESTS`: required feature integration tests for `/new-feature`.

@@ -1,10 +1,16 @@
 ---
-id: delivery-manager
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
 name: delivery-manager
+description: >
+  Prepares the final delivery package after implementation, audits, and tests are complete. Use to assemble delivery evidence, summarize modified artifacts, document verification, and suggest commit/PR text without executing external Git operations.
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write]
 resources:
   - skill://flutter-ds-folder-structure
@@ -18,12 +24,40 @@ permissions:
     - capability: fs_write
       effect: allow
       match: [".sopp/**", "**/.sopp/**", "**/docs/**", "**/README.md", "**/CHANGELOG.md"]
-description: >
-  Prepares the final delivery package after implementation, audits, and tests are complete. Use to assemble delivery evidence, summarize modified artifacts, document verification, and suggest commit/PR text without executing external Git operations.
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/**)
+  - Edit(.sopp/**)
+  - Write(docs/**)
+  - Edit(docs/**)
+  - Write(README.md)
+  - Edit(README.md)
+  - Write(CHANGELOG.md)
+  - Edit(CHANGELOG.md)
+skills:
+  - flutter-ds-folder-structure
+  - flutter-ds-naming-conventions
+  - flutter-ds-markdown-docs
+  - commit-conventions
+  - changelog-management
+  - mobile-sdd-spec-validation
 ---
 # Delivery Manager Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.3 -->
+<!-- author: Pragma Mobile Chapter | version: 2.0.5 -->
 
 ## Active Skills
 

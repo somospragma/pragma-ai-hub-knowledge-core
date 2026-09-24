@@ -50,6 +50,7 @@ module SoppGate
           errors << "human_review.#{field} must be required" unless spec.dig("human_review", field) == "required"
         end
       end
+      validate_domain_modeling(errors)
       validate_schema_ref(errors, @spec_path, spec["schema_ref"], "mobile-spec.schema.yaml")
       validate_schema_ref(errors, @context_path, context["schema_ref"], "mobile-context.schema.json")
       errors << "context.json checkpoints must be an object" unless context["checkpoints"].is_a?(Hash)
@@ -188,6 +189,7 @@ module SoppGate
       checkpoint(layer)["status"] = "approved"
       checkpoint(layer)["approval_ref"] = ref
       checkpoint(layer)["approved_at"] = now
+      reseal_initial_spec!
       context["status"] = "approved_for_execution"
       context["current_phase"] = NEXT_PHASE.fetch(layer)
       context["pending_human_review"] = nil
@@ -228,6 +230,7 @@ module SoppGate
     def assert_can_enter!(phase)
       validate!
       required = case phase
+                 when "scaffold" then "initial_spec"
                  when "domain_layer" then "initial_spec"
                  when "data_layer" then "domain"
                  when "presentation_layer" then "data"
@@ -245,6 +248,17 @@ module SoppGate
 
     def checkpoint(layer)
       context.fetch("checkpoints", {})[layer]
+    end
+
+    # A layer's human approval re-blesses whatever spec.yaml looks like right
+    # now, so the Phase 0 seal doesn't go stale from edits that were already
+    # reviewed and approved through this layer's own checkpoint.
+    def reseal_initial_spec!
+      cp = checkpoint("initial_spec")
+      return unless cp && cp["status"] == "approved"
+
+      cp["artifact_hash"] = "sha256:#{Digest::SHA256.file(@spec_path).hexdigest}"
+      cp["resealed_at"] = now
     end
 
     def now
@@ -276,6 +290,46 @@ module SoppGate
       errors << "#{File.basename(source_path)} schema_ref must end with #{expected_name}" unless File.basename(ref) == expected_name
       resolved = File.expand_path(ref, File.dirname(source_path))
       errors << "#{File.basename(source_path)} schema_ref does not exist: #{ref}" unless File.file?(resolved)
+    end
+
+    def validate_domain_modeling(errors)
+      return unless spec["workflow"] == "new-feature"
+
+      model = spec["domain_modeling"]
+      unless model.is_a?(Hash)
+        errors << "new-feature requires domain_modeling.mode"
+        return
+      end
+
+      mode = model["mode"]
+      unless %w[standard ddd].include?(mode)
+        errors << "domain_modeling.mode must be standard or ddd"
+        return
+      end
+      return if mode == "standard"
+
+      %w[business_rules domain_boundaries server_authority].each do |input|
+        errors << "DDD input #{input} is required" if blank?(spec.dig("inputs", input))
+      end
+      errors << "DDD bounded_context is required" if blank?(model["bounded_context"])
+      errors << "DDD ubiquitous_language is required" unless model["ubiquitous_language"].is_a?(Hash) && !model["ubiquitous_language"].empty?
+      errors << "DDD aggregates are required" unless model["aggregates"].is_a?(Array) && !model["aggregates"].empty?
+      errors << "DDD invariants are required" unless model["invariants"].is_a?(Array) && !model["invariants"].empty?
+
+      authority = model["server_authority"]
+      unless authority.is_a?(Hash) && authority["local"].is_a?(Array) &&
+             authority["backend"].is_a?(Array) && !authority["backend"].empty?
+        errors << "DDD server_authority must declare local and backend decisions"
+      end
+
+      policy = model["offline_policy"]
+      if policy && (!policy.is_a?(Hash) || blank?(policy["mutations"]) || blank?(policy["reconciliation"]))
+        errors << "DDD offline_policy must declare mutations and reconciliation"
+      end
+    end
+
+    def blank?(value)
+      value.nil? || (value.respond_to?(:strip) && value.strip.empty?)
     end
 
     def validate_approved_checkpoints(errors)

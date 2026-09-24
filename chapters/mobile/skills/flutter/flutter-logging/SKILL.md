@@ -1,7 +1,7 @@
 ---
 id: flutter-logging
 name: flutter-logging
-version: 2.1.1
+version: 1.0.4
 scope: stack
 type: skill
 chapter: mobile

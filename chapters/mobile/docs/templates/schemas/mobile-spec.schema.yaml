@@ -57,6 +57,78 @@ properties:
       review_documents:
         type: string
         enum: [es]
+  domain_modeling:
+    type: object
+    additionalProperties: false
+    required: [mode]
+    properties:
+      mode:
+        type: string
+        enum: [standard, ddd]
+        default: standard
+      bounded_context:
+        type: string
+        minLength: 1
+      ubiquitous_language:
+        type: object
+        minProperties: 1
+        additionalProperties:
+          type: string
+          minLength: 1
+      aggregates:
+        type: array
+        minItems: 1
+        items:
+          type: object
+          additionalProperties: false
+          required: [root, entities, references_by_id]
+          properties:
+            root:
+              type: string
+              minLength: 1
+            entities:
+              type: array
+              items:
+                type: string
+                minLength: 1
+            references_by_id:
+              type: array
+              items:
+                type: string
+                minLength: 1
+      invariants:
+        type: array
+        minItems: 1
+        items:
+          type: string
+          minLength: 1
+      server_authority:
+        type: object
+        additionalProperties: false
+        required: [local, backend]
+        properties:
+          local:
+            type: array
+            items:
+              type: string
+              minLength: 1
+          backend:
+            type: array
+            minItems: 1
+            items:
+              type: string
+              minLength: 1
+      offline_policy:
+        type: object
+        additionalProperties: false
+        required: [mutations, reconciliation]
+        properties:
+          mutations:
+            type: string
+            enum: [not_supported, read_only, provisional]
+          reconciliation:
+            type: string
+            minLength: 1
   inputs:
     type: object
     additionalProperties: true
@@ -72,6 +144,18 @@ properties:
       documentation:
         type: boolean
         default: false
+      business_rules:
+        type: string
+        minLength: 1
+      domain_boundaries:
+        type: string
+        minLength: 1
+      server_authority:
+        type: string
+        minLength: 1
+      offline_policy:
+        type: string
+        minLength: 1
       pr_comments_source:
         type: object
         additionalProperties: true
@@ -735,7 +819,7 @@ allOf:
         workflow:
           const: new-feature
     then:
-      required: [execution_capabilities]
+      required: [execution_capabilities, domain_modeling]
       properties:
         human_review:
           required: [initial_spec_approval, layer_checkpoints, stage_checkpoints]
@@ -748,6 +832,28 @@ allOf:
               const: required
         inputs:
           required: [feature_name, description]
+  - if:
+      required: [workflow, domain_modeling]
+      properties:
+        workflow:
+          const: new-feature
+        domain_modeling:
+          required: [mode]
+          properties:
+            mode:
+              const: ddd
+    then:
+      properties:
+        inputs:
+          required: [business_rules, domain_boundaries, server_authority]
+        domain_modeling:
+          required:
+            - mode
+            - bounded_context
+            - ubiquitous_language
+            - aggregates
+            - invariants
+            - server_authority
   - if:
       properties:
         workflow:

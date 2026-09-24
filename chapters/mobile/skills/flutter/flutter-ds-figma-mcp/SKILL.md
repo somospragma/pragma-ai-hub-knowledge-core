@@ -1,6 +1,6 @@
 ---
 id: flutter-ds-figma-mcp
-version: 1.4.0
+version: 1.0.5
 scope: stack
 type: skill
 chapter: mobile

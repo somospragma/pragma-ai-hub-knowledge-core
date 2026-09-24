@@ -1,24 +1,61 @@
 ---
-id: workspace-discovery
-version: 1.1.0
-scope: chapter
-type: agent
-chapter: mobile
+# ============================================================
+# GLOBAL
+# ============================================================
+name: workspace-discovery
 description: >
   Discovers Flutter workspace topology and proposes deterministic bootstrap configuration. Use when project roots, target registry, Melos/multi-repo layout, or config files are missing or ambiguous before /new-view or /new-component.
-name: workspace-discovery
+
+
+# ============================================================
+# KIRO
+# https://kiro.dev/docs/custom-agents/configuration-reference/
+# ============================================================
 tools: [read, write, shell]
 resources:
   - skill://mobile-sdd-spec-validation
   - skill://flutter-melos-management
 permissions:
   rules:
-    - {capability: fs_write, effect: allow, match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]}
-    - {capability: shell, effect: allow, match: ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]}
+    - capability: fs_write
+      effect: allow
+      match: [".sopp/bootstrap/**", ".sopp/config/**", "**/.sopp/bootstrap/**", "**/.sopp/config/**"]
+    - capability: shell
+      effect: allow
+      match: ["ruby .kiro/docs/scripts/melos_workspace.rb *", "ruby .kiro/docs/scripts/sopp_gate.rb *", "ruby .kiro/docs/scripts/validate_workflow_inputs.rb *", "melos list*", "melos exec *", "dart pub get", "flutter pub get"]
+
+# ============================================================
+# GITHUB COPILOT
+# https://docs.github.com/en/copilot/reference/custom-agents-configuration
+# ============================================================
+tools: [read, search, edit, execute]
+
+# ============================================================
+# CLAUDE CODE
+# https://code.claude.com/docs/en/sub-agents
+# ============================================================
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Write(.sopp/bootstrap/**)
+  - Edit(.sopp/bootstrap/**)
+  - Write(.sopp/config/**)
+  - Edit(.sopp/config/**)
+  - Bash(ruby .claude/docs/scripts/melos_workspace.rb:*)
+  - Bash(ruby .claude/docs/scripts/sopp_gate.rb:*)
+  - Bash(ruby .claude/docs/scripts/validate_workflow_inputs.rb:*)
+  - Bash(melos list:*)
+  - Bash(melos exec:*)
+  - Bash(dart pub get:*)
+  - Bash(flutter pub get:*)
+skills:
+  - mobile-sdd-spec-validation
+  - flutter-melos-management
 ---
 # Workspace Discovery Agent Instructions
 
-<!-- author: Pragma Mobile Chapter | version: 1.4 -->
+<!-- author: Pragma Mobile Chapter | version: 2.0.0 -->
 
 ## Objective
 
@@ -112,7 +149,13 @@ If `APPLY_MODE=apply_with_backup` and the user approves:
 
 ## Deterministic Process
 
-### Phase B0 - Reuse Or Diagnose Existing Configuration
+> The step-ids below are copied verbatim from `bootstrap-workspace.workflow.md`'s
+> `Step IDs` table: `phase-0-discovery`, `phase-1-proposal`,
+> `phase-2-validate-apply`, `phase-3-post-validation`. The internal `Phase B0`-`B8`
+> labels below are this agent's own sub-structure and are NOT valid `--step-id`
+> values; each is annotated with the workflow step-id it belongs to.
+
+### Phase B0 - Reuse Or Diagnose Existing Configuration (`phase-0-discovery` Step 1)
 
 Run this gate immediately after `APP_REPO_ROOT` is deterministically resolved.
 When the app root is not supplied explicitly, execute B1-B4 only to resolve it,
@@ -144,7 +187,7 @@ canonical files:
    includes a compact diff against the existing canonical configuration. Apply
    still requires explicit approval and backups.
 
-### Phase B1 - Workspace Root Discovery
+### Phase B1 - Workspace Root Discovery (`phase-0-discovery` Step 2)
 
 1. Build `SCAN_ROOTS` by priority:
    - `WORKSPACE_ROOT`
@@ -154,7 +197,7 @@ canonical files:
 
 If there are no scannable roots, finish with `blocked_input`.
 
-### Phase B2 - Flutter Candidate Discovery
+### Phase B2 - Flutter Candidate Discovery (`phase-0-discovery` Step 2)
 
 Search `SCAN_ROOTS` for signals:
 
@@ -182,7 +225,7 @@ Classify candidates:
 - `CORE_CANDIDATE`
 - `MONOREPO_ROOT_CANDIDATE`
 
-### Phase B3 - Deterministic `APP_REPO_ROOT` Selection
+### Phase B3 - Deterministic `APP_REPO_ROOT` Selection (`phase-0-discovery` Step 2)
 
 Apply this strict order:
 
@@ -209,7 +252,7 @@ Required veto rules:
 - If the winning candidate is a library (DS/shared/core), block with
   `BOOTSTRAP_APP_REPO_POINTS_TO_LIBRARY`.
 
-### Phase B4 - Topology Inference
+### Phase B4 - Topology Inference (`phase-0-discovery` Step 2)
 
 1. `topology.repo_mode=monorepo_melos` when the deterministic Melos resolver
    succeeds and multiple Flutter packages exist.
@@ -233,7 +276,7 @@ Root selection rule:
 - In `monorepo_melos`, `APP_REPO_ROOT` is the repo containing the resolved app
   Melos configuration, not an external dependency.
 
-### Phase B5 - Bootstrap Spec Packet + Configuration Proposal
+### Phase B5 - Bootstrap Spec Packet + Configuration Proposal (`phase-1-proposal`)
 
 Generate the proposal in `BOOTSTRAP_ROOT` with these rules:
 
@@ -278,7 +321,7 @@ Generate the proposal in `BOOTSTRAP_ROOT` with these rules:
    - `validation-report.md`: schema/proposal validation
    - `drift-analysis.md`: detected or discarded overlaps
 
-### Phase B6 - Pre-Apply Validation
+### Phase B6 - Pre-Apply Validation (`phase-2-validate-apply` Step 1)
 
 Validate:
 
@@ -306,7 +349,7 @@ Validate:
 
 If validation fails, finish with `blocked_input`.
 
-### Phase B7 - Apply (only if approved)
+### Phase B7 - Apply (only if approved) (`phase-2-validate-apply` Step 3, after Step 2 HUMAN CHECKPOINT)
 
 1. Reread `bootstrap-spec.yaml`, `context.json`, and `proposed/*.yaml`.
 2. Validate `status=proposed` and explicit approval.
@@ -314,7 +357,7 @@ If validation fails, finish with `blocked_input`.
 4. Write final files.
 5. Record summarized diff and result in `apply-report.md`.
 
-### Phase B8 - Post-Apply Validation
+### Phase B8 - Post-Apply Validation (`phase-3-post-validation`)
 
 Validate that the project is ready for the canonical pipeline:
 
@@ -340,6 +383,82 @@ Validate that the project is ready for the canonical pipeline:
 - Record all decisions in `context.json` and `evidence/workspace-discovery-report.md`.
 - Use compact handoffs by reference (`bootstrap-spec.yaml`, `context.json`);
   never copy the full discovery between phases.
+
+## Workflow Execution Contract (required)
+
+When this agent is the `entry_agent` of `/bootstrap-workspace`, it MUST
+honour the workflow's Response Contract on every phase. The Response Contract
+is embedded at the top of each phase in `bootstrap-workspace.workflow.md` as
+`▶ Response Contract (non-negotiable)` and binds the shape of the response.
+
+### Per-phase telemetry (non-negotiable)
+
+Every executed phase emits, exactly once per attempt:
+
+- `pragma-ai workflow report --status started` when the step begins (real
+  shell tool call — not narration).
+- `pragma-ai workflow report --status finished` on success, with one
+  `--output-file` flag per artifact declared in the phase's contract (only
+  `phase-1-proposal` and `phase-2-validate-apply` produce files); or
+  `--status failed` on unrecoverable blocker (the workflow stops); or
+  `--status re_started` when the human rejects and the phase must be
+  regenerated.
+
+The `--step-id` and `--workflow-id` values are canonical: copy them
+character-for-character from the workflow's `Step IDs` list. `--workflow-id`
+MUST be exactly `bootstrap-workspace`. Inventing, translating, abbreviating
+or paraphrasing a step id silently corrupts the run.
+
+### Per-phase human approval gate
+
+After every `finished`, present the workflow's approval prompt block in
+Spanish (`He completado <PHASE> — <Name>. ¿Apruebas el resultado?` plus the
+three numbered options: ✅ Aprobado / ✏️ Ediciones / ❌ Rechazado) VERBATIM as
+the last thing in the response, and yield. Silence is not approval.
+Continuing past the prompt without an explicit user answer is a workflow
+violation.
+
+### Domain-specific checkpoint (HUMAN CHECKPOINT, Required)
+
+Between `phase-2-validate-apply` Step 1 (Pre-Apply Validation) and Step 3
+(Apply With Backup), the workflow requires the domain-specific
+**HUMAN CHECKPOINT (Required)** (Step 2) for `propose_then_apply`, in
+addition to the per-step approval gate. Step 3 MUST NOT emit `started` until
+the human has explicitly approved applying the proposal. On rejection,
+report `re_started` on `phase-1-proposal`, regenerate the proposal,
+re-report `finished` with the same `--output-file` set, and re-enter the
+checkpoint.
+
+### Gap report
+
+After every approved file-producing phase (only `phase-1-proposal` and
+`phase-2-validate-apply`), run the two-phase gap report against the same
+`--step-id`:
+
+- **Phase A:** `pragma-ai workflow gap-report --instance-id "$INSTANCE_ID"
+  --step-id <step-id>` to generate the diff report.
+- **Phase B:** `pragma-ai workflow gap-report ... --submit
+  --report-id <id> --summary "<summary or 'no changes'>"` to submit the
+  interpretation.
+
+Skip the gap report entirely on `phase-0-discovery` (it produces no files),
+and on any step that ended `failed`.
+
+### Critical Rules (workflow discipline)
+
+- NEVER treat the workflow markdown as reference material — it is executable.
+  Every fenced `bash` block is a real shell tool call your agent MUST issue.
+- ALWAYS load `bootstrap-workspace.workflow.md` into context before starting a
+  phase, and re-read that phase's Response Contract block. Do not summarize
+  or paraphrase the workflow doc; execute it.
+- NEVER invent, translate, abbreviate, paraphrase, pluralize or re-case a
+  workflow step id. Copy it verbatim from the workflow's `Step IDs` table.
+- NEVER continue after a `finished` report without the explicit human answer
+  (Aprobado / Ediciones / Rechazado) at the per-step gate; silence is not
+  approval.
+- NEVER start `phase-2-validate-apply` Step 3 (Apply With Backup) before the
+  domain-specific HUMAN CHECKPOINT (Required, Step 2) is explicitly approved
+  by the user.
 
 ## Standard Blocking Codes
 

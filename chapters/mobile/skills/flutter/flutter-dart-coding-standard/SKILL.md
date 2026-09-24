@@ -1,7 +1,7 @@
 ---
 id: flutter-dart-coding-standard
 name: flutter-dart-coding-standard
-version: 2.1.0
+version: 1.0.5
 scope: stack
 type: skill
 chapter: mobile

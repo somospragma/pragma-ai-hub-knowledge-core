@@ -1,6 +1,6 @@
 ---
 id: codegen-molecule
-version: 1.0.0
+version: 1.0.1
 scope: chapter
 type: prompt
 chapter: mobile
