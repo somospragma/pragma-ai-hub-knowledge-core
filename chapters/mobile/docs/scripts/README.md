@@ -1,5 +1,5 @@
 # Mobile KB Validation Scripts
-> **Versión:** 2.0.0
+> **Versión:** 2.0.1
 ## `validate_mobile_kb.rb`
 
 Local integrity checker for the mobile knowledge base. It is intentionally
