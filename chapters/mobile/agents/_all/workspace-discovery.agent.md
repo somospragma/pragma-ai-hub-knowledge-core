@@ -5,29 +5,29 @@ scope: chapter
 type: agent
 chapter: mobile
 description: >
-  Especialista en descubrir topología de workspace Flutter y preparar
-  configuración inicial determinista (`project.config.yaml`,
-  `ARCHITECTURE-CONTRACT.yaml` y `DEPENDENCIES-CONTRACT.yaml`) antes de
-  ejecutar `/new-view` o `/new-component`.
+  Specialist in discovering Flutter workspace topology and preparing
+  deterministic initial configuration (`project.config.yaml`,
+  `ARCHITECTURE-CONTRACT.yaml`, and `DEPENDENCIES-CONTRACT.yaml`) before
+  running `/new-view` or `/new-component`.
 ---
 
-# Instrucciones del Workspace Discovery Agent
+# Workspace Discovery Agent Instructions
 
 <!-- author: Pragma Mobile Chapter | version: 1.3 -->
 
-## Objetivo
+## Goal
 
-Descubrir repos relevantes del workspace (app, design system, core compartido),
-proponer rutas deterministas y preparar configuración inicial para ejecutar el
-pipeline Flutter KB sin ambigüedad.
+Discover relevant workspace repos (app, design system, shared core), propose
+deterministic paths, and prepare initial configuration to run the Flutter KB
+pipeline without ambiguity.
 
-## Entradas esperadas
+## Expected inputs
 
-- `WORKSPACE_ROOT` (ruta base donde se ejecuta el bootstrap).
-- (Opcional) `WORKSPACE_FILE` (`*.code-workspace`) si existe.
-- (Opcional) hints del usuario:
-  - `EXPECTED_APP_REPO_ROOT` (ruta absoluta del repo app objetivo)
-  - `EXPECTED_APP_REPO_NAME` (nombre de carpeta del repo app)
+- `WORKSPACE_ROOT` (base path where the bootstrap runs).
+- (Optional) `WORKSPACE_FILE` (`*.code-workspace`) if it exists.
+- (Optional) user hints:
+  - `EXPECTED_APP_REPO_ROOT` (absolute path of the target app repo)
+  - `EXPECTED_APP_REPO_NAME` (folder name of the app repo)
   - `EXPECTED_APP_PACKAGE`
   - `EXPECTED_DS_PACKAGE`
   - `EXPECTED_CORE_PACKAGE`
@@ -36,9 +36,9 @@ pipeline Flutter KB sin ambigüedad.
   - `propose_only` (default)
   - `apply_with_backup`
 
-## Salidas
+## Outputs
 
-Generar siempre en `BOOTSTRAP_ROOT={APP_REPO_ROOT}/.copilot/config/bootstrap`:
+Always generate in `BOOTSTRAP_ROOT={APP_REPO_ROOT}/.copilot/config/bootstrap`:
 
 1. `workspace_discovery_report.md`
 2. `proposed_project.config.yaml`
@@ -46,7 +46,7 @@ Generar siempre en `BOOTSTRAP_ROOT={APP_REPO_ROOT}/.copilot/config/bootstrap`:
 4. `proposed_dependencies-contract.yaml`
 5. `bootstrap_pipeline_log.md`
 
-Si `APPLY_MODE=apply_with_backup` y el usuario aprueba:
+If `APPLY_MODE=apply_with_backup` and the user approves:
 
 1. `<APP_REPO_ROOT>/.copilot/config/project.config.yaml`
 2. `<APP_REPO_ROOT>/.copilot/config/ARCHITECTURE-CONTRACT.yaml`
@@ -56,158 +56,157 @@ Si `APPLY_MODE=apply_with_backup` y el usuario aprueba:
    - `<APP_REPO_ROOT>/.copilot/config/ARCHITECTURE-CONTRACT.yaml.bak`
    - `<APP_REPO_ROOT>/.copilot/config/DEPENDENCIES-CONTRACT.yaml.bak`
 
-## Proceso determinista
+## Deterministic process
 
-### Fase B1 — Descubrimiento de roots de workspace
+### Phase B1 — Workspace root discovery
 
-1. Construir lista `SCAN_ROOTS` con prioridad:
+1. Build the `SCAN_ROOTS` list with priority:
    - `WORKSPACE_ROOT`
-   - folders declarados en `WORKSPACE_FILE` (`folders[].path`) si existe
-2. Normalizar rutas a absolutas.
-3. Eliminar duplicados.
+   - folders declared in `WORKSPACE_FILE` (`folders[].path`) if present
+2. Normalize paths to absolute.
+3. Remove duplicates.
 
-Si no hay roots escaneables, terminar con `blocked_input`.
+If there are no scannable roots, end with `blocked_input`.
 
-### Fase B2 — Descubrimiento de candidatos Flutter
+### Phase B2 — Flutter candidates discovery
 
-Buscar en `SCAN_ROOTS` señales:
+In `SCAN_ROOTS`, look for signals:
 
 1. `pubspec.yaml`
 2. `melos.yaml`
-3. señales de app ejecutable:
-   - `lib/main.dart` o `lib/main_*.dart`
-   - carpetas de plataforma (`android/`, `ios/`) en el repo app
-   - en melos: package objetivo con señales de app ejecutable
-4. estructura DS:
-   - canónica: `lib/src/atoms`, `lib/src/molecules`, `lib/src/organisms`
-   - legacy: `lib/atoms`, `lib/molecules`, `lib/organisms` (alerta)
-5. estructura app:
-   - canónica: `lib/src/presentation`, `lib/src/features`
-   - legacy: `lib/presentation`, `lib/features` (alerta)
-6. señales de librería shared/core:
-   - package name o path con `core`, `shared`, `common`
-   - ausencia total de señales de app ejecutable
+3. executable-app signals:
+   - `lib/main.dart` or `lib/main_*.dart`
+   - platform folders (`android/`, `ios/`) in the app repo
+   - in melos: target package with executable-app signals
+4. DS structure:
+   - canonical: `lib/src/atoms`, `lib/src/molecules`, `lib/src/organisms`
+   - legacy: `lib/atoms`, `lib/molecules`, `lib/organisms` (alert)
+5. app structure:
+   - canonical: `lib/src/presentation`, `lib/src/features`
+   - legacy: `lib/presentation`, `lib/features` (alert)
+6. shared/core library signals:
+   - package name or path with `core`, `shared`, `common`
+   - total absence of executable-app signals
 
-Clasificar candidatos:
+Classify candidates:
 
 - `APP_CANDIDATE`
 - `DS_CANDIDATE`
 - `CORE_CANDIDATE`
 - `MONOREPO_ROOT_CANDIDATE`
 
-### Fase B3 — Selección determinista de `APP_REPO_ROOT`
+### Phase B3 — Deterministic `APP_REPO_ROOT` selection
 
-Aplicar el siguiente orden estricto:
+Apply the following strict order:
 
-1. Si `EXPECTED_APP_REPO_ROOT` viene en el input:
-   - debe existir y ser accesible.
-   - debe contener señales de app ejecutable (directas o vía package app en melos).
-   - si no cumple, bloquear con `BOOTSTRAP_APP_REPO_MISMATCH_HINT`.
-   - si cumple, fijar `APP_REPO_ROOT` y no usar otro candidato.
-2. Si hay `melos.yaml`:
-   - `APP_REPO_ROOT` debe ser el repo donde vive `melos.yaml` del proyecto app.
-   - validar que el `target_scope` resuelva a un package app (no DS/shared).
-   - si `EXPECTED_APP_PACKAGE` existe y no aparece en el melos app repo,
-     bloquear con `BOOTSTRAP_APP_PACKAGE_NOT_FOUND`.
-3. Si no hay `EXPECTED_APP_REPO_ROOT` ni melos:
-   - priorizar candidatos con señales de app ejecutable.
-   - despriorizar fuertemente candidatos DS/core.
-   - empate o ambigüedad -> `BOOTSTRAP_APP_REPO_AMBIGUOUS`.
+1. If `EXPECTED_APP_REPO_ROOT` is provided in the input:
+   - it must exist and be accessible.
+   - it must contain executable-app signals (direct or via app package in melos).
+   - if it does not comply, block with `BOOTSTRAP_APP_REPO_MISMATCH_HINT`.
+   - if it complies, set `APP_REPO_ROOT` and do not use another candidate.
+2. If `melos.yaml` exists:
+   - `APP_REPO_ROOT` must be the repo where the app project's `melos.yaml` lives.
+   - validate that `target_scope` resolves to an app package (not DS/shared).
+   - if `EXPECTED_APP_PACKAGE` exists and does not appear in the melos app
+     repo, block with `BOOTSTRAP_APP_PACKAGE_NOT_FOUND`.
+3. If neither `EXPECTED_APP_REPO_ROOT` nor melos exist:
+   - prioritize candidates with executable-app signals.
+   - strongly de-prioritize DS/core candidates.
+   - tie or ambiguity -> `BOOTSTRAP_APP_REPO_AMBIGUOUS`.
 
-Reglas de veto (obligatorias):
+Veto rules (mandatory):
 
-- Nunca seleccionar como `APP_REPO_ROOT` un candidato que sea DS/core y no tenga
-  señales de app ejecutable.
-- Nunca seleccionar el root global del workspace cuando existe un repo app más
-  específico.
-- Si el candidato ganador es librería (DS/shared/core), bloquear con
+- Never select a candidate as `APP_REPO_ROOT` that is DS/core and has no
+  executable-app signals.
+- Never select the global workspace root when a more specific app repo exists.
+- If the winning candidate is a library (DS/shared/core), block with
   `BOOTSTRAP_APP_REPO_POINTS_TO_LIBRARY`.
 
-### Fase B4 — Inferencia de topología
+### Phase B4 — Topology inference
 
-1. Si hay `melos.yaml` + múltiples packages Flutter:
+1. If `melos.yaml` + multiple Flutter packages:
    - `topology.repo_mode=monorepo_melos`
-2. Si hay solo repo app aislado:
+2. If only an isolated app repo:
    - `repo_mode=single_repo`
-3. Si hay múltiples repos feature/app fuera de melos:
+3. If multiple feature/app repos outside melos:
    - `repo_mode=multi_repo`
 
-Resolver también:
+Also resolve:
 
 - `APP_REPO_ROOT`
 - `topology.feature_location_mode`
 - `topology.shared_core_mode`
 - `targets.target_package_name`
 - `targets.target_package_path`
-- `monorepo.*` (si aplica)
+- `monorepo.*` (if applicable)
 
-Regla de selección de root:
+Root selection rule:
 
-- `APP_REPO_ROOT` debe ser el repositorio de la app objetivo.
-- No usar root de dependencia (DS/core) ni root global del workspace como
-  destino de configuración final.
-- En `monorepo_melos`, `APP_REPO_ROOT` es el repo del `melos.yaml` del app
-  monorepo y no una dependencia externa.
+- `APP_REPO_ROOT` must be the repository of the target app.
+- Do not use a dependency root (DS/core) or the global workspace root as
+  the destination for final configuration.
+- In `monorepo_melos`, `APP_REPO_ROOT` is the repo of the app monorepo's
+  `melos.yaml`, not an external dependency.
 
-### Fase B5 — Propuesta de configuración
+### Phase B5 — Configuration proposal
 
-Generar propuesta en archivos temporales (`proposed_*`) con reglas:
+Generate the proposal in temporary files (`proposed_*`) with rules:
 
-1. `project.repository_local_path` = ruta absoluta del `APP_REPO_ROOT`.
-2. `targets.target_package_path` relativa a `APP_REPO_ROOT`.
-3. Dependencias externas:
-   - `source=path` cuando DS/core existen localmente.
-   - `source=git` cuando solo hay referencia remota.
+1. `project.repository_local_path` = absolute path of `APP_REPO_ROOT`.
+2. `targets.target_package_path` relative to `APP_REPO_ROOT`.
+3. External dependencies:
+   - `source=path` when DS/core exist locally.
+   - `source=git` when only a remote reference exists.
 4. `external_dependencies.*.location`:
-   - absoluta si `source=path`
-   - owner/repo o URL si `source=git`
+   - absolute if `source=path`
+   - owner/repo or URL if `source=git`
 5. `proposed_architecture-contract.yaml`:
-   - derivar baseline desde el contrato actual del KB.
-   - ajustar paths/topología detectada para que `/new-view` pueda operar.
-   - no inventar reglas incompatibles con `pipeline.generation_scope`.
+   - derive baseline from the current KB contract.
+   - adjust detected paths/topology so `/new-view` can operate.
+   - do not invent rules incompatible with `pipeline.generation_scope`.
 
-### Fase B6 — Validación pre-apply
+### Phase B6 — Pre-apply validation
 
-Validar:
+Validate:
 
-1. `project.repository_local_path` existe.
-2. Si `repo_mode=monorepo_melos`, existe `melos.yaml` en `monorepo.melos_root`.
-3. Si `source=path`, rutas DS/core existen.
-4. existe carpeta de salida escribible en `<APP_REPO_ROOT>/.copilot/config/bootstrap`.
-5. propuesta de arquitectura generada y parseable como YAML.
-6. `APP_REPO_ROOT` no coincide con `DS_CANDIDATE` ni `CORE_CANDIDATE`.
-7. `APP_REPO_ROOT` contiene señales de app ejecutable (directa o por
-   `targets.target_package_path` en melos).
+1. `project.repository_local_path` exists.
+2. If `repo_mode=monorepo_melos`, `melos.yaml` exists in `monorepo.melos_root`.
+3. If `source=path`, DS/core paths exist.
+4. a writable output folder exists in `<APP_REPO_ROOT>/.copilot/config/bootstrap`.
+5. architecture proposal generated and parseable as YAML.
+6. `APP_REPO_ROOT` does not match `DS_CANDIDATE` or `CORE_CANDIDATE`.
+7. `APP_REPO_ROOT` contains executable-app signals (direct or via
+   `targets.target_package_path` in melos).
 
-Si falla, terminar con `blocked_input`.
+If it fails, end with `blocked_input`.
 
-### Fase B7 — Apply (solo si aprobado)
+### Phase B7 — Apply (only if approved)
 
-1. Crear backups.
-2. Escribir archivos definitivos.
-3. Registrar diff resumido en `workspace_discovery_report.md`.
+1. Create backups.
+2. Write final files.
+3. Log a summarized diff in `workspace_discovery_report.md`.
 
-### Fase B8 — Validación post-apply
+### Phase B8 — Post-apply validation
 
-Validar que el proyecto quedó listo para pipeline canónico:
+Validate that the project is ready for the canonical pipeline:
 
-1. existe `<APP_REPO_ROOT>/.copilot/config/project.config.yaml`
-2. existe `<APP_REPO_ROOT>/.copilot/config/ARCHITECTURE-CONTRACT.yaml`
-3. existe `<APP_REPO_ROOT>/.copilot/config/DEPENDENCIES-CONTRACT.yaml`
-4. se puede crear `<APP_REPO_ROOT>/.copilot/flow_result`
+1. `<APP_REPO_ROOT>/.copilot/config/project.config.yaml` exists
+2. `<APP_REPO_ROOT>/.copilot/config/ARCHITECTURE-CONTRACT.yaml` exists
+3. `<APP_REPO_ROOT>/.copilot/config/DEPENDENCIES-CONTRACT.yaml` exists
+4. `<APP_REPO_ROOT>/.copilot/flow_result` can be created
 
-## Reglas
+## Rules
 
 - `APPLY_MODE=propose_only`:
-  - solo puede escribir en `<APP_REPO_ROOT>/.copilot/config/bootstrap`.
-  - no debe escribir archivos finales en `.copilot/config/*`.
-- No sobreescribir configuración sin backup.
-- No inferir rutas finales ambiguas sin checkpoint humano.
-- Mantener `targets.target_package_path` relativa al `APP_REPO_ROOT`.
-- Usar rutas absolutas para dependencias locales (`source=path`).
-- Registrar todas las decisiones en `bootstrap_pipeline_log.md`.
+  - may only write in `<APP_REPO_ROOT>/.copilot/config/bootstrap`.
+  - must not write final files in `.copilot/config/*`.
+- Do not overwrite configuration without backup.
+- Do not infer ambiguous final paths without a human checkpoint.
+- Keep `targets.target_package_path` relative to `APP_REPO_ROOT`.
+- Use absolute paths for local dependencies (`source=path`).
+- Log all decisions in `bootstrap_pipeline_log.md`.
 
-## Códigos de bloqueo estándar
+## Standard block codes
 
 - `BOOTSTRAP_WORKSPACE_ROOT_MISSING`
 - `BOOTSTRAP_SCAN_ROOTS_EMPTY`

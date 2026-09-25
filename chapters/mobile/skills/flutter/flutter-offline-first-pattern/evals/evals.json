@@ -1,0 +1,143 @@
+{
+  "skill_name": "flutter-offline-first-pattern",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm building a Flutter app that must work fully without internet and feel instant, syncing with the backend when connectivity returns. How should I structure the data layer and repository so the UI never waits on the network?",
+      "expected_output": "Establishes the local database as the single source of truth and the network as a sync mechanism. Repository emits cached data immediately (reactive local stream) and triggers background sync when connected, so the UI never blocks on the network. Follows clean architecture: BLoC watches a Stream<Either<Failure, T>>, domain use case → repository interface, data RepositoryImpl coordinating LocalDataSource (primary) and RemoteDataSource (sync).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response makes the local database the source of truth and treats the network as a sync mechanism",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response has the repository emit cached data first (reactive stream) and sync in the background so the UI never waits on the network",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response integrates the pattern with clean architecture (LocalDataSource as primary, RemoteDataSource for sync, repository coordinating both)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "For my offline-first Flutter app I need to pick a local database. My data is highly relational with joins and I need schema migrations and reactive queries. What should I use and why? What if instead I only needed a simple NoSQL store with full-text search?",
+      "expected_output": "For relational data with joins, migrations, and reactive queries recommends Drift (SQLite, reactive streams, type-safe SQL, migrations). For a simple NoSQL store with full-text search recommends Isar. Mentions ObjectBox for highest write throughput/object graphs and PowerSync for managed sync, and warns that Hive is in maintenance mode (avoid for new projects).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response recommends Drift for the relational + joins + migrations + reactive queries case",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends Isar for the simple NoSQL + full-text search case",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response warns Hive is in maintenance mode and should be avoided for new projects",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "When a user edits a product in my Flutter app I want the change to appear instantly, even offline, and be pushed to the server later. How do I implement this optimistic update correctly?",
+      "expected_output": "Shows an optimistic update: write to the local DB first (upsert) so the reactive stream updates the UI instantly, then enqueue the mutation in a persisted sync queue for later remote sync, returning success immediately. The queued operation is processed when connectivity is restored. UI reflects local state without waiting for the server.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response writes to the local DB first so the UI updates instantly, then enqueues the mutation for remote sync",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response uses a persisted sync queue processed when connectivity is restored, rather than blocking on the network",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains upsert",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Implement a sync queue for my offline-first Flutter app that persists pending mutations across app restarts, processes them when the connection is restored, and retries failed operations with exponential backoff.",
+      "expected_output": "Describes a SyncQueueService backed by the local DB (persisted SyncOperation entries survive restarts) with enqueue, processQueue (called on connectivity restored) and retryFailed with exponential backoff. Operations carry entity/type/data. Processing is triggered by the connectivity 'restored' event, and failed ops are retried with increasing delay.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response persists the sync queue in the local DB so pending mutations survive app restarts",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response processes the queue when connectivity is restored and retries failed operations with exponential backoff",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains processQueue",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "In my offline-first Flutter app the same record can be edited on two devices while offline, so I get conflicts when they sync. What conflict resolution strategies exist and how do I choose one?",
+      "expected_output": "Presents conflict resolution strategies and when to use each: last-write-wins (timestamp) for simple/low-conflict data, server-wins for authoritative data (e.g. inventory), client-wins when user edits must always override (e.g. notes), field-level merge for partial updates on complex objects, and user-prompted for high-value data where loss is unacceptable. Recommends choosing a strategy per entity type.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response describes multiple conflict resolution strategies (e.g. last-write-wins, server-wins, client-wins, field-level merge, user-prompted)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response advises choosing a conflict resolution strategy per entity type based on the data's characteristics",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains last-write-wins",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "How should I detect connectivity in my Flutter offline-first app and trigger a sync when the network comes back? I've seen apps that think they're online just because Wi-Fi is connected but there's no actual internet.",
+      "expected_output": "Recommends a ConnectivityService built on connectivity_plus that listens to onConnectivityChanged, but stresses that connectivity_plus only reports the network interface — an actual reachability check (e.g. a lightweight request/ping to a known endpoint) is needed to confirm real internet. Sync (processQueue) is triggered on the connectivity 'restored' event once reachability is confirmed.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses connectivity_plus (onConnectivityChanged) to detect connectivity changes",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response notes that connectivity_plus only reports the interface and an actual reachability/internet check is required to confirm real connectivity",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response triggers sync (processes the queue) when connectivity is restored",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

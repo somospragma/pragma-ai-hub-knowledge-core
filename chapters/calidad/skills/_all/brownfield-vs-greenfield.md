@@ -5,7 +5,7 @@ scope: chapter
 type: skill
 chapter: calidad
 description: Distingue proyectos brownfield (existentes) de greenfield (nuevos) y define qué se genera y qué no en cada modo, por framework.
-tags: [brownfield, greenfield, karate, playwright, k6, conventions]
+tags: [brownfield, greenfield, karate, playwright, k6, conventions, serenity-wdio]
 ---
 
 # Brownfield vs Greenfield — Reglas de Generación por Modo
@@ -141,6 +141,42 @@ Pragma's Chapter Calidad soporta **tanto greenfield como brownfield** en Appium,
 
 **Acción greenfield iOS:** el scaffolder V2 NO genera proyectos iOS. Apuntar al usuario al workaround manual descrito en `references/android-only-scope-rationale.md` del skill `[[calidad-appium-screenplay-android]]`. V3 del scaffolder incluirá iOS.
 
+### serenity-wdio
+
+El stack `serenity-wdio` (TypeScript + WebdriverIO v9 + Serenity/JS v3.31 + Cucumber 11) soporta cinco modos de ejecución: `web`, `web_movil`, `movil` (Android e iOS via Appium), `desktop` y `api`. El orquestador `scripts/run.mjs` selecciona la configuración correcta mediante `--mode` y `--platform`.
+
+| Modo        | Plataforma(s)        | Qué SE genera                                                                                                                                                 | Qué NO se genera                                                              |
+|-------------|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| greenfield  | web                  | Proyecto completo: `features/web/Features/*.feature`, `features/web/Tasks/`, `features/web/UI/`, `features/step-definitions/web/`, `configs/wdio.web.conf.ts`, `.env.web`, `scripts/run.mjs`, `package.json`, `README.md` | —                                                                             |
+| greenfield  | web_movil            | `features/web/`, `configs/wdio.web_movil.conf.ts`, `.env.web_movil`, entrada en `run.mjs`                                                                    | —                                                                             |
+| greenfield  | movil (Android/iOS)  | `features/mobile/android/` o `features/mobile/ios/`, `features/mobile/shared/`, `configs/wdio.movil.conf.ts`, `.env.movil.android` / `.env.movil.ios`         | —                                                                             |
+| greenfield  | desktop              | `features/desktop/`, `configs/wdio.desktop.conf.ts`, `.env.desktop`                                                                                          | —                                                                             |
+| greenfield  | api                  | `features/api/`, `configs/wdio.api.conf.ts`, `.env.api`                                                                                                      | —                                                                             |
+| brownfield  | todos los modos      | Solo features y step-definitions nuevos/actualizados, Tasks, UI Mapping e Interactions del modo correspondiente                                               | `package.json`, `tsconfig.json`, `configs/wdio.*.conf.ts`, `scripts/run.mjs`, `.env.*`, `support/parameter.config.ts` |
+
+**Detección brownfield serenity-wdio:** el `project_root` contiene `package.json` con `@serenity-js/webdriverio` en dependencies, **más** al menos una carpeta `features/` con archivos `.feature`, **más** `configs/wdio.shared.conf.ts` o equivalente. Si además existe `scripts/run.mjs`, confirma brownfield.
+
+**Acción greenfield:** invocar `[[serenity-wdio-greenfield]]` y el workflow `[[generate-serenity-wdio-greenfield]]`.
+
+**Acción brownfield:** invocar `[[serenity-wdio-brownfield]]` y el workflow `[[extend-serenity-wdio-brownfield]]`. NO regenerar infraestructura existente. Respetar convenciones detectadas.
+
+En **brownfield serenity-wdio** detecta y respeta:
+
+| Convención                    | Cómo se detecta                                                             | Ejemplo                                  |
+|-------------------------------|-----------------------------------------------------------------------------|------------------------------------------|
+| `features_dir`                | Carpeta que contiene los `.feature` existentes                              | `features/web/Features/`                 |
+| `step_defs_dir`               | Carpeta de step definitions del modo                                        | `features/step-definitions/web/`         |
+| `ui_mapping_style`            | `PageElement` + `By` (web) vs selectores `string` (mobile)                 | web: `By.css(...)`, mobile: `'~selector'`|
+| `task_composition_style`      | `Task.where(...)` con Interactions encadenadas                              | `Task.where('#actor...', ...)`           |
+| `tag_convention`              | Tags de canal y suite en uso                                                | `@web @smoke @regression`               |
+| `run_script_modes`            | Modos registrados en `scripts/run.mjs`                                      | `web`, `movil`, `api`                    |
+| `env_files`                   | Archivos `.env.<modo>` presentes                                            | `.env.web`, `.env.api`                   |
+| `workarounds_documented`      | Workarounds en `wdio.shared.conf.ts` (ej. window handles NATIVE_APP)        | `getWindowHandle` override               |
+
+**Regla anti-patrón brownfield:** en brownfield, si se detectan anti-patrones prohibidos (`Target`, `resolveFor`, `browser.$` directo en Tasks/Steps), marcarlos pero NO corregirlos automáticamente. Reportar al humano.
+
+**Paridad multiplataforma:** en brownfield, las garantías universales (smoke gate, evidencia, metadata) se aplican solo a los archivos nuevos de la sesión, filtrados por el `--mode` correspondiente.
+
 ## Restricciones
 
 - En brownfield **jamás regenerar infraestructura existente**: no sobrescribir `pom.xml`, `playwright.config.ts`, `package.json`, runners ni configs.
@@ -153,7 +189,7 @@ Pragma's Chapter Calidad soporta **tanto greenfield como brownfield** en Appium,
 
 En brownfield, la auto-corrección aplica EXCLUSIVAMENTE a tests recién generados/modificados por el agente. NUNCA aplicar correcciones automáticas a tests preexistentes del cliente, aunque fallen. Si tests preexistentes fallan: reportar al humano, NO modificar (puede esconder bugs, romper convenciones del cliente, o violar el contrato implícito de no-modificación).
 
-Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`) y a sus invocaciones desde cualquier workflow brownfield del chapter (`[[calidad-extend-karate-brownfield]]`, `[[calidad-update-playwright-brownfield]]`, `[[calidad-extend-k6-brownfield]]`, `[[calidad-extend-appium-brownfield]]`). El alcance de la auto-corrección se delimita por el conjunto de archivos producidos o modificados en la corrida actual; cualquier fallo fuera de ese conjunto se reporta y escala, no se repara.
+Esta regla aplica a las cuatro capacidades del loop final obligatorio (`[[calidad-test-execution-orchestration]]`, `[[calidad-failure-triage-and-classification]]`, `[[calidad-test-self-correction-loop]]`, `[[calidad-test-self-healing]]`) y a sus invocaciones desde cualquier workflow brownfield del chapter (`[[calidad-extend-karate-brownfield]]`, `[[calidad-update-playwright-brownfield]]`, `[[calidad-extend-k6-brownfield]]`, `[[calidad-extend-appium-brownfield]]`, `[[calidad-extend-appium-wdio-brownfield]]`, `[[calidad-extend-serenity-wdio-brownfield]]`). El alcance de la auto-corrección se delimita por el conjunto de archivos producidos o modificados en la corrida actual; cualquier fallo fuera de ese conjunto se reporta y escala, no se repara.
 
 ## Migración masiva de un patrón repetido
 
@@ -209,6 +245,7 @@ Un símbolo con usos fuera del bloque no se puede eliminar aunque su versión pi
 Los cinco ambiguos nuevos vienen de la principal, no del merge. Sin esta tabla, el equipo los atribuye a la integración y se pierde una tarde.
 
 7. **Verificar en ejecución al menos un escenario del archivo resuelto**, además de uno de control ajeno al conflicto.
+
 
 ## Paridad de garantías universales brownfield ↔ greenfield
 

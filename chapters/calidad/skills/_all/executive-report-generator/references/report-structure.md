@@ -1,6 +1,6 @@
 # Estructura canónica del reporte ejecutivo
 
-El reporte ejecutivo se genera SIEMPRE con las 7 secciones siguientes, en este orden. Aplica a los 4 stacks (Karate, Playwright, K6, Appium). Las plantillas específicas de stack (`karate-report-template.md`, `playwright-report-template.md`, `k6-report-template.md`, `appium-report-template.md`) detallan el contenido por sección.
+El reporte ejecutivo se genera SIEMPRE con las 7 secciones siguientes, en este orden. Aplica a los 5 stacks (Karate, Playwright, K6, Appium, serenity-wdio). Las plantillas específicas de stack (`karate-report-template.md`, `playwright-report-template.md`, `k6-report-template.md`, `appium-report-template.md`, `serenity-wdio-report-template.md`) detallan el contenido por sección.
 
 ## 1. Resumen ejecutivo
 
@@ -41,6 +41,7 @@ Tabla agrupada según el stack:
 - Playwright: por HU (`@user-story:HUT-XXX`) y por página (ver `playwright-report-template.md`).
 - K6: por escenario (smoke / load / stress / spike / soak) y por endpoint (ver `k6-report-template.md`).
 - Appium: por feature y por device (ver `appium-report-template.md`).
+- serenity-wdio: por plataforma (`web`, `web_movil`, `movil` android/ios, `desktop`, `api`) y por feature (ver `serenity-wdio-report-template.md`).
 
 Columnas mínimas: nombre, total, pasados, fallidos, % éxito, duración, estado (verde/amarillo/rojo). Filas ordenadas por prioridad (CRITICAL primero) y luego por % de éxito ascendente.
 

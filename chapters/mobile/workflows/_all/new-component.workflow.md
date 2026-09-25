@@ -4,155 +4,155 @@ version: 1.2.0
 scope: chapter
 type: workflow
 chapter: mobile
-description: Workflow determinista para crear un nuevo componente del Design System desde   Figma. Usar cuando el usuario pide un com
+description: Deterministic workflow for creating a new Design System component from Figma. Use this when a user requests a new component with a Figma URL and HU. Do not use this to create a full screen or to refactor without a new design.
 ---
 
-# Workflow: Nuevo Componente desde Figma
+# Workflow: New Component from Figma
 
-## Prerrequisitos
+## Prerequisites
 
-- URL del componente en Figma con `node-id`.
-- Historia de Usuario (HU) con criterios de aceptación (texto inline o
-  referencia a archivo Markdown).
-- `.copilot/config/project.config.yaml` válido.
-- Si falta configuración confiable de rutas/topología, ejecutar primero
-  `@ds-orchestrator /bootstrap-workspace`.
-- Contexto resuelto por orquestador:
+- Figma component URL with `node-id`.
+- User Story (US) with acceptance criteria (inline text or
+  reference to a Markdown file).
+- Valid `.copilot/config/project.config.yaml`.
+- If reliable path/topology configuration is missing, run
+  `@ds-orchestrator /bootstrap-workspace` first.
+- Context resolved by orchestrator:
   - `PROJECT_ROOT`
   - `TARGET_ROOT`
   - `TOPOLOGY_REPO_MODE`
   - `PIPELINE_SPEC_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
   - `PIPELINE_LOG_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
 
-## Gate de Topología (obligatorio)
+## Topology Gate (mandatory)
 
-1. `TOPOLOGY_REPO_MODE` válido (`single_repo | monorepo_melos | multi_repo`).
-2. `PROJECT_ROOT` y `TARGET_ROOT` accesibles.
-3. Si `monorepo_melos`: `melos_enabled=true`, `melos_root/melos.yaml`,
-   `target_scope` y `target_package_path` existentes.
+1. Valid `TOPOLOGY_REPO_MODE` (`single_repo | monorepo_melos | multi_repo`).
+2. `PROJECT_ROOT` and `TARGET_ROOT` accessible.
+3. If `monorepo_melos`: `melos_enabled=true`, `melos_root/melos.yaml`,
+   `target_scope`, and `target_package_path` exist.
 
-Si falla cualquier validación, terminar con `blocked_input`.
+If any validation fails, end with `blocked_input`.
 
-## Gate de Ownership del Repo App (obligatorio)
+## App Repo Ownership Gate (mandatory)
 
-1. `project.config.yaml` debe ser el canónico del repo app:
+1. `project.config.yaml` must be the canonical one in the app repo:
    `{PROJECT_ROOT}/.copilot/config/project.config.yaml`.
-2. `PROJECT_ROOT` no puede ser una librería DS/shared/core.
-3. Señales mínimas de app:
-   - `single_repo | multi_repo`: existe `lib/main.dart` o `lib/main_*.dart`
-     o carpeta `android/` o `ios/`.
-   - `monorepo_melos`: existe `melos.yaml`, package target válido y package
-     objetivo no clasifica como DS/shared/core.
-4. Si falla, bloquear con:
+2. `PROJECT_ROOT` cannot be a DS/shared/core library.
+3. Minimum app signals:
+   - `single_repo | multi_repo`: `lib/main.dart` or `lib/main_*.dart` exists,
+     or an `android/` or `ios/` folder exists.
+   - `monorepo_melos`: `melos.yaml` exists, valid target package, and the
+     target package does not classify as DS/shared/core.
+4. If it fails, block with:
    - `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`
    - `CONFIG_PROJECT_ROOT_POINTS_TO_LIBRARY`
    - `CONFIG_APP_EXECUTABLE_SIGNAL_MISSING`
 
-## Inputs del Usuario
+## User Inputs
 
 ```text
 @ds-orchestrator /new-component
-URL Figma: https://www.figma.com/file/xxx/Component?node-id=123
-HU: [Referencia a la HU o texto de criterios de aceptación]
-HU_PATH: [Opcional, ruta Markdown; ej: docs/hus/HU-123.md]
+Figma URL: https://www.figma.com/file/xxx/Component?node-id=123
+US: [Reference to the US or acceptance criteria text]
+US_PATH: [Optional, Markdown path; e.g.: docs/us/US-123.md]
 ```
 
-## Secuencia de Ejecución
+## Execution Sequence
 
-### FASE 1 — Análisis de Diseño
+### PHASE 1 — Design Analysis
 
-**Agente**: `@figma-analyzer`
+**Agent**: `@figma-analyzer`
 **Prompt**: `figma-analysis.prompt.md`
 
-Output obligatorio: `§1` en `PIPELINE_SPEC_PATH` (incluye `§1.1b` textos
-literales, `§1.1c` constraints/overflow, `§1.3b` y `§1.3c` si existen
-anotaciones Development/vectores).
+Mandatory output: `§1` in `PIPELINE_SPEC_PATH` (includes `§1.1b` literal
+texts, `§1.1c` constraints/overflow, `§1.3b` and `§1.3c` if Development/
+vector annotations exist).
 
 ---
 
-### FASE 2 — Spec + Inventario + DAG
+### PHASE 2 — Spec + Inventory + DAG
 
-**Agente**: `@component-planner`
+**Agent**: `@component-planner`
 **Prompt**: `atomic-inventory.prompt.md`
 
-Output obligatorio: `§2` y `§3` en `PIPELINE_SPEC_PATH`.
+Mandatory output: `§2` and `§3` in `PIPELINE_SPEC_PATH`.
 
 ---
 
-### FASE 2.5 — Arquitectura Técnica
+### PHASE 2.5 — Technical Architecture
 
-**Agente**: `@component-architect`
+**Agent**: `@component-architect`
 
-Output obligatorio: `§4` en `PIPELINE_SPEC_PATH` con `§4.B` de textos
-literales/overflow.
-
----
-
-### CHECKPOINT HUMANO
-
-Condición: `pipeline.human_checkpoint: true`.
-
-Presentar al desarrollador:
-1. `§1` análisis.
-2. `§2-§3` inventario + DAG.
-3. `§4` plan técnico.
-
-Esperar aprobación explícita para continuar.
+Mandatory output: `§4` in `PIPELINE_SPEC_PATH` with `§4.B` for literal
+texts/overflow.
 
 ---
 
-### FASE 3 — Generación de Código DS
+### HUMAN CHECKPOINT
 
-**Agente**: `@widget-developer`
+Condition: `pipeline.human_checkpoint: true`.
+
+Present to the developer:
+1. `§1` analysis.
+2. `§2-§3` inventory + DAG.
+3. `§4` technical plan.
+
+Wait for explicit approval to continue.
+
+---
+
+### PHASE 3 — DS Code Generation
+
+**Agent**: `@widget-developer`
 **Prompts**: `codegen-atom.prompt.md`, `codegen-molecule.prompt.md`, `codegen-organism.prompt.md`
 
-Orden obligatorio: átomos → moléculas → organismos.
+Mandatory order: atoms → molecules → organisms.
 
-Output: archivos `.dart` en el scope de `TARGET_ROOT`.
-
----
-
-### FASE 3.5 — Auditoría de Calidad
-
-**Agente**: `@code-auditor`
-
-Loop con `@widget-developer` hasta `pipeline.max_audit_retries`.
-
-Output obligatorio: `§5` en `PIPELINE_SPEC_PATH`.
+Output: `.dart` files within the `TARGET_ROOT` scope.
 
 ---
 
-### FASE 4a — Widget Tests DS
+### PHASE 3.5 — Quality Audit
 
-**Agente**: `@test-engineer`
+**Agent**: `@code-auditor`
+
+Loop with `@widget-developer` up to `pipeline.max_audit_retries`.
+
+Mandatory output: `§5` in `PIPELINE_SPEC_PATH`.
+
+---
+
+### PHASE 4a — DS Widget Tests
+
+**Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
 
 ---
 
-### FASE 4b — Golden Tests DS
+### PHASE 4b — DS Golden Tests
 
-**Agente**: `@golden-test-engineer`
+**Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
 
 ---
 
-### FASE 4c — Widgetbook DS
+### PHASE 4c — DS Widgetbook
 
-**Agente**: `@widgetbook-developer`
+**Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGETBOOK`)
 
 ---
 
-### FASE 5 — Entrega
+### PHASE 5 — Delivery
 
-**Agente**: `@delivery-manager`
+**Agent**: `@delivery-manager`
 **Prompt**: `delivery-review.prompt.md`
 
-Output obligatorio: `§7` en `PIPELINE_SPEC_PATH`.
+Mandatory output: `§7` in `PIPELINE_SPEC_PATH`.
 
-## Reglas
+## Rules
 
-- No generar artefactos fuera de `TARGET_ROOT`.
-- No saltar fases obligatorias.
-- Registrar cada fase en `PIPELINE_LOG_PATH`.
-- Si una fase no aplica, usar `skipped` con razón explícita.
+- Do not generate artifacts outside `TARGET_ROOT`.
+- Do not skip mandatory phases.
+- Log every phase in `PIPELINE_LOG_PATH`.
+- If a phase does not apply, use `skipped` with an explicit reason.

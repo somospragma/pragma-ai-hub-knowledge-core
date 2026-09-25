@@ -28,6 +28,7 @@ La regla: **cada step tiene sus propias aserciones, sus propias métricas y su p
 | Playwright | `test.beforeEach` para setup; `test.afterEach` para cleanup; assertions main en el cuerpo del test; tags `@auth-step`, `@main-step` para filtrar métricas. |
 | K6 | `tags: { step: 'auth' \| 'main' \| 'cleanup' }` en cada check; thresholds aislados por tag (`http_req_failed{step:main}: ['rate<0.01']`). |
 | Appium | Tasks separadas para setup vs main; Questions de dominio (las que codifican el contrato) se evalúan SOLO en el step main; setup usa Questions estructurales. |
+| serenity-wdio | `Before`/`After` hooks de Cucumber para setup y cleanup; Tasks de negocio encapsulan el step main; `setDefaultTimeout` declarado por archivo de step-definitions; cada step-definition de canal (`web`, `mobile`, `api`) aislado en su propio directorio para evitar contaminación cross-canal. |
 
 ## Anti-pattern
 
@@ -89,6 +90,7 @@ Después del cambio, la verificación no es "el escenario que fallaba ahora pasa
 - [[calidad-playwright-greenfield]] (consultar `references/step-isolation-playwright.md` en su subfolder)
 - [[calidad-k6-greenfield]] (consultar `references/tag-policy-and-metrics-isolation.md` en su subfolder) (K6 ya cubierto)
 - [[calidad-appium-screenplay-android]] (consultar `references/step-isolation-appium.md` en su subfolder)
+- [[serenity-wdio-greenfield]] (consultar `references/step-isolation-serenity-wdio.md` en su subfolder)
 
 ## Cross-links generales
 

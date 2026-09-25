@@ -1,0 +1,143 @@
+{
+  "skill_name": "flutter-mason-clean-feature",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to scaffold a new 'profile' feature in my Flutter monorepo that follows Clean Architecture, depends on the commons package and the l10n shared library, and is used by mobile_app. How do I generate it with the flutter_clean_feature brick?",
+      "expected_output": "Creates a JSON config for the feature with name 'profile', a prefix, packages: ['commons'], shareds: ['l10n'], isFromCleanProject: true, and apps: ['mobile_app'], then runs `mason make flutter_clean_feature -o ./features -c ./profile.json`. Explains the brick is configuration-driven and scaffolds the Domain/Data/Presentation structure. Notes mason must be activated (dart pub global activate mason_cli) if the command is missing.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response defines a JSON config with name, prefix, packages, shareds, isFromCleanProject and apps, then runs `mason make flutter_clean_feature` with -o and -c",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response sets isFromCleanProject to true for a Clean Architecture project",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains mason make flutter_clean_feature",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "What does the flutter_clean_feature brick actually generate? Walk me through the folder structure and where each Clean Architecture layer lives.",
+      "expected_output": "Describes the generated feature package under lib/src with three layers: domain (entities, abstract repositories, usecases), data (datasources local/remote, models, mappers, repositories implementations), and presentation (blocs/cubits, pages, widgets), plus routes/ and di/ folders, a public API export (lib/{name}.dart), a test/ folder mirroring lib/src, pubspec.yaml and analysis_options.yaml. Explains the dependency direction Domain ← Data ← Presentation.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response describes the three layers (domain, data, presentation) with their sub-folders under lib/src",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response mentions the public API export (lib/{name}.dart), routes/ and di/ folders, and the mirrored test/ structure",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response explains the Clean Architecture dependency direction (Domain <- Data <- Presentation)",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I generated a 'profile' feature with the brick. How do I add it to my mobile_app host and wire up its routes with go_router?",
+      "expected_output": "Registers the feature in the host app's pubspec.yaml as a local path dependency (path: ../features/profile), runs melos bootstrap (or flutter pub get), then imports the feature and spreads its exported route list into the app's GoRouter routes (e.g. ...ProfileRoutes.routes). Explains the feature exposes a ProfileRoutes class with a static list of routes.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response adds the feature to the host pubspec.yaml as a local path dependency and runs melos bootstrap or flutter pub get",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response spreads the feature's exported route list (e.g. ProfileRoutes.routes) into the app's GoRouter configuration",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains path: ../features/profile",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "How do I register the generated feature's dependency injection in my app? It uses GetIt + Injectable with a scoped module.",
+      "expected_output": "Registers the feature's package module in the app's service locator using @InjectableInit with externalPackageModulesBefore (ExternalModule(ProfilePackageModule, scope: 'profile')), initializes the GetIt instance ($initGetIt) and the feature scope (initProfileScope), and stresses that build_runner must be run to generate code from @module/@lazySingleton annotations. Also shows providing the feature's BLoC/Cubit with getIt-resolved use cases.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response registers the feature module via @InjectableInit / ExternalModule with a scope and initializes the feature scope in the service locator",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response emphasizes running build_runner to generate DI code from annotations",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains build_runner",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "In the brick config, what's the difference between 'packages' and 'shareds', and how are they resolved in the generated pubspec.yaml?",
+      "expected_output": "Explains that in a monorepo both packages and shareds are local path dependencies (not pub.dev packages): packages resolve to ../../packages/{name} and shareds resolve to ../../shared/{name}. Gives examples and notes that if the monorepo structure differs (or uses pub.dev packages), the paths in the generated pubspec.yaml must be adjusted manually.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response clarifies both packages and shareds are local path dependencies in a monorepo, not pub.dev packages",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response gives the resolved paths ../../packages/{name} for packages and ../../shared/{name} for shareds, and notes paths may need manual adjustment",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains ../../packages/",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "My team wants to know when we should create a new feature with this brick versus putting the code somewhere else. What's the guidance, and how should we name features?",
+      "expected_output": "Advises creating a feature when the functionality is distinct and cohesive, has no high-risk coupling to other features, and can be tested independently; and NOT creating one for minor UI components (use widgets), shared utilities (use the commons package), or rules that belong to another feature. For naming, recommends lowercase snake_case, descriptive-but-concise names that reflect the business domain (e.g. checkout, profile) rather than implementation details.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response gives criteria for when to create a feature (distinct/cohesive, independently testable) and when NOT to (minor UI, shared utilities → commons)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends lowercase snake_case names that reflect the business domain rather than implementation",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains snake_case",
+          "type": "contains"
+        }
+      ]
+    }
+  ]
+}

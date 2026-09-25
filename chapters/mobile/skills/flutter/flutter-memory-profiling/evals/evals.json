@@ -1,0 +1,143 @@
+{
+  "skill_name": "flutter-memory-profiling",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My Flutter app's memory keeps growing every time I navigate to a details screen and back, and eventually it crashes with OOM. How do I diagnose exactly what's leaking?",
+      "expected_output": "Walks through the DevTools Memory tab workflow in profile mode (not debug): establish a baseline (reach stable state → GC → take heap snapshot), reproduce the leak by navigating in and out several times to amplify it, then GC and take a second snapshot and use Diff mode sorted by delta to find growing objects. Finally inspect the retaining path of the suspicious class to find the root reference keeping it alive.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response insists on profiling in profile mode, not debug mode",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response describes taking a baseline heap snapshot, reproducing the leak, then diffing snapshots sorted by delta to find growing objects",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains retaining path",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Configure leak_tracker so my widget tests automatically fail when a disposable object (controller, subscription, BLoC) is not disposed or not GC'd.",
+      "expected_output": "Adds leak_tracker and leak_tracker_flutter_testing as dev_dependencies and enables leak tracking in the test setup so widget tests fail when a disposable object is not disposed or is disposed but still retained (not GC'd). Shows pumping the widget, then removing it to trigger dispose, and letting leak_tracker report leaks. Mentions leak_tracker is the official Dart package for this.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses leak_tracker / leak_tracker_flutter_testing as dev_dependencies and configures leak tracking for widget tests",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explains that a leak is reported when an object is not disposed OR was disposed but not GC'd (still retained)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains leak_tracker",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Show me the correct disposal pattern for a StatefulWidget that uses an AnimationController, a TextEditingController, a FocusNode, a ScrollController, a StreamSubscription and a Timer.",
+      "expected_output": "Provides a StatefulWidget that creates the controllers in initState (AnimationController with a TickerProvider mixin) and disposes every one of them in dispose(): controllers via dispose(), the StreamSubscription via cancel(), and the Timer via cancel(), calling super.dispose() last. Explains each resource must be released to avoid leaks (tickers, buffers, listeners still active).",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response disposes AnimationController, TextEditingController, FocusNode and ScrollController in dispose() and calls super.dispose() last",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response cancels the StreamSubscription and the Timer in dispose()",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains dispose()",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "My BLoC subscribes to a repository stream to watch products. How do I make sure that subscription doesn't leak?",
+      "expected_output": "Stores the StreamSubscription in the BLoC, cancels any previous subscription before creating a new one, and overrides close() to cancel the subscription before calling super.close(). Emphasizes that BLoC subscriptions must be cancelled in close() (not dispose), and that BlocProvider closes the BLoC when removed from the tree.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response cancels the StreamSubscription in the BLoC's close() override before calling super.close()",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response cancels any previous subscription before creating a new one to avoid duplicate/leaked listeners",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains close()",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "I have an image gallery screen and memory spikes badly when scrolling through lots of network images. How do I keep the image cache under control?",
+      "expected_output": "Recommends bounding the image cache via PaintingBinding.instance.imageCache.maximumSizeBytes and maximumSize, decoding images at display size using cacheWidth/cacheHeight (scaled by devicePixelRatio) to reduce heap usage, and evicting images from the cache when they are no longer needed. Frames these as fixes for unbounded image-cache growth on image-heavy screens.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response bounds the image cache using imageCache.maximumSizeBytes and/or maximumSize",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response decodes images at display size using cacheWidth/cacheHeight to reduce heap memory",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains cacheWidth",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Is it ever OK to store a BuildContext in a service or a BLoC so I can navigate from anywhere? I keep getting stale-context problems.",
+      "expected_output": "Says no — storing BuildContext in long-lived objects (services, BLoCs, singletons) causes stale references, leaks and crashes because the context outlives the widget. Recommends passing data instead of context and using an injected navigation service for navigation, and guarding with a mounted check before using context after an async gap in widgets.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response advises never storing BuildContext in long-lived objects (services, BLoCs, singletons) because it outlives the widget and leaks",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response recommends an injected navigation service (pass data, not context) and a mounted guard before using context after an async gap",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains mounted",
+          "type": "contains"
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 id: flutter-offline-first-pattern
-version: 1.1.0
+version: 1.1.1
 scope: stack
 type: skill
 chapter: mobile
@@ -19,12 +19,12 @@ See `references/implementation_guide.md` for complete patterns and code examples
 
 | Database | Type | Best for | Notes |
 |---|---|---|---|
-| **Drift** 2.23.x | Relational (SQLite) | Complex queries, joins, migrations | Reactive streams, built-in isolate support, type-safe SQL |
+| **Drift** 2.34.x | Relational (SQLite) | Complex queries, joins, migrations | Reactive streams, built-in isolate support, type-safe SQL |
 | **ObjectBox** 5.x | NoSQL (object store) | High-throughput, object graphs | Optional built-in Sync server, fastest writes |
-| **Isar** 3.x | NoSQL (document) | Simple models, full-text search | Hive successor, pure Dart, no native code |
+| **Isar** 3.x | NoSQL (document) | Simple models, full-text search | Native Rust core via FFI. ⚠️ Original package largely unmaintained — check community forks |
 | **sqflite** 2.x | Relational (SQLite) | Simple SQL, no codegen | Low-level, no reactive streams |
-| **Hive** 4.x | Key-value | Simple preferences, small data | ⚠️ Maintenance mode — use Isar for new projects |
-| **PowerSync** | SQLite + managed sync | Supabase/Postgres/MongoDB sync | Managed sync engine, handles conflicts automatically |
+| **Hive** 4.x | Key-value | Simple preferences, small data | ⚠️ Maintenance mode — avoid for new projects |
+| **PowerSync** 2.x | SQLite + managed sync | Supabase/Postgres/MongoDB sync | Managed sync engine, handles conflicts automatically |
 
 ### Decision guide
 
@@ -127,8 +127,8 @@ dependencies:
   drift: ^2.23.0              # relational — recommended default
   drift_flutter: ^0.2.0       # Flutter-specific drift integration
   # objectbox: ^5.3.0         # NoSQL alternative
-  # isar: ^3.1.0              # NoSQL, Hive successor
-  # powersync: ^1.x.x         # managed sync (Supabase/Postgres)
+  # isar: ^3.1.0              # NoSQL (native Rust core; check community forks)
+  # powersync: ^2.3.1         # managed sync (Supabase/Postgres)
 
   connectivity_plus: ^6.1.0
   fpdart: ^1.2.0

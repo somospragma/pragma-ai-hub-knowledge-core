@@ -29,7 +29,7 @@ Es especialmente crítico en clientes regulados de LATAM y Estados Unidos:
 
 Estos marcos prohíben usar datos productivos en ambientes de prueba sin anonimización. Este skill define la estrategia para evitar esa exposición y al mismo tiempo garantizar **reproducibilidad** (mismo seed → mismo dataset → mismos resultados).
 
-Activa este skill en paralelo con `[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]` o `[[calidad-appium-screenplay-android]]`. Coordina con `[[calidad-mandatory-inputs-protocol]]` para obtener catálogo de datasets disponibles del cliente.
+Activa este skill en paralelo con `[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]`, `[[calidad-appium-screenplay-android]]` o `[[serenity-wdio-greenfield]]`. Coordina con `[[calidad-mandatory-inputs-protocol]]` para obtener catálogo de datasets disponibles del cliente.
 
 ## Instrucción
 

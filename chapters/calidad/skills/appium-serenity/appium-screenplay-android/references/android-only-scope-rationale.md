@@ -110,9 +110,9 @@ Pasos concretos para iniciar manualmente un proyecto Appium iOS Screenplay aline
 
 El proyecto resultante respeta las mismas restricciones del chapter (no redefinir `aggregate`/`reports`/`clean`, package `co.com.pragma.*`, no usar `OnlineCast` —dispara ChromeDriver—, etc.).
 
-## Alternativa: el stack Appium sobre TypeScript
+## Alternativas: los stacks TypeScript del chapter
 
-Antes de asumir scaffold manual para iOS, evalúa si el ecosistema del equipo admite el otro stack Appium del chapter: `[[calidad-appium-wdio-greenfield]]` genera iOS de forma nativa —simulador y dispositivo físico— sobre TypeScript, WebdriverIO y cucumber-js, sin las limitaciones del scaffolder JVM.
+Antes de asumir scaffold manual para iOS, evalúa si el ecosistema del equipo admite otro stack del chapter: `[[calidad-appium-wdio-greenfield]]` genera iOS de forma nativa —simulador y dispositivo físico— sobre TypeScript, WebdriverIO y cucumber-js, sin las limitaciones del scaffolder JVM. Si además el equipo necesita cubrir web, web_movil, desktop o api con el mismo vocabulario Gherkin, `serenity-wdio` (TypeScript + WebdriverIO v9 + Serenity/JS + Cucumber 11) también genera iOS nativo dentro de un arquetipo multiplataforma único — ver `[[serenity-wdio-greenfield]]`.
 
 La decisión no es del agente: la determina el ecosistema del equipo (un equipo Java no adopta TypeScript por conveniencia del generador) y, en brownfield, el proyecto que ya existe. Ver la tabla de desambiguación en `[[calidad-intent-detection]]`.
 

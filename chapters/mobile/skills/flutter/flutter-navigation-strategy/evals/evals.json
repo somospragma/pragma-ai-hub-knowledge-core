@@ -1,0 +1,143 @@
+{
+  "skill_name": "flutter-navigation-strategy",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm setting up navigation in a Flutter app with go_router. The app has a login screen and a home screen. If the user is not authenticated, any route should redirect to /login; if the user is authenticated and tries to open /login, redirect to /home. When the user logs out, the router must re-evaluate the guards automatically. Show me how to wire this up.",
+      "expected_output": "GoRouter configured with a top-level redirect callback and a refreshListenable. An AuthNotifier extends ChangeNotifier and calls notifyListeners() on auth changes (login/logout) so go_router re-evaluates redirects. The redirect checks isAuthenticated against the auth routes (/login, /register) and returns the target location or null. No route-guard objects and no synchronous storage reads inside redirect.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses a top-level GoRouter redirect callback combined with refreshListenable instead of guard objects",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response defines a Listenable (e.g. ChangeNotifier) that calls notifyListeners() on login/logout so redirects are re-evaluated",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains refreshListenable",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "My Flutter app has a bottom navigation bar with 4 tabs (Home, Products, Cart, Profile) and each tab must keep its own navigation stack and scroll position when switching between tabs. Tapping the already-active tab should reset that tab to its root. How do I implement this with go_router?",
+      "expected_output": "Uses StatefulShellRoute.indexedStack with one StatefulShellBranch per tab, each branch containing its own GoRoute(s). A shell widget receives the StatefulNavigationShell and renders a NavigationBar bound to navigationShell.currentIndex, calling navigationShell.goBranch(index, initialLocation: index == navigationShell.currentIndex) so tapping the active tab resets it to the root. The shell uses NoTransitionPage in its pageBuilder.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses StatefulShellRoute.indexedStack with a StatefulShellBranch per tab to preserve per-tab state",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response calls navigationShell.goBranch and resets to the initial location when the active tab is tapped (initialLocation: index == navigationShell.currentIndex)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains goBranch",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I have a modular Flutter project. The 'products' feature module needs to navigate to the 'checkout' module's screen after the user taps a button, but I don't want the products module to import go_router or know about the checkout module's routes. What's the recommended pattern?",
+      "expected_output": "Applies the Mediator pattern: an abstract interface class AppNavigator lives in a shared core/navigation layer with intent-based methods (e.g. goCheckout, goProductDetail). AppNavigatorImpl in the app layer implements it using GoRouter and is registered via DI (@LazySingleton(as: AppNavigator)). Feature modules depend only on the AppNavigator interface and never import go_router, AppRouter, or other modules' pages.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response introduces an abstract navigation interface (Mediator/AppNavigator) in a shared/core layer that feature modules depend on",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response keeps go_router usage confined to a single implementation registered via dependency injection, so feature modules never import go_router",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response contains AppNavigator",
+          "type": "contains"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "I want type-safe navigation in my Flutter app so I stop hardcoding route path strings like '/products/123'. I have a product detail screen that takes a productId and an optional fromSearch flag. How do I set this up with go_router?",
+      "expected_output": "Uses go_router_builder with @TypedGoRoute<T> annotations on GoRouteData subclasses (with the generated mixin), typed constructor parameters (productId, fromSearch), and a build() override. Navigation is done via const ProductDetailRoute(productId: 'abc', fromSearch: true).go(context) / .push(context) / .location. Mentions running build_runner to generate the .g.dart file.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses go_router_builder with @TypedGoRoute and a GoRouteData subclass exposing typed parameters",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response shows type-safe navigation via the generated route (e.g. .go(context) / .push(context)) instead of raw path strings",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response mentions running build_runner to generate the code",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "In my Flutter app I have an edit form screen. When the user presses back (or the system back gesture) and there are unsaved changes, I need to show a confirmation dialog before leaving. WillPopScope was removed. What's the correct way to do this with go_router / Flutter 3.22+?",
+      "expected_output": "Explains WillPopScope was removed in Flutter 3.22 and replaced by PopScope with canPop and onPopInvokedWithResult. Recommends GoRoute.onExit(context, state) for route-level exit confirmation returning true/false to allow or block navigation, checking the bloc/state for unsaved changes and showing the dialog. Uses context.mounted before navigating after an await.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response uses PopScope (canPop + onPopInvokedWithResult) and/or GoRoute.onExit instead of the removed WillPopScope",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response blocks navigation when there are unsaved changes until the user confirms via a dialog",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response does not recommend WillPopScope",
+          "type": "llm_judge"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "In go_router, when should I use context.go versus context.push, and how do I pass a full object to the next screen? I tried passing it with extra but it broke when I opened the same route from a deep link.",
+      "expected_output": "Explains context.go replaces the whole stack (good for deep-linkable destinations) while context.push adds a page on top of the stack. Clarifies that extra is in-memory only and is NOT serialized into the URL, so it does not survive URL-based/deep-link navigation. Recommends passing identifiers via path/query parameters for deep-linkable routes and reserving extra for in-app-only pushes.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "a1",
+          "text": "Response correctly distinguishes context.go (replaces the stack) from context.push (adds to the stack)",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a2",
+          "text": "Response explains that extra is in-memory only and not serialized to the URL, so it does not work for deep links",
+          "type": "llm_judge"
+        },
+        {
+          "id": "a3",
+          "text": "Response recommends passing path or query parameters for deep-linkable routes instead of relying on extra",
+          "type": "llm_judge"
+        }
+      ]
+    }
+  ]
+}

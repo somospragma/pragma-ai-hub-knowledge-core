@@ -1,6 +1,11 @@
 .DS_STORE
 .DS_Store
 
+# Scripts añadidos (no versionados)
+scripts/validate-assets-guide.md
+scripts/validate-assets.mjs
+scripts/validate-stack-skills.mjs
+
 # Conocimiento de cuenta: su sistema de registro es Mimir, no este repo
 accounts/
 

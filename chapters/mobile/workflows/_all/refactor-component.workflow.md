@@ -4,107 +4,107 @@ version: 1.2.0
 scope: chapter
 type: workflow
 chapter: mobile
-description: Workflow determinista para refactorizar un componente DS existente. Usar   cuando el usuario pide cambios sobre implemen
+description: Deterministic workflow for refactoring an existing DS component. Use this when the user requests changes to an implementation that has already been deployed.
 ---
 
-# Workflow: Refactorizar Componente
+# Workflow: Refactor Component
 
-## Prerrequisitos
+## Prerequisites
 
-- Path del componente a refactorizar.
-- Descripción del refactor (qué cambiar y por qué).
-- `.copilot/config/project.config.yaml` válido.
-- Contexto resuelto por orquestador:
+- Path of the component to refactor.
+- Refactor description (what to change and why).
+- Valid `.copilot/config/project.config.yaml`.
+- Context resolved by orchestrator:
   - `PROJECT_ROOT`
   - `TARGET_ROOT`
   - `TOPOLOGY_REPO_MODE`
   - `PIPELINE_SPEC_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
   - `PIPELINE_LOG_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
 
-## Gate de Topología
+## Topology Gate
 
-1. Validar `TOPOLOGY_REPO_MODE`.
-2. Validar `PROJECT_ROOT` y `TARGET_ROOT`.
-3. En `monorepo_melos`, validar `melos.yaml`, scope y package target.
+1. Validate `TOPOLOGY_REPO_MODE`.
+2. Validate `PROJECT_ROOT` and `TARGET_ROOT`.
+3. In `monorepo_melos`, validate `melos.yaml`, scope, and target package.
 
-Si falla, terminar con `blocked_input`.
+If it fails, end with `blocked_input`.
 
-## Inputs del Usuario
+## User Inputs
 
 ```text
 @ds-orchestrator /refactor-component lib/src/organisms/cards/product_card.dart
-Descripción: Extraer el header en una molécula separada y agregar soporte para variante "compact".
+Description: Extract the header into a separate molecule and add support for a "compact" variant.
 ```
 
-## Secuencia de Ejecución
+## Execution Sequence
 
-### FASE 1 — Análisis del Componente Actual
+### PHASE 1 — Current Component Analysis
 
-**Agente**: `@component-planner`
+**Agent**: `@component-planner`
 
-Output obligatorio: `§2` y `§3` en `PIPELINE_SPEC_PATH`.
-
----
-
-### FASE 2 — Plan Técnico de Refactor
-
-**Agente**: `@component-architect`
-
-Output obligatorio: `§4` en `PIPELINE_SPEC_PATH`.
+Mandatory output: `§2` and `§3` in `PIPELINE_SPEC_PATH`.
 
 ---
 
-### CHECKPOINT HUMANO (si habilitado)
+### PHASE 2 — Technical Refactor Plan
 
-Presentar:
-1. análisis de impacto
-2. plan de cambios
-3. breaking changes (si los hay)
+**Agent**: `@component-architect`
 
----
-
-### FASE 3 — Aplicar Cambios
-
-**Agente**: `@widget-developer`
-
-Reglas:
-- Mantener compatibilidad hacia atrás cuando sea viable.
-- Si hay APIs en transición, usar `@Deprecated`.
-- Restringir cambios al scope de `TARGET_ROOT`.
+Mandatory output: `§4` in `PIPELINE_SPEC_PATH`.
 
 ---
 
-### FASE 3.5 — Auditoría
+### HUMAN CHECKPOINT (if enabled)
 
-**Agente**: `@code-auditor`
-
-Output obligatorio: `§5` en `PIPELINE_SPEC_PATH`.
+Present:
+1. impact analysis
+2. change plan
+3. breaking changes (if any)
 
 ---
 
-### FASE 4a — Actualizar Widget Tests
+### PHASE 3 — Apply Changes
 
-**Agente**: `@test-engineer`
+**Agent**: `@widget-developer`
+
+Rules:
+- Maintain backward compatibility when feasible.
+- If APIs are in transition, use `@Deprecated`.
+- Restrict changes to the `TARGET_ROOT` scope.
+
+---
+
+### PHASE 3.5 — Audit
+
+**Agent**: `@code-auditor`
+
+Mandatory output: `§5` in `PIPELINE_SPEC_PATH`.
+
+---
+
+### PHASE 4a — Update Widget Tests
+
+**Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
 
 ---
 
-### FASE 4b — Actualizar Golden Tests (si impacto visual)
+### PHASE 4b — Update Golden Tests (if visual impact)
 
-**Agente**: `@golden-test-engineer`
+**Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
 
 ---
 
-### FASE 5 — Entrega
+### PHASE 5 — Delivery
 
-**Agente**: `@delivery-manager`
+**Agent**: `@delivery-manager`
 
-Output obligatorio: `§7` en `PIPELINE_SPEC_PATH`.
+Mandatory output: `§7` in `PIPELINE_SPEC_PATH`.
 
-## Verificación (topology-aware)
+## Verification (topology-aware)
 
-- `single_repo` o `multi_repo`:
+- `single_repo` or `multi_repo`:
   - `flutter analyze`
   - `flutter test`
   - `flutter test --tags golden`

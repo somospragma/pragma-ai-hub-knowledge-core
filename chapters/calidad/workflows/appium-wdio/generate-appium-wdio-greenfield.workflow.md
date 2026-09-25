@@ -13,7 +13,7 @@ tags: [appium, webdriverio, typescript, cucumber, greenfield, mobile]
 
 ## Cuándo usar este workflow
 
-Cuando el router `[[calidad-route-test-generation]]` resolvió intent mobile sobre stack Node/TypeScript en modo greenfield. Para el stack Appium sobre JVM, usar `[[calidad-generate-appium-screenplay-android]]`.
+Cuando el router `[[calidad-route-test-generation]]` resolvió intent mobile-only sobre stack Node/TypeScript en modo greenfield. Para el stack Appium sobre JVM, usar `[[calidad-generate-appium-screenplay-android]]`. Si el intent requiere además cubrir web, web_movil, desktop o api con el mismo vocabulario Gherkin (no solo mobile), usar `[[serenity-wdio-greenfield]]` en su lugar — comparten runtime Node/WebdriverIO pero son arquetipos distintos.
 
 ## Pasos
 

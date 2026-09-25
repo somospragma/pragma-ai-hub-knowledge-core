@@ -56,8 +56,8 @@ grep -B2 'android:exported="true"' android/app/src/main/AndroidManifest.xml
 ## M2 — Inadequate Supply Chain Security
 
 ```bash
-# Known vulnerabilities
-dart pub audit
+# Known vulnerabilities (OSV database — no built-in dart audit command)
+osv-scanner --lockfile=pubspec.lock
 
 # Outdated packages
 dart pub outdated

@@ -12,11 +12,12 @@ Cada stack ya tiene un punto canónico de configuración; el mock se integra ah�
 | Karate | `karate-config.js` con env `mock` (junto a `dev`/`qa`) que fija `baseUrl: 'http://localhost:3010/api'` | `mvn test -Dkarate.env=mock` | `mvn test -Dkarate.env=qa` |
 | K6 | `config.js` lee `__ENV.BASE_URL` | `k6 run -e BASE_URL=http://localhost:3010/api tests/smoke-test.js` | `k6 run -e BASE_URL=https://api.qa.cliente.com tests/...` |
 | Playwright (backend-level) | `BACKEND_URL` en `playwright.config.ts` / Page Objects | `BACKEND_URL=http://localhost:3010` | `BACKEND_URL=https://api.qa.cliente.com` |
-| Appium | Base URL del backend en config del proyecto de tests (o build variant del APK acordado con dev) | APK apuntando al mock (si soporta override) | APK contra ambiente real |
+| Appium (Serenity o WebdriverIO) | Base URL del backend en config del proyecto de tests (o build variant del APK acordado con dev) | APK apuntando al mock (si soporta override) | APK contra ambiente real |
+| serenity-wdio | Variable de entorno por modo (`.env.<modo>`) cargada por `scripts/run.mjs` / config WDIO | `BASE_URL=http://localhost:3010` en el `.env.<modo>` correspondiente | `BASE_URL=https://api.qa.cliente.com` en el `.env.<modo>` correspondiente |
 
 Reglas:
 
-- Los tests referencian rutas relativas y la config resuelve el host (los 4 stacks ya lo exigen; el mock no introduce excepciones).
+- Los tests referencian rutas relativas y la config resuelve el host (los stacks ya lo exigen; el mock no introduce excepciones).
 - Auth: contra mock, el token puede ser dummy (`AUTH_TOKEN=mock-token`) porque Mockoon no lo valida, pero el test DEBE enviarlo igual que contra el real — así el switchover no cambia el shape del request.
 - El data file del mock y la config del ambiente `mock` se entregan versionados: cualquier miembro del equipo reproduce la corrida de construcción con un comando.
 

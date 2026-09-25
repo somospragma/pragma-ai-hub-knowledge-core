@@ -16,7 +16,7 @@ Aplica cada vez que se entregue una suite de pruebas para una aplicación web, m
 
 En clientes del scope del Chapter (LATAM + Estados Unidos) con requisitos de compliance (PCI-DSS 4.0, OWASP API Top 10 2023, ISO 27001, SOC 2; HIPAA / SOX / CCPA/CPRA / FedRAMP en Estados Unidos; Ley 1581 Colombia, LGPD Brasil, LFPDPPP México, Ley 19.628/21.719 Chile, Ley 25.326 Argentina, Ley 29.733 Perú, y equivalentes locales LATAM) la cobertura mínima de seguridad alineada con OWASP API Security Top 10 2023 es **obligatoria**: ninguna suite funcional/regresión se entrega sin ella.
 
-Activa este skill en paralelo con la generación funcional (`[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]`) y aplica la perspectiva de chapter `[[calidad-chapter-perspective]]` para decidir el alcance.
+Activa este skill en paralelo con la generación funcional (`[[calidad-karate-greenfield]]`, `[[calidad-karate-brownfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]`, `[[serenity-wdio-greenfield]]`, `[[serenity-wdio-brownfield]]`) y aplica la perspectiva de chapter `[[calidad-chapter-perspective]]` para decidir el alcance.
 
 ## Instrucción
 
@@ -36,7 +36,7 @@ Activa este skill en paralelo con la generación funcional (`[[calidad-karate-gr
 - **NUNCA** commitear tokens, claves privadas, certificados o credenciales reales en el repositorio. Usa los mecanismos descritos en `references/secrets-management.md` (SOPS, Vault, AWS Secrets Manager, GitHub OIDC).
 - **NUNCA** entregar una suite de seguridad sin gating real en pipeline (DAST + SCA mínimo). Reportes sin gates no detienen regresiones.
 - Encadena con `[[calidad-test-evidence-and-traceability]]` para que los reportes ZAP/Snyk/Schemathesis queden archivados con el resto de la evidencia.
-- Para clientes con cifrado de payloads, respeta [[calidad-karate-greenfield]] (consultar `references/encrypted-payloads.md` en su subfolder) y las convenciones de headers transversales del cliente detectadas en `[[calidad-karate-brownfield]]` (reference `client-specific-conventions.md`) además de este skill.
+- Para clientes con cifrado de payloads, respeta [[calidad-karate-greenfield]] (consultar `references/encrypted-payloads.md` en su subfolder) y las convenciones de headers transversales del cliente detectadas en `[[calidad-karate-brownfield]]` (reference `client-specific-conventions.md`) y en `[[serenity-wdio-brownfield]]` (reference `convention-detection.md`) además de este skill.
 - Sigue `[[calidad-mandatory-inputs-protocol]]` para obtener autorizaciones y `[[calidad-intent-detection]]` para decidir si la conversación es de tipo "security review" o suite funcional con cobertura de seguridad.
 
 ## Cross-links

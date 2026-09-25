@@ -22,6 +22,7 @@ Organizar tests por carpetas (una por HU/escenario/recurso) **cuando hay ≥3 HU
 | Playwright | `tests/{HU}/{flow}.spec.ts` | `tests/{flow}.spec.ts` (flat) |
 | K6 | `tests/{scenario}/main.js` (ya canónico en K3 por escenario de performance) | mismo (K6 siempre usa carpetas porque cada escenario es distinto) |
 | Appium | `features/{capability}/{HU}.feature` | `features/{HU}.feature` (flat) |
+| serenity-wdio | `features/{canal}/Features/{HU}.feature` (ej. `features/web/Features/HU-101/registro.feature`) | `features/{canal}/Features/{HU}.feature` (flat dentro del canal) |
 
 ## Reglas
 
@@ -49,4 +50,4 @@ Cuando una HU adicional llevaría el conteo a 3, refactorizar:
 
 ## Cross-links
 
-`[results-structure-universal](./results-structure-universal.md)`, `[[calidad-karate-greenfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]`, `[[calidad-appium-screenplay-android]]`.
+`[results-structure-universal](./results-structure-universal.md)`, `[[calidad-karate-greenfield]]`, `[[calidad-playwright-greenfield]]`, `[[calidad-k6-greenfield]]`, `[[calidad-appium-screenplay-android]]`, `[[serenity-wdio-greenfield]]`, `[[serenity-wdio-brownfield]]`.

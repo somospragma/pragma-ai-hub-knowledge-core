@@ -15,7 +15,7 @@ tags: [appium, webdriverio, wdio, typescript, cucumber, mobile, android, ios, ip
 
 Cuando se solicita un proyecto **nuevo** de automatización mobile sobre stack Node/TypeScript: Appium como servidor, WebdriverIO como cliente del protocolo y cucumber-js como runner. Es el stack idiomático cuando el equipo ya vive en TypeScript, cuando la misma suite debe cubrir app nativa y navegador móvil, o cuando hay que soportar más de dos plataformas (teléfono, tablet, iPad, web móvil) sin multiplicar proyectos.
 
-Para el stack Appium sobre JVM —Java, Screenplay, Serenity, Gradle— usar `[[calidad-appium-screenplay-android]]`. Son dos stacks distintos con el mismo servidor Appium debajo: no se mezclan en un mismo proyecto y la elección la determina el ecosistema del equipo, no la preferencia del agente. La desambiguación está en `[[calidad-intent-detection]]`.
+Para el stack Appium sobre JVM —Java, Screenplay, Serenity, Gradle— usar `[[calidad-appium-screenplay-android]]`. Ambos comparten el mismo servidor Appium debajo (el canal mobile de `serenity-wdio` también corre sobre Appium, pero como parte de un arquetipo multiplataforma distinto que además cubre web/web_movil/desktop/api): no se mezclan en un mismo proyecto y la elección la determina el ecosistema del equipo, no la preferencia del agente. La desambiguación está en `[[calidad-intent-detection]]`.
 
 Para extender un arquetipo TypeScript/WebdriverIO que ya existe, usar `[[calidad-appium-wdio-brownfield]]`.
 

@@ -4,19 +4,19 @@ version: 1.3.0
 scope: chapter
 type: workflow
 chapter: mobile
-description: Workflow determinista para crear una vista o pantalla Flutter desde Figma,   con componentes DS y capa de presentación d
+description: Deterministic workflow for creating a Flutter view or screen from Figma, using DS components and the app's presentation layer. Do not use this to create a standalone DS component.
 ---
 
-# Workflow: Nueva Vista/Pantalla desde Figma
+# Workflow: New View/Screen from Figma
 
-## Prerrequisitos
+## Prerequisites
 
-- URL de Figma con `node-id`.
-- HU con criterios de aceptación (texto inline o referencia a archivo Markdown).
-- `.copilot/config/project.config.yaml` disponible.
-- Si falta configuración confiable de rutas/topología, ejecutar primero
-  `@ds-orchestrator /bootstrap-workspace`.
-- Contexto resuelto por orquestador:
+- Figma URL with `node-id`.
+- US with acceptance criteria (inline text or reference to a Markdown file).
+- `.copilot/config/project.config.yaml` available.
+- If reliable path/topology configuration is missing, run
+  `@ds-orchestrator /bootstrap-workspace` first.
+- Context resolved by orchestrator:
   - `PROJECT_ROOT`
   - `TARGET_ROOT`
   - `TOPOLOGY_REPO_MODE`
@@ -26,207 +26,207 @@ description: Workflow determinista para crear una vista o pantalla Flutter desde
   - `PIPELINE_SPEC_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
   - `PIPELINE_LOG_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
 
-## Gates obligatorios
+## Mandatory Gates
 
-### Gate 0 — Topología
+### Gate 0 — Topology
 
-1. Validar `TOPOLOGY_REPO_MODE`.
-2. Validar roots (`PROJECT_ROOT`, `TARGET_ROOT`).
-3. En `monorepo_melos`, validar `melos.yaml`, scope y package target.
+1. Validate `TOPOLOGY_REPO_MODE`.
+2. Validate roots (`PROJECT_ROOT`, `TARGET_ROOT`).
+3. In `monorepo_melos`, validate `melos.yaml`, scope, and target package.
 
-### Gate 0.5 — Ownership del Repo App
+### Gate 0.5 — App Repo Ownership
 
-1. `project.config.yaml` debe ser el canónico del repo app:
+1. `project.config.yaml` must be the canonical one in the app repo:
    `{PROJECT_ROOT}/.copilot/config/project.config.yaml`.
-2. `PROJECT_ROOT` no puede ser una librería DS/shared/core.
-3. Señales mínimas de app:
-   - `single_repo | multi_repo`: existe `lib/main.dart` o `lib/main_*.dart`
-     o carpeta `android/` o `ios/`.
-   - `monorepo_melos`: existe `melos.yaml`, package target válido y package
-     objetivo no clasifica como DS/shared/core.
-4. Si falla, bloquear con:
+2. `PROJECT_ROOT` cannot be a DS/shared/core library.
+3. Minimum app signals:
+   - `single_repo | multi_repo`: `lib/main.dart` or `lib/main_*.dart` exists,
+     or an `android/` or `ios/` folder exists.
+   - `monorepo_melos`: `melos.yaml` exists, valid target package, and the
+     target package does not classify as DS/shared/core.
+4. If it fails, block with:
    - `CONFIG_PROJECT_CONFIG_OUTSIDE_APP_REPO`
    - `CONFIG_PROJECT_ROOT_POINTS_TO_LIBRARY`
    - `CONFIG_APP_EXECUTABLE_SIGNAL_MISSING`
 
-### Gate 1 — Arquitectura
+### Gate 1 — Architecture
 
-1. Si `architecture.require_contract_for_new_view=true`, exigir
+1. If `architecture.require_contract_for_new_view=true`, require
    `ARCHITECTURE_CONTRACT_PATH`.
-2. `ARCHITECTURE.md` es opcional como soporte visual.
+2. `ARCHITECTURE.md` is optional as visual support.
 
-### Gate 2 — Política de contratos
+### Gate 2 — Contracts Policy
 
-1. `optional`: continuar.
-2. `generate`: generar contratos mínimos en `§4.C` antes de Fase 3b.
-3. `required`: bloquear si faltan contratos domain/data referenciados.
+1. `optional`: continue.
+2. `generate`: generate minimum contracts in `§4.C` before Phase 3b.
+3. `required`: block if referenced domain/data contracts are missing.
 
-Si falla un gate, terminar con `blocked_input`.
+If a gate fails, end with `blocked_input`.
 
-## Inputs del Usuario
+## User Inputs
 
 ```text
 @ds-orchestrator /new-view
-URL Figma: https://www.figma.com/file/xxx/Screen?node-id=456
-HU: [Referencia a la HU o texto de criterios de aceptación]
-HU_PATH: [Opcional, ruta Markdown; ej: docs/hus/HU-123.md]
+Figma URL: https://www.figma.com/file/xxx/Screen?node-id=456
+US: [Reference to the US or acceptance criteria text]
+US_PATH: [Optional, Markdown path; e.g.: docs/us/US-123.md]
 ```
 
-## Secuencia Canónica
+## Canonical Sequence
 
-### FASE 1 — Análisis de Pantalla
+### PHASE 1 — Screen Analysis
 
-**Agente**: `@figma-analyzer`
+**Agent**: `@figma-analyzer`
 **Prompt**: `figma-analysis.prompt.md`
 
-Output obligatorio:
-- `§1` en `PIPELINE_SPEC_PATH` (incluye `§1.1b` textos literales,
-  `§1.1c` constraints/overflow, `§1.4b`, `§1.3b` y `§1.3c` si existen
-  anotaciones Development/vectores).
-- Registro de fase en `PIPELINE_LOG_PATH`.
+Mandatory output:
+- `§1` in `PIPELINE_SPEC_PATH` (includes `§1.1b` literal texts,
+  `§1.1c` constraints/overflow, `§1.4b`, `§1.3b`, and `§1.3c` if Development/
+  vector annotations exist).
+- Phase log entry in `PIPELINE_LOG_PATH`.
 
 ---
 
-### FASE 2 — Inventario + DAG Extendido
+### PHASE 2 — Extended Inventory + DAG
 
-**Agente**: `@component-planner`
+**Agent**: `@component-planner`
 **Prompt**: `atomic-inventory.prompt.md`
 
-Output obligatorio:
-- `§2` y `§3` en `PIPELINE_SPEC_PATH`.
-- Separación explícita DS vs App.
+Mandatory output:
+- `§2` and `§3` in `PIPELINE_SPEC_PATH`.
+- Explicit DS vs App separation.
 
 ---
 
-### FASE 2.5 — Arquitectura Técnica
+### PHASE 2.5 — Technical Architecture
 
-**Agente**: `@component-architect`
+**Agent**: `@component-architect`
 
-Output obligatorio:
-- `§4` en `PIPELINE_SPEC_PATH` con arquitectura de vista y `§4.B` de textos
-  literales/overflow.
-
----
-
-### FASE 2.6 — Contratos Mínimos (solo `CONTRACTS_POLICY=generate`)
-
-**Agente**: `@component-architect`
-
-Output obligatorio:
-- `§4.C` en `PIPELINE_SPEC_PATH` con contratos mínimos domain/data para
-  consumo de presentación (sin implementación).
+Mandatory output:
+- `§4` in `PIPELINE_SPEC_PATH` with view architecture and `§4.B` for literal
+  texts/overflow.
 
 ---
 
-### CHECKPOINT HUMANO (si aplica)
+### PHASE 2.6 — Minimum Contracts (only `CONTRACTS_POLICY=generate`)
 
-Condición: `pipeline.human_checkpoint: true`.
+**Agent**: `@component-architect`
 
-El orquestador presenta `§1`, `§2-§3`, `§4` y espera aprobación explícita.
-
----
-
-### FASE 3a — Codegen de Componentes DS
-
-**Agente**: `@widget-developer`
-
-Orden obligatorio: átomos → moléculas → organismos.
+Mandatory output:
+- `§4.C` in `PIPELINE_SPEC_PATH` with minimum domain/data contracts for
+  presentation consumption (no implementation).
 
 ---
 
-### FASE 3a.5 — Auditoría de Componentes DS
+### HUMAN CHECKPOINT (if applicable)
 
-**Agente**: `@code-auditor`
+Condition: `pipeline.human_checkpoint: true`.
 
-Loop con `@widget-developer` hasta `pipeline.max_audit_retries`.
+The orchestrator presents `§1`, `§2-§3`, `§4` and waits for explicit approval.
 
 ---
 
-### FASE 3b — Codegen de Vista App
+### PHASE 3a — DS Components Codegen
 
-**Agente**: `@widget-developer`
+**Agent**: `@widget-developer`
+
+Mandatory order: atoms → molecules → organisms.
+
+---
+
+### PHASE 3a.5 — DS Components Audit
+
+**Agent**: `@code-auditor`
+
+Loop with `@widget-developer` up to `pipeline.max_audit_retries`.
+
+---
+
+### PHASE 3b — App View Codegen
+
+**Agent**: `@widget-developer`
 **Prompt**: `codegen-view.prompt.md`
 
 Output:
-- Vista en `structure.views_path`.
-- Widgets privados en `structure.view_widgets_path`.
+- View in `structure.views_path`.
+- Private widgets in `structure.view_widgets_path`.
 
 ---
 
-### FASE 4a — Tests de Componentes DS
+### PHASE 4a — DS Component Tests
 
-**Agente**: `@test-engineer`
+**Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
 
 ---
 
-### FASE 4b — Golden de Componentes DS
+### PHASE 4b — DS Component Goldens
 
-**Agente**: `@golden-test-engineer`
+**Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
 
 ---
 
-### FASE 4c — Widgetbook de Componentes DS
+### PHASE 4c — DS Components Widgetbook
 
-**Agente**: `@widgetbook-developer`
+**Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGETBOOK`)
 
 ---
 
-### FASE 4d — Tests de Vista
+### PHASE 4d — View Tests
 
-**Agente**: `@test-engineer`
+**Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=VIEW_WIDGET_TESTS`)
 
-Cobertura mínima:
+Minimum coverage:
 1. `loading`
 2. `empty`
 3. `error`
 4. `populated`
-5. navegación crítica
-6. textos literales y mitigación de overflow cuando aplique
+5. critical navigation
+6. literal texts and overflow mitigation when applicable
 
 ---
 
-### FASE 4e — Golden Tests de Vista Completa
+### PHASE 4e — Full View Golden Tests
 
-**Agente**: `@golden-test-engineer`
+**Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=VIEW_GOLDEN_TESTS`)
 
-Cobertura mínima:
+Minimum coverage:
 1. `loading`
 2. `empty`
 3. `error`
 4. `populated`
 5. `light/dark`
-6. viewport compacto si existe riesgo de overflow
+6. compact viewport if there is overflow risk
 
 ---
 
-### FASE 4f — Widgetbook de Pantalla App
+### PHASE 4f — App Screen Widgetbook
 
-**Agente**: `@widgetbook-developer`
+**Agent**: `@widgetbook-developer`
 **Prompt**: `test-generation.prompt.md` (`MODE=APP_WIDGETBOOK_SCREENS`, `WIDGETBOOK_SCOPE=APP_SCREENS`)
 
-Cobertura mínima:
+Minimum coverage:
 1. `Default`
 2. `Loading`
-3. `Empty` (si aplica)
-4. `Error` (si aplica)
+3. `Empty` (if applicable)
+4. `Error` (if applicable)
 5. `Populated`
 
 ---
 
-### FASE 5 — Entrega
+### PHASE 5 — Delivery
 
-**Agente**: `@delivery-manager`
+**Agent**: `@delivery-manager`
 **Prompt**: `delivery-review.prompt.md`
 
-Debe:
-1. validar estructura DS/App en `TARGET_ROOT`
-2. actualizar barrel DS solo para componentes DS
-3. usar branch prefix:
-   - `naming.view_branch_prefix` si existe
+Must:
+1. validate DS/App structure in `TARGET_ROOT`
+2. update DS barrel only for DS components
+3. use branch prefix:
+   - `naming.view_branch_prefix` if it exists
    - fallback `naming.branch_prefix`
-4. generar `§7` en `PIPELINE_SPEC_PATH`
+4. generate `§7` in `PIPELINE_SPEC_PATH`

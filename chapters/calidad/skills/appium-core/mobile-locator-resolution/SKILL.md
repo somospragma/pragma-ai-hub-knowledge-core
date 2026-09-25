@@ -15,7 +15,7 @@ tags: [appium, mobile, locators, flutter, semantics, android, ios, agnostico]
 
 Siempre que haya que **escribir o reparar un locator** en una suite Appium, en cualquier plataforma y con cualquier cliente: Java, TypeScript, Python o C#. El problema que resuelve no es del lenguaje sino del árbol de accesibilidad que expone el dispositivo, así que aplica igual desde `AppiumBy` en Java que desde `driver.$()` en WebdriverIO.
 
-Este bundle pertenece al stack `appium-core`, que se instala junto al stack de producto (`appium-serenity` o `appium-wdio`). Los stacks de producto aportan la sintaxis; este aporta el método.
+Este bundle pertenece al stack `appium-core`, que se instala junto al stack de producto (`appium-serenity` o `appium-wdio`). Los stacks de producto aportan la sintaxis; este aporta el método. El stack `serenity-wdio` también cubre mobile Android e iOS, pero no consume este bundle: resuelve locators con su propio conocimiento encapsulado en sus references (Screenplay TypeScript/WebdriverIO); no instalar `appium-core` junto a un proyecto `serenity-wdio`.
 
 ## Lectura obligatoria
 Cuando la aplicación se dibuja sobre lienzo —Flutter y equivalentes—, lo que el driver ve **no es el DOM ni la jerarquía nativa**: es un árbol de semántica con sus propias reglas de localización y de gesto. `[[calidad-flutter-locators-and-gestures]]` es de lectura obligatoria **antes del primer localizador** en ese caso, no cuando los selectores ya fallan.

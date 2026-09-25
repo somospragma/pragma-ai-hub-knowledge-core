@@ -4,14 +4,14 @@ version: 1.0.0
 scope: chapter
 type: skill
 chapter: calidad
-description: "OBLIGATORIO. Convención universal results/{categoría}/{fecha}/ para organización de evidencia en los 4 frameworks. Garantiza diffabilidad, agrupación por HU y compatibilidad con CI."
+description: "OBLIGATORIO. Convención universal results/{categoría}/{fecha}/ para organización de evidencia en los stacks del chapter. Garantiza diffabilidad, agrupación por HU y compatibilidad con CI."
 tags: [evidence, results, structure, universal, mandatory]
 enforcement: mandatory
 ---
 
 # Results Structure — Convención universal `results/{categoría}/{fecha}/`
 
-Convención obligatoria para la organización de evidencia de ejecución en los 4 frameworks. Garantiza diffabilidad entre corridas, agrupación por feature/scenario/HU y compatibilidad con artefactos de CI.
+Convención obligatoria para la organización de evidencia de ejecución en los 5 frameworks. Garantiza diffabilidad entre corridas, agrupación por feature/scenario/HU y compatibilidad con artefactos de CI.
 
 ## Estructura obligatoria
 
@@ -21,6 +21,7 @@ Convención obligatoria para la organización de evidencia de ejecución en los 
 | Playwright | `results/playwright/{YYYY-MM-DD}/{ISO}/` con HTML report, traces, screenshots, `results.json` |
 | K6 | `results/{scenario}/{YYYY-MM-DD}/{ISO}-summary.json` + `{ISO}-metadata.json` (ya cubierto en oleada K6) |
 | Appium | `results/appium/{YYYY-MM-DD}/{ISO}/` con dir serenity report, screenshots, logs |
+| serenity-wdio | `results/serenity-wdio/{YYYY-MM-DD}/{ISO}/` con Allure report, Serenity BDD report, cucumber JSON, video (web), `{ISO}-metadata.json` |
 
 Donde:
 
@@ -113,6 +114,24 @@ serenity {
   outputDirectory = file(resultsDir)
   reports = ['single-page-html']
 }
+```
+
+### serenity-wdio
+
+En `wdio.shared.conf.ts` los reporters (`@wdio/allure-reporter`, `@serenity-js/serenity-bdd`, `wdio-cucumberjs-json-reporter`, `wdio-video-reporter`) se configuran con `outputDir` apuntando a la ruta dinámica. El hook `onComplete` renombra/mueve los artefactos a la estructura canónica:
+
+```typescript
+// wdio.shared.conf.ts (fragmento)
+const today = new Date().toISOString().slice(0, 10);
+const iso = new Date().toISOString().replace(/[:.]/g, '-');
+const RESULTS_BASE = `results/serenity-wdio/${today}/${iso}`;
+
+reporters: [
+  ['allure', { outputDir: `${RESULTS_BASE}/allure-results` }],
+  ['serenity-bdd', { outputDir: `${RESULTS_BASE}/serenity` }],
+  ['cucumberjs-json', { attrAsJSON: true, jsonFolder: `${RESULTS_BASE}/cucumber` }],
+  ['video', { saveAllVideos: false, videoSlowdownMultiplier: 3, outputDir: `${RESULTS_BASE}/video` }],
+],
 ```
 
 ## Cross-links

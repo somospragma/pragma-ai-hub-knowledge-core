@@ -20,7 +20,7 @@ Este archivo es complementario a `[execution-metadata-schema](./execution-metada
 ```json
 {
   "exitCode": 1,
-  "framework": "karate | playwright | k6 | appium",
+  "framework": "karate | playwright | k6 | appium | serenity-wdio",
   "endpoint_or_url": "https://api.example.com",
   "timestamp": "2026-06-05T10:30:15Z",
   "reason": "environment_blocked_waf | environment_blocked_network | environment_auth_fail | environment_rate_limit | environment_dns_fail | environment_device_unavailable | environment_browser_install_missing | environment_jdk_missing_or_wrong",
@@ -114,6 +114,7 @@ ificar el test para evitar el WAF, o relajar matchers para sortear un 403, es **
 | Playwright | Custom reporter `onEnd`: si `failureRate > 0.5` y todos los errores son `net::ERR_*` o `expect status 403`, emite el archivo. Pre-flight script detecta `environment_browser_install_missing` antes de `playwright test`. |
 | K6 | Dentro de `handleSummary` se inspeccionan `http_req_failed`, `http_reqs{status:403}`, y headers vistos. Ver [[calidad-k6-greenfield]] (consultar `references/execution-status-and-blockers.md` en su subfolder). |
 | Appium | Pre-flight script (`preflight-appium.sh`) valida `adb devices`, Appium server y JDK. Gradle `doFirst` aborta y escribe el archivo si el preflight falla. |
+| serenity-wdio | Pre-flight en `scripts/run.mjs` valida conectividad al SUT, Appium server (en modo `movil`) y versión de Node. Si el smoke gate retorna exit ≠ 0 con todos los escenarios en estado `ambiguous` o `broken` por error de red, emite `execution-status.json` vía hook `onComplete` de WebdriverIO. |
 
 ## Cross-links
 

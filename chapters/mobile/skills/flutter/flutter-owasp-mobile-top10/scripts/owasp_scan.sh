@@ -44,13 +44,13 @@ else pass "No obvious hardcoded secrets"; fi
 # ── M2: Supply Chain Security ──────────────────────────────────────────────
 echo ""
 echo "── M2: Supply Chain Security ────────────────"
-if command -v dart &>/dev/null && [ -f "$PROJECT/pubspec.yaml" ]; then
-  AUDIT_OUTPUT=$(cd "$PROJECT" && dart pub audit 2>&1)
-  if echo "$AUDIT_OUTPUT" | grep -qi "affected\|vulnerability"; then
-    fail "dart pub audit found vulnerabilities"
-    echo "$AUDIT_OUTPUT" | head -20
+# Dart/Flutter have NO built-in audit command — scan pubspec.lock with OSV-Scanner.
+if command -v osv-scanner &>/dev/null && [ -f "$PROJECT/pubspec.lock" ]; then
+  if ! (cd "$PROJECT" && osv-scanner --lockfile=pubspec.lock >/dev/null 2>&1); then
+    fail "osv-scanner found known vulnerabilities in dependencies"
+    (cd "$PROJECT" && osv-scanner --lockfile=pubspec.lock 2>&1 | head -20)
   else pass "No known vulnerabilities in dependencies"; fi
-else warn "dart CLI not available — run 'dart pub audit' manually"; fi
+else warn "osv-scanner not available — install it and run 'osv-scanner --lockfile=pubspec.lock'"; fi
 
 if grep -E ":\s*(any|latest)" "$PROJECT/pubspec.yaml" 2>/dev/null | grep -v "#"; then
   fail "Unpinned dependency found (any/latest) — pin to major version"

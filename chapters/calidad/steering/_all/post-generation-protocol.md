@@ -14,7 +14,7 @@ tags: [protocol, mandatory, post-generation, execution, triage, evidence, delive
 
 Después de emitir todos los archivos, ejecutar este protocolo en orden. Saltarse cualquier paso = entrega inválida.
 
-Aplica a los 5 IDEs soportados y a los 4 frameworks del chapter, tanto en greenfield como en brownfield.
+Aplica a los 5 IDEs soportados (Kiro, Claude Code, GitHub Copilot, Amazon Q IDE, Amazon Q CLI) y a los stacks del chapter (Karate, Playwright, K6, Appium Serenity, Appium WebdriverIO, serenity-wdio), tanto en greenfield como en brownfield.
 
 ## Pasos
 

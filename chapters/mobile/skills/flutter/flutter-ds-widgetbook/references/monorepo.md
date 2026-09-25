@@ -1,56 +1,56 @@
-# Monorepo — Configuración de Widgetbook en Monorepositorio
+# Monorepo — Widgetbook Setup in a Monorepository
 
 ---
 
-## Tabla de contenidos
+## Table of contents
 
-1. [Detectar si es monorepo](#1-detectar-si-es-monorepo)
-2. [Elegir estrategia](#2-elegir-estrategia)
-3. [Estrategia A — Single Widgetbook](#3-estrategia-a--single-widgetbook)
-4. [Estrategia B — Per-package Widgetbook](#4-estrategia-b--per-package-widgetbook)
-5. [Configuración con Melos](#5-configuración-con-melos)
-6. [Comandos en monorepo](#6-comandos-en-monorepo)
+1. [Detect whether it's a monorepo](#1-detect-whether-its-a-monorepo)
+2. [Choose a strategy](#2-choose-a-strategy)
+3. [Strategy A — Single Widgetbook](#3-strategy-a--single-widgetbook)
+4. [Strategy B — Per-package Widgetbook](#4-strategy-b--per-package-widgetbook)
+5. [Setup with Melos](#5-setup-with-melos)
+6. [Commands in a monorepo](#6-commands-in-a-monorepo)
 
 ---
 
-## 1. Detectar si es monorepo
+## 1. Detect whether it's a monorepo
 
-Buscar estos indicadores:
+Look for these indicators:
 
-| Indicador | Significado |
+| Indicator | Meaning |
 |---|---|
-| Archivo `melos.yaml` en la raíz | Monorepo gestionado con Melos |
-| Carpeta `packages/` con subcarpetas que tienen `pubspec.yaml` | Monorepo con paquetes compartidos |
-| Carpeta `apps/` con múltiples apps | Monorepo multi-app |
-| Múltiples `pubspec.yaml` en subdirectorios del mismo repositorio | Monorepo manual |
+| A `melos.yaml` file at the root | Monorepo managed with Melos |
+| A `packages/` folder with subfolders that have a `pubspec.yaml` | Monorepo with shared packages |
+| An `apps/` folder with multiple apps | Multi-app monorepo |
+| Multiple `pubspec.yaml` files in subdirectories of the same repository | Manual monorepo |
 
-Si **ninguno** de estos indicadores está presente → usar el setup estándar en `references/setup.md`.
+If **none** of these indicators is present → use the standard setup in `references/setup.md`.
 
 ---
 
-## 2. Elegir estrategia
+## 2. Choose a strategy
 
-| Estrategia | Cuándo usarla | Resultado |
+| Strategy | When to use it | Result |
 |---|---|---|
-| **Single Widgetbook** | Se quiere un catálogo único con componentes de todos los paquetes | Una carpeta `widgetbook_[appname]/` en la raíz del monorepo |
-| **Per-package Widgetbook** | Cada paquete tiene su propio catálogo independiente | Una carpeta `widgetbook_[appname]/` dentro de cada paquete/app |
+| **Single Widgetbook** | You want a single catalog with components from every package | One `widgetbook_[appname]/` folder at the monorepo root |
+| **Per-package Widgetbook** | Each package has its own independent catalog | One `widgetbook_[appname]/` folder inside each package/app |
 
-Si no es claro cuál elegir, **preguntar al usuario**. Si el usuario no tiene preferencia, preferir **Single Widgetbook** por simplicidad.
+If it's unclear which one to choose, **ask the user**. If the user has no preference, prefer **Single Widgetbook** for simplicity.
 
 ---
 
-## 3. Estrategia A — Single Widgetbook
+## 3. Strategy A — Single Widgetbook
 
-Un solo Widgetbook en la raíz del monorepo que cataloga componentes de todos los paquetes.
+A single Widgetbook at the monorepo root that catalogs components from every package.
 
-### Estructura del monorepo
+### Monorepo structure
 
 ```
 monorepo/
 ├── my_app/
 ├── packages/
 │   └── my_design_system/
-└── widgetbook_[appname]/                  ← Widgetbook único para todo el monorepo
+└── widgetbook_[appname]/                  ← Single Widgetbook for the whole monorepo
     ├── pubspec.yaml
     ├── build.yaml
     └── lib/
@@ -64,7 +64,7 @@ monorepo/
 
 ```yaml
 name: widgetbook_workspace
-description: Catálogo de componentes del monorepo
+description: Component catalog for the monorepo
 
 publish_to: none
 
@@ -77,7 +77,7 @@ dependencies:
     sdk: flutter
   widgetbook: ^3.22.0
   widgetbook_annotation: ^3.22.0
-  # Referenciar cada paquete del monorepo que contenga widgets a catalogar
+  # Reference every monorepo package that contains widgets to catalog
   my_design_system:
     path: ../packages/my_design_system
   my_app:
@@ -90,10 +90,10 @@ dev_dependencies:
     sdk: flutter
 ```
 
-> **Clave:** Cada paquete que contenga widgets a catalogar debe aparecer como dependencia
-> con `path:` relativo desde la carpeta `widgetbook_[appname]/`.
+> **Key point:** Every package that contains widgets to catalog must appear as a dependency
+> with a `path:` relative to the `widgetbook_[appname]/` folder.
 
-### build.yaml (igual que setup estándar)
+### build.yaml (same as the standard setup)
 
 ```yaml
 targets:
@@ -104,35 +104,35 @@ targets:
           root_dir: lib
 ```
 
-### Imports en los use cases
+### Imports in the use cases
 
-Los use cases importan widgets usando el nombre del paquete correspondiente:
+Use cases import widgets using the corresponding package name:
 
 ```dart
-// Widget del design system (paquete compartido)
+// Design system widget (shared package)
 import 'package:my_design_system/my_design_system.dart';
 
-// Widget de la app principal
+// Main app widget
 import 'package:my_app/my_app.dart';
 ```
 
 ---
 
-## 4. Estrategia B — Per-package Widgetbook
+## 4. Strategy B — Per-package Widgetbook
 
-Cada paquete o app tiene su propio Widgetbook independiente. Más flexible pero requiere mantener múltiples catálogos.
+Each package or app has its own independent Widgetbook. More flexible, but it requires maintaining multiple catalogs.
 
-### Estructura del monorepo
+### Monorepo structure
 
 ```
 monorepo/
 ├── my_app/
-│   └── widgetbook_my_app/              ← Widgetbook de la app
+│   └── widgetbook_my_app/              ← App Widgetbook
 │       ├── pubspec.yaml
 │       └── lib/
 ├── packages/
 │   └── my_design_system/
-│       └── widgetbook_my_design_system/          ← Widgetbook del design system
+│       └── widgetbook_my_design_system/          ← Design system Widgetbook
 │           ├── pubspec.yaml
 │           └── lib/
 ```
@@ -141,7 +141,7 @@ monorepo/
 
 ```yaml
 name: my_app_widgetbook_workspace
-description: Catálogo de componentes de my_app
+description: Component catalog for my_app
 
 publish_to: none
 
@@ -168,7 +168,7 @@ dev_dependencies:
 
 ```yaml
 name: my_design_system_widgetbook_workspace
-description: Catálogo de componentes del Design System
+description: Component catalog for the Design System
 
 publish_to: none
 
@@ -191,13 +191,13 @@ dev_dependencies:
     sdk: flutter
 ```
 
-> **Nota:** Cada widgetbook referencia **solo** su paquete padre con `path: ../`.
+> **Note:** Each widgetbook references **only** its parent package with `path: ../`.
 
 ---
 
-## 5. Configuración con Melos
+## 5. Setup with Melos
 
-Si el monorepo usa [Melos](https://melos.invertase.dev/) para gestionar dependencias:
+If the monorepo uses [Melos](https://melos.invertase.dev/) to manage dependencies:
 
 ### melos.yaml
 
@@ -207,15 +207,15 @@ name: my_project
 packages:
   - apps/**
   - packages/**
-  - widgetbook_[appname]/          # Single Widgetbook en la raíz
-  # O para per-package:
+  - widgetbook_[appname]/          # Single Widgetbook at the root
+  # Or for per-package:
   # - apps/**/widgetbook_*/
   # - packages/**/widgetbook_*/
 ```
 
-### pubspec.yaml del widgetbook (con Melos)
+### Widgetbook pubspec.yaml (with Melos)
 
-Cuando Melos gestiona las dependencias, usar **versiones** en vez de `path:`:
+When Melos manages dependencies, use **versions** instead of `path:`:
 
 ```yaml
 name: widgetbook_workspace
@@ -225,47 +225,47 @@ dependencies:
     sdk: flutter
   widgetbook: ^3.22.0
   widgetbook_annotation: ^3.11.0
-  my_design_system: ^1.0.0       # Melos resuelve el path automáticamente
-  my_app: ^1.0.0                 # Melos resuelve el path automáticamente
+  my_design_system: ^1.0.0       # Melos resolves the path automatically
+  my_app: ^1.0.0                 # Melos resolves the path automatically
 
 dev_dependencies:
   widgetbook_generator: ^3.22.0
   build_runner:
 ```
 
-Después de configurar, ejecutar:
+After configuring, run:
 
 ```bash
 melos bootstrap
 ```
 
-> **Si hay problemas de dependencias con Melos:** cambiar de versiones (`^1.0.0`) a paths
-> explícitos (`path: ../packages/my_design_system`) o viceversa, según qué resuelva
-> los conflictos.
+> **If you run into dependency issues with Melos:** switch from versions (`^1.0.0`) to explicit
+> paths (`path: ../packages/my_design_system`) or vice versa, depending on which one resolves
+> the conflicts.
 
 ---
 
-## 6. Comandos en monorepo
+## 6. Commands in a monorepo
 
 ```bash
-# Single Widgetbook — desde la raíz del monorepo
+# Single Widgetbook — from the monorepo root
 cd widgetbook_[appname] && flutter pub get
 cd widgetbook_[appname] && dart run build_runner build --delete-conflicting-outputs
 cd widgetbook_[appname] && flutter run -d chrome
 
-# Per-package — desde cada widgetbook individual
+# Per-package — from each individual widgetbook
 cd my_app/widgetbook_my_app && flutter pub get
 cd my_app/widgetbook_my_app && dart run build_runner build --delete-conflicting-outputs
 
 cd packages/my_design_system/widgetbook_my_design_system && flutter pub get
 cd packages/my_design_system/widgetbook_my_design_system && dart run build_runner build --delete-conflicting-outputs
 
-# Con Melos — bootstrap global
+# With Melos — global bootstrap
 melos bootstrap
 ```
 
 ---
 
-## Referencia
+## Reference
 
-Documentación oficial: [docs.widgetbook.io/essentials/monorepo](https://docs.widgetbook.io/essentials/monorepo)
+Official documentation: [docs.widgetbook.io/essentials/monorepo](https://docs.widgetbook.io/essentials/monorepo)

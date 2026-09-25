@@ -15,7 +15,7 @@ Señales de que estás ante este caso, no ante el runner nativo:
 | Comando | `npx playwright test` | `npx cucumber-js --profile web` |
 | Reporte | `playwright-report` | Reporte de Cucumber |
 
-El caso aparece casi siempre por la misma razón: el proyecto necesitaba cubrir web **y** mobile con un vocabulario Gherkin compartido, y Cucumber fue la única capa capaz de orquestar ambos. No es una mala decisión; es una decisión distinta.
+El caso aparece casi siempre por la misma razón: el proyecto necesitaba cubrir web **y** mobile con un vocabulario Gherkin compartido, y Cucumber fue la única capa capaz de orquestar ambos. No es una mala decisión; es una decisión distinta. (Nota informativa: para proyectos **nuevos** con esta misma necesidad, `serenity-wdio` resuelve el mismo problema de forma nativa con un solo arquetipo TypeScript/WebdriverIO/Serenity-JS/Cucumber — ver `[[serenity-wdio-greenfield]]`. Esto no implica proponer migrar un proyecto brownfield existente, ver restricción abajo.)
 
 ## Qué del bundle Playwright sigue aplicando
 

@@ -4,88 +4,88 @@ version: 1.2.0
 scope: chapter
 type: workflow
 chapter: mobile
-description: Workflow determinista para corregir comentarios de Pull Request de forma   trazable. Usar cuando ya existe feedback conc
+description: Deterministic workflow to address Pull Request comments in a traceable way. Use it when concrete feedback already exists
 ---
 
-# Workflow: Corregir Comentarios de PR
+# Workflow: Address PR Comments
 
-## Prerrequisitos
+## Prerequisites
 
-- URL del PR.
-- Comentarios accesibles por conversación, archivo exportado o integración.
-- `.copilot/config/project.config.yaml` válido.
-- Contexto resuelto por orquestador:
+- PR URL.
+- Comments accessible via conversation, exported file, or integration.
+- Valid `.copilot/config/project.config.yaml`.
+- Context resolved by orchestrator:
   - `PROJECT_ROOT`
   - `TARGET_ROOT`
   - `TOPOLOGY_REPO_MODE`
   - `PIPELINE_SPEC_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.spec_file}`
   - `PIPELINE_LOG_PATH = {TARGET_ROOT}/{pipeline.output_dir}/{pipeline.log_file}`
 
-Si no hay comentarios accesibles, terminar con `blocked_input`.
+If no comments are accessible, end with `blocked_input`.
 
-## Gate de Topología
+## Topology Gate
 
-1. Validar `TOPOLOGY_REPO_MODE`.
-2. Validar roots (`PROJECT_ROOT`, `TARGET_ROOT`).
-3. En `monorepo_melos`, validar `melos.yaml`, scope y package target.
+1. Validate `TOPOLOGY_REPO_MODE`.
+2. Validate roots (`PROJECT_ROOT`, `TARGET_ROOT`).
+3. In `monorepo_melos`, validate `melos.yaml`, scope, and target package.
 
-## Secuencia Canónica
+## Canonical Sequence
 
-### FASE 1 — Analizar comentarios y armar plan
+### PHASE 1 — Analyze comments and build the plan
 
-**Agente**: `@component-planner`
+**Agent**: `@component-planner`
 
-Pasos:
-1. Clasificar comentarios por tipo: `[VISUAL]`, `[LÓGICA]`, `[DOCS]`, `[TESTS]`, `[STYLE]`.
-2. Mapear comentario → archivo/área afectada.
-3. Crear plan priorizado.
+Steps:
+1. Classify comments by type: `[VISUAL]`, `[LOGIC]`, `[DOCS]`, `[TESTS]`, `[STYLE]`.
+2. Map comment → affected file/area.
+3. Create a prioritized plan.
 
-Output obligatorio: plan en `PIPELINE_SPEC_PATH`.
-
----
-
-### FASE 2 — Aplicar correcciones de código
-
-**Agente**: `@widget-developer`
-
-Cobertura de categorías:
-- `[VISUAL]`, `[LÓGICA]`, `[STYLE]` → Fase 2
-- `[TESTS]` → Fase 4a/4b
-- `[DOCS]` → Fase 5
+Mandatory output: plan in `PIPELINE_SPEC_PATH`.
 
 ---
 
-### FASE 3 — Auditoría de cobertura de comentarios
+### PHASE 2 — Apply code fixes
 
-**Agente**: `@code-auditor`
+**Agent**: `@widget-developer`
 
-- Verificar matriz comentario→corrección.
-- Si falta cobertura, loop con `@widget-developer`.
-- Escribir reporte en `§5`.
+Category coverage:
+- `[VISUAL]`, `[LOGIC]`, `[STYLE]` → Phase 2
+- `[TESTS]` → Phase 4a/4b
+- `[DOCS]` → Phase 5
 
 ---
 
-### FASE 4a — Actualizar Widget Tests (si impacto funcional)
+### PHASE 3 — Comment coverage audit
 
-**Agente**: `@test-engineer`
+**Agent**: `@code-auditor`
+
+- Verify comment→fix matrix.
+- If coverage is missing, loop with `@widget-developer`.
+- Write report in `§5`.
+
+---
+
+### PHASE 4a — Update Widget Tests (if functional impact)
+
+**Agent**: `@test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_WIDGET_TESTS`)
 
 ---
 
-### FASE 4b — Actualizar Golden Tests (si impacto visual)
+### PHASE 4b — Update Golden Tests (if visual impact)
 
-**Agente**: `@golden-test-engineer`
+**Agent**: `@golden-test-engineer`
 **Prompt**: `test-generation.prompt.md` (`MODE=DS_GOLDEN_TESTS`)
 
 ---
 
-### FASE 5 — Entrega
+### PHASE 5 — Delivery
 
-**Agente**: `@delivery-manager`
+**Agent**: `@delivery-manager`
 
-- Aplicar correcciones `[DOCS]` del plan.
-- Commits por tipo de corrección.
-- Resumen de cobertura de comentarios.
-- Verificación final topology-aware.
+- Apply `[DOCS]` fixes from the plan.
+- Commits per fix type.
+- Comment coverage summary.
+- Final topology-aware verification.
 
-Output obligatorio: `§7` en `PIPELINE_SPEC_PATH` + bitácora.
+Mandatory output: `§7` in `PIPELINE_SPEC_PATH` + log.

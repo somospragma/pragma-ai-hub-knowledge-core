@@ -12,7 +12,7 @@ tags: [mockoon, mock, prompt, service-virtualization, openapi, soap, environment
 
 ## Cuándo invocar este prompt
 
-**Por defecto NO se invoca.** Se activa solo cuando `[[calidad-sut-readiness-gate]]` resolvió `execution_target: mock | hybrid` y el mock requerido es a nivel backend (Karate, K6 smoke, Playwright backend-level, Appium con APK configurable). Gobernado por `[[calidad-service-virtualization-mockoon]]`.
+**Por defecto NO se invoca.** Se activa solo cuando `[[calidad-sut-readiness-gate]]` resolvió `execution_target: mock | hybrid` y el mock requerido es a nivel backend (Karate, K6 smoke, Playwright backend-level, Appium con APK configurable, serenity-wdio modo `api` o backend-level en modos `web`/`web_movil`). Gobernado por `[[calidad-service-virtualization-mockoon]]`.
 
 ## Variables
 
